@@ -1,18 +1,16 @@
 {
+  "name": "admin-farmnport",
+  "version": "0.0.0",
+  "author": "BaRa",
+  "workspaces": [
+    "clients/*"
+  ],
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "dev:admin-fnp": "pnpm --filter  ./apps/admin-fnp run dev",
+    "build:admin-fnp": "nepnpm --filter  ./apps/admin-fnp run build",
+    "start:admin-fnp": "pnpm --filter  ./apps/admin-fnp run start",
+    "lint:admin-fnp": "pnpm --filter  ./apps/admin-fnp run lint"
   },
-  "dependencies": {
-    "react": "18.2.0",
-    "react-dom": "18.2.0"
-  },
-  "devDependencies": {
-    "@types/node": "20.2.5",
-    "@types/react": "18.2.7",
-    "typescript": "5.0.4"
-  }
+  "dependencies": {}
 }
