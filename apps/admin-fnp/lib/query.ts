@@ -11,11 +11,9 @@ var baseUrl = base + version
 var api = axios.create({})
 
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-  var token = null
-
   // Get token in current cookies
 
-  token = Cookies.get("cl_jtkn")
+  const token = Cookies.get("cl_jtkn")
 
   if (token) {
     config.headers["Authorization"] = `Bearer ${token}`
