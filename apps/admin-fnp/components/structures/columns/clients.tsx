@@ -95,7 +95,9 @@ export const clientColumns: ColumnDef<ApplicationUser>[] = [
               Edit
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>View Client Details</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => console.log(client.name)}>
+              View Client Details
+            </DropdownMenuItem>
             <DropdownMenuItem>Verify Client</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
