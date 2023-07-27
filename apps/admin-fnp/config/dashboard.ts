@@ -16,7 +16,7 @@ export const dashboardConfig: DashboardConfig = {
     {
       title: "Administrators",
       href: "/dashboard/admins",
-      icon: "user",
+      icon: "construction",
     },
   ],
 }

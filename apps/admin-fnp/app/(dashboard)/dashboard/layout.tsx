@@ -18,13 +18,13 @@ export default async function DashboardLayout({
           <AdminAccountNavigation />
         </div>
       </header>
-      <div className="container grid flex-1 gap-12 md:grid-cols-[200px_1fr]">
-        <aside className="hidden w-[200px] flex-col md:flex border-r px-4">
+      <div className="container flex flex-1 gap-12">
+        <aside className="hidden w-[200px] flex-col md:flex border-r px-4 fixed h-screen">
           <SidebarNavigation
             navigationLinks={dashboardConfig.sidebarNavigation}
           />
         </aside>
-        <main className="flex w-full flex-1 flex-col overflow-hidden">
+        <main className="flex flex-1 flex-col overflow-hidden sm:ml-64">
           {children}
         </main>
       </div>

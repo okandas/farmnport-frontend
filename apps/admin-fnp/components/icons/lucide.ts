@@ -5,6 +5,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Command,
+  Construction,
   CreditCard,
   File,
   FileText,
@@ -52,4 +53,5 @@ export const Icons = {
   laptop: Laptop,
   twitter: Twitter,
   check: Check,
+  construction: Construction,
 }

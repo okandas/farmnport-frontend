@@ -10,7 +10,7 @@ export default async function DashboardUsersPage() {
         text="Manage Admins."
       ></DashboardHeader>
       <Placeholder>
-        <Placeholder.Icon name="user" />
+        <Placeholder.Icon name="construction" />
         <Placeholder.Title>Work In Progress</Placeholder.Title>
         <Placeholder.Description>
           We are now adding administrators table here.
