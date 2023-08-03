@@ -1,6 +1,7 @@
 "use client"
 
 import { Dispatch, SetStateAction, useState } from "react"
+import { ZoomInIcon } from "@radix-ui/react-icons"
 import {
   ColumnDef,
   flexRender,
@@ -12,6 +13,8 @@ import {
   useReactTable,
 } from "@tanstack/react-table"
 
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import {
   Table,
   TableBody,
@@ -21,8 +24,9 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
+import { provinces } from "../data/data"
+import { FacetedFilter } from "./faceted-filter"
 import { Pagination } from "./pagination"
-import { Toolbar } from "./toolbar"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -30,6 +34,8 @@ interface DataTableProps<TData, TValue> {
   total: number
   pagination: PaginationState
   setPagination: Dispatch<SetStateAction<PaginationState>>
+  searchClient: string
+  setSearchClient: Dispatch<SetStateAction<string>>
 }
 
 export function DataTable<TData, TValue>({
@@ -38,6 +44,8 @@ export function DataTable<TData, TValue>({
   total,
   pagination,
   setPagination,
+  searchClient,
+  setSearchClient,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = useState({})
 
@@ -62,10 +70,46 @@ export function DataTable<TData, TValue>({
     debugTable: true,
   })
 
+  const isFiltered = table.getState().columnFilters.length > 0
+
   return (
     <div className="space-y-8 pb-8">
       <div className="flex justify-end">
-        <Toolbar table={table} />
+        <div className="flex items-center justify-between">
+          <div className="flex flex-1 items-center space-x-2">
+            <Input
+              placeholder="Search for client..."
+              value={searchClient ?? ""}
+              onChange={(event) => setSearchClient(event.target.value)}
+              className="h-8 w-[150px] lg:w-[250px]"
+            />
+            <Button
+              variant="outline"
+              onClick={() => console.log(searchClient)}
+              className="h-8 px-2 lg:px-3"
+            >
+              Search
+              <ZoomInIcon className="ml-2 h-4 w-4" />
+            </Button>
+            {table.getColumn("province") && (
+              <FacetedFilter
+                column={table.getColumn("province")}
+                title="Province"
+                options={provinces}
+              />
+            )}
+            {isFiltered && (
+              <Button
+                variant="ghost"
+                onClick={() => table.resetColumnFilters()}
+                className="h-8 px-2 lg:px-3"
+              >
+                Reset
+                <ZoomInIcon className="ml-2 h-4 w-4" />
+              </Button>
+            )}
+          </div>
+        </div>
       </div>
       <div className="rounded-md border bg-background shadow-sm overflow-x-auto sticky top-0">
         <Table>

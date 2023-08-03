@@ -15,17 +15,21 @@ import { DataTable } from "@/components/structures/components/data-table"
 
 export function AdminClientsTable() {
   const [adminClients, setAdminClients] = useState<ApplicationUser[]>([])
+  const [searchClient, setSearchClient] = useState("")
 
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 1,
-    pageSize: 10,
+    pageSize: 20,
   })
 
   const [total, setTotal] = useState(0)
 
   const { isError, isLoading, isFetching, refetch } = useQuery({
     queryKey: ["dashboard-admin-clients", { p: pagination.pageIndex }],
-    queryFn: () => queryUsersAsAdmin({ p: pagination.pageIndex }),
+    queryFn: () =>
+      queryUsersAsAdmin({
+        p: pagination.pageIndex,
+      }),
     onSuccess(data: AxiosResponse) {
       setAdminClients(data?.data?.data)
       setTotal(data?.data?.total)
@@ -85,6 +89,8 @@ export function AdminClientsTable() {
       total={total}
       pagination={pagination}
       setPagination={setPagination}
+      searchClient={searchClient}
+      setSearchClient={setSearchClient}
     />
   )
 }

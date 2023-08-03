@@ -36,6 +36,7 @@ export function queryAdminLogin(data: FormData) {
 
 type pagintion = {
   p?: number
+  search?: string
 }
 
 export function queryUsersAsAdmin(pagintion?: pagintion) {
@@ -45,6 +46,10 @@ export function queryUsersAsAdmin(pagintion?: pagintion) {
     url = `${baseUrl}/user/clients?p=${pagintion.p}`
   } else {
     url = `${baseUrl}/user/clients`
+  }
+
+  if (pagintion?.search !== undefined && pagintion.search.length >= 2) {
+    url = `${baseUrl}/user/clients?search=${pagintion.search}`
   }
 
   return api.get<ClientDataResponse>(url)
