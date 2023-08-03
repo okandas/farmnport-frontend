@@ -2,7 +2,7 @@ import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 import jwt_decode from "jwt-decode"
 
-import { authenticatedUser } from "./lib/schemas"
+import { AuthenticatedUser } from "./lib/schemas"
 
 // This function can be marked `async` if using `await` inside
 export function middleware(request: NextRequest) {
@@ -23,7 +23,7 @@ export function middleware(request: NextRequest) {
     if (isToken) {
       const token = cookie?.value
 
-      const decodedSession = jwt_decode<authenticatedUser>(token)
+      const decodedSession = jwt_decode<AuthenticatedUser>(token)
 
       console.log(decodedSession)
 

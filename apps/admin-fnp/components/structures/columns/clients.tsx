@@ -1,9 +1,12 @@
+"use client"
+
+import Link from "next/link"
 import { ColumnDef } from "@tanstack/react-table"
 import { PhoneNumberFormat } from "google-libphonenumber"
 import { MoreHorizontal } from "lucide-react"
 
 import { ApplicationUser } from "@/lib/schemas"
-import { phoneUtility } from "@/lib/utilities"
+import { phoneUtility, slug } from "@/lib/utilities"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
@@ -95,8 +98,10 @@ export const clientColumns: ColumnDef<ApplicationUser>[] = [
               Edit
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => console.log(client.name)}>
-              View Client Details
+            <DropdownMenuItem>
+              <Link href={`/dashboard/users/${slug(client.name)}`}>
+                View Client Details
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuItem>Verify Client</DropdownMenuItem>
           </DropdownMenuContent>

@@ -1,6 +1,7 @@
 import {
   AlertTriangle,
   ArrowRight,
+  BadgeCheck,
   Check,
   ChevronLeft,
   ChevronRight,
@@ -18,6 +19,7 @@ import {
   MoreVertical,
   Pizza,
   Plus,
+  Search,
   Settings,
   SunMedium,
   Trash,
@@ -54,4 +56,6 @@ export const Icons = {
   twitter: Twitter,
   check: Check,
   construction: Construction,
+  badgeCheck: BadgeCheck,
+  search: Search,
 }
