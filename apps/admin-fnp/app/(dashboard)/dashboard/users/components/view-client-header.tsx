@@ -67,12 +67,12 @@ export default function ViewClientHeader({ params }: ViewClientHeaderProps) {
 
   return (
     <header className="gap-2 pb-2 border-b">
-      <div className="flex justify-between max-w-2xl">
+      <div className="flex max-w-2xl">
         <Avatar className="w-32 h-32 mb-1 mr-4">
           <AvatarImage />
           <AvatarFallback>{makeAbbveriation(adminClient?.name)}</AvatarFallback>
         </Avatar>
-        <p className="leading-7 [&:not(:first-child)]:mt-5">
+        <p className="leading-7 [&:not(:first-child)]:mt-5 shrink mr-2">
           {adminClient?.short_description}
         </p>
         <div>
