@@ -9,27 +9,25 @@ import { useForm } from "react-hook-form"
 import * as z from "zod"
 
 import { queryAdminLogin } from "@/lib/query"
-import { adminAuthSchema } from "@/lib/schemas"
+import { AdminAuthSchema } from "@/lib/schemas"
 import { cn } from "@/lib/utilities"
 import { buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ToastAction } from "@/components/ui/toast"
-import { useToast } from "@/components/ui/use-toast"
+import { toast } from "@/components/ui/use-toast"
 import { Icons } from "@/components/icons/lucide"
 
 interface AdminAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
-type FormData = z.infer<typeof adminAuthSchema>
+type FormData = z.infer<typeof AdminAuthSchema>
 
 export function AdminAuthForm({ className, ...props }: AdminAuthFormProps) {
   const { register, handleSubmit, formState } = useForm<FormData>({
-    resolver: zodResolver(adminAuthSchema),
+    resolver: zodResolver(AdminAuthSchema),
   })
 
   const router = useRouter()
-
-  const { toast } = useToast()
 
   const { errors } = formState
 

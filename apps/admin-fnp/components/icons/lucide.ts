@@ -1,10 +1,12 @@
 import {
   AlertTriangle,
   ArrowRight,
+  BadgeCheck,
   Check,
   ChevronLeft,
   ChevronRight,
   Command,
+  Construction,
   CreditCard,
   File,
   FileText,
@@ -17,6 +19,7 @@ import {
   MoreVertical,
   Pizza,
   Plus,
+  Search,
   Settings,
   SunMedium,
   Trash,
@@ -52,4 +55,7 @@ export const Icons = {
   laptop: Laptop,
   twitter: Twitter,
   check: Check,
+  construction: Construction,
+  badgeCheck: BadgeCheck,
+  search: Search,
 }
