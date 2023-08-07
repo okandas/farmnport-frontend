@@ -1,26 +1,29 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import { useQuery } from "@tanstack/react-query"
 import { AxiosError, AxiosResponse, isAxiosError } from "axios"
 
 import { queryUserAsAdmin } from "@/lib/query"
 import { ApplicationUser } from "@/lib/schemas"
-import { makeAbbveriation } from "@/lib/utilities"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
+import { cn } from "@/lib/utilities"
+import { buttonVariants } from "@/components/ui/button"
 import { ToastAction } from "@/components/ui/toast"
 import { toast } from "@/components/ui/use-toast"
+import { AdminEditForm } from "@/components/forms/adminClientEdit"
 import { Icons } from "@/components/icons/lucide"
+import { Placeholder } from "@/components/state/placeholder"
 
-interface ViewClientHeaderProps {
+interface EditClientPageProps {
   params: {
     slug: string
   }
 }
 
-export default function ViewClientHeader({ params }: ViewClientHeaderProps) {
+export default function EditClientPage({ params }: EditClientPageProps) {
   const name = params.slug
+  const url = `/dashboard/users/${name}`
 
   const [adminClient, setAdminClient] = useState<ApplicationUser>()
 
@@ -58,35 +61,47 @@ export default function ViewClientHeader({ params }: ViewClientHeaderProps) {
   })
 
   if (isError) {
-    return null
+    return (
+      <div className="mt-20">
+        <Placeholder>
+          <Placeholder.Icon name="close" />
+          <Placeholder.Title>Error Fetching User</Placeholder.Title>
+          <Placeholder.Description>
+            Error Fetching user from the database
+          </Placeholder.Description>
+        </Placeholder>
+      </div>
+    )
   }
 
   if (isLoading || isFetching) {
-    return null
+    return (
+      <div className="mt-20">
+        <Placeholder>
+          <Placeholder.Icon name="search" />
+          <Placeholder.Title>Is Fetching User</Placeholder.Title>
+          <Placeholder.Description>
+            Fetching user from the database
+          </Placeholder.Description>
+        </Placeholder>
+      </div>
+    )
   }
 
-  const stroke = adminClient?.verified ? "stroke-green-500" : "stroke-red-500"
-
   return (
-    <header className="gap-2 pb-2 border-b">
-      <div className="flex max-w-2xl">
-        <Avatar className="w-32 h-32 mb-1 mr-4">
-          <AvatarImage />
-          <AvatarFallback>{makeAbbveriation(adminClient?.name)}</AvatarFallback>
-        </Avatar>
-        <p className="leading-7 [&:not(:first-child)]:mt-5 shrink mr-2">
-          {adminClient?.short_description}
-        </p>
-        <div>
-          <Icons.badgeCheck className={`w-6 h-6 mt-6 ${stroke}`} />
-        </div>
+    <>
+      <div className={"absolute right-10 top-96"}>
+        <Link href={url} className={cn(buttonVariants({ variant: "link" }))}>
+          <>
+            <Icons.close className="w-4 h-4 mr-2" />
+            Close
+          </>
+        </Link>
       </div>
-      <h2 className="text-3xl font-semibold tracking-tight transition-colors scroll-m-20 first:mt-4">
-        {name}
-      </h2>
-      <div className="leading-7 [&:not(:first-child)]:mt-2 mb-4">
-        <Badge variant="outline">{adminClient?.type}</Badge>
-      </div>
-    </header>
+
+      {adminClient !== undefined ? (
+        <AdminEditForm client={adminClient} />
+      ) : null}
+    </>
   )
 }

@@ -49,3 +49,21 @@ export type ApplicationUser = {
   admin: Record<string, string | boolean>
   phase: string
 }
+
+export type AdminEditApplicationUser = Pick<
+  ApplicationUser,
+  | "id"
+  | "name"
+  | "email"
+  | "address"
+  | "city"
+  | "province"
+  | "phone"
+  | "main_activity"
+  | "specialization"
+  | "specializations"
+  | "type"
+  | "scale"
+  | "branches"
+  | "short_description"
+>
