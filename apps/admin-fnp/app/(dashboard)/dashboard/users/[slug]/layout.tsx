@@ -25,7 +25,7 @@ export default async function ViewClientLayout({
           href="/dashboard/users"
           className={cn(
             buttonVariants({ variant: "ghost" }),
-            "absolute right-5 top-24-"
+            "absolute right-5 top-24"
           )}
         >
           <>

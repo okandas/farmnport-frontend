@@ -1,42 +1,58 @@
+import { string } from "zod"
+
 export const provinces = [
-  {
-    label: "Bulawayo",
-    value: "bulawayo",
-  },
-  {
-    label: "Harare",
-    value: "harare",
-  },
-  {
-    label: "Manicaland",
-    value: "manicaland",
-  },
-  {
-    label: "Mashonaland Central",
-    value: "mashonaland central",
-  },
-  {
-    label: "Mashonaland East",
-    value: "mashonaland east",
-  },
-  {
-    label: "Mashonaland West",
-    value: "mashonaland west",
-  },
-  {
-    label: "Masvingo",
-    value: "masvingo",
-  },
-  {
-    label: "Matabeleland North",
-    value: "matabeleland north",
-  },
-  {
-    label: "Matabeleland South",
-    value: "matabeleland south",
-  },
-  {
-    label: "Midlands",
-    value: "midlands",
-  },
+  "bulawayo",
+  "harare",
+  "manicaland",
+  "mashonaland central",
+  "mashonaland east",
+  "mashonaland west",
+  "masvingo",
+  "matabeleland north",
+  "matabeleland south",
+  "midlands",
 ]
+
+export const specializations = [
+  "horticulture",
+  "dairy",
+  "aquaculture",
+  "plantation",
+  "livestock",
+  "grain",
+  "manufacturing",
+  "hospitality",
+  "poultry",
+  "pastures",
+]
+
+export const clientTypes = ["farmer", "buyer", "exporter", "importer"]
+
+export const scales = ["small", "medium", "large"]
+
+export const mainActivity: Record<string, string[]> = {
+  horticulture: ["tomato", "onion", "lettuce", "potato", "sweet potato"],
+  livestock: ["pork", "beef", "cattle", "goat", "sheep"],
+  dairy: ["milk"],
+  aquaculture: ["bream", "kapenta"],
+  grain: ["maize", "soya bean", "wheat", "groundnut", "sugar bean"],
+  plantation: [
+    "orange",
+    "apple",
+    "peacan nut",
+    "banana",
+    "mango",
+    "avocado",
+    "pineapple",
+    "blueberry",
+    "plum",
+    "melon",
+    "grape",
+    "passion fruit",
+    "granadilla",
+  ],
+  manufacturing: ["food processing"],
+  hospitality: ["catering"],
+  poultry: ["chicken", "turkey"],
+  pastures: ["katambora"],
+}

@@ -1,4 +1,5 @@
 import { clsx, type ClassValue } from "clsx"
+import { format } from "date-fns"
 import { PhoneNumberUtil } from "google-libphonenumber"
 import slugify from "slugify"
 import { twMerge } from "tailwind-merge"
@@ -9,7 +10,8 @@ export function cn(...inputs: ClassValue[]) {
 
 export const phoneUtility = PhoneNumberUtil.getInstance()
 
-export function slug(name: string): string {
+export function slug(name?: string): string {
+  if (name === undefined) return ""
   const slugged = slugify(name, {
     replacement: "-",
     remove: /[*+~.()'"!:@]/g,
@@ -43,4 +45,10 @@ export function makeAbbveriation(str?: string) {
     abbv = "FP"
     return abbv
   }
+}
+
+export function formatDate(d?: string) {
+  if (d === undefined) return ""
+  const date = new Date(d)
+  return format(date, "dd MMMM yyyy")
 }

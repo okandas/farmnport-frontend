@@ -6,9 +6,11 @@ import { AxiosError, AxiosResponse, isAxiosError } from "axios"
 
 import { queryUserAsAdmin } from "@/lib/query"
 import { ApplicationUser } from "@/lib/schemas"
+import { formatDate } from "@/lib/utilities"
 import { ToastAction } from "@/components/ui/toast"
 import { toast } from "@/components/ui/use-toast"
 import { Placeholder } from "@/components/state/placeholder"
+import { AdminControlDropDown } from "@/components/structures/components/control-dropdown"
 
 interface ViewClientPageProps {
   params: {
@@ -52,6 +54,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
       }
     },
     refetchOnWindowFocus: false,
+    staleTime: 10000,
   })
 
   if (isError) {
@@ -84,6 +87,10 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
 
   return (
     <>
+      <div className={"absolute right-10 top-64"}>
+        <AdminControlDropDown client={adminClient} />
+      </div>
+
       <section className="grid grid-cols-2 gap-2 mb-3">
         <aside className="max-w-sm lg:max-w-md">
           <div className="flex justify-start [&:not(:first-child)]:my-3">
@@ -114,7 +121,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
             <div className="w-40 leading-7">Joined</div>
             <div className="leading-7">
               <p className="text-base font-semibold tracking-tight">
-                {adminClient?.created}
+                {formatDate(adminClient?.created)}
               </p>
             </div>
           </div>
@@ -182,10 +189,10 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
             Other Specializations
           </h4>
         </header>
-        <div className="flex flex-wrap justify-start my-7 w-3/4">
+        <div className="flex flex-wrap justify-start w-3/4 my-7">
           {adminClient?.specializations.map((specialization) => {
             return (
-              <div className="mt-2 mr-2 tracking-tight rounded-md p-2 border">
+              <div className="p-2 mt-2 mr-2 tracking-tight border rounded-md">
                 {specialization}
               </div>
             )

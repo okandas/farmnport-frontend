@@ -1,22 +1,12 @@
 "use client"
 
-import Link from "next/link"
 import { ColumnDef } from "@tanstack/react-table"
 import { PhoneNumberFormat } from "google-libphonenumber"
-import { MoreHorizontal } from "lucide-react"
 
 import { ApplicationUser } from "@/lib/schemas"
-import { phoneUtility, slug } from "@/lib/utilities"
-import { Button } from "@/components/ui/button"
+import { phoneUtility } from "@/lib/utilities"
 import { Checkbox } from "@/components/ui/checkbox"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+import { AdminControlDropDown } from "@/components/structures/components/control-dropdown"
 
 export const clientColumns: ColumnDef<ApplicationUser>[] = [
   {
@@ -61,7 +51,7 @@ export const clientColumns: ColumnDef<ApplicationUser>[] = [
         PhoneNumberFormat.INTERNATIONAL
       )
       return (
-        <div className="text-right font-medium">
+        <div className="font-medium text-right">
           <a href={`tel:${formatted}`}>{formatted}</a>
         </div>
       )
@@ -82,31 +72,9 @@ export const clientColumns: ColumnDef<ApplicationUser>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      const client = row.original
+      const client = row?.original
 
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => console.log(client.id)}>
-              Edit
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <Link href={`/dashboard/users/${slug(client.name)}`}>
-                View Client Details
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem>Verify Client</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )
+      return <AdminControlDropDown client={client} />
     },
   },
 ]

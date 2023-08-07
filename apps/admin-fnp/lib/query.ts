@@ -4,6 +4,8 @@ import * as z from "zod"
 
 import {
   AdminAuthSchema,
+  AdminEditApplicationUser,
+  ApplicationUser,
   ClientDataResponse,
   LoginResponse,
 } from "@/lib/schemas"
@@ -59,4 +61,9 @@ export function queryUserAsAdmin(name: string) {
   const url = `${baseUrl}/user/${name}`
 
   return api.get<ClientDataResponse>(url)
+}
+
+export function updateClientAsAdmin(data: AdminEditApplicationUser) {
+  var url = `${baseUrl}/user/update_client`
+  return api.post<ApplicationUser>(url, data)
 }

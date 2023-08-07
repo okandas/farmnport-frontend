@@ -23,9 +23,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { Icons } from "@/components/icons/lucide"
 
-import { provinces } from "../data/data"
-import { FacetedFilter } from "./faceted-filter"
 import { Pagination } from "./pagination"
 
 interface DataTableProps<TData, TValue> {
@@ -49,6 +48,8 @@ export function DataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = useState({})
 
+  const pageCount = Math.floor(total / pagination.pageSize)
+
   const table = useReactTable({
     data,
     columns,
@@ -65,18 +66,17 @@ export function DataTable<TData, TValue>({
     state: {
       rowSelection,
     },
-    pageCount: total,
     manualPagination: true,
-    debugTable: true,
+    pageCount: pageCount,
   })
 
   const isFiltered = table.getState().columnFilters.length > 0
 
   return (
-    <div className="space-y-8 pb-8">
+    <div className="pb-8 space-y-8">
       <div className="flex justify-end">
         <div className="flex items-center justify-between">
-          <div className="flex flex-1 items-center space-x-2">
+          <div className="flex items-center flex-1 space-x-2">
             <Input
               placeholder="Search for client..."
               value={searchClient ?? ""}
@@ -89,15 +89,8 @@ export function DataTable<TData, TValue>({
               className="h-8 px-2 lg:px-3"
             >
               Search
-              <ZoomInIcon className="ml-2 h-4 w-4" />
+              <Icons.search className="w-4 h-4 ml-2" />
             </Button>
-            {table.getColumn("province") && (
-              <FacetedFilter
-                column={table.getColumn("province")}
-                title="Province"
-                options={provinces}
-              />
-            )}
             {isFiltered && (
               <Button
                 variant="ghost"
@@ -105,13 +98,13 @@ export function DataTable<TData, TValue>({
                 className="h-8 px-2 lg:px-3"
               >
                 Reset
-                <ZoomInIcon className="ml-2 h-4 w-4" />
+                <Icons.close className="w-4 h-4 ml-2" />
               </Button>
             )}
           </div>
         </div>
       </div>
-      <div className="rounded-md border bg-background shadow-sm overflow-x-auto sticky top-0">
+      <div className="sticky top-0 overflow-x-auto border rounded-md shadow-sm bg-background">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -132,7 +125,7 @@ export function DataTable<TData, TValue>({
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {table?.getRowModel()?.rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
