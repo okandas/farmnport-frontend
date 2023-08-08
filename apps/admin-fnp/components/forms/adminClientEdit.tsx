@@ -302,7 +302,11 @@ export function AdminEditForm({ client }: AdminEditFormProps) {
                 <FormControl>
                   <Select
                     onValueChange={field.onChange}
-                    defaultValue={client?.main_activity}
+                    defaultValue={
+                      client?.main_activity ??
+                      "Please Pick A Specialization First"
+                    }
+                    disabled={changingSpecialization.length === 0}
                   >
                     <FormControl>
                       <SelectTrigger>
