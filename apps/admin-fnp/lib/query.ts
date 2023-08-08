@@ -3,6 +3,7 @@ import Cookies from "js-cookie"
 import * as z from "zod"
 
 import {
+  AdminApplicationUserID,
   AdminAuthSchema,
   AdminEditApplicationUser,
   ApplicationUser,
@@ -65,5 +66,10 @@ export function queryUserAsAdmin(name: string) {
 
 export function updateClientAsAdmin(data: AdminEditApplicationUser) {
   var url = `${baseUrl}/user/update_client`
+  return api.post<ApplicationUser>(url, data)
+}
+
+export function verifyClientAsAdmin(data: AdminApplicationUserID) {
+  var url = `${baseUrl}/user/verify_client`
   return api.post<ApplicationUser>(url, data)
 }

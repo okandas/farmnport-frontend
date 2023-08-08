@@ -192,7 +192,10 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
         <div className="flex flex-wrap justify-start w-3/4 my-7">
           {adminClient?.specializations.map((specialization) => {
             return (
-              <div className="p-2 mt-2 mr-2 tracking-tight border rounded-md">
+              <div
+                className="p-2 mt-2 mr-2 tracking-tight border rounded-md"
+                key={specialization}
+              >
                 {specialization}
               </div>
             )

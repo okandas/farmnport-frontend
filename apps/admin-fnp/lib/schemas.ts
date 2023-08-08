@@ -67,3 +67,5 @@ export type AdminEditApplicationUser = Pick<
   | "branches"
   | "short_description"
 >
+
+export type AdminApplicationUserID = Pick<ApplicationUser, "id">
