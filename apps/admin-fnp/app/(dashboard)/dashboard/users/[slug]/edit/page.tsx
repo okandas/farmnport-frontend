@@ -11,9 +11,9 @@ import { cn } from "@/lib/utilities"
 import { buttonVariants } from "@/components/ui/button"
 import { ToastAction } from "@/components/ui/toast"
 import { toast } from "@/components/ui/use-toast"
-import { AdminEditForm } from "@/components/forms/adminClientEdit"
 import { Icons } from "@/components/icons/lucide"
 import { Placeholder } from "@/components/state/placeholder"
+import { AdminEditForm } from "@/components/structures/forms/adminClientEdit"
 
 interface EditClientPageProps {
   params: {

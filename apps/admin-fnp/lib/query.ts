@@ -64,6 +64,11 @@ export function queryUserAsAdmin(name: string) {
   return api.get<ClientDataResponse>(url)
 }
 
+export function createClientAsAdmin(data: AdminEditApplicationUser) {
+  var url = `${baseUrl}/user/add_client`
+  return api.post<ApplicationUser>(url, data)
+}
+
 export function updateClientAsAdmin(data: AdminEditApplicationUser) {
   var url = `${baseUrl}/user/update_client`
   return api.post<ApplicationUser>(url, data)

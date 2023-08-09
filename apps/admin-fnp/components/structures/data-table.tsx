@@ -1,7 +1,7 @@
 "use client"
 
 import { Dispatch, SetStateAction, useState } from "react"
-import { ZoomInIcon } from "@radix-ui/react-icons"
+import Link from "next/link"
 import {
   ColumnDef,
   flexRender,
@@ -13,7 +13,8 @@ import {
   useReactTable,
 } from "@tanstack/react-table"
 
-import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utilities"
+import { Button, buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
   Table,
@@ -72,35 +73,50 @@ export function DataTable<TData, TValue>({
 
   const isFiltered = table.getState().columnFilters.length > 0
 
+  const url = "/dashboard/users/new"
+
   return (
     <div className="pb-8 space-y-8">
-      <div className="flex justify-end">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center flex-1 space-x-2">
-            <Input
-              placeholder="Search for client..."
-              value={searchClient ?? ""}
-              onChange={(event) => setSearchClient(event.target.value)}
-              className="h-8 w-[150px] lg:w-[250px]"
-            />
-            <Button
-              variant="outline"
-              onClick={() => console.log(searchClient)}
-              className="h-8 px-2 lg:px-3"
-            >
-              Search
-              <Icons.search className="w-4 h-4 ml-2" />
-            </Button>
-            {isFiltered && (
+      <div className="flex justify-between">
+        <div className="flex justify-start">
+          <Link
+            href={url}
+            className={cn(buttonVariants({ variant: "outline" }))}
+          >
+            <>
+              New User
+              <Icons.add className="w-4 h-4 ml-2" />
+            </>
+          </Link>
+        </div>
+        <div className="flex justify-end">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center flex-1 space-x-2">
+              <Input
+                placeholder="Search for client..."
+                value={searchClient ?? ""}
+                onChange={(event) => setSearchClient(event.target.value)}
+                className="h-8 w-[150px] lg:w-[250px]"
+              />
               <Button
-                variant="ghost"
-                onClick={() => table.resetColumnFilters()}
+                variant="outline"
+                onClick={() => console.log(searchClient)}
                 className="h-8 px-2 lg:px-3"
               >
-                Reset
-                <Icons.close className="w-4 h-4 ml-2" />
+                Search
+                <Icons.search className="w-4 h-4 ml-2" />
               </Button>
-            )}
+              {isFiltered && (
+                <Button
+                  variant="ghost"
+                  onClick={() => table.resetColumnFilters()}
+                  className="h-8 px-2 lg:px-3"
+                >
+                  Reset
+                  <Icons.close className="w-4 h-4 ml-2" />
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       </div>

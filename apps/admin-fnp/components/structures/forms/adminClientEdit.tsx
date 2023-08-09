@@ -1,14 +1,18 @@
 "use client"
 
 import { useState } from "react"
-import { usePathname, useRouter } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation } from "@tanstack/react-query"
 import { isAxiosError } from "axios"
 import { useForm, useWatch } from "react-hook-form"
 
 import { updateClientAsAdmin } from "@/lib/query"
-import { AdminEditApplicationUser, ApplicationUser } from "@/lib/schemas"
+import {
+  AdminEditApplicationUser,
+  AdminEditApplicationUserSchema,
+  ApplicationUser,
+} from "@/lib/schemas"
 import { cn, slug } from "@/lib/utilities"
 import { Badge } from "@/components/ui/badge"
 import { buttonVariants } from "@/components/ui/button"
@@ -54,7 +58,7 @@ import {
   provinces,
   scales,
   specializations,
-} from "../structures/data/data"
+} from "../data/data"
 
 interface AdminEditFormProps extends React.HTMLAttributes<HTMLDivElement> {
   client: ApplicationUser
@@ -78,6 +82,7 @@ export function AdminEditForm({ client }: AdminEditFormProps) {
       branches: client?.branches,
       short_description: client?.short_description,
     },
+    resolver: zodResolver(AdminEditApplicationUserSchema),
   })
 
   const selectedSpecializations = useWatch({
@@ -229,36 +234,7 @@ export function AdminEditForm({ client }: AdminEditFormProps) {
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="province"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Province</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={client?.province}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select Province..." />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent className="overflow-visible max-h-44">
-                    {provinces.map((province) => {
-                      return (
-                        <SelectItem key={province} value={province}>
-                          {province}
-                        </SelectItem>
-                      )
-                    })}
-                  </SelectContent>
-                </Select>
-                <FormDescription></FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+
           <FormField
             control={form.control}
             name="specialization"
@@ -293,6 +269,38 @@ export function AdminEditForm({ client }: AdminEditFormProps) {
               </FormItem>
             )}
           />
+
+          <FormField
+            control={form.control}
+            name="province"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Province</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={client?.province}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select Province..." />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent className="overflow-visible max-h-44">
+                    {provinces.map((province) => {
+                      return (
+                        <SelectItem key={province} value={province}>
+                          {province}
+                        </SelectItem>
+                      )
+                    })}
+                  </SelectContent>
+                </Select>
+                <FormDescription></FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           <FormField
             control={form.control}
             name="main_activity"
@@ -306,7 +314,7 @@ export function AdminEditForm({ client }: AdminEditFormProps) {
                       client?.main_activity ??
                       "Please Pick A Specialization First"
                     }
-                    disabled={changingSpecialization.length === 0}
+                    disabled={changingSpecialization?.length === 0}
                   >
                     <FormControl>
                       <SelectTrigger>
@@ -341,17 +349,21 @@ export function AdminEditForm({ client }: AdminEditFormProps) {
                     <PopoverTrigger asChild>
                       <div className="px-3 py-2 text-sm border rounded-md min-h-[2.5rem] group border-input ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-0">
                         <div className="flex flex-wrap gap-1">
-                          {selectedSpecializations?.map((selected) => {
-                            return (
-                              <Badge
-                                key={selected}
-                                variant="outline"
-                                className="flex justify-between text-green-800 bg-green-100 border-green-400"
-                              >
-                                {selected}
-                              </Badge>
-                            )
-                          })}
+                          {selectedSpecializations.length > 1
+                            ? selectedSpecializations?.map((selected) => {
+                                if (selected.length !== 0) {
+                                  return (
+                                    <Badge
+                                      key={selected}
+                                      variant="outline"
+                                      className="flex justify-between text-green-800 bg-green-100 border-green-400"
+                                    >
+                                      {selected}
+                                    </Badge>
+                                  )
+                                }
+                              })
+                            : "Select Specialization ..."}
                         </div>
                       </div>
                     </PopoverTrigger>
@@ -430,7 +442,6 @@ export function AdminEditForm({ client }: AdminEditFormProps) {
                     </PopoverContent>
                   </Popover>
                 </FormControl>
-
                 <FormMessage />
               </FormItem>
             )}
@@ -517,9 +528,13 @@ export function AdminEditForm({ client }: AdminEditFormProps) {
             )}
           />
         </div>
-        <button className={cn(buttonVariants(), "mt-5")} disabled={isLoading}>
+        <button
+          type="submit"
+          className={cn(buttonVariants(), "mt-5")}
+          disabled={isLoading}
+        >
           {isLoading && <Icons.spinner className="w-4 h-4 mr-2 animate-spin" />}
-          Update Client
+          Submit
         </button>
       </form>
     </Form>

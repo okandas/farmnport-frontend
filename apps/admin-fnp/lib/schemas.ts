@@ -25,47 +25,78 @@ export type ClientDataResponse = {
   data: ApplicationUser[]
 }
 
-export type ApplicationUser = {
-  id: string
-  name: string
-  short_description: string
-  scale: string
-  code: string
-  phone: string
-  branches: number
-  email: string
-  address: string
-  city: string
-  province: string
-  specialization: string
-  main_activity: string
-  specializations: string[]
-  created: string
-  updated: string
-  verified: boolean
-  confirmed: boolean
-  location: Record<string, string | number[]>
-  type: string
-  admin: Record<string, string | boolean>
-  phase: string
-}
+export const ApplicationUserSchema = z.object({
+  id: z.string(),
+  name: z.string().min(4),
+  short_description: z.string().optional(),
+  scale: z.string().nonempty(),
+  code: z.string(),
+  phone: z.string().min(5),
+  branches: z.coerce.number().positive(),
+  email: z.string().nonempty().email(),
+  address: z.string().min(10),
+  city: z.string().min(5).nonempty(),
+  province: z.string().nonempty(),
+  specialization: z.string().nonempty(),
+  main_activity: z.string().nonempty(),
+  specializations: z.array(z.string().trim()).min(1),
+  created: z.string(),
+  updated: z.string(),
+  confirmed: z.boolean(),
+  type: z.string().nonempty(),
+  phase: z.string(),
+  admin: z.object({
+    id: z.string(),
+    name: z.boolean(),
+  }),
+  location: z.object({
+    type: z.string(),
+    coordinates: z.array(z.number()),
+  }),
+  verified: z.boolean(),
+})
 
-export type AdminEditApplicationUser = Pick<
-  ApplicationUser,
-  | "id"
-  | "name"
-  | "email"
-  | "address"
-  | "city"
-  | "province"
-  | "phone"
-  | "main_activity"
-  | "specialization"
-  | "specializations"
-  | "type"
-  | "scale"
-  | "branches"
-  | "short_description"
+ApplicationUserSchema.required({
+  name: true,
+  scale: true,
+  phone: true,
+  email: true,
+  address: true,
+  city: true,
+  province: true,
+  main_activity: true,
+  specialization: true,
+  specializations: true,
+  type: true,
+})
+
+export const AdminEditApplicationUserSchema = ApplicationUserSchema.pick({
+  id: true,
+  name: true,
+  email: true,
+  address: true,
+  city: true,
+  province: true,
+  phone: true,
+  main_activity: true,
+  specialization: true,
+  specializations: true,
+  type: true,
+  scale: true,
+  branches: true,
+  short_description: true,
+})
+
+export const AdminApplicationUserIDSchema = ApplicationUserSchema.pick({
+  id: true,
+})
+
+export type ApplicationUser = z.infer<typeof ApplicationUserSchema>
+
+export type AdminEditApplicationUser = z.infer<
+  typeof AdminEditApplicationUserSchema
 >
 
-export type AdminApplicationUserID = Pick<ApplicationUser, "id">
+export type AdminApplicationUserID = z.infer<
+  typeof AdminApplicationUserIDSchema
+>
