@@ -32,7 +32,7 @@ export const scales = ["small", "medium", "large"]
 
 export const mainActivity: Record<string, string[]> = {
   horticulture: ["tomato", "onion", "lettuce", "potato", "sweet potato"],
-  livestock: ["pork", "beef", "cattle", "goat", "sheep"],
+  livestock: ["pork", "beef", "cattle", "goat", "sheep", "pig"],
   dairy: ["milk"],
   aquaculture: ["bream", "kapenta"],
   grain: ["maize", "soya bean", "wheat", "groundnut", "sugar bean"],

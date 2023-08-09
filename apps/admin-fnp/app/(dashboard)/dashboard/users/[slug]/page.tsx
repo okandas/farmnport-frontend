@@ -10,7 +10,7 @@ import { formatDate } from "@/lib/utilities"
 import { ToastAction } from "@/components/ui/toast"
 import { toast } from "@/components/ui/use-toast"
 import { Placeholder } from "@/components/state/placeholder"
-import { AdminControlDropDown } from "@/components/structures/components/control-dropdown"
+import { AdminControlDropDown } from "@/components/structures/control-dropdown"
 
 interface ViewClientPageProps {
   params: {

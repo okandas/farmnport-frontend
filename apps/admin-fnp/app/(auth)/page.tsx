@@ -1,4 +1,4 @@
-import { AdminAuthForm } from "@/components/forms/adminLogin"
+import { AdminAuthForm } from "@/components/structures/forms/adminLogin"
 
 export default function Login() {
   return (

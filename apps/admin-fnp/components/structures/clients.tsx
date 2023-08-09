@@ -6,7 +6,7 @@ import { PhoneNumberFormat } from "google-libphonenumber"
 import { ApplicationUser } from "@/lib/schemas"
 import { phoneUtility } from "@/lib/utilities"
 import { Checkbox } from "@/components/ui/checkbox"
-import { AdminControlDropDown } from "@/components/structures/components/control-dropdown"
+import { AdminControlDropDown } from "@/components/structures/control-dropdown"
 
 export const clientColumns: ColumnDef<ApplicationUser>[] = [
   {

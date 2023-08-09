@@ -4,8 +4,7 @@ import Link from "next/link"
 import { cn } from "@/lib/utilities"
 import { buttonVariants } from "@/components/ui/button"
 import { Icons } from "@/components/icons/lucide"
-
-import ViewClientHeader from "../components/view-client-header"
+import ViewClientHeader from "@/components/navigation/view-client-header"
 
 interface ViewClientLayoutProps {
   children: ReactNode
