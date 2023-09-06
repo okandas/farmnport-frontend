@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation } from "@tanstack/react-query"
 import { isAxiosError } from "axios"
 import Cookies from "js-cookie"
-import { useForm } from "react-hook-form"
+import { SubmitHandler, useForm } from "react-hook-form"
 import * as z from "zod"
 
 import { queryAdminLogin } from "@/lib/query"
@@ -65,7 +65,7 @@ export function AdminAuthForm({ className, ...props }: AdminAuthFormProps) {
     },
   })
 
-  async function onSubmit(payload: FormData) {
+  const onSubmit: SubmitHandler<FormData> = async (payload) => {
     mutate(payload)
   }
 
@@ -85,7 +85,7 @@ export function AdminAuthForm({ className, ...props }: AdminAuthFormProps) {
               autoComplete="email"
               autoCorrect="off"
               disabled={isLoading}
-              {...register("email")}
+              {...register("email", { required: true })}
             />
             {errors?.email && (
               <p className="px-1 text-xs text-red-600">
@@ -104,7 +104,7 @@ export function AdminAuthForm({ className, ...props }: AdminAuthFormProps) {
               autoCapitalize="none"
               autoComplete="off"
               disabled={isLoading}
-              {...register("password")}
+              {...register("password", { required: true })}
             />
             {errors?.password && (
               <p className="px-1 text-xs text-red-600">
@@ -112,7 +112,11 @@ export function AdminAuthForm({ className, ...props }: AdminAuthFormProps) {
               </p>
             )}
           </div>
-          <button className={cn(buttonVariants())} disabled={isLoading}>
+          <button
+            className={cn(buttonVariants())}
+            disabled={isLoading}
+            type="submit"
+          >
             {isLoading && (
               <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
             )}

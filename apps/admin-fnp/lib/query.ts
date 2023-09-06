@@ -9,6 +9,7 @@ import {
   ApplicationUser,
   ClientDataResponse,
   LoginResponse,
+  ProducerPriceList,
 } from "@/lib/schemas"
 
 var base = process.env.NEXT_PUBLIC_BASE_URL
@@ -56,6 +57,14 @@ export function queryUsersAsAdmin(pagintion?: pagintion) {
   }
 
   return api.get<ClientDataResponse>(url)
+}
+
+export function queryUserPricesAsAdmin(clientID?: string) {
+  if (clientID === undefined) {
+    return
+  }
+  const url = `${baseUrl}/prices/get/${clientID}/producer_price`
+  return api.get<ProducerPriceList>(url)
 }
 
 export function queryUserAsAdmin(name: string) {

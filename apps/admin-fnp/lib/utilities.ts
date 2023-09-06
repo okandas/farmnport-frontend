@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx"
 import { format } from "date-fns"
+import Dinero from "dinero.js"
 import { PhoneNumberUtil } from "google-libphonenumber"
 import slugify from "slugify"
 import { twMerge } from "tailwind-merge"
@@ -51,4 +52,14 @@ export function formatDate(d?: string) {
   if (d === undefined) return ""
   const date = new Date(d)
   return format(date, "dd MMMM yyyy")
+}
+
+export function ucFirst(word?: string) {
+  if (word === undefined) return ""
+  return word.charAt(0).toUpperCase() + word.slice(1)
+}
+
+export function centsToDollars(cents: number) {
+  if (isNaN(cents)) return cents
+  return Dinero({ amount: cents }).toFormat("$0,0.00")
 }

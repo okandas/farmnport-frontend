@@ -56,6 +56,54 @@ export const ApplicationUserSchema = z.object({
   verified: z.boolean(),
 })
 
+export const ProductPriceListSchema = z.object({
+  id: z.string(),
+  effectiveDate: z.string(),
+  beef: z.object({
+    super: z.number(),
+    choice: z.number(),
+    commercial: z.number(),
+    economy: z.number(),
+    manufacturing: z.number(),
+    condemned: z.number(),
+    detained: z.string(),
+  }),
+  lamb: z.object({
+    superPremium: z.number(),
+    choice: z.number(),
+    standard: z.number(),
+    inferior: z.number(),
+  }),
+  mutton: z.object({
+    super: z.number(),
+    choice: z.number(),
+    standard: z.number(),
+    oridnary: z.number(),
+    inferior: z.number(),
+  }),
+  goat: z.object({
+    super: z.number(),
+    choice: z.number(),
+    standard: z.number(),
+    inferior: z.number(),
+  }),
+  chicken: z.object({
+    below: z.number(),
+    midRange: z.number(),
+    above: z.number(),
+    condemned: z.number(),
+  }),
+  pork: z.object({
+    super: z.number(),
+    manufacturing: z.number(),
+    head: z.number(),
+  }),
+  catering: z.object({
+    chicken: z.number(),
+  }),
+  unit: z.string(),
+})
+
 ApplicationUserSchema.required({
   name: true,
   scale: true,
@@ -92,6 +140,7 @@ export const AdminApplicationUserIDSchema = ApplicationUserSchema.pick({
 })
 
 export type ApplicationUser = z.infer<typeof ApplicationUserSchema>
+export type ProducerPriceList = z.infer<typeof ProductPriceListSchema>
 
 export type AdminEditApplicationUser = z.infer<
   typeof AdminEditApplicationUserSchema

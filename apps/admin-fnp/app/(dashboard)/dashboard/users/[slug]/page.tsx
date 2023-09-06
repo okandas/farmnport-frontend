@@ -4,9 +4,19 @@ import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { AxiosError, AxiosResponse, isAxiosError } from "axios"
 
-import { queryUserAsAdmin } from "@/lib/query"
-import { ApplicationUser } from "@/lib/schemas"
-import { formatDate } from "@/lib/utilities"
+import { queryUserAsAdmin, queryUserPricesAsAdmin } from "@/lib/query"
+import { ApplicationUser, ProducerPriceList } from "@/lib/schemas"
+import { centsToDollars, cn, formatDate, ucFirst } from "@/lib/utilities"
+import { Button } from "@/components/ui/button"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ToastAction } from "@/components/ui/toast"
 import { toast } from "@/components/ui/use-toast"
 import { Placeholder } from "@/components/state/placeholder"
@@ -22,6 +32,8 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
   const name = params.slug
 
   const [adminClient, setAdminClient] = useState<ApplicationUser>()
+  const [latestProducerPriceList, setLatestProducerPriceList] =
+    useState<ProducerPriceList>()
 
   const { isError, isLoading, isFetching, refetch } = useQuery({
     queryKey: ["dashboard-admin-client", name],
@@ -45,6 +57,47 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
               description: "There was a problem with your request.",
               action: (
                 <ToastAction altText="Try again" onClick={() => refetch()}>
+                  Try again
+                </ToastAction>
+              ),
+            })
+            break
+        }
+      }
+    },
+    refetchOnWindowFocus: false,
+    staleTime: 10000,
+  })
+
+  const clientID = adminClient?.id
+
+  const {
+    isError: priceIsError,
+    isLoading: priceIsLoading,
+    isFetching: priceIsFetching,
+    refetch: refetchPrice,
+  } = useQuery({
+    queryKey: ["dashboard-admin-client-price", clientID],
+    queryFn: () => queryUserPricesAsAdmin(clientID),
+    onSuccess(data: AxiosResponse) {
+      setLatestProducerPriceList(data?.data)
+    },
+    onError(error: AxiosError) {
+      if (isAxiosError(error)) {
+        switch (error.code) {
+          case "ERR_NETWORK":
+            toast({
+              description: "There seems to be a network error.",
+              action: <ToastAction altText="Try again">Try again</ToastAction>,
+            })
+            break
+
+          default:
+            toast({
+              title: "Uh oh! Failed to fetch client price.",
+              description: "There was a problem with your request.",
+              action: (
+                <ToastAction altText="Try again" onClick={() => refetchPrice()}>
                   Try again
                 </ToastAction>
               ),
@@ -83,6 +136,51 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
         </Placeholder>
       </div>
     )
+  }
+
+  const statuses = [
+    "text-green-700 bg-green-50 ring-green-600/20",
+    "text-lime-700 bg-lime-50 ring-lime-600/20",
+    "text-yellow-700 bg-yellow-50 ring-yellow-600/20",
+    "text-amber-700 bg-amber-50 ring-amber-600/20",
+    "text-orange-700 bg-orange-50 ring-orange-600/20",
+    "text-red-700 bg-red-50 ring-red-600/10",
+    "text-stone-600 bg-stone-50 ring-stone-500/10",
+    "text-gray-600 bg-gray-50 ring-gray-500/10",
+  ]
+
+  const grades: Record<string, Record<string, string>> = {
+    beef: {
+      super: "S",
+      choice: "O",
+      commercial: "B",
+      economy: "X",
+      manufacturing: "J",
+      condemned: "CD",
+    },
+    lamb: {
+      superPremium: "SL",
+      choice: "CL",
+      standard: "TL",
+      inferior: "IL",
+    },
+    mutton: {
+      super: "SM",
+      choice: "CM",
+      standard: "TM",
+      ordinary: "OM",
+      inferior: "IM",
+    },
+    goat: {
+      super: "SG",
+      choice: "CG",
+      standard: "TG",
+      inferior: "IG",
+    },
+  }
+
+  const pricingTypes: Record<string, string[]> = {
+    livestock: ["beef", "lamb", "mutton", "goat", "chicken", "pork"],
   }
 
   return (
@@ -142,45 +240,88 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
             </div>
           </div>
         </aside>
-        <aside className="max-w-sm lg:max-w-md">
-          <div className="grid justify-center gap-4 sm:grid-cols-2 md:max-w-[64rem] md:grid-cols-2">
-            <div className="relative p-2 overflow-hidden border rounded-lg bg-background">
-              <div className="flex h-[80px] flex-col justify-between rounded-md p-2">
-                <div className="space-y-2">
-                  <h3 className="font-bold">Branches</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {adminClient?.branches}
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="relative p-2 overflow-hidden border rounded-lg bg-background">
-              <div className="flex h-[80px] flex-col justify-between rounded-md p-2">
-                <div className="space-y-2">
-                  <h3 className="font-bold">Specilization</h3>
-                  <p className="text-sm">{adminClient?.specialization}</p>
-                </div>
-              </div>
-            </div>
-            <div className="relative p-2 overflow-hidden border rounded-lg bg-background">
-              <div className="flex h-[80px] flex-col justify-between rounded-md p-2">
-                <div className="space-y-2">
-                  <h3 className="font-bold">Main Activity</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {adminClient?.main_activity}
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="relative p-2 overflow-hidden border rounded-lg bg-background">
-              <div className="flex h-[80px] flex-col justify-between rounded-md p-2">
-                <div className="space-y-2">
-                  <h3 className="font-bold">Scale</h3>
-                  <p className="text-sm">{adminClient?.scale}</p>
-                </div>
-              </div>
-            </div>
-          </div>
+        <aside>
+          {adminClient?.specialization !== undefined &&
+          latestProducerPriceList != undefined &&
+          adminClient?.type === "buyer" ? (
+            <Tabs defaultValue="beef" className="w-[500px]">
+              <TabsList className="grid w-full grid-cols-6">
+                {pricingTypes[adminClient.specialization].map((type, index) => {
+                  return (
+                    <TabsTrigger key={index} value={type}>
+                      {type}
+                    </TabsTrigger>
+                  )
+                })}
+              </TabsList>
+              {pricingTypes[adminClient.specialization].map((type, index) => {
+                return (
+                  <TabsContent key={index} value={type}>
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>{ucFirst(type)} Producer Prices</CardTitle>
+                        <CardDescription>
+                          This how much you is paying farmers for the {type} you
+                          sell and they buy from you.
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-2 min-h-[280px]">
+                        {latestProducerPriceList[
+                          type as keyof typeof latestProducerPriceList
+                        ] !== undefined ? (
+                          <ul
+                            role="list"
+                            className="grid grid-cols-1 gap-x-2 gap-y-2 lg:grid-cols-2 xl:gap-x-4 "
+                          >
+                            {Object.keys(
+                              latestProducerPriceList[
+                                type as keyof typeof latestProducerPriceList
+                              ]
+                            ).map((key, index) => (
+                              <li
+                                className="overflow-hidden border border-gray-200 rounded-xl"
+                                key={index}
+                              >
+                                <dl className="px-6 py-4 -my-3 text-sm leading-6 divide-y divide-gray-100">
+                                  <div className="flex justify-between py-3 gap-x-4">
+                                    <dt className="text-gray-700">
+                                      {ucFirst(key)}
+                                    </dt>
+                                    <dd className="flex items-start gap-x-2">
+                                      <div className="font-medium text-gray-900">
+                                        {centsToDollars(
+                                          latestProducerPriceList[
+                                            type as keyof typeof latestProducerPriceList
+                                          ][key]
+                                        )}
+                                      </div>
+                                      {grades?.[type]?.[key] ? (
+                                        <div
+                                          className={cn(
+                                            statuses[index],
+                                            "rounded-md py-1 px-2 text-xs font-medium ring-1 ring-inset"
+                                          )}
+                                        >
+                                          {grades[type][key]}
+                                        </div>
+                                      ) : null}
+                                    </dd>
+                                  </div>
+                                </dl>
+                              </li>
+                            ))}
+                          </ul>
+                        ) : null}
+                      </CardContent>
+                      <CardFooter>
+                        <Button>Book Now</Button>
+                      </CardFooter>
+                    </Card>
+                  </TabsContent>
+                )
+              })}
+            </Tabs>
+          ) : null}
         </aside>
       </section>
       <section className="gap-4">
@@ -189,18 +330,60 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
             Other Specializations
           </h4>
         </header>
-        <div className="flex flex-wrap justify-start w-3/4 my-7">
-          {adminClient?.specializations.map((specialization) => {
-            return (
-              <div
-                className="p-2 mt-2 mr-2 tracking-tight border rounded-md"
-                key={specialization}
-              >
-                {specialization}
+        <section className="grid grid-cols-2 gap-2 mb-3 mt-7">
+          <aside className="max-w-sm lg:max-w-md">
+            <div className="grid justify-center gap-4 sm:grid-cols-2 md:max-w-[64rem] md:grid-cols-2">
+              <div className="relative p-2 overflow-hidden border rounded-lg bg-background">
+                <div className="flex h-[80px] flex-col justify-between rounded-md p-2">
+                  <div className="space-y-2">
+                    <h3 className="font-bold">Branches</h3>
+                    <p className="text-sm text-muted-foreground">
+                      {adminClient?.branches}
+                    </p>
+                  </div>
+                </div>
               </div>
-            )
-          })}
-        </div>
+              <div className="relative p-2 overflow-hidden border rounded-lg bg-background">
+                <div className="flex h-[80px] flex-col justify-between rounded-md p-2">
+                  <div className="space-y-2">
+                    <h3 className="font-bold">Specilization</h3>
+                    <p className="text-sm">{adminClient?.specialization}</p>
+                  </div>
+                </div>
+              </div>
+              <div className="relative p-2 overflow-hidden border rounded-lg bg-background">
+                <div className="flex h-[80px] flex-col justify-between rounded-md p-2">
+                  <div className="space-y-2">
+                    <h3 className="font-bold">Main Activity</h3>
+                    <p className="text-sm text-muted-foreground">
+                      {adminClient?.main_activity}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="relative p-2 overflow-hidden border rounded-lg bg-background">
+                <div className="flex h-[80px] flex-col justify-between rounded-md p-2">
+                  <div className="space-y-2">
+                    <h3 className="font-bold">Scale</h3>
+                    <p className="text-sm">{adminClient?.scale}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </aside>
+          <div className="flex flex-wrap h-8">
+            {adminClient?.specializations.map((specialization) => {
+              return (
+                <div
+                  className="h-10 p-2 mb-1 mr-2 tracking-tight border rounded-md"
+                  key={specialization}
+                >
+                  {specialization}
+                </div>
+              )
+            })}
+          </div>
+        </section>
       </section>
     </>
   )
