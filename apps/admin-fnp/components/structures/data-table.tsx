@@ -31,6 +31,8 @@ import { Pagination } from "./pagination"
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  newUrl: string
+  tableName: string
   total: number
   pagination: PaginationState
   setPagination: Dispatch<SetStateAction<PaginationState>>
@@ -41,6 +43,8 @@ interface DataTableProps<TData, TValue> {
 export function DataTable<TData, TValue>({
   columns,
   data,
+  newUrl,
+  tableName,
   total,
   pagination,
   setPagination,
@@ -73,18 +77,16 @@ export function DataTable<TData, TValue>({
 
   const isFiltered = table.getState().columnFilters.length > 0
 
-  const url = "/dashboard/users/new"
-
   return (
     <div className="pb-8 space-y-8">
       <div className="flex justify-between">
         <div className="flex justify-start">
           <Link
-            href={url}
+            href={newUrl}
             className={cn(buttonVariants({ variant: "outline" }))}
           >
             <>
-              New User
+              New {tableName}
               <Icons.add className="w-4 h-4 ml-2" />
             </>
           </Link>
