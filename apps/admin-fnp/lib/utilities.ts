@@ -63,3 +63,7 @@ export function centsToDollars(cents: number) {
   if (isNaN(cents)) return cents
   return Dinero({ amount: cents }).toFormat("$0,0.00")
 }
+
+export function dollarsToCents(dollars: number) {
+  return Math.round(100 * dollars)
+}

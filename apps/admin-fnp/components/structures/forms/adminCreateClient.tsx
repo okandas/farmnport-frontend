@@ -130,7 +130,6 @@ export function AdminCreateForm({ client }: AdminCreateFormProps) {
   })
 
   async function onSubmit(payload: AdminEditApplicationUser) {
-    payload.branches = Number(payload.branches)
     mutate(payload)
   }
 

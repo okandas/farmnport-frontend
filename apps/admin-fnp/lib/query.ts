@@ -6,6 +6,7 @@ import {
   AdminApplicationUserID,
   AdminAuthSchema,
   AdminEditApplicationUser,
+  AdminEditProducerPriceList,
   ApplicationUser,
   ClientUserResponse,
   LoginResponse,
@@ -103,4 +104,11 @@ export function updateClientAsAdmin(data: AdminEditApplicationUser) {
 export function verifyClientAsAdmin(data: AdminApplicationUserID) {
   var url = `${baseUrl}/user/verify_client`
   return api.post<ApplicationUser>(url, data)
+}
+
+export function createClientProductPriceListAsAdmin(
+  data: AdminEditProducerPriceList
+) {
+  var url = `${baseUrl}/prices/add/producer_price`
+  return api.post(url, data)
 }
