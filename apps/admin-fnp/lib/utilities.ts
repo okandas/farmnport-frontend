@@ -59,7 +59,8 @@ export function ucFirst(word?: string) {
   return word.charAt(0).toUpperCase() + word.slice(1)
 }
 
-export function centsToDollars(cents: number) {
+export function centsToDollars(cents: number | boolean) {
+  if (typeof cents === "boolean") return cents
   if (isNaN(cents)) return cents
   return Dinero({ amount: cents }).toFormat("$0,0.00")
 }

@@ -318,11 +318,11 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
                                         </dt>
                                         <dd className="flex items-start gap-x-2">
                                           <div className="font-medium text-gray-900">
-                                            {
+                                            {centsToDollars(
                                               gradePrices[
                                                 key as keyof typeof gradePrices
                                               ]
-                                            }
+                                            )}
                                           </div>
 
                                           {grades?.[pricingType]?.[key] ? (
