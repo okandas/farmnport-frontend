@@ -56,3 +56,5 @@ export const mainActivity: Record<string, string[]> = {
   poultry: ["chicken", "turkey"],
   pastures: ["katambora"],
 }
+
+export const units = ["kg"]

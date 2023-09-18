@@ -20,9 +20,14 @@ export type LoginResponse = {
   token: string
 }
 
-export type ClientDataResponse = {
+export type ClientUserResponse = {
   total: number
   data: ApplicationUser[]
+}
+
+export type ProducerPriceListsResponse = {
+  total: number
+  data: ProducerPriceList[]
 }
 
 export const ApplicationUserSchema = z.object({
@@ -58,50 +63,58 @@ export const ApplicationUserSchema = z.object({
 
 export const ProductPriceListSchema = z.object({
   id: z.string(),
-  effectiveDate: z.string(),
+  client_id: z.string().length(24),
+  effectiveDate: z.coerce.date(),
   beef: z.object({
-    super: z.number(),
-    choice: z.number(),
-    commercial: z.number(),
-    economy: z.number(),
-    manufacturing: z.number(),
-    condemned: z.number(),
+    super: z.coerce.number().nonnegative(),
+    choice: z.coerce.number().nonnegative(),
+    commercial: z.coerce.number().nonnegative(),
+    economy: z.coerce.number().nonnegative(),
+    manufacturing: z.coerce.number().nonnegative(),
+    condemned: z.coerce.number().nonnegative(),
     detained: z.string(),
+    hasPrice: z.boolean(),
   }),
   lamb: z.object({
-    superPremium: z.number(),
-    choice: z.number(),
-    standard: z.number(),
-    inferior: z.number(),
+    superPremium: z.coerce.number().nonnegative(),
+    choice: z.coerce.number().nonnegative(),
+    standard: z.coerce.number().nonnegative(),
+    inferior: z.coerce.number().nonnegative(),
+    hasPrice: z.boolean(),
   }),
   mutton: z.object({
-    super: z.number(),
-    choice: z.number(),
-    standard: z.number(),
-    oridnary: z.number(),
-    inferior: z.number(),
+    super: z.coerce.number().nonnegative(),
+    choice: z.coerce.number().nonnegative(),
+    standard: z.coerce.number().nonnegative(),
+    oridnary: z.coerce.number().nonnegative(),
+    inferior: z.coerce.number().nonnegative(),
+    hasPrice: z.boolean(),
   }),
   goat: z.object({
-    super: z.number(),
-    choice: z.number(),
-    standard: z.number(),
-    inferior: z.number(),
+    super: z.coerce.number().nonnegative(),
+    choice: z.coerce.number().nonnegative(),
+    standard: z.coerce.number().nonnegative(),
+    inferior: z.coerce.number().nonnegative(),
+    hasPrice: z.boolean(),
   }),
   chicken: z.object({
-    below: z.number(),
-    midRange: z.number(),
-    above: z.number(),
-    condemned: z.number(),
+    below: z.coerce.number().nonnegative(),
+    midRange: z.coerce.number().nonnegative(),
+    above: z.coerce.number().nonnegative(),
+    condemned: z.coerce.number().nonnegative(),
+    hasPrice: z.boolean(),
   }),
   pork: z.object({
-    super: z.number(),
-    manufacturing: z.number(),
-    head: z.number(),
+    super: z.coerce.number().nonnegative(),
+    manufacturing: z.coerce.number().nonnegative(),
+    head: z.coerce.number().nonnegative(),
+    hasPrice: z.boolean(),
   }),
   catering: z.object({
-    chicken: z.number(),
+    chicken: z.coerce.number().nonnegative(),
+    hasPrice: z.boolean(),
   }),
-  unit: z.string(),
+  unit: z.string().nonempty(),
 })
 
 ApplicationUserSchema.required({
@@ -135,6 +148,10 @@ export const AdminEditApplicationUserSchema = ApplicationUserSchema.pick({
   short_description: true,
 })
 
+export const AdminEditProducerPriceListSchema = ProductPriceListSchema.omit({
+  id: true,
+})
+
 export const AdminApplicationUserIDSchema = ApplicationUserSchema.pick({
   id: true,
 })
@@ -144,6 +161,9 @@ export type ProducerPriceList = z.infer<typeof ProductPriceListSchema>
 
 export type AdminEditApplicationUser = z.infer<
   typeof AdminEditApplicationUserSchema
+>
+export type AdminEditProducerPriceList = z.infer<
+  typeof AdminEditProducerPriceListSchema
 >
 
 export type AdminApplicationUserID = z.infer<

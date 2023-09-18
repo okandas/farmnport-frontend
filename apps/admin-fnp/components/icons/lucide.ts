@@ -2,6 +2,7 @@ import {
   AlertTriangle,
   ArrowRight,
   BadgeCheck,
+  CalendarIcon,
   Check,
   ChevronLeft,
   ChevronRight,
@@ -58,4 +59,5 @@ export const Icons = {
   construction: Construction,
   badgeCheck: BadgeCheck,
   search: Search,
+  calender: CalendarIcon,
 }
