@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { string } from "zod"
 
 import { AdminEditProducerPriceList } from "@/lib/schemas"
 import { AdminCreateProductPriceForm } from "@/components/structures/forms/adminCreatePriceList"
