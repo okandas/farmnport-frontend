@@ -86,8 +86,6 @@ export function AdminClientsTable() {
     <DataTable
       columns={clientColumns}
       data={adminClients}
-      newUrl="/dashboard/users/new"
-      tableName="User"
       total={total}
       pagination={pagination}
       setPagination={setPagination}

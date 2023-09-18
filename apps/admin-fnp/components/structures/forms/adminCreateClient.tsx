@@ -11,6 +11,7 @@ import { createClientAsAdmin } from "@/lib/query"
 import {
   AdminEditApplicationUser,
   AdminEditApplicationUserSchema,
+  ApplicationUser,
 } from "@/lib/schemas"
 import { cn, slug } from "@/lib/utilities"
 import { Badge } from "@/components/ui/badge"
@@ -58,11 +59,11 @@ import {
   specializations,
 } from "@/components/structures/data/data"
 
-interface AdminCreateFormProps extends React.HTMLAttributes<HTMLDivElement> {
+interface AdminEditFormProps extends React.HTMLAttributes<HTMLDivElement> {
   client: AdminEditApplicationUser
 }
 
-export function AdminCreateForm({ client }: AdminCreateFormProps) {
+export function AdminCreateForm({ client }: AdminEditFormProps) {
   const form = useForm({
     defaultValues: {
       id: client?.id,
@@ -130,6 +131,7 @@ export function AdminCreateForm({ client }: AdminCreateFormProps) {
   })
 
   async function onSubmit(payload: AdminEditApplicationUser) {
+    payload.branches = Number(payload.branches)
     mutate(payload)
   }
 

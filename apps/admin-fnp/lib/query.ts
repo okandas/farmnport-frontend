@@ -6,12 +6,10 @@ import {
   AdminApplicationUserID,
   AdminAuthSchema,
   AdminEditApplicationUser,
-  AdminEditProducerPriceList,
   ApplicationUser,
-  ClientUserResponse,
+  ClientDataResponse,
   LoginResponse,
   ProducerPriceList,
-  ProducerPriceListsResponse,
 } from "@/lib/schemas"
 
 var base = process.env.NEXT_PUBLIC_BASE_URL
@@ -58,7 +56,7 @@ export function queryUsersAsAdmin(pagintion?: pagintion) {
     url = `${baseUrl}/user/clients?search=${pagintion.search}`
   }
 
-  return api.get<ClientUserResponse>(url)
+  return api.get<ClientDataResponse>(url)
 }
 
 export function queryUserPricesAsAdmin(clientID?: string) {
@@ -69,26 +67,10 @@ export function queryUserPricesAsAdmin(clientID?: string) {
   return api.get<ProducerPriceList>(url)
 }
 
-export function queryProducerPriceListsAsAdmin(pagintion?: pagintion) {
-  var url: string
-
-  if (pagintion?.p !== undefined && pagintion.p >= 2) {
-    url = `${baseUrl}/prices/get/producer_prices?p=${pagintion.p}`
-  } else {
-    url = `${baseUrl}/prices/get/producer_prices`
-  }
-
-  // if (pagintion?.search !== undefined && pagintion.search.length >= 2) {
-  //   url = `${baseUrl}/user/clients?search=${pagintion.search}`
-  // }
-
-  return api.get<ProducerPriceListsResponse>(url)
-}
-
 export function queryUserAsAdmin(name: string) {
   const url = `${baseUrl}/user/${name}`
 
-  return api.get<ClientUserResponse>(url)
+  return api.get<ClientDataResponse>(url)
 }
 
 export function createClientAsAdmin(data: AdminEditApplicationUser) {
@@ -104,11 +86,4 @@ export function updateClientAsAdmin(data: AdminEditApplicationUser) {
 export function verifyClientAsAdmin(data: AdminApplicationUserID) {
   var url = `${baseUrl}/user/verify_client`
   return api.post<ApplicationUser>(url, data)
-}
-
-export function createClientProductPriceListAsAdmin(
-  data: AdminEditProducerPriceList
-) {
-  var url = `${baseUrl}/prices/add/producer_price`
-  return api.post(url, data)
 }

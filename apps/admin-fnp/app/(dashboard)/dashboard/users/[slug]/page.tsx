@@ -69,7 +69,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
     staleTime: 10000,
   })
 
-  const clientID = adminClient?.id ?? ""
+  const clientID = adminClient?.id
 
   const {
     isError: priceIsError,
@@ -149,22 +149,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
     "text-gray-600 bg-gray-50 ring-gray-500/10",
   ]
 
-  type ProducerPriceListKeys =
-    | "beef"
-    | "lamb"
-    | "mutton"
-    | "goat"
-    | "chicken"
-    | "pork"
-
-  const beef: ProducerPriceListKeys = "beef"
-  const lamb: ProducerPriceListKeys = "lamb"
-  const mutton: ProducerPriceListKeys = "mutton"
-  const goat: ProducerPriceListKeys = "goat"
-  const chicken: ProducerPriceListKeys = "chicken"
-  const pork: ProducerPriceListKeys = "pork"
-
-  const grades: Record<ProducerPriceListKeys, Record<string, string>> = {
+  const grades: Record<string, Record<string, string>> = {
     beef: {
       super: "S",
       choice: "O",
@@ -192,17 +177,10 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
       standard: "TG",
       inferior: "IG",
     },
-    chicken: {
-      grade: "A",
-    },
-    pork: {
-      super: "SP",
-      manufacturing: "MP",
-    },
   }
 
-  const pricingTypes: Record<string, ProducerPriceListKeys[]> = {
-    livestock: [beef, lamb, mutton, goat, chicken, pork],
+  const pricingTypes: Record<string, string[]> = {
+    livestock: ["beef", "lamb", "mutton", "goat", "chicken", "pork"],
   }
 
   return (
@@ -276,82 +254,72 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
                   )
                 })}
               </TabsList>
-              {pricingTypes[adminClient.specialization].map(
-                (pricingType, index) => {
-                  return (
-                    <TabsContent key={index} value={pricingType}>
-                      <Card>
-                        <CardHeader>
-                          <CardTitle>
-                            {ucFirst(pricingType)} Producer Prices
-                          </CardTitle>
-                          <CardDescription>
-                            This how much you is paying farmers for the{" "}
-                            {pricingType} you sell and they buy from you.
-                          </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-2 min-h-[280px]">
-                          {latestProducerPriceList[pricingType] !==
-                          undefined ? (
-                            <ul
-                              role="list"
-                              className="grid grid-cols-1 gap-x-2 gap-y-2 lg:grid-cols-2 xl:gap-x-4 "
-                            >
-                              {Object.keys(
-                                latestProducerPriceList[pricingType]
-                              ).map((key, index) => {
-                                if (key === "hasPrice") {
-                                  return null
-                                }
-                                const gradePrices =
-                                  latestProducerPriceList[pricingType]
-
-                                return (
-                                  <li
-                                    className="overflow-hidden border border-gray-200 rounded-xl"
-                                    key={index}
-                                  >
-                                    <dl className="px-6 py-4 -my-3 text-sm leading-6 divide-y divide-gray-100">
-                                      <div className="flex justify-between py-3 gap-x-4">
-                                        <dt className="text-gray-700">
-                                          {ucFirst(key)}
-                                        </dt>
-                                        <dd className="flex items-start gap-x-2">
-                                          <div className="font-medium text-gray-900">
-                                            {
-                                              gradePrices[
-                                                key as keyof typeof gradePrices
-                                              ]
-                                            }
-                                          </div>
-
-                                          {grades?.[pricingType]?.[key] ? (
-                                            <div
-                                              className={cn(
-                                                statuses[index],
-                                                "rounded-md py-1 px-2 text-xs font-medium ring-1 ring-inset"
-                                              )}
-                                            >
-                                              {grades[pricingType][key]}
-                                            </div>
-                                          ) : null}
-                                        </dd>
+              {pricingTypes[adminClient.specialization].map((type, index) => {
+                return (
+                  <TabsContent key={index} value={type}>
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>{ucFirst(type)} Producer Prices</CardTitle>
+                        <CardDescription>
+                          This how much you is paying farmers for the {type} you
+                          sell and they buy from you.
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-2 min-h-[280px]">
+                        {latestProducerPriceList[
+                          type as keyof typeof latestProducerPriceList
+                        ] !== undefined ? (
+                          <ul
+                            role="list"
+                            className="grid grid-cols-1 gap-x-2 gap-y-2 lg:grid-cols-2 xl:gap-x-4 "
+                          >
+                            {Object.keys(
+                              latestProducerPriceList[
+                                type as keyof typeof latestProducerPriceList
+                              ]
+                            ).map((key, index) => (
+                              <li
+                                className="overflow-hidden border border-gray-200 rounded-xl"
+                                key={index}
+                              >
+                                <dl className="px-6 py-4 -my-3 text-sm leading-6 divide-y divide-gray-100">
+                                  <div className="flex justify-between py-3 gap-x-4">
+                                    <dt className="text-gray-700">
+                                      {ucFirst(key)}
+                                    </dt>
+                                    <dd className="flex items-start gap-x-2">
+                                      <div className="font-medium text-gray-900">
+                                        {centsToDollars(
+                                          latestProducerPriceList[
+                                            type as keyof typeof latestProducerPriceList
+                                          ][key]
+                                        )}
                                       </div>
-                                    </dl>
-                                  </li>
-                                )
-                              })}
-                            </ul>
-                          ) : null}
-                        </CardContent>
-                        <CardFooter>
-                          <Button>Book Now</Button>
-                        </CardFooter>
-                      </Card>
-                    </TabsContent>
-                  )
-                }
-              )}
+                                      {grades?.[type]?.[key] ? (
+                                        <div
+                                          className={cn(
+                                            statuses[index],
+                                            "rounded-md py-1 px-2 text-xs font-medium ring-1 ring-inset"
+                                          )}
+                                        >
+                                          {grades[type][key]}
+                                        </div>
+                                      ) : null}
+                                    </dd>
+                                  </div>
+                                </dl>
+                              </li>
+                            ))}
+                          </ul>
+                        ) : null}
+                      </CardContent>
+                      <CardFooter>
+                        <Button>Book Now</Button>
+                      </CardFooter>
+                    </Card>
+                  </TabsContent>
+                )
+              })}
             </Tabs>
           ) : null}
         </aside>
@@ -405,10 +373,6 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
           </aside>
           <div className="flex flex-wrap h-8">
             {adminClient?.specializations.map((specialization) => {
-              if (specialization.length === 0) {
-                return null
-              }
-
               return (
                 <div
                   className="h-10 p-2 mb-1 mr-2 tracking-tight border rounded-md"
