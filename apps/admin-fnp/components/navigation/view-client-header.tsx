@@ -54,7 +54,6 @@ export default function ViewClientHeader({ params }: ViewClientHeaderProps) {
         }
       }
     },
-    refetchOnWindowFocus: false,
   })
 
   if (isError) {

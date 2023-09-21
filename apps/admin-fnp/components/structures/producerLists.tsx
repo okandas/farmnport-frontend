@@ -5,7 +5,7 @@ import { ColumnDef } from "@tanstack/react-table"
 import { ProducerPriceList } from "@/lib/schemas"
 import { formatDate } from "@/lib/utilities"
 import { Checkbox } from "@/components/ui/checkbox"
-import { AdminControlDropDown } from "@/components/structures/control-dropdown"
+import { PriceControlDropDown } from "@/components/structures/price-dropdown"
 
 export const producerPriceListColumns: ColumnDef<ProducerPriceList>[] = [
   {
@@ -45,5 +45,13 @@ export const producerPriceListColumns: ColumnDef<ProducerPriceList>[] = [
   {
     accessorKey: "client_id",
     header: "Client ID",
+  },
+  {
+    id: "actions",
+    cell: ({ row }) => {
+      const priceItem = row?.original
+
+      return <PriceControlDropDown priceItem={priceItem} />
+    },
   },
 ]

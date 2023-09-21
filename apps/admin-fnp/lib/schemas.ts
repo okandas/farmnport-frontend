@@ -61,9 +61,10 @@ export const ApplicationUserSchema = z.object({
   verified: z.boolean(),
 })
 
-export const ProductPriceListSchema = z.object({
+export const ProducerPriceListSchema = z.object({
   id: z.string(),
   client_id: z.string().length(24),
+  client_name: z.string(),
   effectiveDate: z.coerce.date(),
   beef: z.object({
     super: z.coerce.number().nonnegative(),
@@ -148,22 +149,15 @@ export const AdminEditApplicationUserSchema = ApplicationUserSchema.pick({
   short_description: true,
 })
 
-export const AdminEditProducerPriceListSchema = ProductPriceListSchema.omit({
-  id: true,
-})
-
 export const AdminApplicationUserIDSchema = ApplicationUserSchema.pick({
   id: true,
 })
 
 export type ApplicationUser = z.infer<typeof ApplicationUserSchema>
-export type ProducerPriceList = z.infer<typeof ProductPriceListSchema>
+export type ProducerPriceList = z.infer<typeof ProducerPriceListSchema>
 
 export type AdminEditApplicationUser = z.infer<
   typeof AdminEditApplicationUserSchema
->
-export type AdminEditProducerPriceList = z.infer<
-  typeof AdminEditProducerPriceListSchema
 >
 
 export type AdminApplicationUserID = z.infer<

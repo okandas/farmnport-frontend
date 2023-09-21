@@ -63,8 +63,6 @@ export function AdminProducePriceLists() {
         }
       }
     },
-    refetchOnWindowFocus: false,
-    keepPreviousData: true,
   })
 
   if (isError) {
