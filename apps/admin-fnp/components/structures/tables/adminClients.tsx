@@ -58,8 +58,6 @@ export function AdminClientsTable() {
         }
       }
     },
-    refetchOnWindowFocus: false,
-    keepPreviousData: true,
   })
 
   if (isError) {

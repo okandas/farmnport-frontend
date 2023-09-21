@@ -57,7 +57,6 @@ export default function EditClientPage({ params }: EditClientPageProps) {
         }
       }
     },
-    refetchOnWindowFocus: false,
   })
 
   if (isError) {

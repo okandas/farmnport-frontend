@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { AxiosError, AxiosResponse, isAxiosError } from "axios"
 
-import { queryUserAsAdmin, queryUserPricesAsAdmin } from "@/lib/query"
+import { queryUserAsAdmin, queryUserProductPriceListAsAdmin } from "@/lib/query"
 import { ApplicationUser, ProducerPriceList } from "@/lib/schemas"
 import { centsToDollars, cn, formatDate, ucFirst } from "@/lib/utilities"
 import { Button } from "@/components/ui/button"
@@ -65,8 +65,6 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
         }
       }
     },
-    refetchOnWindowFocus: false,
-    staleTime: 10000,
   })
 
   const clientID = adminClient?.id ?? ""
@@ -78,7 +76,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
     refetch: refetchPrice,
   } = useQuery({
     queryKey: ["dashboard-admin-client-price", clientID],
-    queryFn: () => queryUserPricesAsAdmin(clientID),
+    queryFn: () => queryUserProductPriceListAsAdmin(clientID),
     onSuccess(data: AxiosResponse) {
       setLatestProducerPriceList(data?.data)
     },
@@ -106,8 +104,6 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
         }
       }
     },
-    refetchOnWindowFocus: false,
-    staleTime: 10000,
   })
 
   if (isError) {

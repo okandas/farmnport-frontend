@@ -6,7 +6,6 @@ import {
   AdminApplicationUserID,
   AdminAuthSchema,
   AdminEditApplicationUser,
-  AdminEditProducerPriceList,
   ApplicationUser,
   ClientUserResponse,
   LoginResponse,
@@ -61,10 +60,7 @@ export function queryUsersAsAdmin(pagintion?: pagintion) {
   return api.get<ClientUserResponse>(url)
 }
 
-export function queryUserPricesAsAdmin(clientID?: string) {
-  if (clientID === undefined) {
-    return
-  }
+export function queryUserProductPriceListAsAdmin(clientID?: string) {
   const url = `${baseUrl}/prices/get/${clientID}/producer_price`
   return api.get<ProducerPriceList>(url)
 }
@@ -106,9 +102,12 @@ export function verifyClientAsAdmin(data: AdminApplicationUserID) {
   return api.post<ApplicationUser>(url, data)
 }
 
-export function createClientProductPriceListAsAdmin(
-  data: AdminEditProducerPriceList
-) {
+export function createClientProductPriceListAsAdmin(data: ProducerPriceList) {
   var url = `${baseUrl}/prices/add/producer_price`
+  return api.post(url, data)
+}
+
+export function updateClientProductPriceListAsAdmin(data: ProducerPriceList) {
+  var url = `${baseUrl}/prices/up/producer_price`
   return api.post(url, data)
 }

@@ -65,6 +65,11 @@ export function centsToDollars(cents: number | boolean) {
   return Dinero({ amount: cents }).toFormat("$0,0.00")
 }
 
+export function centsToDollarsFormInputs(cents: number) {
+  const amount = isNaN(cents) ? 0 : Number(cents)
+  return Number(Dinero({ amount: amount }).toFormat("0.00"))
+}
+
 export function dollarsToCents(dollars: number) {
   return Math.round(100 * dollars)
 }

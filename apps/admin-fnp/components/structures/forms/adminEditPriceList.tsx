@@ -10,8 +10,8 @@ import { useForm, useWatch } from "react-hook-form"
 import { useDebounce } from "use-debounce"
 
 import {
-  createClientProductPriceListAsAdmin,
   queryUsersAsAdmin,
+  updateClientProductPriceListAsAdmin,
 } from "@/lib/query"
 import {
   ApplicationUser,
@@ -60,14 +60,14 @@ import { toast } from "@/components/ui/use-toast"
 import { Icons } from "@/components/icons/lucide"
 import { units } from "@/components/structures/data/data"
 
-interface AdminCreateProductPriceFormProps
+interface AdminEditProductPriceFormProps
   extends React.HTMLAttributes<HTMLDivElement> {
   priceList: ProducerPriceList
 }
 
-export function AdminCreateProductPriceForm({
+export function AdminEditProductPriceForm({
   priceList,
-}: AdminCreateProductPriceFormProps) {
+}: AdminEditProductPriceFormProps) {
   const form = useForm({
     defaultValues: {
       id: priceList.id,
@@ -218,7 +218,7 @@ export function AdminCreateProductPriceForm({
   })
 
   const { mutate, isLoading } = useMutation(
-    createClientProductPriceListAsAdmin,
+    updateClientProductPriceListAsAdmin,
     {
       onSuccess: () => {
         toast({
