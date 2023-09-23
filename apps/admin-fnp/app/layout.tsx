@@ -5,6 +5,8 @@ import QueryProvider from "@/components/providers/QueryProvider"
 
 import "@/styles/globals.css"
 
+import React from "react"
+
 const fontSans = FontSans({
   subsets: ["latin"],
   variable: "--font-sans",
@@ -16,9 +18,10 @@ export const metadata = {
 }
 interface RootLayoutProps {
   children: React.ReactNode
+  modal: React.ReactNode
 }
 
-export default function RootLayout({ children }: RootLayoutProps) {
+export default function RootLayout({ children, modal }: RootLayoutProps) {
   return (
     <html lang="en">
       <body
@@ -27,7 +30,10 @@ export default function RootLayout({ children }: RootLayoutProps) {
           fontSans.variable
         )}
       >
-        <QueryProvider>{children}</QueryProvider>
+        <QueryProvider>
+          {children}
+          {modal}
+        </QueryProvider>
       </body>
     </html>
   )
