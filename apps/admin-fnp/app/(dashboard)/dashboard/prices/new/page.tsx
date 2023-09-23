@@ -2,14 +2,16 @@
 
 import { useState } from "react"
 
-import { AdminEditProducerPriceList } from "@/lib/schemas"
+import { ProducerPriceList } from "@/lib/schemas"
 import { AdminCreateProductPriceForm } from "@/components/structures/forms/adminCreatePriceList"
 
 export default function CreateClientPage() {
-  const [admimProductPriceItem, _] = useState<AdminEditProducerPriceList>({
+  const [adminProductPriceItem, _] = useState<ProducerPriceList>({
+    id: "",
     effectiveDate: new Date(),
     client_id: "",
     client_name: "",
+    client_specialization: "",
     beef: {
       super: 0,
       choice: 0,
@@ -62,5 +64,5 @@ export default function CreateClientPage() {
     unit: "",
   })
 
-  return <AdminCreateProductPriceForm priceList={admimProductPriceItem} />
+  return <AdminCreateProductPriceForm priceList={adminProductPriceItem} />
 }

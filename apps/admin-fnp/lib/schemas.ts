@@ -63,8 +63,9 @@ export const ApplicationUserSchema = z.object({
 
 export const ProducerPriceListSchema = z.object({
   id: z.string(),
-  client_id: z.string().length(24),
+  client_id: z.string().length(24).nonempty(),
   client_name: z.string(),
+  client_specialization: z.string(),
   effectiveDate: z.coerce.date(),
   beef: z.object({
     super: z.coerce.number().nonnegative(),

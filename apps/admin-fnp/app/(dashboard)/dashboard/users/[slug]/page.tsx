@@ -282,11 +282,11 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
                             {ucFirst(pricingType)} Producer Prices
                           </CardTitle>
                           <CardDescription>
-                            This how much you is paying farmers for the{" "}
+                            This how much you are paying farmers for the{" "}
                             {pricingType} you sell and they buy from you.
                           </CardDescription>
                         </CardHeader>
-                        <CardContent className="space-y-2 min-h-[280px]">
+                        <CardContent className="space-y-2 min-h-[305px]">
                           {latestProducerPriceList[pricingType] !==
                           undefined ? (
                             <ul

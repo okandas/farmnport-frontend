@@ -42,6 +42,14 @@ export function PriceControlDropDown({ priceItem }: PriceControlDropDownProps) {
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
+        <DropdownMenuItem>
+          <Link
+            className="w-full"
+            href={`/dashboard/prices/${slug(priceItem?.client_id)}`}
+          >
+            View Price Details
+          </Link>
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   )
