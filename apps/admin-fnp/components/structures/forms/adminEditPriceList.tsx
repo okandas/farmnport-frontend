@@ -74,6 +74,7 @@ export function AdminEditProductPriceForm({
       effectiveDate: new Date(priceList.effectiveDate),
       client_id: priceList.client_id,
       client_name: priceList.client_name,
+      client_specialization: priceList.client_specialization,
       beef: {
         super: centsToDollarsFormInputs(priceList.beef.super),
         choice: centsToDollarsFormInputs(priceList.beef.choice),

@@ -105,7 +105,7 @@ export function AdminControlDropDown({ client }: AdminControlDropDownProps) {
             }
           }}
         >
-          Verify Client
+          {client?.verified === true ? "Unverify Client" : "Verify Client"}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
