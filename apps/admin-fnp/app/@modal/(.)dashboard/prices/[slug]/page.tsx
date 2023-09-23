@@ -168,7 +168,7 @@ export default function ViewClientProductListDialog({
     livestock: [beef, lamb, mutton, goat, chicken, pork],
   }
 
-  const effectiveDate = new Date(producerPriceList.effectiveDate)
+  const effectiveDate = producerPriceList.effectiveDate.toString()
 
   return (
     <Dialog open onOpenChange={handleOnOpenChange}>
