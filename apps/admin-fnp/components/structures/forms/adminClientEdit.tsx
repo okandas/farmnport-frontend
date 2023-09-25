@@ -101,7 +101,8 @@ export function AdminEditForm({ client }: AdminEditFormProps) {
 
   const router = useRouter()
 
-  const { mutate, isLoading } = useMutation(updateClientAsAdmin, {
+  const { mutate, isPending } = useMutation({
+    mutationFn: updateClientAsAdmin,
     onSuccess: (data) => {
       toast({
         description: "Updated User Succesfully",
@@ -531,9 +532,9 @@ export function AdminEditForm({ client }: AdminEditFormProps) {
         <button
           type="submit"
           className={cn(buttonVariants(), "mt-5")}
-          disabled={isLoading}
+          disabled={isPending}
         >
-          {isLoading && <Icons.spinner className="w-4 h-4 mr-2 animate-spin" />}
+          {isPending && <Icons.spinner className="w-4 h-4 mr-2 animate-spin" />}
           Submit
         </button>
       </form>

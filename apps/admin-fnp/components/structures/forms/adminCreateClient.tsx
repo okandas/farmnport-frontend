@@ -99,7 +99,8 @@ export function AdminCreateForm({ client }: AdminCreateFormProps) {
 
   const router = useRouter()
 
-  const { mutate, isLoading } = useMutation(createClientAsAdmin, {
+  const { mutate, isPending } = useMutation({
+    mutationFn: createClientAsAdmin,
     onSuccess: () => {
       toast({
         description: "Created User Succesfully",
@@ -526,9 +527,9 @@ export function AdminCreateForm({ client }: AdminCreateFormProps) {
         <button
           type="submit"
           className={cn(buttonVariants(), "mt-5")}
-          disabled={isLoading}
+          disabled={isPending}
         >
-          {isLoading && <Icons.spinner className="w-4 h-4 mr-2 animate-spin" />}
+          {isPending && <Icons.spinner className="w-4 h-4 mr-2 animate-spin" />}
           Submit
         </button>
       </form>
