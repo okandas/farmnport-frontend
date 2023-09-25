@@ -1,9 +1,8 @@
 "use client"
 
-import { useState } from "react"
 import Link from "next/link"
 import { useQuery } from "@tanstack/react-query"
-import { AxiosError, AxiosResponse, isAxiosError } from "axios"
+import { isAxiosError } from "axios"
 
 import { queryUserAsAdmin } from "@/lib/query"
 import { ApplicationUser } from "@/lib/schemas"
@@ -25,41 +24,36 @@ export default function EditClientPage({ params }: EditClientPageProps) {
   const name = params.slug
   const url = `/dashboard/users/${name}`
 
-  const [adminClient, setAdminClient] = useState<ApplicationUser>()
-
-  const { isError, isLoading, isFetching, refetch } = useQuery({
+  const { isError, isLoading, isFetching, data, refetch } = useQuery({
     queryKey: ["dashboard-admin-client", name],
     queryFn: () => queryUserAsAdmin(name),
-    onSuccess(data: AxiosResponse) {
-      setAdminClient(data?.data)
-    },
-    onError(error: AxiosError) {
-      if (isAxiosError(error)) {
-        switch (error.code) {
-          case "ERR_NETWORK":
-            toast({
-              description: "There seems to be a network error.",
-              action: <ToastAction altText="Try again">Try again</ToastAction>,
-            })
-            break
-
-          default:
-            toast({
-              title: "Uh oh! Failed to fetch clients.",
-              description: "There was a problem with your request.",
-              action: (
-                <ToastAction altText="Try again" onClick={() => refetch()}>
-                  Try again
-                </ToastAction>
-              ),
-            })
-            break
-        }
-      }
-    },
   })
 
+  const adminClient = data?.data as ApplicationUser
+
   if (isError) {
+    if (isAxiosError(data)) {
+      switch (data.code) {
+        case "ERR_NETWORK":
+          toast({
+            description: "There seems to be a network error.",
+            action: <ToastAction altText="Try again">Try again</ToastAction>,
+          })
+          break
+
+        default:
+          toast({
+            title: "Uh oh! Failed to fetch clients.",
+            description: "There was a problem with your request.",
+            action: (
+              <ToastAction altText="Try again" onClick={() => refetch()}>
+                Try again
+              </ToastAction>
+            ),
+          })
+          break
+      }
+    }
     return (
       <div className="mt-20">
         <Placeholder>

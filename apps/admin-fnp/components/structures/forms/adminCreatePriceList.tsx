@@ -129,7 +129,6 @@ export function AdminCreateProductPriceForm({
     resolver: zodResolver(ProducerPriceListSchema),
   })
 
-  const [adminClients, setAdminClients] = useState<ApplicationUser[]>([])
   const [searchClient, setSearchClient] = useState("")
   const [selectedClient, setSelectedClient] = useState(priceList.client_id)
   const [open, setOpen] = useState(false)
@@ -175,24 +174,55 @@ export function AdminCreateProductPriceForm({
 
   const router = useRouter()
 
-  const {
-    isError: clientSearchError,
-    isLoading: clientSearchLoading,
-    isFetching,
-    refetch,
-  } = useQuery({
+  const { data, isError, refetch } = useQuery({
     queryKey: ["dashboard-admin-clients", { search: debouncedSearchQuery }],
     queryFn: () =>
       queryUsersAsAdmin({
         search: debouncedSearchQuery,
       }),
-    onSuccess(data: AxiosResponse) {
-      setAdminClients(data?.data?.data)
-    },
-    onError(error: AxiosError) {
-      if (isAxiosError(error)) {
-        setOpen(false)
+    enabled,
+  })
 
+  const adminClients = data?.data?.data as ApplicationUser[]
+
+  if (isError) {
+    if (isAxiosError(data)) {
+      setOpen(false)
+
+      switch (data.code) {
+        case "ERR_NETWORK":
+          toast({
+            description: "There seems to be a network error.",
+            action: <ToastAction altText="Try again">Try again</ToastAction>,
+          })
+          break
+
+        default:
+          toast({
+            title: "Uh oh! Failed to fetch clients.",
+            description: "There was a problem with your request.",
+            action: (
+              <ToastAction altText="Try again" onClick={() => refetch()}>
+                Try again
+              </ToastAction>
+            ),
+          })
+          break
+      }
+    }
+  }
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: createClientProductPriceListAsAdmin,
+    onSuccess: () => {
+      toast({
+        description: "Created Product Price List Succesfully",
+      })
+
+      router.push(`/dashboard/prices`)
+    },
+    onError: (error) => {
+      if (isAxiosError(error)) {
         switch (error.code) {
           case "ERR_NETWORK":
             toast({
@@ -203,57 +233,15 @@ export function AdminCreateProductPriceForm({
 
           default:
             toast({
-              title: "Uh oh! Failed to fetch clients.",
+              title: "Uh oh! Admin client update failed.",
               description: "There was a problem with your request.",
-              action: (
-                <ToastAction altText="Try again" onClick={() => refetch()}>
-                  Try again
-                </ToastAction>
-              ),
+              action: <ToastAction altText="Try again">Try again</ToastAction>,
             })
             break
         }
       }
     },
-    enabled,
   })
-
-  const { mutate, isLoading } = useMutation(
-    createClientProductPriceListAsAdmin,
-    {
-      onSuccess: () => {
-        toast({
-          description: "Created Product Price List Succesfully",
-        })
-
-        router.push(`/dashboard/prices`)
-      },
-      onError: (error) => {
-        if (isAxiosError(error)) {
-          switch (error.code) {
-            case "ERR_NETWORK":
-              toast({
-                description: "There seems to be a network error.",
-                action: (
-                  <ToastAction altText="Try again">Try again</ToastAction>
-                ),
-              })
-              break
-
-            default:
-              toast({
-                title: "Uh oh! Admin client update failed.",
-                description: "There was a problem with your request.",
-                action: (
-                  <ToastAction altText="Try again">Try again</ToastAction>
-                ),
-              })
-              break
-          }
-        }
-      },
-    }
-  )
 
   async function onSubmit(payload: ProducerPriceList) {
     payload.beef.super = dollarsToCents(payload.beef.super)
@@ -424,7 +412,6 @@ export function AdminCreateProductPriceForm({
                                     setSelectedClient(client.name)
                                     setOpen(false)
                                     setSearchClient("")
-                                    setAdminClients([])
                                   }}
                                 >
                                   <span>{client.name}</span>
@@ -1193,9 +1180,9 @@ export function AdminCreateProductPriceForm({
         <button
           type="submit"
           className={cn(buttonVariants(), "mt-5")}
-          disabled={isLoading}
+          disabled={isPending}
         >
-          {isLoading && <Icons.spinner className="w-4 h-4 mr-2 animate-spin" />}
+          {isPending && <Icons.spinner className="w-4 h-4 mr-2 animate-spin" />}
           Submit
         </button>
       </form>

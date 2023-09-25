@@ -27,7 +27,8 @@ interface AdminControlDropDownProps {
 
 export function AdminControlDropDown({ client }: AdminControlDropDownProps) {
   const router = useRouter()
-  const { mutate, isLoading } = useMutation(verifyClientAsAdmin, {
+  const { mutate, isPending } = useMutation({
+    mutationFn: verifyClientAsAdmin,
     onSuccess: (data) => {
       const verified = data?.data?.verified
         ? "Verified Successfully"
@@ -64,7 +65,7 @@ export function AdminControlDropDown({ client }: AdminControlDropDownProps) {
     mutate(payload)
   }
 
-  const animate = isLoading ? "animate-bounce" : ""
+  const animate = isPending ? "animate-bounce" : ""
 
   const stroke = client?.verified ? "stroke-green-500" : "stroke-red-500"
 

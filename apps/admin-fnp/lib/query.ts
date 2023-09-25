@@ -7,7 +7,6 @@ import {
   AdminAuthSchema,
   AdminEditApplicationUser,
   ApplicationUser,
-  ClientUserResponse,
   LoginResponse,
   ProducerPriceList,
   ProducerPriceListsResponse,
@@ -57,12 +56,12 @@ export function queryUsersAsAdmin(pagintion?: pagintion) {
     url = `${baseUrl}/user/clients?search=${pagintion.search}`
   }
 
-  return api.get<ClientUserResponse>(url)
+  return api.get(url)
 }
 
 export function queryUserProductPriceListAsAdmin(clientID?: string) {
   const url = `${baseUrl}/prices/get/${clientID}/producer_price`
-  return api.get<ProducerPriceList>(url)
+  return api.get(url)
 }
 
 export function queryProducerPriceListsAsAdmin(pagintion?: pagintion) {
@@ -78,23 +77,22 @@ export function queryProducerPriceListsAsAdmin(pagintion?: pagintion) {
   //   url = `${baseUrl}/user/clients?search=${pagintion.search}`
   // }
 
-  return api.get<ProducerPriceListsResponse>(url)
+  return api.get(url)
 }
 
 export function queryUserAsAdmin(name: string) {
   const url = `${baseUrl}/user/${name}`
-
-  return api.get<ClientUserResponse>(url)
+  return api.get(url)
 }
 
 export function createClientAsAdmin(data: AdminEditApplicationUser) {
   var url = `${baseUrl}/user/add_client`
-  return api.post<ApplicationUser>(url, data)
+  return api.post(url, data)
 }
 
 export function updateClientAsAdmin(data: AdminEditApplicationUser) {
   var url = `${baseUrl}/user/update_client`
-  return api.post<ApplicationUser>(url, data)
+  return api.post(url, data)
 }
 
 export function verifyClientAsAdmin(data: AdminApplicationUserID) {

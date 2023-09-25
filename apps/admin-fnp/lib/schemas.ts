@@ -20,11 +20,6 @@ export type LoginResponse = {
   token: string
 }
 
-export type ClientUserResponse = {
-  total: number
-  data: ApplicationUser[]
-}
-
 export type ProducerPriceListsResponse = {
   total: number
   data: ProducerPriceList[]

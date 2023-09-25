@@ -14,9 +14,6 @@ import { DataTable } from "@/components/structures/data-table"
 import { producerPriceListColumns } from "@/components/structures/producerLists"
 
 export function AdminProducePriceLists() {
-  const [adminProducePriceLists, setAdminProducePriceLists] = useState<
-    ProducerPriceList[]
-  >([])
   const [searchClient, setSearchClient] = useState("")
 
   const [pagination, setPagination] = useState<PaginationState>({
@@ -24,9 +21,7 @@ export function AdminProducePriceLists() {
     pageSize: 20,
   })
 
-  const [total, setTotal] = useState(0)
-
-  const { isError, isLoading, isFetching, refetch } = useQuery({
+  const { isError, isLoading, isFetching, refetch, data } = useQuery({
     queryKey: [
       "dashboard-admin-producer-price-lists",
       { p: pagination.pageIndex },
@@ -35,37 +30,34 @@ export function AdminProducePriceLists() {
       queryProducerPriceListsAsAdmin({
         p: pagination.pageIndex,
       }),
-    onSuccess(data: AxiosResponse) {
-      setAdminProducePriceLists(data?.data?.data)
-      setTotal(data?.data?.total)
-    },
-    onError(error: AxiosError) {
-      if (isAxiosError(error)) {
-        switch (error.code) {
-          case "ERR_NETWORK":
-            toast({
-              description: "There seems to be a network error.",
-              action: <ToastAction altText="Try again">Try again</ToastAction>,
-            })
-            break
-
-          default:
-            toast({
-              title: "Uh oh! Failed to fetch clients.",
-              description: "There was a problem with your request.",
-              action: (
-                <ToastAction altText="Try again" onClick={() => refetch()}>
-                  Try again
-                </ToastAction>
-              ),
-            })
-            break
-        }
-      }
-    },
   })
 
+  const adminProducePriceLists = data?.data?.data as ProducerPriceList[]
+  const total = data?.data?.total as number
+
   if (isError) {
+    if (isAxiosError(data)) {
+      switch (data.code) {
+        case "ERR_NETWORK":
+          toast({
+            description: "There seems to be a network error.",
+            action: <ToastAction altText="Try again">Try again</ToastAction>,
+          })
+          break
+
+        default:
+          toast({
+            title: "Uh oh! Failed to fetch clients.",
+            description: "There was a problem with your request.",
+            action: (
+              <ToastAction altText="Try again" onClick={() => refetch()}>
+                Try again
+              </ToastAction>
+            ),
+          })
+          break
+      }
+    }
     return (
       <Placeholder>
         <Placeholder.Icon name="close" />

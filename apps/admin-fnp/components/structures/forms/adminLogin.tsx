@@ -31,7 +31,8 @@ export function AdminAuthForm({ className, ...props }: AdminAuthFormProps) {
 
   const { errors } = formState
 
-  const { mutate, isLoading } = useMutation(queryAdminLogin, {
+  const { mutate, isPending } = useMutation({
+    mutationFn: queryAdminLogin,
     onSuccess: (data) => {
       toast({
         description: "Login Successful redirecting you to dashboard.",
@@ -84,7 +85,7 @@ export function AdminAuthForm({ className, ...props }: AdminAuthFormProps) {
               autoCapitalize="none"
               autoComplete="email"
               autoCorrect="off"
-              disabled={isLoading}
+              disabled={isPending}
               {...register("email", { required: true })}
             />
             {errors?.email && (
@@ -103,7 +104,7 @@ export function AdminAuthForm({ className, ...props }: AdminAuthFormProps) {
               type="password"
               autoCapitalize="none"
               autoComplete="off"
-              disabled={isLoading}
+              disabled={isPending}
               {...register("password", { required: true })}
             />
             {errors?.password && (
@@ -114,11 +115,11 @@ export function AdminAuthForm({ className, ...props }: AdminAuthFormProps) {
           </div>
           <button
             className={cn(buttonVariants())}
-            disabled={isLoading}
+            disabled={isPending}
             type="submit"
           >
-            {isLoading && (
-              <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+            {isPending && (
+              <Icons.spinner className="w-4 h-4 mr-2 animate-spin" />
             )}
             Login
           </button>
