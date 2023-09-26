@@ -11,20 +11,20 @@ export default async function DashboardLayout({
   children,
 }: DashboardLayoutProps) {
   return (
-    <div className="flex min-h-screen flex-col space-y-6">
-      <header className="sticky top-0 z-40 border-b bg-background shadow-sm">
-        <div className="container flex h-16 items-center justify-between py-4">
+    <div className="flex flex-col min-h-screen space-y-6">
+      <header className="sticky top-0 z-40 border-b shadow-sm bg-background">
+        <div className="container flex items-center justify-between h-16 py-4">
           <MainNavigation />
           <AdminAccountNavigation />
         </div>
       </header>
       <div className="container flex flex-1 gap-12">
-        <aside className="hidden w-[200px] flex-col md:flex border-r px-4 fixed h-screen">
+        <aside className="fixed hidden h-screen w-[200px] flex-col border-r px-4 md:flex">
           <SidebarNavigation
             navigationLinks={dashboardConfig.sidebarNavigation}
           />
         </aside>
-        <main className="flex flex-1 flex-col overflow-hidden sm:ml-64">
+        <main className="flex flex-col flex-1 overflow-hidden sm:ml-64">
           {children}
         </main>
       </div>
