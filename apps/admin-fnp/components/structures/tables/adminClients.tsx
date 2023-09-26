@@ -1,25 +1,25 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useQuery } from "@tanstack/react-query"
-import { PaginationState } from "@tanstack/react-table"
-import { isAxiosError } from "axios"
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { PaginationState } from "@tanstack/react-table";
+import { isAxiosError } from "axios";
 
-import { queryUsersAsAdmin } from "@/lib/query"
-import { ApplicationUser } from "@/lib/schemas"
-import { ToastAction } from "@/components/ui/toast"
-import { toast } from "@/components/ui/use-toast"
-import { Placeholder } from "@/components/state/placeholder"
-import { clientColumns } from "@/components/structures/clients"
-import { DataTable } from "@/components/structures/data-table"
+import { queryUsersAsAdmin } from "@/lib/query";
+import { ApplicationUser } from "@/lib/schemas";
+import { ToastAction } from "@/components/ui/toast";
+import { toast } from "@/components/ui/use-toast";
+import { Placeholder } from "@/components/state/placeholder";
+import { clientColumns } from "@/components/structures/clients";
+import { DataTable } from "@/components/structures/data-table";
 
 export function AdminClientsTable() {
-  const [searchClient, setSearchClient] = useState("")
+  const [searchClient, setSearchClient] = useState("");
 
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 1,
     pageSize: 20,
-  })
+  });
 
   const { isError, isLoading, isFetching, data, refetch } = useQuery({
     queryKey: ["dashboard-admin-clients", { p: pagination.pageIndex }],
@@ -27,10 +27,10 @@ export function AdminClientsTable() {
       queryUsersAsAdmin({
         p: pagination.pageIndex,
       }),
-  })
+  });
 
-  const adminClients = data?.data?.data as ApplicationUser[]
-  const total = data?.data?.total as number
+  const adminClients = data?.data?.data as ApplicationUser[];
+  const total = data?.data?.total as number;
 
   if (isError) {
     if (isAxiosError(data)) {
@@ -39,8 +39,8 @@ export function AdminClientsTable() {
           toast({
             description: "There seems to be a network error.",
             action: <ToastAction altText="Try again">Try again</ToastAction>,
-          })
-          break
+          });
+          break;
 
         default:
           toast({
@@ -51,8 +51,8 @@ export function AdminClientsTable() {
                 Try again
               </ToastAction>
             ),
-          })
-          break
+          });
+          break;
       }
     }
     return (
@@ -63,7 +63,7 @@ export function AdminClientsTable() {
           Error Fetching users from the database
         </Placeholder.Description>
       </Placeholder>
-    )
+    );
   }
 
   if (isLoading || isFetching) {
@@ -71,7 +71,7 @@ export function AdminClientsTable() {
       <Placeholder>
         <Placeholder.Title>Fetching Users</Placeholder.Title>
       </Placeholder>
-    )
+    );
   }
 
   return (
@@ -86,5 +86,5 @@ export function AdminClientsTable() {
       searchClient={searchClient}
       setSearchClient={setSearchClient}
     />
-  )
+  );
 }

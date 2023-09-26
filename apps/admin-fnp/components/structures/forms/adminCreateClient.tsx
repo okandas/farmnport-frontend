@@ -1,20 +1,20 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useMutation } from "@tanstack/react-query"
-import { isAxiosError } from "axios"
-import { useForm, useWatch } from "react-hook-form"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
+import { isAxiosError } from "axios";
+import { useForm, useWatch } from "react-hook-form";
 
-import { createClientAsAdmin } from "@/lib/query"
+import { createClientAsAdmin } from "@/lib/query";
 import {
   AdminEditApplicationUser,
   AdminEditApplicationUserSchema,
-} from "@/lib/schemas"
-import { cn, slug } from "@/lib/utilities"
-import { Badge } from "@/components/ui/badge"
-import { buttonVariants } from "@/components/ui/button"
+} from "@/lib/schemas";
+import { cn, slug } from "@/lib/utilities";
+import { Badge } from "@/components/ui/badge";
+import { buttonVariants } from "@/components/ui/button";
 import {
   Command,
   CommandEmpty,
@@ -23,7 +23,7 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
-} from "@/components/ui/command"
+} from "@/components/ui/command";
 import {
   Form,
   FormControl,
@@ -32,34 +32,34 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
+} from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea"
-import { ToastAction } from "@/components/ui/toast"
-import { toast } from "@/components/ui/use-toast"
-import { Icons } from "@/components/icons/lucide"
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { ToastAction } from "@/components/ui/toast";
+import { toast } from "@/components/ui/use-toast";
+import { Icons } from "@/components/icons/lucide";
 import {
   clientTypes,
   mainActivity,
   provinces,
   scales,
   specializations,
-} from "@/components/structures/data/data"
+} from "@/components/structures/data/data";
 
 interface AdminCreateFormProps extends React.HTMLAttributes<HTMLDivElement> {
-  client: AdminEditApplicationUser
+  client: AdminEditApplicationUser;
 }
 
 export function AdminCreateForm({ client }: AdminCreateFormProps) {
@@ -81,32 +81,32 @@ export function AdminCreateForm({ client }: AdminCreateFormProps) {
       short_description: client?.short_description,
     },
     resolver: zodResolver(AdminEditApplicationUserSchema),
-  })
+  });
 
   const selectedSpecializations = useWatch({
     name: "specializations",
     control: form.control,
-  })
+  });
 
   const selectedMainActivity = useWatch({
     name: "main_activity",
     control: form.control,
-  })
+  });
 
-  const changingSpecialization = form.watch("specialization")
+  const changingSpecialization = form.watch("specialization");
 
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
 
-  const router = useRouter()
+  const router = useRouter();
 
   const { mutate, isPending } = useMutation({
     mutationFn: createClientAsAdmin,
     onSuccess: () => {
       toast({
         description: "Created User Succesfully",
-      })
+      });
 
-      router.push(`/dashboard/users`)
+      router.push(`/dashboard/users`);
     },
     onError: (error) => {
       if (isAxiosError(error)) {
@@ -115,23 +115,23 @@ export function AdminCreateForm({ client }: AdminCreateFormProps) {
             toast({
               description: "There seems to be a network error.",
               action: <ToastAction altText="Try again">Try again</ToastAction>,
-            })
-            break
+            });
+            break;
 
           default:
             toast({
               title: "Uh oh! Admin client update failed.",
               description: "There was a problem with your request.",
               action: <ToastAction altText="Try again">Try again</ToastAction>,
-            })
-            break
+            });
+            break;
         }
       }
     },
-  })
+  });
 
   async function onSubmit(payload: AdminEditApplicationUser) {
-    mutate(payload)
+    mutate(payload);
   }
 
   return (
@@ -252,7 +252,7 @@ export function AdminCreateForm({ client }: AdminCreateFormProps) {
                         <SelectItem key={specialization} value={specialization}>
                           {specialization}
                         </SelectItem>
-                      )
+                      );
                     })}
                   </SelectContent>
                 </Select>
@@ -287,7 +287,7 @@ export function AdminCreateForm({ client }: AdminCreateFormProps) {
                         <SelectItem key={province} value={province}>
                           {province}
                         </SelectItem>
-                      )
+                      );
                     })}
                   </SelectContent>
                 </Select>
@@ -323,7 +323,7 @@ export function AdminCreateForm({ client }: AdminCreateFormProps) {
                           <SelectItem key={activity} value={activity}>
                             {activity}
                           </SelectItem>
-                        )
+                        );
                       })}
                     </SelectContent>
                   </Select>
@@ -356,7 +356,7 @@ export function AdminCreateForm({ client }: AdminCreateFormProps) {
                                     >
                                       {selected}
                                     </Badge>
-                                  )
+                                  );
                                 }
                               })
                             : "Select Specialization ..."}
@@ -385,52 +385,52 @@ export function AdminCreateForm({ client }: AdminCreateFormProps) {
                                           onSelect={(value) => {
                                             if (
                                               !selectedSpecializations?.includes(
-                                                value
+                                                value,
                                               )
                                             ) {
                                               const NewSpecialization = [
                                                 ...selectedSpecializations,
                                                 value,
-                                              ]
+                                              ];
 
                                               form.setValue(
                                                 "specializations",
-                                                NewSpecialization
-                                              )
+                                                NewSpecialization,
+                                              );
                                             } else {
                                               const removeAtIndex =
                                                 selectedSpecializations?.indexOf(
-                                                  value
-                                                )
+                                                  value,
+                                                );
 
                                               selectedSpecializations?.splice(
                                                 removeAtIndex,
-                                                1
-                                              )
+                                                1,
+                                              );
 
                                               form.setValue(
                                                 "specializations",
-                                                selectedSpecializations
-                                              )
+                                                selectedSpecializations,
+                                              );
                                             }
                                           }}
                                         >
                                           {selectedSpecializations?.includes(
-                                            activity
+                                            activity,
                                           ) ? (
                                             <Icons.check className="w-4 h-4 mr-2" />
                                           ) : null}
 
                                           <span>{activity}</span>
                                         </CommandItem>
-                                      )
+                                      );
                                     } else {
-                                      null
+                                      null;
                                     }
-                                  }
+                                  },
                                 )}
                               </CommandGroup>
-                            )
+                            );
                           })}
                           <CommandSeparator />
                         </CommandList>
@@ -463,7 +463,7 @@ export function AdminCreateForm({ client }: AdminCreateFormProps) {
                         <SelectItem key={type} value={type}>
                           {type}
                         </SelectItem>
-                      )
+                      );
                     })}
                   </SelectContent>
                 </Select>
@@ -494,7 +494,7 @@ export function AdminCreateForm({ client }: AdminCreateFormProps) {
                           <SelectItem key={scale} value={scale}>
                             {scale}
                           </SelectItem>
-                        )
+                        );
                       })}
                     </SelectContent>
                   </Select>
@@ -534,5 +534,5 @@ export function AdminCreateForm({ client }: AdminCreateFormProps) {
         </button>
       </form>
     </Form>
-  )
+  );
 }

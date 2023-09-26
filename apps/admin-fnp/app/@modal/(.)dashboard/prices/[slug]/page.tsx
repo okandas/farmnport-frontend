@@ -1,48 +1,48 @@
-"use client"
+"use client";
 
-import { useRouter } from "next/navigation"
-import { useQuery } from "@tanstack/react-query"
-import { isAxiosError } from "axios"
+import { useRouter } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
+import { isAxiosError } from "axios";
 
-import { queryUserProductPriceListAsAdmin } from "@/lib/query"
-import { ProducerPriceList } from "@/lib/schemas"
-import { centsToDollars, cn, formatDate, ucFirst } from "@/lib/utilities"
-import { Card, CardContent, CardDescription } from "@/components/ui/card"
+import { queryUserProductPriceListAsAdmin } from "@/lib/query";
+import { ProducerPriceList } from "@/lib/schemas";
+import { centsToDollars, cn, formatDate, ucFirst } from "@/lib/utilities";
+import { Card, CardContent, CardDescription } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ToastAction } from "@/components/ui/toast"
-import { toast } from "@/components/ui/use-toast"
-import { Placeholder } from "@/components/state/placeholder"
+} from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ToastAction } from "@/components/ui/toast";
+import { toast } from "@/components/ui/use-toast";
+import { Placeholder } from "@/components/state/placeholder";
 
 interface ViewClientProductListDialogProps {
   params: {
-    slug: string
-  }
+    slug: string;
+  };
 }
 
 export default function ViewClientProductListDialog({
   params,
 }: ViewClientProductListDialogProps) {
-  const clientID = params.slug
+  const clientID = params.slug;
 
   const { isError, isLoading, isFetching, refetch, data } = useQuery({
     queryKey: ["dashboard-admin-client-price", clientID],
     queryFn: () => queryUserProductPriceListAsAdmin(clientID),
-  })
+  });
 
-  const router = useRouter()
+  const router = useRouter();
 
   const handleOnOpenChange = (open: boolean) => {
     if (!open) {
-      router.back()
+      router.back();
     }
-  }
+  };
 
   if (isError) {
     if (isAxiosError(data)) {
@@ -51,8 +51,8 @@ export default function ViewClientProductListDialog({
           toast({
             description: "There seems to be a network error.",
             action: <ToastAction altText="Try again">Try again</ToastAction>,
-          })
-          break
+          });
+          break;
 
         default:
           toast({
@@ -63,8 +63,8 @@ export default function ViewClientProductListDialog({
                 Try again
               </ToastAction>
             ),
-          })
-          break
+          });
+          break;
       }
     }
 
@@ -82,7 +82,7 @@ export default function ViewClientProductListDialog({
           </div>
         </DialogContent>
       </Dialog>
-    )
+    );
   }
 
   if (isLoading || isFetching) {
@@ -96,10 +96,10 @@ export default function ViewClientProductListDialog({
           </Placeholder>
         </DialogContent>
       </Dialog>
-    )
+    );
   }
 
-  const producerPriceList = data?.data as ProducerPriceList
+  const producerPriceList = data?.data as ProducerPriceList;
 
   const statuses = [
     "text-green-700 bg-green-50 ring-green-600/20",
@@ -110,7 +110,7 @@ export default function ViewClientProductListDialog({
     "text-red-700 bg-red-50 ring-red-600/10",
     "text-stone-600 bg-stone-50 ring-stone-500/10",
     "text-gray-600 bg-gray-50 ring-gray-500/10",
-  ]
+  ];
 
   type ProducerPriceListKeys =
     | "beef"
@@ -118,14 +118,14 @@ export default function ViewClientProductListDialog({
     | "mutton"
     | "goat"
     | "chicken"
-    | "pork"
+    | "pork";
 
-  const beef: ProducerPriceListKeys = "beef"
-  const lamb: ProducerPriceListKeys = "lamb"
-  const mutton: ProducerPriceListKeys = "mutton"
-  const goat: ProducerPriceListKeys = "goat"
-  const chicken: ProducerPriceListKeys = "chicken"
-  const pork: ProducerPriceListKeys = "pork"
+  const beef: ProducerPriceListKeys = "beef";
+  const lamb: ProducerPriceListKeys = "lamb";
+  const mutton: ProducerPriceListKeys = "mutton";
+  const goat: ProducerPriceListKeys = "goat";
+  const chicken: ProducerPriceListKeys = "chicken";
+  const pork: ProducerPriceListKeys = "pork";
 
   const grades: Record<ProducerPriceListKeys, Record<string, string>> = {
     beef: {
@@ -162,13 +162,13 @@ export default function ViewClientProductListDialog({
       super: "SP",
       manufacturing: "MP",
     },
-  }
+  };
 
   const pricingTypes: Record<string, ProducerPriceListKeys[]> = {
     livestock: [beef, lamb, mutton, goat, chicken, pork],
-  }
+  };
 
-  const effectiveDate = producerPriceList.effectiveDate.toString()
+  const effectiveDate = producerPriceList.effectiveDate.toString();
 
   return (
     <Dialog open onOpenChange={handleOnOpenChange}>
@@ -189,8 +189,8 @@ export default function ViewClientProductListDialog({
                     <TabsTrigger key={index} value={type}>
                       {type}
                     </TabsTrigger>
-                  )
-                }
+                  );
+                },
               )}
             </TabsList>
             {pricingTypes[producerPriceList.client_specialization].map(
@@ -212,10 +212,10 @@ export default function ViewClientProductListDialog({
                             {Object.keys(producerPriceList[pricingType]).map(
                               (key, index) => {
                                 if (key === "hasPrice") {
-                                  return null
+                                  return null;
                                 }
                                 const gradePrices =
-                                  producerPriceList[pricingType]
+                                  producerPriceList[pricingType];
 
                                 return (
                                   <li
@@ -232,7 +232,7 @@ export default function ViewClientProductListDialog({
                                             {centsToDollars(
                                               gradePrices[
                                                 key as keyof typeof gradePrices
-                                              ]
+                                              ],
                                             )}
                                           </div>
 
@@ -240,7 +240,7 @@ export default function ViewClientProductListDialog({
                                             <div
                                               className={cn(
                                                 statuses[index],
-                                                "rounded-md py-1 px-2 text-xs font-medium ring-1 ring-inset"
+                                                "rounded-md py-1 px-2 text-xs font-medium ring-1 ring-inset",
                                               )}
                                             >
                                               {grades[pricingType][key]}
@@ -250,20 +250,20 @@ export default function ViewClientProductListDialog({
                                       </div>
                                     </dl>
                                   </li>
-                                )
-                              }
+                                );
+                              },
                             )}
                           </ul>
                         ) : null}
                       </CardContent>
                     </Card>
                   </TabsContent>
-                )
-              }
+                );
+              },
             )}
           </Tabs>
         </section>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

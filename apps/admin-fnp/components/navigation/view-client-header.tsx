@@ -1,31 +1,31 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useQuery } from "@tanstack/react-query"
-import { isAxiosError } from "axios"
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { isAxiosError } from "axios";
 
-import { queryUserAsAdmin } from "@/lib/query"
-import { ApplicationUser } from "@/lib/schemas"
-import { makeAbbveriation } from "@/lib/utilities"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { ToastAction } from "@/components/ui/toast"
-import { toast } from "@/components/ui/use-toast"
-import { Icons } from "@/components/icons/lucide"
+import { queryUserAsAdmin } from "@/lib/query";
+import { ApplicationUser } from "@/lib/schemas";
+import { makeAbbveriation } from "@/lib/utilities";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { ToastAction } from "@/components/ui/toast";
+import { toast } from "@/components/ui/use-toast";
+import { Icons } from "@/components/icons/lucide";
 
 interface ViewClientHeaderProps {
   params: {
-    slug: string
-  }
+    slug: string;
+  };
 }
 
 export default function ViewClientHeader({ params }: ViewClientHeaderProps) {
-  const name = params.slug
+  const name = params.slug;
 
   const { isError, isLoading, isFetching, data, refetch } = useQuery({
     queryKey: ["dashboard-admin-client", name],
     queryFn: () => queryUserAsAdmin(name),
-  })
+  });
 
   if (isError) {
     if (isAxiosError(data)) {
@@ -34,8 +34,8 @@ export default function ViewClientHeader({ params }: ViewClientHeaderProps) {
           toast({
             description: "There seems to be a network error.",
             action: <ToastAction altText="Try again">Try again</ToastAction>,
-          })
-          break
+          });
+          break;
 
         default:
           toast({
@@ -46,20 +46,20 @@ export default function ViewClientHeader({ params }: ViewClientHeaderProps) {
                 Try again
               </ToastAction>
             ),
-          })
-          break
+          });
+          break;
       }
     }
-    return null
+    return null;
   }
 
   if (isLoading || isFetching) {
-    return null
+    return null;
   }
 
-  const adminClient = data?.data as ApplicationUser
+  const adminClient = data?.data as ApplicationUser;
 
-  const stroke = adminClient?.verified ? "stroke-green-500" : "stroke-red-500"
+  const stroke = adminClient?.verified ? "stroke-green-500" : "stroke-red-500";
 
   return (
     <header className="gap-2 pb-2 border-b">
@@ -82,5 +82,5 @@ export default function ViewClientHeader({ params }: ViewClientHeaderProps) {
         <Badge variant="outline">{adminClient?.type}</Badge>
       </div>
     </header>
-  )
+  );
 }

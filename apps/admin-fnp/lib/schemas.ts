@@ -1,29 +1,29 @@
-import * as z from "zod"
+import * as z from "zod";
 
 export const AdminAuthSchema = z.object({
   email: z.string().nonempty().email(),
   password: z.string().nonempty(),
-})
+});
 
 export type AuthenticatedUser = {
-  admin: boolean
-  banned: boolean
-  exp: number
-  iat: number
-  id: string
-  iss: string
-  subject: string
-  username: string
-}
+  admin: boolean;
+  banned: boolean;
+  exp: number;
+  iat: number;
+  id: string;
+  iss: string;
+  subject: string;
+  username: string;
+};
 
 export type LoginResponse = {
-  token: string
-}
+  token: string;
+};
 
 export type ProducerPriceListsResponse = {
-  total: number
-  data: ProducerPriceList[]
-}
+  total: number;
+  data: ProducerPriceList[];
+};
 
 export const ApplicationUserSchema = z.object({
   id: z.string(),
@@ -54,7 +54,7 @@ export const ApplicationUserSchema = z.object({
     coordinates: z.array(z.number()),
   }),
   verified: z.boolean(),
-})
+});
 
 export const ProducerPriceListSchema = z.object({
   id: z.string(),
@@ -112,7 +112,7 @@ export const ProducerPriceListSchema = z.object({
     hasPrice: z.boolean(),
   }),
   unit: z.string().nonempty(),
-})
+});
 
 ApplicationUserSchema.required({
   name: true,
@@ -126,7 +126,7 @@ ApplicationUserSchema.required({
   specialization: true,
   specializations: true,
   type: true,
-})
+});
 
 export const AdminEditApplicationUserSchema = ApplicationUserSchema.pick({
   id: true,
@@ -143,19 +143,19 @@ export const AdminEditApplicationUserSchema = ApplicationUserSchema.pick({
   scale: true,
   branches: true,
   short_description: true,
-})
+});
 
 export const AdminApplicationUserIDSchema = ApplicationUserSchema.pick({
   id: true,
-})
+});
 
-export type ApplicationUser = z.infer<typeof ApplicationUserSchema>
-export type ProducerPriceList = z.infer<typeof ProducerPriceListSchema>
+export type ApplicationUser = z.infer<typeof ApplicationUserSchema>;
+export type ProducerPriceList = z.infer<typeof ProducerPriceListSchema>;
 
 export type AdminEditApplicationUser = z.infer<
   typeof AdminEditApplicationUserSchema
->
+>;
 
 export type AdminApplicationUserID = z.infer<
   typeof AdminApplicationUserIDSchema
->
+>;

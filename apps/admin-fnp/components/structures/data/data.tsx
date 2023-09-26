@@ -1,4 +1,4 @@
-import { string } from "zod"
+import { string } from "zod";
 
 export const provinces = [
   "bulawayo",
@@ -11,7 +11,7 @@ export const provinces = [
   "matabeleland north",
   "matabeleland south",
   "midlands",
-]
+];
 
 export const specializations = [
   "horticulture",
@@ -24,11 +24,11 @@ export const specializations = [
   "hospitality",
   "poultry",
   "pastures",
-]
+];
 
-export const clientTypes = ["farmer", "buyer", "exporter", "importer"]
+export const clientTypes = ["farmer", "buyer", "exporter", "importer"];
 
-export const scales = ["small", "medium", "large"]
+export const scales = ["small", "medium", "large"];
 
 export const mainActivity: Record<string, string[]> = {
   horticulture: ["tomato", "onion", "lettuce", "potato", "sweet potato"],
@@ -55,6 +55,6 @@ export const mainActivity: Record<string, string[]> = {
   hospitality: ["catering"],
   poultry: ["chicken", "turkey"],
   pastures: ["katambora"],
-}
+};
 
-export const units = ["kg"]
+export const units = ["kg"];

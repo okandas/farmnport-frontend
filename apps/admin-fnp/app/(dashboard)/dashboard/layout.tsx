@@ -1,10 +1,10 @@
-import { dashboardConfig } from "@/config/dashboard"
-import { AdminAccountNavigation } from "@/components/navigation/admin-account"
-import { MainNavigation } from "@/components/navigation/main"
-import { SidebarNavigation } from "@/components/navigation/sidebar"
+import { dashboardConfig } from "@/config/dashboard";
+import { AdminAccountNavigation } from "@/components/navigation/admin-account";
+import { MainNavigation } from "@/components/navigation/main";
+import { SidebarNavigation } from "@/components/navigation/sidebar";
 
 interface DashboardLayoutProps {
-  children?: React.ReactNode
+  children?: React.ReactNode;
 }
 
 export default async function DashboardLayout({
@@ -29,5 +29,5 @@ export default async function DashboardLayout({
         </main>
       </div>
     </div>
-  )
+  );
 }

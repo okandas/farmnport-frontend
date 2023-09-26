@@ -1,12 +1,12 @@
-"use client"
+"use client";
 
-import { ColumnDef } from "@tanstack/react-table"
-import { PhoneNumberFormat } from "google-libphonenumber"
+import { ColumnDef } from "@tanstack/react-table";
+import { PhoneNumberFormat } from "google-libphonenumber";
 
-import { ApplicationUser } from "@/lib/schemas"
-import { phoneUtility } from "@/lib/utilities"
-import { Checkbox } from "@/components/ui/checkbox"
-import { AdminControlDropDown } from "@/components/structures/control-dropdown"
+import { ApplicationUser } from "@/lib/schemas";
+import { phoneUtility } from "@/lib/utilities";
+import { Checkbox } from "@/components/ui/checkbox";
+import { AdminControlDropDown } from "@/components/structures/control-dropdown";
 
 export const clientColumns: ColumnDef<ApplicationUser>[] = [
   {
@@ -44,24 +44,24 @@ export const clientColumns: ColumnDef<ApplicationUser>[] = [
     cell: ({ row }) => {
       const phone = phoneUtility.parseAndKeepRawInput(
         row.getValue("phone"),
-        "ZW"
-      )
+        "ZW",
+      );
       const formatted = phoneUtility.format(
         phone,
-        PhoneNumberFormat.INTERNATIONAL
-      )
+        PhoneNumberFormat.INTERNATIONAL,
+      );
       return (
         <div className="font-medium text-right">
           <a href={`tel:${formatted}`}>{formatted}</a>
         </div>
-      )
+      );
     },
   },
   {
     accessorKey: "province",
     header: "Province",
     filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id))
+      return value.includes(row.getValue(id));
     },
   },
   {
@@ -72,9 +72,9 @@ export const clientColumns: ColumnDef<ApplicationUser>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      const client = row?.original
+      const client = row?.original;
 
-      return <AdminControlDropDown client={client} />
+      return <AdminControlDropDown client={client} />;
     },
   },
-]
+];

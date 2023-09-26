@@ -1,27 +1,27 @@
-import { Inter as FontSans } from "next/font/google"
-import Script from "next/script"
+import { Inter as FontSans } from "next/font/google";
+import Script from "next/script";
 
-import { cn } from "@/lib/utilities"
-import QueryProvider from "@/components/providers/QueryProvider"
+import { cn } from "@/lib/utilities";
+import QueryProvider from "@/components/providers/QueryProvider";
 
-import "@/styles/globals.css"
+import "@/styles/globals.css";
 
-import React from "react"
+import React from "react";
 
-var GTM_ID = process.env.NEXT_PUBLIC_GTM_ID
+var GTM_ID = process.env.NEXT_PUBLIC_GTM_ID;
 
 const fontSans = FontSans({
   subsets: ["latin"],
   variable: "--font-sans",
-})
+});
 
 export const metadata = {
   title: "farmnport - Welcome Administrator",
   description: "Manage Farmnport",
-}
+};
 interface RootLayoutProps {
-  children: React.ReactNode
-  modal: React.ReactNode
+  children: React.ReactNode;
+  modal: React.ReactNode;
 }
 
 export default function RootLayout({ children, modal }: RootLayoutProps) {
@@ -40,7 +40,7 @@ export default function RootLayout({ children, modal }: RootLayoutProps) {
       <body
         className={cn(
           "min-h-screen bg-background font-sans antialiased",
-          fontSans.variable
+          fontSans.variable,
         )}
       >
         <noscript
@@ -54,5 +54,5 @@ export default function RootLayout({ children, modal }: RootLayoutProps) {
         </QueryProvider>
       </body>
     </html>
-  )
+  );
 }

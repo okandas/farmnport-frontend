@@ -1,4 +1,4 @@
-import { AdminAuthForm } from "@/components/structures/forms/adminLogin"
+import { AdminAuthForm } from "@/components/structures/forms/adminLogin";
 
 export default function Login() {
   return (
@@ -18,5 +18,5 @@ export default function Login() {
         <p className="px-8 text-center text-sm text-muted-foreground"></p>
       </div>
     </div>
-  )
+  );
 }

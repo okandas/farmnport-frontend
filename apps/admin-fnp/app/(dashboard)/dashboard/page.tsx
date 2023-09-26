@@ -1,4 +1,4 @@
-import { Placeholder } from "@/components/state/placeholder"
+import { Placeholder } from "@/components/state/placeholder";
 
 export default async function DashboardPage() {
   return (
@@ -9,5 +9,5 @@ export default async function DashboardPage() {
         We are still working on the dashboard data.
       </Placeholder.Description>
     </Placeholder>
-  )
+  );
 }

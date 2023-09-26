@@ -1,6 +1,6 @@
-import { DashboardHeader } from "@/components/state/dashboardHeader"
-import { DashboardShell } from "@/components/state/dashboardShell"
-import { Placeholder } from "@/components/state/placeholder"
+import { DashboardHeader } from "@/components/state/dashboardHeader";
+import { DashboardShell } from "@/components/state/dashboardShell";
+import { Placeholder } from "@/components/state/placeholder";
 
 export default async function DashboardUsersPage() {
   return (
@@ -17,5 +17,5 @@ export default async function DashboardUsersPage() {
         </Placeholder.Description>
       </Placeholder>
     </DashboardShell>
-  )
+  );
 }

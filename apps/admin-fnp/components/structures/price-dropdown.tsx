@@ -1,12 +1,12 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { MoreHorizontal } from "lucide-react"
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { MoreHorizontal } from "lucide-react";
 
-import { ProducerPriceList } from "@/lib/schemas"
-import { slug } from "@/lib/utilities"
-import { Button } from "@/components/ui/button"
+import { ProducerPriceList } from "@/lib/schemas";
+import { slug } from "@/lib/utilities";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,12 +14,12 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { ToastAction } from "@/components/ui/toast"
-import { toast } from "@/components/ui/use-toast"
+} from "@/components/ui/dropdown-menu";
+import { ToastAction } from "@/components/ui/toast";
+import { toast } from "@/components/ui/use-toast";
 
 interface PriceControlDropDownProps {
-  priceItem?: ProducerPriceList
+  priceItem?: ProducerPriceList;
 }
 
 export function PriceControlDropDown({ priceItem }: PriceControlDropDownProps) {
@@ -52,5 +52,5 @@ export function PriceControlDropDown({ priceItem }: PriceControlDropDownProps) {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }

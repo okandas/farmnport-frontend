@@ -1,6 +1,6 @@
-import { DashboardHeader } from "@/components/state/dashboardHeader"
-import { DashboardShell } from "@/components/state/dashboardShell"
-import { AdminProducePriceLists } from "@/components/structures/tables/adminProducerPriceLists"
+import { DashboardHeader } from "@/components/state/dashboardHeader";
+import { DashboardShell } from "@/components/state/dashboardShell";
+import { AdminProducePriceLists } from "@/components/structures/tables/adminProducerPriceLists";
 
 export default async function DashboardUsersPage() {
   return (
@@ -11,5 +11,5 @@ export default async function DashboardUsersPage() {
       ></DashboardHeader>
       <AdminProducePriceLists />
     </DashboardShell>
-  )
+  );
 }

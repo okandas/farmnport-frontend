@@ -1,29 +1,29 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useMutation, useQuery } from "@tanstack/react-query"
-import { AxiosError, AxiosResponse, isAxiosError } from "axios"
-import { format } from "date-fns"
-import { useForm, useWatch } from "react-hook-form"
-import { useDebounce } from "use-debounce"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { AxiosError, AxiosResponse, isAxiosError } from "axios";
+import { format } from "date-fns";
+import { useForm, useWatch } from "react-hook-form";
+import { useDebounce } from "use-debounce";
 
 import {
   createClientProductPriceListAsAdmin,
   queryUsersAsAdmin,
-} from "@/lib/query"
+} from "@/lib/query";
 import {
   ApplicationUser,
   ProducerPriceList,
   ProducerPriceListSchema,
-} from "@/lib/schemas"
-import { centsToDollarsFormInputs, cn, dollarsToCents } from "@/lib/utilities"
-import { Badge } from "@/components/ui/badge"
-import { Button, buttonVariants } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Checkbox } from "@/components/ui/checkbox"
+} from "@/lib/schemas";
+import { centsToDollarsFormInputs, cn, dollarsToCents } from "@/lib/utilities";
+import { Badge } from "@/components/ui/badge";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Command,
   CommandEmpty,
@@ -32,7 +32,7 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
-} from "@/components/ui/command"
+} from "@/components/ui/command";
 import {
   Form,
   FormControl,
@@ -41,28 +41,28 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
+} from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { ToastAction } from "@/components/ui/toast"
-import { toast } from "@/components/ui/use-toast"
-import { Icons } from "@/components/icons/lucide"
-import { units } from "@/components/structures/data/data"
+} from "@/components/ui/select";
+import { ToastAction } from "@/components/ui/toast";
+import { toast } from "@/components/ui/use-toast";
+import { Icons } from "@/components/icons/lucide";
+import { units } from "@/components/structures/data/data";
 
 interface AdminCreateProductPriceFormProps
   extends React.HTMLAttributes<HTMLDivElement> {
-  priceList: ProducerPriceList
+  priceList: ProducerPriceList;
 }
 
 export function AdminCreateProductPriceForm({
@@ -127,52 +127,52 @@ export function AdminCreateProductPriceForm({
       unit: priceList.unit,
     },
     resolver: zodResolver(ProducerPriceListSchema),
-  })
+  });
 
-  const [searchClient, setSearchClient] = useState("")
-  const [selectedClient, setSelectedClient] = useState(priceList.client_id)
-  const [open, setOpen] = useState(false)
+  const [searchClient, setSearchClient] = useState("");
+  const [selectedClient, setSelectedClient] = useState(priceList.client_id);
+  const [open, setOpen] = useState(false);
 
   const showBeef = useWatch({
     name: "beef.hasPrice",
     control: form.control,
-  })
+  });
 
   const showLamb = useWatch({
     name: "lamb.hasPrice",
     control: form.control,
-  })
+  });
 
   const showMutton = useWatch({
     name: "mutton.hasPrice",
     control: form.control,
-  })
+  });
 
   const showGoat = useWatch({
     name: "goat.hasPrice",
     control: form.control,
-  })
+  });
 
   const showChicken = useWatch({
     name: "chicken.hasPrice",
     control: form.control,
-  })
+  });
 
   const showPork = useWatch({
     name: "pork.hasPrice",
     control: form.control,
-  })
+  });
 
   const showCatering = useWatch({
     name: "catering.hasPrice",
     control: form.control,
-  })
+  });
 
-  const [debouncedSearchQuery] = useDebounce(searchClient, 1000)
+  const [debouncedSearchQuery] = useDebounce(searchClient, 1000);
 
-  const enabled = !!debouncedSearchQuery
+  const enabled = !!debouncedSearchQuery;
 
-  const router = useRouter()
+  const router = useRouter();
 
   const { data, isError, refetch } = useQuery({
     queryKey: ["dashboard-admin-clients", { search: debouncedSearchQuery }],
@@ -181,21 +181,21 @@ export function AdminCreateProductPriceForm({
         search: debouncedSearchQuery,
       }),
     enabled,
-  })
+  });
 
-  const adminClients = data?.data?.data as ApplicationUser[]
+  const adminClients = data?.data?.data as ApplicationUser[];
 
   if (isError) {
     if (isAxiosError(data)) {
-      setOpen(false)
+      setOpen(false);
 
       switch (data.code) {
         case "ERR_NETWORK":
           toast({
             description: "There seems to be a network error.",
             action: <ToastAction altText="Try again">Try again</ToastAction>,
-          })
-          break
+          });
+          break;
 
         default:
           toast({
@@ -206,8 +206,8 @@ export function AdminCreateProductPriceForm({
                 Try again
               </ToastAction>
             ),
-          })
-          break
+          });
+          break;
       }
     }
   }
@@ -217,9 +217,9 @@ export function AdminCreateProductPriceForm({
     onSuccess: () => {
       toast({
         description: "Created Product Price List Succesfully",
-      })
+      });
 
-      router.push(`/dashboard/prices`)
+      router.push(`/dashboard/prices`);
     },
     onError: (error) => {
       if (isAxiosError(error)) {
@@ -228,57 +228,57 @@ export function AdminCreateProductPriceForm({
             toast({
               description: "There seems to be a network error.",
               action: <ToastAction altText="Try again">Try again</ToastAction>,
-            })
-            break
+            });
+            break;
 
           default:
             toast({
               title: "Uh oh! Admin client update failed.",
               description: "There was a problem with your request.",
               action: <ToastAction altText="Try again">Try again</ToastAction>,
-            })
-            break
+            });
+            break;
         }
       }
     },
-  })
+  });
 
   async function onSubmit(payload: ProducerPriceList) {
-    payload.beef.super = dollarsToCents(payload.beef.super)
-    payload.beef.choice = dollarsToCents(payload.beef.choice)
-    payload.beef.commercial = dollarsToCents(payload.beef.commercial)
-    payload.beef.economy = dollarsToCents(payload.beef.economy)
-    payload.beef.manufacturing = dollarsToCents(payload.beef.manufacturing)
-    payload.beef.condemned = dollarsToCents(payload.beef.condemned)
+    payload.beef.super = dollarsToCents(payload.beef.super);
+    payload.beef.choice = dollarsToCents(payload.beef.choice);
+    payload.beef.commercial = dollarsToCents(payload.beef.commercial);
+    payload.beef.economy = dollarsToCents(payload.beef.economy);
+    payload.beef.manufacturing = dollarsToCents(payload.beef.manufacturing);
+    payload.beef.condemned = dollarsToCents(payload.beef.condemned);
 
-    payload.lamb.superPremium = dollarsToCents(payload.lamb.superPremium)
-    payload.lamb.choice = dollarsToCents(payload.lamb.choice)
-    payload.lamb.standard = dollarsToCents(payload.lamb.standard)
-    payload.lamb.inferior = dollarsToCents(payload.lamb.inferior)
+    payload.lamb.superPremium = dollarsToCents(payload.lamb.superPremium);
+    payload.lamb.choice = dollarsToCents(payload.lamb.choice);
+    payload.lamb.standard = dollarsToCents(payload.lamb.standard);
+    payload.lamb.inferior = dollarsToCents(payload.lamb.inferior);
 
-    payload.mutton.super = dollarsToCents(payload.mutton.super)
-    payload.mutton.choice = dollarsToCents(payload.mutton.choice)
-    payload.mutton.standard = dollarsToCents(payload.mutton.standard)
-    payload.mutton.oridnary = dollarsToCents(payload.mutton.oridnary)
-    payload.mutton.inferior = dollarsToCents(payload.mutton.inferior)
+    payload.mutton.super = dollarsToCents(payload.mutton.super);
+    payload.mutton.choice = dollarsToCents(payload.mutton.choice);
+    payload.mutton.standard = dollarsToCents(payload.mutton.standard);
+    payload.mutton.oridnary = dollarsToCents(payload.mutton.oridnary);
+    payload.mutton.inferior = dollarsToCents(payload.mutton.inferior);
 
-    payload.goat.super = dollarsToCents(payload.goat.super)
-    payload.goat.choice = dollarsToCents(payload.goat.choice)
-    payload.goat.standard = dollarsToCents(payload.goat.standard)
-    payload.goat.inferior = dollarsToCents(payload.goat.inferior)
+    payload.goat.super = dollarsToCents(payload.goat.super);
+    payload.goat.choice = dollarsToCents(payload.goat.choice);
+    payload.goat.standard = dollarsToCents(payload.goat.standard);
+    payload.goat.inferior = dollarsToCents(payload.goat.inferior);
 
-    payload.chicken.below = dollarsToCents(payload.chicken.below)
-    payload.chicken.midRange = dollarsToCents(payload.chicken.midRange)
-    payload.chicken.above = dollarsToCents(payload.chicken.above)
-    payload.chicken.condemned = dollarsToCents(payload.chicken.condemned)
+    payload.chicken.below = dollarsToCents(payload.chicken.below);
+    payload.chicken.midRange = dollarsToCents(payload.chicken.midRange);
+    payload.chicken.above = dollarsToCents(payload.chicken.above);
+    payload.chicken.condemned = dollarsToCents(payload.chicken.condemned);
 
-    payload.pork.super = dollarsToCents(payload.pork.super)
-    payload.pork.manufacturing = dollarsToCents(payload.pork.manufacturing)
-    payload.pork.head = dollarsToCents(payload.pork.head)
+    payload.pork.super = dollarsToCents(payload.pork.super);
+    payload.pork.manufacturing = dollarsToCents(payload.pork.manufacturing);
+    payload.pork.head = dollarsToCents(payload.pork.head);
 
-    payload.catering.chicken = dollarsToCents(payload.catering.chicken)
+    payload.catering.chicken = dollarsToCents(payload.catering.chicken);
 
-    mutate(payload)
+    mutate(payload);
   }
 
   return (
@@ -301,7 +301,7 @@ export function AdminCreateProductPriceForm({
                         variant={"outline"}
                         className={cn(
                           "w-[240px] pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground"
+                          !field.value && "text-muted-foreground",
                         )}
                       >
                         {field.value ? (
@@ -354,7 +354,7 @@ export function AdminCreateProductPriceForm({
                           <SelectItem key={unit} value={unit}>
                             {unit}
                           </SelectItem>
-                        )
+                        );
                       })}
                     </SelectContent>
                   </Select>
@@ -408,15 +408,15 @@ export function AdminCreateProductPriceForm({
                                   key={client.id}
                                   value={client.id}
                                   onSelect={(value) => {
-                                    form.setValue("client_id", value)
-                                    setSelectedClient(client.name)
-                                    setOpen(false)
-                                    setSearchClient("")
+                                    form.setValue("client_id", value);
+                                    setSelectedClient(client.name);
+                                    setOpen(false);
+                                    setSearchClient("");
                                   }}
                                 >
                                   <span>{client.name}</span>
                                 </CommandItem>
-                              )
+                              );
                             })}
                           </CommandList>
                         ) : null}
@@ -444,7 +444,7 @@ export function AdminCreateProductPriceForm({
                   <Checkbox
                     checked={field.value}
                     onCheckedChange={() => {
-                      return field.onChange(!field.value)
+                      return field.onChange(!field.value);
                     }}
                   />
                 </FormControl>
@@ -462,7 +462,7 @@ export function AdminCreateProductPriceForm({
                   <Checkbox
                     checked={field.value}
                     onCheckedChange={() => {
-                      return field.onChange(!field.value)
+                      return field.onChange(!field.value);
                     }}
                   />
                 </FormControl>
@@ -480,7 +480,7 @@ export function AdminCreateProductPriceForm({
                   <Checkbox
                     checked={field.value}
                     onCheckedChange={() => {
-                      return field.onChange(!field.value)
+                      return field.onChange(!field.value);
                     }}
                   />
                 </FormControl>
@@ -498,7 +498,7 @@ export function AdminCreateProductPriceForm({
                   <Checkbox
                     checked={field.value}
                     onCheckedChange={() => {
-                      return field.onChange(!field.value)
+                      return field.onChange(!field.value);
                     }}
                   />
                 </FormControl>
@@ -516,7 +516,7 @@ export function AdminCreateProductPriceForm({
                   <Checkbox
                     checked={field.value}
                     onCheckedChange={() => {
-                      return field.onChange(!field.value)
+                      return field.onChange(!field.value);
                     }}
                   />
                 </FormControl>
@@ -534,7 +534,7 @@ export function AdminCreateProductPriceForm({
                   <Checkbox
                     checked={field.value}
                     onCheckedChange={() => {
-                      return field.onChange(!field.value)
+                      return field.onChange(!field.value);
                     }}
                   />
                 </FormControl>
@@ -552,7 +552,7 @@ export function AdminCreateProductPriceForm({
                   <Checkbox
                     checked={field.value}
                     onCheckedChange={() => {
-                      return field.onChange(!field.value)
+                      return field.onChange(!field.value);
                     }}
                   />
                 </FormControl>
@@ -1187,5 +1187,5 @@ export function AdminCreateProductPriceForm({
         </button>
       </form>
     </Form>
-  )
+  );
 }
