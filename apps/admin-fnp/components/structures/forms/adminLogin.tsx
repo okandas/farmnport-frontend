@@ -1,48 +1,48 @@
-"use client";
+"use client"
 
-import { useRouter } from "next/navigation";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
-import { isAxiosError } from "axios";
-import Cookies from "js-cookie";
-import { SubmitHandler, useForm } from "react-hook-form";
-import * as z from "zod";
+import { useRouter } from "next/navigation"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useMutation } from "@tanstack/react-query"
+import { isAxiosError } from "axios"
+import Cookies from "js-cookie"
+import { SubmitHandler, useForm } from "react-hook-form"
+import * as z from "zod"
 
-import { queryAdminLogin } from "@/lib/query";
-import { AdminAuthSchema } from "@/lib/schemas";
-import { cn } from "@/lib/utilities";
-import { buttonVariants } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { ToastAction } from "@/components/ui/toast";
-import { toast } from "@/components/ui/use-toast";
-import { Icons } from "@/components/icons/lucide";
+import { queryAdminLogin } from "@/lib/query"
+import { AdminAuthSchema } from "@/lib/schemas"
+import { cn } from "@/lib/utilities"
+import { buttonVariants } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { ToastAction } from "@/components/ui/toast"
+import { toast } from "@/components/ui/use-toast"
+import { Icons } from "@/components/icons/lucide"
 
 interface AdminAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
-type FormData = z.infer<typeof AdminAuthSchema>;
+type FormData = z.infer<typeof AdminAuthSchema>
 
 export function AdminAuthForm({ className, ...props }: AdminAuthFormProps) {
   const { register, handleSubmit, formState } = useForm<FormData>({
     resolver: zodResolver(AdminAuthSchema),
-  });
+  })
 
-  const router = useRouter();
+  const router = useRouter()
 
-  const { errors } = formState;
+  const { errors } = formState
 
   const { mutate, isPending } = useMutation({
     mutationFn: queryAdminLogin,
     onSuccess: (data) => {
       toast({
         description: "Login Successful redirecting you to dashboard.",
-      });
+      })
 
       Cookies.set("cl_jtkn", data?.data?.token, {
         expires: 30,
-      });
+      })
 
-      router.push("/dashboard");
+      router.push("/dashboard")
     },
     onError: (error) => {
       if (isAxiosError(error)) {
@@ -51,24 +51,24 @@ export function AdminAuthForm({ className, ...props }: AdminAuthFormProps) {
             toast({
               description: "There seems to be a network error.",
               action: <ToastAction altText="Try again">Try again</ToastAction>,
-            });
-            break;
+            })
+            break
 
           default:
             toast({
               title: "Uh oh! Admin login failed.",
               description: "There was a problem with your request.",
               action: <ToastAction altText="Try again">Try again</ToastAction>,
-            });
-            break;
+            })
+            break
         }
       }
     },
-  });
+  })
 
   const onSubmit: SubmitHandler<FormData> = async (payload) => {
-    mutate(payload);
-  };
+    mutate(payload)
+  }
 
   return (
     <div className={cn("grid gap-6", className)} {...props}>
@@ -126,5 +126,5 @@ export function AdminAuthForm({ className, ...props }: AdminAuthFormProps) {
         </div>
       </form>
     </div>
-  );
+  )
 }

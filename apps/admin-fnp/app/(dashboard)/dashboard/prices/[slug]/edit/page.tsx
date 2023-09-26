@@ -1,37 +1,37 @@
-"use client";
+"use client"
 
-import Link from "next/link";
-import { useQuery } from "@tanstack/react-query";
-import { isAxiosError } from "axios";
+import Link from "next/link"
+import { useQuery } from "@tanstack/react-query"
+import { isAxiosError } from "axios"
 
-import { queryUserProductPriceListAsAdmin } from "@/lib/query";
-import { ProducerPriceList } from "@/lib/schemas";
-import { cn } from "@/lib/utilities";
-import { buttonVariants } from "@/components/ui/button";
-import { ToastAction } from "@/components/ui/toast";
-import { toast } from "@/components/ui/use-toast";
-import { Icons } from "@/components/icons/lucide";
-import { Placeholder } from "@/components/state/placeholder";
-import { AdminEditProductPriceForm } from "@/components/structures/forms/adminEditPriceList";
+import { queryUserProductPriceListAsAdmin } from "@/lib/query"
+import { ProducerPriceList } from "@/lib/schemas"
+import { cn } from "@/lib/utilities"
+import { buttonVariants } from "@/components/ui/button"
+import { ToastAction } from "@/components/ui/toast"
+import { toast } from "@/components/ui/use-toast"
+import { Icons } from "@/components/icons/lucide"
+import { Placeholder } from "@/components/state/placeholder"
+import { AdminEditProductPriceForm } from "@/components/structures/forms/adminEditPriceList"
 
 interface EditProductListPriceProps {
   params: {
-    slug: string;
-  };
+    slug: string
+  }
 }
 
 export default function EditProductListPrice({
   params,
 }: EditProductListPriceProps) {
-  const clientID = params.slug;
-  const url = `/dashboard/prices`;
+  const clientID = params.slug
+  const url = `/dashboard/prices`
 
   const { isError, isLoading, isFetching, refetch, data, isSuccess } = useQuery(
     {
       queryKey: ["dashboard-admin-client-price", clientID],
       queryFn: () => queryUserProductPriceListAsAdmin(clientID),
-    },
-  );
+    }
+  )
 
   if (isLoading || isFetching) {
     return (
@@ -42,7 +42,7 @@ export default function EditProductListPrice({
           <Placeholder.Description>fetching</Placeholder.Description>
         </Placeholder>
       </div>
-    );
+    )
   }
 
   if (isError) {
@@ -52,8 +52,8 @@ export default function EditProductListPrice({
           toast({
             description: "There seems to be a network error.",
             action: <ToastAction altText="Try again">Try again</ToastAction>,
-          });
-          break;
+          })
+          break
 
         default:
           toast({
@@ -64,8 +64,8 @@ export default function EditProductListPrice({
                 Try again
               </ToastAction>
             ),
-          });
-          break;
+          })
+          break
       }
     }
     return (
@@ -78,17 +78,17 @@ export default function EditProductListPrice({
           </Placeholder.Description>
         </Placeholder>
       </div>
-    );
+    )
   }
 
-  const producerPriceList = data?.data as ProducerPriceList;
+  const producerPriceList = data?.data as ProducerPriceList
 
   return (
     <>
       <div className={"absolute right-10 top-96"}>
         <Link href={url} className={cn(buttonVariants({ variant: "link" }))}>
           <>
-            <Icons.close className="w-4 h-4 mr-2" />
+            <Icons.close className="mr-2 h-4 w-4" />
             Close
           </>
         </Link>
@@ -98,5 +98,5 @@ export default function EditProductListPrice({
         <AdminEditProductPriceForm priceList={producerPriceList} />
       ) : null}
     </>
-  );
+  )
 }

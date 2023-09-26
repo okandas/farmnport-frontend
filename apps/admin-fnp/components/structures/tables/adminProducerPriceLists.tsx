@@ -1,25 +1,25 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { PaginationState } from "@tanstack/react-table";
-import { AxiosError, AxiosResponse, isAxiosError } from "axios";
+import { useState } from "react"
+import { useQuery } from "@tanstack/react-query"
+import { PaginationState } from "@tanstack/react-table"
+import { isAxiosError } from "axios"
 
-import { queryProducerPriceListsAsAdmin } from "@/lib/query";
-import { ProducerPriceList } from "@/lib/schemas";
-import { ToastAction } from "@/components/ui/toast";
-import { toast } from "@/components/ui/use-toast";
-import { Placeholder } from "@/components/state/placeholder";
-import { DataTable } from "@/components/structures/data-table";
-import { producerPriceListColumns } from "@/components/structures/producerLists";
+import { queryProducerPriceListsAsAdmin } from "@/lib/query"
+import { ProducerPriceList } from "@/lib/schemas"
+import { ToastAction } from "@/components/ui/toast"
+import { toast } from "@/components/ui/use-toast"
+import { Placeholder } from "@/components/state/placeholder"
+import { DataTable } from "@/components/structures/data-table"
+import { producerPriceListColumns } from "@/components/structures/producerLists"
 
 export function AdminProducePriceLists() {
-  const [searchClient, setSearchClient] = useState("");
+  const [searchClient, setSearchClient] = useState("")
 
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 1,
     pageSize: 20,
-  });
+  })
 
   const { isError, isLoading, isFetching, refetch, data } = useQuery({
     queryKey: [
@@ -30,10 +30,10 @@ export function AdminProducePriceLists() {
       queryProducerPriceListsAsAdmin({
         p: pagination.pageIndex,
       }),
-  });
+  })
 
-  const adminProducePriceLists = data?.data?.data as ProducerPriceList[];
-  const total = data?.data?.total as number;
+  const adminProducePriceLists = data?.data?.data as ProducerPriceList[]
+  const total = data?.data?.total as number
 
   if (isError) {
     if (isAxiosError(data)) {
@@ -42,8 +42,8 @@ export function AdminProducePriceLists() {
           toast({
             description: "There seems to be a network error.",
             action: <ToastAction altText="Try again">Try again</ToastAction>,
-          });
-          break;
+          })
+          break
 
         default:
           toast({
@@ -54,8 +54,8 @@ export function AdminProducePriceLists() {
                 Try again
               </ToastAction>
             ),
-          });
-          break;
+          })
+          break
       }
     }
     return (
@@ -66,7 +66,7 @@ export function AdminProducePriceLists() {
           Error Fetching users from the database
         </Placeholder.Description>
       </Placeholder>
-    );
+    )
   }
 
   if (isLoading || isFetching) {
@@ -74,7 +74,7 @@ export function AdminProducePriceLists() {
       <Placeholder>
         <Placeholder.Title>Fetching Producer Price Lists</Placeholder.Title>
       </Placeholder>
-    );
+    )
   }
 
   return (
@@ -89,5 +89,5 @@ export function AdminProducePriceLists() {
       searchClient={searchClient}
       setSearchClient={setSearchClient}
     />
-  );
+  )
 }

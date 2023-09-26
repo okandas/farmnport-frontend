@@ -1,31 +1,31 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { isAxiosError } from "axios";
+import { useState } from "react"
+import { useQuery } from "@tanstack/react-query"
+import { isAxiosError } from "axios"
 
-import { queryUserAsAdmin } from "@/lib/query";
-import { ApplicationUser } from "@/lib/schemas";
-import { makeAbbveriation } from "@/lib/utilities";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { ToastAction } from "@/components/ui/toast";
-import { toast } from "@/components/ui/use-toast";
-import { Icons } from "@/components/icons/lucide";
+import { queryUserAsAdmin } from "@/lib/query"
+import { ApplicationUser } from "@/lib/schemas"
+import { makeAbbveriation } from "@/lib/utilities"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
+import { ToastAction } from "@/components/ui/toast"
+import { toast } from "@/components/ui/use-toast"
+import { Icons } from "@/components/icons/lucide"
 
 interface ViewClientHeaderProps {
   params: {
-    slug: string;
-  };
+    slug: string
+  }
 }
 
 export default function ViewClientHeader({ params }: ViewClientHeaderProps) {
-  const name = params.slug;
+  const name = params.slug
 
   const { isError, isLoading, isFetching, data, refetch } = useQuery({
     queryKey: ["dashboard-admin-client", name],
     queryFn: () => queryUserAsAdmin(name),
-  });
+  })
 
   if (isError) {
     if (isAxiosError(data)) {
@@ -34,8 +34,8 @@ export default function ViewClientHeader({ params }: ViewClientHeaderProps) {
           toast({
             description: "There seems to be a network error.",
             action: <ToastAction altText="Try again">Try again</ToastAction>,
-          });
-          break;
+          })
+          break
 
         default:
           toast({
@@ -46,41 +46,41 @@ export default function ViewClientHeader({ params }: ViewClientHeaderProps) {
                 Try again
               </ToastAction>
             ),
-          });
-          break;
+          })
+          break
       }
     }
-    return null;
+    return null
   }
 
   if (isLoading || isFetching) {
-    return null;
+    return null
   }
 
-  const adminClient = data?.data as ApplicationUser;
+  const adminClient = data?.data as ApplicationUser
 
-  const stroke = adminClient?.verified ? "stroke-green-500" : "stroke-red-500";
+  const stroke = adminClient?.verified ? "stroke-green-500" : "stroke-red-500"
 
   return (
-    <header className="gap-2 pb-2 border-b">
+    <header className="gap-2 border-b pb-2">
       <div className="flex max-w-2xl">
-        <Avatar className="w-32 h-32 mb-1 mr-4">
+        <Avatar className="mb-1 mr-4 h-32 w-32">
           <AvatarImage />
           <AvatarFallback>{makeAbbveriation(adminClient?.name)}</AvatarFallback>
         </Avatar>
-        <p className="leading-7 [&:not(:first-child)]:mt-5 shrink mr-2">
+        <p className="mr-2 shrink leading-7 [&:not(:first-child)]:mt-5">
           {adminClient?.short_description}
         </p>
         <div>
-          <Icons.badgeCheck className={`w-6 h-6 mt-6 ${stroke}`} />
+          <Icons.badgeCheck className={`mt-6 h-6 w-6 ${stroke}`} />
         </div>
       </div>
-      <h2 className="text-3xl font-semibold tracking-tight transition-colors scroll-m-20 first:mt-4">
+      <h2 className="scroll-m-20 text-3xl font-semibold tracking-tight transition-colors first:mt-4">
         {name}
       </h2>
-      <div className="leading-7 [&:not(:first-child)]:mt-2 mb-4">
+      <div className="mb-4 leading-7 [&:not(:first-child)]:mt-2">
         <Badge variant="outline">{adminClient?.type}</Badge>
       </div>
     </header>
-  );
+  )
 }

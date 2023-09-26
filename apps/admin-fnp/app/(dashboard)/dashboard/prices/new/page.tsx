@@ -1,9 +1,9 @@
-"use client";
+"use client"
 
-import { useState } from "react";
+import { useState } from "react"
 
-import { ProducerPriceList } from "@/lib/schemas";
-import { AdminCreateProductPriceForm } from "@/components/structures/forms/adminCreatePriceList";
+import { ProducerPriceList } from "@/lib/schemas"
+import { AdminCreateProductPriceForm } from "@/components/structures/forms/adminCreatePriceList"
 
 export default function CreateClientPage() {
   const [adminProductPriceItem, _] = useState<ProducerPriceList>({
@@ -62,7 +62,7 @@ export default function CreateClientPage() {
       hasPrice: false,
     },
     unit: "",
-  });
+  })
 
-  return <AdminCreateProductPriceForm priceList={adminProductPriceItem} />;
+  return <AdminCreateProductPriceForm priceList={adminProductPriceItem} />
 }

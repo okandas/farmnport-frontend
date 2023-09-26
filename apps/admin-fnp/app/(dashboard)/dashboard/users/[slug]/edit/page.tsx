@@ -1,35 +1,35 @@
-"use client";
+"use client"
 
-import Link from "next/link";
-import { useQuery } from "@tanstack/react-query";
-import { isAxiosError } from "axios";
+import Link from "next/link"
+import { useQuery } from "@tanstack/react-query"
+import { isAxiosError } from "axios"
 
-import { queryUserAsAdmin } from "@/lib/query";
-import { ApplicationUser } from "@/lib/schemas";
-import { cn } from "@/lib/utilities";
-import { buttonVariants } from "@/components/ui/button";
-import { ToastAction } from "@/components/ui/toast";
-import { toast } from "@/components/ui/use-toast";
-import { Icons } from "@/components/icons/lucide";
-import { Placeholder } from "@/components/state/placeholder";
-import { AdminEditForm } from "@/components/structures/forms/adminClientEdit";
+import { queryUserAsAdmin } from "@/lib/query"
+import { ApplicationUser } from "@/lib/schemas"
+import { cn } from "@/lib/utilities"
+import { buttonVariants } from "@/components/ui/button"
+import { ToastAction } from "@/components/ui/toast"
+import { toast } from "@/components/ui/use-toast"
+import { Icons } from "@/components/icons/lucide"
+import { Placeholder } from "@/components/state/placeholder"
+import { AdminEditForm } from "@/components/structures/forms/adminClientEdit"
 
 interface EditClientPageProps {
   params: {
-    slug: string;
-  };
+    slug: string
+  }
 }
 
 export default function EditClientPage({ params }: EditClientPageProps) {
-  const name = params.slug;
-  const url = `/dashboard/users/${name}`;
+  const name = params.slug
+  const url = `/dashboard/users/${name}`
 
   const { isError, isLoading, isFetching, data, refetch } = useQuery({
     queryKey: ["dashboard-admin-client", name],
     queryFn: () => queryUserAsAdmin(name),
-  });
+  })
 
-  const adminClient = data?.data as ApplicationUser;
+  const adminClient = data?.data as ApplicationUser
 
   if (isError) {
     if (isAxiosError(data)) {
@@ -38,8 +38,8 @@ export default function EditClientPage({ params }: EditClientPageProps) {
           toast({
             description: "There seems to be a network error.",
             action: <ToastAction altText="Try again">Try again</ToastAction>,
-          });
-          break;
+          })
+          break
 
         default:
           toast({
@@ -50,8 +50,8 @@ export default function EditClientPage({ params }: EditClientPageProps) {
                 Try again
               </ToastAction>
             ),
-          });
-          break;
+          })
+          break
       }
     }
     return (
@@ -64,7 +64,7 @@ export default function EditClientPage({ params }: EditClientPageProps) {
           </Placeholder.Description>
         </Placeholder>
       </div>
-    );
+    )
   }
 
   if (isLoading || isFetching) {
@@ -78,7 +78,7 @@ export default function EditClientPage({ params }: EditClientPageProps) {
           </Placeholder.Description>
         </Placeholder>
       </div>
-    );
+    )
   }
 
   return (
@@ -86,7 +86,7 @@ export default function EditClientPage({ params }: EditClientPageProps) {
       <div className={"absolute right-10 top-96"}>
         <Link href={url} className={cn(buttonVariants({ variant: "link" }))}>
           <>
-            <Icons.close className="w-4 h-4 mr-2" />
+            <Icons.close className="mr-2 h-4 w-4" />
             Close
           </>
         </Link>
@@ -96,5 +96,5 @@ export default function EditClientPage({ params }: EditClientPageProps) {
         <AdminEditForm client={adminClient} />
       ) : null}
     </>
-  );
+  )
 }

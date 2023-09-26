@@ -1,21 +1,21 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
-import { isAxiosError } from "axios";
-import { useForm, useWatch } from "react-hook-form";
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useMutation } from "@tanstack/react-query"
+import { isAxiosError } from "axios"
+import { useForm, useWatch } from "react-hook-form"
 
-import { updateClientAsAdmin } from "@/lib/query";
+import { updateClientAsAdmin } from "@/lib/query"
 import {
   AdminEditApplicationUser,
   AdminEditApplicationUserSchema,
   ApplicationUser,
-} from "@/lib/schemas";
-import { cn, slug } from "@/lib/utilities";
-import { Badge } from "@/components/ui/badge";
-import { buttonVariants } from "@/components/ui/button";
+} from "@/lib/schemas"
+import { cn, slug } from "@/lib/utilities"
+import { Badge } from "@/components/ui/badge"
+import { buttonVariants } from "@/components/ui/button"
 import {
   Command,
   CommandEmpty,
@@ -24,7 +24,7 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
-} from "@/components/ui/command";
+} from "@/components/ui/command"
 import {
   Form,
   FormControl,
@@ -33,24 +33,24 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+} from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
+} from "@/components/ui/popover"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { ToastAction } from "@/components/ui/toast";
-import { toast } from "@/components/ui/use-toast";
-import { Icons } from "@/components/icons/lucide";
+} from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea"
+import { ToastAction } from "@/components/ui/toast"
+import { toast } from "@/components/ui/use-toast"
+import { Icons } from "@/components/icons/lucide"
 
 import {
   clientTypes,
@@ -58,10 +58,10 @@ import {
   provinces,
   scales,
   specializations,
-} from "../data/data";
+} from "../data/data"
 
 interface AdminEditFormProps extends React.HTMLAttributes<HTMLDivElement> {
-  client: ApplicationUser;
+  client: ApplicationUser
 }
 
 export function AdminEditForm({ client }: AdminEditFormProps) {
@@ -83,32 +83,32 @@ export function AdminEditForm({ client }: AdminEditFormProps) {
       short_description: client?.short_description,
     },
     resolver: zodResolver(AdminEditApplicationUserSchema),
-  });
+  })
 
   const selectedSpecializations = useWatch({
     name: "specializations",
     control: form.control,
-  });
+  })
 
   const selectedMainActivity = useWatch({
     name: "main_activity",
     control: form.control,
-  });
+  })
 
-  const changingSpecialization = form.watch("specialization");
+  const changingSpecialization = form.watch("specialization")
 
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false)
 
-  const router = useRouter();
+  const router = useRouter()
 
   const { mutate, isPending } = useMutation({
     mutationFn: updateClientAsAdmin,
     onSuccess: (data) => {
       toast({
         description: "Updated User Succesfully",
-      });
+      })
 
-      const name = slug(data.data?.name);
+      const name = slug(data.data?.name)
 
       // router.push(`/dashboard/users/${name}`)
     },
@@ -119,31 +119,31 @@ export function AdminEditForm({ client }: AdminEditFormProps) {
             toast({
               description: "There seems to be a network error.",
               action: <ToastAction altText="Try again">Try again</ToastAction>,
-            });
-            break;
+            })
+            break
 
           default:
             toast({
               title: "Uh oh! Admin client update failed.",
               description: "There was a problem with your request.",
               action: <ToastAction altText="Try again">Try again</ToastAction>,
-            });
-            break;
+            })
+            break
         }
       }
     },
-  });
+  })
 
   async function onSubmit(payload: AdminEditApplicationUser) {
-    payload.branches = Number(payload.branches);
-    mutate(payload);
+    payload.branches = Number(payload.branches)
+    mutate(payload)
   }
 
   return (
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="w-3/4 gap-4 mx-auto mb-8"
+        className="mx-auto mb-8 w-3/4 gap-4"
       >
         <div className="grid grid-cols-2 gap-4">
           <FormField
@@ -251,13 +251,13 @@ export function AdminEditForm({ client }: AdminEditFormProps) {
                       <SelectValue placeholder="Select a specialization" />
                     </SelectTrigger>
                   </FormControl>
-                  <SelectContent className="overflow-visible max-h-44">
+                  <SelectContent className="max-h-44 overflow-visible">
                     {specializations.map((specialization) => {
                       return (
                         <SelectItem key={specialization} value={specialization}>
                           {specialization}
                         </SelectItem>
-                      );
+                      )
                     })}
                   </SelectContent>
                 </Select>
@@ -286,13 +286,13 @@ export function AdminEditForm({ client }: AdminEditFormProps) {
                       <SelectValue placeholder="Select Province..." />
                     </SelectTrigger>
                   </FormControl>
-                  <SelectContent className="overflow-visible max-h-44">
+                  <SelectContent className="max-h-44 overflow-visible">
                     {provinces.map((province) => {
                       return (
                         <SelectItem key={province} value={province}>
                           {province}
                         </SelectItem>
-                      );
+                      )
                     })}
                   </SelectContent>
                 </Select>
@@ -322,13 +322,13 @@ export function AdminEditForm({ client }: AdminEditFormProps) {
                         <SelectValue placeholder="What do you do ?" />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent className="overflow-visible max-h-44">
+                    <SelectContent className="max-h-44 overflow-visible">
                       {mainActivity[changingSpecialization]?.map((activity) => {
                         return (
                           <SelectItem key={activity} value={activity}>
                             {activity}
                           </SelectItem>
-                        );
+                        )
                       })}
                     </SelectContent>
                   </Select>
@@ -348,7 +348,7 @@ export function AdminEditForm({ client }: AdminEditFormProps) {
                 <FormControl>
                   <Popover open={open} onOpenChange={setOpen}>
                     <PopoverTrigger asChild>
-                      <div className="px-3 py-2 text-sm border rounded-md min-h-[2.5rem] group border-input ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-0">
+                      <div className="group min-h-[2.5rem] rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-0">
                         <div className="flex flex-wrap gap-1">
                           {selectedSpecializations.length > 1
                             ? selectedSpecializations?.map((selected) => {
@@ -357,11 +357,11 @@ export function AdminEditForm({ client }: AdminEditFormProps) {
                                     <Badge
                                       key={selected}
                                       variant="outline"
-                                      className="flex justify-between text-green-800 bg-green-100 border-green-400"
+                                      className="flex justify-between border-green-400 bg-green-100 text-green-800"
                                     >
                                       {selected}
                                     </Badge>
-                                  );
+                                  )
                                 }
                               })
                             : "Select Specialization ..."}
@@ -369,7 +369,7 @@ export function AdminEditForm({ client }: AdminEditFormProps) {
                       </div>
                     </PopoverTrigger>
                     <PopoverContent className="w-[320px] p-0">
-                      <Command className="border rounded-lg shadow-md max-h-52 ">
+                      <Command className="max-h-52 rounded-lg border shadow-md ">
                         <CommandInput placeholder="Search..." />
                         <CommandList>
                           <CommandEmpty className="py-3 text-center">
@@ -390,52 +390,52 @@ export function AdminEditForm({ client }: AdminEditFormProps) {
                                           onSelect={(value) => {
                                             if (
                                               !selectedSpecializations?.includes(
-                                                value,
+                                                value
                                               )
                                             ) {
                                               const NewSpecialization = [
                                                 ...selectedSpecializations,
                                                 value,
-                                              ];
+                                              ]
 
                                               form.setValue(
                                                 "specializations",
-                                                NewSpecialization,
-                                              );
+                                                NewSpecialization
+                                              )
                                             } else {
                                               const removeAtIndex =
                                                 selectedSpecializations?.indexOf(
-                                                  value,
-                                                );
+                                                  value
+                                                )
 
                                               selectedSpecializations?.splice(
                                                 removeAtIndex,
-                                                1,
-                                              );
+                                                1
+                                              )
 
                                               form.setValue(
                                                 "specializations",
-                                                selectedSpecializations,
-                                              );
+                                                selectedSpecializations
+                                              )
                                             }
                                           }}
                                         >
                                           {selectedSpecializations?.includes(
-                                            activity,
+                                            activity
                                           ) ? (
-                                            <Icons.check className="w-4 h-4 mr-2" />
+                                            <Icons.check className="mr-2 h-4 w-4" />
                                           ) : null}
 
                                           <span>{activity}</span>
                                         </CommandItem>
-                                      );
+                                      )
                                     } else {
-                                      null;
+                                      null
                                     }
-                                  },
+                                  }
                                 )}
                               </CommandGroup>
-                            );
+                            )
                           })}
                           <CommandSeparator />
                         </CommandList>
@@ -462,13 +462,13 @@ export function AdminEditForm({ client }: AdminEditFormProps) {
                       <SelectValue placeholder="What user type are you?" />
                     </SelectTrigger>
                   </FormControl>
-                  <SelectContent className="overflow-visible max-h-44">
+                  <SelectContent className="max-h-44 overflow-visible">
                     {clientTypes.map((type) => {
                       return (
                         <SelectItem key={type} value={type}>
                           {type}
                         </SelectItem>
-                      );
+                      )
                     })}
                   </SelectContent>
                 </Select>
@@ -493,13 +493,13 @@ export function AdminEditForm({ client }: AdminEditFormProps) {
                         <SelectValue placeholder="What is your scale ?" />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent className="overflow-visible max-h-44">
+                    <SelectContent className="max-h-44 overflow-visible">
                       {scales.map((scale) => {
                         return (
                           <SelectItem key={scale} value={scale}>
                             {scale}
                           </SelectItem>
-                        );
+                        )
                       })}
                     </SelectContent>
                   </Select>
@@ -534,10 +534,10 @@ export function AdminEditForm({ client }: AdminEditFormProps) {
           className={cn(buttonVariants(), "mt-5")}
           disabled={isPending}
         >
-          {isPending && <Icons.spinner className="w-4 h-4 mr-2 animate-spin" />}
+          {isPending && <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />}
           Submit
         </button>
       </form>
     </Form>
-  );
+  )
 }

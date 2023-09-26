@@ -3,13 +3,13 @@ import {
   ChevronRightIcon,
   DoubleArrowLeftIcon,
   DoubleArrowRightIcon,
-} from "@radix-ui/react-icons";
-import { Table } from "@tanstack/react-table";
+} from "@radix-ui/react-icons"
+import { Table } from "@tanstack/react-table"
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button"
 
 interface PaginationProps<TData> {
-  table: Table<TData>;
+  table: Table<TData>
 }
 
 export function Pagination<TData>({ table }: PaginationProps<TData>) {
@@ -63,5 +63,5 @@ export function Pagination<TData>({ table }: PaginationProps<TData>) {
         </div>
       </div>
     </div>
-  );
+  )
 }

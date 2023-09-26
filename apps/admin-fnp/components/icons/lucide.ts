@@ -26,8 +26,7 @@ import {
   Twitter,
   User,
   X,
-  type LucideIcon,
-  type LucideProps,
+  type IconNode as LucideIcon,
 } from "lucide-react"
 
 export type Icon = LucideIcon

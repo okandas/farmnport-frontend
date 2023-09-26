@@ -1,4 +1,4 @@
-import { DashboardConfig } from "@/types";
+import { DashboardConfig } from "@/types"
 
 export const dashboardConfig: DashboardConfig = {
   mainNavigation: [
@@ -24,4 +24,4 @@ export const dashboardConfig: DashboardConfig = {
       icon: "construction",
     },
   ],
-};
+}

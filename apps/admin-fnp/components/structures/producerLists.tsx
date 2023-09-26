@@ -1,11 +1,11 @@
-"use client";
+"use client"
 
-import { ColumnDef } from "@tanstack/react-table";
+import { ColumnDef } from "@tanstack/react-table"
 
-import { ProducerPriceList } from "@/lib/schemas";
-import { formatDate } from "@/lib/utilities";
-import { Checkbox } from "@/components/ui/checkbox";
-import { PriceControlDropDown } from "@/components/structures/price-dropdown";
+import { ProducerPriceList } from "@/lib/schemas"
+import { formatDate } from "@/lib/utilities"
+import { Checkbox } from "@/components/ui/checkbox"
+import { PriceControlDropDown } from "@/components/structures/price-dropdown"
 
 export const producerPriceListColumns: ColumnDef<ProducerPriceList>[] = [
   {
@@ -33,9 +33,9 @@ export const producerPriceListColumns: ColumnDef<ProducerPriceList>[] = [
     accessorKey: "effectiveDate",
     header: "Effective Date",
     cell: ({ row }) => {
-      const date = row.getValue("effectiveDate") as string;
+      const date = row.getValue("effectiveDate") as string
 
-      return <p className="text-base tracking-tight">{formatDate(date)}</p>;
+      return <p className="text-base tracking-tight">{formatDate(date)}</p>
     },
   },
   {
@@ -49,9 +49,9 @@ export const producerPriceListColumns: ColumnDef<ProducerPriceList>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      const priceItem = row?.original;
+      const priceItem = row?.original
 
-      return <PriceControlDropDown priceItem={priceItem} />;
+      return <PriceControlDropDown priceItem={priceItem} />
     },
   },
-];
+]

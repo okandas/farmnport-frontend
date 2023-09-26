@@ -1,16 +1,16 @@
-import { ReactNode } from "react";
-import Link from "next/link";
+import { ReactNode } from "react"
+import Link from "next/link"
 
-import { cn } from "@/lib/utilities";
-import { buttonVariants } from "@/components/ui/button";
-import { Icons } from "@/components/icons/lucide";
-import ViewClientHeader from "@/components/navigation/view-client-header";
+import { cn } from "@/lib/utilities"
+import { buttonVariants } from "@/components/ui/button"
+import { Icons } from "@/components/icons/lucide"
+import ViewClientHeader from "@/components/navigation/view-client-header"
 
 interface ViewClientLayoutProps {
-  children: ReactNode;
+  children: ReactNode
   params: {
-    slug: string;
-  };
+    slug: string
+  }
 }
 
 export default async function ViewClientLayout({
@@ -24,11 +24,11 @@ export default async function ViewClientLayout({
           href="/dashboard/users"
           className={cn(
             buttonVariants({ variant: "ghost" }),
-            "absolute right-5 top-24",
+            "absolute right-5 top-24"
           )}
         >
           <>
-            <Icons.chevronLeft className="w-4 h-4 mr-2" />
+            <Icons.chevronLeft className="mr-2 h-4 w-4" />
             Back
           </>
         </Link>
@@ -36,5 +36,5 @@ export default async function ViewClientLayout({
       <ViewClientHeader params={params} />
       <div>{children}</div>
     </div>
-  );
+  )
 }

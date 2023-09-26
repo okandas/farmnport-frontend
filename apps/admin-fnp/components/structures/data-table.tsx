@@ -1,7 +1,7 @@
-"use client";
+"use client"
 
-import { Dispatch, SetStateAction, useState } from "react";
-import Link from "next/link";
+import { Dispatch, SetStateAction, useState } from "react"
+import Link from "next/link"
 import {
   ColumnDef,
   flexRender,
@@ -11,11 +11,11 @@ import {
   getFilteredRowModel,
   PaginationState,
   useReactTable,
-} from "@tanstack/react-table";
+} from "@tanstack/react-table"
 
-import { cn } from "@/lib/utilities";
-import { Button, buttonVariants } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utilities"
+import { Button, buttonVariants } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import {
   Table,
   TableBody,
@@ -23,21 +23,21 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Icons } from "@/components/icons/lucide";
+} from "@/components/ui/table"
+import { Icons } from "@/components/icons/lucide"
 
-import { Pagination } from "./pagination";
+import { Pagination } from "./pagination"
 
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
-  newUrl: string;
-  tableName: string;
-  total: number;
-  pagination: PaginationState;
-  setPagination: Dispatch<SetStateAction<PaginationState>>;
-  searchClient: string;
-  setSearchClient: Dispatch<SetStateAction<string>>;
+  columns: ColumnDef<TData, TValue>[]
+  data: TData[]
+  newUrl: string
+  tableName: string
+  total: number
+  pagination: PaginationState
+  setPagination: Dispatch<SetStateAction<PaginationState>>
+  searchClient: string
+  setSearchClient: Dispatch<SetStateAction<string>>
 }
 
 export function DataTable<TData, TValue>({
@@ -51,9 +51,9 @@ export function DataTable<TData, TValue>({
   searchClient,
   setSearchClient,
 }: DataTableProps<TData, TValue>) {
-  const [rowSelection, setRowSelection] = useState({});
+  const [rowSelection, setRowSelection] = useState({})
 
-  const pageCount = Math.floor(total / pagination.pageSize);
+  const pageCount = Math.floor(total / pagination.pageSize)
 
   const table = useReactTable({
     data,
@@ -73,12 +73,12 @@ export function DataTable<TData, TValue>({
     },
     manualPagination: true,
     pageCount: pageCount,
-  });
+  })
 
-  const isFiltered = table.getState().columnFilters.length > 0;
+  const isFiltered = table.getState().columnFilters.length > 0
 
   return (
-    <div className="pb-8 space-y-8">
+    <div className="space-y-8 pb-8">
       <div className="flex justify-between">
         <div className="flex justify-start">
           <Link
@@ -87,13 +87,13 @@ export function DataTable<TData, TValue>({
           >
             <>
               New {tableName}
-              <Icons.add className="w-4 h-4 ml-2" />
+              <Icons.add className="ml-2 h-4 w-4" />
             </>
           </Link>
         </div>
         <div className="flex justify-end">
           <div className="flex items-center justify-between">
-            <div className="flex items-center flex-1 space-x-2">
+            <div className="flex flex-1 items-center space-x-2">
               <Input
                 placeholder="Search for client..."
                 value={searchClient ?? ""}
@@ -106,7 +106,7 @@ export function DataTable<TData, TValue>({
                 className="h-8 px-2 lg:px-3"
               >
                 Search
-                <Icons.search className="w-4 h-4 ml-2" />
+                <Icons.search className="ml-2 h-4 w-4" />
               </Button>
               {isFiltered && (
                 <Button
@@ -115,14 +115,14 @@ export function DataTable<TData, TValue>({
                   className="h-8 px-2 lg:px-3"
                 >
                   Reset
-                  <Icons.close className="w-4 h-4 ml-2" />
+                  <Icons.close className="ml-2 h-4 w-4" />
                 </Button>
               )}
             </div>
           </div>
         </div>
       </div>
-      <div className="sticky top-0 overflow-x-auto border rounded-md shadow-sm bg-background">
+      <div className="sticky top-0 overflow-x-auto rounded-md border bg-background shadow-sm">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -134,10 +134,10 @@ export function DataTable<TData, TValue>({
                         ? null
                         : flexRender(
                             header.column.columnDef.header,
-                            header.getContext(),
+                            header.getContext()
                           )}
                     </TableHead>
-                  );
+                  )
                 })}
               </TableRow>
             ))}
@@ -153,7 +153,7 @@ export function DataTable<TData, TValue>({
                     <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext(),
+                        cell.getContext()
                       )}
                     </TableCell>
                   ))}
@@ -174,5 +174,5 @@ export function DataTable<TData, TValue>({
       </div>
       <Pagination table={table} />
     </div>
-  );
+  )
 }

@@ -1,15 +1,12 @@
-"use client";
+"use client"
 
-import { useQuery } from "@tanstack/react-query";
-import { isAxiosError } from "axios";
+import { useQuery } from "@tanstack/react-query"
+import { isAxiosError } from "axios"
 
-import {
-  queryUserAsAdmin,
-  queryUserProductPriceListAsAdmin,
-} from "@/lib/query";
-import { ApplicationUser, ProducerPriceList } from "@/lib/schemas";
-import { centsToDollars, cn, formatDate, ucFirst } from "@/lib/utilities";
-import { Button } from "@/components/ui/button";
+import { queryUserAsAdmin, queryUserProductPriceListAsAdmin } from "@/lib/query"
+import { ApplicationUser, ProducerPriceList } from "@/lib/schemas"
+import { centsToDollars, cn, formatDate, ucFirst } from "@/lib/utilities"
+import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
@@ -17,37 +14,37 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ToastAction } from "@/components/ui/toast";
-import { toast } from "@/components/ui/use-toast";
-import { Placeholder } from "@/components/state/placeholder";
-import { AdminControlDropDown } from "@/components/structures/control-dropdown";
+} from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { ToastAction } from "@/components/ui/toast"
+import { toast } from "@/components/ui/use-toast"
+import { Placeholder } from "@/components/state/placeholder"
+import { AdminControlDropDown } from "@/components/structures/control-dropdown"
 
 interface ViewClientPageProps {
   params: {
-    slug: string;
-  };
+    slug: string
+  }
 }
 
 export default function ViewClientPage({ params }: ViewClientPageProps) {
-  const name = params.slug;
+  const name = params.slug
 
   const { isError, isLoading, isFetching, data, refetch } = useQuery({
     queryKey: ["dashboard-admin-client", name],
     queryFn: () => queryUserAsAdmin(name),
-  });
+  })
 
-  const adminClient = data?.data as ApplicationUser;
+  const adminClient = data?.data as ApplicationUser
 
-  const clientID = adminClient?.id ?? "";
+  const clientID = adminClient?.id ?? ""
 
   const { data: priceListData } = useQuery({
     queryKey: ["dashboard-admin-client-price", clientID],
     queryFn: () => queryUserProductPriceListAsAdmin(clientID),
-  });
+  })
 
-  const latestProducerPriceList = priceListData?.data as ProducerPriceList;
+  const latestProducerPriceList = priceListData?.data as ProducerPriceList
 
   if (isError) {
     if (isAxiosError(data)) {
@@ -56,8 +53,8 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
           toast({
             description: "There seems to be a network error.",
             action: <ToastAction altText="Try again">Try again</ToastAction>,
-          });
-          break;
+          })
+          break
 
         default:
           toast({
@@ -68,8 +65,8 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
                 Try again
               </ToastAction>
             ),
-          });
-          break;
+          })
+          break
       }
     }
 
@@ -83,7 +80,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
           </Placeholder.Description>
         </Placeholder>
       </div>
-    );
+    )
   }
 
   if (isLoading || isFetching) {
@@ -97,7 +94,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
           </Placeholder.Description>
         </Placeholder>
       </div>
-    );
+    )
   }
 
   const statuses = [
@@ -109,7 +106,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
     "text-red-700 bg-red-50 ring-red-600/10",
     "text-stone-600 bg-stone-50 ring-stone-500/10",
     "text-gray-600 bg-gray-50 ring-gray-500/10",
-  ];
+  ]
 
   type ProducerPriceListKeys =
     | "beef"
@@ -117,14 +114,14 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
     | "mutton"
     | "goat"
     | "chicken"
-    | "pork";
+    | "pork"
 
-  const beef: ProducerPriceListKeys = "beef";
-  const lamb: ProducerPriceListKeys = "lamb";
-  const mutton: ProducerPriceListKeys = "mutton";
-  const goat: ProducerPriceListKeys = "goat";
-  const chicken: ProducerPriceListKeys = "chicken";
-  const pork: ProducerPriceListKeys = "pork";
+  const beef: ProducerPriceListKeys = "beef"
+  const lamb: ProducerPriceListKeys = "lamb"
+  const mutton: ProducerPriceListKeys = "mutton"
+  const goat: ProducerPriceListKeys = "goat"
+  const chicken: ProducerPriceListKeys = "chicken"
+  const pork: ProducerPriceListKeys = "pork"
 
   const grades: Record<ProducerPriceListKeys, Record<string, string>> = {
     beef: {
@@ -161,11 +158,11 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
       super: "SP",
       manufacturing: "MP",
     },
-  };
+  }
 
   const pricingTypes: Record<string, ProducerPriceListKeys[]> = {
     livestock: [beef, lamb, mutton, goat, chicken, pork],
-  };
+  }
 
   return (
     <>
@@ -173,7 +170,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
         <AdminControlDropDown client={adminClient} />
       </div>
 
-      <section className="grid grid-cols-2 gap-2 mb-3">
+      <section className="mb-3 grid grid-cols-2 gap-2">
         <aside className="max-w-sm lg:max-w-md">
           <div className="flex justify-start [&:not(:first-child)]:my-3">
             <div className="w-40 leading-7">ID</div>
@@ -235,7 +232,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
                     <TabsTrigger key={index} value={type}>
                       {type}
                     </TabsTrigger>
-                  );
+                  )
                 })}
               </TabsList>
               {pricingTypes[adminClient.specialization].map(
@@ -252,7 +249,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
                             {pricingType} you sell and they buy from you.
                           </CardDescription>
                         </CardHeader>
-                        <CardContent className="space-y-2 min-h-[305px]">
+                        <CardContent className="min-h-[305px] space-y-2">
                           {latestProducerPriceList[pricingType] !==
                           undefined ? (
                             <ul
@@ -260,21 +257,21 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
                               className="grid grid-cols-1 gap-x-2 gap-y-2 lg:grid-cols-2 xl:gap-x-4 "
                             >
                               {Object.keys(
-                                latestProducerPriceList[pricingType],
+                                latestProducerPriceList[pricingType]
                               ).map((key, index) => {
                                 if (key === "hasPrice") {
-                                  return null;
+                                  return null
                                 }
                                 const gradePrices =
-                                  latestProducerPriceList[pricingType];
+                                  latestProducerPriceList[pricingType]
 
                                 return (
                                   <li
-                                    className="overflow-hidden border border-gray-200 rounded-xl"
+                                    className="overflow-hidden rounded-xl border border-gray-200"
                                     key={index}
                                   >
-                                    <dl className="px-6 py-4 -my-3 text-sm leading-6 divide-y divide-gray-100">
-                                      <div className="flex justify-between py-3 gap-x-4">
+                                    <dl className="-my-3 divide-y divide-gray-100 px-6 py-4 text-sm leading-6">
+                                      <div className="flex justify-between gap-x-4 py-3">
                                         <dt className="text-gray-700">
                                           {ucFirst(key)}
                                         </dt>
@@ -283,7 +280,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
                                             {centsToDollars(
                                               gradePrices[
                                                 key as keyof typeof gradePrices
-                                              ],
+                                              ]
                                             )}
                                           </div>
 
@@ -291,7 +288,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
                                             <div
                                               className={cn(
                                                 statuses[index],
-                                                "rounded-md py-1 px-2 text-xs font-medium ring-1 ring-inset",
+                                                "rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset"
                                               )}
                                             >
                                               {grades[pricingType][key]}
@@ -301,7 +298,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
                                       </div>
                                     </dl>
                                   </li>
-                                );
+                                )
                               })}
                             </ul>
                           ) : null}
@@ -311,8 +308,8 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
                         </CardFooter>
                       </Card>
                     </TabsContent>
-                  );
-                },
+                  )
+                }
               )}
             </Tabs>
           ) : null}
@@ -320,14 +317,14 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
       </section>
       <section className="gap-4">
         <header>
-          <h4 className="pb-2 mt-10 text-lg font-semibold tracking-tight transition-colors border-b scroll-m-20 first:mt-0">
+          <h4 className="mt-10 scroll-m-20 border-b pb-2 text-lg font-semibold tracking-tight transition-colors first:mt-0">
             Other Specializations
           </h4>
         </header>
-        <section className="grid grid-cols-2 gap-2 mb-3 mt-7">
+        <section className="mb-3 mt-7 grid grid-cols-2 gap-2">
           <aside className="max-w-sm lg:max-w-md">
             <div className="grid justify-center gap-4 sm:grid-cols-2 md:max-w-[64rem] md:grid-cols-2">
-              <div className="relative p-2 overflow-hidden border rounded-lg bg-background">
+              <div className="relative overflow-hidden rounded-lg border bg-background p-2">
                 <div className="flex h-[80px] flex-col justify-between rounded-md p-2">
                   <div className="space-y-2">
                     <h3 className="font-bold">Branches</h3>
@@ -337,7 +334,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
                   </div>
                 </div>
               </div>
-              <div className="relative p-2 overflow-hidden border rounded-lg bg-background">
+              <div className="relative overflow-hidden rounded-lg border bg-background p-2">
                 <div className="flex h-[80px] flex-col justify-between rounded-md p-2">
                   <div className="space-y-2">
                     <h3 className="font-bold">Specilization</h3>
@@ -345,7 +342,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
                   </div>
                 </div>
               </div>
-              <div className="relative p-2 overflow-hidden border rounded-lg bg-background">
+              <div className="relative overflow-hidden rounded-lg border bg-background p-2">
                 <div className="flex h-[80px] flex-col justify-between rounded-md p-2">
                   <div className="space-y-2">
                     <h3 className="font-bold">Main Activity</h3>
@@ -355,7 +352,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
                   </div>
                 </div>
               </div>
-              <div className="relative p-2 overflow-hidden border rounded-lg bg-background">
+              <div className="relative overflow-hidden rounded-lg border bg-background p-2">
                 <div className="flex h-[80px] flex-col justify-between rounded-md p-2">
                   <div className="space-y-2">
                     <h3 className="font-bold">Scale</h3>
@@ -365,24 +362,24 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
               </div>
             </div>
           </aside>
-          <div className="flex flex-wrap h-8">
+          <div className="flex h-8 flex-wrap">
             {adminClient?.specializations.map((specialization) => {
               if (specialization.length === 0) {
-                return null;
+                return null
               }
 
               return (
                 <div
-                  className="h-10 p-2 mb-1 mr-2 tracking-tight border rounded-md"
+                  className="mb-1 mr-2 h-10 rounded-md border p-2 tracking-tight"
                   key={specialization}
                 >
                   {specialization}
                 </div>
-              );
+              )
             })}
           </div>
         </section>
       </section>
     </>
-  );
+  )
 }

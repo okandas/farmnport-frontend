@@ -1,13 +1,13 @@
-"use client";
+"use client"
 
-import Link from "next/link";
-import { useQuery } from "@tanstack/react-query";
-import { isAxiosError } from "axios";
+import Link from "next/link"
+import { useQuery } from "@tanstack/react-query"
+import { isAxiosError } from "axios"
 
-import { queryUserProductPriceListAsAdmin } from "@/lib/query";
-import { ProducerPriceList } from "@/lib/schemas";
-import { centsToDollars, cn, formatDate, ucFirst } from "@/lib/utilities";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { queryUserProductPriceListAsAdmin } from "@/lib/query"
+import { ProducerPriceList } from "@/lib/schemas"
+import { centsToDollars, cn, formatDate, ucFirst } from "@/lib/utilities"
+import { Button, buttonVariants } from "@/components/ui/button"
 import {
   Card,
   CardContent,
@@ -15,28 +15,28 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ToastAction } from "@/components/ui/toast";
-import { toast } from "@/components/ui/use-toast";
-import { Icons } from "@/components/icons/lucide";
-import { Placeholder } from "@/components/state/placeholder";
+} from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { ToastAction } from "@/components/ui/toast"
+import { toast } from "@/components/ui/use-toast"
+import { Icons } from "@/components/icons/lucide"
+import { Placeholder } from "@/components/state/placeholder"
 
 interface ViewClientProductListPageProps {
   params: {
-    slug: string;
-  };
+    slug: string
+  }
 }
 
 export default function ViewClientProductListPage({
   params,
 }: ViewClientProductListPageProps) {
-  const clientID = params.slug;
+  const clientID = params.slug
 
   const { isError, isLoading, isFetching, refetch, data } = useQuery({
     queryKey: ["dashboard-admin-client-price", clientID],
     queryFn: () => queryUserProductPriceListAsAdmin(clientID),
-  });
+  })
 
   if (isError) {
     if (isAxiosError(data)) {
@@ -45,8 +45,8 @@ export default function ViewClientProductListPage({
           toast({
             description: "There seems to be a network error.",
             action: <ToastAction altText="Try again">Try again</ToastAction>,
-          });
-          break;
+          })
+          break
 
         default:
           toast({
@@ -57,8 +57,8 @@ export default function ViewClientProductListPage({
                 Try again
               </ToastAction>
             ),
-          });
-          break;
+          })
+          break
       }
     }
 
@@ -72,7 +72,7 @@ export default function ViewClientProductListPage({
           <Placeholder.Description>Error Fetching</Placeholder.Description>
         </Placeholder>
       </div>
-    );
+    )
   }
 
   if (isLoading || isFetching) {
@@ -84,10 +84,10 @@ export default function ViewClientProductListPage({
           <Placeholder.Description>fetching</Placeholder.Description>
         </Placeholder>
       </div>
-    );
+    )
   }
 
-  const producerPriceList = data?.data as ProducerPriceList;
+  const producerPriceList = data?.data as ProducerPriceList
 
   const statuses = [
     "text-green-700 bg-green-50 ring-green-600/20",
@@ -98,7 +98,7 @@ export default function ViewClientProductListPage({
     "text-red-700 bg-red-50 ring-red-600/10",
     "text-stone-600 bg-stone-50 ring-stone-500/10",
     "text-gray-600 bg-gray-50 ring-gray-500/10",
-  ];
+  ]
 
   type ProducerPriceListKeys =
     | "beef"
@@ -106,14 +106,14 @@ export default function ViewClientProductListPage({
     | "mutton"
     | "goat"
     | "chicken"
-    | "pork";
+    | "pork"
 
-  const beef: ProducerPriceListKeys = "beef";
-  const lamb: ProducerPriceListKeys = "lamb";
-  const mutton: ProducerPriceListKeys = "mutton";
-  const goat: ProducerPriceListKeys = "goat";
-  const chicken: ProducerPriceListKeys = "chicken";
-  const pork: ProducerPriceListKeys = "pork";
+  const beef: ProducerPriceListKeys = "beef"
+  const lamb: ProducerPriceListKeys = "lamb"
+  const mutton: ProducerPriceListKeys = "mutton"
+  const goat: ProducerPriceListKeys = "goat"
+  const chicken: ProducerPriceListKeys = "chicken"
+  const pork: ProducerPriceListKeys = "pork"
 
   const grades: Record<ProducerPriceListKeys, Record<string, string>> = {
     beef: {
@@ -150,25 +150,25 @@ export default function ViewClientProductListPage({
       super: "SP",
       manufacturing: "MP",
     },
-  };
+  }
 
   const pricingTypes: Record<string, ProducerPriceListKeys[]> = {
     livestock: [beef, lamb, mutton, goat, chicken, pork],
-  };
+  }
 
-  const url = `/dashboard/prices`;
+  const url = `/dashboard/prices`
 
   return (
     <>
       <div className={"absolute right-10 top-96"}>
         <Link href={url} className={cn(buttonVariants({ variant: "link" }))}>
           <>
-            <Icons.close className="w-4 h-4 mr-2" />
+            <Icons.close className="mr-2 h-4 w-4" />
             Close
           </>
         </Link>
       </div>
-      <section className="flex flex-col items-center justify-center min-h-full p-8 text-center">
+      <section className="flex min-h-full flex-col items-center justify-center p-8 text-center">
         <Tabs defaultValue="beef" className="w-[500px]">
           <TabsList className="grid w-full grid-cols-6">
             {pricingTypes[producerPriceList.client_specialization].map(
@@ -177,8 +177,8 @@ export default function ViewClientProductListPage({
                   <TabsTrigger key={index} value={type}>
                     {type}
                   </TabsTrigger>
-                );
-              },
+                )
+              }
             )}
           </TabsList>
           {pricingTypes[producerPriceList.client_specialization].map(
@@ -196,7 +196,7 @@ export default function ViewClientProductListPage({
                         clients.
                       </CardDescription>
                     </CardHeader>
-                    <CardContent className="space-y-2 min-h-[305px]">
+                    <CardContent className="min-h-[305px] space-y-2">
                       {producerPriceList[pricingType] !== undefined ? (
                         <ul
                           role="list"
@@ -205,18 +205,17 @@ export default function ViewClientProductListPage({
                           {Object.keys(producerPriceList[pricingType]).map(
                             (key, index) => {
                               if (key === "hasPrice") {
-                                return null;
+                                return null
                               }
-                              const gradePrices =
-                                producerPriceList[pricingType];
+                              const gradePrices = producerPriceList[pricingType]
 
                               return (
                                 <li
-                                  className="overflow-hidden border border-gray-200 rounded-xl"
+                                  className="overflow-hidden rounded-xl border border-gray-200"
                                   key={index}
                                 >
-                                  <dl className="px-6 py-4 -my-3 text-sm leading-6 divide-y divide-gray-100">
-                                    <div className="flex justify-between py-3 gap-x-4">
+                                  <dl className="-my-3 divide-y divide-gray-100 px-6 py-4 text-sm leading-6">
+                                    <div className="flex justify-between gap-x-4 py-3">
                                       <dt className="text-gray-700">
                                         {ucFirst(key)}
                                       </dt>
@@ -225,7 +224,7 @@ export default function ViewClientProductListPage({
                                           {centsToDollars(
                                             gradePrices[
                                               key as keyof typeof gradePrices
-                                            ],
+                                            ]
                                           )}
                                         </div>
 
@@ -233,7 +232,7 @@ export default function ViewClientProductListPage({
                                           <div
                                             className={cn(
                                               statuses[index],
-                                              "rounded-md py-1 px-2 text-xs font-medium ring-1 ring-inset",
+                                              "rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset"
                                             )}
                                           >
                                             {grades[pricingType][key]}
@@ -243,8 +242,8 @@ export default function ViewClientProductListPage({
                                     </div>
                                   </dl>
                                 </li>
-                              );
-                            },
+                              )
+                            }
                           )}
                         </ul>
                       ) : null}
@@ -254,11 +253,11 @@ export default function ViewClientProductListPage({
                     </CardFooter>
                   </Card>
                 </TabsContent>
-              );
-            },
+              )
+            }
           )}
         </Tabs>
       </section>
     </>
-  );
+  )
 }
