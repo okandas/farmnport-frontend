@@ -170,7 +170,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
         <AdminControlDropDown client={adminClient} />
       </div>
 
-      <section className="mb-3 grid grid-cols-2 gap-2">
+      <section className="grid grid-cols-2 gap-2 mb-3">
         <aside className="max-w-sm lg:max-w-md">
           <div className="flex justify-start [&:not(:first-child)]:my-3">
             <div className="w-40 leading-7">ID</div>
@@ -267,11 +267,11 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
 
                                 return (
                                   <li
-                                    className="overflow-hidden rounded-xl border border-gray-200"
+                                    className="overflow-hidden border border-gray-200 rounded-xl"
                                     key={index}
                                   >
-                                    <dl className="-my-3 divide-y divide-gray-100 px-6 py-4 text-sm leading-6">
-                                      <div className="flex justify-between gap-x-4 py-3">
+                                    <dl className="px-6 py-4 -my-3 text-sm leading-6 divide-y divide-gray-100">
+                                      <div className="flex justify-between py-3 gap-x-4">
                                         <dt className="text-gray-700">
                                           {ucFirst(key)}
                                         </dt>
@@ -317,14 +317,14 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
       </section>
       <section className="gap-4">
         <header>
-          <h4 className="mt-10 scroll-m-20 border-b pb-2 text-lg font-semibold tracking-tight transition-colors first:mt-0">
+          <h4 className="pb-2 mt-10 text-lg font-semibold tracking-tight transition-colors border-b scroll-m-20 first:mt-0">
             Other Specializations
           </h4>
         </header>
-        <section className="mb-3 mt-7 grid grid-cols-2 gap-2">
+        <section className="grid grid-cols-2 gap-2 mb-3 mt-7">
           <aside className="max-w-sm lg:max-w-md">
             <div className="grid justify-center gap-4 sm:grid-cols-2 md:max-w-[64rem] md:grid-cols-2">
-              <div className="relative overflow-hidden rounded-lg border bg-background p-2">
+              <div className="relative p-2 overflow-hidden border rounded-lg bg-background">
                 <div className="flex h-[80px] flex-col justify-between rounded-md p-2">
                   <div className="space-y-2">
                     <h3 className="font-bold">Branches</h3>
@@ -334,7 +334,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
                   </div>
                 </div>
               </div>
-              <div className="relative overflow-hidden rounded-lg border bg-background p-2">
+              <div className="relative p-2 overflow-hidden border rounded-lg bg-background">
                 <div className="flex h-[80px] flex-col justify-between rounded-md p-2">
                   <div className="space-y-2">
                     <h3 className="font-bold">Specilization</h3>
@@ -342,7 +342,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
                   </div>
                 </div>
               </div>
-              <div className="relative overflow-hidden rounded-lg border bg-background p-2">
+              <div className="relative p-2 overflow-hidden border rounded-lg bg-background">
                 <div className="flex h-[80px] flex-col justify-between rounded-md p-2">
                   <div className="space-y-2">
                     <h3 className="font-bold">Main Activity</h3>
@@ -352,7 +352,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
                   </div>
                 </div>
               </div>
-              <div className="relative overflow-hidden rounded-lg border bg-background p-2">
+              <div className="relative p-2 overflow-hidden border rounded-lg bg-background">
                 <div className="flex h-[80px] flex-col justify-between rounded-md p-2">
                   <div className="space-y-2">
                     <h3 className="font-bold">Scale</h3>
@@ -362,15 +362,15 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
               </div>
             </div>
           </aside>
-          <div className="flex h-8 flex-wrap">
+          <div className="flex flex-wrap h-8">
             {adminClient?.specializations.map((specialization) => {
-              if (specialization.length === 0) {
+              if (specialization?.length === 0) {
                 return null
               }
 
               return (
                 <div
-                  className="mb-1 mr-2 h-10 rounded-md border p-2 tracking-tight"
+                  className="h-10 p-2 mb-1 mr-2 tracking-tight border rounded-md"
                   key={specialization}
                 >
                   {specialization}

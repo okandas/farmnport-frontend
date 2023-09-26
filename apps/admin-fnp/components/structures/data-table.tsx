@@ -75,10 +75,10 @@ export function DataTable<TData, TValue>({
     pageCount: pageCount,
   })
 
-  const isFiltered = table.getState().columnFilters.length > 0
+  const isFiltered = table.getState().columnFilters?.length > 0
 
   return (
-    <div className="space-y-8 pb-8">
+    <div className="pb-8 space-y-8">
       <div className="flex justify-between">
         <div className="flex justify-start">
           <Link
@@ -87,13 +87,13 @@ export function DataTable<TData, TValue>({
           >
             <>
               New {tableName}
-              <Icons.add className="ml-2 h-4 w-4" />
+              <Icons.add className="w-4 h-4 ml-2" />
             </>
           </Link>
         </div>
         <div className="flex justify-end">
           <div className="flex items-center justify-between">
-            <div className="flex flex-1 items-center space-x-2">
+            <div className="flex items-center flex-1 space-x-2">
               <Input
                 placeholder="Search for client..."
                 value={searchClient ?? ""}
@@ -106,7 +106,7 @@ export function DataTable<TData, TValue>({
                 className="h-8 px-2 lg:px-3"
               >
                 Search
-                <Icons.search className="ml-2 h-4 w-4" />
+                <Icons.search className="w-4 h-4 ml-2" />
               </Button>
               {isFiltered && (
                 <Button
@@ -115,14 +115,14 @@ export function DataTable<TData, TValue>({
                   className="h-8 px-2 lg:px-3"
                 >
                   Reset
-                  <Icons.close className="ml-2 h-4 w-4" />
+                  <Icons.close className="w-4 h-4 ml-2" />
                 </Button>
               )}
             </div>
           </div>
         </div>
       </div>
-      <div className="sticky top-0 overflow-x-auto rounded-md border bg-background shadow-sm">
+      <div className="sticky top-0 overflow-x-auto border rounded-md shadow-sm bg-background">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -144,7 +144,7 @@ export function DataTable<TData, TValue>({
           </TableHeader>
           <TableBody>
             {table?.getRowModel()?.rows?.length ? (
-              table.getRowModel().rows.map((row) => (
+              table.getRowModel()?.rows.map((row) => (
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
