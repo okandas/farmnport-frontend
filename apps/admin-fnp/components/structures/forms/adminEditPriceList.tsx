@@ -344,7 +344,7 @@ export function AdminEditProductPriceForm({
                 <FormControl>
                   <Popover open={open} onOpenChange={setOpen}>
                     <PopoverTrigger asChild>
-                      <div className="px-3 py-2 text-sm border rounded-md min-h-[2.5rem] group border-input ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-0">
+                      <div className="group min-h-[2.5rem] rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-0">
                         <div className="flex flex-wrap gap-1">
                           {selectedClient.length > 1 ? (
                             <Badge
@@ -368,7 +368,7 @@ export function AdminEditProductPriceForm({
                         />
 
                         {adminClients?.length > 0 ? (
-                          <CommandList className="max-h-[150px] mb-8">
+                          <CommandList className="mb-8 max-h-[150px]">
                             {adminClients.map((client) => {
                               return (
                                 <CommandItem

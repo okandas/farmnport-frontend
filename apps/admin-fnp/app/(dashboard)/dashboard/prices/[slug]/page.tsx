@@ -163,12 +163,12 @@ export default function ViewClientProductListPage({
       <div className={"absolute right-10 top-96"}>
         <Link href={url} className={cn(buttonVariants({ variant: "link" }))}>
           <>
-            <Icons.close className="w-4 h-4 mr-2" />
+            <Icons.close className="mr-2 h-4 w-4" />
             Close
           </>
         </Link>
       </div>
-      <section className="flex flex-col items-center justify-center min-h-full p-8 text-center">
+      <section className="flex min-h-full flex-col items-center justify-center p-8 text-center">
         <Tabs defaultValue="beef" className="w-[500px]">
           <TabsList className="grid w-full grid-cols-6">
             {pricingTypes[producerPriceList.client_specialization].map(
@@ -196,7 +196,7 @@ export default function ViewClientProductListPage({
                         clients.
                       </CardDescription>
                     </CardHeader>
-                    <CardContent className="space-y-2 min-h-[305px]">
+                    <CardContent className="min-h-[305px] space-y-2">
                       {producerPriceList[pricingType] !== undefined ? (
                         <ul
                           role="list"
@@ -211,11 +211,11 @@ export default function ViewClientProductListPage({
 
                               return (
                                 <li
-                                  className="overflow-hidden border border-gray-200 rounded-xl"
+                                  className="overflow-hidden rounded-xl border border-gray-200"
                                   key={index}
                                 >
-                                  <dl className="px-6 py-4 -my-3 text-sm leading-6 divide-y divide-gray-100">
-                                    <div className="flex justify-between py-3 gap-x-4">
+                                  <dl className="-my-3 divide-y divide-gray-100 px-6 py-4 text-sm leading-6">
+                                    <div className="flex justify-between gap-x-4 py-3">
                                       <dt className="text-gray-700">
                                         {ucFirst(key)}
                                       </dt>
@@ -232,7 +232,7 @@ export default function ViewClientProductListPage({
                                           <div
                                             className={cn(
                                               statuses[index],
-                                              "rounded-md py-1 px-2 text-xs font-medium ring-1 ring-inset"
+                                              "rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset"
                                             )}
                                           >
                                             {grades[pricingType][key]}

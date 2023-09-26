@@ -44,11 +44,11 @@ export const clientColumns: ColumnDef<ApplicationUser>[] = [
     cell: ({ row }) => {
       const phone = phoneUtility.parseAndKeepRawInput(
         row.getValue("phone"),
-        "ZW"
+        "ZW",
       )
       const formatted = phoneUtility.format(
         phone,
-        PhoneNumberFormat.INTERNATIONAL
+        PhoneNumberFormat.INTERNATIONAL,
       )
       return (
         <div className="font-medium text-right">

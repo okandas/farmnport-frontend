@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { PaginationState } from "@tanstack/react-table"
-import { AxiosError, AxiosResponse, isAxiosError } from "axios"
+import { isAxiosError } from "axios"
 
 import { queryProducerPriceListsAsAdmin } from "@/lib/query"
 import { ProducerPriceList } from "@/lib/schemas"

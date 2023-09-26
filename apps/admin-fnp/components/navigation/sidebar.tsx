@@ -17,7 +17,7 @@ export function SidebarNavigation({ navigationLinks }: SidebarNavigationProps) {
   return (
     <nav className="grid items-start gap-2">
       {navigationLinks.map((navLink, index) => {
-        const Icon = Icons[navLink.icon || "arrowRight"]
+        const Icon = Icons[navLink.icon ?? "arrowRight"]
         return (
           navLink.href && (
             <Link key={index} href={navLink.disabled ? "/" : navLink.href}>
@@ -28,7 +28,7 @@ export function SidebarNavigation({ navigationLinks }: SidebarNavigationProps) {
                   navLink.disabled && "cursor-not-allowed opacity-80"
                 )}
               >
-                <Icon className="mr-2 h-4 w-4" />
+                <Icon className="w-4 h-4 mr-2" />
                 <span>{navLink.title}</span>
               </span>
             </Link>

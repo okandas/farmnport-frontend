@@ -1,3 +1,5 @@
+import { Icons } from "@/components/icons/lucide"
+
 export type SidebarNavigationItem = {
   title: string
   disabled?: boolean

@@ -28,7 +28,7 @@ export default async function ViewClientLayout({
           )}
         >
           <>
-            <Icons.chevronLeft className="w-4 h-4 mr-2" />
+            <Icons.chevronLeft className="mr-2 h-4 w-4" />
             Back
           </>
         </Link>

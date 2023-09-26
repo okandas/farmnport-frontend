@@ -348,11 +348,11 @@ export function AdminEditForm({ client }: AdminEditFormProps) {
                 <FormControl>
                   <Popover open={open} onOpenChange={setOpen}>
                     <PopoverTrigger asChild>
-                      <div className="px-3 py-2 text-sm border rounded-md min-h-[2.5rem] group border-input ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-0">
+                      <div className="group min-h-[2.5rem] rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-0">
                         <div className="flex flex-wrap gap-1">
-                          {selectedSpecializations.length > 1
+                          {selectedSpecializations?.length > 1
                             ? selectedSpecializations?.map((selected) => {
-                                if (selected.length !== 0) {
+                                if (selected?.length !== 0) {
                                   return (
                                     <Badge
                                       key={selected}

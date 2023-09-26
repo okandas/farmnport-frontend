@@ -249,7 +249,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
                             {pricingType} you sell and they buy from you.
                           </CardDescription>
                         </CardHeader>
-                        <CardContent className="space-y-2 min-h-[305px]">
+                        <CardContent className="min-h-[305px] space-y-2">
                           {latestProducerPriceList[pricingType] !==
                           undefined ? (
                             <ul
@@ -288,7 +288,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
                                             <div
                                               className={cn(
                                                 statuses[index],
-                                                "rounded-md py-1 px-2 text-xs font-medium ring-1 ring-inset"
+                                                "rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset"
                                               )}
                                             >
                                               {grades[pricingType][key]}
@@ -364,7 +364,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
           </aside>
           <div className="flex flex-wrap h-8">
             {adminClient?.specializations.map((specialization) => {
-              if (specialization.length === 0) {
+              if (specialization?.length === 0) {
                 return null
               }
 

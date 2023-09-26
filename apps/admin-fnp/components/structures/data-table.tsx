@@ -75,7 +75,7 @@ export function DataTable<TData, TValue>({
     pageCount: pageCount,
   })
 
-  const isFiltered = table.getState().columnFilters.length > 0
+  const isFiltered = table.getState().columnFilters?.length > 0
 
   return (
     <div className="pb-8 space-y-8">
@@ -144,7 +144,7 @@ export function DataTable<TData, TValue>({
           </TableHeader>
           <TableBody>
             {table?.getRowModel()?.rows?.length ? (
-              table.getRowModel().rows.map((row) => (
+              table.getRowModel()?.rows.map((row) => (
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}

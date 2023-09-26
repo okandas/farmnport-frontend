@@ -138,7 +138,7 @@ export function AdminCreateForm({ client }: AdminCreateFormProps) {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="w-3/4 gap-4 mx-auto mb-8"
+        className="mx-auto mb-8 w-3/4 gap-4"
       >
         <div className="grid grid-cols-2 gap-4">
           <FormField
@@ -246,7 +246,7 @@ export function AdminCreateForm({ client }: AdminCreateFormProps) {
                       <SelectValue placeholder="Select a specialization" />
                     </SelectTrigger>
                   </FormControl>
-                  <SelectContent className="overflow-visible max-h-44">
+                  <SelectContent className="max-h-44 overflow-visible">
                     {specializations.map((specialization) => {
                       return (
                         <SelectItem key={specialization} value={specialization}>
@@ -281,7 +281,7 @@ export function AdminCreateForm({ client }: AdminCreateFormProps) {
                       <SelectValue placeholder="Select Province..." />
                     </SelectTrigger>
                   </FormControl>
-                  <SelectContent className="overflow-visible max-h-44">
+                  <SelectContent className="max-h-44 overflow-visible">
                     {provinces.map((province) => {
                       return (
                         <SelectItem key={province} value={province}>
@@ -317,7 +317,7 @@ export function AdminCreateForm({ client }: AdminCreateFormProps) {
                         <SelectValue placeholder="What do you do ?" />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent className="overflow-visible max-h-44">
+                    <SelectContent className="max-h-44 overflow-visible">
                       {mainActivity[changingSpecialization]?.map((activity) => {
                         return (
                           <SelectItem key={activity} value={activity}>
@@ -343,7 +343,7 @@ export function AdminCreateForm({ client }: AdminCreateFormProps) {
                 <FormControl>
                   <Popover open={open} onOpenChange={setOpen}>
                     <PopoverTrigger asChild>
-                      <div className="px-3 py-2 text-sm border rounded-md min-h-[2.5rem] group border-input ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-0">
+                      <div className="group min-h-[2.5rem] rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-0">
                         <div className="flex flex-wrap gap-1">
                           {selectedSpecializations.length > 1
                             ? selectedSpecializations?.map((selected) => {
@@ -352,7 +352,7 @@ export function AdminCreateForm({ client }: AdminCreateFormProps) {
                                     <Badge
                                       key={selected}
                                       variant="outline"
-                                      className="flex justify-between text-green-800 bg-green-100 border-green-400"
+                                      className="flex justify-between border-green-400 bg-green-100 text-green-800"
                                     >
                                       {selected}
                                     </Badge>
@@ -364,7 +364,7 @@ export function AdminCreateForm({ client }: AdminCreateFormProps) {
                       </div>
                     </PopoverTrigger>
                     <PopoverContent className="w-[320px] p-0">
-                      <Command className="border rounded-lg shadow-md max-h-52">
+                      <Command className="max-h-52 rounded-lg border shadow-md">
                         <CommandInput placeholder="Search..." />
                         <CommandList>
                           <CommandEmpty className="py-3 text-center">
@@ -418,7 +418,7 @@ export function AdminCreateForm({ client }: AdminCreateFormProps) {
                                           {selectedSpecializations?.includes(
                                             activity
                                           ) ? (
-                                            <Icons.check className="w-4 h-4 mr-2" />
+                                            <Icons.check className="mr-2 h-4 w-4" />
                                           ) : null}
 
                                           <span>{activity}</span>
@@ -457,7 +457,7 @@ export function AdminCreateForm({ client }: AdminCreateFormProps) {
                       <SelectValue placeholder="What user type are you?" />
                     </SelectTrigger>
                   </FormControl>
-                  <SelectContent className="overflow-visible max-h-44">
+                  <SelectContent className="max-h-44 overflow-visible">
                     {clientTypes.map((type) => {
                       return (
                         <SelectItem key={type} value={type}>
@@ -488,7 +488,7 @@ export function AdminCreateForm({ client }: AdminCreateFormProps) {
                         <SelectValue placeholder="What is your scale ?" />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent className="overflow-visible max-h-44">
+                    <SelectContent className="max-h-44 overflow-visible">
                       {scales.map((scale) => {
                         return (
                           <SelectItem key={scale} value={scale}>
@@ -529,7 +529,7 @@ export function AdminCreateForm({ client }: AdminCreateFormProps) {
           className={cn(buttonVariants(), "mt-5")}
           disabled={isPending}
         >
-          {isPending && <Icons.spinner className="w-4 h-4 mr-2 animate-spin" />}
+          {isPending && <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />}
           Submit
         </button>
       </form>

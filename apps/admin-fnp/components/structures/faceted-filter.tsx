@@ -45,7 +45,7 @@ export function FacetedFilter<TData, TValue>({
         <Button
           variant="outline"
           size="sm"
-          className="h-8 bg-background shadow-sm border"
+          className="h-8 border bg-background shadow-sm"
         >
           <PlusCircledIcon className="mr-2 h-4 w-4" />
           {title}

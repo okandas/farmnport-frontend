@@ -86,7 +86,7 @@ export default function EditClientPage({ params }: EditClientPageProps) {
       <div className={"absolute right-10 top-96"}>
         <Link href={url} className={cn(buttonVariants({ variant: "link" }))}>
           <>
-            <Icons.close className="w-4 h-4 mr-2" />
+            <Icons.close className="mr-2 h-4 w-4" />
             Close
           </>
         </Link>

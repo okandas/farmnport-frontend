@@ -62,23 +62,23 @@ export default function ViewClientHeader({ params }: ViewClientHeaderProps) {
   const stroke = adminClient?.verified ? "stroke-green-500" : "stroke-red-500"
 
   return (
-    <header className="gap-2 pb-2 border-b">
+    <header className="gap-2 border-b pb-2">
       <div className="flex max-w-2xl">
-        <Avatar className="w-32 h-32 mb-1 mr-4">
+        <Avatar className="mb-1 mr-4 h-32 w-32">
           <AvatarImage />
           <AvatarFallback>{makeAbbveriation(adminClient?.name)}</AvatarFallback>
         </Avatar>
-        <p className="leading-7 [&:not(:first-child)]:mt-5 shrink mr-2">
+        <p className="mr-2 shrink leading-7 [&:not(:first-child)]:mt-5">
           {adminClient?.short_description}
         </p>
         <div>
-          <Icons.badgeCheck className={`w-6 h-6 mt-6 ${stroke}`} />
+          <Icons.badgeCheck className={`mt-6 h-6 w-6 ${stroke}`} />
         </div>
       </div>
-      <h2 className="text-3xl font-semibold tracking-tight transition-colors scroll-m-20 first:mt-4">
+      <h2 className="scroll-m-20 text-3xl font-semibold tracking-tight transition-colors first:mt-4">
         {name}
       </h2>
-      <div className="leading-7 [&:not(:first-child)]:mt-2 mb-4">
+      <div className="mb-4 leading-7 [&:not(:first-child)]:mt-2">
         <Badge variant="outline">{adminClient?.type}</Badge>
       </div>
     </header>

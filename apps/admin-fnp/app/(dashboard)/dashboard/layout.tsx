@@ -19,7 +19,7 @@ export default async function DashboardLayout({
         </div>
       </header>
       <div className="container flex flex-1 gap-12">
-        <aside className="hidden w-[200px] flex-col md:flex border-r px-4 fixed h-screen">
+        <aside className="fixed hidden h-screen w-[200px] flex-col border-r px-4 md:flex">
           <SidebarNavigation
             navigationLinks={dashboardConfig.sidebarNavigation}
           />
