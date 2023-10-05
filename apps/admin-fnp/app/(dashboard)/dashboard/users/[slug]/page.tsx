@@ -171,7 +171,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
       </div>
 
       <section className="grid grid-cols-2 gap-2 mb-3">
-        <aside className="max-w-sm lg:max-w-md">
+        <aside className="max-w-sm lg:max-w-lg">
           <div className="flex justify-start [&:not(:first-child)]:my-3">
             <div className="w-40 leading-7">ID</div>
             <div className="leading-7">
@@ -257,7 +257,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
                               className="grid grid-cols-1 gap-x-2 gap-y-2 lg:grid-cols-2 xl:gap-x-4 "
                             >
                               {Object.keys(
-                                latestProducerPriceList[pricingType]
+                                latestProducerPriceList[pricingType],
                               ).map((key, index) => {
                                 if (key === "hasPrice") {
                                   return null
@@ -280,7 +280,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
                                             {centsToDollars(
                                               gradePrices[
                                                 key as keyof typeof gradePrices
-                                              ]
+                                              ],
                                             )}
                                           </div>
 
@@ -288,7 +288,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
                                             <div
                                               className={cn(
                                                 statuses[index],
-                                                "rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset"
+                                                "rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset",
                                               )}
                                             >
                                               {grades[pricingType][key]}
@@ -309,7 +309,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
                       </Card>
                     </TabsContent>
                   )
-                }
+                },
               )}
             </Tabs>
           ) : null}
