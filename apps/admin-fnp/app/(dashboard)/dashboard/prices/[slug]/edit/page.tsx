@@ -4,7 +4,7 @@ import Link from "next/link"
 import { useQuery } from "@tanstack/react-query"
 import { isAxiosError } from "axios"
 
-import { queryUserProductPriceListAsAdmin } from "@/lib/query"
+import { queryUserProductPriceList } from "@/lib/query"
 import { ProducerPriceList } from "@/lib/schemas"
 import { cn } from "@/lib/utilities"
 import { buttonVariants } from "@/components/ui/button"
@@ -12,7 +12,7 @@ import { ToastAction } from "@/components/ui/toast"
 import { toast } from "@/components/ui/use-toast"
 import { Icons } from "@/components/icons/lucide"
 import { Placeholder } from "@/components/state/placeholder"
-import { AdminEditProductPriceForm } from "@/components/structures/forms/adminEditPriceList"
+import { EditProductPriceForm } from "@/components/structures/forms/editPriceList"
 
 interface EditProductListPriceProps {
   params: {
@@ -28,9 +28,9 @@ export default function EditProductListPrice({
 
   const { isError, isLoading, isFetching, refetch, data, isSuccess } = useQuery(
     {
-      queryKey: ["dashboard-admin-client-price", clientID],
-      queryFn: () => queryUserProductPriceListAsAdmin(clientID),
-    }
+      queryKey: ["dashboard-client-price", clientID],
+      queryFn: () => queryUserProductPriceList(clientID),
+    },
   )
 
   if (isLoading || isFetching) {
@@ -88,14 +88,14 @@ export default function EditProductListPrice({
       <div className={"absolute right-10 top-96"}>
         <Link href={url} className={cn(buttonVariants({ variant: "link" }))}>
           <>
-            <Icons.close className="mr-2 h-4 w-4" />
+            <Icons.close className="w-4 h-4 mr-2" />
             Close
           </>
         </Link>
       </div>
 
       {isSuccess ? (
-        <AdminEditProductPriceForm priceList={producerPriceList} />
+        <EditProductPriceForm priceList={producerPriceList} />
       ) : null}
     </>
   )

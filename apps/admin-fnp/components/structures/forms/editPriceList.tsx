@@ -9,10 +9,7 @@ import { format } from "date-fns"
 import { useForm, useWatch } from "react-hook-form"
 import { useDebounce } from "use-debounce"
 
-import {
-  queryUsersAsAdmin,
-  updateClientProductPriceListAsAdmin,
-} from "@/lib/query"
+import { queryUsers, updateClientProductPriceList } from "@/lib/query"
 import {
   ApplicationUser,
   ProducerPriceList,
@@ -57,14 +54,12 @@ import { toast } from "@/components/ui/use-toast"
 import { Icons } from "@/components/icons/lucide"
 import { units } from "@/components/structures/data/data"
 
-interface AdminEditProductPriceFormProps
+interface EditProductPriceFormProps
   extends React.HTMLAttributes<HTMLDivElement> {
   priceList: ProducerPriceList
 }
 
-export function AdminEditProductPriceForm({
-  priceList,
-}: AdminEditProductPriceFormProps) {
+export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
   const form = useForm({
     defaultValues: {
       id: priceList.id,
@@ -172,15 +167,15 @@ export function AdminEditProductPriceForm({
   const router = useRouter()
 
   const { data: searchedClients } = useQuery({
-    queryKey: ["dashboard-admin-clients", { search: debouncedSearchQuery }],
-    queryFn: () => queryUsersAsAdmin({ search: debouncedSearchQuery }),
+    queryKey: ["dashboard-lients", { search: debouncedSearchQuery }],
+    queryFn: () => queryUsers({ search: debouncedSearchQuery }),
     enabled,
   })
 
-  const adminClients = searchedClients?.data as ApplicationUser[]
+  const clients = searchedClients?.data as ApplicationUser[]
 
   const { mutate, isPending } = useMutation({
-    mutationFn: updateClientProductPriceListAsAdmin,
+    mutationFn: updateClientProductPriceList,
     onSuccess: () => {
       toast({
         description: "Created Product Price List Succesfully",
@@ -200,7 +195,7 @@ export function AdminEditProductPriceForm({
 
           default:
             toast({
-              title: "Uh oh! Admin client update failed.",
+              title: "Uh oh!  client update failed.",
               description: "There was a problem with your request.",
               action: <ToastAction altText="Try again">Try again</ToastAction>,
             })
@@ -268,7 +263,7 @@ export function AdminEditProductPriceForm({
                         variant={"outline"}
                         className={cn(
                           "w-[240px] pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground"
+                          !field.value && "text-muted-foreground",
                         )}
                       >
                         {field.value ? (
@@ -367,9 +362,9 @@ export function AdminEditProductPriceForm({
                           placeholder="Search..."
                         />
 
-                        {adminClients?.length > 0 ? (
+                        {clients?.length > 0 ? (
                           <CommandList className="mb-8 max-h-[150px]">
-                            {adminClients.map((client) => {
+                            {Clients.map((client) => {
                               return (
                                 <CommandItem
                                   key={client.id}

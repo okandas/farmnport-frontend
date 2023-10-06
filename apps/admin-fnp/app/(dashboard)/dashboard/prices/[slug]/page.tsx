@@ -4,7 +4,7 @@ import Link from "next/link"
 import { useQuery } from "@tanstack/react-query"
 import { isAxiosError } from "axios"
 
-import { queryUserProductPriceListAsAdmin } from "@/lib/query"
+import { queryUserProductPriceList } from "@/lib/query"
 import { ProducerPriceList } from "@/lib/schemas"
 import { centsToDollars, cn, formatDate, ucFirst } from "@/lib/utilities"
 import { Button, buttonVariants } from "@/components/ui/button"
@@ -34,8 +34,8 @@ export default function ViewClientProductListPage({
   const clientID = params.slug
 
   const { isError, isLoading, isFetching, refetch, data } = useQuery({
-    queryKey: ["dashboard-admin-client-price", clientID],
-    queryFn: () => queryUserProductPriceListAsAdmin(clientID),
+    queryKey: ["dashboard-client-price", clientID],
+    queryFn: () => queryUserProductPriceList(clientID),
   })
 
   if (isError) {
@@ -178,7 +178,7 @@ export default function ViewClientProductListPage({
                     {type}
                   </TabsTrigger>
                 )
-              }
+              },
             )}
           </TabsList>
           {pricingTypes[producerPriceList.client_specialization].map(
@@ -224,7 +224,7 @@ export default function ViewClientProductListPage({
                                           {centsToDollars(
                                             gradePrices[
                                               key as keyof typeof gradePrices
-                                            ]
+                                            ],
                                           )}
                                         </div>
 
@@ -232,7 +232,7 @@ export default function ViewClientProductListPage({
                                           <div
                                             className={cn(
                                               statuses[index],
-                                              "rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset"
+                                              "rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset",
                                             )}
                                           >
                                             {grades[pricingType][key]}
@@ -243,7 +243,7 @@ export default function ViewClientProductListPage({
                                   </dl>
                                 </li>
                               )
-                            }
+                            },
                           )}
                         </ul>
                       ) : null}
@@ -254,7 +254,7 @@ export default function ViewClientProductListPage({
                   </Card>
                 </TabsContent>
               )
-            }
+            },
           )}
         </Tabs>
       </section>

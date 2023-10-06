@@ -9,10 +9,7 @@ import { format } from "date-fns"
 import { useForm, useWatch } from "react-hook-form"
 import { useDebounce } from "use-debounce"
 
-import {
-  createClientProductPriceListAsAdmin,
-  queryUsersAsAdmin,
-} from "@/lib/query"
+import { createClientProductPriceList, queryUsers } from "@/lib/query"
 import {
   ApplicationUser,
   ProducerPriceList,
@@ -60,14 +57,14 @@ import { toast } from "@/components/ui/use-toast"
 import { Icons } from "@/components/icons/lucide"
 import { units } from "@/components/structures/data/data"
 
-interface AdminCreateProductPriceFormProps
+interface CreateProductPriceFormProps
   extends React.HTMLAttributes<HTMLDivElement> {
   priceList: ProducerPriceList
 }
 
-export function AdminCreateProductPriceForm({
+export function CreateProductPriceForm({
   priceList,
-}: AdminCreateProductPriceFormProps) {
+}: CreateProductPriceFormProps) {
   const form = useForm({
     defaultValues: {
       id: priceList.id,
@@ -175,15 +172,15 @@ export function AdminCreateProductPriceForm({
   const router = useRouter()
 
   const { data, isError, refetch } = useQuery({
-    queryKey: ["dashboard-admin-clients", { search: debouncedSearchQuery }],
+    queryKey: ["dashboard-ients", { search: debouncedSearchQuery }],
     queryFn: () =>
-      queryUsersAsAdmin({
+      queryUsers({
         search: debouncedSearchQuery,
       }),
     enabled,
   })
 
-  const adminClients = data?.data?.data as ApplicationUser[]
+  const Clients = data?.data?.data as ApplicationUser[]
 
   if (isError) {
     if (isAxiosError(data)) {
@@ -213,7 +210,7 @@ export function AdminCreateProductPriceForm({
   }
 
   const { mutate, isPending } = useMutation({
-    mutationFn: createClientProductPriceListAsAdmin,
+    mutationFn: createClientProductPriceList,
     onSuccess: () => {
       toast({
         description: "Created Product Price List Succesfully",
@@ -233,7 +230,7 @@ export function AdminCreateProductPriceForm({
 
           default:
             toast({
-              title: "Uh oh! Admin client update failed.",
+              title: "Uh oh!  client update failed.",
               description: "There was a problem with your request.",
               action: <ToastAction altText="Try again">Try again</ToastAction>,
             })
@@ -301,7 +298,7 @@ export function AdminCreateProductPriceForm({
                         variant={"outline"}
                         className={cn(
                           "w-[240px] pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground"
+                          !field.value && "text-muted-foreground",
                         )}
                       >
                         {field.value ? (
@@ -400,9 +397,9 @@ export function AdminCreateProductPriceForm({
                           placeholder="Search..."
                         />
 
-                        {adminClients?.length > 0 ? (
+                        {clients?.length > 0 ? (
                           <CommandList className="mb-8 max-h-[150px]">
-                            {adminClients.map((client) => {
+                            {Clients.map((client) => {
                               return (
                                 <CommandItem
                                   key={client.id}

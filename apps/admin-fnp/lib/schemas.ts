@@ -1,6 +1,6 @@
 import * as z from "zod"
 
-export const AdminAuthSchema = z.object({
+export const AuthSchema = z.object({
   email: z.string().nonempty().email(),
   password: z.string().nonempty(),
 })
@@ -114,6 +114,99 @@ export const ProducerPriceListSchema = z.object({
   unit: z.string().nonempty(),
 })
 
+export const ProductSchema = z.object({
+  id: z.string(),
+  description: z.array(
+    z.object({
+      name: z.string(),
+      value: z.string(),
+    }),
+  ),
+  reg_number: z.string(),
+  cat: z.string(),
+  admin: z.object({
+    id: z.string(),
+    name: z.boolean(),
+  }),
+  images: z.array(
+    z.object({
+      img: z.object({
+        height: z.string(),
+        width: z.string(),
+        src: z.string(),
+      }),
+    }),
+  ),
+  unit: z.object({
+    value: z.number(),
+    name: z.string(),
+  }),
+  manufacturer: z.object({
+    name: z.string(),
+  }),
+  distributor: z.object({
+    name: z.string(),
+  }),
+  warnings: z.array(
+    z.object({
+      name: z.string(),
+      value: z.string(),
+      location: z.string(),
+    }),
+  ),
+  instructions: z.object({
+    usage: z.array(
+      z.object({
+        name: z.string(),
+        value: z.string(),
+      }),
+    ),
+    examples: z.array(
+      z.object({
+        description: z.string(),
+        dosage: z.object({
+          name: z.number(),
+          unit: z.string(),
+        }),
+        mass: z.object({
+          weight: z.number(),
+          unit: z.string(),
+        }),
+        example: z.array(
+          z.object({
+            dosage: z.object({
+              name: z.number(),
+              unit: z.string(),
+            }),
+            mass: z.object({
+              weight: z.number(),
+              unit: z.string(),
+            }),
+            pack: z.number(),
+          }),
+        ),
+      }),
+    ),
+    efficacy_table: z.array(
+      z.object({
+        species: z.string(),
+        third_stage: z.string(),
+        fourth_stage: z.string(),
+        adults: z.string(),
+      }),
+    ),
+    efficacy: z.array(
+      z.object({
+        name: z.string(),
+        value: z.string(),
+      }),
+    ),
+    key_map: z.object({
+      type: z.string(),
+    }),
+  }),
+})
+
 ApplicationUserSchema.required({
   name: true,
   scale: true,
@@ -128,7 +221,14 @@ ApplicationUserSchema.required({
   type: true,
 })
 
-export const AdminEditApplicationUserSchema = ApplicationUserSchema.pick({
+ProducerPriceListSchema.required({
+  client_id: true,
+  client_name: true,
+  client_specialization: true,
+  effectiveDate: true,
+})
+
+export const EditApplicationUserSchema = ApplicationUserSchema.pick({
   id: true,
   name: true,
   email: true,
@@ -145,17 +245,14 @@ export const AdminEditApplicationUserSchema = ApplicationUserSchema.pick({
   short_description: true,
 })
 
-export const AdminApplicationUserIDSchema = ApplicationUserSchema.pick({
+export const ApplicationUserIDSchema = ApplicationUserSchema.pick({
   id: true,
 })
 
 export type ApplicationUser = z.infer<typeof ApplicationUserSchema>
 export type ProducerPriceList = z.infer<typeof ProducerPriceListSchema>
+export type ProductItem = z.infer<typeof ProductSchema>
 
-export type AdminEditApplicationUser = z.infer<
-  typeof AdminEditApplicationUserSchema
->
+export type EditApplicationUser = z.infer<typeof EditApplicationUserSchema>
 
-export type AdminApplicationUserID = z.infer<
-  typeof AdminApplicationUserIDSchema
->
+export type ApplicationUserID = z.infer<typeof ApplicationUserIDSchema>

@@ -4,7 +4,7 @@ import Link from "next/link"
 import { useQuery } from "@tanstack/react-query"
 import { isAxiosError } from "axios"
 
-import { queryUserAsAdmin } from "@/lib/query"
+import { queryUser } from "@/lib/query"
 import { ApplicationUser } from "@/lib/schemas"
 import { cn } from "@/lib/utilities"
 import { buttonVariants } from "@/components/ui/button"
@@ -12,7 +12,7 @@ import { ToastAction } from "@/components/ui/toast"
 import { toast } from "@/components/ui/use-toast"
 import { Icons } from "@/components/icons/lucide"
 import { Placeholder } from "@/components/state/placeholder"
-import { AdminEditForm } from "@/components/structures/forms/adminClientEdit"
+import { EditForm } from "@/components/structures/forms/clientEdit"
 
 interface EditClientPageProps {
   params: {
@@ -25,11 +25,11 @@ export default function EditClientPage({ params }: EditClientPageProps) {
   const url = `/dashboard/users/${name}`
 
   const { isError, isLoading, isFetching, data, refetch } = useQuery({
-    queryKey: ["dashboard-admin-client", name],
-    queryFn: () => queryUserAsAdmin(name),
+    queryKey: ["dashboard-client", name],
+    queryFn: () => queryUser(name),
   })
 
-  const adminClient = data?.data as ApplicationUser
+  const Client = data?.data as ApplicationUser
 
   if (isError) {
     if (isAxiosError(data)) {
@@ -86,15 +86,13 @@ export default function EditClientPage({ params }: EditClientPageProps) {
       <div className={"absolute right-10 top-96"}>
         <Link href={url} className={cn(buttonVariants({ variant: "link" }))}>
           <>
-            <Icons.close className="mr-2 h-4 w-4" />
+            <Icons.close className="w-4 h-4 mr-2" />
             Close
           </>
         </Link>
       </div>
 
-      {adminClient !== undefined ? (
-        <AdminEditForm client={adminClient} />
-      ) : null}
+      {Client !== undefined ? <EditForm client={Client} /> : null}
     </>
   )
 }

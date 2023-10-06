@@ -5,15 +5,15 @@ import { useQuery } from "@tanstack/react-query"
 import { PaginationState } from "@tanstack/react-table"
 import { isAxiosError } from "axios"
 
-import { queryProducerPriceListsAsAdmin } from "@/lib/query"
-import { ProducerPriceList } from "@/lib/schemas"
+import { queryUsers } from "@/lib/query"
+import { ApplicationUser } from "@/lib/schemas"
 import { ToastAction } from "@/components/ui/toast"
 import { toast } from "@/components/ui/use-toast"
 import { Placeholder } from "@/components/state/placeholder"
+import { clientColumns } from "@/components/structures/clients"
 import { DataTable } from "@/components/structures/data-table"
-import { producerPriceListColumns } from "@/components/structures/producerLists"
 
-export function AdminProducePriceLists() {
+export function ClientsTable() {
   const [searchClient, setSearchClient] = useState("")
 
   const [pagination, setPagination] = useState<PaginationState>({
@@ -21,18 +21,15 @@ export function AdminProducePriceLists() {
     pageSize: 20,
   })
 
-  const { isError, isLoading, isFetching, refetch, data } = useQuery({
-    queryKey: [
-      "dashboard-admin-producer-price-lists",
-      { p: pagination.pageIndex },
-    ],
+  const { isError, isLoading, isFetching, data, refetch } = useQuery({
+    queryKey: ["dashboard-clients", { p: pagination.pageIndex }],
     queryFn: () =>
-      queryProducerPriceListsAsAdmin({
+      queryUsers({
         p: pagination.pageIndex,
       }),
   })
 
-  const adminProducePriceLists = data?.data?.data as ProducerPriceList[]
+  const Clients = data?.data?.data as ApplicationUser[]
   const total = data?.data?.total as number
 
   if (isError) {
@@ -72,22 +69,22 @@ export function AdminProducePriceLists() {
   if (isLoading || isFetching) {
     return (
       <Placeholder>
-        <Placeholder.Title>Fetching Producer Price Lists</Placeholder.Title>
+        <Placeholder.Title>Fetching Users</Placeholder.Title>
       </Placeholder>
     )
   }
 
   return (
     <DataTable
-      columns={producerPriceListColumns}
-      data={adminProducePriceLists}
-      newUrl="/dashboard/prices/new"
-      tableName="Price"
+      columns={clientColumns}
+      data={Clients}
+      newUrl="/dashboard/users/new"
+      tableName="User"
       total={total}
       pagination={pagination}
       setPagination={setPagination}
       searchClient={searchClient}
-      setSearchClient={setSearchClient}
+      setSearchclient={setSearchClient}
     />
   )
 }

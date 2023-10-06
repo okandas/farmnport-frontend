@@ -2,16 +2,16 @@
 
 import { useState } from "react"
 
-import { queryUserAsAdmin } from "@/lib/query"
-import { AdminEditApplicationUser, ApplicationUser } from "@/lib/schemas"
+import { queryUser } from "@/lib/query"
+import { EditApplicationUser, ApplicationUser } from "@/lib/schemas"
 import { cn } from "@/lib/utilities"
 import { buttonVariants } from "@/components/ui/button"
 import { ToastAction } from "@/components/ui/toast"
 import { toast } from "@/components/ui/use-toast"
-import { AdminCreateForm } from "@/components/structures/forms/adminCreateClient"
+import { CreateForm } from "@/components/structures/forms/createClient"
 
 export default function CreateClientPage() {
-  const [adminClient, _] = useState<AdminEditApplicationUser>({
+  const [Client, _] = useState<EditApplicationUser>({
     id: "",
     name: "",
     email: "",
@@ -28,5 +28,5 @@ export default function CreateClientPage() {
     short_description: "",
   })
 
-  return <AdminCreateForm client={adminClient} />
+  return <CreateForm client={Client} />
 }

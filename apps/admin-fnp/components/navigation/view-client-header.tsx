@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { isAxiosError } from "axios"
 
-import { queryUserAsAdmin } from "@/lib/query"
+import { queryUser } from "@/lib/query"
 import { ApplicationUser } from "@/lib/schemas"
 import { makeAbbveriation } from "@/lib/utilities"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -23,8 +23,8 @@ export default function ViewClientHeader({ params }: ViewClientHeaderProps) {
   const name = params.slug
 
   const { isError, isLoading, isFetching, data, refetch } = useQuery({
-    queryKey: ["dashboard-admin-client", name],
-    queryFn: () => queryUserAsAdmin(name),
+    queryKey: ["dashboard-lient", name],
+    queryFn: () => queryUser(name),
   })
 
   if (isError) {
@@ -57,29 +57,29 @@ export default function ViewClientHeader({ params }: ViewClientHeaderProps) {
     return null
   }
 
-  const adminClient = data?.data as ApplicationUser
+  const Client = data?.data as ApplicationUser
 
-  const stroke = adminClient?.verified ? "stroke-green-500" : "stroke-red-500"
+  const stroke = Client?.verified ? "stroke-green-500" : "stroke-red-500"
 
   return (
-    <header className="gap-2 border-b pb-2">
+    <header className="gap-2 pb-2 border-b">
       <div className="flex max-w-2xl">
-        <Avatar className="mb-1 mr-4 h-32 w-32">
+        <Avatar className="w-32 h-32 mb-1 mr-4">
           <AvatarImage />
-          <AvatarFallback>{makeAbbveriation(adminClient?.name)}</AvatarFallback>
+          <AvatarFallback>{makeAbbveriation(Client?.name)}</AvatarFallback>
         </Avatar>
         <p className="mr-2 shrink leading-7 [&:not(:first-child)]:mt-5">
-          {adminClient?.short_description}
+          {Client?.short_description}
         </p>
         <div>
           <Icons.badgeCheck className={`mt-6 h-6 w-6 ${stroke}`} />
         </div>
       </div>
-      <h2 className="scroll-m-20 text-3xl font-semibold tracking-tight transition-colors first:mt-4">
+      <h2 className="text-3xl font-semibold tracking-tight transition-colors scroll-m-20 first:mt-4">
         {name}
       </h2>
       <div className="mb-4 leading-7 [&:not(:first-child)]:mt-2">
-        <Badge variant="outline">{adminClient?.type}</Badge>
+        <Badge variant="outline">{Client?.type}</Badge>
       </div>
     </header>
   )

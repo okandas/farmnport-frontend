@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query"
 import { isAxiosError } from "axios"
 
-import { queryUserAsAdmin, queryUserProductPriceListAsAdmin } from "@/lib/query"
+import { queryUser, queryUserProductPriceList } from "@/lib/query"
 import { ApplicationUser, ProducerPriceList } from "@/lib/schemas"
 import { centsToDollars, cn, formatDate, ucFirst } from "@/lib/utilities"
 import { Button } from "@/components/ui/button"
@@ -19,7 +19,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ToastAction } from "@/components/ui/toast"
 import { toast } from "@/components/ui/use-toast"
 import { Placeholder } from "@/components/state/placeholder"
-import { AdminControlDropDown } from "@/components/structures/control-dropdown"
+import { ControlDropDown } from "@/components/structures/control-dropdown"
 
 interface ViewClientPageProps {
   params: {
@@ -31,17 +31,17 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
   const name = params.slug
 
   const { isError, isLoading, isFetching, data, refetch } = useQuery({
-    queryKey: ["dashboard-admin-client", name],
-    queryFn: () => queryUserAsAdmin(name),
+    queryKey: ["dashboard-client", name],
+    queryFn: () => queryUser(name),
   })
 
-  const adminClient = data?.data as ApplicationUser
+  const Client = data?.data as ApplicationUser
 
-  const clientID = adminClient?.id ?? ""
+  const clientID = Client?.id ?? ""
 
   const { data: priceListData } = useQuery({
-    queryKey: ["dashboard-admin-client-price", clientID],
-    queryFn: () => queryUserProductPriceListAsAdmin(clientID),
+    queryKey: ["dashboard-nt-price", clientID],
+    queryFn: () => queryUserProductPriceList(clientID),
   })
 
   const latestProducerPriceList = priceListData?.data as ProducerPriceList
@@ -167,7 +167,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
   return (
     <>
       <div className={"absolute right-10 top-64"}>
-        <AdminControlDropDown client={adminClient} />
+        <ControlDropDown client={Client} />
       </div>
 
       <section className="grid grid-cols-2 gap-2 mb-3">
@@ -176,7 +176,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
             <div className="w-40 leading-7">ID</div>
             <div className="leading-7">
               <p className="text-base font-semibold tracking-tight">
-                {adminClient?.id}
+                {Client?.id}
               </p>
             </div>
           </div>
@@ -184,7 +184,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
             <div className="w-40 leading-7">Email</div>
             <div className="leading-7">
               <p className="text-base font-semibold tracking-tight">
-                {adminClient?.email}
+                {Client?.email}
               </p>
             </div>
           </div>
@@ -192,7 +192,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
             <div className="w-40 leading-7">Phone</div>
             <div className="leading-7">
               <p className="text-base font-semibold tracking-tight">
-                {adminClient?.phone}
+                {Client?.phone}
               </p>
             </div>
           </div>
@@ -200,7 +200,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
             <div className="w-40 leading-7">Joined</div>
             <div className="leading-7">
               <p className="text-base font-semibold tracking-tight">
-                {formatDate(adminClient?.created)}
+                {formatDate(Client?.created)}
               </p>
             </div>
           </div>
@@ -208,7 +208,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
             <div className="w-40 leading-7">Address</div>
             <div className="leading-7">
               <p className="text-base font-semibold tracking-tight">
-                {adminClient?.address}
+                {Client?.address}
               </p>
             </div>
           </div>
@@ -216,18 +216,18 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
             <div className="w-40 leading-7">City/Province</div>
             <div className="leading-7">
               <p className="text-base font-semibold tracking-tight">
-                {adminClient?.city}, {adminClient?.province}
+                {Client?.city}, {Client?.province}
               </p>
             </div>
           </div>
         </aside>
         <aside>
-          {adminClient?.specialization !== undefined &&
+          {Client?.specialization !== undefined &&
           latestProducerPriceList != undefined &&
-          adminClient?.type === "buyer" ? (
+          t?.type === "buyer" ? (
             <Tabs defaultValue="beef" className="w-[500px]">
               <TabsList className="grid w-full grid-cols-6">
-                {pricingTypes[adminClient.specialization].map((type, index) => {
+                {pricingTypes[Client.specialization].map((type, index) => {
                   return (
                     <TabsTrigger key={index} value={type}>
                       {type}
@@ -235,82 +235,79 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
                   )
                 })}
               </TabsList>
-              {pricingTypes[adminClient.specialization].map(
-                (pricingType, index) => {
-                  return (
-                    <TabsContent key={index} value={pricingType}>
-                      <Card>
-                        <CardHeader>
-                          <CardTitle>
-                            {ucFirst(pricingType)} Producer Prices
-                          </CardTitle>
-                          <CardDescription>
-                            This how much you are paying farmers for the{" "}
-                            {pricingType} you sell and they buy from you.
-                          </CardDescription>
-                        </CardHeader>
-                        <CardContent className="min-h-[305px] space-y-2">
-                          {latestProducerPriceList[pricingType] !==
-                          undefined ? (
-                            <ul
-                              role="list"
-                              className="grid grid-cols-1 gap-x-2 gap-y-2 lg:grid-cols-2 xl:gap-x-4 "
-                            >
-                              {Object.keys(
-                                latestProducerPriceList[pricingType],
-                              ).map((key, index) => {
-                                if (key === "hasPrice") {
-                                  return null
-                                }
-                                const gradePrices =
-                                  latestProducerPriceList[pricingType]
+              {pricingTypes[t.specialization].map((pricingType, index) => {
+                return (
+                  <TabsContent key={index} value={pricingType}>
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>
+                          {ucFirst(pricingType)} Producer Prices
+                        </CardTitle>
+                        <CardDescription>
+                          This how much you are paying farmers for the{" "}
+                          {pricingType} you sell and they buy from you.
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="min-h-[305px] space-y-2">
+                        {latestProducerPriceList[pricingType] !== undefined ? (
+                          <ul
+                            role="list"
+                            className="grid grid-cols-1 gap-x-2 gap-y-2 lg:grid-cols-2 xl:gap-x-4 "
+                          >
+                            {Object.keys(
+                              latestProducerPriceList[pricingType],
+                            ).map((key, index) => {
+                              if (key === "hasPrice") {
+                                return null
+                              }
+                              const gradePrices =
+                                latestProducerPriceList[pricingType]
 
-                                return (
-                                  <li
-                                    className="overflow-hidden border border-gray-200 rounded-xl"
-                                    key={index}
-                                  >
-                                    <dl className="px-6 py-4 -my-3 text-sm leading-6 divide-y divide-gray-100">
-                                      <div className="flex justify-between py-3 gap-x-4">
-                                        <dt className="text-gray-700">
-                                          {ucFirst(key)}
-                                        </dt>
-                                        <dd className="flex items-start gap-x-2">
-                                          <div className="font-medium text-gray-900">
-                                            {centsToDollars(
-                                              gradePrices[
-                                                key as keyof typeof gradePrices
-                                              ],
+                              return (
+                                <li
+                                  className="overflow-hidden border border-gray-200 rounded-xl"
+                                  key={index}
+                                >
+                                  <dl className="px-6 py-4 -my-3 text-sm leading-6 divide-y divide-gray-100">
+                                    <div className="flex justify-between py-3 gap-x-4">
+                                      <dt className="text-gray-700">
+                                        {ucFirst(key)}
+                                      </dt>
+                                      <dd className="flex items-start gap-x-2">
+                                        <div className="font-medium text-gray-900">
+                                          {centsToDollars(
+                                            gradePrices[
+                                              key as keyof typeof gradePrices
+                                            ],
+                                          )}
+                                        </div>
+
+                                        {grades?.[pricingType]?.[key] ? (
+                                          <div
+                                            className={cn(
+                                              statuses[index],
+                                              "rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset",
                                             )}
+                                          >
+                                            {grades[pricingType][key]}
                                           </div>
-
-                                          {grades?.[pricingType]?.[key] ? (
-                                            <div
-                                              className={cn(
-                                                statuses[index],
-                                                "rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset",
-                                              )}
-                                            >
-                                              {grades[pricingType][key]}
-                                            </div>
-                                          ) : null}
-                                        </dd>
-                                      </div>
-                                    </dl>
-                                  </li>
-                                )
-                              })}
-                            </ul>
-                          ) : null}
-                        </CardContent>
-                        <CardFooter>
-                          <Button>Book Now</Button>
-                        </CardFooter>
-                      </Card>
-                    </TabsContent>
-                  )
-                },
-              )}
+                                        ) : null}
+                                      </dd>
+                                    </div>
+                                  </dl>
+                                </li>
+                              )
+                            })}
+                          </ul>
+                        ) : null}
+                      </CardContent>
+                      <CardFooter>
+                        <Button>Book Now</Button>
+                      </CardFooter>
+                    </Card>
+                  </TabsContent>
+                )
+              })}
             </Tabs>
           ) : null}
         </aside>
@@ -329,7 +326,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
                   <div className="space-y-2">
                     <h3 className="font-bold">Branches</h3>
                     <p className="text-sm text-muted-foreground">
-                      {adminClient?.branches}
+                      {Client?.branches}
                     </p>
                   </div>
                 </div>
@@ -338,7 +335,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
                 <div className="flex h-[80px] flex-col justify-between rounded-md p-2">
                   <div className="space-y-2">
                     <h3 className="font-bold">Specilization</h3>
-                    <p className="text-sm">{adminClient?.specialization}</p>
+                    <p className="text-sm">{Client?.specialization}</p>
                   </div>
                 </div>
               </div>
@@ -347,7 +344,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
                   <div className="space-y-2">
                     <h3 className="font-bold">Main Activity</h3>
                     <p className="text-sm text-muted-foreground">
-                      {adminClient?.main_activity}
+                      {Client?.main_activity}
                     </p>
                   </div>
                 </div>
@@ -356,14 +353,14 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
                 <div className="flex h-[80px] flex-col justify-between rounded-md p-2">
                   <div className="space-y-2">
                     <h3 className="font-bold">Scale</h3>
-                    <p className="text-sm">{adminClient?.scale}</p>
+                    <p className="text-sm">{Client?.scale}</p>
                   </div>
                 </div>
               </div>
             </div>
           </aside>
           <div className="flex flex-wrap h-8">
-            {adminClient?.specializations.map((specialization) => {
+            {ecializations.map((specialization) => {
               if (specialization?.length === 0) {
                 return null
               }

@@ -16,39 +16,32 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
-interface AdminAccountNavigationProps
-  extends React.HTMLAttributes<HTMLDivElement> {}
+interface AccountNavigationProps extends React.HTMLAttributes<HTMLDivElement> {}
 
-export function AdminAccountNavigation({
-  ...props
-}: AdminAccountNavigationProps) {
+export function AccountNavigation({ ...props }: AccountNavigationProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant="secondary"
-          className="relative h-8 w-8 rounded-lg
-        "
-        >
-          <Avatar className="h-8 w-8">
+        <Button variant="secondary" className="relative w-8 h-8 rounded-lg ">
+          <Avatar className="w-8 h-8">
             <AvatarImage />
             <AvatarFallback>RK</AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="start" side="left">
-        <DropdownMenuLabel>Your Admin Account</DropdownMenuLabel>
+        <DropdownMenuLabel>Your Account</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem>
-            <User className="mr-2 h-4 w-4" />
+            <User className="w-4 h-4 mr-2" />
             <span>Profile</span>
             <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
           </DropdownMenuItem>
         </DropdownMenuGroup>
 
         <DropdownMenuItem>
-          <LogOut className="mr-2 h-4 w-4" />
+          <LogOut className="w-4 h-4 mr-2" />
           <span>Log out</span>
           <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
         </DropdownMenuItem>

@@ -7,12 +7,8 @@ import { useMutation } from "@tanstack/react-query"
 import { isAxiosError } from "axios"
 import { useForm, useWatch } from "react-hook-form"
 
-import { updateClientAsAdmin } from "@/lib/query"
-import {
-  AdminEditApplicationUser,
-  AdminEditApplicationUserSchema,
-  ApplicationUser,
-} from "@/lib/schemas"
+import { createClient } from "@/lib/query"
+import { EditApplicationUser, EditApplicationUserSchema } from "@/lib/schemas"
 import { cn, slug } from "@/lib/utilities"
 import { Badge } from "@/components/ui/badge"
 import { buttonVariants } from "@/components/ui/button"
@@ -51,20 +47,19 @@ import { Textarea } from "@/components/ui/textarea"
 import { ToastAction } from "@/components/ui/toast"
 import { toast } from "@/components/ui/use-toast"
 import { Icons } from "@/components/icons/lucide"
-
 import {
   clientTypes,
   mainActivity,
   provinces,
   scales,
   specializations,
-} from "../data/data"
+} from "@/components/structures/data/data"
 
-interface AdminEditFormProps extends React.HTMLAttributes<HTMLDivElement> {
-  client: ApplicationUser
+interface CreateFormProps extends React.HTMLAttributes<HTMLDivElement> {
+  client: EditApplicationUser
 }
 
-export function AdminEditForm({ client }: AdminEditFormProps) {
+export function CreateForm({ client }: CreateFormProps) {
   const form = useForm({
     defaultValues: {
       id: client?.id,
@@ -82,7 +77,7 @@ export function AdminEditForm({ client }: AdminEditFormProps) {
       branches: client?.branches,
       short_description: client?.short_description,
     },
-    resolver: zodResolver(AdminEditApplicationUserSchema),
+    resolver: zodResolver(EditApplicationUserSchema),
   })
 
   const selectedSpecializations = useWatch({
@@ -102,15 +97,13 @@ export function AdminEditForm({ client }: AdminEditFormProps) {
   const router = useRouter()
 
   const { mutate, isPending } = useMutation({
-    mutationFn: updateClientAsAdmin,
-    onSuccess: (data) => {
+    mutationFn: createClient,
+    onSuccess: () => {
       toast({
-        description: "Updated User Succesfully",
+        description: "Created User Succesfully",
       })
 
-      const name = slug(data.data?.name)
-
-      // router.push(`/dashboard/users/${name}`)
+      router.push(`/dashboard/users`)
     },
     onError: (error) => {
       if (isAxiosError(error)) {
@@ -124,7 +117,7 @@ export function AdminEditForm({ client }: AdminEditFormProps) {
 
           default:
             toast({
-              title: "Uh oh! Admin client update failed.",
+              title: "Uh oh!  client update failed.",
               description: "There was a problem with your request.",
               action: <ToastAction altText="Try again">Try again</ToastAction>,
             })
@@ -134,8 +127,7 @@ export function AdminEditForm({ client }: AdminEditFormProps) {
     },
   })
 
-  async function onSubmit(payload: AdminEditApplicationUser) {
-    payload.branches = Number(payload.branches)
+  async function onSubmit(payload: EditApplicationUser) {
     mutate(payload)
   }
 
@@ -350,9 +342,9 @@ export function AdminEditForm({ client }: AdminEditFormProps) {
                     <PopoverTrigger asChild>
                       <div className="group min-h-[2.5rem] rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-0">
                         <div className="flex flex-wrap gap-1">
-                          {selectedSpecializations?.length > 1
+                          {selectedSpecializations.length > 1
                             ? selectedSpecializations?.map((selected) => {
-                                if (selected?.length !== 0) {
+                                if (selected.length !== 0) {
                                   return (
                                     <Badge
                                       key={selected}
@@ -369,7 +361,7 @@ export function AdminEditForm({ client }: AdminEditFormProps) {
                       </div>
                     </PopoverTrigger>
                     <PopoverContent className="w-[320px] p-0">
-                      <Command className="border rounded-lg shadow-md max-h-52 ">
+                      <Command className="border rounded-lg shadow-md max-h-52">
                         <CommandInput placeholder="Search..." />
                         <CommandList>
                           <CommandEmpty className="py-3 text-center">
@@ -390,7 +382,7 @@ export function AdminEditForm({ client }: AdminEditFormProps) {
                                           onSelect={(value) => {
                                             if (
                                               !selectedSpecializations?.includes(
-                                                value
+                                                value,
                                               )
                                             ) {
                                               const NewSpecialization = [
@@ -400,28 +392,28 @@ export function AdminEditForm({ client }: AdminEditFormProps) {
 
                                               form.setValue(
                                                 "specializations",
-                                                NewSpecialization
+                                                NewSpecialization,
                                               )
                                             } else {
                                               const removeAtIndex =
                                                 selectedSpecializations?.indexOf(
-                                                  value
+                                                  value,
                                                 )
 
                                               selectedSpecializations?.splice(
                                                 removeAtIndex,
-                                                1
+                                                1,
                                               )
 
                                               form.setValue(
                                                 "specializations",
-                                                selectedSpecializations
+                                                selectedSpecializations,
                                               )
                                             }
                                           }}
                                         >
                                           {selectedSpecializations?.includes(
-                                            activity
+                                            activity,
                                           ) ? (
                                             <Icons.check className="w-4 h-4 mr-2" />
                                           ) : null}
@@ -432,7 +424,7 @@ export function AdminEditForm({ client }: AdminEditFormProps) {
                                     } else {
                                       null
                                     }
-                                  }
+                                  },
                                 )}
                               </CommandGroup>
                             )
