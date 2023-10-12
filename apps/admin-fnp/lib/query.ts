@@ -130,3 +130,8 @@ export function createProduct(data: ProductItem) {
   var url = `${baseUrl}/user/products/add`
   return api.post(url, data)
 }
+
+export function queryProduct(id: string) {
+  const url = `${baseUrl}/user/products/${id}`
+  return api.get(url)
+}

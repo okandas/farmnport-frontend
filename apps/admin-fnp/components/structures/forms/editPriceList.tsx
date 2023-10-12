@@ -364,7 +364,7 @@ export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
 
                         {clients?.length > 0 ? (
                           <CommandList className="mb-8 max-h-[150px]">
-                            {Clients.map((client) => {
+                            {clients.map((client) => {
                               return (
                                 <CommandItem
                                   key={client.id}

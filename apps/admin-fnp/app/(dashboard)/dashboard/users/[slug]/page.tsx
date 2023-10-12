@@ -35,9 +35,9 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
     queryFn: () => queryUser(name),
   })
 
-  const Client = data?.data as ApplicationUser
+  const client = data?.data as ApplicationUser
 
-  const clientID = Client?.id ?? ""
+  const clientID = client?.id ?? ""
 
   const { data: priceListData } = useQuery({
     queryKey: ["dashboard-nt-price", clientID],
@@ -167,7 +167,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
   return (
     <>
       <div className={"absolute right-10 top-64"}>
-        <ControlDropDown client={Client} />
+        <ControlDropDown client={client} />
       </div>
 
       <section className="grid grid-cols-2 gap-2 mb-3">
@@ -176,7 +176,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
             <div className="w-40 leading-7">ID</div>
             <div className="leading-7">
               <p className="text-base font-semibold tracking-tight">
-                {Client?.id}
+                {client?.id}
               </p>
             </div>
           </div>
@@ -184,7 +184,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
             <div className="w-40 leading-7">Email</div>
             <div className="leading-7">
               <p className="text-base font-semibold tracking-tight">
-                {Client?.email}
+                {client?.email}
               </p>
             </div>
           </div>
@@ -192,7 +192,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
             <div className="w-40 leading-7">Phone</div>
             <div className="leading-7">
               <p className="text-base font-semibold tracking-tight">
-                {Client?.phone}
+                {client?.phone}
               </p>
             </div>
           </div>
@@ -200,7 +200,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
             <div className="w-40 leading-7">Joined</div>
             <div className="leading-7">
               <p className="text-base font-semibold tracking-tight">
-                {formatDate(Client?.created)}
+                {formatDate(client?.created)}
               </p>
             </div>
           </div>
@@ -208,7 +208,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
             <div className="w-40 leading-7">Address</div>
             <div className="leading-7">
               <p className="text-base font-semibold tracking-tight">
-                {Client?.address}
+                {client?.address}
               </p>
             </div>
           </div>
@@ -216,18 +216,18 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
             <div className="w-40 leading-7">City/Province</div>
             <div className="leading-7">
               <p className="text-base font-semibold tracking-tight">
-                {Client?.city}, {Client?.province}
+                {client?.city}, {client?.province}
               </p>
             </div>
           </div>
         </aside>
         <aside>
-          {Client?.specialization !== undefined &&
+          {client?.specialization !== undefined &&
           latestProducerPriceList != undefined &&
-          t?.type === "buyer" ? (
+          client?.type === "buyer" ? (
             <Tabs defaultValue="beef" className="w-[500px]">
               <TabsList className="grid w-full grid-cols-6">
-                {pricingTypes[Client.specialization].map((type, index) => {
+                {pricingTypes[client.specialization].map((type, index) => {
                   return (
                     <TabsTrigger key={index} value={type}>
                       {type}
@@ -235,79 +235,82 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
                   )
                 })}
               </TabsList>
-              {pricingTypes[t.specialization].map((pricingType, index) => {
-                return (
-                  <TabsContent key={index} value={pricingType}>
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>
-                          {ucFirst(pricingType)} Producer Prices
-                        </CardTitle>
-                        <CardDescription>
-                          This how much you are paying farmers for the{" "}
-                          {pricingType} you sell and they buy from you.
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent className="min-h-[305px] space-y-2">
-                        {latestProducerPriceList[pricingType] !== undefined ? (
-                          <ul
-                            role="list"
-                            className="grid grid-cols-1 gap-x-2 gap-y-2 lg:grid-cols-2 xl:gap-x-4 "
-                          >
-                            {Object.keys(
-                              latestProducerPriceList[pricingType],
-                            ).map((key, index) => {
-                              if (key === "hasPrice") {
-                                return null
-                              }
-                              const gradePrices =
-                                latestProducerPriceList[pricingType]
+              {pricingTypes[client?.specialization].map(
+                (pricingType, index) => {
+                  return (
+                    <TabsContent key={index} value={pricingType}>
+                      <Card>
+                        <CardHeader>
+                          <CardTitle>
+                            {ucFirst(pricingType)} Producer Prices
+                          </CardTitle>
+                          <CardDescription>
+                            This how much you are paying farmers for the{" "}
+                            {pricingType} you sell and they buy from you.
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent className="min-h-[305px] space-y-2">
+                          {latestProducerPriceList[pricingType] !==
+                          undefined ? (
+                            <ul
+                              role="list"
+                              className="grid grid-cols-1 gap-2 lg:grid-cols-2 xl:gap-x-4"
+                            >
+                              {Object.keys(
+                                latestProducerPriceList[pricingType],
+                              ).map((key, index) => {
+                                if (key === "hasPrice") {
+                                  return null
+                                }
+                                const gradePrices =
+                                  latestProducerPriceList[pricingType]
 
-                              return (
-                                <li
-                                  className="overflow-hidden border border-gray-200 rounded-xl"
-                                  key={index}
-                                >
-                                  <dl className="px-6 py-4 -my-3 text-sm leading-6 divide-y divide-gray-100">
-                                    <div className="flex justify-between py-3 gap-x-4">
-                                      <dt className="text-gray-700">
-                                        {ucFirst(key)}
-                                      </dt>
-                                      <dd className="flex items-start gap-x-2">
-                                        <div className="font-medium text-gray-900">
-                                          {centsToDollars(
-                                            gradePrices[
-                                              key as keyof typeof gradePrices
-                                            ],
-                                          )}
-                                        </div>
-
-                                        {grades?.[pricingType]?.[key] ? (
-                                          <div
-                                            className={cn(
-                                              statuses[index],
-                                              "rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset",
+                                return (
+                                  <li
+                                    className="overflow-hidden border border-gray-200 rounded-xl"
+                                    key={index}
+                                  >
+                                    <dl className="px-6 py-4 -my-3 text-sm leading-6 divide-y divide-gray-100">
+                                      <div className="flex justify-between py-3 gap-x-4">
+                                        <dt className="text-gray-700">
+                                          {ucFirst(key)}
+                                        </dt>
+                                        <dd className="flex items-start gap-x-2">
+                                          <div className="font-medium text-gray-900">
+                                            {centsToDollars(
+                                              gradePrices[
+                                                key as keyof typeof gradePrices
+                                              ],
                                             )}
-                                          >
-                                            {grades[pricingType][key]}
                                           </div>
-                                        ) : null}
-                                      </dd>
-                                    </div>
-                                  </dl>
-                                </li>
-                              )
-                            })}
-                          </ul>
-                        ) : null}
-                      </CardContent>
-                      <CardFooter>
-                        <Button>Book Now</Button>
-                      </CardFooter>
-                    </Card>
-                  </TabsContent>
-                )
-              })}
+
+                                          {grades?.[pricingType]?.[key] ? (
+                                            <div
+                                              className={cn(
+                                                statuses[index],
+                                                "rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset",
+                                              )}
+                                            >
+                                              {grades[pricingType][key]}
+                                            </div>
+                                          ) : null}
+                                        </dd>
+                                      </div>
+                                    </dl>
+                                  </li>
+                                )
+                              })}
+                            </ul>
+                          ) : null}
+                        </CardContent>
+                        <CardFooter>
+                          <Button>Book Now</Button>
+                        </CardFooter>
+                      </Card>
+                    </TabsContent>
+                  )
+                },
+              )}
             </Tabs>
           ) : null}
         </aside>
@@ -326,7 +329,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
                   <div className="space-y-2">
                     <h3 className="font-bold">Branches</h3>
                     <p className="text-sm text-muted-foreground">
-                      {Client?.branches}
+                      {client?.branches}
                     </p>
                   </div>
                 </div>
@@ -335,7 +338,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
                 <div className="flex h-[80px] flex-col justify-between rounded-md p-2">
                   <div className="space-y-2">
                     <h3 className="font-bold">Specilization</h3>
-                    <p className="text-sm">{Client?.specialization}</p>
+                    <p className="text-sm">{client?.specialization}</p>
                   </div>
                 </div>
               </div>
@@ -344,7 +347,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
                   <div className="space-y-2">
                     <h3 className="font-bold">Main Activity</h3>
                     <p className="text-sm text-muted-foreground">
-                      {Client?.main_activity}
+                      {client?.main_activity}
                     </p>
                   </div>
                 </div>
@@ -353,14 +356,14 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
                 <div className="flex h-[80px] flex-col justify-between rounded-md p-2">
                   <div className="space-y-2">
                     <h3 className="font-bold">Scale</h3>
-                    <p className="text-sm">{Client?.scale}</p>
+                    <p className="text-sm">{client?.scale}</p>
                   </div>
                 </div>
               </div>
             </div>
           </aside>
           <div className="flex flex-wrap h-8">
-            {ecializations.map((specialization) => {
+            {client?.specializations?.map((specialization: string) => {
               if (specialization?.length === 0) {
                 return null
               }

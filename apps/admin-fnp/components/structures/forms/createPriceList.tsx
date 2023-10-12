@@ -23,8 +23,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
   Command,
-  CommandEmpty,
-  CommandGroup,
   CommandInput,
   CommandItem,
   CommandList,
@@ -180,7 +178,7 @@ export function CreateProductPriceForm({
     enabled,
   })
 
-  const Clients = data?.data?.data as ApplicationUser[]
+  const clients = data?.data?.data as ApplicationUser[]
 
   if (isError) {
     if (isAxiosError(data)) {
@@ -399,7 +397,7 @@ export function CreateProductPriceForm({
 
                         {clients?.length > 0 ? (
                           <CommandList className="mb-8 max-h-[150px]">
-                            {Clients.map((client) => {
+                            {clients.map((client) => {
                               return (
                                 <CommandItem
                                   key={client.id}

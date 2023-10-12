@@ -5,15 +5,15 @@ import { useQuery } from "@tanstack/react-query"
 import { PaginationState } from "@tanstack/react-table"
 import { isAxiosError } from "axios"
 
-import { queryProducerPriceLists } from "@/lib/query"
-import { ProducerPriceList } from "@/lib/schemas"
+import { queryProducts } from "@/lib/query"
+import { ProductItem } from "@/lib/schemas"
 import { ToastAction } from "@/components/ui/toast"
 import { toast } from "@/components/ui/use-toast"
 import { Placeholder } from "@/components/state/placeholder"
 import { DataTable } from "@/components/structures/data-table"
-import { producerPriceListColumns } from "@/components/structures/producerLists"
+import { productColums } from "@/components/structures/products"
 
-export function ProducePriceLists() {
+export function ProductsTable() {
   const [searchClient, setSearchClient] = useState("")
 
   const [pagination, setPagination] = useState<PaginationState>({
@@ -22,14 +22,14 @@ export function ProducePriceLists() {
   })
 
   const { isError, isLoading, isFetching, refetch, data } = useQuery({
-    queryKey: ["dashboard-producer-price-lists", { p: pagination.pageIndex }],
+    queryKey: ["dashboard-products", { p: pagination.pageIndex }],
     queryFn: () =>
-      queryProducerPriceLists({
+      queryProducts({
         p: pagination.pageIndex,
       }),
   })
 
-  const ProducePriceLists = data?.data?.data as ProducerPriceList[]
+  const products = data?.data?.data as ProductItem[]
   const total = data?.data?.total as number
 
   if (isError) {
@@ -58,7 +58,7 @@ export function ProducePriceLists() {
     return (
       <Placeholder>
         <Placeholder.Icon name="close" />
-        <Placeholder.Title>Error Fetching Users</Placeholder.Title>
+        <Placeholder.Title>Error Fetching Products</Placeholder.Title>
         <Placeholder.Description>
           Error Fetching users from the database
         </Placeholder.Description>
@@ -76,10 +76,10 @@ export function ProducePriceLists() {
 
   return (
     <DataTable
-      columns={producerPriceListColumns}
-      data={ProducePriceLists}
-      newUrl="/dashboard/prices/new"
-      tableName="Price"
+      columns={productColums}
+      data={products}
+      newUrl="/dashboard/products/new"
+      tableName="Product"
       total={total}
       pagination={pagination}
       setPagination={setPagination}

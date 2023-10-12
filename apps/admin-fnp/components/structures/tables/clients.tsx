@@ -21,7 +21,7 @@ export function ClientsTable() {
     pageSize: 20,
   })
 
-  const { isError, isLoading, isFetching, data, refetch } = useQuery({
+  const { isError, isLoading, isFetching, refetch, data } = useQuery({
     queryKey: ["dashboard-clients", { p: pagination.pageIndex }],
     queryFn: () =>
       queryUsers({
@@ -29,7 +29,7 @@ export function ClientsTable() {
       }),
   })
 
-  const Clients = data?.data?.data as ApplicationUser[]
+  const clients = data?.data?.data as ApplicationUser[]
   const total = data?.data?.total as number
 
   if (isError) {
@@ -77,7 +77,7 @@ export function ClientsTable() {
   return (
     <DataTable
       columns={clientColumns}
-      data={Clients}
+      data={clients}
       newUrl="/dashboard/users/new"
       tableName="User"
       total={total}

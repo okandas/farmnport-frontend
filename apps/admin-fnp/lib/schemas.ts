@@ -252,7 +252,5 @@ export const ApplicationUserIDSchema = ApplicationUserSchema.pick({
 export type ApplicationUser = z.infer<typeof ApplicationUserSchema>
 export type ProducerPriceList = z.infer<typeof ProducerPriceListSchema>
 export type ProductItem = z.infer<typeof ProductSchema>
-
 export type EditApplicationUser = z.infer<typeof EditApplicationUserSchema>
-
 export type ApplicationUserID = z.infer<typeof ApplicationUserIDSchema>
