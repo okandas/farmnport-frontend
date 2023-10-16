@@ -116,7 +116,8 @@ export const ProducerPriceListSchema = z.object({
 
 export const ProductSchema = z.object({
   id: z.string(),
-  description: z.array(
+  name: z.string(),
+  descriptions: z.array(
     z.object({
       name: z.string(),
       value: z.string(),
@@ -161,32 +162,19 @@ export const ProductSchema = z.object({
         value: z.string(),
       }),
     ),
-    examples: z.array(
-      z.object({
-        description: z.string(),
+    examples: z.array(z.object({
+      description: z.string().optional(),
+      values: z.array(z.object({
         dosage: z.object({
-          name: z.number(),
           unit: z.string(),
+          value: z.number(),
         }),
         mass: z.object({
-          weight: z.number(),
           unit: z.string(),
-        }),
-        example: z.array(
-          z.object({
-            dosage: z.object({
-              name: z.number(),
-              unit: z.string(),
-            }),
-            mass: z.object({
-              weight: z.number(),
-              unit: z.string(),
-            }),
-            pack: z.number(),
-          }),
-        ),
-      }),
-    ),
+          weight: z.number(),
+        })
+      }))
+    })),
     efficacy_table: z.array(
       z.object({
         species: z.string(),
@@ -203,8 +191,20 @@ export const ProductSchema = z.object({
     ),
     key_map: z.object({
       type: z.string(),
+      values: z.array(
+        z.object({
+          name: z.string(),
+          value: z.string(),
+        }),
+      )
     }),
   }),
+})
+
+export const FormProductSchema = ProductSchema.omit({
+  admin: true,
+  created: true,
+  updated: true
 })
 
 ApplicationUserSchema.required({
@@ -250,7 +250,9 @@ export const ApplicationUserIDSchema = ApplicationUserSchema.pick({
 })
 
 export type ApplicationUser = z.infer<typeof ApplicationUserSchema>
+export type ApplicationUserID = z.infer<typeof ApplicationUserIDSchema>
+export type EditApplicationUser = z.infer<typeof EditApplicationUserSchema>
+
 export type ProducerPriceList = z.infer<typeof ProducerPriceListSchema>
 export type ProductItem = z.infer<typeof ProductSchema>
-export type EditApplicationUser = z.infer<typeof EditApplicationUserSchema>
-export type ApplicationUserID = z.infer<typeof ApplicationUserIDSchema>
+export type FormProductModel = z.infer<typeof FormProductSchema>

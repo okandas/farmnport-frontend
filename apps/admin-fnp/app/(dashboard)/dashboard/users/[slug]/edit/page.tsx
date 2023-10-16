@@ -29,7 +29,7 @@ export default function EditClientPage({ params }: EditClientPageProps) {
     queryFn: () => queryUser(name),
   })
 
-  const Client = data?.data as ApplicationUser
+  const client = data?.data as ApplicationUser
 
   if (isError) {
     if (isAxiosError(data)) {
@@ -92,7 +92,7 @@ export default function EditClientPage({ params }: EditClientPageProps) {
         </Link>
       </div>
 
-      {Client !== undefined ? <EditForm client={Client} /> : null}
+      {client !== undefined ? <EditForm client={client} /> : null}
     </>
   )
 }

@@ -12,7 +12,7 @@ import { ToastAction } from "@/components/ui/toast"
 import { toast } from "@/components/ui/use-toast"
 import { Icons } from "@/components/icons/lucide"
 import { Placeholder } from "@/components/state/placeholder"
-import { EditForm } from "@/components/structures/forms/clientEdit"
+import { EditForm } from "@/components/structures/forms/productEdit"
 
 interface EditProductPageProps {
   params: {
@@ -91,6 +91,8 @@ export default function EditProductPage({ params }: EditProductPageProps) {
           </>
         </Link>
       </div>
+
+      {product !== undefined ? <EditForm product={product} /> : null}
     </>
   )
 }
