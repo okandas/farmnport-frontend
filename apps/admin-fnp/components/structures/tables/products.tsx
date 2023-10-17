@@ -11,7 +11,7 @@ import { ToastAction } from "@/components/ui/toast"
 import { toast } from "@/components/ui/use-toast"
 import { Placeholder } from "@/components/state/placeholder"
 import { DataTable } from "@/components/structures/data-table"
-import { productColums } from "@/components/structures/products"
+import { productColums } from "@/components/structures/columns/products"
 
 export function ProductsTable() {
   const [searchClient, setSearchClient] = useState("")

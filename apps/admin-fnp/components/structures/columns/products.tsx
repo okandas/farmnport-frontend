@@ -3,7 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { ProductItem } from "@/lib/schemas"
 import { Checkbox } from "@/components/ui/checkbox"
-import { ProductControlDropDown } from "@/components/structures/product-dropdown"
+import { ProductControlDropDown } from "@/components/structures/dropdowns/product-dropdown"
 
 export const productColums: ColumnDef<ProductItem>[] = [
   {

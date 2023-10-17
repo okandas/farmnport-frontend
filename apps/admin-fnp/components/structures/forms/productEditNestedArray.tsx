@@ -57,7 +57,7 @@ export function ProductExamples({ nestedIndex, control }: productExamplesProps) 
 
                         <FormField
                             control={control}
-                            key={secondIndex + 1}
+                            key={secondIndex + 2}
                             name={`instructions.examples.${nestedIndex}.values.${secondIndex}.dosage.value`}
                             render={({ field }) => (
                                 <FormItem>
@@ -77,7 +77,7 @@ export function ProductExamples({ nestedIndex, control }: productExamplesProps) 
 
                         <FormField
                             control={control}
-                            key={secondIndex + 1}
+                            key={secondIndex + 3}
                             name={`instructions.examples.${nestedIndex}.values.${secondIndex}.mass.unit`}
                             render={({ field }) => (
                                 <FormItem>
@@ -97,7 +97,7 @@ export function ProductExamples({ nestedIndex, control }: productExamplesProps) 
 
                         <FormField
                             control={control}
-                            key={secondIndex + 1}
+                            key={secondIndex + 4}
                             name={`instructions.examples.${nestedIndex}.values.${secondIndex}.mass.weight`}
                             render={({ field }) => (
                                 <FormItem>

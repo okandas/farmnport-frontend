@@ -10,7 +10,7 @@ import { ApplicationUser } from "@/lib/schemas"
 import { ToastAction } from "@/components/ui/toast"
 import { toast } from "@/components/ui/use-toast"
 import { Placeholder } from "@/components/state/placeholder"
-import { clientColumns } from "@/components/structures/clients"
+import { clientColumns } from "@/components/structures/columns/clients"
 import { DataTable } from "@/components/structures/data-table"
 
 export function ClientsTable() {

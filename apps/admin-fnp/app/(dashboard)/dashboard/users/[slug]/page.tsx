@@ -19,7 +19,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ToastAction } from "@/components/ui/toast"
 import { toast } from "@/components/ui/use-toast"
 import { Placeholder } from "@/components/state/placeholder"
-import { ControlDropDown } from "@/components/structures/control-dropdown"
+import { ControlDropDown } from "@/components/structures/dropdowns/control-dropdown"
 
 interface ViewClientPageProps {
   params: {
@@ -223,8 +223,8 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
         </aside>
         <aside>
           {client?.specialization !== undefined &&
-          latestProducerPriceList != undefined &&
-          client?.type === "buyer" ? (
+            latestProducerPriceList != undefined &&
+            client?.type === "buyer" ? (
             <Tabs defaultValue="beef" className="w-[500px]">
               <TabsList className="grid w-full grid-cols-6">
                 {pricingTypes[client.specialization].map((type, index) => {
@@ -251,7 +251,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
                         </CardHeader>
                         <CardContent className="min-h-[305px] space-y-2">
                           {latestProducerPriceList[pricingType] !==
-                          undefined ? (
+                            undefined ? (
                             <ul
                               role="list"
                               className="grid grid-cols-1 gap-2 lg:grid-cols-2 xl:gap-x-4"
@@ -279,7 +279,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
                                           <div className="font-medium text-gray-900">
                                             {centsToDollars(
                                               gradePrices[
-                                                key as keyof typeof gradePrices
+                                              key as keyof typeof gradePrices
                                               ],
                                             )}
                                           </div>

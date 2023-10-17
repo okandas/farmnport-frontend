@@ -154,7 +154,7 @@ export function EditForm({ product }: EditFormProps) {
                 <div >
                     {fields.map((field, index) => {
                         return (
-                            <div className="" key={field.id}>
+                            <div className="" key={index}>
                                 <FormField
                                     control={form.control}
                                     key={index + 1}
