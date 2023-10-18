@@ -172,7 +172,8 @@ export const ProductSchema = z.object({
         mass: z.object({
           unit: z.string(),
           weight: z.number(),
-        })
+        }),
+        pack: z.number()
       }))
     })),
     efficacy_table: z.array(
