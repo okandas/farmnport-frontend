@@ -154,6 +154,26 @@ export function EditForm({ product }: EditFormProps) {
                             </FormItem>
                         )}
                     />
+
+
+                    <div className="flex min-h-full flex-col items-center justify-center rounded-md border p-8 text-center shadow-sm">
+
+                        <div className="flex items-center justify-center w-30 h-30">
+                            <Icons.image />
+                        </div>
+
+                        <h3 className="mt-2 text-sm font-semibold text-gray-900">Upload</h3>
+                        <p className="mt-1 text-sm text-gray-500">Upload product images here</p>
+                        <div className="mt-6">
+                            <button
+                                type="button"
+                                className="inline-flex items-center rounded-md  px-3 py-2 text-sm font-semibold  shadow-sm"
+                            >
+                                <Icons.add className="-ml-0.5 mr-1.5 h-5 w-5" aria-hidden="true" />
+                                New Image
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
 
@@ -453,7 +473,6 @@ export function EditForm({ product }: EditFormProps) {
                         Efficacy Table
                     </h3>
                     {efficacyTableFields.map((field, index) => {
-
                         return (
                             <div className="grid grid-cols-1 gap-2 sm:grid-cols-5" key={field.id}>
                                 <FormField
