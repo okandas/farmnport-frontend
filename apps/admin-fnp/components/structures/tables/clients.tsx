@@ -21,7 +21,7 @@ export function ClientsTable() {
     pageSize: 20,
   })
 
-  const { isError, isLoading, isFetching, refetch, data } = useQuery({
+  const { isError, isLoading, refetch, data } = useQuery({
     queryKey: ["dashboard-clients", { p: pagination.pageIndex }],
     queryFn: () =>
       queryUsers({
@@ -29,7 +29,7 @@ export function ClientsTable() {
       }),
   })
 
-  const clients = data?.data?.data as ApplicationUser[]
+  const clients = data?.data?.data as ApplicationUser[] || []
   const total = data?.data?.total as number
 
   if (isError) {
@@ -66,7 +66,7 @@ export function ClientsTable() {
     )
   }
 
-  if (isLoading || isFetching) {
+  if (isLoading) {
     return (
       <Placeholder>
         <Placeholder.Title>Fetching Users</Placeholder.Title>

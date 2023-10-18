@@ -24,7 +24,7 @@ export default function EditProductPage({ params }: EditProductPageProps) {
   const id = params.slug
   const url = `/dashboard/products/${id}`
 
-  const { isError, isLoading, isFetching, data, refetch } = useQuery({
+  const { isError, isLoading, isFetching, refetch, data } = useQuery({
     queryKey: ["dashboard-product", id],
     queryFn: () => queryProduct(id),
   })
@@ -83,7 +83,7 @@ export default function EditProductPage({ params }: EditProductPageProps) {
 
   return (
     <>
-      <div className={"absolute right-10 top-96"}>
+      <div className={"absolute right-10 top-8"}>
         <Link href={url} className={cn(buttonVariants({ variant: "link" }))}>
           <>
             <Icons.close className="w-4 h-4 mr-2" />

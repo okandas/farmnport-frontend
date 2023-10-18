@@ -6,6 +6,7 @@ import { useMutation } from "@tanstack/react-query"
 import { isAxiosError } from "axios"
 import { useForm, useFieldArray } from "react-hook-form"
 
+
 import { updateClient } from "@/lib/query"
 import {
     FormProductModel,
@@ -31,6 +32,7 @@ import { ToastAction } from "@/components/ui/toast"
 import { toast } from "@/components/ui/use-toast"
 import { Icons } from "@/components/icons/lucide"
 import { ProductExamples } from "./productEditNestedArray"
+import { Button } from "@/components/ui/button"
 
 import { buttonVariants } from "@/components/ui/button"
 
@@ -134,40 +136,49 @@ export function EditForm({ product }: EditFormProps) {
         <Form {...form}>
             <form
                 onSubmit={form.handleSubmit(onSubmit)}
-                className="w-3/4 gap-4 mx-auto mb-8"
+                className="w-full gap-4 mx-auto mb-8 px-3"
             >
-                <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Name</FormLabel>
-                            <FormControl>
-                                <Input placeholder="Product name" {...field} />
-                            </FormControl>
-                            <FormDescription></FormDescription>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <FormField
+                        control={form.control}
+                        name="name"
 
-                <div >
+                        render={({ field }) => (
+                            <FormItem >
+                                <FormLabel>Name</FormLabel>
+                                <FormControl className="col-span-3">
+                                    <Input placeholder="Product name" {...field} />
+                                </FormControl>
+                                <FormDescription></FormDescription>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                </div>
+
+
+                <div>
+                    <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight sm:my-3">
+                        Product Description
+                    </h3>
                     {fields.map((field, index) => {
                         return (
-                            <div className="" key={index}>
+                            <div className="grid grid-cols-1 gap-2 sm:grid-cols-5" key={index}>
                                 <FormField
                                     control={form.control}
-                                    key={index + 1}
                                     name={`descriptions.${index}.name`}
                                     render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className="">
-                                                Description Name
-                                            </FormLabel>
-                                            <FormDescription className="">
-                                                Description Attribute Name
-                                            </FormDescription>
-                                            <FormControl>
+                                        <FormItem className="sm:col-span-1 mb-1">
+                                            {
+                                                index === 0 ? (<>
+                                                    <FormLabel>
+                                                        Description Name
+                                                    </FormLabel>
+                                                    <FormDescription>
+                                                        Describe the discription name.
+                                                    </FormDescription></>) : null
+                                            }
+                                            <FormControl >
                                                 <Input {...field} />
                                             </FormControl>
                                             <FormMessage />
@@ -176,16 +187,18 @@ export function EditForm({ product }: EditFormProps) {
                                 />
                                 <FormField
                                     control={form.control}
-                                    key={index + 2}
                                     name={`descriptions.${index}.value`}
                                     render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>
-                                                Description Value
-                                            </FormLabel>
-                                            <FormDescription>
-                                                Describe the discription name.
-                                            </FormDescription>
+                                        <FormItem className="sm:col-span-3  mb-1">
+                                            {
+                                                index === 0 ? (<>
+                                                    <FormLabel>
+                                                        Description Value
+                                                    </FormLabel>
+                                                    <FormDescription>
+                                                        Describe the discription name.
+                                                    </FormDescription></>) : null
+                                            }
                                             <FormControl>
                                                 <Textarea {...field} />
                                             </FormControl>
@@ -194,79 +207,88 @@ export function EditForm({ product }: EditFormProps) {
                                     )}
                                 />
 
-                                <div className="">
-                                    <button
-                                        type="button"
-                                        className=""
-                                        onClick={() => remove(index)}
-                                    >
-                                        Delete
-                                    </button>
+                                <div className="sm:colspan-1 sm:flex sm:justify-end sm:flex-col pb-2">
+                                    <Button variant="outline" size="icon" onClick={() => remove(index)} >
+                                        <Icons.bin className="h-4 w-4" />
+                                    </Button>
                                 </div>
                             </div>
                         );
                     })}
 
-                    <button
-                        type="button"
-                        className=""
-                        onClick={() =>
+
+                    <div className="sm:flex justify-end">
+                        <Button onClick={() =>
                             append({
                                 name: "",
                                 value: ""
                             })
-                        }
-                    >
-                        Append
-                    </button>
+                        }>
+                            <Icons.add className="h-4 w-4" /> Add Description
+                        </Button>
+                    </div>
+
                 </div>
 
-                <FormField
-                    control={form.control}
-                    name="manufacturer.name"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Manufacturer</FormLabel>
-                            <FormControl>
-                                <Input placeholder="Manufacturer name" {...field} />
-                            </FormControl>
-                            <FormDescription></FormDescription>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
 
-                <FormField
-                    control={form.control}
-                    name="distributor.name"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Distributor</FormLabel>
-                            <FormControl>
-                                <Input placeholder="Distributor name" {...field} />
-                            </FormControl>
-                            <FormDescription></FormDescription>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
+                    <FormField
+                        control={form.control}
+                        name="manufacturer.name"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Manufacturer</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="Manufacturer name" {...field} />
+                                </FormControl>
+                                <FormDescription></FormDescription>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+
+                    <FormField
+                        control={form.control}
+                        name="distributor.name"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Distributor</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="Distributor name" {...field} />
+                                </FormControl>
+                                <FormDescription></FormDescription>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+                </div>
+
+
 
                 <div>
+                    <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight sm:my-3">
+                        Warning Info
+                    </h3>
                     {warningFields.map((field, index) => {
                         return (
-                            <div className="" key={field.id}>
+                            <div className="grid grid-cols-1 gap-2 sm:grid-cols-5" key={index}>
                                 <FormField
                                     control={form.control}
-                                    key={index + 1}
                                     name={`warnings.${index}.name`}
                                     render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className="">
-                                                Warning Name
-                                            </FormLabel>
-                                            <FormDescription className="">
-                                                Warning Attribute Name
-                                            </FormDescription>
+                                        <FormItem className="sm:col-span-1 mb-1">
+                                            {
+                                                index === 0 ? (<>
+                                                    <FormLabel className="">
+                                                        Warning Name
+                                                    </FormLabel>
+                                                    <FormDescription>
+                                                        Warning Attribute Name
+                                                    </FormDescription>
+                                                </>) : null
+                                            }
                                             <FormControl>
                                                 <Input {...field} />
                                             </FormControl>
@@ -274,18 +296,50 @@ export function EditForm({ product }: EditFormProps) {
                                         </FormItem>
                                     )}
                                 />
+
                                 <FormField
                                     control={form.control}
-                                    key={index + 2}
+                                    name={`warnings.${index}.location`}
+                                    render={({ field }) => (
+                                        <FormItem className="sm:col-span-1 mb-1">
+
+                                            {
+                                                index === 0 ? (
+                                                    <>
+                                                        <FormLabel className="">
+                                                            Warning Location
+                                                        </FormLabel>
+                                                        <FormDescription>
+                                                            Where the warning is located.
+                                                        </FormDescription>
+                                                    </>
+                                                ) : null
+                                            }
+                                            <FormControl>
+                                                <Input {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                <FormField
+                                    control={form.control}
                                     name={`warnings.${index}.value`}
                                     render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>
-                                                Warning Value
-                                            </FormLabel>
-                                            <FormDescription>
-                                                Warning Describe the discription name.
-                                            </FormDescription>
+                                        <FormItem className="sm:col-span-2 mb-1">
+
+                                            {
+                                                index === 0 ? (
+                                                    <>
+                                                        <FormLabel className="">
+                                                            Warning Value
+                                                        </FormLabel>
+                                                        <FormDescription>
+                                                            Warning Describe the discription name.
+                                                        </FormDescription>
+                                                    </>) : null
+                                            }
                                             <FormControl>
                                                 <Textarea {...field} />
                                             </FormControl>
@@ -293,70 +347,54 @@ export function EditForm({ product }: EditFormProps) {
                                         </FormItem>
                                     )}
                                 />
-                                <FormField
-                                    control={form.control}
-                                    key={index + 3}
-                                    name={`warnings.${index}.location`}
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>
-                                                Located
-                                            </FormLabel>
-                                            <FormDescription>
-                                                Where the warning is located.
-                                            </FormDescription>
-                                            <FormControl>
-                                                <Input {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
 
-                                <div className="">
-                                    <button
-                                        type="button"
-                                        className=""
-                                        onClick={() => warningRemove(index)}
-                                    >
-                                        Delete
-                                    </button>
+                                <div className="sm:colspan-1 sm:flex sm:justify-end sm:flex-col pb-2">
+                                    <Button variant="outline" size="icon" onClick={() => warningRemove(index)} >
+                                        <Icons.bin className="h-4 w-4" />
+                                    </Button>
                                 </div>
                             </div>
                         );
                     })}
 
-                    <button
-                        type="button"
-                        className=""
-                        onClick={() =>
+
+                    <div className="sm:flex justify-end">
+                        <Button onClick={() =>
                             warningAppend({
                                 name: "",
                                 value: "",
                                 location: ""
                             })
-                        }
-                    >
-                        Append
-                    </button>
+                        }>
+                            <Icons.add className="h-4 w-4" /> Add Warning
+                        </Button>
+                    </div>
                 </div>
 
                 <div>
+                    <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight sm:my-3">
+                        How to use product.
+                    </h3>
                     {usageFields.map((field, index) => {
                         return (
-                            <div className="" key={field.id}>
+                            <div className="grid grid-cols-1 gap-2 sm:grid-cols-5" key={index}>
                                 <FormField
                                     control={form.control}
-                                    key={index + 1}
                                     name={`instructions.usage.${index}.name`}
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="">
-                                                Usage Name
-                                            </FormLabel>
-                                            <FormDescription className="">
-                                                Usage Attribute Name
-                                            </FormDescription>
+                                            {
+                                                index === 0 ? (
+                                                    <>
+                                                        <FormLabel className="">
+                                                            Usage Name
+                                                        </FormLabel>
+                                                        <FormDescription className="">
+                                                            Usage Attribute Name
+                                                        </FormDescription>
+                                                    </>
+                                                ) : null
+                                            }
                                             <FormControl>
                                                 <Input {...field} />
                                             </FormControl>
@@ -366,16 +404,21 @@ export function EditForm({ product }: EditFormProps) {
                                 />
                                 <FormField
                                     control={form.control}
-                                    key={index + 2}
                                     name={`instructions.usage.${index}.value`}
                                     render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>
-                                                Usage Value
-                                            </FormLabel>
-                                            <FormDescription>
-                                                Usage the discription value.
-                                            </FormDescription>
+                                        <FormItem className="col-span-3">
+                                            {
+                                                index === 0 ? (
+                                                    <>
+                                                        <FormLabel>
+                                                            Usage Value
+                                                        </FormLabel>
+                                                        <FormDescription>
+                                                            Usage the discription value.
+                                                        </FormDescription>
+                                                    </>
+                                                ) : null
+                                            }
                                             <FormControl>
                                                 <Textarea {...field} />
                                             </FormControl>
@@ -384,50 +427,51 @@ export function EditForm({ product }: EditFormProps) {
                                     )}
                                 />
 
-
-                                <div className="">
-                                    <button
-                                        type="button"
-                                        className=""
-                                        onClick={() => usageRemove(index)}
-                                    >
-                                        Delete
-                                    </button>
+                                <div className="sm:colspan-1 sm:flex sm:justify-end sm:flex-col pb-2">
+                                    <Button variant="outline" size="icon" onClick={() => usageRemove(index)} >
+                                        <Icons.bin className="h-4 w-4" />
+                                    </Button>
                                 </div>
                             </div>
                         );
                     })}
 
-                    <button
-                        type="button"
-                        className=""
-                        onClick={() =>
+                    <div className="sm:flex justify-end">
+                        <Button onClick={() =>
                             usageAppend({
                                 name: "",
                                 value: ""
                             })
-                        }
-                    >
-                        Append
-                    </button>
+                        }>
+                            <Icons.add className="h-4 w-4" /> Add Usage Instruction
+                        </Button>
+                    </div>
                 </div>
 
                 <div>
+                    <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight sm:my-3">
+                        Efficacy Table
+                    </h3>
                     {efficacyTableFields.map((field, index) => {
                         return (
-                            <div className="" key={field.id}>
+                            <div className="grid grid-cols-1 gap-2 sm:grid-cols-5 first:my-1" key={index}>
                                 <FormField
                                     control={form.control}
-                                    key={index + 1}
                                     name={`instructions.efficacy_table.${index}.species`}
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="">
-                                                Species
-                                            </FormLabel>
-                                            <FormDescription className="">
-                                                Description Attribute
-                                            </FormDescription>
+                                            {
+                                                index === 0 ? (
+                                                    <>
+                                                        <FormLabel>
+                                                            Species
+                                                        </FormLabel>
+                                                        <FormDescription>
+                                                            Species Attribute
+                                                        </FormDescription>
+                                                    </>
+                                                ) : null
+                                            }
                                             <FormControl>
                                                 <Input {...field} />
                                             </FormControl>
@@ -437,18 +481,24 @@ export function EditForm({ product }: EditFormProps) {
                                 />
                                 <FormField
                                     control={form.control}
-                                    key={index + 2}
                                     name={`instructions.efficacy_table.${index}.third_stage`}
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>
-                                                Description Value
-                                            </FormLabel>
-                                            <FormDescription>
-                                                Describe the discription name.
-                                            </FormDescription>
+
+                                            {
+                                                index === 0 ? (
+                                                    <>
+                                                        <FormLabel>
+                                                            Third Stage
+                                                        </FormLabel>
+                                                        <FormDescription>
+                                                            Description Third Stage.
+                                                        </FormDescription>
+                                                    </>
+                                                ) : null
+                                            }
                                             <FormControl>
-                                                <Textarea {...field} />
+                                                <Input {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -456,18 +506,23 @@ export function EditForm({ product }: EditFormProps) {
                                 />
                                 <FormField
                                     control={form.control}
-                                    key={index + 2}
                                     name={`instructions.efficacy_table.${index}.fourth_stage`}
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>
-                                                Description Value
-                                            </FormLabel>
-                                            <FormDescription>
-                                                Describe the discription name.
-                                            </FormDescription>
+                                            {
+                                                index === 0 ? (
+                                                    <>
+                                                        <FormLabel>
+                                                            Fourth Stage
+                                                        </FormLabel>
+                                                        <FormDescription>
+                                                            Description Fourth Stage.
+                                                        </FormDescription>
+                                                    </>
+                                                ) : null
+                                            }
                                             <FormControl>
-                                                <Textarea {...field} />
+                                                <Input {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -475,61 +530,61 @@ export function EditForm({ product }: EditFormProps) {
                                 />
                                 <FormField
                                     control={form.control}
-                                    key={index + 2}
                                     name={`instructions.efficacy_table.${index}.adults`}
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>
-                                                Description Value
-                                            </FormLabel>
-                                            <FormDescription>
-                                                Describe the discription name.
-                                            </FormDescription>
+                                            {
+                                                index === 0 ? (
+                                                    <>
+                                                        <FormLabel>
+                                                            Adults
+                                                        </FormLabel>
+                                                        <FormDescription>
+                                                            Describe Adult Value.
+                                                        </FormDescription>
+                                                    </>
+                                                ) : null
+                                            }
                                             <FormControl>
-                                                <Textarea {...field} />
+                                                <Input {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
                                     )}
                                 />
 
-
-                                <div className="">
-                                    <button
-                                        type="button"
-                                        className=""
-                                        onClick={() => efficacyTableRemove(index)}
-                                    >
-                                        Delete
-                                    </button>
+                                <div className="sm:colspan-1 sm:flex sm:justify-end sm:flex-col pb-2">
+                                    <Button variant="outline" size="icon" onClick={() => efficacyTableRemove(index)} >
+                                        <Icons.bin className="h-4 w-4" />
+                                    </Button>
                                 </div>
                             </div>
                         );
                     })}
 
-                    <button
-                        type="button"
-                        className=""
-                        onClick={() =>
+                    <div className="sm:flex justify-end">
+                        <Button onClick={() =>
                             efficacyTableAppend({
                                 species: "",
                                 third_stage: "",
                                 fourth_stage: "",
                                 adults: ""
                             })
-                        }
-                    >
-                        Append
-                    </button>
+                        }>
+                            <Icons.add className="h-4 w-4" /> Add Efficacy
+                        </Button>
+                    </div>
                 </div>
 
                 <div>
+                    <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight sm:my-3">
+                        Efficacy Info
+                    </h3>
                     {efficacyFields.map((field, index) => {
                         return (
-                            <div className="" key={field.id}>
+                            <div className="grid grid-cols-1 gap-2 sm:grid-cols-3" key={index}>
                                 <FormField
                                     control={form.control}
-                                    key={index + 1}
                                     name={`instructions.efficacy.${index}.name`}
                                     render={({ field }) => (
                                         <FormItem>
@@ -548,7 +603,6 @@ export function EditForm({ product }: EditFormProps) {
                                 />
                                 <FormField
                                     control={form.control}
-                                    key={index + 2}
                                     name={`instructions.efficacy.${index}.value`}
                                     render={({ field }) => (
                                         <FormItem>
@@ -559,71 +613,76 @@ export function EditForm({ product }: EditFormProps) {
                                                 Efficacy Describe the discription name.
                                             </FormDescription>
                                             <FormControl>
-                                                <Textarea {...field} />
+                                                <Input {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
                                     )}
                                 />
 
-                                <div className="">
-                                    <button
-                                        type="button"
-                                        className=""
-                                        onClick={() => efficacyRemove(index)}
-                                    >
-                                        Delete
-                                    </button>
+                                <div className="sm:colspan-1 sm:flex sm:justify-end sm:flex-col">
+                                    <Button variant="outline" size="icon" onClick={() => efficacyRemove(index)} >
+                                        <Icons.bin className="h-4 w-4" />
+                                    </Button>
                                 </div>
                             </div>
                         );
                     })}
 
-                    <button
-                        type="button"
-                        className=""
-                        onClick={() =>
+                    <div className="sm:flex justify-end">
+                        <Button onClick={() =>
                             efficacyAppend({
                                 name: "",
                                 value: ""
                             })
-                        }
-                    >
-                        Append
-                    </button>
+                        }>
+                            <Icons.add className="h-4 w-4" /> Add Efficacy
+                        </Button>
+                    </div>
                 </div>
 
-                <FormField
-                    control={form.control}
-                    name="instructions.key_map.type"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Key Map Type</FormLabel>
-                            <FormControl>
-                                <Input placeholder="Type" {...field} />
-                            </FormControl>
-                            <FormDescription></FormDescription>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
 
                 <div>
+
+                    <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight sm:my-3">
+                        Key Map Values.
+                    </h3>
+
+                    <FormField
+                        control={form.control}
+                        name="instructions.key_map.type"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Key Map Type</FormLabel>
+                                <FormControl className="w-1/2">
+                                    <Input placeholder="Type" {...field} />
+                                </FormControl>
+                                <FormDescription></FormDescription>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
                     {keyMapValueFields.map((field, index) => {
                         return (
-                            <div className="" key={field.id}>
+                            <div className="grid grid-cols-1 gap-2 sm:grid-cols-4" key={index}>
                                 <FormField
                                     control={form.control}
                                     key={index + 1}
                                     name={`instructions.key_map.values.${index}.name`}
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="">
-                                                Keymap Name
-                                            </FormLabel>
-                                            <FormDescription className="">
-                                                Keymap Description Attribute Name
-                                            </FormDescription>
+                                            {
+                                                index === 0 ? (
+                                                    <>
+                                                        <FormLabel className="">
+                                                            Keymap Name
+                                                        </FormLabel>
+                                                        <FormDescription className="">
+                                                            Keymap Description Attribute Name
+                                                        </FormDescription>
+                                                    </>) : null
+                                            }
                                             <FormControl>
                                                 <Input {...field} />
                                             </FormControl>
@@ -633,94 +692,103 @@ export function EditForm({ product }: EditFormProps) {
                                 />
                                 <FormField
                                     control={form.control}
-                                    key={index + 2}
                                     name={`instructions.key_map.values.${index}.value`}
 
                                     render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>
-                                                Keymap Value
-                                            </FormLabel>
-                                            <FormDescription>
-                                                Keymap Describe the discription name.
-                                            </FormDescription>
+                                        <FormItem className="col-span-2">
+                                            {
+                                                index === 0 ? (
+                                                    <>
+                                                        <FormLabel>
+                                                            Keymap Value
+                                                        </FormLabel>
+                                                        <FormDescription>
+                                                            Keymap Describe the discription name.
+                                                        </FormDescription>
+                                                    </>) : null
+                                            }
                                             <FormControl>
-                                                <Textarea {...field} />
+                                                <Input {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
                                     )}
                                 />
 
-                                <div className="">
-                                    <button
-                                        type="button"
-                                        className=""
-                                        onClick={() => keyMapValueRemove(index)}
-                                    >
-                                        Delete
-                                    </button>
+
+                                <div className="sm:colspan-1 sm:flex sm:justify-end sm:flex-col pb-2">
+                                    <Button variant="outline" size="icon" onClick={() => keyMapValueRemove(index)} >
+                                        <Icons.bin className="h-4 w-4" />
+                                    </Button>
                                 </div>
                             </div>
                         );
                     })}
 
-                    <button
-                        type="button"
-                        className=""
-                        onClick={() =>
+
+
+
+                    <div className="sm:flex justify-end">
+                        <Button onClick={() =>
                             keyMapValueAppend({
                                 name: "",
                                 value: ""
                             })
-                        }
-                    >
-                        Append
-                    </button>
+                        }>
+                            <Icons.add className="h-4 w-4" /> Add Key Map
+                        </Button>
+                    </div>
                 </div>
 
                 <div>
+                    <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight sm:my-3">
+                        Dosage Examples
+                    </h3>
                     {examplesField.map((field, index) => {
                         return (
-                            <div className="" key={field.id}>
-                                <FormField
-                                    control={form.control}
-                                    key={index + 1}
-                                    name={`instructions.examples.${index}.description`}
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className="">
-                                                Keymap Name
-                                            </FormLabel>
-                                            <FormDescription className="">
-                                                Keymap Description Attribute Name
-                                            </FormDescription>
-                                            <FormControl>
-                                                <Input {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                            <>
+                                <div className="grid grid-cols-1 gap-2 sm:grid-cols-3" key={index}>
+                                    <FormField
+                                        control={form.control}
+                                        name={`instructions.examples.${index}.description`}
+                                        render={({ field }) => (
+                                            <FormItem className="col-span-2">
+                                                {
+                                                    index === 0 ? (
+                                                        <>
+                                                            <FormLabel>
+                                                                Dosage
+                                                            </FormLabel>
+                                                            <FormDescription>
+                                                                Description For Dosage
+                                                            </FormDescription>
+                                                        </>
+                                                    ) : null
+                                                }
+                                                <FormControl>
+                                                    <Input {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
 
-                                <div className="">
-                                    <button
-                                        type="button"
-                                        className=""
-                                        onClick={() => examplesRemove(index)}
-                                    >
-                                        Delete
-                                    </button>
+                                    <div className="sm:colspan-1 sm:flex sm:justify-end sm:flex-col">
+                                        <Button variant="outline" size="icon" onClick={() => examplesRemove(index)} >
+                                            <Icons.bin className="h-4 w-4" />
+                                        </Button>
+                                    </div>
+
                                 </div>
                                 <ProductExamples nestedIndex={index} {...{ control }} />
-                            </div>
+                            </>
                         );
                     })}
 
-                    <button
-                        type="button"
-                        className=""
-                        onClick={() =>
+
+
+                    <div className="sm:flex justify-start">
+                        <Button onClick={() =>
                             examplesAppend({
                                 description: "",
                                 values: [
@@ -736,10 +804,10 @@ export function EditForm({ product }: EditFormProps) {
                                     }
                                 ]
                             })
-                        }
-                    >
-                        Append
-                    </button>
+                        }>
+                            <Icons.add className="h-4 w-4" /> Add Full Dosage
+                        </Button>
+                    </div>
                 </div>
 
                 <button

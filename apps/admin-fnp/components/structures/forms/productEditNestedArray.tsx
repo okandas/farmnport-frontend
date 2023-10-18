@@ -16,6 +16,9 @@ import {
     FormProductModel,
 } from "@/lib/schemas"
 
+import { Icons } from "@/components/icons/lucide"
+import { Button } from "@/components/ui/button"
+
 
 interface productExamplesProps {
     nestedIndex: number
@@ -34,39 +37,17 @@ export function ProductExamples({ nestedIndex, control }: productExamplesProps) 
         <div>
             {fields.map((field, secondIndex) => {
                 return (
-                    <div className="" key={secondIndex}>
-                        <FormField
-                            control={control}
-                            key={secondIndex + 1}
-                            name={`instructions.examples.${nestedIndex}.values.${secondIndex}.dosage.unit`}
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className="">
-                                        Dosage Unit
-                                    </FormLabel>
-                                    <FormDescription className="">
-                                        Unit Name
-                                    </FormDescription>
-                                    <FormControl>
-                                        <Input {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                    <div className="grid grid-cols-1 gap-2 sm:grid-cols-5" key={secondIndex}>
 
                         <FormField
                             control={control}
-                            key={secondIndex + 2}
+                            key={secondIndex}
                             name={`instructions.examples.${nestedIndex}.values.${secondIndex}.dosage.value`}
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel className="">
                                         Dosage Value
                                     </FormLabel>
-                                    <FormDescription className="">
-                                        Unit Name
-                                    </FormDescription>
                                     <FormControl>
                                         <Input type="number" {...field} />
                                     </FormControl>
@@ -77,16 +58,13 @@ export function ProductExamples({ nestedIndex, control }: productExamplesProps) 
 
                         <FormField
                             control={control}
-                            key={secondIndex + 3}
-                            name={`instructions.examples.${nestedIndex}.values.${secondIndex}.mass.unit`}
+                            key={secondIndex}
+                            name={`instructions.examples.${nestedIndex}.values.${secondIndex}.dosage.unit`}
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel className="">
-                                        Mass Unit
+                                        Dosage Unit
                                     </FormLabel>
-                                    <FormDescription className="">
-                                        Unit Name
-                                    </FormDescription>
                                     <FormControl>
                                         <Input {...field} />
                                     </FormControl>
@@ -95,18 +73,16 @@ export function ProductExamples({ nestedIndex, control }: productExamplesProps) 
                             )}
                         />
 
+
                         <FormField
                             control={control}
-                            key={secondIndex + 4}
+                            key={secondIndex}
                             name={`instructions.examples.${nestedIndex}.values.${secondIndex}.mass.weight`}
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel className="">
                                         Mass Weight
                                     </FormLabel>
-                                    <FormDescription className="">
-                                        Mass Value
-                                    </FormDescription>
                                     <FormControl>
                                         <Input type="number" {...field} />
                                     </FormControl>
@@ -116,26 +92,36 @@ export function ProductExamples({ nestedIndex, control }: productExamplesProps) 
                         />
 
 
+                        <FormField
+                            control={control}
+                            key={secondIndex}
+                            name={`instructions.examples.${nestedIndex}.values.${secondIndex}.mass.unit`}
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel className="">
+                                        Mass Unit
+                                    </FormLabel>
+                                    <FormControl>
+                                        <Input {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
 
 
 
-                        <div className="">
-                            <button
-                                type="button"
-                                className=""
-                                onClick={() => remove(secondIndex)}
-                            >
-                                Delete Nested
-                            </button>
+                        <div className="sm:colspan-1 sm:flex sm:justify-end sm:flex-col">
+                            <Button variant="outline" size="icon" onClick={() => remove(secondIndex)} >
+                                <Icons.bin className="h-4 w-4" />
+                            </Button>
                         </div>
                     </div>
                 );
             })}
 
-            <button
-                type="button"
-                className=""
-                onClick={() =>
+            <div className="sm:flex justify-end mt-2">
+                <Button onClick={() =>
                     append({
                         dosage: {
                             unit: "",
@@ -146,10 +132,10 @@ export function ProductExamples({ nestedIndex, control }: productExamplesProps) 
                             weight: 0
                         }
                     })
-                }
-            >
-                Append Nested
-            </button>
+                }>
+                    <Icons.add className="h-4 w-4" /> Add Dosage Example
+                </Button>
+            </div>
         </div>
     );
 };

@@ -28,6 +28,7 @@ import {
   X,
   PackageSearch,
   LucideIcon,
+  Trash2
 } from "lucide-react"
 
 export type Icon = LucideIcon
@@ -61,4 +62,5 @@ export const Icons = {
   search: Search,
   calender: CalendarIcon,
   productSearch: PackageSearch,
+  bin: Trash2
 }
