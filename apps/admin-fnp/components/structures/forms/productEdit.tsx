@@ -474,7 +474,7 @@ export function EditForm({ product }: EditFormProps) {
                     </h3>
                     {efficacyTableFields.map((field, index) => {
                         return (
-                            <div className="grid grid-cols-1 gap-2 sm:grid-cols-5" key={field.id}>
+                            <div className="grid grid-cols-1 gap-2 sm:grid-cols-5 mt-2" key={field.id}>
                                 <FormField
                                     control={form.control}
                                     name={`instructions.efficacy_table.${index}.species`}
@@ -573,7 +573,7 @@ export function EditForm({ product }: EditFormProps) {
                                     )}
                                 />
 
-                                <div className="sm:colspan-1 sm:flex sm:justify-end sm:flex-col pb-2">
+                                <div className="sm:colspan-1 sm:flex sm:justify-end sm:flex-col">
                                     <Button variant="outline" size="icon" onClick={() => efficacyTableRemove(index)} >
                                         <Icons.bin className="h-4 w-4" />
                                     </Button>
@@ -685,7 +685,7 @@ export function EditForm({ product }: EditFormProps) {
 
                     {keyMapValueFields.map((field, index) => {
                         return (
-                            <div className="grid grid-cols-1 gap-2 sm:grid-cols-4" key={field.id}>
+                            <div className="grid grid-cols-1 gap-2 sm:grid-cols-4 mt-2" key={field.id}>
                                 <FormField
                                     control={form.control}
                                     name={`instructions.key_map.values.${index}.name`}
@@ -735,7 +735,7 @@ export function EditForm({ product }: EditFormProps) {
                                 />
 
 
-                                <div className="sm:colspan-1 sm:flex sm:justify-end sm:flex-col pb-2">
+                                <div className="sm:colspan-1 sm:flex sm:justify-end sm:flex-col">
                                     <Button variant="outline" size="icon" onClick={() => keyMapValueRemove(index)} >
                                         <Icons.bin className="h-4 w-4" />
                                     </Button>
