@@ -1,18 +1,18 @@
 "use client"
 
-import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { isAxiosError } from "axios"
 import { useForm, useFieldArray } from "react-hook-form"
 
-
-import { updateClient } from "@/lib/query"
+import { updateProduct } from "@/lib/query"
 import {
     FormProductModel,
     FormProductSchema,
 } from "@/lib/schemas"
-import { cn, slug } from "@/lib/utilities"
+import { cn } from "@/lib/utilities"
+
+import { DevTool } from "@hookform/devtools";
 
 
 import {
@@ -32,6 +32,7 @@ import { ToastAction } from "@/components/ui/toast"
 import { toast } from "@/components/ui/use-toast"
 import { Icons } from "@/components/icons/lucide"
 import { ProductExamples } from "./productEditNestedArray"
+import { FileInput } from "../controls/file-input"
 import { Button } from "@/components/ui/button"
 
 import { buttonVariants } from "@/components/ui/button"
@@ -41,6 +42,7 @@ interface EditFormProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export function EditForm({ product }: EditFormProps) {
+
     const form = useForm({
         defaultValues: {
             id: product?.id,
@@ -96,15 +98,11 @@ export function EditForm({ product }: EditFormProps) {
     });
 
     const { mutate, isPending } = useMutation({
-        mutationFn: updateClient,
+        mutationFn: updateProduct,
         onSuccess: (data) => {
             toast({
                 description: "Updated Product Succesfully",
             })
-
-            const name = slug(data.data?.name)
-
-            // router.push(`/dashboard/users/${name}`)
         },
         onError: (error) => {
             if (isAxiosError(error)) {
@@ -126,10 +124,11 @@ export function EditForm({ product }: EditFormProps) {
                 }
             }
         },
+
     })
 
     async function onSubmit(payload: FormProductModel) {
-        console.log(payload)
+        mutate(payload)
     }
 
     return (
@@ -156,26 +155,19 @@ export function EditForm({ product }: EditFormProps) {
                     />
 
 
-                    <div className="flex min-h-full flex-col items-center justify-center rounded-md border p-8 text-center shadow-sm">
-
-                        <div className="flex items-center justify-center w-30 h-30">
-                            <Icons.image />
-                        </div>
-
-                        <h3 className="mt-2 text-sm font-semibold text-gray-900">Upload</h3>
-                        <p className="mt-1 text-sm text-gray-500">Upload product images here</p>
-                        <div className="mt-6">
-                            <button
-                                type="button"
-                                className="inline-flex items-center rounded-md  px-3 py-2 text-sm font-semibold  shadow-sm"
-                            >
-                                <Icons.add className="-ml-0.5 mr-1.5 h-5 w-5" aria-hidden="true" />
-                                New Image
-                            </button>
-                        </div>
-                    </div>
+                    <FormField
+                        control={form.control}
+                        name="images"
+                        render={({ field }) => (
+                            <FormItem >
+                                <FormControl>
+                                    <FileInput id={product.id} {...field} onChange={field.onChange} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
                 </div>
-
 
                 <div>
                     <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight sm:my-3">
@@ -840,7 +832,7 @@ export function EditForm({ product }: EditFormProps) {
                 </button>
 
             </form>
-
+            <DevTool control={form.control} />
         </Form>
     )
 }

@@ -27,6 +27,7 @@ export default function EditClientPage({ params }: EditClientPageProps) {
   const { isError, isLoading, isFetching, data, refetch } = useQuery({
     queryKey: ["dashboard-client", name],
     queryFn: () => queryUser(name),
+    refetchOnWindowFocus: false
   })
 
   const client = data?.data as ApplicationUser

@@ -9,8 +9,9 @@ import {
   ApplicationUser,
   LoginResponse,
   ProducerPriceList,
-  ProductItem,
+  FormProductModel,
 } from "@/lib/schemas"
+
 
 var base = process.env.NEXT_PUBLIC_BASE_URL
 var version = "/v1"
@@ -30,7 +31,7 @@ api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   return config
 })
 
-type FormData = z.infer<typeof AuthSchema>
+type LoginFormData = z.infer<typeof AuthSchema>
 
 // Administrator
 export function queryLogin(data: FormData) {
@@ -126,7 +127,7 @@ export function queryProducts(pagintion?: pagintion) {
   return api.get(url)
 }
 
-export function createProduct(data: ProductItem) {
+export function createProduct(data: FormProductModel) {
   var url = `${baseUrl}/user/products/add`
   return api.post(url, data)
 }
@@ -134,4 +135,14 @@ export function createProduct(data: ProductItem) {
 export function queryProduct(id: string) {
   const url = `${baseUrl}/user/products/${id}`
   return api.get(url)
+}
+
+export function updateProduct(data: FormProductModel) {
+  var url = `${baseUrl}/user/products/update`
+  return api.post(url, data)
+}
+
+export function uploadImages(data: FormData) {
+  var url = `${baseUrl}/user/image/uploads`
+  return api.post(url, data)
 }

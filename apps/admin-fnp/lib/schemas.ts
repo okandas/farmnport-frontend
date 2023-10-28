@@ -132,16 +132,17 @@ export const ProductSchema = z.object({
   images: z.array(
     z.object({
       img: z.object({
-        height: z.string(),
-        width: z.string(),
+        id: z.string(),
         src: z.string(),
       }),
     }),
   ),
-  unit: z.object({
-    value: z.number(),
-    name: z.string(),
-  }),
+  unit: z.array(
+    z.object({
+      value: z.number(),
+      name: z.string(),
+    })
+  ),
   manufacturer: z.object({
     name: z.string(),
   }),
@@ -257,3 +258,10 @@ export type EditApplicationUser = z.infer<typeof EditApplicationUserSchema>
 export type ProducerPriceList = z.infer<typeof ProducerPriceListSchema>
 export type ProductItem = z.infer<typeof ProductSchema>
 export type FormProductModel = z.infer<typeof FormProductSchema>
+
+export type ImageModel = {
+  img: {
+    id: string,
+    src: string
+  }
+}
