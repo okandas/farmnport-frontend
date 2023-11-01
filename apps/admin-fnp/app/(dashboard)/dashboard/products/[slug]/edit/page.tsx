@@ -58,9 +58,9 @@ export default function EditProductPage({ params }: EditProductPageProps) {
       <div className="mt-20">
         <Placeholder>
           <Placeholder.Icon name="close" />
-          <Placeholder.Title>Error Fetching User</Placeholder.Title>
+          <Placeholder.Title>Error Fetching Product</Placeholder.Title>
           <Placeholder.Description>
-            Error Fetching user from the database
+            Error Fetching product from the database
           </Placeholder.Description>
         </Placeholder>
       </div>

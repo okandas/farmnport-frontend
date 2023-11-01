@@ -10,6 +10,7 @@ import {
   LoginResponse,
   ProducerPriceList,
   FormProductModel,
+  ImageModel,
 } from "@/lib/schemas"
 
 
@@ -144,5 +145,10 @@ export function updateProduct(data: FormProductModel) {
 
 export function uploadImages(data: FormData) {
   var url = `${baseUrl}/user/image/uploads`
+  return api.post(url, data)
+}
+
+export function removeImage(data: ImageModel) {
+  var url = `${baseUrl}/user/image/remove`
   return api.post(url, data)
 }

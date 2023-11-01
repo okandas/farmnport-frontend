@@ -153,8 +153,9 @@ export function EditForm({ product }: EditFormProps) {
                             </FormItem>
                         )}
                     />
+                </div>
 
-
+                <div>
                     <FormField
                         control={form.control}
                         name="images"
