@@ -21,9 +21,9 @@ export function FileInput({ id, value, onChange }: FileInputProps) {
     const mutationUploadImage = useMutation({
         mutationFn: uploadImages,
         onSuccess: (data) => {
-            console.log(files, data)
             const newImages = [...files, ...data.data]
             onChange(newImages)
+            setFiles(newImages)
         },
         onSettled: () => {
         }

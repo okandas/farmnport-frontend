@@ -27,6 +27,7 @@ export default function EditProductPage({ params }: EditProductPageProps) {
   const { isError, isLoading, isFetching, refetch, data } = useQuery({
     queryKey: ["dashboard-product", id],
     queryFn: () => queryProduct(id),
+    refetchOnWindowFocus: false
   })
 
   const product = data?.data as ProductItem
