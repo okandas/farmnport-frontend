@@ -2,16 +2,11 @@
 
 import { useState } from "react"
 
-import { queryUser } from "@/lib/query"
 import { EditApplicationUser, ApplicationUser } from "@/lib/schemas"
-import { cn } from "@/lib/utilities"
-import { buttonVariants } from "@/components/ui/button"
-import { ToastAction } from "@/components/ui/toast"
-import { toast } from "@/components/ui/use-toast"
 import { CreateForm } from "@/components/structures/forms/createClient"
 
 export default function CreateClientPage() {
-  const [Client, _] = useState<EditApplicationUser>({
+  const [client, _] = useState<EditApplicationUser>({
     id: "",
     name: "",
     email: "",
@@ -28,5 +23,5 @@ export default function CreateClientPage() {
     short_description: "",
   })
 
-  return <CreateForm client={Client} />
+  return <CreateForm client={client} />
 }

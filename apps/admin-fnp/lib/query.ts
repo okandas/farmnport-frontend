@@ -128,7 +128,7 @@ export function queryProducts(pagintion?: pagintion) {
   return api.get(url)
 }
 
-export function createProduct(data: FormProductModel) {
+export function addProduct(data: FormProductModel) {
   var url = `${baseUrl}/user/products/add`
   return api.post(url, data)
 }

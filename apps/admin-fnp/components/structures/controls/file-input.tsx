@@ -71,8 +71,8 @@ export function FileInput({ id, value, onChange }: FileInputProps) {
 
 
     const thumbnails = files.map((file: ImageModel, index) => {
-        return (
-            <div
+        {
+            return file.img.id.length > 0 ? (<div
                 className="inline-flex flex-col overflow-hidden border border-border-200 rounded mt-2 me-2 relative"
                 key={index}
             >
@@ -90,8 +90,9 @@ export function FileInput({ id, value, onChange }: FileInputProps) {
                 >
                     {mutationRemoveImage.isPending ? <Icons.spinner width={10} height={10} /> : <Icons.close width={10} height={10} />}
                 </button>
-            </div>
-        )
+            </div>) : null
+        }
+
     })
 
     return (

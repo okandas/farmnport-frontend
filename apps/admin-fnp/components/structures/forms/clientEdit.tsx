@@ -186,27 +186,61 @@ export function EditForm({ client }: EditFormProps) {
                 <FormControl>
                   <Textarea placeholder="Short Description" {...field} />
                 </FormControl>
-                <FormDescription>
+                <FormDescription className="">
                   Your company slogan or Short description of your entity
                 </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="phone"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Phone</FormLabel>
-                <FormControl>
-                  <Input placeholder="Phone Number" {...field} />
-                </FormControl>
-                <FormDescription></FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div>
+            <FormField
+              control={form.control}
+              name="phone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Phone</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Phone Number" {...field} />
+                  </FormControl>
+                  <FormDescription></FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="province"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Paynent Terms</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={client?.province}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select Province..." />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent className="overflow-visible max-h-44">
+                      {provinces.map((province) => {
+                        return (
+                          <SelectItem key={province} value={province}>
+                            {province}
+                          </SelectItem>
+                        )
+                      })}
+                    </SelectContent>
+                  </Select>
+                  <FormDescription></FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
           <FormField
             control={form.control}
             name="address"
@@ -352,18 +386,18 @@ export function EditForm({ client }: EditFormProps) {
                         <div className="flex flex-wrap gap-1">
                           {selectedSpecializations?.length > 1
                             ? selectedSpecializations?.map((selected) => {
-                                if (selected?.length !== 0) {
-                                  return (
-                                    <Badge
-                                      key={selected}
-                                      variant="outline"
-                                      className="flex justify-between text-green-800 bg-green-100 border-green-400"
-                                    >
-                                      {selected}
-                                    </Badge>
-                                  )
-                                }
-                              })
+                              if (selected?.length !== 0) {
+                                return (
+                                  <Badge
+                                    key={selected}
+                                    variant="outline"
+                                    className="flex justify-between text-green-800 bg-green-100 border-green-400"
+                                  >
+                                    {selected}
+                                  </Badge>
+                                )
+                              }
+                            })
                             : "Select Specialization ..."}
                         </div>
                       </div>

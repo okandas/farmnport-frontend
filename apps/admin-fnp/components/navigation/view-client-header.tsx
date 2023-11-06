@@ -25,6 +25,7 @@ export default function ViewClientHeader({ params }: ViewClientHeaderProps) {
   const { isError, isLoading, isFetching, data, refetch } = useQuery({
     queryKey: ["dashboard-lient", name],
     queryFn: () => queryUser(name),
+    refetchOnWindowFocus: false
   })
 
   if (isError) {
