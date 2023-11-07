@@ -63,6 +63,8 @@ export function CreateProductForm({ product }: EditFormProps) {
 
     const router = useRouter()
 
+    const control = form.control
+
     const { fields, append, remove } = useFieldArray({
         name: "descriptions",
         control: form.control

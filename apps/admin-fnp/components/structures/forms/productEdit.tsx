@@ -127,14 +127,15 @@ export function EditForm({ product }: EditFormProps) {
 
     })
 
-    async function onSubmit(payload: FormProductModel) {
+    async function updateProduct(payload: FormProductModel) {
+        console.log(payload)
         mutate(payload)
     }
 
     return (
         <Form {...form}>
             <form
-                onSubmit={form.handleSubmit(onSubmit)}
+                onSubmit={form.handleSubmit(updateProduct)}
                 className="w-full gap-4 mx-auto mb-8 px-3"
             >
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -277,8 +278,6 @@ export function EditForm({ product }: EditFormProps) {
                     />
 
                 </div>
-
-
 
                 <div>
                     <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight sm:my-3">
