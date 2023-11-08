@@ -8,7 +8,7 @@ import { FormProductModel } from "@/lib/schemas"
 import { cn } from "@/lib/utilities"
 import { buttonVariants } from "@/components/ui/button"
 import { Icons } from "@/components/icons/lucide"
-import { EditForm } from "@/components/structures/forms/productEdit"
+import { CreateProductForm } from "@/components/structures/forms/productCreate"
 
 
 
@@ -88,7 +88,7 @@ export default function EditProductPage() {
                 </Link>
             </div>
 
-            <EditForm product={product} />
+            <CreateProductForm product={product} />
         </>
     )
 }

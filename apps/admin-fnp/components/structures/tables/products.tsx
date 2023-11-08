@@ -27,6 +27,7 @@ export function ProductsTable() {
       queryProducts({
         p: pagination.pageIndex,
       }),
+    refetchOnWindowFocus: false
   })
 
   const products = data?.data?.data as ProductItem[]

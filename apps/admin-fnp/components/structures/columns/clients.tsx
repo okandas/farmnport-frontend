@@ -4,7 +4,7 @@ import { ColumnDef } from "@tanstack/react-table"
 import { PhoneNumberFormat } from "google-libphonenumber"
 
 import { ApplicationUser } from "@/lib/schemas"
-import { phoneUtility } from "@/lib/utilities"
+import { phoneUtility, formatDate } from "@/lib/utilities"
 import { Checkbox } from "@/components/ui/checkbox"
 import { ControlDropDown } from "@/components/structures/dropdowns/control-dropdown"
 
@@ -39,6 +39,19 @@ export const clientColumns: ColumnDef<ApplicationUser>[] = [
     header: "Address",
   },
   {
+    accessorKey: "created",
+    header: () => <div className="text-right">Joined</div>,
+    cell: ({ row }) => {
+      const date = row.getValue("created") as string
+
+      return (
+        <div className="font-medium text-right w-32">
+          {formatDate(date)}
+        </div>
+      )
+    },
+  },
+  {
     accessorKey: "phone",
     header: () => <div className="text-right">Phone</div>,
     cell: ({ row }) => {
@@ -51,7 +64,7 @@ export const clientColumns: ColumnDef<ApplicationUser>[] = [
         PhoneNumberFormat.INTERNATIONAL,
       )
       return (
-        <div className="font-medium text-right">
+        <div className="font-medium text-right w-40">
           <a href={`tel:${formatted}`}>{formatted}</a>
         </div>
       )

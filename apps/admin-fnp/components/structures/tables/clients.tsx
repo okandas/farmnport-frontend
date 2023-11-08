@@ -29,7 +29,7 @@ export function ClientsTable() {
       }),
   })
 
-  const clients = data?.data?.data as ApplicationUser[] || []
+  const clients = data?.data?.data as ApplicationUser[]
   const total = data?.data?.total as number
 
   if (isError) {

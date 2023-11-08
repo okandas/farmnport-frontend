@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { isAxiosError } from "axios"
-import { useForm, useFieldArray } from "react-hook-form"
+import { useForm, useFieldArray, FieldErrors } from "react-hook-form"
 
 import { updateProduct } from "@/lib/query"
 import {
@@ -11,9 +11,6 @@ import {
     FormProductSchema,
 } from "@/lib/schemas"
 import { cn } from "@/lib/utilities"
-
-import { DevTool } from "@hookform/devtools";
-
 
 import {
     Form,
@@ -64,6 +61,11 @@ export function EditForm({ product }: EditFormProps) {
 
     const { fields, append, remove } = useFieldArray({
         name: "descriptions",
+        control: form.control
+    });
+
+    const { fields: unitFields, append: unitAppend, remove: unitRemove } = useFieldArray({
+        name: "unit",
         control: form.control
     });
 
@@ -128,14 +130,23 @@ export function EditForm({ product }: EditFormProps) {
     })
 
     async function updateProduct(payload: FormProductModel) {
-        console.log(payload)
-        mutate(payload)
+        // async request which may result error
+        try {
+            mutate(payload)
+        } catch (e) {
+            console.error(e)
+
+        }
+    }
+
+    const onError = (errors: FieldErrors<FormProductModel>) => {
+        console.log(errors)
     }
 
     return (
         <Form {...form}>
             <form
-                onSubmit={form.handleSubmit(updateProduct)}
+                onSubmit={form.handleSubmit(updateProduct, onError)}
                 className="w-full gap-4 mx-auto mb-8 px-3"
             >
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -276,6 +287,79 @@ export function EditForm({ product }: EditFormProps) {
                             </FormItem>
                         )}
                     />
+
+                </div>
+
+                <div>
+                    <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight sm:my-3">
+                        Measurement Unit
+                    </h3>
+                    {unitFields.map((field, index) => {
+                        return (
+                            <div className="grid grid-cols-1 gap-2 sm:grid-cols-5 first:mb-2" key={field.id}>
+                                <FormField
+                                    control={form.control}
+                                    name={`unit.${index}.name`}
+                                    render={({ field }) => (
+                                        <FormItem className="sm:col-span-1 mb-1">
+                                            {
+                                                index === 0 ? (<>
+                                                    <FormLabel>
+                                                        Unit Name
+                                                    </FormLabel>
+                                                    <FormDescription>
+                                                        Describe the discription name.
+                                                    </FormDescription></>) : null
+                                            }
+                                            <FormControl >
+                                                <Input {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name={`unit.${index}.value`}
+                                    render={({ field }) => (
+                                        <FormItem className="sm:col-span-3  mb-1">
+                                            {
+                                                index === 0 ? (<>
+                                                    <FormLabel>
+                                                        Unit Value
+                                                    </FormLabel>
+                                                    <FormDescription>
+                                                        Describe the discription name.
+                                                    </FormDescription></>) : null
+                                            }
+                                            <FormControl>
+                                                <Input {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                <div className="sm:colspan-1 sm:flex sm:justify-end sm:flex-col pb-2">
+                                    <Button variant="outline" size="icon" onClick={() => unitRemove(index)} >
+                                        <Icons.bin className="h-4 w-4" />
+                                    </Button>
+                                </div>
+                            </div>
+                        );
+                    })}
+
+
+                    <div className="sm:flex justify-end">
+                        <Button onClick={() =>
+                            unitAppend({
+                                name: "",
+                                value: 0
+                            })
+                        }>
+                            <Icons.add className="h-4 w-4" /> Add Unit
+                        </Button>
+                    </div>
 
                 </div>
 
@@ -832,7 +916,6 @@ export function EditForm({ product }: EditFormProps) {
                 </button>
 
             </form>
-            <DevTool control={form.control} />
         </Form>
     )
 }

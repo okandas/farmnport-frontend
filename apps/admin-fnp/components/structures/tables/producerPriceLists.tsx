@@ -29,7 +29,7 @@ export function ProducePriceLists() {
       }),
   })
 
-  const ProducePriceLists = data?.data?.data as ProducerPriceList[]
+  const producePriceLists = data?.data?.data as ProducerPriceList[]
   const total = data?.data?.total as number
 
   if (isError) {
@@ -77,7 +77,7 @@ export function ProducePriceLists() {
   return (
     <DataTable
       columns={producerPriceListColumns}
-      data={ProducePriceLists}
+      data={producePriceLists}
       newUrl="/dashboard/prices/new"
       tableName="Price"
       total={total}
