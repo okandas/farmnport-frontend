@@ -35,7 +35,7 @@ api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
 type LoginFormData = z.infer<typeof AuthSchema>
 
 // Administrator
-export function queryLogin(data: FormData) {
+export function queryLogin(data: LoginFormData) {
   var url = `${baseUrl}/user/signin`
   return api.post<LoginResponse>(url, data)
 }

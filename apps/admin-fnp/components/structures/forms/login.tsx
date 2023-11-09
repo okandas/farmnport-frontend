@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation } from "@tanstack/react-query"
 import { isAxiosError } from "axios"
 import Cookies from "js-cookie"
-import { SubmitHandler, useForm } from "react-hook-form"
+import { useForm } from "react-hook-form"
 import * as z from "zod"
 
 import { queryLogin } from "@/lib/query"
@@ -18,7 +18,7 @@ import { ToastAction } from "@/components/ui/toast"
 import { toast } from "@/components/ui/use-toast"
 import { Icons } from "@/components/icons/lucide"
 
-interface AuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
+interface AuthFormProps extends React.HTMLAttributes<HTMLDivElement> { }
 
 type FormData = z.infer<typeof AuthSchema>
 
@@ -66,7 +66,7 @@ export function AuthForm({ className, ...props }: AuthFormProps) {
     },
   })
 
-  const onSubmit: SubmitHandler<FormData> = async (payload) => {
+  const onSubmit = (payload: FormData) => {
     mutate(payload)
   }
 
