@@ -109,7 +109,7 @@ export function CreateProductForm({ product }: EditFormProps) {
                 description: "Added Product Succesfully",
             })
 
-            // router.push(`/dashboard/products`)
+            router.push(`/dashboard/products`)
         },
         onError: (error) => {
             if (isAxiosError(error)) {
@@ -290,12 +290,35 @@ export function CreateProductForm({ product }: EditFormProps) {
                 </div>
 
                 <div>
-                    <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight sm:my-3">
+                    <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight sm:mb-3 sm:mt-6">
                         Measurement Unit
                     </h3>
                     {unitFields.map((field, index) => {
                         return (
                             <div className="grid grid-cols-1 gap-2 sm:grid-cols-5 first:mb-2" key={field.id}>
+
+                                <FormField
+                                    control={form.control}
+                                    name={`unit.${index}.value`}
+                                    render={({ field }) => (
+                                        <FormItem className="sm:col-span-1 mb-1">
+                                            {
+                                                index === 0 ? (<>
+                                                    <FormLabel>
+                                                        Unit Value
+                                                    </FormLabel>
+                                                    <FormDescription>
+                                                        Describe the discription name.
+                                                    </FormDescription></>) : null
+                                            }
+                                            <FormControl>
+                                                <Input type="number" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
                                 <FormField
                                     control={form.control}
                                     name={`unit.${index}.name`}
@@ -317,29 +340,8 @@ export function CreateProductForm({ product }: EditFormProps) {
                                         </FormItem>
                                     )}
                                 />
-                                <FormField
-                                    control={form.control}
-                                    name={`unit.${index}.value`}
-                                    render={({ field }) => (
-                                        <FormItem className="sm:col-span-3  mb-1">
-                                            {
-                                                index === 0 ? (<>
-                                                    <FormLabel>
-                                                        Unit Value
-                                                    </FormLabel>
-                                                    <FormDescription>
-                                                        Describe the discription name.
-                                                    </FormDescription></>) : null
-                                            }
-                                            <FormControl>
-                                                <Textarea {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
 
-                                <div className="sm:colspan-1 sm:flex sm:justify-end sm:flex-col pb-2">
+                                <div className="sm:colspan-1 sm:flex sm:justify-end sm:flex-col pb-1">
                                     <Button variant="outline" size="icon" onClick={() => unitRemove(index)} >
                                         <Icons.bin className="h-4 w-4" />
                                     </Button>

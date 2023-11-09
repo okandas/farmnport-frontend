@@ -116,7 +116,7 @@ export const ProducerPriceListSchema = z.object({
 
 export const ProductSchema = z.object({
   id: z.string(),
-  name: z.string(),
+  name: z.string().nonempty(),
   descriptions: z.array(
     z.object({
       name: z.string(),
@@ -139,8 +139,8 @@ export const ProductSchema = z.object({
   ),
   unit: z.array(
     z.object({
-      value: z.number(),
-      name: z.string(),
+      name: z.string().nonempty(),
+      value: z.coerce.number(),
     })
   ),
   manufacturer: z.object({
@@ -159,8 +159,8 @@ export const ProductSchema = z.object({
   instructions: z.object({
     usage: z.array(
       z.object({
-        name: z.string(),
-        value: z.string(),
+        name: z.string().nonempty(),
+        value: z.string().nonempty(),
       }),
     ),
     examples: z.array(z.object({
