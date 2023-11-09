@@ -5,7 +5,7 @@ import { ClientsTable } from "@/components/structures/tables/clients"
 export default async function DashboardUsersPage() {
   return (
     <DashboardShell>
-      <DashboardHeader heading="Users" text="Manage Users."></DashboardHeader>
+      <DashboardHeader heading="Clients" text="Manage Clients."></DashboardHeader>
       <ClientsTable />
     </DashboardShell>
   )
