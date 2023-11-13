@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { isAxiosError } from "axios"
 import { MoreHorizontal } from "lucide-react"
 
@@ -27,6 +27,8 @@ interface ControlDropDownProps {
 
 export function ControlDropDown({ client }: ControlDropDownProps) {
   const router = useRouter()
+  const queryClient = useQueryClient()
+
   const { mutate, isPending } = useMutation({
     mutationFn: verifyClient,
     onSuccess: (data) => {
@@ -36,6 +38,8 @@ export function ControlDropDown({ client }: ControlDropDownProps) {
       toast({
         description: verified,
       })
+
+      queryClient.invalidateQueries({ queryKey: ["dashboard-clients"] })
 
       router.refresh()
     },

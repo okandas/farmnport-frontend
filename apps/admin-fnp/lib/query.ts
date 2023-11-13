@@ -75,9 +75,9 @@ export function queryProducerPriceLists(pagintion?: pagintion) {
     url = `${baseUrl}/prices/get/producer_prices`
   }
 
-  // if (pagintion?.search !== undefined && pagintion.search.length >= 2) {
-  //   url = `${baseUrl}/user/clients?search=${pagintion.search}`
-  // }
+  if (pagintion?.search !== undefined && pagintion.search.length >= 2) {
+    url = `${baseUrl}/prices/get/producer_prices?search=${pagintion.search}`
+  }
 
   return api.get(url)
 }
