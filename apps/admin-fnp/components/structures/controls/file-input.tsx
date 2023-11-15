@@ -38,9 +38,6 @@ export function FileInput({ id, value, onChange }: FileInputProps) {
                 setFiles(newImages)
 
             }
-
-
-
         },
         onSettled: () => {
         },
