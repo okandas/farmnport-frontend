@@ -1,6 +1,6 @@
 "use client"
 
-import { ColumnDef } from "@tanstack/react-table"
+import { createColumnHelper } from "@tanstack/react-table"
 import { PhoneNumberFormat } from "google-libphonenumber"
 
 import { ApplicationUser } from "@/lib/schemas"
@@ -8,9 +8,12 @@ import { phoneUtility, formatDate } from "@/lib/utilities"
 import { Checkbox } from "@/components/ui/checkbox"
 import { ControlDropDown } from "@/components/structures/dropdowns/control-dropdown"
 
-export const clientColumns: ColumnDef<ApplicationUser>[] = [
-  {
-    id: "select",
+const columnHelper = createColumnHelper<ApplicationUser>()
+
+export const clientColumns = [
+
+  columnHelper.display({
+    id: 'select',
     header: ({ table }) => (
       <Checkbox
         checked={table.getIsAllPageRowsSelected()}
@@ -29,30 +32,25 @@ export const clientColumns: ColumnDef<ApplicationUser>[] = [
     ),
     enableSorting: false,
     enableHiding: false,
-  },
-  {
-    accessorKey: "name",
-    header: "Name",
-  },
-  {
-    accessorKey: "address",
-    header: "Address",
-  },
-  {
-    accessorKey: "created",
+  }),
+  columnHelper.accessor('name', {
+    header: "Name"
+  }),
+  columnHelper.accessor('address', {
+    header: "Address"
+  }),
+  columnHelper.accessor('created', {
     header: () => <div className="text-right">Joined</div>,
     cell: ({ row }) => {
       const date = row.getValue("created") as string
-
       return (
         <div className="font-medium text-right w-32">
           {formatDate(date)}
         </div>
       )
     },
-  },
-  {
-    accessorKey: "phone",
+  }),
+  columnHelper.accessor('phone', {
     header: () => <div className="text-right">Phone</div>,
     cell: ({ row }) => {
       const phone = phoneUtility.parseAndKeepRawInput(
@@ -69,24 +67,22 @@ export const clientColumns: ColumnDef<ApplicationUser>[] = [
         </div>
       )
     },
-  },
-  {
-    accessorKey: "province",
+  }),
+  columnHelper.accessor('province', {
     header: "Province",
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id))
     },
-  },
-  {
-    accessorKey: "specialization",
-    header: "Specialization",
-  },
-  {
-    id: "actions",
+  }),
+  columnHelper.accessor('specialization', {
+    header: "Specialization"
+  }),
+  columnHelper.display({
+    id: 'actions',
     cell: ({ row }) => {
       const client = row?.original
-
       return <ControlDropDown client={client} />
     },
-  },
+  }),
 ]
+

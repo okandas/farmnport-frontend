@@ -28,7 +28,7 @@ export type ProducerPriceListsResponse = {
 export const ApplicationUserSchema = z.object({
   id: z.string(),
   name: z.string().min(4),
-  short_description: z.string().optional(),
+  short_description: z.string(),
   scale: z.string().nonempty(),
   code: z.string(),
   phone: z.string().min(5),
