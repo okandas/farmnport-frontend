@@ -24,6 +24,8 @@ export function FileInput({ id, value, onChange }: FileInputProps) {
         mutationFn: uploadImages,
         onSuccess: (data) => {
 
+            console.log(data)
+
             if (data === null) {
 
                 toast({
