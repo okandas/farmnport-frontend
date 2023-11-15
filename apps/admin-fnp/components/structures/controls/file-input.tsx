@@ -57,6 +57,8 @@ export function FileInput({ id, value, onChange }: FileInputProps) {
                 formData.append("entity_id", entity_id)
             }
 
+            console.log(acceptedFiles, acceptedFiles.length)
+
             if (acceptedFiles.length) {
 
                 acceptedFiles.forEach((attachment) => {
@@ -78,7 +80,7 @@ export function FileInput({ id, value, onChange }: FileInputProps) {
 
             mutationUploadImage.reset()
 
-        },
+        }
 
     })
 
