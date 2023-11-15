@@ -1,16 +1,19 @@
 "use client"
 
-import { ColumnDef } from "@tanstack/react-table"
+import { createColumnHelper } from "@tanstack/react-table"
 import { PhoneNumberFormat } from "google-libphonenumber"
 
 import { ApplicationUser } from "@/lib/schemas"
-import { phoneUtility } from "@/lib/utilities"
+import { phoneUtility, formatDate } from "@/lib/utilities"
 import { Checkbox } from "@/components/ui/checkbox"
-import { AdminControlDropDown } from "@/components/structures/control-dropdown"
+import { ControlDropDown } from "@/components/structures/dropdowns/control-dropdown"
 
-export const clientColumns: ColumnDef<ApplicationUser>[] = [
-  {
-    id: "select",
+const columnHelper = createColumnHelper<ApplicationUser>()
+
+export const clientColumns = [
+
+  columnHelper.display({
+    id: 'select',
     header: ({ table }) => (
       <Checkbox
         checked={table.getIsAllPageRowsSelected()}
@@ -29,17 +32,25 @@ export const clientColumns: ColumnDef<ApplicationUser>[] = [
     ),
     enableSorting: false,
     enableHiding: false,
-  },
-  {
-    accessorKey: "name",
-    header: "Name",
-  },
-  {
-    accessorKey: "address",
-    header: "Address",
-  },
-  {
-    accessorKey: "phone",
+  }),
+  columnHelper.accessor('name', {
+    header: "Name"
+  }),
+  columnHelper.accessor('address', {
+    header: "Address"
+  }),
+  columnHelper.accessor('created', {
+    header: () => <div className="text-right">Joined</div>,
+    cell: ({ row }) => {
+      const date = row.getValue("created") as string
+      return (
+        <div className="font-medium text-right w-32">
+          {formatDate(date)}
+        </div>
+      )
+    },
+  }),
+  columnHelper.accessor('phone', {
     header: () => <div className="text-right">Phone</div>,
     cell: ({ row }) => {
       const phone = phoneUtility.parseAndKeepRawInput(
@@ -51,30 +62,27 @@ export const clientColumns: ColumnDef<ApplicationUser>[] = [
         PhoneNumberFormat.INTERNATIONAL,
       )
       return (
-        <div className="font-medium text-right">
+        <div className="font-medium text-right w-40">
           <a href={`tel:${formatted}`}>{formatted}</a>
         </div>
       )
     },
-  },
-  {
-    accessorKey: "province",
+  }),
+  columnHelper.accessor('province', {
     header: "Province",
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id))
     },
-  },
-  {
-    accessorKey: "specialization",
-    header: "Specialization",
-  },
-
-  {
-    id: "actions",
+  }),
+  columnHelper.accessor('specialization', {
+    header: "Specialization"
+  }),
+  columnHelper.display({
+    id: 'actions',
     cell: ({ row }) => {
       const client = row?.original
-
-      return <AdminControlDropDown client={client} />
+      return <ControlDropDown client={client} />
     },
-  },
+  }),
 ]
+

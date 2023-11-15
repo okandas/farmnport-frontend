@@ -5,15 +5,15 @@ import { useQuery } from "@tanstack/react-query"
 import { PaginationState } from "@tanstack/react-table"
 import { isAxiosError } from "axios"
 
-import { queryUsersAsAdmin } from "@/lib/query"
-import { ApplicationUser } from "@/lib/schemas"
+import { queryProducts } from "@/lib/query"
+import { ProductItem } from "@/lib/schemas"
 import { ToastAction } from "@/components/ui/toast"
 import { toast } from "@/components/ui/use-toast"
 import { Placeholder } from "@/components/state/placeholder"
-import { clientColumns } from "@/components/structures/clients"
 import { DataTable } from "@/components/structures/data-table"
+import { productColumns } from "@/components/structures/columns/products"
 
-export function AdminClientsTable() {
+export function ProductsTable() {
   const [searchClient, setSearchClient] = useState("")
 
   const [pagination, setPagination] = useState<PaginationState>({
@@ -21,15 +21,16 @@ export function AdminClientsTable() {
     pageSize: 20,
   })
 
-  const { isError, isLoading, isFetching, data, refetch } = useQuery({
-    queryKey: ["dashboard-admin-clients", { p: pagination.pageIndex }],
+  const { isError, isLoading, isFetching, refetch, data } = useQuery({
+    queryKey: ["dashboard-products", { p: pagination.pageIndex }],
     queryFn: () =>
-      queryUsersAsAdmin({
+      queryProducts({
         p: pagination.pageIndex,
       }),
+    refetchOnWindowFocus: false
   })
 
-  const adminClients = data?.data?.data as ApplicationUser[]
+  const products = data?.data?.data as ProductItem[]
   const total = data?.data?.total as number
 
   if (isError) {
@@ -58,7 +59,7 @@ export function AdminClientsTable() {
     return (
       <Placeholder>
         <Placeholder.Icon name="close" />
-        <Placeholder.Title>Error Fetching Users</Placeholder.Title>
+        <Placeholder.Title>Error Fetching Products</Placeholder.Title>
         <Placeholder.Description>
           Error Fetching users from the database
         </Placeholder.Description>
@@ -69,17 +70,17 @@ export function AdminClientsTable() {
   if (isLoading || isFetching) {
     return (
       <Placeholder>
-        <Placeholder.Title>Fetching Users</Placeholder.Title>
+        <Placeholder.Title>Fetching Producer Price Lists</Placeholder.Title>
       </Placeholder>
     )
   }
 
   return (
     <DataTable
-      columns={clientColumns}
-      data={adminClients}
-      newUrl="/dashboard/users/new"
-      tableName="User"
+      columns={productColumns}
+      data={products}
+      newUrl="/dashboard/products/new"
+      tableName="Product"
       total={total}
       pagination={pagination}
       setPagination={setPagination}

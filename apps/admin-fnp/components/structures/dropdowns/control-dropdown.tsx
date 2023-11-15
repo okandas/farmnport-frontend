@@ -2,12 +2,12 @@
 
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { isAxiosError } from "axios"
 import { MoreHorizontal } from "lucide-react"
 
-import { verifyClientAsAdmin } from "@/lib/query"
-import { AdminApplicationUserID, ApplicationUser } from "@/lib/schemas"
+import { verifyClient } from "@/lib/query"
+import { ApplicationUserID, ApplicationUser } from "@/lib/schemas"
 import { slug } from "@/lib/utilities"
 import { Button } from "@/components/ui/button"
 import {
@@ -21,14 +21,16 @@ import {
 import { ToastAction } from "@/components/ui/toast"
 import { toast } from "@/components/ui/use-toast"
 
-interface AdminControlDropDownProps {
+interface ControlDropDownProps {
   client?: ApplicationUser
 }
 
-export function AdminControlDropDown({ client }: AdminControlDropDownProps) {
+export function ControlDropDown({ client }: ControlDropDownProps) {
   const router = useRouter()
+  const queryClient = useQueryClient()
+
   const { mutate, isPending } = useMutation({
-    mutationFn: verifyClientAsAdmin,
+    mutationFn: verifyClient,
     onSuccess: (data) => {
       const verified = data?.data?.verified
         ? "Verified Successfully"
@@ -36,6 +38,8 @@ export function AdminControlDropDown({ client }: AdminControlDropDownProps) {
       toast({
         description: verified,
       })
+
+      queryClient.invalidateQueries({ queryKey: ["dashboard-clients"] })
 
       router.refresh()
     },
@@ -51,7 +55,7 @@ export function AdminControlDropDown({ client }: AdminControlDropDownProps) {
 
           default:
             toast({
-              title: "Uh oh! Admin client update failed.",
+              title: "Uh oh!  client update failed.",
               description: "There was a problem with your request.",
               action: <ToastAction altText="Try again">Try again</ToastAction>,
             })
@@ -61,7 +65,7 @@ export function AdminControlDropDown({ client }: AdminControlDropDownProps) {
     },
   })
 
-  async function onSubmit(payload: AdminApplicationUserID) {
+  async function onSubmit(payload: ApplicationUserID) {
     mutate(payload)
   }
 
@@ -72,7 +76,7 @@ export function AdminControlDropDown({ client }: AdminControlDropDownProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="h-8 w-8 p-0">
+        <Button variant="ghost" className="w-8 h-8 p-0">
           <span className="sr-only">Open menu</span>
           <MoreHorizontal className={`h-4 w-4 ${stroke} ${animate}`} />
         </Button>
@@ -99,7 +103,7 @@ export function AdminControlDropDown({ client }: AdminControlDropDownProps) {
         <DropdownMenuItem
           onClick={() => {
             if (client?.id !== undefined) {
-              const payload: AdminApplicationUserID = {
+              const payload: ApplicationUserID = {
                 id: client.id,
               }
               onSubmit(payload)

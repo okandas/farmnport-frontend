@@ -5,11 +5,11 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation } from "@tanstack/react-query"
 import { isAxiosError } from "axios"
 import Cookies from "js-cookie"
-import { SubmitHandler, useForm } from "react-hook-form"
+import { useForm } from "react-hook-form"
 import * as z from "zod"
 
-import { queryAdminLogin } from "@/lib/query"
-import { AdminAuthSchema } from "@/lib/schemas"
+import { queryLogin } from "@/lib/query"
+import { AuthSchema } from "@/lib/schemas"
 import { cn } from "@/lib/utilities"
 import { buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -18,13 +18,13 @@ import { ToastAction } from "@/components/ui/toast"
 import { toast } from "@/components/ui/use-toast"
 import { Icons } from "@/components/icons/lucide"
 
-interface AdminAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
+interface AuthFormProps extends React.HTMLAttributes<HTMLDivElement> { }
 
-type FormData = z.infer<typeof AdminAuthSchema>
+type FormData = z.infer<typeof AuthSchema>
 
-export function AdminAuthForm({ className, ...props }: AdminAuthFormProps) {
+export function AuthForm({ className, ...props }: AuthFormProps) {
   const { register, handleSubmit, formState } = useForm<FormData>({
-    resolver: zodResolver(AdminAuthSchema),
+    resolver: zodResolver(AuthSchema),
   })
 
   const router = useRouter()
@@ -32,7 +32,7 @@ export function AdminAuthForm({ className, ...props }: AdminAuthFormProps) {
   const { errors } = formState
 
   const { mutate, isPending } = useMutation({
-    mutationFn: queryAdminLogin,
+    mutationFn: queryLogin,
     onSuccess: (data) => {
       toast({
         description: "Login Successful redirecting you to dashboard.",
@@ -66,7 +66,7 @@ export function AdminAuthForm({ className, ...props }: AdminAuthFormProps) {
     },
   })
 
-  const onSubmit: SubmitHandler<FormData> = async (payload) => {
+  const onSubmit = (payload: FormData) => {
     mutate(payload)
   }
 

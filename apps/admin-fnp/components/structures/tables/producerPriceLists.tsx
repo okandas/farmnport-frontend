@@ -5,15 +5,15 @@ import { useQuery } from "@tanstack/react-query"
 import { PaginationState } from "@tanstack/react-table"
 import { isAxiosError } from "axios"
 
-import { queryProducerPriceListsAsAdmin } from "@/lib/query"
+import { queryProducerPriceLists } from "@/lib/query"
 import { ProducerPriceList } from "@/lib/schemas"
 import { ToastAction } from "@/components/ui/toast"
 import { toast } from "@/components/ui/use-toast"
 import { Placeholder } from "@/components/state/placeholder"
 import { DataTable } from "@/components/structures/data-table"
-import { producerPriceListColumns } from "@/components/structures/producerLists"
+import { producerPriceListColumns } from "@/components/structures/columns/producerLists"
 
-export function AdminProducePriceLists() {
+export function ProducePriceLists() {
   const [searchClient, setSearchClient] = useState("")
 
   const [pagination, setPagination] = useState<PaginationState>({
@@ -22,17 +22,14 @@ export function AdminProducePriceLists() {
   })
 
   const { isError, isLoading, isFetching, refetch, data } = useQuery({
-    queryKey: [
-      "dashboard-admin-producer-price-lists",
-      { p: pagination.pageIndex },
-    ],
+    queryKey: ["dashboard-producer-price-lists", { p: pagination.pageIndex }],
     queryFn: () =>
-      queryProducerPriceListsAsAdmin({
+      queryProducerPriceLists({
         p: pagination.pageIndex,
       }),
   })
 
-  const adminProducePriceLists = data?.data?.data as ProducerPriceList[]
+  const producePriceLists = data?.data?.data as ProducerPriceList[]
   const total = data?.data?.total as number
 
   if (isError) {
@@ -80,7 +77,7 @@ export function AdminProducePriceLists() {
   return (
     <DataTable
       columns={producerPriceListColumns}
-      data={adminProducePriceLists}
+      data={producePriceLists}
       newUrl="/dashboard/prices/new"
       tableName="Price"
       total={total}

@@ -4,33 +4,33 @@ import Link from "next/link"
 import { useQuery } from "@tanstack/react-query"
 import { isAxiosError } from "axios"
 
-import { queryUser } from "@/lib/query"
-import { ApplicationUser } from "@/lib/schemas"
+import { queryProduct } from "@/lib/query"
+import { ProductItem } from "@/lib/schemas"
 import { cn } from "@/lib/utilities"
 import { buttonVariants } from "@/components/ui/button"
 import { ToastAction } from "@/components/ui/toast"
 import { toast } from "@/components/ui/use-toast"
 import { Icons } from "@/components/icons/lucide"
 import { Placeholder } from "@/components/state/placeholder"
-import { EditForm } from "@/components/structures/forms/clientEdit"
+import { EditForm } from "@/components/structures/forms/productEdit"
 
-interface EditClientPageProps {
+interface EditProductPageProps {
   params: {
     slug: string
   }
 }
 
-export default function EditClientPage({ params }: EditClientPageProps) {
-  const name = params.slug
-  const url = `/dashboard/users/${name}`
+export default function EditProductPage({ params }: EditProductPageProps) {
+  const id = params.slug
+  const url = `/dashboard/products/${id}`
 
-  const { isError, isLoading, isFetching, data, refetch } = useQuery({
-    queryKey: ["dashboard-client", name],
-    queryFn: () => queryUser(name),
+  const { isError, isLoading, isFetching, refetch, data } = useQuery({
+    queryKey: ["dashboard-product", id],
+    queryFn: () => queryProduct(id),
     refetchOnWindowFocus: false
   })
 
-  const client = data?.data as ApplicationUser
+  const product = data?.data as ProductItem
 
   if (isError) {
     if (isAxiosError(data)) {
@@ -59,9 +59,9 @@ export default function EditClientPage({ params }: EditClientPageProps) {
       <div className="mt-20">
         <Placeholder>
           <Placeholder.Icon name="close" />
-          <Placeholder.Title>Error Fetching User</Placeholder.Title>
+          <Placeholder.Title>Error Fetching Product</Placeholder.Title>
           <Placeholder.Description>
-            Error Fetching user from the database
+            Error Fetching product from the database
           </Placeholder.Description>
         </Placeholder>
       </div>
@@ -73,9 +73,9 @@ export default function EditClientPage({ params }: EditClientPageProps) {
       <div className="mt-20">
         <Placeholder>
           <Placeholder.Icon name="search" />
-          <Placeholder.Title>Is Fetching User</Placeholder.Title>
+          <Placeholder.Title>Fetching Product</Placeholder.Title>
           <Placeholder.Description>
-            Fetching user from the database
+            Fetching product from the database
           </Placeholder.Description>
         </Placeholder>
       </div>
@@ -84,7 +84,7 @@ export default function EditClientPage({ params }: EditClientPageProps) {
 
   return (
     <>
-      <div className={"absolute right-10 top-96"}>
+      <div className={"absolute right-10 top-8"}>
         <Link href={url} className={cn(buttonVariants({ variant: "link" }))}>
           <>
             <Icons.close className="w-4 h-4 mr-2" />
@@ -93,7 +93,7 @@ export default function EditClientPage({ params }: EditClientPageProps) {
         </Link>
       </div>
 
-      {client !== undefined ? <EditForm client={client} /> : null}
+      {product !== undefined ? <EditForm product={product} /> : null}
     </>
   )
 }

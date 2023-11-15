@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation"
 import { useQuery } from "@tanstack/react-query"
 import { isAxiosError } from "axios"
 
-import { queryUserProductPriceListAsAdmin } from "@/lib/query"
+import { queryUserProductPriceList } from "@/lib/query"
 import { ProducerPriceList } from "@/lib/schemas"
 import { centsToDollars, cn, formatDate, ucFirst } from "@/lib/utilities"
 import { Card, CardContent, CardDescription } from "@/components/ui/card"
@@ -32,8 +32,8 @@ export default function ViewClientProductListDialog({
   const clientID = params.slug
 
   const { isError, isLoading, isFetching, refetch, data } = useQuery({
-    queryKey: ["dashboard-admin-client-price", clientID],
-    queryFn: () => queryUserProductPriceListAsAdmin(clientID),
+    queryKey: ["dashboard-lient-price", clientID],
+    queryFn: () => queryUserProductPriceList(clientID),
   })
 
   const router = useRouter()
@@ -190,7 +190,7 @@ export default function ViewClientProductListDialog({
                       {type}
                     </TabsTrigger>
                   )
-                }
+                },
               )}
             </TabsList>
             {pricingTypes[producerPriceList.client_specialization].map(
@@ -232,7 +232,7 @@ export default function ViewClientProductListDialog({
                                             {centsToDollars(
                                               gradePrices[
                                                 key as keyof typeof gradePrices
-                                              ]
+                                              ],
                                             )}
                                           </div>
 
@@ -240,7 +240,7 @@ export default function ViewClientProductListDialog({
                                             <div
                                               className={cn(
                                                 statuses[index],
-                                                "rounded-md py-1 px-2 text-xs font-medium ring-1 ring-inset"
+                                                "rounded-md py-1 px-2 text-xs font-medium ring-1 ring-inset",
                                               )}
                                             >
                                               {grades[pricingType][key]}
@@ -251,7 +251,7 @@ export default function ViewClientProductListDialog({
                                     </dl>
                                   </li>
                                 )
-                              }
+                              },
                             )}
                           </ul>
                         ) : null}
@@ -259,7 +259,7 @@ export default function ViewClientProductListDialog({
                     </Card>
                   </TabsContent>
                 )
-              }
+              },
             )}
           </Tabs>
         </section>

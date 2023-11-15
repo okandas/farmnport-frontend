@@ -1,6 +1,6 @@
 import { DashboardHeader } from "@/components/state/dashboardHeader"
 import { DashboardShell } from "@/components/state/dashboardShell"
-import { AdminProducePriceLists } from "@/components/structures/tables/adminProducerPriceLists"
+import { ProducePriceLists } from "@/components/structures/tables/producerPriceLists"
 
 export default async function DashboardUsersPage() {
   return (
@@ -9,7 +9,7 @@ export default async function DashboardUsersPage() {
         heading="Producer Price Lists"
         text="Manage Price Lists."
       ></DashboardHeader>
-      <AdminProducePriceLists />
+      <ProducePriceLists />
     </DashboardShell>
   )
 }

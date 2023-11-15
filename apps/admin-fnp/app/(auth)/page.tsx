@@ -1,8 +1,8 @@
-import { AdminAuthForm } from "@/components/structures/forms/adminLogin"
+import { AuthForm } from "@/components/structures/forms/login"
 
 export default function Login() {
   return (
-    <div className="container flex h-screen w-screen flex-col items-center justify-center">
+    <div className="container flex flex-col items-center justify-center w-screen h-screen">
       <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
         <div className="flex flex-col space-y-2 text-center">
           <h1 className="text-2xl font-semibold tracking-tight">
@@ -13,9 +13,9 @@ export default function Login() {
           </p>
         </div>
 
-        <AdminAuthForm />
+        <AuthForm />
 
-        <p className="px-8 text-center text-sm text-muted-foreground"></p>
+        <p className="px-8 text-sm text-center text-muted-foreground"></p>
       </div>
     </div>
   )

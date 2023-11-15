@@ -7,10 +7,11 @@ import { useMutation } from "@tanstack/react-query"
 import { isAxiosError } from "axios"
 import { useForm, useWatch } from "react-hook-form"
 
-import { createClientAsAdmin } from "@/lib/query"
+import { updateClient } from "@/lib/query"
 import {
-  AdminEditApplicationUser,
-  AdminEditApplicationUserSchema,
+  EditApplicationUser,
+  EditApplicationUserSchema,
+  ApplicationUser,
 } from "@/lib/schemas"
 import { cn, slug } from "@/lib/utilities"
 import { Badge } from "@/components/ui/badge"
@@ -50,19 +51,20 @@ import { Textarea } from "@/components/ui/textarea"
 import { ToastAction } from "@/components/ui/toast"
 import { toast } from "@/components/ui/use-toast"
 import { Icons } from "@/components/icons/lucide"
+
 import {
   clientTypes,
   mainActivity,
   provinces,
   scales,
   specializations,
-} from "@/components/structures/data/data"
+} from "../data/data"
 
-interface AdminCreateFormProps extends React.HTMLAttributes<HTMLDivElement> {
-  client: AdminEditApplicationUser
+interface EditFormProps extends React.HTMLAttributes<HTMLDivElement> {
+  client: ApplicationUser
 }
 
-export function AdminCreateForm({ client }: AdminCreateFormProps) {
+export function EditForm({ client }: EditFormProps) {
   const form = useForm({
     defaultValues: {
       id: client?.id,
@@ -80,7 +82,7 @@ export function AdminCreateForm({ client }: AdminCreateFormProps) {
       branches: client?.branches,
       short_description: client?.short_description,
     },
-    resolver: zodResolver(AdminEditApplicationUserSchema),
+    resolver: zodResolver(EditApplicationUserSchema),
   })
 
   const selectedSpecializations = useWatch({
@@ -100,13 +102,15 @@ export function AdminCreateForm({ client }: AdminCreateFormProps) {
   const router = useRouter()
 
   const { mutate, isPending } = useMutation({
-    mutationFn: createClientAsAdmin,
-    onSuccess: () => {
+    mutationFn: updateClient,
+    onSuccess: (data) => {
       toast({
-        description: "Created User Succesfully",
+        description: "Updated User Succesfully",
       })
 
-      router.push(`/dashboard/users`)
+      const name = slug(data.data?.name)
+
+      // router.push(`/dashboard/users/${name}`)
     },
     onError: (error) => {
       if (isAxiosError(error)) {
@@ -120,7 +124,7 @@ export function AdminCreateForm({ client }: AdminCreateFormProps) {
 
           default:
             toast({
-              title: "Uh oh! Admin client update failed.",
+              title: "Uh oh!  client update failed.",
               description: "There was a problem with your request.",
               action: <ToastAction altText="Try again">Try again</ToastAction>,
             })
@@ -130,7 +134,8 @@ export function AdminCreateForm({ client }: AdminCreateFormProps) {
     },
   })
 
-  async function onSubmit(payload: AdminEditApplicationUser) {
+  async function onSubmit(payload: EditApplicationUser) {
+    payload.branches = Number(payload.branches)
     mutate(payload)
   }
 
@@ -138,7 +143,7 @@ export function AdminCreateForm({ client }: AdminCreateFormProps) {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="mx-auto mb-8 w-3/4 gap-4"
+        className="w-3/4 gap-4 mx-auto mb-8"
       >
         <div className="grid grid-cols-2 gap-4">
           <FormField
@@ -181,27 +186,61 @@ export function AdminCreateForm({ client }: AdminCreateFormProps) {
                 <FormControl>
                   <Textarea placeholder="Short Description" {...field} />
                 </FormControl>
-                <FormDescription>
+                <FormDescription className="">
                   Your company slogan or Short description of your entity
                 </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="phone"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Phone</FormLabel>
-                <FormControl>
-                  <Input placeholder="Phone Number" {...field} />
-                </FormControl>
-                <FormDescription></FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div>
+            <FormField
+              control={form.control}
+              name="phone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Phone</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Phone Number" {...field} />
+                  </FormControl>
+                  <FormDescription></FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="province"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Paynent Terms</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={client?.province}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select Province..." />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent className="overflow-visible max-h-44">
+                      {provinces.map((province) => {
+                        return (
+                          <SelectItem key={province} value={province}>
+                            {province}
+                          </SelectItem>
+                        )
+                      })}
+                    </SelectContent>
+                  </Select>
+                  <FormDescription></FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
           <FormField
             control={form.control}
             name="address"
@@ -246,7 +285,7 @@ export function AdminCreateForm({ client }: AdminCreateFormProps) {
                       <SelectValue placeholder="Select a specialization" />
                     </SelectTrigger>
                   </FormControl>
-                  <SelectContent className="max-h-44 overflow-visible">
+                  <SelectContent className="overflow-visible max-h-44">
                     {specializations.map((specialization) => {
                       return (
                         <SelectItem key={specialization} value={specialization}>
@@ -281,7 +320,7 @@ export function AdminCreateForm({ client }: AdminCreateFormProps) {
                       <SelectValue placeholder="Select Province..." />
                     </SelectTrigger>
                   </FormControl>
-                  <SelectContent className="max-h-44 overflow-visible">
+                  <SelectContent className="overflow-visible max-h-44">
                     {provinces.map((province) => {
                       return (
                         <SelectItem key={province} value={province}>
@@ -317,7 +356,7 @@ export function AdminCreateForm({ client }: AdminCreateFormProps) {
                         <SelectValue placeholder="What do you do ?" />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent className="max-h-44 overflow-visible">
+                    <SelectContent className="overflow-visible max-h-44">
                       {mainActivity[changingSpecialization]?.map((activity) => {
                         return (
                           <SelectItem key={activity} value={activity}>
@@ -345,26 +384,26 @@ export function AdminCreateForm({ client }: AdminCreateFormProps) {
                     <PopoverTrigger asChild>
                       <div className="group min-h-[2.5rem] rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-0">
                         <div className="flex flex-wrap gap-1">
-                          {selectedSpecializations.length > 1
+                          {selectedSpecializations?.length > 1
                             ? selectedSpecializations?.map((selected) => {
-                                if (selected.length !== 0) {
-                                  return (
-                                    <Badge
-                                      key={selected}
-                                      variant="outline"
-                                      className="flex justify-between border-green-400 bg-green-100 text-green-800"
-                                    >
-                                      {selected}
-                                    </Badge>
-                                  )
-                                }
-                              })
+                              if (selected?.length !== 0) {
+                                return (
+                                  <Badge
+                                    key={selected}
+                                    variant="outline"
+                                    className="flex justify-between text-green-800 bg-green-100 border-green-400"
+                                  >
+                                    {selected}
+                                  </Badge>
+                                )
+                              }
+                            })
                             : "Select Specialization ..."}
                         </div>
                       </div>
                     </PopoverTrigger>
                     <PopoverContent className="w-[320px] p-0">
-                      <Command className="max-h-52 rounded-lg border shadow-md">
+                      <Command className="border rounded-lg shadow-md max-h-52 ">
                         <CommandInput placeholder="Search..." />
                         <CommandList>
                           <CommandEmpty className="py-3 text-center">
@@ -385,7 +424,7 @@ export function AdminCreateForm({ client }: AdminCreateFormProps) {
                                           onSelect={(value) => {
                                             if (
                                               !selectedSpecializations?.includes(
-                                                value
+                                                value,
                                               )
                                             ) {
                                               const NewSpecialization = [
@@ -395,30 +434,30 @@ export function AdminCreateForm({ client }: AdminCreateFormProps) {
 
                                               form.setValue(
                                                 "specializations",
-                                                NewSpecialization
+                                                NewSpecialization,
                                               )
                                             } else {
                                               const removeAtIndex =
                                                 selectedSpecializations?.indexOf(
-                                                  value
+                                                  value,
                                                 )
 
                                               selectedSpecializations?.splice(
                                                 removeAtIndex,
-                                                1
+                                                1,
                                               )
 
                                               form.setValue(
                                                 "specializations",
-                                                selectedSpecializations
+                                                selectedSpecializations,
                                               )
                                             }
                                           }}
                                         >
                                           {selectedSpecializations?.includes(
-                                            activity
+                                            activity,
                                           ) ? (
-                                            <Icons.check className="mr-2 h-4 w-4" />
+                                            <Icons.check className="w-4 h-4 mr-2" />
                                           ) : null}
 
                                           <span>{activity}</span>
@@ -427,7 +466,7 @@ export function AdminCreateForm({ client }: AdminCreateFormProps) {
                                     } else {
                                       null
                                     }
-                                  }
+                                  },
                                 )}
                               </CommandGroup>
                             )
@@ -457,7 +496,7 @@ export function AdminCreateForm({ client }: AdminCreateFormProps) {
                       <SelectValue placeholder="What user type are you?" />
                     </SelectTrigger>
                   </FormControl>
-                  <SelectContent className="max-h-44 overflow-visible">
+                  <SelectContent className="overflow-visible max-h-44">
                     {clientTypes.map((type) => {
                       return (
                         <SelectItem key={type} value={type}>
@@ -488,7 +527,7 @@ export function AdminCreateForm({ client }: AdminCreateFormProps) {
                         <SelectValue placeholder="What is your scale ?" />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent className="max-h-44 overflow-visible">
+                    <SelectContent className="overflow-visible max-h-44">
                       {scales.map((scale) => {
                         return (
                           <SelectItem key={scale} value={scale}>
@@ -529,7 +568,7 @@ export function AdminCreateForm({ client }: AdminCreateFormProps) {
           className={cn(buttonVariants(), "mt-5")}
           disabled={isPending}
         >
-          {isPending && <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />}
+          {isPending && <Icons.spinner className="w-4 h-4 mr-2 animate-spin" />}
           Submit
         </button>
       </form>

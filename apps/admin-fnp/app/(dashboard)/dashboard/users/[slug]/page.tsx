@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query"
 import { isAxiosError } from "axios"
 
-import { queryUserAsAdmin, queryUserProductPriceListAsAdmin } from "@/lib/query"
+import { queryUser, queryUserProductPriceList } from "@/lib/query"
 import { ApplicationUser, ProducerPriceList } from "@/lib/schemas"
 import { centsToDollars, cn, formatDate, ucFirst } from "@/lib/utilities"
 import { Button } from "@/components/ui/button"
@@ -19,7 +19,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ToastAction } from "@/components/ui/toast"
 import { toast } from "@/components/ui/use-toast"
 import { Placeholder } from "@/components/state/placeholder"
-import { AdminControlDropDown } from "@/components/structures/control-dropdown"
+import { ControlDropDown } from "@/components/structures/dropdowns/control-dropdown"
 
 interface ViewClientPageProps {
   params: {
@@ -31,17 +31,17 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
   const name = params.slug
 
   const { isError, isLoading, isFetching, data, refetch } = useQuery({
-    queryKey: ["dashboard-admin-client", name],
-    queryFn: () => queryUserAsAdmin(name),
+    queryKey: ["dashboard-client", name],
+    queryFn: () => queryUser(name),
   })
 
-  const adminClient = data?.data as ApplicationUser
+  const client = data?.data as ApplicationUser
 
-  const clientID = adminClient?.id ?? ""
+  const clientID = client?.id ?? ""
 
   const { data: priceListData } = useQuery({
-    queryKey: ["dashboard-admin-client-price", clientID],
-    queryFn: () => queryUserProductPriceListAsAdmin(clientID),
+    queryKey: ["dashboard-nt-price", clientID],
+    queryFn: () => queryUserProductPriceList(clientID),
   })
 
   const latestProducerPriceList = priceListData?.data as ProducerPriceList
@@ -167,16 +167,16 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
   return (
     <>
       <div className={"absolute right-10 top-64"}>
-        <AdminControlDropDown client={adminClient} />
+        <ControlDropDown client={client} />
       </div>
 
       <section className="grid grid-cols-2 gap-2 mb-3">
-        <aside className="max-w-sm lg:max-w-md">
+        <aside className="max-w-sm lg:max-w-lg">
           <div className="flex justify-start [&:not(:first-child)]:my-3">
             <div className="w-40 leading-7">ID</div>
             <div className="leading-7">
               <p className="text-base font-semibold tracking-tight">
-                {adminClient?.id}
+                {client?.id}
               </p>
             </div>
           </div>
@@ -184,7 +184,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
             <div className="w-40 leading-7">Email</div>
             <div className="leading-7">
               <p className="text-base font-semibold tracking-tight">
-                {adminClient?.email}
+                {client?.email}
               </p>
             </div>
           </div>
@@ -192,7 +192,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
             <div className="w-40 leading-7">Phone</div>
             <div className="leading-7">
               <p className="text-base font-semibold tracking-tight">
-                {adminClient?.phone}
+                {client?.phone}
               </p>
             </div>
           </div>
@@ -200,7 +200,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
             <div className="w-40 leading-7">Joined</div>
             <div className="leading-7">
               <p className="text-base font-semibold tracking-tight">
-                {formatDate(adminClient?.created)}
+                {formatDate(client?.created)}
               </p>
             </div>
           </div>
@@ -208,7 +208,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
             <div className="w-40 leading-7">Address</div>
             <div className="leading-7">
               <p className="text-base font-semibold tracking-tight">
-                {adminClient?.address}
+                {client?.address}
               </p>
             </div>
           </div>
@@ -216,18 +216,18 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
             <div className="w-40 leading-7">City/Province</div>
             <div className="leading-7">
               <p className="text-base font-semibold tracking-tight">
-                {adminClient?.city}, {adminClient?.province}
+                {client?.city}, {client?.province}
               </p>
             </div>
           </div>
         </aside>
         <aside>
-          {adminClient?.specialization !== undefined &&
-          latestProducerPriceList != undefined &&
-          adminClient?.type === "buyer" ? (
+          {client?.specialization !== undefined &&
+            latestProducerPriceList != undefined &&
+            client?.type === "buyer" ? (
             <Tabs defaultValue="beef" className="w-[500px]">
               <TabsList className="grid w-full grid-cols-6">
-                {pricingTypes[adminClient.specialization].map((type, index) => {
+                {pricingTypes[client.specialization].map((type, index) => {
                   return (
                     <TabsTrigger key={index} value={type}>
                       {type}
@@ -235,7 +235,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
                   )
                 })}
               </TabsList>
-              {pricingTypes[adminClient.specialization].map(
+              {pricingTypes[client?.specialization].map(
                 (pricingType, index) => {
                   return (
                     <TabsContent key={index} value={pricingType}>
@@ -251,13 +251,13 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
                         </CardHeader>
                         <CardContent className="min-h-[305px] space-y-2">
                           {latestProducerPriceList[pricingType] !==
-                          undefined ? (
+                            undefined ? (
                             <ul
                               role="list"
-                              className="grid grid-cols-1 gap-x-2 gap-y-2 lg:grid-cols-2 xl:gap-x-4 "
+                              className="grid grid-cols-1 gap-2 lg:grid-cols-2 xl:gap-x-4"
                             >
                               {Object.keys(
-                                latestProducerPriceList[pricingType]
+                                latestProducerPriceList[pricingType],
                               ).map((key, index) => {
                                 if (key === "hasPrice") {
                                   return null
@@ -279,8 +279,8 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
                                           <div className="font-medium text-gray-900">
                                             {centsToDollars(
                                               gradePrices[
-                                                key as keyof typeof gradePrices
-                                              ]
+                                              key as keyof typeof gradePrices
+                                              ],
                                             )}
                                           </div>
 
@@ -288,7 +288,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
                                             <div
                                               className={cn(
                                                 statuses[index],
-                                                "rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset"
+                                                "rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset",
                                               )}
                                             >
                                               {grades[pricingType][key]}
@@ -309,7 +309,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
                       </Card>
                     </TabsContent>
                   )
-                }
+                },
               )}
             </Tabs>
           ) : null}
@@ -329,7 +329,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
                   <div className="space-y-2">
                     <h3 className="font-bold">Branches</h3>
                     <p className="text-sm text-muted-foreground">
-                      {adminClient?.branches}
+                      {client?.branches}
                     </p>
                   </div>
                 </div>
@@ -338,7 +338,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
                 <div className="flex h-[80px] flex-col justify-between rounded-md p-2">
                   <div className="space-y-2">
                     <h3 className="font-bold">Specilization</h3>
-                    <p className="text-sm">{adminClient?.specialization}</p>
+                    <p className="text-sm">{client?.specialization}</p>
                   </div>
                 </div>
               </div>
@@ -347,7 +347,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
                   <div className="space-y-2">
                     <h3 className="font-bold">Main Activity</h3>
                     <p className="text-sm text-muted-foreground">
-                      {adminClient?.main_activity}
+                      {client?.main_activity}
                     </p>
                   </div>
                 </div>
@@ -356,14 +356,14 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
                 <div className="flex h-[80px] flex-col justify-between rounded-md p-2">
                   <div className="space-y-2">
                     <h3 className="font-bold">Scale</h3>
-                    <p className="text-sm">{adminClient?.scale}</p>
+                    <p className="text-sm">{client?.scale}</p>
                   </div>
                 </div>
               </div>
             </div>
           </aside>
           <div className="flex flex-wrap h-8">
-            {adminClient?.specializations.map((specialization) => {
+            {client?.specializations?.map((specialization: string) => {
               if (specialization?.length === 0) {
                 return null
               }

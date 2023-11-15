@@ -5,7 +5,7 @@ import { ColumnDef } from "@tanstack/react-table"
 import { ProducerPriceList } from "@/lib/schemas"
 import { formatDate } from "@/lib/utilities"
 import { Checkbox } from "@/components/ui/checkbox"
-import { PriceControlDropDown } from "@/components/structures/price-dropdown"
+import { PriceControlDropDown } from "@/components/structures/dropdowns/price-dropdown"
 
 export const producerPriceListColumns: ColumnDef<ProducerPriceList>[] = [
   {

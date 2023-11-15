@@ -1,6 +1,6 @@
 import * as z from "zod"
 
-export const AdminAuthSchema = z.object({
+export const AuthSchema = z.object({
   email: z.string().nonempty().email(),
   password: z.string().nonempty(),
 })
@@ -28,7 +28,7 @@ export type ProducerPriceListsResponse = {
 export const ApplicationUserSchema = z.object({
   id: z.string(),
   name: z.string().min(4),
-  short_description: z.string().optional(),
+  short_description: z.string(),
   scale: z.string().nonempty(),
   code: z.string(),
   phone: z.string().min(5),
@@ -114,6 +114,101 @@ export const ProducerPriceListSchema = z.object({
   unit: z.string().nonempty(),
 })
 
+export const ProductSchema = z.object({
+  id: z.string(),
+  name: z.string().nonempty(),
+  descriptions: z.array(
+    z.object({
+      name: z.string(),
+      value: z.string(),
+    }),
+  ),
+  reg_number: z.string(),
+  cat: z.string(),
+  admin: z.object({
+    id: z.string(),
+    name: z.boolean(),
+  }),
+  images: z.array(
+    z.object({
+      img: z.object({
+        id: z.string(),
+        src: z.string(),
+      }),
+    }),
+  ),
+  unit: z.array(
+    z.object({
+      name: z.string().nonempty(),
+      value: z.coerce.number(),
+    })
+  ),
+  manufacturer: z.object({
+    name: z.string(),
+  }),
+  distributor: z.object({
+    name: z.string(),
+  }),
+  warnings: z.array(
+    z.object({
+      name: z.string(),
+      value: z.string(),
+      location: z.string(),
+    }),
+  ),
+  instructions: z.object({
+    usage: z.array(
+      z.object({
+        name: z.string().nonempty(),
+        value: z.string().nonempty(),
+      }),
+    ),
+    examples: z.array(z.object({
+      description: z.string().optional(),
+      values: z.array(z.object({
+        dosage: z.object({
+          unit: z.string(),
+          value: z.number(),
+        }),
+        mass: z.object({
+          unit: z.string(),
+          weight: z.number(),
+        }),
+        pack: z.number()
+      }))
+    })),
+    efficacy_table: z.array(
+      z.object({
+        species: z.string(),
+        third_stage: z.string(),
+        fourth_stage: z.string(),
+        adults: z.string(),
+      }),
+    ),
+    efficacy: z.array(
+      z.object({
+        name: z.string(),
+        value: z.string(),
+      }),
+    ),
+    key_map: z.object({
+      type: z.string(),
+      values: z.array(
+        z.object({
+          name: z.string(),
+          value: z.string(),
+        }),
+      )
+    }),
+  }),
+})
+
+export const FormProductSchema = ProductSchema.omit({
+  admin: true,
+  created: true,
+  updated: true
+})
+
 ApplicationUserSchema.required({
   name: true,
   scale: true,
@@ -128,7 +223,14 @@ ApplicationUserSchema.required({
   type: true,
 })
 
-export const AdminEditApplicationUserSchema = ApplicationUserSchema.pick({
+ProducerPriceListSchema.required({
+  client_id: true,
+  client_name: true,
+  client_specialization: true,
+  effectiveDate: true,
+})
+
+export const EditApplicationUserSchema = ApplicationUserSchema.pick({
   id: true,
   name: true,
   email: true,
@@ -145,17 +247,21 @@ export const AdminEditApplicationUserSchema = ApplicationUserSchema.pick({
   short_description: true,
 })
 
-export const AdminApplicationUserIDSchema = ApplicationUserSchema.pick({
+export const ApplicationUserIDSchema = ApplicationUserSchema.pick({
   id: true,
 })
 
 export type ApplicationUser = z.infer<typeof ApplicationUserSchema>
+export type ApplicationUserID = z.infer<typeof ApplicationUserIDSchema>
+export type EditApplicationUser = z.infer<typeof EditApplicationUserSchema>
+
 export type ProducerPriceList = z.infer<typeof ProducerPriceListSchema>
+export type ProductItem = z.infer<typeof ProductSchema>
+export type FormProductModel = z.infer<typeof FormProductSchema>
 
-export type AdminEditApplicationUser = z.infer<
-  typeof AdminEditApplicationUserSchema
->
-
-export type AdminApplicationUserID = z.infer<
-  typeof AdminApplicationUserIDSchema
->
+export type ImageModel = {
+  img: {
+    id: string,
+    src: string
+  }
+}

@@ -1,12 +1,12 @@
 import { DashboardHeader } from "@/components/state/dashboardHeader"
 import { DashboardShell } from "@/components/state/dashboardShell"
-import { AdminClientsTable } from "@/components/structures/tables/adminClients"
+import { ClientsTable } from "@/components/structures/tables/clients"
 
 export default async function DashboardUsersPage() {
   return (
     <DashboardShell>
-      <DashboardHeader heading="Users" text="Manage Users."></DashboardHeader>
-      <AdminClientsTable />
+      <DashboardHeader heading="Clients" text="Manage Clients."></DashboardHeader>
+      <ClientsTable />
     </DashboardShell>
   )
 }

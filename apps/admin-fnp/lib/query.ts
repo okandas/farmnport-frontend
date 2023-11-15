@@ -3,14 +3,16 @@ import Cookies from "js-cookie"
 import * as z from "zod"
 
 import {
-  AdminApplicationUserID,
-  AdminAuthSchema,
-  AdminEditApplicationUser,
+  ApplicationUserID,
+  AuthSchema,
+  EditApplicationUser,
   ApplicationUser,
   LoginResponse,
   ProducerPriceList,
-  ProducerPriceListsResponse,
+  FormProductModel,
+  ImageModel,
 } from "@/lib/schemas"
+
 
 var base = process.env.NEXT_PUBLIC_BASE_URL
 var version = "/v1"
@@ -30,10 +32,10 @@ api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   return config
 })
 
-type FormData = z.infer<typeof AdminAuthSchema>
+type LoginFormData = z.infer<typeof AuthSchema>
 
 // Administrator
-export function queryAdminLogin(data: FormData) {
+export function queryLogin(data: LoginFormData) {
   var url = `${baseUrl}/user/signin`
   return api.post<LoginResponse>(url, data)
 }
@@ -43,7 +45,7 @@ type pagintion = {
   search?: string
 }
 
-export function queryUsersAsAdmin(pagintion?: pagintion) {
+export function queryUsers(pagintion?: pagintion) {
   var url: string
 
   if (pagintion?.p !== undefined && pagintion.p >= 2) {
@@ -59,12 +61,12 @@ export function queryUsersAsAdmin(pagintion?: pagintion) {
   return api.get(url)
 }
 
-export function queryUserProductPriceListAsAdmin(clientID?: string) {
+export function queryUserProductPriceList(clientID?: string) {
   const url = `${baseUrl}/prices/get/${clientID}/producer_price`
   return api.get(url)
 }
 
-export function queryProducerPriceListsAsAdmin(pagintion?: pagintion) {
+export function queryProducerPriceLists(pagintion?: pagintion) {
   var url: string
 
   if (pagintion?.p !== undefined && pagintion.p >= 2) {
@@ -73,39 +75,80 @@ export function queryProducerPriceListsAsAdmin(pagintion?: pagintion) {
     url = `${baseUrl}/prices/get/producer_prices`
   }
 
-  // if (pagintion?.search !== undefined && pagintion.search.length >= 2) {
-  //   url = `${baseUrl}/user/clients?search=${pagintion.search}`
-  // }
+  if (pagintion?.search !== undefined && pagintion.search.length >= 2) {
+    url = `${baseUrl}/prices/get/producer_prices?search=${pagintion.search}`
+  }
 
   return api.get(url)
 }
 
-export function queryUserAsAdmin(name: string) {
+export function queryUser(name: string) {
   const url = `${baseUrl}/user/${name}`
   return api.get(url)
 }
 
-export function createClientAsAdmin(data: AdminEditApplicationUser) {
+export function createClient(data: EditApplicationUser) {
   var url = `${baseUrl}/user/add_client`
   return api.post(url, data)
 }
 
-export function updateClientAsAdmin(data: AdminEditApplicationUser) {
+export function updateClient(data: EditApplicationUser) {
   var url = `${baseUrl}/user/update_client`
   return api.post(url, data)
 }
 
-export function verifyClientAsAdmin(data: AdminApplicationUserID) {
+export function verifyClient(data: ApplicationUserID) {
   var url = `${baseUrl}/user/verify_client`
   return api.post<ApplicationUser>(url, data)
 }
 
-export function createClientProductPriceListAsAdmin(data: ProducerPriceList) {
+export function createClientProductPriceList(data: ProducerPriceList) {
   var url = `${baseUrl}/prices/add/producer_price`
   return api.post(url, data)
 }
 
-export function updateClientProductPriceListAsAdmin(data: ProducerPriceList) {
+export function updateClientProductPriceList(data: ProducerPriceList) {
   var url = `${baseUrl}/prices/up/producer_price`
+  return api.post(url, data)
+}
+
+export function queryProducts(pagintion?: pagintion) {
+  var url: string
+
+  if (pagintion?.p !== undefined && pagintion.p >= 2) {
+    url = `${baseUrl}/user/products?p=${pagintion.p}`
+  } else {
+    url = `${baseUrl}/user/products`
+  }
+
+  if (pagintion?.search !== undefined && pagintion.search.length >= 2) {
+    url = `${baseUrl}/user/products?search=${pagintion.search}`
+  }
+
+  return api.get(url)
+}
+
+export function addProduct(data: FormProductModel) {
+  var url = `${baseUrl}/user/products/add`
+  return api.post(url, data)
+}
+
+export function queryProduct(id: string) {
+  const url = `${baseUrl}/user/products/${id}`
+  return api.get(url)
+}
+
+export function updateProduct(data: FormProductModel) {
+  var url = `${baseUrl}/user/products/update`
+  return api.post(url, data)
+}
+
+export function uploadImages(data: FormData) {
+  var url = `${baseUrl}/user/image/uploads`
+  return api.post(url, data)
+}
+
+export function removeImage(data: ImageModel) {
+  var url = `${baseUrl}/user/image/remove`
   return api.post(url, data)
 }
