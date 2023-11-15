@@ -23,14 +23,29 @@ export function FileInput({ id, value, onChange }: FileInputProps) {
     const mutationUploadImage = useMutation({
         mutationFn: uploadImages,
         onSuccess: (data) => {
-            const newImages = [...files, ...data.data]
-            onChange(newImages)
-            setFiles(newImages)
+
+            if (data === null) {
+
+                toast({
+                    description: "There seems to be an issue with your upload, please wait and try again or contact admin if it persists.",
+                    action: <ToastAction altText="Try again">Try again</ToastAction>,
+                })
+
+            } else {
+
+                const newImages = [...files, ...data.data]
+                onChange(newImages)
+                setFiles(newImages)
+
+            }
+
         },
         onSettled: () => {
-        }
-    })
+        },
+        onError(error, variables, context) {
 
+        },
+    })
 
     const { getRootProps, getInputProps } = useDropzone({
         multiple: true,
