@@ -39,6 +39,8 @@ export function FileInput({ id, value, onChange }: FileInputProps) {
 
             }
 
+
+
         },
         onSettled: () => {
         },
@@ -85,6 +87,10 @@ export function FileInput({ id, value, onChange }: FileInputProps) {
     const mutationRemoveImage = useMutation({
         mutationFn: removeImage
     })
+
+    if (mutationUploadImage.isSuccess || mutationUploadImage.isError) {
+        mutationUploadImage.reset()
+    }
 
 
     const deleteImage = (image: ImageModel) => {
