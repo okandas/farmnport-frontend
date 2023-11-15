@@ -5,7 +5,13 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'cyan-adults-happen.tunnelapp.dev',
+        hostname: '*.tunnelapp.dev',
+        port: '',
+        pathname: '/storage/images/**'
+      },
+      {
+        protocol: 'https',
+        hostname: 's3.farmnport.com',
         port: '',
         pathname: '/storage/images/**'
       },
