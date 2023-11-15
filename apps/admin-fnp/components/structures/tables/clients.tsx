@@ -27,6 +27,7 @@ export function ClientsTable() {
       queryUsers({
         p: pagination.pageIndex,
       }),
+    refetchOnWindowFocus: false
   })
 
   const clients = data?.data?.data as ApplicationUser[]
