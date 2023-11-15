@@ -7,6 +7,8 @@ import {
 } from "@/lib/schemas"
 import { uploadImages, removeImage } from "@/lib/query"
 import Image from 'next/image'
+import { toast } from "@/components/ui/use-toast"
+import { ToastAction } from "@/components/ui/toast"
 
 interface FileInputProps {
     value: ImageModel[],
@@ -48,6 +50,19 @@ export function FileInput({ id, value, onChange }: FileInputProps) {
 
                 mutationUploadImage.mutate(formData)
             }
+        },
+        onError(err) {
+
+            toast({
+                description: "There seems to be an issue with your uploads, please wait and try again or contact admin.",
+                action: <ToastAction altText="Try again">Try again</ToastAction>,
+            })
+
+            // TODO: add logstash
+            console.log(err)
+
+            mutationUploadImage.reset()
+
         },
 
     })
