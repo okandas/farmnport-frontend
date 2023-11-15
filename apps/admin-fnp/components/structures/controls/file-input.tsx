@@ -19,6 +19,7 @@ interface FileInputProps {
 export function FileInput({ id, value, onChange }: FileInputProps) {
     const [files, setFiles] = useState<ImageModel[]>(value)
     const queryClient = useQueryClient()
+    const entity_id = id
 
     const mutationUploadImage = useMutation({
         mutationFn: uploadImages,
@@ -52,8 +53,8 @@ export function FileInput({ id, value, onChange }: FileInputProps) {
 
             const formData = new FormData()
 
-            if (id !== undefined) {
-                formData.append("entity_id", id)
+            if (entity_id !== undefined) {
+                formData.append("entity_id", entity_id)
             }
 
             if (acceptedFiles.length) {
