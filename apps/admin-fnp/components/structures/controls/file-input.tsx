@@ -24,9 +24,7 @@ export function FileInput({ id, value, onChange }: FileInputProps) {
         mutationFn: uploadImages,
         onSuccess: (data) => {
 
-            console.log(data)
-
-            if (data === null) {
+            if (data.data === null) {
 
                 toast({
                     description: "There seems to be an issue with your upload, please wait and try again or contact admin if it persists.",
