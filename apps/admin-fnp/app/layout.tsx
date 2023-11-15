@@ -3,6 +3,7 @@ import Script from "next/script"
 
 import { cn } from "@/lib/utilities"
 import QueryProvider from "@/components/providers/QueryProvider"
+import { Analytics } from '@vercel/analytics/react'
 
 import "@/styles/globals.css"
 
@@ -51,6 +52,7 @@ export default function RootLayout({ children, modal }: RootLayoutProps) {
         <QueryProvider>
           {children}
           {modal}
+          <Analytics />
         </QueryProvider>
       </body>
     </html>
