@@ -43,7 +43,7 @@ export function FileInput({ id, value, onChange }: FileInputProps) {
         onSettled: () => {
         },
         onError(error, variables, context) {
-
+            console.log(error)
         },
     })
 
@@ -89,6 +89,10 @@ export function FileInput({ id, value, onChange }: FileInputProps) {
     })
 
     if (mutationUploadImage.isSuccess || mutationUploadImage.isError) {
+        toast({
+            description: "There seems to be an issue with your uploads, please wait and try again or contact admin.",
+        })
+
         mutationUploadImage.reset()
     }
 
