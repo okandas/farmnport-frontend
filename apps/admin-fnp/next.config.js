@@ -7,13 +7,13 @@ const nextConfig = {
         protocol: 'https',
         hostname: '*.tunnelapp.dev',
         port: '',
-        pathname: '/storage/images/**'
+        pathname: '/images/**'
       },
       {
         protocol: 'https',
         hostname: 's3.farmnport.com',
         port: '',
-        pathname: '/storage/images/**'
+        pathname: '/images/**'
       },
     ],
   },

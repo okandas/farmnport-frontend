@@ -9,6 +9,8 @@ import { uploadImages, removeImage } from "@/lib/query"
 import Image from 'next/image'
 import { toast } from "@/components/ui/use-toast"
 import { ToastAction } from "@/components/ui/toast"
+import { Logtail } from "@logtail/node"
+import { log } from 'console';
 
 interface FileInputProps {
     value: ImageModel[],
@@ -16,10 +18,13 @@ interface FileInputProps {
     onChange: (value: any) => void
 }
 
+
+
 export function FileInput({ id, value, onChange }: FileInputProps) {
     const [files, setFiles] = useState<ImageModel[]>(value)
     const queryClient = useQueryClient()
     const entity_id = id
+    const logtail = new Logtail("qBaLFyhMa3oZsq86JuRmfwpo")
 
     const mutationUploadImage = useMutation({
         mutationFn: uploadImages,
@@ -43,7 +48,12 @@ export function FileInput({ id, value, onChange }: FileInputProps) {
         onSettled: () => {
         },
         onError(error, variables, context) {
-            console.log(error)
+
+            logtail.error("use mutation error line 52 file input", {
+                error: error
+            })
+
+            logtail.flush()
         },
     })
 
@@ -68,17 +78,18 @@ export function FileInput({ id, value, onChange }: FileInputProps) {
                 mutationUploadImage.mutate(formData)
             }
         },
-        onError(err) {
+        onError(error) {
 
             toast({
                 description: "There seems to be an issue with your uploads, please wait and try again or contact admin.",
-                action: <ToastAction altText="Try again">Try again</ToastAction>,
             })
 
-            // TODO: add logstash
-            console.log(err)
 
-            mutationUploadImage.reset()
+            logtail.error("use dropzone error, line 86", {
+                error: error
+            })
+
+            logtail.flush()
 
         }
 
@@ -88,12 +99,10 @@ export function FileInput({ id, value, onChange }: FileInputProps) {
         mutationFn: removeImage
     })
 
-    if (mutationUploadImage.isSuccess || mutationUploadImage.isError) {
+    if (mutationUploadImage.isError) {
         toast({
             description: "There seems to be an issue with your uploads, please wait and try again or contact admin.",
         })
-
-        mutationUploadImage.reset()
     }
 
 
@@ -116,10 +125,10 @@ export function FileInput({ id, value, onChange }: FileInputProps) {
                 className="inline-flex flex-col overflow-hidden border border-border-200 rounded mt-2 me-2 relative"
                 key={index}
             >
-                <div className="flex items-center justify-center min-w-0 w-16 h-16 overflow-hidden">
+                <div className="flex items-center justify-center min-w-0 w-28 h-16 overflow-hidden">
                     <Image
                         src={file.img.src}
-                        width={64}
+                        width={36}
                         height={64}
                         alt="product preview image"
                     />
