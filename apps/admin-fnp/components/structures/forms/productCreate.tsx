@@ -242,11 +242,13 @@ export function CreateProductForm({ product }: EditFormProps) {
 
 
                     <div className="sm:flex justify-end">
-                        <Button onClick={() =>
+                        <Button onClick={(event) => {
+                            event.preventDefault()
                             append({
                                 name: "",
                                 value: ""
                             })
+                        }
                         }>
                             <Icons.add className="h-4 w-4" /> Add Description
                         </Button>
@@ -352,11 +354,14 @@ export function CreateProductForm({ product }: EditFormProps) {
 
 
                     <div className="sm:flex justify-end">
-                        <Button onClick={() =>
+                        <Button onClick={(event) => {
+                            event.preventDefault()
                             unitAppend({
                                 name: "",
                                 value: 0
                             })
+                        }
+
                         }>
                             <Icons.add className="h-4 w-4" /> Add Unit
                         </Button>
@@ -456,12 +461,15 @@ export function CreateProductForm({ product }: EditFormProps) {
 
 
                     <div className="sm:flex justify-end">
-                        <Button onClick={() =>
+                        <Button onClick={(event) => {
+                            event.preventDefault()
                             warningAppend({
                                 name: "",
                                 value: "",
                                 location: ""
                             })
+                        }
+
                         }>
                             <Icons.add className="h-4 w-4" /> Add Warning
                         </Button>
@@ -534,11 +542,14 @@ export function CreateProductForm({ product }: EditFormProps) {
                     })}
 
                     <div className="sm:flex justify-end">
-                        <Button onClick={() =>
+                        <Button onClick={(event) => {
+                            event.preventDefault()
                             usageAppend({
                                 name: "",
                                 value: ""
                             })
+                        }
+
                         }>
                             <Icons.add className="h-4 w-4" /> Add Usage Instruction
                         </Button>
@@ -660,13 +671,15 @@ export function CreateProductForm({ product }: EditFormProps) {
                     })}
 
                     <div className="sm:flex justify-end">
-                        <Button onClick={() =>
+                        <Button onClick={(event) => {
+                            event.preventDefault()
                             efficacyTableAppend({
                                 species: "",
                                 third_stage: "",
                                 fourth_stage: "",
                                 adults: ""
                             })
+                        }
                         }>
                             <Icons.add className="h-4 w-4" /> Add Efficacy
                         </Button>
@@ -727,11 +740,14 @@ export function CreateProductForm({ product }: EditFormProps) {
                     })}
 
                     <div className="sm:flex justify-end">
-                        <Button onClick={() =>
+                        <Button onClick={(event) => {
+                            event.preventDefault()
                             efficacyAppend({
                                 name: "",
                                 value: ""
                             })
+                        }
+
                         }>
                             <Icons.add className="h-4 w-4" /> Add Efficacy
                         </Button>
@@ -825,11 +841,13 @@ export function CreateProductForm({ product }: EditFormProps) {
 
 
                     <div className="sm:flex justify-end">
-                        <Button onClick={() =>
+                        <Button onClick={(event) => {
+                            event.preventDefault()
                             keyMapValueAppend({
                                 name: "",
                                 value: ""
                             })
+                        }
                         }>
                             <Icons.add className="h-4 w-4" /> Add Key Map
                         </Button>
@@ -884,7 +902,8 @@ export function CreateProductForm({ product }: EditFormProps) {
 
 
                     <div className="sm:flex justify-start">
-                        <Button onClick={() =>
+                        <Button onClick={(event) => {
+                            event.preventDefault()
                             examplesAppend({
                                 description: "",
                                 values: [
@@ -901,6 +920,8 @@ export function CreateProductForm({ product }: EditFormProps) {
                                     }
                                 ]
                             })
+                        }
+
                         }>
                             <Icons.add className="h-4 w-4" /> Add Full Dosage
                         </Button>
