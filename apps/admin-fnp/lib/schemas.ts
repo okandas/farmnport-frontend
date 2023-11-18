@@ -119,8 +119,8 @@ export const ProductSchema = z.object({
   name: z.string().nonempty(),
   descriptions: z.array(
     z.object({
-      name: z.string(),
-      value: z.string(),
+      name: z.string().nonempty(),
+      value: z.string().nonempty(),
     }),
   ),
   reg_number: z.string(),
@@ -140,7 +140,7 @@ export const ProductSchema = z.object({
   unit: z.array(
     z.object({
       name: z.string().nonempty(),
-      value: z.coerce.number(),
+      value: z.coerce.number().nonnegative(),
     })
   ),
   manufacturer: z.object({
@@ -151,9 +151,9 @@ export const ProductSchema = z.object({
   }),
   warnings: z.array(
     z.object({
-      name: z.string(),
-      value: z.string(),
-      location: z.string(),
+      name: z.string().nonempty(),
+      value: z.string().nonempty(),
+      location: z.string().nonempty(),
     }),
   ),
   instructions: z.object({
@@ -167,14 +167,14 @@ export const ProductSchema = z.object({
       description: z.string().optional(),
       values: z.array(z.object({
         dosage: z.object({
-          unit: z.string(),
-          value: z.number(),
+          unit: z.string().nonempty(),
+          value: z.number().nonnegative(),
         }),
         mass: z.object({
-          unit: z.string(),
-          weight: z.number(),
+          unit: z.string().nonempty(),
+          weight: z.number().nonnegative(),
         }),
-        pack: z.number()
+        pack: z.number().nonnegative()
       }))
     })),
     efficacy_table: z.array(
@@ -187,16 +187,16 @@ export const ProductSchema = z.object({
     ),
     efficacy: z.array(
       z.object({
-        name: z.string(),
-        value: z.string(),
+        name: z.string().nonempty(),
+        value: z.string().nonempty(),
       }),
     ),
     key_map: z.object({
       type: z.string(),
       values: z.array(
         z.object({
-          name: z.string(),
-          value: z.string(),
+          name: z.string().nonempty(),
+          value: z.string().nonempty(),
         }),
       )
     }),

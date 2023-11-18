@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useDropzone } from 'react-dropzone';
+import { useDropzone, Accept } from 'react-dropzone';
 import { Icons } from "@/components/icons/lucide"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import {
@@ -10,7 +10,6 @@ import Image from 'next/image'
 import { toast } from "@/components/ui/use-toast"
 import { ToastAction } from "@/components/ui/toast"
 import { Logtail } from "@logtail/node"
-import { log } from 'console';
 
 interface FileInputProps {
     value: ImageModel[],
@@ -57,17 +56,22 @@ export function FileInput({ id, value, onChange }: FileInputProps) {
         },
     })
 
+    const accepts: Accept = {
+        'image/jpeg': [],
+        'image/png': [],
+        'image/webp': []
+    }
+
     const { getRootProps, getInputProps } = useDropzone({
+        accept: accepts,
         multiple: true,
-        onDrop: (acceptedFiles) => {
+        onDrop: (acceptedFiles, fileRejections, event) => {
 
             const formData = new FormData()
 
             if (entity_id !== undefined) {
                 formData.append("entity_id", entity_id)
             }
-
-            console.log(acceptedFiles, acceptedFiles.length)
 
             if (acceptedFiles.length) {
 
@@ -96,28 +100,30 @@ export function FileInput({ id, value, onChange }: FileInputProps) {
     })
 
     const mutationRemoveImage = useMutation({
-        mutationFn: removeImage
+        mutationFn: removeImage,
+        onSuccess(data, variables, context) {
+            const image = variables
+            const retainedImages = files.filter((file: ImageModel) => file.img.id !== image?.img.id)
+            onChange(retainedImages)
+            setFiles(retainedImages)
+        },
+        onError(error, variables, context) {
+            toast({
+                description: "There seems to be an issue with your uploads, please wait and try again or contact admin.",
+            })
+
+            logtail.error("mutation remove - line 110", {
+                error: error
+            })
+
+            logtail.flush()
+
+        },
     })
 
-    if (mutationUploadImage.isError) {
-        toast({
-            description: "There seems to be an issue with your uploads, please wait and try again or contact admin.",
-        })
-    }
-
-
     const deleteImage = (image: ImageModel) => {
-
         mutationRemoveImage.mutate(image)
-
-        if (mutationRemoveImage.isSuccess) {
-            const retainedImages = files.filter((file: ImageModel) => file.img.id !== image.img.id)
-            setFiles(retainedImages)
-            onChange(retainedImages)
-        }
-
     }
-
 
     const thumbnails = files.map((file: ImageModel, index) => {
         {
@@ -135,7 +141,10 @@ export function FileInput({ id, value, onChange }: FileInputProps) {
                 </div>
                 <button
                     className="w-4 h-4 flex items-center justify-center rounded-full bg-red-600 text-xs text-light text-white absolute top-1 end-1 shadow-xl outline-none"
-                    onClick={() => deleteImage(file)}
+                    onClick={(event) => {
+                        event.preventDefault()
+                        deleteImage(file)
+                    }}
                 >
                     {mutationRemoveImage.isPending ? <Icons.spinner width={10} height={10} /> : <Icons.close width={10} height={10} />}
                 </button>

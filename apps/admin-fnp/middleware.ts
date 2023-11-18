@@ -25,7 +25,7 @@ export function middleware(request: NextRequest) {
 
       const decodedSession = jwt_decode<AuthenticatedUser>(token)
 
-      console.log(decodedSession)
+      // console.log(decodedSession)
 
       if (decodedSession.admin) {
         return NextResponse.redirect(new URL("/dashboard", request.url))
