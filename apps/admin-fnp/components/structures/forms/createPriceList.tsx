@@ -66,10 +66,10 @@ export function CreateProductPriceForm({
   const form = useForm({
     defaultValues: {
       id: priceList.id,
-      effectiveDate: new Date(priceList.effectiveDate),
+      effectiveDate: new Date(),
       client_id: priceList.client_id,
       client_name: priceList.client_name,
-      client_specialization: priceList.client_specialization,
+      client_specialization: priceList.client_specialization || 'livestock',
       beef: {
         super: centsToDollarsFormInputs(priceList.beef.super),
         choice: centsToDollarsFormInputs(priceList.beef.choice),
@@ -125,7 +125,7 @@ export function CreateProductPriceForm({
   })
 
   const [searchClient, setSearchClient] = useState("")
-  const [selectedClient, setSelectedClient] = useState(priceList.client_id)
+  const [selectedClient, setSelectedClient] = useState(priceList.client_name)
   const [open, setOpen] = useState(false)
 
   const showBeef = useWatch({
@@ -170,7 +170,7 @@ export function CreateProductPriceForm({
   const router = useRouter()
 
   const { data, isError, refetch } = useQuery({
-    queryKey: ["dashboard-ients", { search: debouncedSearchQuery }],
+    queryKey: ["dashboard-client", { search: debouncedSearchQuery }],
     queryFn: () =>
       queryUsers({
         search: debouncedSearchQuery,
@@ -371,10 +371,10 @@ export function CreateProductPriceForm({
                 <FormMessage />
                 <FormControl>
                   <Popover open={open} onOpenChange={setOpen}>
-                    <PopoverTrigger asChild>
+                    <PopoverTrigger asChild className="w-80">
                       <div className="group min-h-[2.5rem] rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-0">
                         <div className="flex flex-wrap gap-1">
-                          {selectedClient.length > 1 ? (
+                          {selectedClient.length > 1 && open === false ? (
                             <Badge
                               variant="outline"
                               className="flex justify-between text-green-800 bg-green-100 border-green-400"

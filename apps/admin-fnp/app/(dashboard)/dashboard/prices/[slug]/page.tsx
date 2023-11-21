@@ -4,7 +4,7 @@ import Link from "next/link"
 import { useQuery } from "@tanstack/react-query"
 import { isAxiosError } from "axios"
 
-import { queryUserProductPriceList } from "@/lib/query"
+import { queryPriceList } from "@/lib/query"
 import { ProducerPriceList } from "@/lib/schemas"
 import { centsToDollars, cn, formatDate, ucFirst } from "@/lib/utilities"
 import { Button, buttonVariants } from "@/components/ui/button"
@@ -35,7 +35,7 @@ export default function ViewClientProductListPage({
 
   const { isError, isLoading, isFetching, refetch, data } = useQuery({
     queryKey: ["dashboard-client-price", clientID],
-    queryFn: () => queryUserProductPriceList(clientID),
+    queryFn: () => queryPriceList(clientID),
   })
 
   if (isError) {
@@ -171,7 +171,7 @@ export default function ViewClientProductListPage({
       <section className="flex min-h-full flex-col items-center justify-center p-8 text-center">
         <Tabs defaultValue="beef" className="w-[500px]">
           <TabsList className="grid w-full grid-cols-6">
-            {pricingTypes[producerPriceList.client_specialization].map(
+            {pricingTypes[producerPriceList?.client_specialization].map(
               (type, index) => {
                 return (
                   <TabsTrigger key={index} value={type}>
@@ -181,7 +181,7 @@ export default function ViewClientProductListPage({
               },
             )}
           </TabsList>
-          {pricingTypes[producerPriceList.client_specialization].map(
+          {pricingTypes[producerPriceList?.client_specialization].map(
             (pricingType, index) => {
               return (
                 <TabsContent key={index} value={pricingType}>
@@ -223,7 +223,7 @@ export default function ViewClientProductListPage({
                                         <div className="font-medium text-gray-900">
                                           {centsToDollars(
                                             gradePrices[
-                                              key as keyof typeof gradePrices
+                                            key as keyof typeof gradePrices
                                             ],
                                           )}
                                         </div>

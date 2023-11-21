@@ -4,7 +4,7 @@ import Link from "next/link"
 import { useQuery } from "@tanstack/react-query"
 import { isAxiosError } from "axios"
 
-import { queryUserProductPriceList } from "@/lib/query"
+import { queryPriceList } from "@/lib/query"
 import { ProducerPriceList } from "@/lib/schemas"
 import { cn } from "@/lib/utilities"
 import { buttonVariants } from "@/components/ui/button"
@@ -29,7 +29,8 @@ export default function EditProductListPrice({
   const { isError, isLoading, isFetching, refetch, data, isSuccess } = useQuery(
     {
       queryKey: ["dashboard-client-price", clientID],
-      queryFn: () => queryUserProductPriceList(clientID),
+      queryFn: () => queryPriceList(clientID),
+      refetchOnWindowFocus: false
     },
   )
 

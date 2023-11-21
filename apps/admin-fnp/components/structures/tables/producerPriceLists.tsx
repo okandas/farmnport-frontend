@@ -29,7 +29,7 @@ export function ProducePriceLists() {
       }),
   })
 
-  const producePriceLists = data?.data?.data as ProducerPriceList[]
+  const producePriceLists: ProducerPriceList[] = data?.data?.data || []
   const total = data?.data?.total as number
 
   if (isError) {

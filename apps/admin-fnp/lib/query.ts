@@ -61,8 +61,13 @@ export function queryUsers(pagintion?: pagintion) {
   return api.get(url)
 }
 
-export function queryUserProductPriceList(clientID?: string) {
-  const url = `${baseUrl}/prices/get/${clientID}/producer_price`
+export function queryPriceList(priceListID?: string) {
+  const url = `${baseUrl}/prices/get/${priceListID}/producer_price`
+  return api.get(url)
+}
+
+export function queryLatestProductPriceList(clientID?: string) {
+  const url = `${baseUrl}/prices/latest/${clientID}/producer_price`
   return api.get(url)
 }
 

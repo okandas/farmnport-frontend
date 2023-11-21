@@ -122,7 +122,7 @@ export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
   })
 
   const [searchClient, setSearchClient] = useState("")
-  const [selectedClient, setSelectedClient] = useState(priceList.client_id)
+  const [selectedClient, setSelectedClient] = useState(priceList.client_name)
   const [open, setOpen] = useState(false)
 
   const showBeef = useWatch({
@@ -167,7 +167,7 @@ export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
   const router = useRouter()
 
   const { data: searchedClients } = useQuery({
-    queryKey: ["dashboard-lients", { search: debouncedSearchQuery }],
+    queryKey: ["dashboard-client", { search: debouncedSearchQuery }],
     queryFn: () => queryUsers({ search: debouncedSearchQuery }),
     enabled,
   })
@@ -337,54 +337,9 @@ export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
                 <FormLabel>Client</FormLabel>
                 <FormMessage />
                 <FormControl>
-                  <Popover open={open} onOpenChange={setOpen}>
-                    <PopoverTrigger asChild>
-                      <div className="group min-h-[2.5rem] rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-0">
-                        <div className="flex flex-wrap gap-1">
-                          {selectedClient.length > 1 ? (
-                            <Badge
-                              variant="outline"
-                              className="flex justify-between text-green-800 bg-green-100 border-green-400"
-                            >
-                              {selectedClient}
-                            </Badge>
-                          ) : (
-                            "Select Client For Pricing List ..."
-                          )}
-                        </div>
-                      </div>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-[320px] p-0">
-                      <Command shouldFilter={false}>
-                        <CommandInput
-                          value={searchClient}
-                          onValueChange={setSearchClient}
-                          placeholder="Search..."
-                        />
-
-                        {clients?.length > 0 ? (
-                          <CommandList className="mb-8 max-h-[150px]">
-                            {clients.map((client) => {
-                              return (
-                                <CommandItem
-                                  key={client.id}
-                                  value={client.id}
-                                  onSelect={(value) => {
-                                    form.setValue("client_id", value)
-                                    setSelectedClient(client.name)
-                                    setOpen(false)
-                                    setSearchClient("")
-                                  }}
-                                >
-                                  <span>{client.name}</span>
-                                </CommandItem>
-                              )
-                            })}
-                          </CommandList>
-                        ) : null}
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
+                  <div className="text-green-800 bg-green-100 border-green-400 group min-h-[2.5rem] rounded-md border px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-0">
+                    {selectedClient}
+                  </div>
                 </FormControl>
               </FormItem>
             )}
