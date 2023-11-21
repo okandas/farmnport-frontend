@@ -66,6 +66,11 @@ export function queryPriceList(priceListID?: string) {
   return api.get(url)
 }
 
+export function queryLatestProductPriceList(clientID?: string) {
+  const url = `${baseUrl}/prices/latest/${clientID}/producer_price`
+  return api.get(url)
+}
+
 export function queryProducerPriceLists(pagintion?: pagintion) {
   var url: string
 

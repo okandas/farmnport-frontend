@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query"
 import { isAxiosError } from "axios"
 
-import { queryUser, queryUserProductPriceList } from "@/lib/query"
+import { queryUser, queryLatestProductPriceList } from "@/lib/query"
 import { ApplicationUser, ProducerPriceList } from "@/lib/schemas"
 import { centsToDollars, cn, formatDate, ucFirst } from "@/lib/utilities"
 import { Button } from "@/components/ui/button"
@@ -41,7 +41,7 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
 
   const { data: priceListData } = useQuery({
     queryKey: ["dashboard-nt-price", clientID],
-    queryFn: () => queryUserProductPriceList(clientID),
+    queryFn: () => queryLatestProductPriceList(clientID),
   })
 
   const latestProducerPriceList = priceListData?.data as ProducerPriceList
