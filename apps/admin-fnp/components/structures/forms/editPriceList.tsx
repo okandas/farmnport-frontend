@@ -337,7 +337,7 @@ export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
                 <FormLabel>Client</FormLabel>
                 <FormMessage />
                 <FormControl>
-                  <div className="text-green-800 bg-green-100 border-green-400 group min-h-[2.5rem] rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-0">
+                  <div className="text-green-800 bg-green-100 border-green-400 group min-h-[2.5rem] rounded-md border px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-0">
                     {selectedClient}
                   </div>
                 </FormControl>
