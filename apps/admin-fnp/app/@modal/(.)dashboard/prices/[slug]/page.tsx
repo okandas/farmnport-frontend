@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation"
 import { useQuery } from "@tanstack/react-query"
 import { isAxiosError } from "axios"
 
-import { queryUserProductPriceList } from "@/lib/query"
+import { queryPriceList } from "@/lib/query"
 import { ProducerPriceList } from "@/lib/schemas"
 import { centsToDollars, cn, formatDate, ucFirst } from "@/lib/utilities"
 import { Card, CardContent, CardDescription } from "@/components/ui/card"
@@ -33,7 +33,7 @@ export default function ViewClientProductListDialog({
 
   const { isError, isLoading, isFetching, refetch, data } = useQuery({
     queryKey: ["dashboard-lient-price", clientID],
-    queryFn: () => queryUserProductPriceList(clientID),
+    queryFn: () => queryPriceList(clientID),
   })
 
   const router = useRouter()
@@ -70,7 +70,7 @@ export default function ViewClientProductListDialog({
 
     return (
       <Dialog open onOpenChange={handleOnOpenChange}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[425px] border-none">
           <div className="mt-20">
             <Placeholder>
               <Placeholder.Icon name="close" />
@@ -88,7 +88,7 @@ export default function ViewClientProductListDialog({
   if (isLoading || isFetching) {
     return (
       <Dialog open onOpenChange={handleOnOpenChange}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[425px] border-none">
           <Placeholder>
             <Placeholder.Icon name="search" />
             <Placeholder.Title>Is Fetching Producer Price</Placeholder.Title>
@@ -183,7 +183,7 @@ export default function ViewClientProductListDialog({
         <section className="flex flex-col items-center justify-center min-h-full p-8 text-center">
           <Tabs defaultValue="beef" className="w-[500px]">
             <TabsList className="grid w-full grid-cols-6">
-              {pricingTypes[producerPriceList.client_specialization].map(
+              {pricingTypes[producerPriceList?.client_specialization].map(
                 (type, index) => {
                   return (
                     <TabsTrigger key={index} value={type}>
@@ -193,7 +193,7 @@ export default function ViewClientProductListDialog({
                 },
               )}
             </TabsList>
-            {pricingTypes[producerPriceList.client_specialization].map(
+            {pricingTypes[producerPriceList?.client_specialization].map(
               (pricingType, index) => {
                 return (
                   <TabsContent key={index} value={pricingType}>
@@ -219,7 +219,7 @@ export default function ViewClientProductListDialog({
 
                                 return (
                                   <li
-                                    className="overflow-hidden border border-gray-200 rounded-xl"
+                                    className="overflow-hidden rounded-xl"
                                     key={index}
                                   >
                                     <dl className="px-6 py-4 -my-3 text-sm leading-6 divide-y divide-gray-100">
@@ -231,8 +231,9 @@ export default function ViewClientProductListDialog({
                                           <div className="font-medium text-gray-900">
                                             {centsToDollars(
                                               gradePrices[
-                                                key as keyof typeof gradePrices
+                                              key as keyof typeof gradePrices
                                               ],
+
                                             )}
                                           </div>
 
