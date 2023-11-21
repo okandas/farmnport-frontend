@@ -11,7 +11,7 @@ export default function CreateClientPage() {
     effectiveDate: new Date(),
     client_id: "",
     client_name: "",
-    client_specialization: "",
+    client_specialization: "livestock",
     beef: {
       super: 0,
       choice: 0,
