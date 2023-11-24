@@ -208,37 +208,6 @@ export function EditForm({ client }: EditFormProps) {
                 </FormItem>
               )}
             />
-
-            <FormField
-              control={form.control}
-              name="province"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Paynent Terms</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={client?.province}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select Province..." />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent className="overflow-visible max-h-44">
-                      {provinces.map((province) => {
-                        return (
-                          <SelectItem key={province} value={province}>
-                            {province}
-                          </SelectItem>
-                        )
-                      })}
-                    </SelectContent>
-                  </Select>
-                  <FormDescription></FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
           </div>
 
           <FormField
@@ -558,6 +527,37 @@ export function EditForm({ client }: EditFormProps) {
                     ? "These are total the places of business you sell from ."
                     : "This are total places of business you supply to."}
                 </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="province"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Payment Terms</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={client?.province}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select Province..." />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent className="overflow-visible max-h-44">
+                    {provinces.map((province) => {
+                      return (
+                        <SelectItem key={province} value={province}>
+                          {province}
+                        </SelectItem>
+                      )
+                    })}
+                  </SelectContent>
+                </Select>
+                <FormDescription></FormDescription>
                 <FormMessage />
               </FormItem>
             )}

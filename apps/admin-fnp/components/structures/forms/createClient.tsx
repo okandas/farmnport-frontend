@@ -344,18 +344,18 @@ export function CreateForm({ client }: CreateFormProps) {
                         <div className="flex flex-wrap gap-1">
                           {selectedSpecializations.length > 1
                             ? selectedSpecializations?.map((selected) => {
-                                if (selected.length !== 0) {
-                                  return (
-                                    <Badge
-                                      key={selected}
-                                      variant="outline"
-                                      className="flex justify-between text-green-800 bg-green-100 border-green-400"
-                                    >
-                                      {selected}
-                                    </Badge>
-                                  )
-                                }
-                              })
+                              if (selected.length !== 0) {
+                                return (
+                                  <Badge
+                                    key={selected}
+                                    variant="outline"
+                                    className="flex justify-between text-green-800 bg-green-100 border-green-400"
+                                  >
+                                    {selected}
+                                  </Badge>
+                                )
+                              }
+                            })
                             : "Select Specialization ..."}
                         </div>
                       </div>
@@ -516,6 +516,37 @@ export function CreateForm({ client }: CreateFormProps) {
                     ? "These are total the places of business you sell from ."
                     : "This are total places of business you supply to."}
                 </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="province"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Payment Terms</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={client?.province}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select Province..." />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent className="overflow-visible max-h-44">
+                    {provinces.map((province) => {
+                      return (
+                        <SelectItem key={province} value={province}>
+                          {province}
+                        </SelectItem>
+                      )
+                    })}
+                  </SelectContent>
+                </Select>
+                <FormDescription></FormDescription>
                 <FormMessage />
               </FormItem>
             )}
