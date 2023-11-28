@@ -53,6 +53,7 @@ import {
   provinces,
   scales,
   specializations,
+  paymentTerms
 } from "@/components/structures/data/data"
 
 interface CreateFormProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -76,6 +77,7 @@ export function CreateForm({ client }: CreateFormProps) {
       scale: client?.scale,
       branches: client?.branches,
       short_description: client?.short_description,
+      payment_terms: client?.payment_terms
     },
     resolver: zodResolver(EditApplicationUserSchema),
   })
@@ -344,18 +346,18 @@ export function CreateForm({ client }: CreateFormProps) {
                         <div className="flex flex-wrap gap-1">
                           {selectedSpecializations.length > 1
                             ? selectedSpecializations?.map((selected) => {
-                                if (selected.length !== 0) {
-                                  return (
-                                    <Badge
-                                      key={selected}
-                                      variant="outline"
-                                      className="flex justify-between text-green-800 bg-green-100 border-green-400"
-                                    >
-                                      {selected}
-                                    </Badge>
-                                  )
-                                }
-                              })
+                              if (selected.length !== 0) {
+                                return (
+                                  <Badge
+                                    key={selected}
+                                    variant="outline"
+                                    className="flex justify-between text-green-800 bg-green-100 border-green-400"
+                                  >
+                                    {selected}
+                                  </Badge>
+                                )
+                              }
+                            })
                             : "Select Specialization ..."}
                         </div>
                       </div>
@@ -516,6 +518,36 @@ export function CreateForm({ client }: CreateFormProps) {
                     ? "These are total the places of business you sell from ."
                     : "This are total places of business you supply to."}
                 </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="payment_terms"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Payment Terms</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={client?.payment_terms}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select Province..." />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent className="overflow-visible max-h-44">
+                    {paymentTerms.map((payment: string, index: number) => {
+                      return (
+                        <SelectItem key={index} value={payment}>
+                          {payment}
+                        </SelectItem>
+                      )
+                    })}
+                  </SelectContent>
+                </Select>
+                <FormDescription></FormDescription>
                 <FormMessage />
               </FormItem>
             )}

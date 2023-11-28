@@ -58,6 +58,7 @@ import {
   provinces,
   scales,
   specializations,
+  paymentTerms
 } from "../data/data"
 
 interface EditFormProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -81,6 +82,7 @@ export function EditForm({ client }: EditFormProps) {
       scale: client?.scale,
       branches: client?.branches,
       short_description: client?.short_description,
+      payment_terms: client?.payment_terms
     },
     resolver: zodResolver(EditApplicationUserSchema),
   })
@@ -203,37 +205,6 @@ export function EditForm({ client }: EditFormProps) {
                   <FormControl>
                     <Input placeholder="Phone Number" {...field} />
                   </FormControl>
-                  <FormDescription></FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="province"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Paynent Terms</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={client?.province}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select Province..." />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent className="overflow-visible max-h-44">
-                      {provinces.map((province) => {
-                        return (
-                          <SelectItem key={province} value={province}>
-                            {province}
-                          </SelectItem>
-                        )
-                      })}
-                    </SelectContent>
-                  </Select>
                   <FormDescription></FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -558,6 +529,37 @@ export function EditForm({ client }: EditFormProps) {
                     ? "These are total the places of business you sell from ."
                     : "This are total places of business you supply to."}
                 </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="payment_terms"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Payment Terms</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={client?.payment_terms}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select Province..." />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent className="overflow-visible max-h-44">
+                    {paymentTerms.map((payment, index) => {
+                      return (
+                        <SelectItem key={index} value={payment}>
+                          {payment}
+                        </SelectItem>
+                      )
+                    })}
+                  </SelectContent>
+                </Select>
+                <FormDescription></FormDescription>
                 <FormMessage />
               </FormItem>
             )}
