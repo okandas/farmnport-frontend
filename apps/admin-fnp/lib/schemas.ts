@@ -54,6 +54,7 @@ export const ApplicationUserSchema = z.object({
     coordinates: z.array(z.number()),
   }),
   verified: z.boolean(),
+  payment_terms: z.string(),
 })
 
 export const ProducerPriceListSchema = z.object({
@@ -245,6 +246,7 @@ export const EditApplicationUserSchema = ApplicationUserSchema.pick({
   scale: true,
   branches: true,
   short_description: true,
+  payment_terms: true
 })
 
 export const ApplicationUserIDSchema = ApplicationUserSchema.pick({

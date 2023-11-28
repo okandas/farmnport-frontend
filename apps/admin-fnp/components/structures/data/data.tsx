@@ -58,3 +58,5 @@ export const mainActivity: Record<string, string[]> = {
 }
 
 export const units = ["kg"]
+
+export const paymentTerms = ["Next Day", "2 weeks", "30 Days", "60 Days"]

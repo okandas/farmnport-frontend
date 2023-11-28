@@ -53,6 +53,7 @@ import {
   provinces,
   scales,
   specializations,
+  paymentTerms
 } from "@/components/structures/data/data"
 
 interface CreateFormProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -76,6 +77,7 @@ export function CreateForm({ client }: CreateFormProps) {
       scale: client?.scale,
       branches: client?.branches,
       short_description: client?.short_description,
+      payment_terms: client?.payment_terms
     },
     resolver: zodResolver(EditApplicationUserSchema),
   })
@@ -520,16 +522,15 @@ export function CreateForm({ client }: CreateFormProps) {
               </FormItem>
             )}
           />
-
           <FormField
             control={form.control}
-            name="province"
+            name="payment_terms"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Payment Terms</FormLabel>
                 <Select
                   onValueChange={field.onChange}
-                  defaultValue={client?.province}
+                  defaultValue={client?.payment_terms}
                 >
                   <FormControl>
                     <SelectTrigger>
@@ -537,10 +538,10 @@ export function CreateForm({ client }: CreateFormProps) {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent className="overflow-visible max-h-44">
-                    {provinces.map((province) => {
+                    {paymentTerms.map((payment: string, index: number) => {
                       return (
-                        <SelectItem key={province} value={province}>
-                          {province}
+                        <SelectItem key={index} value={payment}>
+                          {payment}
                         </SelectItem>
                       )
                     })}
