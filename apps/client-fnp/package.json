@@ -1,5 +1,5 @@
 {
-  "name": "admin-farmnport",
+  "name": "client-farmnport",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -8,8 +8,10 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@sentry/nextjs": "^7.76.0",
     "@tailwindcss/typography": "^0.5.9",
-    "next": "13.4.8",
+    "next": "14.0.3",
+    "next-themes": "^0.2.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "tailwindcss-animate": "^1.0.6"

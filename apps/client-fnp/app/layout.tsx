@@ -8,8 +8,8 @@ const fontSans = FontSans({
 })
 
 export const metadata = {
-  title: "farmnport",
-  description: "Getting you to market",
+  title: "Farmnport - Getting you to market",
+  description: "",
 }
 interface RootLayoutProps {
   children: React.ReactNode
