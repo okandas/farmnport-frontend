@@ -21,6 +21,7 @@ export default function CreateClientPage() {
     scale: "",
     branches: 0,
     short_description: "",
+    payment_terms: ""
   })
 
   return <CreateForm client={client} />

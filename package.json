@@ -11,6 +11,9 @@
     "build:admin-fnp": "nepnpm --filter  ./apps/admin-fnp run build",
     "start:admin-fnp": "pnpm --filter  ./apps/admin-fnp run start",
     "lint:admin-fnp": "pnpm --filter  ./apps/admin-fnp run lint",
-    "dev:client-fnp": "pnpm --filter  ./apps/client-fnp run dev"
+    "dev:client-fnp": "pnpm --filter  ./apps/client-fnp run dev",
+    "build:client-fnp": "nepnpm --filter  ./apps/client-fnp run build",
+    "start:client-fnp": "pnpm --filter  ./apps/client-fnp run start",
+    "lint:client-fnp": "pnpm --filter  ./apps/client-fnp run lint"
   }
 }
