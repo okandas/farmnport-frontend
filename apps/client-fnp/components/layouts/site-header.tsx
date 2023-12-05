@@ -3,6 +3,7 @@ import Link from "next/link"
 import { siteConfig } from "@/config/site"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button, buttonVariants } from "@/components/ui/button"
+import { ThemeSwitcher } from "@/components/ui/theme-switcher"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -93,6 +94,7 @@ export function SiteHeader({ user }: SiteHeaderProps) {
                                 <span className="sr-only">Sign Up</span>
                             </Link>
                         )}
+                        < ThemeSwitcher />
                     </nav>
                 </div>
             </div>
