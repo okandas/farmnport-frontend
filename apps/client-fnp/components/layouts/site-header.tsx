@@ -1,6 +1,8 @@
-import Link from "next/link"
+'use client'
 
-import { siteConfig } from "@/config/site"
+import Link from "next/link"
+import { sendGTMEvent } from '@next/third-parties/google'
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { ThemeSwitcher } from "@/components/ui/theme-switcher"
@@ -11,7 +13,6 @@ import {
     DropdownMenuItem,
     DropdownMenuLabel,
     DropdownMenuSeparator,
-    DropdownMenuShortcut,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
@@ -32,7 +33,7 @@ export function SiteHeader({ user }: SiteHeaderProps) {
                 <MobileNav />
                 <div className="flex flex-1 items-center justify-end space-x-4">
                     <nav className="flex items-center space-x-2">
-                        <Button
+                        <Button onClick={() => sendGTMEvent({ event: 'link', value: 'BuyerTopNavigation' })}
                             className={buttonVariants({
                                 size: "sm",
                                 variant: "secondary"
