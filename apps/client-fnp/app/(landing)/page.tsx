@@ -1,5 +1,6 @@
 "use client"
 
+import { sendGTMEvent } from '@next/third-parties/google'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Image, { ImageProps } from "next/image"
 import { Button } from "@/components/ui/button"
@@ -31,8 +32,8 @@ export default function LandingPage() {
                             <p className="mt-6 leading-normal text-muted-foreground sm:text-xl sm:leading-8">Its never been easier to pre plan your harvest sales, with fresh farm produce buyers at the tip of your fingers. Farmnport the best pace to find buyers for your agriproduce.</p>
                             <div className="mt-10 flex items-center gap-x-6">
                                 <TabsList className="">
-                                    <TabsTrigger value="farmers"><span className="mr-1">For Farmers</span>  <span aria-hidden="true">&rarr;</span></TabsTrigger>
-                                    <TabsTrigger value="buyers"><span className="mr-1">Buyer Management</span>  <span aria-hidden="true">&#8644;</span></TabsTrigger>
+                                    <TabsTrigger value="farmers" onClick={() => sendGTMEvent({ event: 'view', value: 'FarmerFaqTab' })}><span className="mr-1">For Farmers</span>  <span aria-hidden="true">&rarr;</span></TabsTrigger>
+                                    <TabsTrigger value="buyers" onClick={() => sendGTMEvent({ event: 'view', value: 'BuyerManagementTab' })}><span className="mr-1">Buyer Management</span>  <span aria-hidden="true">&#8644;</span></TabsTrigger>
                                 </TabsList>
                             </div>
                         </div>
@@ -166,7 +167,7 @@ function FarmerInfo() {
                     <Info key={infoIndex} info={info} />
                 ))}
             </ol>
-            <Button variant="secondary" className="group mt-6 w-full">
+            <Button variant="secondary" className="group mt-6 w-full" onClick={() => sendGTMEvent({ event: 'link', value: 'SignupFaqNavigation' })}>
                 Get Started
                 <ArrowDownIcon className="h-4 w-4 stroke-zinc-400 transition group-active:stroke-zinc-600 dark:group-hover:stroke-zinc-50 dark:group-active:stroke-zinc-50" />
             </Button>
@@ -240,20 +241,20 @@ function BuyerFaqs() {
                             <>
                                 <div className="relative flex h-6 w-6 flex-none items-center justify-center bg-background">
                                     {activityItem.type === 'paid' ? (
-                                        <Icons.clipboardCheck className="h-6 w-6 text-orange-600" aria-hidden="true" />
+                                        <Icons.clipboardCheck className="h-6 w-6 text-indigo-600" aria-hidden="true" />
                                     ) : (
                                         <div className="h-1.5 w-1.5 rounded-full bg-gray-100 ring-1 ring-gray-300" />
                                     )}
                                 </div>
                                 <p className="flex-auto py-0.5 text-xs leading-5 ">
-                                    <span className="font-medium text-muted-foreground">{activityItem.description.name}</span> {activityItem.type}.
+                                    <span className="font-medium text-muted-foreground">{activityItem.description.name}</span>
                                 </p>
                             </>
                         )}
                     </li>
                 ))}
             </ul>
-            <Button variant="secondary" className="group mt-6 w-full">
+            <Button variant="secondary" className="group mt-6 w-full" onClick={() => sendGTMEvent({ event: 'link', value: 'BuyerFaqNavigation' })}>
                 View Buyers
                 <ArrowDownIcon className="h-4 w-4 stroke-zinc-400 transition group-active:stroke-zinc-600 dark:group-hover:stroke-zinc-50 dark:group-active:stroke-zinc-50" />
             </Button>
