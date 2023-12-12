@@ -1,9 +1,11 @@
 import { Inter as FontSans } from "next/font/google"
+import localFont from "next/font/local"
 import { GoogleTagManager } from '@next/third-parties/google'
 
 import { QueryProvider } from "@/components/providers/QueryProvider"
 import { ThemeProvider } from "@/components/providers/ThemeProvider"
 import { cn } from "@/lib/utilities"
+
 
 import "@/styles/globals.css"
 
@@ -12,9 +14,14 @@ const fontSans = FontSans({
   variable: "--font-sans",
 })
 
+const fontHeading = localFont({
+  src: "../assets/fonts/CalSans-SemiBold.woff2",
+  variable: "--font-heading",
+})
+
 export const metadata = {
   title: "Farmnport - Getting you to market",
-  description: "",
+  description: "Buyers, Exporters, Farmers, Importers in the livestock, cattle, horticulture, poultry, aquaculture, grain, seed, dairy and plantation Agriculture Agri Business.",
 }
 interface RootLayoutProps {
   children: React.ReactNode
@@ -30,7 +37,8 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <body
           className={cn(
             "min-h-screen bg-background font-sans antialiased",
-            fontSans.variable
+            fontSans.variable,
+            fontHeading.variable
           )}
         >
           <ThemeProvider
