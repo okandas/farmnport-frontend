@@ -48,9 +48,8 @@ export default function LandingPage() {
                     </div>
                 </div>
             </Tabs>
-
+            <FeaturedPopularSection />
             <CTAPrices />
-
         </main>
     )
 }
@@ -159,7 +158,7 @@ function FarmerInfo() {
     ]
 
     return (
-        <div className="rounded-2xl border border-zinc-100 p-6 dark:border-zinc-700/40">
+        <div className="rounded-lg border border-zinc-100 p-6 dark:border-zinc-700/40">
             <h2 className="flex text-sm font-semibold text-zinc-900 dark:text-zinc-100">
                 <BriefcaseIcon className="h-6 w-6 flex-none" />
                 <span className="ml-3">How we help you succeed.</span>
@@ -264,7 +263,7 @@ function CTAPrices() {
     return (
         <div className='mx-auto max-w-7xl'>
             <div className="px-9 lg:flex lg:items-center lg:justify-between">
-                <h2 className="text-3xl max-w-2xl font-bold tracking-tight sm:text-4xl">
+                <h2 className="text-3xl max-w-2xl font-bold tracking-tight sm:text-4xl font-heading">
                     Prices Anyone?
                     <br />
                     See what prices buyers are buying farm produce for today.
@@ -279,4 +278,75 @@ function CTAPrices() {
     )
 }
 
+function FeaturedPopularSection() {
 
+    const markets = [
+        {
+            name: 'Chicken',
+            message: 'Find Chicken, Broiler Buyers in Zimbabwe, Make Poultry Farming Profitable for You.',
+            logo: logoPlanning,
+        },
+        {
+            name: 'Pork',
+            message: 'Find Pig, Pork, Porker Buyers in Zimbabwe, Make Livestock Farming Profitable for You.',
+            email: 'leslie.alexander@example.com',
+            logo: logoPlanning,
+        },
+        {
+            name: 'Onions',
+            message: 'Find Onion Buyers in Zimbabwe, Make Horticulture Farming Profitable for You.',
+            logo: logoPlanning,
+        },
+        {
+            name: 'Cattle',
+            message: 'Find Cattle Buyers in Zimbabwe, Make Ranching, Livestock Farming Profitable for You.',
+
+            logo: logoPlanning,
+        },
+        {
+            name: 'Tomatoes',
+            message: 'Find Tomato Buyers in Zimbabwe, Make Horticulture Farming Profitable for You.',
+            logo: logoPlanning,
+        },
+        {
+            name: 'Ground Nuts',
+            message: 'Find Ground Nut Buyers in Zimbabwe, Make Horticulture Farming Profitable for You.',
+            logo: logoPlanning,
+        },
+    ]
+
+
+    return (
+        <div className="">
+            <div className="mx-auto max-w-7xl px-6 lg:px-8">
+                <div className="mx-auto max-w-2xl lg:mx-0">
+                    <h2 className="text-3xl font-bold tracking-tight font-heading sm:text-4xl">
+                        Our most popular markets!
+                    </h2>
+                    <p className="mt-6 text-lg leading-8 text-muted-foreground">
+                        These agri produce markets are the most searched for by farmers looking to sell, market their fresh produce.
+                    </p>
+                </div>
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 pt-4 pb-12 lg:pb-20 lg:pt-16">
+                    {markets.map((market) => (
+                        <div
+                            key={market.email}
+                            className="relative flex items-center space-x-3 bg-card text-card-foreground shadow-sm rounded-lg  border border-zinc-100 p-6 dark:border-zinc-700/40 px-6 py-5 "
+                        >
+                            <div className="relative mt-1 flex h-10 w-10 flex-none items-center justify-center rounded-full shadow-md shadow-zinc-800/5 ring-1 ring-zinc-900/5 dark:border dark:border-zinc-700/50 dark:bg-zinc-800 dark:ring-0">
+                                <Image src={market.logo} alt="" className="h-7 w-7" unoptimized />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                                <a href="#" className="focus:outline-none">
+                                    <span className="absolute inset-0" aria-hidden="true" />
+                                    <p className="text-lg font-medium">{market.name}</p>
+                                    <p className="text-base text-muted-foreground pt-1">{market.message}</p>
+                                </a>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
+    )
+}
