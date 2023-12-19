@@ -9,6 +9,12 @@ import logoInputs from '@/assets/logos/inputs.svg'
 import logoGuidance from '@/assets/logos/guidance.svg'
 import logoPlanning from '@/assets/logos/planning.svg'
 import logoResearch from '@/assets/logos/research.svg'
+import logoChicken from '@/assets/logos/chicken.svg'
+import logoPig from '@/assets/logos/pig.svg'
+import logoCattle from '@/assets/logos/cattle.svg'
+import logoGroundNut from '@/assets/logos/groundnut.svg'
+import logoTomato from '@/assets/logos/tomato.svg'
+import logoOnion from '@/assets/logos/onion.svg'
 
 import { cn } from "@/lib/utilities"
 import { Icons } from "@/components/icons/lucide"
@@ -176,34 +182,35 @@ function FarmerInfo() {
     )
 }
 
-const activity = [
-    { id: 1, type: 'faq', description: { name: 'Do they pay on time ?' } },
-
-    {
-        id: 2,
-        type: 'commented',
-        description: {
-            name: 'Guides and Reviews',
-            imageUrl:
-                'https://images.unsplash.com/photo-1635850967683-17df1f33e749?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-        },
-        comment: 'Find out when and how buyers pay their invoices?'
-    },
-    { id: 3, type: 'faq', description: { name: 'Buyer Standards.' } },
-    {
-        id: 2,
-        type: 'commented',
-        description: {
-            name: 'Trust and Professionalism',
-            imageUrl:
-                'https://images.unsplash.com/photo-1521791136064-7986c2920216?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-        },
-        comment: 'Are buyers professional in their operations and give fair value for produce purchased..'
-    },
-    { id: 5, type: 'paid', description: { name: 'Stay ahead and achieve profitability in agriculture!' } },
-]
 
 function BuyerFaqs() {
+
+    const activity = [
+        { id: 1, type: 'faq', description: { name: 'Do they pay on time ?' } },
+
+        {
+            id: 2,
+            type: 'commented',
+            description: {
+                name: 'Guides and Reviews',
+                imageUrl:
+                    'https://images.unsplash.com/photo-1635850967683-17df1f33e749?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+            },
+            comment: 'Find out when and how buyers pay their invoices?'
+        },
+        { id: 3, type: 'faq', description: { name: 'Buyer Standards.' } },
+        {
+            id: 2,
+            type: 'commented',
+            description: {
+                name: 'Trust and Professionalism',
+                imageUrl:
+                    'https://images.unsplash.com/photo-1521791136064-7986c2920216?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+            },
+            comment: 'Are buyers professional in their operations and give fair value for produce purchased..'
+        },
+        { id: 5, type: 'paid', description: { name: 'Stay ahead and achieve profitability in agriculture!' } },
+    ]
 
     return (
         <>
@@ -284,34 +291,34 @@ function FeaturedPopularSection() {
         {
             name: 'Chicken',
             message: 'Find Chicken, Broiler Buyers in Zimbabwe, Make Poultry Farming Profitable for You.',
-            logo: logoPlanning,
+            logo: logoChicken,
         },
         {
             name: 'Pork',
             message: 'Find Pig, Pork, Porker Buyers in Zimbabwe, Make Livestock Farming Profitable for You.',
             email: 'leslie.alexander@example.com',
-            logo: logoPlanning,
+            logo: logoPig,
         },
         {
             name: 'Onions',
             message: 'Find Onion Buyers in Zimbabwe, Make Horticulture Farming Profitable for You.',
-            logo: logoPlanning,
+            logo: logoOnion,
         },
         {
             name: 'Cattle',
-            message: 'Find Cattle Buyers in Zimbabwe, Make Ranching, Livestock Farming Profitable for You.',
+            message: 'Find Cattle Buyers in Zimbabwe, Make Ranching, Dairy, Livestock Farming Profitable for You.',
 
-            logo: logoPlanning,
+            logo: logoCattle,
         },
         {
             name: 'Tomatoes',
             message: 'Find Tomato Buyers in Zimbabwe, Make Horticulture Farming Profitable for You.',
-            logo: logoPlanning,
+            logo: logoTomato,
         },
         {
             name: 'Ground Nuts',
             message: 'Find Ground Nut Buyers in Zimbabwe, Make Horticulture Farming Profitable for You.',
-            logo: logoPlanning,
+            logo: logoGroundNut,
         },
     ]
 
