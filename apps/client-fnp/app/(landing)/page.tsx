@@ -20,7 +20,7 @@ export default function LandingPage() {
         <main>
             <Tabs defaultValue="farmers">
                 <div className="mx-auto max-w-7xl lg:grid lg:grid-cols-12 lg:gap-x-8 lg:px-8">
-                    <div className="px-6 pb-24 pt-3 sm:pb-32 lg:col-span-7 lg:px-0 lg:pb-16 lg:pt-7 xl:col-span-6">
+                    <div className="px-9 pt-3 pb-6 lg:col-span-7 lg:px-0 lg:pb-16 lg:pt-7 xl:col-span-6">
                         <div className="mx-auto max-w-2xl lg:mx-0">
 
                             <div className="mt-12 mb-8 sm:mt-32 sm:flex lg:mt-16">
@@ -38,7 +38,7 @@ export default function LandingPage() {
                             </div>
                         </div>
                     </div>
-                    <div className="relative px-6 pb-24 pt-3 sm:pb-32 lg:col-span-5 lg:-mr-8 lg:px-0 lg:pb-16 lg:pt-7 xl:col-span-5">
+                    <div className="relative px-6 pb-10 sm:pb-32 lg:col-span-5 lg:-mr-8 lg:px-0 lg:pb-16 lg:pt-7 xl:col-span-5">
                         <TabsContent value="farmers">
                             <FarmerInfo />
                         </TabsContent>
@@ -48,6 +48,8 @@ export default function LandingPage() {
                     </div>
                 </div>
             </Tabs>
+
+            <CTAPrices />
 
         </main>
     )
@@ -175,8 +177,6 @@ function FarmerInfo() {
     )
 }
 
-
-
 const activity = [
     { id: 1, type: 'faq', description: { name: 'Do they pay on time ?' } },
 
@@ -203,8 +203,6 @@ const activity = [
     },
     { id: 5, type: 'paid', description: { name: 'Stay ahead and achieve profitability in agriculture!' } },
 ]
-
-
 
 function BuyerFaqs() {
 
@@ -261,3 +259,24 @@ function BuyerFaqs() {
         </>
     )
 }
+
+function CTAPrices() {
+    return (
+        <div className='mx-auto max-w-7xl'>
+            <div className="px-9 lg:flex lg:items-center lg:justify-between">
+                <h2 className="text-3xl max-w-2xl font-bold tracking-tight sm:text-4xl">
+                    Prices Anyone?
+                    <br />
+                    See what prices buyers are buying farm produce for today.
+                </h2>
+                <div className="mt-10 flex items-center gap-x-6 lg:mt-0 lg:flex-shrink-0">
+                    <a href="#" className="text-sm font-semibold leading-6 text-muted-foreground">
+                        See more <span aria-hidden="true">→</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    )
+}
+
+
