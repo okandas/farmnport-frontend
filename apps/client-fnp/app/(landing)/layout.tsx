@@ -11,6 +11,7 @@ export default function LandingLayout({ children }: RootLayoutProps) {
         <div>
             <SiteHeader user={null} />
             {children}
+            <SiteFooter />
 
         </div>
     )
