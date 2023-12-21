@@ -3,6 +3,7 @@
 import { sendGTMEvent } from '@next/third-parties/google'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Image, { ImageProps } from "next/image"
+import Link from 'next/link'
 import { Button } from "@/components/ui/button"
 
 import logoInputs from '@/assets/logos/inputs.svg'
@@ -258,10 +259,13 @@ function BuyerFaqs() {
                     </li>
                 ))}
             </ul>
-            <Button variant="secondary" className="group mt-6 w-full" onClick={() => sendGTMEvent({ event: 'link', value: 'BuyerFaqNavigation' })}>
-                View Buyers
-                <ArrowDownIcon className="h-4 w-4 stroke-zinc-400 transition group-active:stroke-zinc-600 dark:group-hover:stroke-zinc-50 dark:group-active:stroke-zinc-50" />
-            </Button>
+            <Link href="/buyers">
+                <Button variant="secondary" className="group mt-6 w-full" onClick={() => sendGTMEvent({ event: 'link', value: 'BuyerFaqNavigation' })}>
+                    View Buyers
+                    <ArrowDownIcon className="h-4 w-4 stroke-zinc-400 transition group-active:stroke-zinc-600 dark:group-hover:stroke-zinc-50 dark:group-active:stroke-zinc-50" />
+                </Button>
+            </Link>
+
         </>
     )
 }
@@ -276,9 +280,9 @@ function CTAPrices() {
                     See what prices buyers are buying farm produce for today.
                 </h2>
                 <div className="mt-10 flex items-center gap-x-6 lg:mt-0 lg:flex-shrink-0">
-                    <a href="#" className="text-sm font-semibold leading-6 text-muted-foreground">
+                    <Link href="/prices" className="text-sm font-semibold leading-6 text-muted-foreground">
                         See more <span aria-hidden="true">→</span>
-                    </a>
+                    </Link>
                 </div>
             </div>
         </div>
@@ -296,7 +300,6 @@ function FeaturedPopularSection() {
         {
             name: 'Pork',
             message: 'Find Pig, Pork, Porker Buyers in Zimbabwe, Make Livestock Farming Profitable for You.',
-            email: 'leslie.alexander@example.com',
             logo: logoPig,
         },
         {
@@ -337,7 +340,7 @@ function FeaturedPopularSection() {
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 pt-4 pb-12 lg:pb-20 lg:pt-16">
                     {markets.map((market) => (
                         <div
-                            key={market.email}
+                            key={market.name}
                             className="relative flex items-center space-x-3 bg-card text-card-foreground shadow-sm rounded-lg  border border-zinc-100 p-6 dark:border-zinc-700/40 px-6 py-5 "
                         >
                             <div className="relative mt-1 flex h-10 w-10 flex-none items-center justify-center rounded-full shadow-md shadow-zinc-800/5 ring-1 ring-zinc-900/5 dark:border dark:border-zinc-700/50 dark:bg-zinc-800 dark:ring-0">
