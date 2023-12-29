@@ -12,9 +12,8 @@ import {
 
 import { capitalizeFirstLetter } from "@/lib/utilities"
 
-import { SidebarFilter } from "@/types"
-
 import { Checkbox } from "@/components/ui/checkbox"
+import { Buyers } from "@/components/layouts/buyers"
 
 
 export const metadata = {
@@ -22,20 +21,20 @@ export const metadata = {
     description: 'Agri produce, fresh produce, buyers buying directly from farmers in Zimbabwe'
 }
 
+
 export default function BuyersPage() {
     return (
         <main>
             <div className="mx-auto max-w-7xl px-6 lg:px-8">
                 <div className="lg:flex lg:space-x-6">
 
-                    <div className="hidden lg:block lg:w-72">
+                    <div className="hidden lg:block lg:w-44">
                         <FilterSidebar />
                     </div>
 
                     <div className="lg:w-2/3">
-                        <Example />
+                        <Buyers />
                     </div>
-
                 </div>
             </div>
         </main>
@@ -85,52 +84,7 @@ function CheckboxesWithText({ filters }: { filters: string[] }) {
 }
 
 
-function Example() {
 
-    const items = [
-        { id: 1 },
-        { id: 2 },
-        { id: 3 },
-        { id: 4 },
-        { id: 5 },
-        { id: 6 },
-        { id: 7 },
-        { id: 8 },
-        { id: 9 },
-        { id: 10 },
-        // More items...
-    ]
-
-    return (
-        <ul role="list" className="divide-y divide-gray-200">
-            {items.map((item) => (
-                <li key={item.id} className="py-4">
-                    <div className="flex">
-                        <div className="mr-4 flex-shrink-0 self-center">
-                            <svg
-                                className="h-16 w-16 border border-gray-300 bg-white text-gray-300"
-                                preserveAspectRatio="none"
-                                stroke="currentColor"
-                                fill="none"
-                                viewBox="0 0 200 200"
-                                aria-hidden="true"
-                            >
-                                <path vectorEffect="non-scaling-stroke" strokeWidth={1} d="M0 0l200 200M0 200L200 0" />
-                            </svg>
-                        </div>
-                        <div>
-                            <h4 className="text-lg font-bold">Lorem ipsum</h4>
-                            <p className="mt-1">
-                                Repudiandae sint consequuntur vel. Amet ut nobis explicabo numquam expedita quia omnis voluptatem. Minus
-                                quidem ipsam quia iusto.
-                            </p>
-                        </div>
-                    </div>
-                </li>
-            ))}
-        </ul>
-    )
-}
 
 
 
