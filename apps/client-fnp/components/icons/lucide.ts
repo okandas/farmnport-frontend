@@ -33,7 +33,11 @@ import {
     Trash2,
     ImagePlus,
     MenuIcon,
-    ClipboardCheckIcon
+    ClipboardCheckIcon,
+    MailCheck,
+    TabletSmartphone,
+    MapPin,
+    Landmark
 } from "lucide-react"
 
 export type Icon = LucideIcon
@@ -72,5 +76,9 @@ export const Icons = {
     image: ImagePlus,
     menu: MenuIcon,
     dollar: Banknote,
-    clipboardCheck: ClipboardCheckIcon
+    clipboardCheck: ClipboardCheckIcon,
+    mail: MailCheck,
+    phone: TabletSmartphone,
+    map: MapPin,
+    landmark: Landmark
 }

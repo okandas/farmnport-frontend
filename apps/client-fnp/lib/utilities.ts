@@ -1,5 +1,6 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { format } from "date-fns"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -25,4 +26,10 @@ export function makeAbbveriation(str?: string) {
     abbv = "FP"
     return abbv
   }
+}
+
+export function formatDate(d?: string) {
+  if (d === undefined) return ""
+  const date = new Date(d)
+  return format(date, "dd MMMM yyyy")
 }

@@ -1,15 +1,17 @@
 "use client"
 
 import { useCallback } from "react"
-
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { useQuery } from "@tanstack/react-query"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import Link from "next/link"
 
 import { Pagination } from "@/components/generic/pagination"
 import { queryBuyers } from "@/lib/query"
 import { ApplicationUser } from "@/lib/schemas"
-import { makeAbbveriation, capitalizeFirstLetter } from "@/lib/utilities"
+import { makeAbbveriation, capitalizeFirstLetter, formatDate } from "@/lib/utilities"
+import { Icons } from "@/components/icons/lucide"
+
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 
 export function Buyers() {
@@ -44,8 +46,12 @@ export function Buyers() {
     const { data, isError, refetch, isFetching } = useQuery({
         queryKey: ["results-buyers", { p: page }],
         queryFn: () => queryBuyers({ p: page }),
-        refetchOnMount: false
+        refetchOnWindowFocus: false
     })
+
+    if (isError) {
+        return null
+    }
 
     if (isFetching) {
         return null
@@ -56,23 +62,70 @@ export function Buyers() {
 
     const pageCount = Math.ceil(total / 10)
 
+    if (buyers === undefined) {
+        return null
+    }
+
     return (
-        <section className="space-y-4">
+        <section className="space-y-8 mt-[21px]">
             <ul role="list" className="divide-y">
                 {buyers.map((buyer, buyerIndex) => (
                     <li key={buyerIndex} className="py-4">
-                        <div className="flex">
-                            <div className="mr-4 flex-shrink-0 self-center">
-                                <Avatar className="w-32 h-32 mb-1 mr-4">
-                                    <AvatarImage />
-                                    <AvatarFallback>{makeAbbveriation(buyer?.name)}</AvatarFallback>
-                                </Avatar>
-                            </div>
-                            <div>
-                                <h4 className="text-lg">{capitalizeFirstLetter(buyer.name)}</h4>
 
+                        <div>
+                            <h4 className="text-lg">{capitalizeFirstLetter(buyer.name)}</h4>
+                            {buyer.short_description.length > 0 ? <h4 className="text-muted-foreground text-sm">{capitalizeFirstLetter(buyer.short_description)}</h4> : null}
+                            <div className="grid grid-cols-1 lg:grid-cols-2">
+                                <div>
+                                    <dl className="-my-3 py-4 text-sm leading-6">
+                                        <div className="flex justify-between gap-x-4 py-3">
+                                            <dt>
+                                                <span className="sr-only">Joined</span>
+                                                <Icons.calender className="h-6 w-5" aria-hidden="true" />
+                                            </dt>
+                                            <dd className="text-sm font-medium leading-6 text-muted-foreground">{formatDate(buyer.created)}</dd>
+                                        </div>
+                                        <div className="flex justify-between gap-x-4 py-3">
+                                            <dt>
+                                                <span className="sr-only">Email</span>
+                                                <Icons.mail className="h-6 w-5" aria-hidden="true" />
+                                            </dt>
+                                            <dd className="text-sm font-medium leading-6 text-muted-foreground hover:underline">
+                                                <Link href={`mailto:${buyer.email}`}>
+                                                    {buyer.email}
+                                                </Link>
+                                            </dd>
+                                        </div>
+                                        <div className="flex justify-between gap-x-4 py-3">
+                                            <dt>
+                                                <span className="sr-only">Phone</span>
+                                                <Icons.phone className="h-6 w-5" aria-hidden="true" />
+                                            </dt>
+                                            <dd className="text-sm font-medium leading-6 text-muted-foreground hover:underline">
+                                                <Link href={`tel:${buyer.phone}`}>
+                                                    {buyer.phone}
+                                                </Link>
+                                            </dd>
+                                        </div>
+                                        <div className="flex justify-between gap-x-4 py-3">
+                                            <dt>
+                                                <span className="sr-only">Address</span>
+                                                <Icons.map className="h-6 w-5" aria-hidden="true" />
+                                            </dt>
+                                            <dd className="text-sm font-medium leading-6 text-muted-foreground">{buyer.address}</dd>
+                                        </div>
+                                        <div className="flex justify-between gap-x-4 py-3">
+                                            <dt>
+                                                <span className="sr-only">City, Province</span>
+                                                <Icons.landmark className="h-6 w-5" aria-hidden="true" />
+                                            </dt>
+                                            <dd className="text-sm font-medium leading-6 text-muted-foreground">{capitalizeFirstLetter(buyer.city)}, {capitalizeFirstLetter(buyer.province)}</dd>
+                                        </div>
+                                    </dl>
+                                </div>
                             </div>
                         </div>
+
                     </li>
                 ))}
             </ul>
