@@ -26,3 +26,8 @@ export type DashboardConfig = {
     mainNavigation: NavigationItem[]
     sidebarNavigation: SidebarNavigationItem[]
 }
+
+export interface SidebarFilter {
+    name: string
+    data: string[]
+}

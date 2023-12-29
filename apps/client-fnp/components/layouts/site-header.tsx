@@ -33,14 +33,14 @@ export function SiteHeader({ user }: SiteHeaderProps) {
                 <MobileNav />
                 <div className="flex flex-1 items-center justify-end space-x-4">
                     <nav className="flex items-center space-x-2">
-                        <Button onClick={() => sendGTMEvent({ event: 'link', value: 'BuyerTopNavigation' })}
+                        <Link href="/buyers" onClick={() => sendGTMEvent({ event: 'link', value: 'BuyerTopNavigation' })}
                             className={buttonVariants({
                                 size: "sm",
                                 variant: "secondary"
                             })}
                         >
                             <Icons.dollar className="mr-2" /> Buyers
-                        </Button>
+                        </Link>
                         {user ? (
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
