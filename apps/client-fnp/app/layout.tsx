@@ -1,12 +1,11 @@
 import { Inter as FontSans } from "next/font/google"
 import localFont from "next/font/local"
 
- // @ts-expect-error package creators need to fix this.
+// @ts-expect-error package creators need to fix this.
 import { GoogleTagManager } from '@next/third-parties/google'
 
 import { QueryProvider } from "@/components/providers/QueryProvider"
 import { ThemeProvider } from "@/components/providers/ThemeProvider"
-import { SessionProvider } from "next-auth/react"
 import { Toaster } from "@/components/ui/sonner"
 
 import { cn } from "@/lib/utilities"
@@ -49,20 +48,18 @@ export default async function RootLayout({ children }: RootLayoutProps) {
             fontHeading.variable
           )}
         >
-          <SessionProvider session={session}>
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="system"
-              enableSystem
-              disableTransitionOnChange
-            >
-              <QueryProvider>
-                {children}
-                <GoogleTagManager gtmId={GTM_ID} />
-                <Toaster />
-              </QueryProvider>
-            </ThemeProvider>
-          </SessionProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <QueryProvider>
+              {children}
+              <GoogleTagManager gtmId={GTM_ID} />
+              <Toaster />
+            </QueryProvider>
+          </ThemeProvider>
         </body>
       </html>
     </>
