@@ -7,15 +7,13 @@ import { auth } from "@/auth"
 
 import { PaginationModel, AuthSchema, LoginFormData, BaseURL } from "@/lib/schemas"
 import { resolve } from "path"
+import { retrieveToken } from "@/lib/actions"
 
 var api = axios.create({})
 
-api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-    // Get token in current cookies
+api.interceptors.request.use(async(config: InternalAxiosRequestConfig) => {
 
-    // const session = await auth()
-    // const token = session?.access_token
-    const token = null
+    const token = await retrieveToken()
 
     if (token) {
         config.headers["Authorization"] = `Bearer ${token}`
