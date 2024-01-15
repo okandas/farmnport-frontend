@@ -1,10 +1,16 @@
 import { Inter as FontSans } from "next/font/google"
 import localFont from "next/font/local"
+
+ // @ts-expect-error package creators need to fix this.
 import { GoogleTagManager } from '@next/third-parties/google'
 
 import { QueryProvider } from "@/components/providers/QueryProvider"
 import { ThemeProvider } from "@/components/providers/ThemeProvider"
+import { SessionProvider } from "next-auth/react"
+import { Toaster } from "@/components/ui/sonner"
+
 import { cn } from "@/lib/utilities"
+import { auth } from "@/auth"
 
 
 import "@/styles/globals.css"
@@ -29,7 +35,9 @@ interface RootLayoutProps {
 
 const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID
 
-export default function RootLayout({ children }: RootLayoutProps) {
+export default async function RootLayout({ children }: RootLayoutProps) {
+  const session = await auth()
+
   return (
     <>
       <html lang="en" suppressHydrationWarning>
@@ -41,17 +49,20 @@ export default function RootLayout({ children }: RootLayoutProps) {
             fontHeading.variable
           )}
         >
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <QueryProvider>
-              {children}
-              <GoogleTagManager gtmId={GTM_ID} />
-            </QueryProvider>
-          </ThemeProvider>
+          <SessionProvider session={session}>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              <QueryProvider>
+                {children}
+                <GoogleTagManager gtmId={GTM_ID} />
+                <Toaster />
+              </QueryProvider>
+            </ThemeProvider>
+          </SessionProvider>
         </body>
       </html>
     </>
