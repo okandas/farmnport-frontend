@@ -13,7 +13,7 @@ export default middleware((request: NextAuthRequest) => {
     return NextResponse.redirect(url)
 
   }
-  
+
   return NextResponse.next()
 })
 

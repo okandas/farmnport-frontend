@@ -1,6 +1,7 @@
 import axios, { InternalAxiosRequestConfig } from "axios"
 import Cookies from "js-cookie"
 import * as z from "zod"
+import { auth } from "@/auth"
 
 
 
@@ -12,7 +13,9 @@ var api = axios.create({})
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
     // Get token in current cookies
 
-    const token = Cookies.get("cl_jtkn")
+    // const session = await auth()
+    // const token = session?.access_token
+    const token = null
 
     if (token) {
         config.headers["Authorization"] = `Bearer ${token}`

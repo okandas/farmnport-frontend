@@ -4,7 +4,8 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation } from "@tanstack/react-query"
 import { isAxiosError } from "axios"
-import Cookies from "js-cookie"
+import { AuthError } from "next-auth"
+ 
 import { useForm } from "react-hook-form"
 
 
@@ -69,6 +70,10 @@ export function AuthForm({ className, ...props }: AuthFormProps) {
                         break
                 }
             }
+
+            toast("Failed to login", {
+                description: 'System Failure or Network Failure Please Try Again'
+            })
         },
     })
 

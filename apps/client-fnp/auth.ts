@@ -1,10 +1,8 @@
-import NextAuth, { User } from "next-auth";
+import NextAuth, { AuthError, User } from "next-auth";
 import { authConfig } from "@/auth.config";
 import Credentials from 'next-auth/providers/credentials'
-import axios from "axios"
+import axios, { isAxiosError } from "axios"
 import jwt_decode from "jwt-decode"
-import JWT from "next-auth/jwt"
-
 declare module "next-auth" {
     interface User {
         admin: boolean;
@@ -24,14 +22,6 @@ declare module "next-auth" {
 
 }
 
-declare module "next-auth/jwt" {
-    interface JWT {
-        user?: User
-    }
-}
-
-
-
 import { BaseURL } from "@/lib/schemas"
 
 export const { auth, signIn, signOut, handlers } = NextAuth({
@@ -47,16 +37,30 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
 
                 var url = `${BaseURL}/client/login`
 
-                const response = await axios.post(url, data)
+                try {
+                    const response = await axios.post(url, data)
 
-                if (response.status === 200) {
-                    const decodedSession = jwt_decode<User>(response.data.token)
-                    decodedSession.token = response.data.token
-                    decodedSession.name = decodedSession.username
-                    return decodedSession
+                    if (response.status === 200) {
+                        const decodedSession = jwt_decode<User>(response.data.token)
+                        decodedSession.token = response.data.token
+                        decodedSession.name = decodedSession.username
+                        return decodedSession
+                    }
+
+                    return null
+
+                } catch (error) {                  
+                    // @ts-expect-error
+                    const formatted = new AuthError(error)
+
+                    if (isAxiosError(formatted.cause?.err)) {
+                       console.log(formatted.cause?.err.response?.statusText)
+                    }
+
+                     // @ts-expect-error
+                    throw new Error(error)
+
                 }
-
-                return null
             }
         })],
     callbacks: {
@@ -69,12 +73,12 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
             return token
         },
         async session({ session, token }) {
-           
 
             if (token.user) {
 
                 const user = token.user as User
                 session.user = user
+                session.access_token = user.token
             }
 
             return session
