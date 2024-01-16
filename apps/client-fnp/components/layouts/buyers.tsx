@@ -2,24 +2,27 @@
 
 import { useCallback } from "react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
+
+// @ts-expect-error package creators need to fix this.
 import { sendGTMEvent } from '@next/third-parties/google'
 import { useQuery } from "@tanstack/react-query"
 import Link from "next/link"
 
 import { Pagination } from "@/components/generic/pagination"
 import { queryBuyers } from "@/lib/query"
-import { ApplicationUser } from "@/lib/schemas"
+import { ApplicationUser, AuthenticatedUser } from "@/lib/schemas"
 import { slug, capitalizeFirstLetter, formatDate } from "@/lib/utilities"
 import { Icons } from "@/components/icons/lucide"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import { Buenard } from "next/font/google"
 
+interface BuyerPageProps {
+    user: AuthenticatedUser | null
+}
 
-export function Buyers() {
-
-    const user = null
+export function Buyers({ user }: BuyerPageProps) {
+    
     const router = useRouter()
     const pathname = usePathname()
     const searchParams = useSearchParams()
@@ -77,7 +80,8 @@ export function Buyers() {
     function Info({ info, name }: { info: Info, name: string }) {
         const name_slug = slug(name)
         const queryString = createQueryString({
-            'wantToSee':  `${name_slug}`
+            'entity': 'buyer',
+            'wantToSee': `${name_slug}`
         })
         return (
             <dd>
@@ -152,7 +156,7 @@ export function Buyers() {
                                                                 {buyer.phone}
                                                             </Link>
                                                         </dd>
-                                                    ) : <Info info={infoPhone} name={buyer.name}/>
+                                                    ) : <Info info={infoPhone} name={buyer.name} />
                                             }
 
                                         </div>
