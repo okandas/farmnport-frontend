@@ -14,8 +14,6 @@ import { capitalizeFirstLetter } from "@/lib/utilities"
 
 import { Checkbox } from "@/components/ui/checkbox"
 import { Buyers } from "@/components/layouts/buyers"
-import { auth } from "@/auth"
-import { AuthenticatedUser } from "@/lib/schemas"
 import { retrieveUser } from "@/lib/actions"
 
 
