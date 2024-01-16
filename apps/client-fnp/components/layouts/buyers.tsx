@@ -45,9 +45,6 @@ export function Buyers({ user }: BuyerPageProps) {
         [searchParams]
     )
 
-    console.log(user)
-
-
     // Search params
     const page = Number(searchParams?.get("page")) ?? 1
 

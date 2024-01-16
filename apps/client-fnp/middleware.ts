@@ -6,7 +6,7 @@ import { AppURL } from "@/lib/schemas"
 export default middleware((request: NextAuthRequest) => {
   const pathname = request.nextUrl.pathname
 
-  if ((pathname === '/login' || pathname === '/signup') && request.auth?.user !==undefined) {
+  if ((pathname === '/login' || pathname === '/signup') && request.auth?.user !== undefined) {
 
     var url = `${AppURL}/buyer`
 
