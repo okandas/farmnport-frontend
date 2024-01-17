@@ -2,21 +2,24 @@
 
 import { useCallback } from "react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { sendGTMEvent } from '@next/third-parties/google'
 import { useQuery } from "@tanstack/react-query"
 import Link from "next/link"
 
 import { Pagination } from "@/components/generic/pagination"
 import { queryBuyers } from "@/lib/query"
 import { ApplicationUser } from "@/lib/schemas"
-import { makeAbbveriation, capitalizeFirstLetter, formatDate } from "@/lib/utilities"
+import { slug, capitalizeFirstLetter, formatDate } from "@/lib/utilities"
 import { Icons } from "@/components/icons/lucide"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
+import { Buenard } from "next/font/google"
 
 
 export function Buyers() {
 
-
+    const user = null
     const router = useRouter()
     const pathname = usePathname()
     const searchParams = useSearchParams()
@@ -66,6 +69,40 @@ export function Buyers() {
         return null
     }
 
+    interface Info {
+        title: string
+        action: string
+    }
+
+    function Info({ info, name }: { info: Info, name: string }) {
+        const name_slug = slug(name)
+        const queryString = createQueryString({
+            'wantToSee':  `${name_slug}`
+        })
+        return (
+            <dd>
+                <Button variant="outline" onClick={() => {
+                    sendGTMEvent({ event: 'action', value: info.action })
+                    router.push(`/login?${queryString}`)
+                }
+                }>
+                    See {info.title}
+                </Button>
+            </dd>
+
+        )
+    }
+
+    const infoPhone: Info = {
+        title: "Number",
+        action: "LoggedOutViewNumber"
+    }
+
+    const infoEmail: Info = {
+        title: "Email",
+        action: "LoggedOutViewEmail"
+    }
+
     return (
         <section className="space-y-8 mt-[21px]">
             <ul role="list" className="divide-y">
@@ -78,43 +115,55 @@ export function Buyers() {
                             <div className="grid grid-cols-1 lg:grid-cols-2">
                                 <div>
                                     <dl className="-my-3 py-4 text-sm leading-6">
-                                        <div className="flex justify-between gap-x-4 py-3">
+                                        <div className="flex justify-between gap-x-4 py-2">
                                             <dt>
                                                 <span className="sr-only">Joined</span>
                                                 <Icons.calender className="h-6 w-5" aria-hidden="true" />
                                             </dt>
                                             <dd className="text-sm font-medium leading-6 text-muted-foreground">{formatDate(buyer.created)}</dd>
                                         </div>
-                                        <div className="flex justify-between gap-x-4 py-3">
+                                        <div className="flex justify-between gap-x-4 py-1">
                                             <dt>
                                                 <span className="sr-only">Email</span>
                                                 <Icons.mail className="h-6 w-5" aria-hidden="true" />
                                             </dt>
-                                            <dd className="text-sm font-medium leading-6 text-muted-foreground hover:underline">
-                                                <Link href={`mailto:${buyer.email}`}>
-                                                    {buyer.email}
-                                                </Link>
-                                            </dd>
+
+                                            {
+                                                user !== null ?
+                                                    (
+                                                        <dd className="text-sm font-medium leading-6 text-muted-foreground hover:underline">
+                                                            <Link href={`mailto:${buyer.email}`}>
+                                                                {buyer.email}
+                                                            </Link>
+                                                        </dd>
+                                                    ) : <Info info={infoEmail} name={buyer.name} />
+                                            }
                                         </div>
-                                        <div className="flex justify-between gap-x-4 py-3">
+                                        <div className="flex justify-between gap-x-4 py-1">
                                             <dt>
                                                 <span className="sr-only">Phone</span>
                                                 <Icons.phone className="h-6 w-5" aria-hidden="true" />
                                             </dt>
-                                            <dd className="text-sm font-medium leading-6 text-muted-foreground hover:underline">
-                                                <Link href={`tel:${buyer.phone}`}>
-                                                    {buyer.phone}
-                                                </Link>
-                                            </dd>
+                                            {
+                                                user !== null ?
+                                                    (
+                                                        <dd className="text-sm font-medium leading-6 text-muted-foreground hover:underline">
+                                                            <Link href={`tel:${buyer.phone}`}>
+                                                                {buyer.phone}
+                                                            </Link>
+                                                        </dd>
+                                                    ) : <Info info={infoPhone} name={buyer.name}/>
+                                            }
+
                                         </div>
-                                        <div className="flex justify-between gap-x-4 py-3">
+                                        <div className="flex justify-between gap-x-4 py-1">
                                             <dt>
                                                 <span className="sr-only">Address</span>
                                                 <Icons.map className="h-6 w-5" aria-hidden="true" />
                                             </dt>
                                             <dd className="text-sm font-medium leading-6 text-muted-foreground">{buyer.address}</dd>
                                         </div>
-                                        <div className="flex justify-between gap-x-4 py-3">
+                                        <div className="flex justify-between gap-x-4 py-1">
                                             <dt>
                                                 <span className="sr-only">City, Province</span>
                                                 <Icons.landmark className="h-6 w-5" aria-hidden="true" />
@@ -141,3 +190,5 @@ export function Buyers() {
 
     )
 }
+
+

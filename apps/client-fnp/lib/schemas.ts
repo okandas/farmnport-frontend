@@ -14,7 +14,7 @@ export type AuthenticatedUser = {
     iss: string
     subject: string
     username: string
-}
+} | undefined
 
 export type LoginResponse = {
     token: string
@@ -275,4 +275,11 @@ export const PagintionSchema = z.object({
 })
 
 export type PaginationModel = z.infer<typeof PagintionSchema>
+
+export type LoginFormData = z.infer<typeof AuthSchema>
+
+var base = process.env.NEXT_PUBLIC_BASE_URL
+var version = "/v1"
+export const BaseURL = base + version
+export const AppURL = process.env.NEXT_PUBLIC_APP_URL
 
