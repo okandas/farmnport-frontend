@@ -1,11 +1,11 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { format } from "date-fns"
+import slugify from "slugify"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
-
 
 export function capitalizeFirstLetter(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1)
@@ -32,4 +32,16 @@ export function formatDate(d?: string) {
   if (d === undefined) return ""
   const date = new Date(d)
   return format(date, "dd MMMM yyyy")
+}
+
+export function slug(name?: string): string {
+  if (name === undefined) return ""
+
+  const slugged = slugify(name, {
+    replacement: "-",
+    remove: /[*+~.()'"!:@]/g,
+    lower: true
+  })
+
+  return slugged
 }

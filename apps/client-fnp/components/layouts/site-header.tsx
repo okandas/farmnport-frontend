@@ -1,6 +1,8 @@
 'use client'
 
 import Link from "next/link"
+
+// @ts-expect-error package creators need to fix this.
 import { sendGTMEvent } from '@next/third-parties/google'
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -19,9 +21,13 @@ import {
 import { Icons } from "@/components/icons/lucide"
 import { MainNav } from "@/components/layouts/main-nav"
 import { MobileNav } from "@/components/layouts/mobile-nav"
+import { AppURL, AuthenticatedUser } from "@/lib/schemas"
+import { capitalizeFirstLetter, makeAbbveriation } from "@/lib/utilities"
+import { signOut } from "@/auth"
+import { logoutUser } from "@/lib/actions"
 
 interface SiteHeaderProps {
-    user: null
+    user: AuthenticatedUser | null
 }
 
 export function SiteHeader({ user }: SiteHeaderProps) {
@@ -54,15 +60,17 @@ export function SiteHeader({ user }: SiteHeaderProps) {
                                                 alt={user.username ?? ""}
                                             />
                                             <AvatarFallback>{initials}</AvatarFallback> */}
+                                            <AvatarFallback>{makeAbbveriation(user.username)}</AvatarFallback>
                                         </Avatar>
                                     </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent className="w-56" align="end" forceMount>
                                     <DropdownMenuLabel className="font-normal">
                                         <div className="flex flex-col space-y-1">
-                                            {/* <p className="text-sm font-medium leading-none">
-                                                {user.firstName} {user.lastName}
+                                            <p className="text-base font-medium leading-none">
+                                                {capitalizeFirstLetter(user.username)}
                                             </p>
+                                            {/*
                                             <p className="text-xs leading-none text-muted-foreground">
                                                 {email}
                                             </p> */}
@@ -81,10 +89,31 @@ export function SiteHeader({ user }: SiteHeaderProps) {
                                         </DropdownMenuItem>
                                     </DropdownMenuGroup>
                                     <DropdownMenuSeparator />
+                                    <DropdownMenuGroup>
+                                        <DropdownMenuItem asChild>
+                                            <Link href="#" onClick={() => logoutUser()}>
+                                                {/* <DashboardIcon
+                                                    className="mr-2 h-4 w-4"
+                                                    aria-hidden="true"
+                                                /> */}
+                                                Logout
+                                            </Link>
+                                        </DropdownMenuItem>
+                                    </DropdownMenuGroup>
 
                                 </DropdownMenuContent>
                             </DropdownMenu>
-                        ) : (
+                        ) : (<>
+                            <Link
+                                href="/login"
+                                className={buttonVariants({
+                                    size: "sm",
+                                    variant: "outline"
+                                })}
+                            >
+                                Login
+                                <span className="sr-only">Login</span>
+                            </Link>
                             <Link
                                 href="/signup"
                                 className={buttonVariants({
@@ -94,6 +123,8 @@ export function SiteHeader({ user }: SiteHeaderProps) {
                                 Sign Up
                                 <span className="sr-only">Sign Up</span>
                             </Link>
+                        </>
+
                         )}
                         < ThemeSwitcher />
                     </nav>
