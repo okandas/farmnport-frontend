@@ -1,6 +1,6 @@
 "use client"
 
-import { Dispatch, SetStateAction, useState } from "react"
+import { ChangeEvent, Dispatch, SetStateAction, useState } from "react"
 import Link from "next/link"
 import {
   ColumnDef,
@@ -36,8 +36,8 @@ interface DataTableProps<TData, TValue> {
   total: number
   pagination: PaginationState
   setPagination: Dispatch<SetStateAction<PaginationState>>
-  searchClient: string
-  setSearchClient: Dispatch<SetStateAction<string>>
+  search: string
+  setSearch: Dispatch<SetStateAction<string>>
 }
 
 export function DataTable<TData, TValue>({
@@ -48,12 +48,12 @@ export function DataTable<TData, TValue>({
   total,
   pagination,
   setPagination,
-  searchClient,
-  setSearchClient,
+  search,
+  setSearch,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = useState({})
 
-  const pageCount = Math.floor(total / pagination.pageSize)
+  const pageCount = Math.ceil(total / pagination.pageSize)
 
   const table = useReactTable({
     data,
@@ -96,13 +96,17 @@ export function DataTable<TData, TValue>({
             <div className="flex items-center flex-1 space-x-2">
               <Input
                 placeholder="Search for client..."
-                value={searchClient ?? ""}
-                onChange={(event) => setSearchClient(event.target.value)}
+                value={search ?? ""}
+                onChange={(event) => {
+                  setSearch(event.target.value)
+                }}
                 className="h-8 w-[150px] lg:w-[250px]"
               />
               <Button
                 variant="outline"
-                onClick={() => console.log(searchClient)}
+                onClick={() => {
+                  console.log(search)
+                }}
                 className="h-8 px-2 lg:px-3"
               >
                 Search
