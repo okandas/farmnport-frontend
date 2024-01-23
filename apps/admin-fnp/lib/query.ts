@@ -107,6 +107,11 @@ export function verifyClient(data: ApplicationUserID) {
   return api.post<ApplicationUser>(url, data)
 }
 
+export function badClient(data: ApplicationUserID) {
+  var url = `${baseUrl}/user/bad_client`
+  return api.post<ApplicationUser>(url, data)
+}
+
 export function createClientProductPriceList(data: ProducerPriceList) {
   var url = `${baseUrl}/prices/add/producer_price`
   return api.post(url, data)
