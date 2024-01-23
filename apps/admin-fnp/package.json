@@ -59,7 +59,7 @@
     "@types/dinero.js": "^1.9.0",
     "@types/google-libphonenumber": "^7.4.23",
     "@types/node": "20.2.5",
-    "@types/react": "18.2.7",
+    "@types/react": "18.2.48",
     "@types/react-dom": "18.2.4",
     "autoprefixer": "10.4.14",
     "eslint": "8.41.0",
