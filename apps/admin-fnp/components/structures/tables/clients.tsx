@@ -73,7 +73,6 @@ export function ClientsTable() {
 
   return (
     <DataTable
-      /* @ts-ignore */ // working on all other table besides this one jeez
       columns={clientColumns}
       data={clients}
       newUrl="/dashboard/users/new"
