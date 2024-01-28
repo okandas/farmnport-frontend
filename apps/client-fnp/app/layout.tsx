@@ -1,4 +1,4 @@
-import { Inter as FontSans } from "next/font/google"
+import { Open_Sans } from "next/font/google"
 import localFont from "next/font/local"
 
 // @ts-expect-error package creators need to fix this.
@@ -14,9 +14,10 @@ import { auth } from "@/auth"
 
 import "@/styles/globals.css"
 
-const fontSans = FontSans({
-  subsets: ["latin"],
-  variable: "--font-sans",
+const openSans = Open_Sans({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-opensans',
 })
 
 const fontHeading = localFont({
@@ -43,8 +44,8 @@ export default async function RootLayout({ children }: RootLayoutProps) {
         <head />
         <body
           className={cn(
-            "min-h-screen bg-background font-sans antialiased",
-            fontSans.variable,
+            "min-h-screen bg-background antialiased font-sans",
+            openSans.variable,
             fontHeading.variable
           )}
         >
