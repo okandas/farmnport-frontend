@@ -1,7 +1,6 @@
 import { Open_Sans } from "next/font/google"
 import localFont from "next/font/local"
 
-// @ts-expect-error package creators need to fix this.
 import { GoogleTagManager } from '@next/third-parties/google'
 
 import { QueryProvider } from "@/components/providers/QueryProvider"
@@ -33,7 +32,7 @@ interface RootLayoutProps {
   children: React.ReactNode
 }
 
-const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID
+const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID as string
 
 export default async function RootLayout({ children }: RootLayoutProps) {
   const session = await auth()

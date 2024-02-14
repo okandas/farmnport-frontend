@@ -2,7 +2,6 @@
 
 import Link from "next/link"
 
-// @ts-expect-error package creators need to fix this.
 import { sendGTMEvent } from '@next/third-parties/google'
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"

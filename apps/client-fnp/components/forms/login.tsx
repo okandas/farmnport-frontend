@@ -50,8 +50,6 @@ export function AuthForm({ className, ...props }: AuthFormProps) {
             } else {
                 router.push("/")
             }
-
-
         },
         onError: (error) => {
             if (isAxiosError(error)) {

@@ -175,10 +175,12 @@ function FarmerInfo() {
                     <Info key={infoIndex} info={info} />
                 ))}
             </ol>
-            <Button variant="secondary" className="group mt-6 w-full" onClick={() => sendGTMEvent({ event: 'link', value: 'SignupFaqNavigation' })}>
-                Get Started
-                <ArrowDownIcon className="h-4 w-4 stroke-zinc-400 transition group-active:stroke-zinc-600 dark:group-hover:stroke-zinc-50 dark:group-active:stroke-zinc-50" />
-            </Button>
+            <Link href="/signup">
+                <Button variant="secondary" className="group mt-6 w-full" onClick={() => sendGTMEvent({ event: 'link', value: 'SignupFarmerNavigation' })}>
+                    Get Started
+                    <ArrowDownIcon className="h-4 w-4 stroke-zinc-400 transition group-active:stroke-zinc-600 dark:group-hover:stroke-zinc-50 dark:group-active:stroke-zinc-50" />
+                </Button>
+            </Link>
         </div>
     )
 }
@@ -259,9 +261,9 @@ function BuyerFaqs() {
                     </li>
                 ))}
             </ul>
-            <Link href="/buyers">
-                <Button variant="secondary" className="group mt-6 w-full" onClick={() => sendGTMEvent({ event: 'link', value: 'BuyerFaqNavigation' })}>
-                    View Buyers
+            <Link href="/signup">
+                <Button variant="secondary" className="group mt-6 w-full" onClick={() => sendGTMEvent({ event: 'link', value: 'SignupBuyerNavigation' })}>
+                    Get Started
                     <ArrowDownIcon className="h-4 w-4 stroke-zinc-400 transition group-active:stroke-zinc-600 dark:group-hover:stroke-zinc-50 dark:group-active:stroke-zinc-50" />
                 </Button>
             </Link>
