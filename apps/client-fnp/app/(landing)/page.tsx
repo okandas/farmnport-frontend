@@ -13,7 +13,7 @@ import logoResearch from '@/assets/logos/research.svg'
 import logoChicken from '@/assets/logos/chicken.svg'
 import logoPig from '@/assets/logos/pig.svg'
 import logoCattle from '@/assets/logos/cattle.svg'
-import logoGroundNut from '@/assets/logos/groundnut.svg'
+import logoChilli from '@/assets/logos/chilli.svg'
 import logoTomato from '@/assets/logos/tomato.svg'
 import logoOnion from '@/assets/logos/onion.svg'
 
@@ -298,32 +298,37 @@ function FeaturedPopularSection() {
             name: 'Chicken',
             message: 'Find Chicken, Broiler Buyers in Zimbabwe, Make Poultry Farming Profitable for You.',
             logo: logoChicken,
+            link: 'buyers/chicken'
         },
         {
             name: 'Pork',
             message: 'Find Pig, Pork, Porker Buyers in Zimbabwe, Make Livestock Farming Profitable for You.',
             logo: logoPig,
+            link: 'buyers/pork'
         },
         {
             name: 'Onions',
             message: 'Find Onion Buyers in Zimbabwe, Make Horticulture Farming Profitable for You.',
             logo: logoOnion,
+            link: 'buyers/onions'
         },
         {
             name: 'Cattle',
             message: 'Find Cattle Buyers in Zimbabwe, Make Ranching, Dairy, Livestock Farming Profitable for You.',
-
             logo: logoCattle,
+            link: 'buyers/cattle'
         },
         {
             name: 'Tomatoes',
             message: 'Find Tomato Buyers in Zimbabwe, Make Horticulture Farming Profitable for You.',
             logo: logoTomato,
+            link: 'buyers/tomatoes'
         },
         {
-            name: 'Ground Nuts',
-            message: 'Find Ground Nut Buyers in Zimbabwe, Make Horticulture Farming Profitable for You.',
-            logo: logoGroundNut,
+            name: 'Chilli',
+            message: 'Find Chilli Buyers in Zimbabwe, Make Horticulture Farming Profitable for You.',
+            logo: logoChilli,
+            link: 'buyers/chilli'
         },
     ]
 
@@ -349,11 +354,11 @@ function FeaturedPopularSection() {
                                 <Image src={market.logo} alt="" className="h-7 w-7" unoptimized />
                             </div>
                             <div className="min-w-0 flex-1">
-                                <a href="#" className="focus:outline-none">
+                                <Link href={market.link} className="focus:outline-none" onClick={() => sendGTMEvent({ event: 'view', value: 'FeaturedLink' })}>
                                     <span className="absolute inset-0" aria-hidden="true" />
                                     <p className="text-lg font-medium">{market.name}</p>
                                     <p className="text-base text-muted-foreground pt-1">{market.message}</p>
-                                </a>
+                                </Link>
                             </div>
                         </div>
                     ))}
