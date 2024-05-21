@@ -55,6 +55,8 @@ export const ApplicationUserSchema = z.object({
   }),
   verified: z.boolean(),
   payment_terms: z.string(),
+  bad_participant: z.boolean(),
+  has_prices: z.boolean(),
 })
 
 export const ProducerPriceListSchema = z.object({

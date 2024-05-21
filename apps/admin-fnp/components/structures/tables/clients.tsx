@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { PaginationState } from "@tanstack/react-table"
 import { isAxiosError } from "axios"
+import { useDebounce } from "use-debounce"
 
 import { queryUsers } from "@/lib/query"
 import { ApplicationUser } from "@/lib/schemas"
@@ -14,23 +15,26 @@ import { clientColumns } from "@/components/structures/columns/clients"
 import { DataTable } from "@/components/structures/data-table"
 
 export function ClientsTable() {
-  const [searchClient, setSearchClient] = useState("")
+  const [search, setSearch] = useState("")
 
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 1,
     pageSize: 20,
   })
 
+  const [debouncedSearchQuery] = useDebounce(search, 1000)
+
   const { isError, isLoading, isFetching, refetch, data } = useQuery({
-    queryKey: ["dashboard-clients", { p: pagination.pageIndex }],
+    queryKey: ["dashboard-clients", { p: pagination.pageIndex, search: debouncedSearchQuery }],
     queryFn: () =>
       queryUsers({
         p: pagination.pageIndex,
+        search: debouncedSearchQuery
       }),
     refetchOnWindowFocus: false
   })
 
-  const clients = data?.data?.data as ApplicationUser[]
+  const clients = data?.data?.data as ApplicationUser[] || []
   const total = data?.data?.total as number
 
   if (isError) {
@@ -67,17 +71,8 @@ export function ClientsTable() {
     )
   }
 
-  if (isLoading || isFetching) {
-    return (
-      <Placeholder>
-        <Placeholder.Title>Fetching Producer Price Lists</Placeholder.Title>
-      </Placeholder>
-    )
-  }
-
   return (
     <DataTable
-      /* @ts-ignore */ // working on all other table besides this one jeez
       columns={clientColumns}
       data={clients}
       newUrl="/dashboard/users/new"
@@ -85,8 +80,8 @@ export function ClientsTable() {
       total={total}
       pagination={pagination}
       setPagination={setPagination}
-      searchClient={searchClient}
-      setSearchclient={setSearchClient}
+      search={search}
+      setSearch={setSearch}
     />
   )
 }
