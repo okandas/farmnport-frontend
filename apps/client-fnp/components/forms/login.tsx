@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation } from "@tanstack/react-query"
 import { isAxiosError } from "axios"
 import { AuthError } from "next-auth"
- 
+
 import { useForm } from "react-hook-form"
 
 
@@ -42,17 +42,14 @@ export function AuthForm({ className, ...props }: AuthFormProps) {
                 description: "Login Successful redirecting you to dashboard.",
             })
 
-            console.log(data);
-
+            const entity = searchParams.get('entity');
             const wantToSee = searchParams.get('wantToSee');
 
-            if(wantToSee) {
-                router.push(`/${wantToSee}`)
+            if (wantToSee && entity) {
+                router.push(`/${entity}/${wantToSee}`)
             } else {
                 router.push("/")
             }
-
-            
         },
         onError: (error) => {
             if (isAxiosError(error)) {

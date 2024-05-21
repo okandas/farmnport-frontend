@@ -1,25 +1,28 @@
 "use client"
 
-import { useCallback } from "react"
+import { useCallback, useState } from "react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
+
+// @ts-expect-error package creators need to fix this.
 import { sendGTMEvent } from '@next/third-parties/google'
 import { useQuery } from "@tanstack/react-query"
 import Link from "next/link"
 
 import { Pagination } from "@/components/generic/pagination"
 import { queryBuyers } from "@/lib/query"
-import { ApplicationUser } from "@/lib/schemas"
+import { ApplicationUser, AuthenticatedUser } from "@/lib/schemas"
 import { slug, capitalizeFirstLetter, formatDate } from "@/lib/utilities"
 import { Icons } from "@/components/icons/lucide"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import { Buenard } from "next/font/google"
 
+interface BuyerPageProps {
+    user: AuthenticatedUser | null
+}
 
-export function Buyers() {
+export function Buyers({ user }: BuyerPageProps) {
 
-    const user = null
     const router = useRouter()
     const pathname = usePathname()
     const searchParams = useSearchParams()
@@ -41,7 +44,6 @@ export function Buyers() {
         },
         [searchParams]
     )
-
 
     // Search params
     const page = Number(searchParams?.get("page")) ?? 1
@@ -77,7 +79,8 @@ export function Buyers() {
     function Info({ info, name }: { info: Info, name: string }) {
         const name_slug = slug(name)
         const queryString = createQueryString({
-            'wantToSee':  `${name_slug}`
+            'entity': 'buyer',
+            'wantToSee': `${name_slug}`
         })
         return (
             <dd>
@@ -101,6 +104,63 @@ export function Buyers() {
     const infoEmail: Info = {
         title: "Email",
         action: "LoggedOutViewEmail"
+    }
+
+    function ShowEmail({ email }: { email: string }) {
+        const [showDetail, setShowDetail] = useState(false);
+
+        const showDetailButton = () => {
+            setShowDetail(true);
+        };
+
+        return (
+            <>
+                {
+                    showDetail ?
+                        <dd className="text-sm font-medium leading-6 text-muted-foreground hover:underline">
+                            <Link href={`mailto:${email}`}>
+                                {email}
+                            </Link>
+                        </dd>
+                        : (
+                            <Button className="p-0 h-4" variant="link" onClick={() => {
+                                sendGTMEvent({ event: 'action', value: 'LoggedInViewEmail' })
+                                showDetailButton()
+                            }}>
+                                Show email
+                            </Button>
+                        )
+                }
+            </>
+        )
+    }
+    function ShowPhone({ phone }: { phone: string }) {
+        const [showDetail, setShowDetail] = useState(false);
+
+        const showDetailButton = () => {
+            setShowDetail(true);
+        };
+
+        return (
+            <>
+                {
+                    showDetail ?
+                        <dd className="text-sm font-medium leading-6 text-muted-foreground hover:underline">
+                            <Link href={`tel:${phone}`}>
+                                {phone}
+                            </Link>
+                        </dd>
+                        : (
+                            <Button className="p-0 h-4" variant="link" onClick={() => {
+                                sendGTMEvent({ event: 'action', value: 'LoggedInViewPhone' })
+                                showDetailButton()
+                            }}>
+                                Show phone
+                            </Button>
+                        )
+                }
+            </>
+        )
     }
 
     return (
@@ -129,14 +189,7 @@ export function Buyers() {
                                             </dt>
 
                                             {
-                                                user !== null ?
-                                                    (
-                                                        <dd className="text-sm font-medium leading-6 text-muted-foreground hover:underline">
-                                                            <Link href={`mailto:${buyer.email}`}>
-                                                                {buyer.email}
-                                                            </Link>
-                                                        </dd>
-                                                    ) : <Info info={infoEmail} name={buyer.name} />
+                                                user !== undefined ? (<ShowEmail email={buyer.email} />) : (<Info info={infoEmail} name={buyer.name} />)
                                             }
                                         </div>
                                         <div className="flex justify-between gap-x-4 py-1">
@@ -144,15 +197,9 @@ export function Buyers() {
                                                 <span className="sr-only">Phone</span>
                                                 <Icons.phone className="h-6 w-5" aria-hidden="true" />
                                             </dt>
+
                                             {
-                                                user !== null ?
-                                                    (
-                                                        <dd className="text-sm font-medium leading-6 text-muted-foreground hover:underline">
-                                                            <Link href={`tel:${buyer.phone}`}>
-                                                                {buyer.phone}
-                                                            </Link>
-                                                        </dd>
-                                                    ) : <Info info={infoPhone} name={buyer.name}/>
+                                                user !== undefined ? (<ShowPhone phone={buyer.phone} />) : (<Info info={infoPhone} name={buyer.name} />)
                                             }
 
                                         </div>

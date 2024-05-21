@@ -14,6 +14,7 @@ import { capitalizeFirstLetter } from "@/lib/utilities"
 
 import { Checkbox } from "@/components/ui/checkbox"
 import { Buyers } from "@/components/layouts/buyers"
+import { retrieveUser } from "@/lib/actions"
 
 
 export const metadata = {
@@ -21,8 +22,10 @@ export const metadata = {
     description: 'Agri produce, fresh produce, buyers buying directly from farmers in Zimbabwe'
 }
 
+export default async function BuyersPage() {
 
-export default function BuyersPage() {
+    const user = await retrieveUser()
+
     return (
         <main>
             <div className="mx-auto max-w-7xl px-6 lg:px-8">
@@ -33,7 +36,7 @@ export default function BuyersPage() {
                     </div>
 
                     <div className="lg:w-2/3">
-                        <Buyers />
+                        <Buyers user={user} />
                     </div>
                 </div>
             </div>

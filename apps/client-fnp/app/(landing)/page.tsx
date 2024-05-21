@@ -13,7 +13,7 @@ import logoResearch from '@/assets/logos/research.svg'
 import logoChicken from '@/assets/logos/chicken.svg'
 import logoPig from '@/assets/logos/pig.svg'
 import logoCattle from '@/assets/logos/cattle.svg'
-import logoGroundNut from '@/assets/logos/groundnut.svg'
+import logoChilli from '@/assets/logos/chilli.svg'
 import logoTomato from '@/assets/logos/tomato.svg'
 import logoOnion from '@/assets/logos/onion.svg'
 
@@ -175,10 +175,12 @@ function FarmerInfo() {
                     <Info key={infoIndex} info={info} />
                 ))}
             </ol>
-            <Button variant="secondary" className="group mt-6 w-full" onClick={() => sendGTMEvent({ event: 'link', value: 'SignupFaqNavigation' })}>
-                Get Started
-                <ArrowDownIcon className="h-4 w-4 stroke-zinc-400 transition group-active:stroke-zinc-600 dark:group-hover:stroke-zinc-50 dark:group-active:stroke-zinc-50" />
-            </Button>
+            <Link href="/signup">
+                <Button variant="secondary" className="group mt-6 w-full" onClick={() => sendGTMEvent({ event: 'link', value: 'SignupFarmerNavigation' })}>
+                    Get Started
+                    <ArrowDownIcon className="h-4 w-4 stroke-zinc-400 transition group-active:stroke-zinc-600 dark:group-hover:stroke-zinc-50 dark:group-active:stroke-zinc-50" />
+                </Button>
+            </Link>
         </div>
     )
 }
@@ -259,9 +261,9 @@ function BuyerFaqs() {
                     </li>
                 ))}
             </ul>
-            <Link href="/buyers">
-                <Button variant="secondary" className="group mt-6 w-full" onClick={() => sendGTMEvent({ event: 'link', value: 'BuyerFaqNavigation' })}>
-                    View Buyers
+            <Link href="/signup">
+                <Button variant="secondary" className="group mt-6 w-full" onClick={() => sendGTMEvent({ event: 'link', value: 'SignupBuyerNavigation' })}>
+                    Get Started
                     <ArrowDownIcon className="h-4 w-4 stroke-zinc-400 transition group-active:stroke-zinc-600 dark:group-hover:stroke-zinc-50 dark:group-active:stroke-zinc-50" />
                 </Button>
             </Link>
@@ -296,32 +298,37 @@ function FeaturedPopularSection() {
             name: 'Chicken',
             message: 'Find Chicken, Broiler Buyers in Zimbabwe, Make Poultry Farming Profitable for You.',
             logo: logoChicken,
+            link: 'buyers/chicken'
         },
         {
             name: 'Pork',
             message: 'Find Pig, Pork, Porker Buyers in Zimbabwe, Make Livestock Farming Profitable for You.',
             logo: logoPig,
+            link: 'buyers/pork'
         },
         {
             name: 'Onions',
             message: 'Find Onion Buyers in Zimbabwe, Make Horticulture Farming Profitable for You.',
             logo: logoOnion,
+            link: 'buyers/onions'
         },
         {
             name: 'Cattle',
             message: 'Find Cattle Buyers in Zimbabwe, Make Ranching, Dairy, Livestock Farming Profitable for You.',
-
             logo: logoCattle,
+            link: 'buyers/cattle'
         },
         {
             name: 'Tomatoes',
             message: 'Find Tomato Buyers in Zimbabwe, Make Horticulture Farming Profitable for You.',
             logo: logoTomato,
+            link: 'buyers/tomatoes'
         },
         {
-            name: 'Ground Nuts',
-            message: 'Find Ground Nut Buyers in Zimbabwe, Make Horticulture Farming Profitable for You.',
-            logo: logoGroundNut,
+            name: 'Chilli',
+            message: 'Find Chilli Buyers in Zimbabwe, Make Horticulture Farming Profitable for You.',
+            logo: logoChilli,
+            link: 'buyers/chilli'
         },
     ]
 
@@ -337,7 +344,7 @@ function FeaturedPopularSection() {
                         These agri produce markets are the most searched for by farmers looking to sell, market their fresh produce.
                     </p>
                 </div>
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 pt-4 pb-12 lg:pb-20 lg:pt-16">
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 pt-4 pb-12 lg:pb-20 lg:pt-12">
                     {markets.map((market) => (
                         <div
                             key={market.name}
@@ -347,11 +354,11 @@ function FeaturedPopularSection() {
                                 <Image src={market.logo} alt="" className="h-7 w-7" unoptimized />
                             </div>
                             <div className="min-w-0 flex-1">
-                                <a href="#" className="focus:outline-none">
+                                <Link href={market.link} className="focus:outline-none" onClick={() => sendGTMEvent({ event: 'view', value: 'FeaturedLink' })}>
                                     <span className="absolute inset-0" aria-hidden="true" />
                                     <p className="text-lg font-medium">{market.name}</p>
                                     <p className="text-base text-muted-foreground pt-1">{market.message}</p>
-                                </a>
+                                </Link>
                             </div>
                         </div>
                     ))}

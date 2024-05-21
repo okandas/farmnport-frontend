@@ -4,6 +4,7 @@ import { SiteFooter } from "@/components/layouts/site-footer"
 import { auth } from "@/auth"
 import { useState } from "react"
 import { AuthenticatedUser } from "@/lib/schemas"
+import { retrieveUser } from "@/lib/actions"
 
 interface RootLayoutProps {
     children: React.ReactNode
@@ -11,19 +12,8 @@ interface RootLayoutProps {
 
 
 export default async function LandingLayout({ children }: RootLayoutProps) {
-    const session = await auth()
-    let user: AuthenticatedUser
-    const sessionUser = session?.user
 
-    if (sessionUser !== undefined) {
-
-        user = {
-            ...sessionUser
-        }
-        
-    } else {
-        user = undefined
-    }
+    const user = await retrieveUser()
 
     return (
         <div>

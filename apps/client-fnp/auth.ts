@@ -49,15 +49,15 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
 
                     return null
 
-                } catch (error) {                  
+                } catch (error) {
                     // @ts-expect-error
                     const formatted = new AuthError(error)
 
                     if (isAxiosError(formatted.cause?.err)) {
-                       console.log(formatted.cause?.err.response?.statusText)
+                        console.log(formatted.cause?.err.response?.statusText)
                     }
 
-                     // @ts-expect-error
+                    // @ts-expect-error
                     throw new Error(error)
 
                 }

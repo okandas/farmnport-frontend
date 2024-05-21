@@ -207,8 +207,8 @@ importers:
         specifier: ^3.1.1
         version: 3.1.1(react-hook-form@7.45.4)
       '@next/third-parties':
-        specifier: ^14.0.3
-        version: 14.0.3(next@14.0.4)(react@18.2.0)
+        specifier: 14.0.5-canary.59
+        version: 14.0.5-canary.59(next@14.0.4)(react@18.2.0)
       '@radix-ui/react-accordion':
         specifier: ^1.1.2
         version: 1.1.2(@types/react-dom@18.2.4)(@types/react@18.2.7)(react-dom@18.2.0)(react@18.2.0)
@@ -1058,17 +1058,9 @@ packages:
     dev: false
     optional: true
 
-  /@next/swc-win32-x64-msvc@14.1.0:
-    resolution: {integrity: sha512-9WEbVRRAqJ3YFVqEZIxUqkiO8l1nool1LmNxygr5HWF8AcSYsEpneUDhmjUVJEzO2A04+oPtZdombzzPPkTtgg==}
-    engines: {node: '>= 10'}
-    cpu: [x64]
-    os: [win32]
-    requiresBuild: true
-    dev: false
-    optional: true
 
-  /@next/third-parties@14.0.3(next@14.0.4)(react@18.2.0):
-    resolution: {integrity: sha512-TTFuDDenb2dzO84g+S7jMfhqvw2+4bi3Xu6qdtWk1vpywHeSZNSSY9clwF15YxdBvrdRXV/Gez1AjDjCfiQiOA==}
+  /@next/third-parties@14.0.5-canary.59(next@14.0.4)(react@18.2.0):
+    resolution: {integrity: sha512-q1lU9SG7pL5a7nA49L3nhyEerXmyTH2xyQJ+HeKb+1jV8NVd4H7ewT+Voo2QA3LF5NW1zlmYGukiwaKZFAMnUg==}
     peerDependencies:
       next: ^13.0.0 || ^14.0.0
       react: ^18.2.0
