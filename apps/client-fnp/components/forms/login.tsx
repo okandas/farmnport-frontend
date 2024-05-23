@@ -4,7 +4,6 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation } from "@tanstack/react-query"
 import { isAxiosError } from "axios"
-import { AuthError } from "next-auth"
 
 import { useForm } from "react-hook-form"
 
