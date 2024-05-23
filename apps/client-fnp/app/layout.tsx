@@ -6,6 +6,7 @@ import { GoogleTagManager } from '@next/third-parties/google'
 import { QueryProvider } from "@/components/providers/QueryProvider"
 import { ThemeProvider } from "@/components/providers/ThemeProvider"
 import { Toaster } from "@/components/ui/sonner"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 import { cn } from "@/lib/utilities"
 import { auth } from "@/auth"
@@ -60,6 +61,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
               <Toaster />
             </QueryProvider>
           </ThemeProvider>
+          <SpeedInsights />
         </body>
       </html>
     </>

@@ -1,5 +1,5 @@
 {
-  "name": "admin-farmnport",
+  "name": "farmnport",
   "version": "0.0.0",
   "author": "BaRa",
   "workspaces": [
@@ -8,7 +8,7 @@
   "private": true,
   "scripts": {
     "dev:admin-fnp": "pnpm --filter  ./apps/admin-fnp run dev",
-    "build:admin-fnp": "nepnpm --filter  ./apps/admin-fnp run build",
+    "build:admin-fnp": "pnpm --filter  ./apps/admin-fnp run build",
     "start:admin-fnp": "pnpm --filter  ./apps/admin-fnp run start",
     "lint:admin-fnp": "pnpm --filter  ./apps/admin-fnp run lint",
     "dev:client-fnp": "pnpm --filter  ./apps/client-fnp run dev",
