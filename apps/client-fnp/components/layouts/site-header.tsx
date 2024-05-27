@@ -22,8 +22,7 @@ import { MainNav } from "@/components/layouts/main-nav"
 import { MobileNav } from "@/components/layouts/mobile-nav"
 import { AppURL, AuthenticatedUser } from "@/lib/schemas"
 import { capitalizeFirstLetter, makeAbbveriation } from "@/lib/utilities"
-import { signOut } from "@/auth"
-import { logoutUser } from "@/lib/actions"
+import { signOut } from "next-auth/react"
 
 interface SiteHeaderProps {
     user: AuthenticatedUser | null
@@ -90,7 +89,7 @@ export function SiteHeader({ user }: SiteHeaderProps) {
                                     <DropdownMenuSeparator />
                                     <DropdownMenuGroup>
                                         <DropdownMenuItem asChild>
-                                            <Link href="#" onClick={() => logoutUser()}>
+                                            <Link href="#" onClick={() => signOut()}>
                                                 {/* <DashboardIcon
                                                     className="mr-2 h-4 w-4"
                                                     aria-hidden="true"

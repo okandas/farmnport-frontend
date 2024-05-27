@@ -34,7 +34,7 @@ export function AuthForm({ className, ...props }: AuthFormProps) {
 
     const { errors } = formState
 
-    const { mutate, isPending } = useMutation({
+    const { mutate, isPending, isSuccess } = useMutation({
         mutationFn: loginUser,
         onSuccess: (data) => {
             toast("Success", {
@@ -123,7 +123,7 @@ export function AuthForm({ className, ...props }: AuthFormProps) {
                     </div>
                     <button
                         className={cn(buttonVariants())}
-                        disabled={isPending}
+                        disabled={isPending || isSuccess}
                         type="submit"
                     >
                         {isPending && (

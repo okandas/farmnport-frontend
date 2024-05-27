@@ -6,6 +6,15 @@ import { AppURL } from "@/lib/schemas"
 export default middleware((request: NextAuthRequest) => {
   const pathname = request.nextUrl.pathname
 
+
+    if ((pathname === '/login' || pathname === '/signup') && request.auth?.user !== undefined) {
+
+    var url = `${AppURL}/buyers`
+
+    return NextResponse.redirect(url)
+
+  }
+
   const paths = ['buyers', 'prices']
 
   for (const path of paths) {
@@ -15,7 +24,7 @@ export default middleware((request: NextAuthRequest) => {
       return NextResponse.redirect(url) 
     }
   }
-  
+
   return NextResponse.next()
 })
 
