@@ -59,9 +59,9 @@ export default async function RootLayout({ children }: RootLayoutProps) {
               {children}
               <GoogleTagManager gtmId={GTM_ID} />
               <Toaster />
+              <SpeedInsights />
             </QueryProvider>
           </ThemeProvider>
-          <SpeedInsights />
         </body>
       </html>
     </>
