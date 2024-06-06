@@ -6,7 +6,7 @@ import { useMutation } from "@tanstack/react-query"
 import { isAxiosError } from "axios"
 
 import { useForm } from "react-hook-form"
-
+import Link from 'next/link'
 
 import { toast } from "sonner"
 
@@ -136,9 +136,9 @@ export function AuthForm({ className, ...props }: AuthFormProps) {
 
             <div className="flex items-center justify-between mt-10">
                 <div className="text-sm leading-6">
-                    <a href="#" className="font-semibold text-orange-600 hover:text-orange-500">
+                    <Link href="/reset" className="font-semibold text-orange-600 hover:text-orange-500">
                         Forgotten your password?
-                    </a>
+                    </Link>
                 </div>
 
                 <div className="flex items-center text-sm">

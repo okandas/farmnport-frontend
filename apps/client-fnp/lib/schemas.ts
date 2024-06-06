@@ -5,6 +5,9 @@ export const AuthSchema = z.object({
     password: z.string().nonempty(),
 })
 
+export const ResetSchema = AuthSchema.pick({
+    email: true
+})
 export type AuthenticatedUser = {
     admin: boolean
     banned: boolean
@@ -277,6 +280,7 @@ export const PagintionSchema = z.object({
 export type PaginationModel = z.infer<typeof PagintionSchema>
 
 export type LoginFormData = z.infer<typeof AuthSchema>
+export type ResetFormData = z.infer<typeof ResetSchema>
 
 var base = process.env.NEXT_PUBLIC_BASE_URL
 var version = "/v1"
