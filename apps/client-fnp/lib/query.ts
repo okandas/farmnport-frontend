@@ -5,7 +5,7 @@ import { auth } from "@/auth"
 
 
 
-import { PaginationModel, AuthSchema, LoginFormData, BaseURL } from "@/lib/schemas"
+import { PaginationModel, ResetFormData, LoginFormData, BaseURL } from "@/lib/schemas"
 import { resolve } from "path"
 import { retrieveToken } from "@/lib/actions"
 
@@ -41,6 +41,11 @@ export function queryBuyers(pagintion?: PaginationModel) {
 
 export function clientLogin(data: LoginFormData) {
     var url = `${BaseURL}/client/login`
+    return api.post(url, data)
+}
+
+export function clientReset(data: ResetFormData) {
+    var url = `${BaseURL}/client/reset`
     return api.post(url, data)
 }
 

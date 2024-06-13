@@ -6,19 +6,18 @@ import { useMutation } from "@tanstack/react-query"
 import { isAxiosError } from "axios"
 
 import { useForm } from "react-hook-form"
-import Link from 'next/link'
-
 import { toast } from "sonner"
-
 import { ResetSchema, ResetFormData } from "@/lib/schemas"
 import { cn } from "@/lib/utilities"
-import { resetUser } from "@/lib/actions"
+import { clientReset} from "@/lib/query"
 
 import { buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
 import { Icons } from "@/components/icons/lucide"
+
+
 
 interface RessetFormProps extends React.HTMLAttributes<HTMLDivElement> { }
 
@@ -34,11 +33,12 @@ export function ResetAuthForm({ className, ...props }: RessetFormProps) {
     const { errors } = formState
 
     const { mutate, isPending, isSuccess } = useMutation({
-        mutationFn: resetUser,
+        mutationFn: clientReset,
         onSuccess: (data) => {
             toast("Success", {
                 description: "Reset email sent successfully, please check your email",
             })
+            router.push("/login")
         },
         onError: (error) => {
             if (isAxiosError(error)) {
@@ -55,11 +55,16 @@ export function ResetAuthForm({ className, ...props }: RessetFormProps) {
                         })
                         break
                 }
+            } else {
+
+                toast("Failed send reset password link", {
+                    description: 'System Failure or Network Failure Please Try Again'
+                })
+                
             }
 
-            toast("Failed send reset password link", {
-                description: 'System Failure or Network Failure Please Try Again'
-            })
+            console.log(error)
+
         },
     })
 
