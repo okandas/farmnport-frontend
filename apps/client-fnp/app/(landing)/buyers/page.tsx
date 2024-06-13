@@ -31,7 +31,7 @@ export default async function BuyersPage() {
             <div className="mx-auto max-w-7xl px-6 lg:px-8">
                 <div className="lg:flex lg:space-x-6">
 
-                    <div className="hidden lg:block lg:w-44">
+                    <div className="hidden lg:block lg:w-44 relative">
                         <FilterSidebar />
                     </div>
 
@@ -46,7 +46,7 @@ export default async function BuyersPage() {
 
 function FilterSidebar() {
     return (
-        <div className="mt-6">
+        <div className="sticky top-20">
             <Accordion type="multiple" className="w-full" defaultValue={defaultSideBarData}>
                 {
                     sideBarFilterData.map((filterData, filterDataIndex) => (
