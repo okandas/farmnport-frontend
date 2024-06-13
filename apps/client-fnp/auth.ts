@@ -5,6 +5,7 @@ import jwt_decode from "jwt-decode"
 
 declare module "next-auth" {
     interface User {
+        bad_participant: boolean
         admin: boolean
         banned: boolean
         exp: number

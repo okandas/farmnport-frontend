@@ -31,7 +31,7 @@ export async function retrieveUser() {
         user = {
             ...sessionUser
         }
-        
+             
     } else {
         user = undefined
     }

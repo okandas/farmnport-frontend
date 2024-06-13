@@ -9,14 +9,18 @@ export const ResetSchema = AuthSchema.pick({
     email: true
 })
 export type AuthenticatedUser = {
-    admin: boolean
-    banned: boolean
-    exp: number
-    iat: number
-    id: string
-    iss: string
-    subject: string
-    username: string
+    bad_participant?: boolean
+    admin?: boolean
+    banned?: boolean
+    exp?: number
+    iat?: number
+    id?: string
+    iss?: string
+    subject?: string
+    username?: string
+    token?: string
+    email?: string | null
+    emailVerified?: Date | null
 } | undefined
 
 export type LoginResponse = {
