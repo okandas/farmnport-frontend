@@ -29,7 +29,7 @@ export default async function BuyersPage() {
     return (
         <main>
             <div className="mx-auto max-w-7xl px-6 lg:px-8">
-                <div className="lg:flex lg:space-x-6">
+                <div className="lg:flex lg:space-x-10">
 
                     <div className="hidden lg:block lg:w-44 relative">
                         <FilterSidebar />

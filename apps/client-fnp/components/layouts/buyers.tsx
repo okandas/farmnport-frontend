@@ -11,7 +11,7 @@ import Link from "next/link"
 import { Pagination } from "@/components/generic/pagination"
 import { queryBuyers } from "@/lib/query"
 import { ApplicationUser, AuthenticatedUser } from "@/lib/schemas"
-import { slug, capitalizeFirstLetter, formatDate } from "@/lib/utilities"
+import { slug, capitalizeFirstLetter, formatDate, plural } from "@/lib/utilities"
 import { Icons } from "@/components/icons/lucide"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -167,7 +167,7 @@ export function Buyers({ user }: BuyerPageProps) {
         <section className="space-y-8 mt-[21px]">
             <ul role="list" className="divide-y">
                 {buyers.map((buyer, buyerIndex) => (
-                    <li key={buyerIndex} className="py-4">
+                    <li key={buyerIndex} className="py-4 first:pt-2">
 
                         <div>
                             <h4 className="text-lg">{capitalizeFirstLetter(buyer.name)}</h4>
@@ -209,6 +209,18 @@ export function Buyers({ user }: BuyerPageProps) {
                                                 <Icons.map className="h-6 w-5" aria-hidden="true" />
                                             </dt>
                                             <dd className="text-sm font-medium leading-6 text-muted-foreground">{buyer.address}</dd>
+                                        </div>
+                                        <div className="flex gap-x-4 py-1">
+                                            <dt>
+                                                <span className="sr-only">Quick overview</span>
+                                                <Icons.info className="h-6 w-5" aria-hidden="true" />
+                                            </dt>
+                                            <div>
+                                                <dd className="text-sm font-medium leading-6 text-muted-foreground">Buyer mainly specializes in <span className="font-semibold text-foreground">{capitalizeFirstLetter(buyer.specialization)}</span></dd>
+                                                <dd className="text-sm font-medium leading-6 text-muted-foreground">Mainly buying <span className="font-semibold text-foreground">{capitalizeFirstLetter(plural(buyer.main_activity))}</span></dd>
+                                                <dd className="text-sm font-medium leading-6 text-muted-foreground">Buys <span className="font-semibold text-foreground">{buyer.specializations.length}</span> other agri produce, see more</dd>
+                                            </div>
+      
                                         </div>
                                         <div className="flex gap-x-4 py-1">
                                             <dt>

@@ -2,6 +2,7 @@ import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { format } from "date-fns"
 import slugify from "slugify"
+import pluralize from "pluralize"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -44,4 +45,16 @@ export function slug(name?: string): string {
   })
 
   return slugged
+}
+
+export function plural(word: string, count?: number): string {
+  pluralize.addUncountableRule('cattle')
+  pluralize.addUncountableRule('asparagus')
+  pluralize.addUncountableRule('beetroot')
+  
+  if (count == null) {
+    return pluralize(word)
+  } else {
+    return pluralize(word, count)
+  }
 }

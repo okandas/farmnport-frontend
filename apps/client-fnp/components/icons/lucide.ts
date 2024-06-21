@@ -37,7 +37,8 @@ import {
     MailCheck,
     TabletSmartphone,
     MapPin,
-    Landmark
+    Landmark,
+    Info
 } from "lucide-react"
 
 export type Icon = LucideIcon
@@ -80,5 +81,6 @@ export const Icons = {
     mail: MailCheck,
     phone: TabletSmartphone,
     map: MapPin,
-    landmark: Landmark
+    landmark: Landmark,
+    info: Info
 }
