@@ -1,7 +1,8 @@
 "use server"
 
 import { auth, signIn, signOut } from "@/auth"
-import { AuthenticatedUser, LoginFormData } from "@/lib/schemas"
+import { AuthenticatedUser, LoginFormData, ResetFormData } from "@/lib/schemas"
+
 
 export async function loginUser(payload: LoginFormData) {
     const response = await signIn('credentials', { email: payload.email, password: payload.password, redirect: false })
@@ -13,10 +14,12 @@ export async function logoutUser() {
 }
 
 export async function retrieveToken() {
+    
     const session = await auth()
     const token = session?.access_token
     return token
-}
+
+} 
 
 export async function retrieveUser() {
     const session = await auth()
@@ -28,7 +31,7 @@ export async function retrieveUser() {
         user = {
             ...sessionUser
         }
-        
+             
     } else {
         user = undefined
     }

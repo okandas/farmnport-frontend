@@ -5,15 +5,22 @@ export const AuthSchema = z.object({
     password: z.string().nonempty(),
 })
 
+export const ResetSchema = AuthSchema.pick({
+    email: true
+})
 export type AuthenticatedUser = {
-    admin: boolean
-    banned: boolean
-    exp: number
-    iat: number
-    id: string
-    iss: string
-    subject: string
-    username: string
+    bad_participant?: boolean
+    admin?: boolean
+    banned?: boolean
+    exp?: number
+    iat?: number
+    id?: string
+    iss?: string
+    subject?: string
+    username?: string
+    token?: string
+    email?: string | null
+    emailVerified?: Date | null
 } | undefined
 
 export type LoginResponse = {
@@ -206,8 +213,6 @@ export const ProductSchema = z.object({
 
 export const FormProductSchema = ProductSchema.omit({
     admin: true,
-    created: true,
-    updated: true
 })
 
 ApplicationUserSchema.required({
@@ -277,6 +282,7 @@ export const PagintionSchema = z.object({
 export type PaginationModel = z.infer<typeof PagintionSchema>
 
 export type LoginFormData = z.infer<typeof AuthSchema>
+export type ResetFormData = z.infer<typeof ResetSchema>
 
 var base = process.env.NEXT_PUBLIC_BASE_URL
 var version = "/v1"
