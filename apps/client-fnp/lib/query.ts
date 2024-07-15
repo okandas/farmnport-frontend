@@ -39,6 +39,13 @@ export function queryBuyers(pagintion?: PaginationModel) {
     return api.get(url)
 }
 
+export function queryBuyer(slug: string) {
+
+    var url = `${BaseURL}/client/${slug}`
+
+    return api.get(url)
+}
+
 export function clientLogin(data: LoginFormData) {
     var url = `${BaseURL}/client/login`
     return api.post(url, data)

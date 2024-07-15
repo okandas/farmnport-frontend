@@ -17,11 +17,11 @@ import { Icons } from "@/components/icons/lucide"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 
-interface BuyerPageProps {
+interface BuyersPageProps {
     user: AuthenticatedUser | null
 }
 
-export function Buyers({ user }: BuyerPageProps) {
+export function Buyers({ user }: BuyersPageProps) {
 
     const router = useRouter()
     const pathname = usePathname()
@@ -170,7 +170,9 @@ export function Buyers({ user }: BuyerPageProps) {
                     <li key={buyerIndex} className="py-4 first:pt-2">
 
                         <div>
-                            <h4 className="text-lg">{capitalizeFirstLetter(buyer.name)}</h4>
+                            <h4 className="text-lg hover:underline hover:decoration-2">
+                                <Link href={`/buyer/${slug(buyer.name)}`}>{capitalizeFirstLetter(buyer.name)}</Link>
+                            </h4>
                             {buyer.short_description.length > 0 ? <h4 className="text-muted-foreground text-sm">{capitalizeFirstLetter(buyer.short_description)}</h4> : null}
                             <div className="-my-3 py-4">
                               
