@@ -12,6 +12,7 @@ import { slug as createSlug, capitalizeFirstLetter, formatDate, plural } from "@
 import { Icons } from "@/components/icons/lucide"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 
 interface BuyerPageProps {
@@ -156,7 +157,8 @@ export function Buyer({ slug, user }: BuyerPageProps) {
         <div className="space-y-8 mt-[21px]">
             <section className="">
                 <div className="flex gap-x-4 py-1 px-6">
-                    <img className="h-12 w-12 flex-none rounded-full bg-gray-50" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="" />
+
+                    <Image className="h-12 w-12 flex-none rounded-full bg-gray-50" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="" unoptimized/>
                     <div className="min-w-0">
                         <h1 className="text-sm font-semibold leading-6 text-gray-900">Leslie Alexander</h1>
                         <p className="truncate text-xs leading-4 text-gray-500">leslie.alexander@example.com</p>

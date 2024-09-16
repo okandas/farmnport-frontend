@@ -153,7 +153,7 @@ export function AuthForm({ className, ...props }: AuthFormProps) {
                         <div className="w-full border-t border-border" />
                     </div>
                     <div className="relative flex justify-center text-sm font-medium leading-6">
-                        <span className="bg-card px-6 text-muted-foreground">Don't have an account?</span>
+                        <span className="bg-card px-6 text-muted-foreground">{"Don't have an account?"}</span>
                     </div>
                 </div>
 

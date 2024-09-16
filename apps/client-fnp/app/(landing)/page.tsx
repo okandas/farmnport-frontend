@@ -32,7 +32,7 @@ export default function LandingPage() {
 
                             <div className="mt-12 mb-8 sm:mt-32 sm:flex lg:mt-16">
                                 <div className="relative rounded-full px-3 py-1 text-sm leading-6 ring-1 ring-orange-500 hover:ring-900/20 w-44">
-                                    See <a href="#" className="whitespace-nowrap font-semibold text-orange-600">What's new!? <span aria-hidden="true">&rarr;</span></a>
+                                    See <a href="#" className="whitespace-nowrap font-semibold text-orange-600">{"What's new!?"}<span aria-hidden="true">&rarr;</span></a>
                                 </div>
                             </div>
                             <h1 className="text-4xl font-bold tracking-tight sm:mt-10 sm:text-6xl font-heading">Getting You To Market.</h1>
@@ -230,8 +230,8 @@ function BuyerFaqs() {
                         </div>
                         {activityItem.type === 'commented' ? (
                             <>
-                                <img
-                                    src={activityItem.description.imageUrl}
+                                <Image
+                                    src={activityItem?.description?.imageUrl as string}
                                     alt=""
                                     className="relative mt-3 h-6 w-6 flex-none rounded-full bg-gray-50"
                                 />
