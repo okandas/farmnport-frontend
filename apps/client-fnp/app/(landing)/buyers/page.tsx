@@ -18,8 +18,11 @@ import { retrieveUser } from "@/lib/actions"
 
 
 export const metadata = {
-    title: 'Buyers in Zimbabwe',
-    description: 'Agri produce, fresh produce, buyers buying directly from farmers in Zimbabwe'
+    title: 'Buyers in Zimbabwe | farmnport.com',
+    description: 'Agri produce, fresh produce, buyers buying directly from farmers in Zimbabwe',
+    alternates: {
+        canonical: `/buyers`,
+    }
 }
 
 export default async function BuyersPage() {

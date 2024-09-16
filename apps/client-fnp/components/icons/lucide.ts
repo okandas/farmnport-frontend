@@ -38,7 +38,12 @@ import {
     TabletSmartphone,
     MapPin,
     Landmark,
-    Info
+    Info,
+    Linkedin,
+    Facebook,
+    CircleDollarSign,
+    ShieldCheck,
+    ShieldX
 } from "lucide-react"
 
 export type Icon = LucideIcon
@@ -82,5 +87,10 @@ export const Icons = {
     phone: TabletSmartphone,
     map: MapPin,
     landmark: Landmark,
-    info: Info
+    info: Info,
+    linkedin: Linkedin,
+    facebook: Facebook,
+    circleDollarSign: CircleDollarSign,
+    verified: ShieldCheck,
+    unverified: ShieldX
 }
