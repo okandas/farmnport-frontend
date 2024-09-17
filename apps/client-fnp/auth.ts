@@ -51,7 +51,11 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
 
 
                 try {
-                    const response = await axios.post(url, data)
+                    const response = await axios.post(url, data, {
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    })
 
                     captureException(response)
 
