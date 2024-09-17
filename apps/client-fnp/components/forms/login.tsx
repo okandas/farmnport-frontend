@@ -68,12 +68,10 @@ export function AuthForm({ className, ...props }: AuthFormProps) {
             }
 
             toast("Failed to login", {
-                description: 'System Failure or Network Failure Please Try Again',
-                action: {
-                    label: 'Action',
-                    onClick: () => console.log(error),
-                },
+                description: 'System Failure or Network Failure Please Try Again'
             })
+
+            console.log(error)
         },
     })
 

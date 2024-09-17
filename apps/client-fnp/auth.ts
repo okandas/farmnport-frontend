@@ -1,7 +1,8 @@
-import NextAuth, {  User } from "next-auth";
+import NextAuth, { User } from "next-auth";
 import Credentials from 'next-auth/providers/credentials'
 import axios, { isAxiosError } from "axios"
 import jwt_decode from "jwt-decode"
+import { Debug } from "@/lib/schemas"
 
 declare module "next-auth" {
     interface User {
@@ -29,7 +30,7 @@ import { BaseURL } from "@/lib/schemas"
 
 
 export const { auth, signIn, signOut, handlers } = NextAuth({
-    debug: true,
+    debug: Debug,
     session: {
         strategy: "jwt"
     },
@@ -50,8 +51,6 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
                 try {
                     const response = await axios.post(url, data)
 
-                    console.log(response, 'response')
-
                     if (response.status === 200) {
                         const decodedSession = jwt_decode<User>(response.data.token)
                         decodedSession.token = response.data.token
@@ -62,7 +61,6 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
                     return null
 
                 } catch (error) {
-                    console.log(error, 'error auth')
                     return null
                 }
             }
@@ -78,7 +76,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
             const entity = newURL.searchParams.get('entity')
             const wantToSee = newURL.searchParams.get('wantToSee')
 
-            if (wantToSee !== null && entity !== null ) {
+            if (wantToSee !== null && entity !== null) {
                 return `${newURL.origin}/${entity}/${wantToSee}`
             }
 
@@ -105,7 +103,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
                 const name = user.name as string
                 const email = user.email != null || user.email != undefined ? user.email : ''
                 const emailVerified = user.emailVerified != null || user.emailVerified != undefined ? user.emailVerified : null
-                session.user = { ...user, id, name, email, emailVerified}
+                session.user = { ...user, id, name, email, emailVerified }
                 session.access_token = user.token
             }
 
