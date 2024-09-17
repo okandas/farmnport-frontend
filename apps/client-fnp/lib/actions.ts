@@ -6,6 +6,7 @@ import { AuthenticatedUser, LoginFormData, ResetFormData } from "@/lib/schemas"
 
 export async function loginUser(payload: LoginFormData) {
     const response = await signIn('credentials', { email: payload.email, password: payload.password, redirect: false })
+    console.log(response)
     return response
 }
 
