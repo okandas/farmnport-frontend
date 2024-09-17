@@ -53,6 +53,8 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
                 try {
                     const response = await axios.post(url, data)
 
+                    captureException(response)
+
                     if (response.status === 200) {
                         const decodedSession = jwt_decode<User>(response.data.token)
                         decodedSession.token = response.data.token
