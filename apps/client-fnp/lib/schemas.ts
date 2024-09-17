@@ -288,5 +288,5 @@ var base = process.env.NEXT_PUBLIC_BASE_URL
 var version = "/v1"
 export const BaseURL = base + version
 export const AppURL = process.env.NEXT_PUBLIC_APP_URL
-export const Debug = process.env.NEXT_PUBLIC_DEBUG
+export const Debug = process.env.NEXT_PUBLIC_DEBUG == 'true' ? true : false
 
