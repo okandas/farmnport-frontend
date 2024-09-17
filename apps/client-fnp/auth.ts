@@ -3,6 +3,7 @@ import Credentials from 'next-auth/providers/credentials'
 import axios, { isAxiosError } from "axios"
 import jwt_decode from "jwt-decode"
 import { Debug } from "@/lib/schemas"
+import { captureException } from "@sentry/nextjs";
 
 declare module "next-auth" {
     interface User {
@@ -48,6 +49,8 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
 
                 var url = `${BaseURL}/client/login`
 
+                captureException(url)
+
                 try {
                     const response = await axios.post(url, data)
 
@@ -71,6 +74,8 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
             return true
         },
         async redirect({ url, baseUrl }) {
+
+            captureException(url)
 
             const newURL = new URL(url)
             const entity = newURL.searchParams.get('entity')

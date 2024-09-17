@@ -23,6 +23,7 @@ const openSans = Open_Sans({
 const fontHeading = localFont({
   src: "../assets/fonts/CalSans-SemiBold.woff2",
   variable: "--font-heading",
+  preload: true
 })
 
 export const metadata = {
