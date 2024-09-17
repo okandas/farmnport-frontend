@@ -50,6 +50,8 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
                 try {
                     const response = await axios.post(url, data)
 
+                    console.log(response, 'response')
+
                     if (response.status === 200) {
                         const decodedSession = jwt_decode<User>(response.data.token)
                         decodedSession.token = response.data.token
@@ -60,6 +62,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
                     return null
 
                 } catch (error) {
+                    console.log(error, 'error auth')
                     return null
                 }
             }
