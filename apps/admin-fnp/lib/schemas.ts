@@ -207,9 +207,7 @@ export const ProductSchema = z.object({
 })
 
 export const FormProductSchema = ProductSchema.omit({
-  admin: true,
-  created: true,
-  updated: true
+  admin: true
 })
 
 ApplicationUserSchema.required({
