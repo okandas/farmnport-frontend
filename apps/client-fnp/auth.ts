@@ -1,6 +1,5 @@
 import NextAuth, { User } from "next-auth";
 import Credentials from 'next-auth/providers/credentials'
-import axios, { isAxiosError } from "axios"
 import jwt_decode from "jwt-decode"
 import { Debug } from "@/lib/schemas"
 import { captureException } from "@sentry/nextjs";
@@ -51,7 +50,19 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
 
 
                 try {
-                    const response = await axios.post(url, data)
+
+                    const rawResponse = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                          'Accept': 'application/json',
+                          'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    });
+
+                    const response = await rawResponse.json();
+                    
+                
                     
                     if (response.status === 200) {
                         const decodedSession = jwt_decode<User>(response.data.token)
@@ -59,6 +70,8 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
                         decodedSession.name = decodedSession.username
                         return decodedSession
                     }
+
+                    captureException(response)
 
                     return null
 
