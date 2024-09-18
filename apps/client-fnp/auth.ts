@@ -51,14 +51,9 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
 
 
                 try {
-                    const response = await axios.post(url, data, {
-                        headers: {
-                            'Content-Type': 'application/json',
-                        }
-                    })
-
-                    captureException(response)
-
+                    captureException(url)
+                    const response = await axios.post(url, data)
+                    
                     if (response.status === 200) {
                         const decodedSession = jwt_decode<User>(response.data.token)
                         decodedSession.token = response.data.token
