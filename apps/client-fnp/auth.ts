@@ -40,7 +40,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
     },
     providers: [
         Credentials({
-            async authorize(credentials) {
+            async authorize(credentials: any) {
 
                 const email = credentials.email as string
                 const password = credentials.password as string
@@ -51,7 +51,6 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
 
 
                 try {
-                    captureException(url)
                     const response = await axios.post(url, data)
                     
                     if (response.status === 200) {
@@ -64,7 +63,11 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
                     return null
 
                 } catch (error) {
-                    captureException(error)
+                    const errObj = {
+                        message: 'happened in the credentials provider',
+                        error: error
+                    }
+                    captureException(errObj)
                     return null
                 }
             }
