@@ -61,23 +61,27 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
                     });
 
                     const response = await rawResponse.json();
-                    
-                
-                    
-                    if (response.status === 200) {
-                        const decodedSession = jwt_decode<User>(response.data.token)
-                        decodedSession.token = response.data.token
-                        decodedSession.name = decodedSession.username
-                        return decodedSession
+                    const check = true
+
+                    if (response.code !== 200) {
+                        const errObj = {
+                            message: 'Authorize in the credentials provider',
+                            error: response
+                        }
+                        captureException(errObj)
+                        throw new Error(JSON.stringify(errObj))
                     }
 
-                    captureException(response)
+                    const decodedSession = jwt_decode<User>(response.token)
+                    decodedSession.token = response.token
+                    decodedSession.name = decodedSession.username
+                    return decodedSession
 
-                    return null
-
+                  
+ 
                 } catch (error) {
                     const errObj = {
-                        message: 'happened in the credentials provider',
+                        message: 'Authorize in the credentials provider',
                         error: error
                     }
                     captureException(errObj)

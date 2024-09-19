@@ -3,7 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation } from "@tanstack/react-query"
-import { isAxiosError } from "axios"
+import { captureException } from "@sentry/nextjs";
 
 import { useForm } from "react-hook-form"
 import Link from 'next/link'
@@ -51,27 +51,12 @@ export function AuthForm({ className, ...props }: AuthFormProps) {
             }
         },
         onError: (error) => {
-            if (isAxiosError(error)) {
-                switch (error.code) {
-                    case "ERR_NETWORK":
-                        toast("Network Issues", {
-                            description: "There seems to be a network error."
-                        })
-                        break
-
-                    default:
-                        toast("Unsuccesful", {
-                            description: "There was a problem with your request."
-                        })
-                        break
-                }
-            }
 
             toast("Failed to login", {
-                description: 'System Failure or Network Failure Please Try Again'
+                description: 'System Failure or Network Failure Please Try Again',     
             })
 
-            console.log(error)
+            captureException(error)
         },
     })
 
