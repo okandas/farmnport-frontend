@@ -1,7 +1,10 @@
 import { Buyer } from "@/components/layouts/buyer"
 import { retrieveUser } from "@/lib/actions"
+import { AppURL } from "@/lib/schemas"
 
 import type { Metadata, ResolvingMetadata } from 'next'
+
+import { unSlug } from "@/lib/utilities"
 
 type Props = {
   params: { slug: string }
@@ -13,13 +16,14 @@ export async function generateMetadata(
   parent: ResolvingMetadata
 ): Promise<Metadata> {
   const slug = params.slug
+  const name = unSlug(slug)
  
 
   return {
     alternates: {
-      canonical: `/buyer/${slug}`,
+      canonical: `${AppURL}/buyer/${slug}`,
     },
-    title: 'Buyers in Zimbabwe | farmnport.com',
+    title: `${name} - Buyer in Zimbabwe | farmnport.com`,
   }
 }
 

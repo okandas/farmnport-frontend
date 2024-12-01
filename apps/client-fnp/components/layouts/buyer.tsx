@@ -8,10 +8,11 @@ import Link from "next/link"
 
 import { queryBuyer } from "@/lib/query"
 import { ApplicationUser, AuthenticatedUser } from "@/lib/schemas"
-import { slug as createSlug, capitalizeFirstLetter, formatDate, plural } from "@/lib/utilities"
+import { slug as createSlug } from "@/lib/utilities"
 import { Icons } from "@/components/icons/lucide"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from '@/components/ui/badge'
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 
@@ -158,9 +159,9 @@ export function Buyer({ slug, user }: BuyerPageProps) {
             <section className="">
                 <div className="flex gap-x-4 py-1 px-6">
 
-                    <Image className="h-12 w-12 flex-none rounded-full bg-gray-50" 
-                    src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="" unoptimized
-                    width={256} height={256}/>
+                    <Image className="h-12 w-12 flex-none rounded-full bg-gray-50"
+                        src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="" unoptimized
+                        width={256} height={256} />
                     <div className="min-w-0">
                         <h1 className="text-sm font-semibold leading-6 text-gray-900">Leslie Alexander</h1>
                         <p className="truncate text-xs leading-4 text-gray-500">leslie.alexander@example.com</p>
@@ -212,15 +213,117 @@ export function Buyer({ slug, user }: BuyerPageProps) {
                     <div className="flex-none w-16">
                         <dt>
                             <span className="sr-only">Unverified</span>
-                            <Icons.unverified className="h-6 w-5" aria-hidden="true" color="#FF0000"/>
+                            <Icons.unverified className="h-6 w-5" aria-hidden="true" color="#FF0000" />
                         </dt>
                         <dd className="text-[10px] font-medium leading-3 text-muted-foreground">Unverified</dd>
                     </div>
                 </div>
 
-                <div className="min-h-[300px] bg-secondary mt-4">
+                <div className="min-h-[150px] bg-secondary mt-4">
+                    <div className="px-6 py-4 space-y-4">
+                        <div className="space-y-2">
+                            <h3 className="text-sm text-foreground">Specializations</h3>
+                            <ul className="grid grid-cols-4 gap-1">
+                                <li className="col-span-1 flex justify-center ">
+                                    <span className="flex justify-center rounded-md bg-green-600 px-2 py-2 text-xs font-medium text-white ring-1 ring-inset ring-green-500/20  w-full text-center">Badge</span>
+                                </li>
+                                <li className="col-span-1 flex justify-center  ">
+                                    <span className="flex justify-center rounded-md bg-green-600 px-2 py-2 text-xs font-medium text-white ring-1 ring-inset ring-green-500/20  w-full text-center">Badge</span>
+                                </li>
+                                <li className="col-span-1 flex justify-center">
+                                    <span className="flex justify-center rounded-md bg-green-600 px-2 py-2 text-xs font-medium text-white ring-1 ring-inset ring-green-500/20  w-full text-center">Badge</span>
+                                </li>
+                                <li className="col-span-1 flex justify-center">
+                                    <span className="flex justify-center rounded-md bg-green-600 px-2 py-2 text-xs font-medium text-white ring-1 ring-inset ring-green-500/20  w-full text-center">Badge</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div className="space-y-2">
+                            <h3 className="text-sm text-foreground">Specializations</h3>
+                            <ul className="grid grid-cols-4 gap-1">
+                                <li className="col-span-1 flex justify-center">
+                                    <span className="flex justify-center  items-center rounded-md bg-white px-2 py-2 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-400/20 w-full text-center">Badge</span>
+                                </li>
+                                <li className="col-span-1 flex justify-center">
+                                    <span className="flex justify-center rounded-md bg-white px-2 py-2 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-400/20 w-full text-center">Badge</span>
+                                </li>
+                                <li className="col-span-1 flex justify-center">
+                                    <span className="flex justify-center  items-center rounded-md bg-white px-2 py-2 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-400/20 w-full text-center">Badge</span>
+                                </li>
+                                <li className="col-span-1 flex justify-center">
+                                    <span className="flex justify-center  items-center rounded-md bg-white px-2 py2 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-400/20 w-full text-center">Badge</span>
+                                </li>
+                            </ul>
+                        </div>
 
+                    </div>
                 </div>
+
+                <div className="py-4 px-6 space-y-4">
+                    <ul role="list" className="grid grid-cols-2 gap-3">
+                        <li className="col-span-1">
+                            <div className="flex-1 truncate">
+                                <div className="flex items-center space-x-3">
+                                    <h3 className="truncate text-sm font-medium text-gray-900">Jane Cooper</h3>
+
+                                </div>
+                                <p className="mt-1 truncate text-sm text-gray-500">Regional Paradigm Technician</p>
+                            </div>
+                        </li>
+                        <li className="col-span-1">
+                            <div className="flex-1 truncate">
+                                <div className="flex items-center space-x-3">
+                                    <h3 className="truncate text-sm font-medium text-gray-900">Jane Cooper</h3>
+                                </div>
+                                <p className="mt-1 truncate text-sm text-gray-500">Regional Paradigm Technician</p>
+                            </div>
+                        </li>
+                    </ul>
+                    <ul role="list" className="grid grid-cols-2 gap-3">
+                        <li className="col-span-1">
+                            <div className="flex-1 truncate">
+                                <div className="flex items-center space-x-3">
+                                    <h3 className="truncate text-sm font-medium text-gray-900">Jane Cooper</h3>
+
+                                </div>
+                                <p className="mt-1 truncate text-sm text-gray-500">Regional Paradigm Technician</p>
+                            </div>
+                        </li>
+                        <li className="col-span-1">
+                            <div className="flex-1 truncate">
+                                <div className="flex items-center space-x-3">
+                                    <h3 className="truncate text-sm font-medium text-gray-900">Jane Cooper</h3>
+                                </div>
+                                <p className="mt-1 truncate text-sm text-gray-500">Regional Paradigm Technician</p>
+                            </div>
+                        </li>
+                    </ul>
+                    <div className="flex-1 truncate">
+                        <div className="flex items-center space-x-3">
+                            <h3 className="truncate text-sm font-medium text-gray-900">Jane Cooper</h3>
+                        </div>
+                        <p className="mt-1 truncate text-sm text-gray-500">Regional Paradigm Technician</p>
+                    </div>
+                </div>
+
+                <div className="py-4 px-2">
+                    <div className="overflow-hidden md:rounded-xl md:border md:border-gray-200">
+                        <div className="flex justify-between items-center gap-x-4 border-b border-gray-900/5 p-2">
+                            <div className="text-sm font-medium leading-6 text-gray-900">Amount</div>
+                            <div className="flex justify-between gap-x-4 py-3">
+                                <dd className="flex items-start gap-x-2">
+                                    <div className="font-medium text-gray-900">$2,000.00</div>
+                                    <div className="rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10">Overdue</div>
+                                </dd>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+
+
             </section>
 
         </div>

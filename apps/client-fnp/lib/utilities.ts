@@ -48,6 +48,15 @@ export function slug(name?: string): string {
   return slugged
 }
 
+export function unSlug(slug: string): string {
+
+  const split = slug.split('-')
+
+  const words = split.map(word => capitalizeFirstLetter(word))
+
+  return words.join(" ")
+}
+
 export function plural(word: string, count?: number): string {
   pluralize.addUncountableRule('cattle')
   pluralize.addUncountableRule('asparagus')
