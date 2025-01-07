@@ -7,8 +7,8 @@ interface AuthLayoutProps {
 export default async function AuthLayout({ children }: AuthLayoutProps) {
 
     return (
-        <div>
+        <main>
             {children}
-        </div>
+        </main>
     )
 }

@@ -16,11 +16,10 @@ export default async function LandingLayout({ children }: RootLayoutProps) {
     const user = await retrieveUser()
 
     return (
-        <div>
+        <main>
             <SiteHeader user={user} />
             {children}
             <SiteFooter />
-
-        </div>
+        </main>
     )
 }

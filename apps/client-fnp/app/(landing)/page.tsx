@@ -1,21 +1,21 @@
 "use client"
 
-import { sendGTMEvent } from '@next/third-parties/google'
+import { sendGTMEvent } from "@next/third-parties/google"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Image, { ImageProps } from "next/image"
-import Link from 'next/link'
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 
-import logoInputs from '@/assets/logos/inputs.svg'
-import logoGuidance from '@/assets/logos/guidance.svg'
-import logoPlanning from '@/assets/logos/planning.svg'
-import logoResearch from '@/assets/logos/research.svg'
-import logoChicken from '@/assets/logos/chicken.svg'
-import logoPig from '@/assets/logos/pig.svg'
-import logoCattle from '@/assets/logos/cattle.svg'
-import logoChilli from '@/assets/logos/chilli.svg'
-import logoTomato from '@/assets/logos/tomato.svg'
-import logoOnion from '@/assets/logos/onion.svg'
+import logoInputs from "@/assets/logos/inputs.svg"
+import logoGuidance from "@/assets/logos/guidance.svg"
+import logoPlanning from "@/assets/logos/planning.svg"
+import logoResearch from "@/assets/logos/research.svg"
+import logoChicken from "@/assets/logos/chicken.svg"
+import logoPig from "@/assets/logos/pig.svg"
+import logoCattle from "@/assets/logos/cattle.svg"
+import logoChilli from "@/assets/logos/chilli.svg"
+import logoTomato from "@/assets/logos/tomato.svg"
+import logoOnion from "@/assets/logos/onion.svg"
 
 import { cn } from "@/lib/utilities"
 import { Icons } from "@/components/icons/lucide"
@@ -32,15 +32,15 @@ export default function LandingPage() {
 
                             <div className="mt-12 mb-8 sm:mt-32 sm:flex lg:mt-16">
                                 <div className="relative rounded-full px-3 py-1 text-sm leading-6 ring-1 ring-orange-500 hover:ring-900/20 w-44">
-                                    See <a href="#" className="whitespace-nowrap font-semibold text-orange-600">What's new!? <span aria-hidden="true">&rarr;</span></a>
+                                    See <a href="#" className="whitespace-nowrap font-semibold text-orange-600">What&apos;s new!? <span aria-hidden="true">&rarr;</span></a>
                                 </div>
                             </div>
                             <h1 className="text-4xl font-bold tracking-tight sm:mt-10 sm:text-6xl font-heading">Getting You To Market.</h1>
                             <p className="mt-6 leading-normal text-muted-foreground sm:text-xl sm:leading-8">Its never been easier to pre plan your harvest sales, with fresh farm produce buyers at the tip of your fingers. Farmnport the best pace to find buyers for your agriproduce.</p>
                             <div className="mt-10 flex items-center gap-x-6">
                                 <TabsList className="">
-                                    <TabsTrigger value="farmers" onClick={() => sendGTMEvent({ event: 'view', value: 'FarmerFaqTab' })}><span className="mr-1">For Farmers</span>  <span aria-hidden="true">&rarr;</span></TabsTrigger>
-                                    <TabsTrigger value="buyers" onClick={() => sendGTMEvent({ event: 'view', value: 'BuyerManagementTab' })}><span className="mr-1">Buyer Management</span>  <span aria-hidden="true">&#8644;</span></TabsTrigger>
+                                    <TabsTrigger value="farmers" onClick={() => sendGTMEvent({ event: "view", value: "FarmerFaqTab" })}><span className="mr-1">For Farmers</span>  <span aria-hidden="true">&rarr;</span></TabsTrigger>
+                                    <TabsTrigger value="buyers" onClick={() => sendGTMEvent({ event: "view", value: "BuyerManagementTab" })}><span className="mr-1">Buyer Management</span>  <span aria-hidden="true">&#8644;</span></TabsTrigger>
                                 </TabsList>
                             </div>
                         </div>
@@ -61,7 +61,7 @@ export default function LandingPage() {
     )
 }
 
-function BriefcaseIcon(props: React.ComponentPropsWithoutRef<'svg'>) {
+function BriefcaseIcon(props: React.ComponentPropsWithoutRef<"svg">) {
     return (
         <svg
             viewBox="0 0 24 24"
@@ -84,7 +84,7 @@ function BriefcaseIcon(props: React.ComponentPropsWithoutRef<'svg'>) {
     )
 }
 
-function ArrowDownIcon(props: React.ComponentPropsWithoutRef<'svg'>) {
+function ArrowDownIcon(props: React.ComponentPropsWithoutRef<"svg">) {
     return (
         <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" {...props}>
             <path
@@ -100,7 +100,7 @@ function ArrowDownIcon(props: React.ComponentPropsWithoutRef<'svg'>) {
 interface Info {
     company: string
     title: string
-    logo: ImageProps['src']
+    logo: ImageProps["src"]
     activity: string
 }
 
@@ -135,31 +135,31 @@ function Info({ info }: { info: Info }) {
 function FarmerInfo() {
     let details: Array<Info> = [
         {
-            company: 'Planning',
-            title: 'Plan, Grow and Sell Produce',
+            company: "Planning",
+            title: "Plan, Grow and Sell Produce",
             logo: logoPlanning,
-            activity: 'marketing'
+            activity: "marketing"
 
         },
         {
-            company: 'Inputs',
-            title: 'Where, How to source affordable inputs.',
+            company: "Inputs",
+            title: "Where, How to source affordable inputs.",
             logo: logoInputs,
-            activity: 'strategy'
+            activity: "strategy"
 
         },
         {
-            company: 'Guidance',
-            title: 'Agronomists, Ministry at your disposal.',
+            company: "Guidance",
+            title: "Agronomists, Ministry at your disposal.",
             logo: logoGuidance,
-            activity: 'guidance'
+            activity: "guidance"
 
         },
         {
-            company: 'Research',
-            title: 'Seed, Breeds, Vaccines available for your use',
+            company: "Research",
+            title: "Seed, Breeds, Vaccines available for your use",
             logo: logoResearch,
-            activity: 'information'
+            activity: "information"
 
         },
     ]
@@ -176,7 +176,7 @@ function FarmerInfo() {
                 ))}
             </ol>
             <Link href="/signup">
-                <Button variant="secondary" className="group mt-6 w-full" onClick={() => sendGTMEvent({ event: 'link', value: 'SignupFarmerNavigation' })}>
+                <Button variant="secondary" className="group mt-6 w-full" onClick={() => sendGTMEvent({ event: "link", value: "SignupFarmerNavigation" })}>
                     Get Started
                     <ArrowDownIcon className="h-4 w-4 stroke-zinc-400 transition group-active:stroke-zinc-600 dark:group-hover:stroke-zinc-50 dark:group-active:stroke-zinc-50" />
                 </Button>
@@ -189,30 +189,30 @@ function FarmerInfo() {
 function BuyerFaqs() {
 
     const activity = [
-        { id: 1, type: 'faq', description: { name: 'Do they pay on time ?' } },
+        { id: 1, type: "faq", description: { name: "Do they pay on time ?" } },
 
         {
             id: 2,
-            type: 'commented',
+            type: "commented",
             description: {
-                name: 'Guides and Reviews',
+                name: "Guides and Reviews",
                 imageUrl:
-                    'https://images.unsplash.com/photo-1635850967683-17df1f33e749?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+                    "https://images.unsplash.com/photo-1635850967683-17df1f33e749?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
             },
-            comment: 'Find out when and how buyers pay their invoices?'
+            comment: "Find out when and how buyers pay their invoices?"
         },
-        { id: 3, type: 'faq', description: { name: 'Buyer Standards.' } },
+        { id: 3, type: "faq", description: { name: "Buyer Standards." } },
         {
             id: 2,
-            type: 'commented',
+            type: "commented",
             description: {
-                name: 'Trust and Professionalism',
+                name: "Trust and Professionalism",
                 imageUrl:
-                    'https://images.unsplash.com/photo-1521791136064-7986c2920216?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+                    "https://images.unsplash.com/photo-1521791136064-7986c2920216?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
             },
-            comment: 'Are buyers professional in their operations and give fair value for produce purchased..'
+            comment: "Are buyers professional in their operations and give fair value for produce purchased.."
         },
-        { id: 5, type: 'paid', description: { name: 'Stay ahead and achieve profitability in agriculture!' } },
+        { id: 5, type: "paid", description: { name: "Stay ahead and achieve profitability in agriculture!" } },
     ]
 
     return (
@@ -222,19 +222,15 @@ function BuyerFaqs() {
                     <li key={activityItem.id} className="relative flex gap-x-4">
                         <div
                             className={cn(
-                                activityItemIdx === activity.length - 1 ? 'h-6' : '-bottom-6',
-                                'absolute left-0 top-0 flex w-6 justify-center'
+                                activityItemIdx === activity.length - 1 ? "h-6" : "-bottom-6",
+                                "absolute left-0 top-0 flex w-6 justify-center"
                             )}
                         >
                             <div className="w-px bg-gray-200" />
                         </div>
-                        {activityItem.type === 'commented' ? (
+                        {activityItem.type === "commented" ? (
                             <>
-                                <img
-                                    src={activityItem.description.imageUrl}
-                                    alt=""
-                                    className="relative mt-3 h-6 w-6 flex-none rounded-full bg-gray-50"
-                                />
+                                <Image src={activityItem.description.imageUrl ?? ""} alt="" className="relative mt-3 h-6 w-6 flex-none rounded-full bg-gray-50" unoptimized />
                                 <div className="flex-auto rounded-md p-3 ring-1 ring-inset ring-orange-500">
                                     <div className="flex justify-between gap-x-4">
                                         <div className="py-0.5 text-xs leading-5">
@@ -247,7 +243,7 @@ function BuyerFaqs() {
                         ) : (
                             <>
                                 <div className="relative flex h-6 w-6 flex-none items-center justify-center bg-background">
-                                    {activityItem.type === 'paid' ? (
+                                    {activityItem.type === "paid" ? (
                                         <Icons.clipboardCheck className="h-6 w-6 text-indigo-600" aria-hidden="true" />
                                     ) : (
                                         <div className="h-1.5 w-1.5 rounded-full bg-gray-100 ring-1 ring-gray-300" />
@@ -262,7 +258,7 @@ function BuyerFaqs() {
                 ))}
             </ul>
             <Link href="/signup">
-                <Button variant="secondary" className="group mt-6 w-full" onClick={() => sendGTMEvent({ event: 'link', value: 'SignupBuyerNavigation' })}>
+                <Button variant="secondary" className="group mt-6 w-full" onClick={() => sendGTMEvent({ event: "link", value: "SignupBuyerNavigation" })}>
                     Get Started
                     <ArrowDownIcon className="h-4 w-4 stroke-zinc-400 transition group-active:stroke-zinc-600 dark:group-hover:stroke-zinc-50 dark:group-active:stroke-zinc-50" />
                 </Button>
@@ -274,7 +270,7 @@ function BuyerFaqs() {
 
 function CTAPrices() {
     return (
-        <div className='mx-auto max-w-7xl'>
+        <div className="mx-auto max-w-7xl">
             <div className="px-9 lg:flex lg:items-center lg:justify-between">
                 <h2 className="text-3xl max-w-2xl font-bold tracking-tight sm:text-4xl font-heading">
                     Prices Anyone?
@@ -295,40 +291,40 @@ function FeaturedPopularSection() {
 
     const markets = [
         {
-            name: 'Chicken',
-            message: 'Find Chicken, Broiler Buyers in Zimbabwe, Make Poultry Farming Profitable for You.',
+            name: "Chicken",
+            message: "Find Chicken, Broiler Buyers in Zimbabwe, Make Poultry Farming Profitable for You.",
             logo: logoChicken,
-            link: 'buyers/chicken'
+            link: "buyers/chicken"
         },
         {
-            name: 'Pork',
-            message: 'Find Pig, Pork, Porker Buyers in Zimbabwe, Make Livestock Farming Profitable for You.',
+            name: "Pork",
+            message: "Find Pig, Pork, Porker Buyers in Zimbabwe, Make Livestock Farming Profitable for You.",
             logo: logoPig,
-            link: 'buyers/pork'
+            link: "buyers/pork"
         },
         {
-            name: 'Onions',
-            message: 'Find Onion Buyers in Zimbabwe, Make Horticulture Farming Profitable for You.',
+            name: "Onions",
+            message: "Find Onion Buyers in Zimbabwe, Make Horticulture Farming Profitable for You.",
             logo: logoOnion,
-            link: 'buyers/onions'
+            link: "buyers/onions"
         },
         {
-            name: 'Cattle',
-            message: 'Find Cattle Buyers in Zimbabwe, Make Ranching, Dairy, Livestock Farming Profitable for You.',
+            name: "Cattle",
+            message: "Find Cattle Buyers in Zimbabwe, Make Ranching, Dairy, Livestock Farming Profitable for You.",
             logo: logoCattle,
-            link: 'buyers/cattle'
+            link: "buyers/cattle"
         },
         {
-            name: 'Tomatoes',
-            message: 'Find Tomato Buyers in Zimbabwe, Make Horticulture Farming Profitable for You.',
+            name: "Tomatoes",
+            message: "Find Tomato Buyers in Zimbabwe, Make Horticulture Farming Profitable for You.",
             logo: logoTomato,
-            link: 'buyers/tomatoes'
+            link: "buyers/tomatoes"
         },
         {
-            name: 'Chilli',
-            message: 'Find Chilli Buyers in Zimbabwe, Make Horticulture Farming Profitable for You.',
+            name: "Chilli",
+            message: "Find Chilli Buyers in Zimbabwe, Make Horticulture Farming Profitable for You.",
             logo: logoChilli,
-            link: 'buyers/chilli'
+            link: "buyers/chilli"
         },
     ]
 
@@ -354,7 +350,7 @@ function FeaturedPopularSection() {
                                 <Image src={market.logo} alt="" className="h-7 w-7" unoptimized />
                             </div>
                             <div className="min-w-0 flex-1">
-                                <Link href={market.link} className="focus:outline-none" onClick={() => sendGTMEvent({ event: 'view', value: 'FeaturedLink' })}>
+                                <Link href={market.link} className="focus:outline-none" onClick={() => sendGTMEvent({ event: "view", value: "FeaturedLink" })}>
                                     <span className="absolute inset-0" aria-hidden="true" />
                                     <p className="text-lg font-medium">{market.name}</p>
                                     <p className="text-base text-muted-foreground pt-1">{market.message}</p>

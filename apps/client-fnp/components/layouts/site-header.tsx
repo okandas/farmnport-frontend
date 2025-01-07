@@ -66,7 +66,7 @@ export function SiteHeader({ user }: SiteHeaderProps) {
                                     <DropdownMenuLabel className="font-normal">
                                         <div className="flex flex-col space-y-1">
                                             <p className="text-base font-medium leading-none">
-                                                {capitalizeFirstLetter(user.username)}
+                                                {capitalizeFirstLetter(user.username ?? '')}
                                             </p>
                                             {/*
                                             <p className="text-xs leading-none text-muted-foreground">
