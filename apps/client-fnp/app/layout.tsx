@@ -2,6 +2,7 @@ import { Open_Sans } from "next/font/google"
 import localFont from "next/font/local"
 
 import { GoogleTagManager } from '@next/third-parties/google'
+import { Analytics } from "@vercel/analytics/react"
 
 import { QueryProvider } from "@/components/providers/QueryProvider"
 import { ThemeProvider } from "@/components/providers/ThemeProvider"
@@ -61,6 +62,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
               <GoogleTagManager gtmId={GTM_ID} />
               <Toaster />
               <SpeedInsights />
+              <Analytics />
             </QueryProvider>
           </ThemeProvider>
         </body>

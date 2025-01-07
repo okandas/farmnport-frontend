@@ -6,7 +6,7 @@ import { useMutation } from "@tanstack/react-query"
 import { captureException } from "@sentry/nextjs";
 
 import { useForm } from "react-hook-form"
-import Link from 'next/link'
+import Link from "next/link"
 
 import { toast } from "sonner"
 
@@ -41,8 +41,8 @@ export function AuthForm({ className, ...props }: AuthFormProps) {
                 description: "Login Successful redirecting you to dashboard.",
             })
 
-            const entity = searchParams.get('entity');
-            const wantToSee = searchParams.get('wantToSee');
+            const entity = searchParams.get("entity");
+            const wantToSee = searchParams.get("wantToSee");
 
             if (wantToSee && entity) {
                 router.push(`/${entity}/${wantToSee}`)
@@ -53,7 +53,7 @@ export function AuthForm({ className, ...props }: AuthFormProps) {
         onError: (error) => {
 
             toast("Failed to login", {
-                description: 'System Failure or Network Failure Please Try Again',     
+                description: "System Failure or Network Failure Please Try Again"
             })
 
             captureException(error)
@@ -140,7 +140,7 @@ export function AuthForm({ className, ...props }: AuthFormProps) {
                         <div className="w-full border-t border-border" />
                     </div>
                     <div className="relative flex justify-center text-sm font-medium leading-6">
-                        <span className="bg-card px-6 text-muted-foreground">{"Don't have an account?"}</span>
+                        <span className="bg-card px-6 text-muted-foreground">Don&apos;t have an account?</span>
                     </div>
                 </div>
 

@@ -3,13 +3,15 @@ import { NextAuthRequest } from "next-auth/lib"
 import { auth as middleware } from "@/auth"
 import { AppURL } from "@/lib/schemas"
 
+
 export default middleware((request: NextAuthRequest) => {
   const pathname = request.nextUrl.pathname
 
 
-    if ((pathname === '/login' || pathname === '/signup') && request.auth?.user !== undefined) {
+  if ((pathname === '/login' || pathname === '/signup') && request.auth?.user !== undefined) {
 
-    var url = `${AppURL}/buyers`
+    const url = request.nextUrl.clone()
+    url.pathname = '/buyers'
 
     return NextResponse.redirect(url)
 
@@ -19,9 +21,11 @@ export default middleware((request: NextAuthRequest) => {
 
   for (const path of paths) {
     if (pathname.includes(path) && request.auth?.user === undefined) {
-      var url = `${AppURL}/login`
 
-      return NextResponse.redirect(url) 
+      const url = request.nextUrl.clone()
+      url.pathname = '/login'
+
+      return NextResponse.redirect(url)
     }
   }
 
