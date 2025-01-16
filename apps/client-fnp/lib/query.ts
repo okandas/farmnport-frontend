@@ -5,7 +5,7 @@ import { auth } from "@/auth"
 
 
 
-import { PaginationModel, ResetFormData, LoginFormData, BaseURL } from "@/lib/schemas"
+import { PaginationModel, ResetFormData, LoginFormData, BaseURL, SignUpFormData } from "@/lib/schemas"
 import { resolve } from "path"
 import { retrieveToken } from "@/lib/actions"
 
@@ -57,3 +57,7 @@ export function clientReset(data: ResetFormData) {
 }
 
 
+export async function clientSignup(data: SignUpFormData) {
+    var url = `${BaseURL}/client/signup`
+    return api.post(url, data)
+}

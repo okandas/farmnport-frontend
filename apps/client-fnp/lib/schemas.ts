@@ -5,6 +5,23 @@ export const AuthSchema = z.object({
     password: z.string().nonempty(),
 })
 
+export const AuthSignUpSchema = z.object({
+    name: z.string().min(4),
+    email: z.string().email(),
+    password: z.string().min(8),
+    confirm_password: z.string().min(8),
+    code: z.string(),
+    phone: z.string().min(10).max(10),
+    address: z.string().min(10),
+    city: z.string().min(5),
+    province: z.string(),
+    specialization: z.string(),
+    main_activity: z.string().min(1),
+    specializations: z.array(z.string().trim()).min(1),
+    type: z.string(),
+    scale: z.string(),
+})
+
 export const ResetSchema = AuthSchema.pick({
     email: true
 })
@@ -283,6 +300,7 @@ export type PaginationModel = z.infer<typeof PagintionSchema>
 
 export type LoginFormData = z.infer<typeof AuthSchema>
 export type ResetFormData = z.infer<typeof ResetSchema>
+export type SignUpFormData = z.infer<typeof AuthSignUpSchema>
 
 var base = process.env.NEXT_PUBLIC_BASE_URL
 var version = "/v1"

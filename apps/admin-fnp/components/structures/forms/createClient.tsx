@@ -54,7 +54,7 @@ import {
   scales,
   specializations,
   paymentTerms
-} from "@/components/structures/data/data"
+} from "@/components/structures/repository/data"
 
 interface CreateFormProps extends React.HTMLAttributes<HTMLDivElement> {
   client: EditApplicationUser

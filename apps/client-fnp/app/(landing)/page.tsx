@@ -196,8 +196,7 @@ function BuyerFaqs() {
             type: "commented",
             description: {
                 name: "Guides and Reviews",
-                imageUrl:
-                    "https://images.unsplash.com/photo-1635850967683-17df1f33e749?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+                imageUrl: logoGuidance,
             },
             comment: "Find out when and how buyers pay their invoices?"
         },
@@ -207,8 +206,7 @@ function BuyerFaqs() {
             type: "commented",
             description: {
                 name: "Trust and Professionalism",
-                imageUrl:
-                    "https://images.unsplash.com/photo-1521791136064-7986c2920216?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+                imageUrl: logoGuidance,
             },
             comment: "Are buyers professional in their operations and give fair value for produce purchased.."
         },
@@ -244,7 +242,7 @@ function BuyerFaqs() {
                             <>
                                 <div className="relative flex h-6 w-6 flex-none items-center justify-center bg-background">
                                     {activityItem.type === "paid" ? (
-                                        <Icons.clipboardCheck className="h-6 w-6 text-indigo-600" aria-hidden="true" />
+                                        <Icons.billing className="h-6 w-6 text-green-600" aria-hidden="true" />
                                     ) : (
                                         <div className="h-1.5 w-1.5 rounded-full bg-gray-100 ring-1 ring-gray-300" />
                                     )}
