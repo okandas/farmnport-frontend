@@ -17,7 +17,7 @@ export const AuthSignUpSchema = z.object({
     province: z.string(),
     specialization: z.string(),
     main_activity: z.string().min(1),
-    specializations: z.array(z.string().trim()).min(1),
+    specializations: z.array(z.string().trim()),
     type: z.string(),
     scale: z.string(),
 })

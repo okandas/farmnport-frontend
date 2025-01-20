@@ -116,23 +116,17 @@ export function SignUpAuthForm({ className, ...props }: AuthFormProps) {
                         <Label htmlFor="name">
                             Company or Farm Name
                         </Label>
-                        <Controller
-                            name="name"
-                            control={control}
-                            render={({ field }) =>
-                                <Input {...field}
-                                    className="mt-2"
-                                    id="name"
-                                    placeholder="BaRa Farm"
-                                    type="text"
-                                    autoCapitalize="none"
-                                    autoComplete="name"
-                                    autoCorrect="off"
-                                    disabled={isPending}
-
-                                />}
+                        <Input 
+                            className="mt-2"
+                            id="name"
+                            placeholder="BaRa Farm"
+                            type="text"
+                            autoCapitalize="none"
+                            autoComplete="name"
+                            autoCorrect="off"
+                            disabled={isPending}
+                            {...register("name", { required: true })}
                         />
-
                         {errors?.name && (
                             <p className="px-2 text-xs text-red-600 py-2">
                                 {errors.name.message}
@@ -429,16 +423,7 @@ export function SignUpAuthForm({ className, ...props }: AuthFormProps) {
                             autoComplete="confirm_password"
                             autoCorrect="off"
                             disabled={isPending}
-                            {...register("confirm_password", {
-                                required: true, validate: (value) => {
-
-                                    console.log(value, 'value')
-                                    console.log('password', watch("password"))
-
-                                    return value === watch("password") || "Passwords do not match"
-
-                                }
-                            })}
+                            {...register("confirm_password", { required: true })}
                         />
                         {errors?.confirm_password && (
                             <p className="px-2 text-xs text-red-600 py-2">
@@ -455,11 +440,11 @@ export function SignUpAuthForm({ className, ...props }: AuthFormProps) {
                             name="specializations"
                             control={control}
                             render={({ field }) =>
-                                <Popover open={open} onOpenChange={setOpen} disabled={typeof selectedMainActivity === "undefined"}>
+                                <Popover open={open} onOpenChange={setOpen}>
                                     <PopoverTrigger asChild>
                                         <div className="group min-h-[2.5rem] rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-0">
                                             <div className="flex flex-wrap gap-1">
-                                                {selectedSpecializations?.length > 1
+                                                {selectedSpecializations?.length >= 1
                                                     ? selectedSpecializations?.map((selected) => {
                                                         if (selected.length !== 0) {
                                                             return (
