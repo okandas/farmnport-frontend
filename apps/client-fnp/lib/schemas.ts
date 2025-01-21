@@ -10,7 +10,6 @@ export const AuthSignUpSchema = z.object({
     email: z.string().email(),
     password: z.string().min(8),
     confirm_password: z.string().min(8),
-    code: z.string(),
     phone: z.string().min(10).max(10),
     address: z.string().min(10),
     city: z.string().min(5),

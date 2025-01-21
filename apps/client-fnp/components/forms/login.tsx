@@ -62,7 +62,8 @@ export function AuthForm({ className, ...props }: AuthFormProps) {
 
 
     const submitLoginForm = async (payload: LoginFormData) => {
-        mutate(payload)
+        console.log(payload)
+        // mutate(payload)
     }
 
     return (
@@ -138,10 +139,16 @@ export function AuthForm({ className, ...props }: AuthFormProps) {
                 <div className="relative mt-10">
                     <div className="absolute inset-0 flex items-center" aria-hidden="true">
                         <div className="w-full border-t border-border" />
-                    </div>
+                    </div>  
                     <div className="relative flex justify-center text-sm font-medium leading-6">
                         <span className="bg-card px-6 text-muted-foreground">Don&apos;t have an account?</span>
                     </div>
+                </div>
+
+                <div className="text-sm leading-6 flex justify-center mt-10">
+                    <Link href="/signup" className="font-semibold text-orange-600 hover:text-orange-500">
+                        Get Started Here!
+                    </Link>
                 </div>
 
                 <div className="mt-6 grid grid-cols-2 gap-4">
