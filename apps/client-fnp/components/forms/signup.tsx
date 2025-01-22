@@ -1,6 +1,8 @@
 "use client"
 
 import { useState } from "react"
+import axios from 'axios'
+
 import { useRouter, useSearchParams } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation } from "@tanstack/react-query"
@@ -12,7 +14,7 @@ import Link from "next/link"
 import { toast } from "sonner"
 
 import { AuthSignUpSchema, SignUpFormData } from "@/lib/schemas"
-import { cn } from "@/lib/utilities"
+import { cn, capitalizeFirstLetter } from "@/lib/utilities"
 import { clientSignup } from "@/lib/query"
 
 import { buttonVariants } from "@/components/ui/button"
@@ -27,7 +29,6 @@ import {
     provinces,
     scales,
     specializations,
-    paymentTerms
 } from "@/components/structures/repository/data"
 
 import {
@@ -59,8 +60,8 @@ interface AuthFormProps extends React.HTMLAttributes<HTMLDivElement> { }
 
 export function SignUpAuthForm({ className, ...props }: AuthFormProps) {
 
-    const { register, handleSubmit, formState, control, watch, setValue } = useForm<SignUpFormData>({
-        resolver: zodResolver(AuthSignUpSchema),
+    const { register, handleSubmit, formState, control, watch, setValue, setError  } = useForm<SignUpFormData>({
+        resolver: zodResolver(AuthSignUpSchema)
     })
 
     const router = useRouter()
@@ -73,9 +74,9 @@ export function SignUpAuthForm({ className, ...props }: AuthFormProps) {
         mutationFn: clientSignup,
         onSuccess: (data) => {
             console.log(data)
-            // toast("Success", {
-            //     description: "Login Successful redirecting you to dashboard.",
-            // })
+            toast("Success", {
+                description: "Sign up successful redirecting you to dashboard.",
+            })
 
             // const entity = searchParams.get("entity");
             // const wantToSee = searchParams.get("wantToSee");
@@ -88,24 +89,35 @@ export function SignUpAuthForm({ className, ...props }: AuthFormProps) {
         },
         onError: (error) => {
 
-            toast("Failed to login", {
-                description: "System Failure or Network Failure Please Try Again"
-            })
-
             captureException(error)
+
+            if (axios.isAxiosError(error))  {
+
+                if(error.response?.data.message == "email/number already used") {
+                    setError('email', { message: "email already used"}, {shouldFocus: true})
+                    setError('phone', { message: "phone already used"}, {shouldFocus: true})
+                    
+                    toast("Account already in use", {
+                        description: "Email or Number already used!"
+                    })
+                }
+            } else {
+
+                toast("Failed to login", {
+                    description: "System Failure or Network Failure Please Try Again"
+                })
+            }
         },
     })
 
-    const selectedSpecializations =watch("specializations")
+    const selectedSpecializations = watch("specializations") || []
 
     const changingSpecialization = watch("specialization")
 
     const selectedMainActivity = watch("main_activity")
 
-
     const submitSignUpForm = async (payload: SignUpFormData) => {
-        console.log(payload, 'payload', isPending, 'isPending')
-        // mutate(payload)
+        mutate(payload)
     }
 
     return (
@@ -237,7 +249,7 @@ export function SignUpAuthForm({ className, ...props }: AuthFormProps) {
                                         {provinces.map((province) => {
                                             return (
                                                 <SelectItem key={province} value={province}>
-                                                    {province}
+                                                    {capitalizeFirstLetter(province)}
                                                 </SelectItem>
                                             )
                                         })}
@@ -270,7 +282,7 @@ export function SignUpAuthForm({ className, ...props }: AuthFormProps) {
                                         {scales.map((scale) => {
                                             return (
                                                 <SelectItem key={scale} value={scale}>
-                                                    {scale}
+                                                    {capitalizeFirstLetter(scale)}
                                                 </SelectItem>
                                             )
                                         })}
@@ -303,7 +315,7 @@ export function SignUpAuthForm({ className, ...props }: AuthFormProps) {
                                         {clientTypes.map((type) => {
                                             return (
                                                 <SelectItem key={type} value={type}>
-                                                    {type}
+                                                    {capitalizeFirstLetter(type)}
                                                 </SelectItem>
                                             )
                                         })}
@@ -336,7 +348,7 @@ export function SignUpAuthForm({ className, ...props }: AuthFormProps) {
                                         {specializations.map((specialization) => {
                                             return (
                                                 <SelectItem key={specialization} value={specialization}>
-                                                    {specialization}
+                                                    {capitalizeFirstLetter(specialization)}
                                                 </SelectItem>
                                             )
                                         })}
@@ -375,7 +387,7 @@ export function SignUpAuthForm({ className, ...props }: AuthFormProps) {
                                         {mainActivity[changingSpecialization]?.map((activity) => {
                                             return (
                                                 <SelectItem key={activity} value={activity}>
-                                                    {activity}
+                                                    {capitalizeFirstLetter(activity)}
                                                 </SelectItem>
                                             )
                                         })}
@@ -423,7 +435,11 @@ export function SignUpAuthForm({ className, ...props }: AuthFormProps) {
                             autoComplete="confirm_password"
                             autoCorrect="off"
                             disabled={isPending}
-                            {...register("confirm_password", { required: true })}
+                            {...register("confirm_password", { 
+                                    validate: (value, formValues) =>
+                                        value === formValues.password || "The passwords do not match"
+                                })
+                            }
                         />
                         {errors?.confirm_password && (
                             <p className="px-2 text-xs text-red-600 py-2">
@@ -453,7 +469,7 @@ export function SignUpAuthForm({ className, ...props }: AuthFormProps) {
                                                                     variant="outline"
                                                                     className="flex justify-between text-green-800 bg-green-100 border-green-400"
                                                                 >
-                                                                    {selected}
+                                                                    {capitalizeFirstLetter(selected)}
                                                                 </Badge>
                                                             )
                                                         }
@@ -537,7 +553,7 @@ export function SignUpAuthForm({ className, ...props }: AuthFormProps) {
                                                                                     <Icons.check className="w-4 h-4 mr-2" />
                                                                                 ) : null}
 
-                                                                                <span>{activity}</span>
+                                                                                <span>{capitalizeFirstLetter(activity)}</span>
                                                                             </CommandItem>
                                                                         )
                                                                     } else {

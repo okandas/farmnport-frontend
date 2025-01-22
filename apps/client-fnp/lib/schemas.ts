@@ -12,14 +12,23 @@ export const AuthSignUpSchema = z.object({
     confirm_password: z.string().min(8),
     phone: z.string().min(10).max(10),
     address: z.string().min(10),
-    city: z.string().min(5),
+    city: z.string().min(4),
     province: z.string(),
     specialization: z.string(),
     main_activity: z.string().min(1),
     specializations: z.array(z.string().trim()).optional(),
     type: z.string(),
     scale: z.string(),
+}).superRefine((data, ctx) => {
+    if (data.password !== data.confirm_password) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['confirm_password'],
+        message: "Passwords should match!",
+      });
+    }
 })
+  
 
 export const ResetSchema = AuthSchema.pick({
     email: true
