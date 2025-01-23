@@ -73,19 +73,19 @@ export function SignUpAuthForm({ className, ...props }: AuthFormProps) {
     const { mutate, isPending, isSuccess } = useMutation({
         mutationFn: clientSignup,
         onSuccess: (data) => {
-            console.log(data)
+    
             toast("Success", {
                 description: "Sign up successful redirecting you to dashboard.",
             })
 
-            // const entity = searchParams.get("entity");
-            // const wantToSee = searchParams.get("wantToSee");
+            const entity = searchParams.get("entity");
+            const wantToSee = searchParams.get("wantToSee");
 
-            // if (wantToSee && entity) {
-            //     router.push(`/${entity}/${wantToSee}`)
-            // } else {
-            //     router.push("/")
-            // }
+            if (wantToSee && entity) {
+                router.push(`/${entity}/${wantToSee}`)
+            } else {
+                router.push("/")
+            }
         },
         onError: (error) => {
 
@@ -93,18 +93,26 @@ export function SignUpAuthForm({ className, ...props }: AuthFormProps) {
 
             if (axios.isAxiosError(error))  {
 
-                if(error.response?.data.message == "email/number already used") {
-                    setError('email', { message: "email already used"}, {shouldFocus: true})
-                    setError('phone', { message: "phone already used"}, {shouldFocus: true})
-                    
-                    toast("Account already in use", {
-                        description: "Email or Number already used!"
-                    })
-                }
-            } else {
+                if (error.response?.data.message == "This name has already been registered") {
 
-                toast("Failed to login", {
-                    description: "System Failure or Network Failure Please Try Again"
+                    setError('name', { message: "Change this name"}, {shouldFocus: true})
+
+                } else if (error.response?.data.message == "This email has already been registered")  {
+
+                    setError('email', { message: "Change this email"}, {shouldFocus: true})
+                
+                } else if (error.response?.data.message == "This phone has already been registered") {
+                
+                    setError('phone', { message: "Change this phone number "}, {shouldFocus: true})
+
+                } else {
+                    toast("Failed to signup", {
+                          description: `(${error?.message}) Please Try Again`
+                    })
+                }                
+            } else {
+                toast("Failed to signup", {
+                    description: `(${error?.message}) Please Try Again`
                 })
             }
         },
