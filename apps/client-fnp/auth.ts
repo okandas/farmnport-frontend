@@ -1,8 +1,10 @@
-import NextAuth, { User } from "next-auth";
+import NextAuth, { Session, User } from "next-auth";
+import { useSession } from "next-auth/react"
 import Credentials from 'next-auth/providers/credentials'
 import jwt_decode from "jwt-decode"
 import { Debug } from "@/lib/schemas"
 import { captureException } from "@sentry/nextjs";
+
 
 declare module "next-auth" {
     interface User {
@@ -135,3 +137,26 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
         }
     }
 })
+
+export const handleTokenRefresh = async (token: string, session: Session | null) => {
+    
+    const decodedUser = jwt_decode<User>(token)
+    decodedUser.token = token
+    decodedUser.name = decodedUser.username
+
+    console.log(decodedUser, "decodedUser")
+    console.log(session, "currentSession")
+
+    const user = decodedUser
+    const id = user.id as string
+    const name = user.name as string
+    const email = user.email != null || user.email != undefined ? user.email : ''
+    const emailVerified = user.emailVerified != null || user.emailVerified != undefined ? user.emailVerified : null
+
+    if (session != null) {
+
+        session.user = { ...user, id, name, email, emailVerified }
+        session.access_token = user.token
+
+    }
+}

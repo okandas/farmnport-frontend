@@ -7,21 +7,22 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation } from "@tanstack/react-query"
 import { captureException } from "@sentry/nextjs";
-
-import { useForm, useWatch, Controller } from "react-hook-form"
+import { useForm, Controller } from "react-hook-form"
 import Link from "next/link"
-
-import { toast } from "sonner"
-
-import { AuthSignUpSchema, SignUpFormData } from "@/lib/schemas"
-import { cn, capitalizeFirstLetter } from "@/lib/utilities"
-import { clientSignup } from "@/lib/query"
 
 import { buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { Icons } from "@/components/icons/lucide"
+import { toast } from "sonner"
+
+import { AuthSignUpSchema, SignUpFormData, LoginFormData } from "@/lib/schemas"
+import { cn, capitalizeFirstLetter } from "@/lib/utilities"
+import { clientSignup } from "@/lib/query"
+import { handleTokenRefresh, auth, signIn} from "@/auth"
+import { loginUser } from "@/lib/actions"
+
 
 import {
     clientTypes,
@@ -67,25 +68,23 @@ export function SignUpAuthForm({ className, ...props }: AuthFormProps) {
     const router = useRouter()
     const searchParams = useSearchParams()
     const [open, setOpen] = useState(false)
+    const [credentials, setCredentials] = useState<LoginFormData>({
+        email: '',
+        password: ''
+    })
 
     const { errors } = formState
 
     const { mutate, isPending, isSuccess } = useMutation({
         mutationFn: clientSignup,
-        onSuccess: (data) => {
+        onSuccess: async (response) => {
     
             toast("Success", {
-                description: "Sign up successful redirecting you to dashboard.",
+                description: "Sign up successful, logging you in and redirecting you to dashboard.",
             })
 
-            const entity = searchParams.get("entity");
-            const wantToSee = searchParams.get("wantToSee");
-
-            if (wantToSee && entity) {
-                router.push(`/${entity}/${wantToSee}`)
-            } else {
-                router.push("/")
-            }
+            const signedInResponse = await signIn('credentials', { email: credentials.email, password: credentials.password, redirect: true })
+    
         },
         onError: (error) => {
 
@@ -114,6 +113,8 @@ export function SignUpAuthForm({ className, ...props }: AuthFormProps) {
                 toast("Failed to signup", {
                     description: `(${error?.message}) Please Try Again`
                 })
+
+                console.log(error?.message)
             }
         },
     })
@@ -125,6 +126,13 @@ export function SignUpAuthForm({ className, ...props }: AuthFormProps) {
     const selectedMainActivity = watch("main_activity")
 
     const submitSignUpForm = async (payload: SignUpFormData) => {
+
+        const credentialsPayload: LoginFormData = {
+            email: payload.email,
+            password: payload.password
+        }
+
+        setCredentials(credentialsPayload)
         mutate(payload)
     }
 

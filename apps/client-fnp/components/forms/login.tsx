@@ -62,8 +62,7 @@ export function AuthForm({ className, ...props }: AuthFormProps) {
 
 
     const submitLoginForm = async (payload: LoginFormData) => {
-        console.log(payload)
-        // mutate(payload)
+        mutate(payload)
     }
 
     return (
