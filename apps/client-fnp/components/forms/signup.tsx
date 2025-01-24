@@ -20,8 +20,8 @@ import { toast } from "sonner"
 import { AuthSignUpSchema, SignUpFormData, LoginFormData } from "@/lib/schemas"
 import { cn, capitalizeFirstLetter } from "@/lib/utilities"
 import { clientSignup } from "@/lib/query"
-import { handleTokenRefresh, auth, signIn} from "@/auth"
-import { loginUser } from "@/lib/actions"
+import { signIn} from "@/auth"
+
 
 
 import {
@@ -65,8 +65,6 @@ export function SignUpAuthForm({ className, ...props }: AuthFormProps) {
         resolver: zodResolver(AuthSignUpSchema)
     })
 
-    const router = useRouter()
-    const searchParams = useSearchParams()
     const [open, setOpen] = useState(false)
     const [credentials, setCredentials] = useState<LoginFormData>({
         email: '',
