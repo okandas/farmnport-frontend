@@ -11,11 +11,8 @@ type Props = {
   searchParams: { [key: string]: string | string[] | undefined }
 }
  
-export async function generateMetadata(
-  { params, searchParams }: Props,
-  parent: ResolvingMetadata
-): Promise<Metadata> {
-  const slug = params.slug
+export async function generateMetadata({ params, searchParams }: Props,  parent: ResolvingMetadata): Promise<Metadata> {
+  const { slug } = await params
   const name = unSlug(slug)
  
 
@@ -34,17 +31,16 @@ interface BuyerPageProps {
   }
 
   
-  export default async function BuyerPage({
-    params
-  }: BuyerPageProps) {
+  export default async function BuyerPage({ params }: BuyerPageProps) {
 
     const user = await retrieveUser()
+    const { slug } = await params
 
     return(
     <main className="min-h-[70lvh]">
     <div className="mx-auto max-w-7xl min-h-[70lvh]">
         <div className="lg:flex lg:space-x-10">
-          <Buyer slug={params.slug} user={user}/>
+          <Buyer slug={slug} user={user}/>
         </div>
     </div>
 </main>
