@@ -18,7 +18,7 @@ export default function GlobalError({
         // global-error must include html and body tags
         <html>
             <body>
-                <NextError statusCode={0} />
+                <NextError statusCode={0} withDarkMode={false}/>
             </body>
         </html>
     )
