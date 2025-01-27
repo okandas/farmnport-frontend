@@ -8,7 +8,7 @@ import Link from "next/link"
 
 import { queryBuyer } from "@/lib/query"
 import { ApplicationUser, AuthenticatedUser } from "@/lib/schemas"
-import { slug as createSlug, capitalizeFirstLetter } from "@/lib/utilities"
+import { slug as createSlug, capitalizeFirstLetter, makeAbbveriation } from "@/lib/utilities"
 import { Icons } from "@/components/icons/lucide"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -156,10 +156,11 @@ export function Buyer({ slug, user }: BuyerPageProps) {
         <div className="space-y-8 mt-[21px]">
             <section className="">
                 <div className="flex gap-x-4 py-1 px-6">
+                    <Avatar className="h-12 w-12 flex-none rounded-full">
+                        <AvatarImage />
+                        <AvatarFallback>{makeAbbveriation(buyer.name)}</AvatarFallback>
+                    </Avatar>
 
-                    <Image className="h-12 w-12 flex-none rounded-full bg-gray-50"
-                        src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="" unoptimized
-                        width={256} height={256} />
                     <div className="min-w-0">
                         <h1 className="text-sm font-semibold leading-6">{ capitalizeFirstLetter(buyer.name) }</h1>
                         <p className="text-xs leading-4 text-muted-foreground ">{ capitalizeFirstLetter(buyer.short_description) }</p>
@@ -243,7 +244,7 @@ export function Buyer({ slug, user }: BuyerPageProps) {
                 <div className="min-h-[150px] bg-secondary mt-4">
                     <div className="px-6 py-4 space-y-4">
                         <div className="space-y-2">
-                            <h3 className="text-sm text-foreground">Other Procured Items</h3>
+                            <h3 className="text-sm text-foreground">Secondary Procurement Activites</h3>
                             <ul className="grid grid-cols-4 gap-1">
                                 {
                                     buyer.specializations.map((specialization) => (
