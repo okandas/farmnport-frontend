@@ -7,11 +7,11 @@ import type { Metadata, ResolvingMetadata } from 'next'
 import { unSlug } from "@/lib/utilities"
 
 type Props = {
-  params: { slug: string }
-  searchParams: { [key: string]: string | string[] | undefined }
+  params: Promise<{ slug: string }>
+  searchParams:  Promise<{ [key: string]: string | string[] | undefined }>
 }
  
-export async function generateMetadata({ params, searchParams }: Props,  parent: ResolvingMetadata): Promise<Metadata> {
+export async function generateMetadata({ params }: Props,  parent: ResolvingMetadata): Promise<Metadata> {
   const { slug } = await params
   const name = unSlug(slug)
  
@@ -24,18 +24,14 @@ export async function generateMetadata({ params, searchParams }: Props,  parent:
   }
 }
 
-type BuyerPageProps = Promise<{
-    params: {
-      slug: string
-    }
-  }>
-
+type BuyerPageProps ={
+    params:  Promise<{ slug: string }>
+}
   
-  export default async function BuyerPage(props: { params: BuyerPageProps}) {
+  export default async function BuyerPage({ params }:  BuyerPageProps) {
 
     const user = await retrieveUser()
-    const { params } = await props.params
-    const slug = params.slug
+    const { slug } = await params
 
     return(
     <main className="min-h-[70lvh]">
