@@ -12,8 +12,6 @@ import { slug as createSlug, capitalizeFirstLetter, makeAbbveriation } from "@/l
 import { Icons } from "@/components/icons/lucide"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from '@/components/ui/badge'
-import Image from "next/image"
 import { Button } from "@/components/ui/button"
 
 
@@ -177,7 +175,7 @@ export function Buyer({ slug, user }: BuyerPageProps) {
                             <>                  
                                 <dt>
                                     <span className="sr-only">Verified</span>
-                                    <Icons.unverified className="h-6 w-5" aria-hidden="true" color="#98FB98" />
+                                    <Icons.unverified className="h-6 w-5" aria-hidden="true" color="#7CFC00" />
                                 </dt>
                                 <dd className="text-xs font-medium leading-4 text-muted-foreground">Verified</dd> 
                             </>  

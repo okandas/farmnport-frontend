@@ -24,17 +24,18 @@ export async function generateMetadata({ params, searchParams }: Props,  parent:
   }
 }
 
-interface BuyerPageProps {
+type BuyerPageProps = Promise<{
     params: {
       slug: string
     }
-  }
+  }>
 
   
-  export default async function BuyerPage({ params }: BuyerPageProps) {
+  export default async function BuyerPage(props: { params: BuyerPageProps}) {
 
     const user = await retrieveUser()
-    const { slug } = await params
+    const { params } = await props.params
+    const slug = params.slug
 
     return(
     <main className="min-h-[70lvh]">
