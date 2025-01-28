@@ -1,7 +1,7 @@
 "use server"
 
 import { auth, signIn, signOut } from "@/auth"
-import { AuthenticatedUser, LoginFormData, ResetFormData } from "@/lib/schemas"
+import { AuthenticatedUser, LoginFormData } from "@/lib/schemas"
 
 
 export async function loginUser(payload: LoginFormData) {

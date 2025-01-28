@@ -53,7 +53,7 @@ import {
 import { ToastAction } from "@/components/ui/toast"
 import { toast } from "@/components/ui/use-toast"
 import { Icons } from "@/components/icons/lucide"
-import { units } from "@/components/structures/data/data"
+import { units } from "@/components/structures/repository/data"
 
 interface CreateProductPriceFormProps
   extends React.HTMLAttributes<HTMLDivElement> {

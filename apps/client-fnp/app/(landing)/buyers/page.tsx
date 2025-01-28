@@ -18,8 +18,11 @@ import { retrieveUser } from "@/lib/actions"
 
 
 export const metadata = {
-    title: 'Buyers in Zimbabwe',
-    description: 'Agri produce, fresh produce, buyers buying directly from farmers in Zimbabwe'
+    title: 'Buyers in Zimbabwe | farmnport.com',
+    description: 'Agri produce, fresh produce, buyers buying directly from farmers in Zimbabwe',
+    alternates: {
+        canonical: `/buyers`,
+    }
 }
 
 export default async function BuyersPage() {
@@ -28,7 +31,7 @@ export default async function BuyersPage() {
 
     return (
         <main>
-            <div className="mx-auto max-w-7xl px-6 lg:px-8">
+            <div className="mx-auto max-w-7xl px-6 lg:px-8 min-h-[70lvh]">
                 <div className="lg:flex lg:space-x-10">
 
                     <div className="hidden lg:block lg:w-44 relative">

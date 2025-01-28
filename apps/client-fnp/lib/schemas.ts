@@ -5,6 +5,31 @@ export const AuthSchema = z.object({
     password: z.string().nonempty(),
 })
 
+export const AuthSignUpSchema = z.object({
+    name: z.string().min(4),
+    email: z.string().email(),
+    password: z.string().min(8),
+    confirm_password: z.string().min(8),
+    phone: z.string().min(10).max(10),
+    address: z.string().min(10),
+    city: z.string().min(4),
+    province: z.string(),
+    specialization: z.string(),
+    main_activity: z.string().min(1),
+    specializations: z.array(z.string().trim()).optional(),
+    type: z.string(),
+    scale: z.string(),
+}).superRefine((data, ctx) => {
+    if (data.password !== data.confirm_password) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['confirm_password'],
+        message: "Passwords should match!",
+      });
+    }
+})
+  
+
 export const ResetSchema = AuthSchema.pick({
     email: true
 })
@@ -283,9 +308,11 @@ export type PaginationModel = z.infer<typeof PagintionSchema>
 
 export type LoginFormData = z.infer<typeof AuthSchema>
 export type ResetFormData = z.infer<typeof ResetSchema>
+export type SignUpFormData = z.infer<typeof AuthSignUpSchema>
 
 var base = process.env.NEXT_PUBLIC_BASE_URL
 var version = "/v1"
 export const BaseURL = base + version
 export const AppURL = process.env.NEXT_PUBLIC_APP_URL
+export const Debug = process.env.NEXT_PUBLIC_DEBUG == 'true' ? true : false
 

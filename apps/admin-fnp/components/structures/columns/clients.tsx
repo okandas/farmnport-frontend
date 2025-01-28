@@ -1,6 +1,6 @@
 "use client"
 
-import { createColumnHelper } from "@tanstack/react-table"
+import { createColumnHelper, ColumnDef } from "@tanstack/react-table"
 import { PhoneNumberFormat } from "google-libphonenumber"
 
 import { ApplicationUser } from "@/lib/schemas"
@@ -10,7 +10,7 @@ import { ControlDropDown } from "@/components/structures/dropdowns/control-dropd
 
 const columnHelper = createColumnHelper<ApplicationUser>()
 
-export const clientColumns = [
+ const proxyColumns = [
 
   columnHelper.display({
     id: 'select',
@@ -85,4 +85,6 @@ export const clientColumns = [
     },
   }),
 ]
+
+export const clientColumns = proxyColumns as ColumnDef<ApplicationUser>[];
 

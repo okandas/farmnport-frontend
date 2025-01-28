@@ -10,7 +10,7 @@ export default function LoginPage() {
 
     return (
         <>
-            <div className="flex min-h-full flex-1 flex-col justify-center py-16 sm:px-6 lg:px-8">
+            <div className="flex min-h-full flex-1 flex-col justify-center py-16 px-3 sm:px-6 lg:px-8">
                 <div className="mx-auto sm:w-full sm:max-w-md h-10 text-center">
                     <h3 className="text-lg">Sign into Farmnport</h3>
                     <p className="text-muted-foreground text-sm">We pleased to have you back.</p>

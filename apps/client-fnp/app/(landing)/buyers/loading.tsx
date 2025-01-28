@@ -4,7 +4,7 @@ import { ContactCardSkeleton } from "@/components/skeletons/contact-card"
 
 export default function ContactsLoading() {
     return (
-        <Shell>
+        <Shell className="min-h-[70lvh]">
             <div className="space-y-2">
                 <Skeleton className="h-10 w-28" />
                 <Skeleton className="h-4 w-48" />

@@ -8,7 +8,8 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function capitalizeFirstLetter(str: string): string {
+export function capitalizeFirstLetter(str?: string): string {
+  if (str === undefined) return "" 
   return str.charAt(0).toUpperCase() + str.slice(1)
 }
 
@@ -45,6 +46,15 @@ export function slug(name?: string): string {
   })
 
   return slugged
+}
+
+export function unSlug(slug: string): string {
+
+  const split = slug.split('-')
+
+  const words = split.map(word => capitalizeFirstLetter(word))
+
+  return words.join(" ")
 }
 
 export function plural(word: string, count?: number): string {
