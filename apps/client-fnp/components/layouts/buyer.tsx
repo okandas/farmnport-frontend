@@ -247,9 +247,9 @@ export function Buyer({ slug, user }: BuyerPageProps) {
                             <h3 className="text-sm text-foreground">Secondary Procurement Activites</h3>
                             <ul className="grid grid-cols-4 gap-1">
                                 {
-                                    buyer.specializations.map((specialization) => (
+                                    buyer.specializations.map((specialization, index) => (
                                         
-                                        <li className="col-span-1 flex justify-center">
+                                        <li className="col-span-1 flex justify-center" key={index}>
                                             <span className="flex justify-center  items-center rounded-md bg-white px-2 py-2 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-400/20 w-full text-center">{ capitalizeFirstLetter(specialization) }</span>
                                         </li>
                                     
