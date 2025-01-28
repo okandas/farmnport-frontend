@@ -8,11 +8,12 @@ import Link from "next/link"
 
 import { queryBuyer } from "@/lib/query"
 import { ApplicationUser, AuthenticatedUser } from "@/lib/schemas"
-import { slug as createSlug, capitalizeFirstLetter, makeAbbveriation } from "@/lib/utilities"
+import { slug as createSlug, capitalizeFirstLetter, makeAbbveriation, plural } from "@/lib/utilities"
 import { Icons } from "@/components/icons/lucide"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
+import { Contacts } from "@/components/layouts/contacts"
 
 
 interface BuyerPageProps {
@@ -21,24 +22,8 @@ interface BuyerPageProps {
 }
 
 export function Buyer({ slug, user }: BuyerPageProps) {
-    const router = useRouter()
     const searchParams = useSearchParams()
-    const createQueryString = useCallback(
-        (params: Record<string, string | number | null>) => {
-            const newSearchParams = new URLSearchParams(searchParams?.toString())
 
-            for (const [key, value] of Object.entries(params)) {
-                if (value === null) {
-                    newSearchParams.delete(key)
-                } else {
-                    newSearchParams.set(key, String(value))
-                }
-            }
-
-            return newSearchParams.toString()
-        },
-        [searchParams]
-    )
     const { data, isError, refetch, isFetching } = useQuery({
         queryKey: [`result-buyer-${slug}`, slug],
         queryFn: () => queryBuyer(slug),
@@ -58,100 +43,8 @@ export function Buyer({ slug, user }: BuyerPageProps) {
         return null
     }
 
-    interface Info {
-        title: string
-        action: string
-    }
-
-    function Info({ info, name }: { info: Info, name: string }) {
-        const name_slug = createSlug(name)
-        const queryString = createQueryString({
-            'entity': 'buyer',
-            'wantToSee': `${name_slug}`
-        })
-        return (
-            <dd>
-                <Button variant="outline" onClick={() => {
-                    sendGTMEvent({ event: 'action', value: info.action })
-                    router.push(`/login?${queryString}`)
-                }
-                }>
-                    See {info.title}
-                </Button>
-            </dd>
-
-        )
-    }
-
-    const infoPhone: Info = {
-        title: "Number",
-        action: "LoggedOutViewNumber"
-    }
-
-    const infoEmail: Info = {
-        title: "Email",
-        action: "LoggedOutViewEmail"
-    }
-
-    function ShowEmail({ email }: { email: string }) {
-        const [showDetail, setShowDetail] = useState(false);
-
-        const showDetailButton = () => {
-            setShowDetail(true);
-        };
-
-        return (
-            <>
-                {
-                    showDetail ?
-                        <dd className="text-sm font-medium leading-6 text-muted-foreground hover:underline">
-                            <Link href={`mailto:${email}`}>
-                                {email}
-                            </Link>
-                        </dd>
-                        : (
-                            <Button className="p-0 h-[22px]" variant="link" onClick={() => {
-                                sendGTMEvent({ event: 'action', value: 'LoggedInViewEmail' })
-                                showDetailButton()
-                            }}>
-                                Show email
-                            </Button>
-                        )
-                }
-            </>
-        )
-    }
-    function ShowPhone({ phone }: { phone: string }) {
-        const [showDetail, setShowDetail] = useState(false);
-
-        const showDetailButton = () => {
-            setShowDetail(true);
-        };
-
-        return (
-            <>
-                {
-                    showDetail ?
-                        <dd className="text-sm font-medium leading-6 text-muted-foreground hover:underline">
-                            <Link href={`tel:${phone}`}>
-                                {phone}
-                            </Link>
-                        </dd>
-                        : (
-                            <Button className="p-0 h-[22px]" variant="link" onClick={() => {
-                                sendGTMEvent({ event: 'action', value: 'LoggedInViewPhone' })
-                                showDetailButton()
-                            }}>
-                                Show phone
-                            </Button>
-                        )
-                }
-            </>
-        )
-    }
-
     return (
-        <div className="space-y-8 mt-[21px]">
+        <div className="space-y-8 mt-[21px] md:min-w-[500px]">
             <section className="">
                 <div className="flex gap-x-4 py-1 px-6">
                     <Avatar className="h-12 w-12 flex-none rounded-full">
@@ -161,34 +54,35 @@ export function Buyer({ slug, user }: BuyerPageProps) {
 
                     <div className="min-w-0">
                         <h1 className="text-sm font-semibold leading-6">{ capitalizeFirstLetter(buyer.name) }</h1>
-                        <p className="text-xs leading-4 text-muted-foreground ">{ capitalizeFirstLetter(buyer.short_description) }</p>
-                    </div>
-                </div>
+                        <p className="text-xs leading-4 text-muted-foreground ">{ buyer.short_description ? capitalizeFirstLetter(buyer.short_description) :
+                         `${ capitalizeFirstLetter(buyer.scale)} scale ${buyer.type} in the ${buyer.specialization} industry mainly procuring ${plural(buyer.main_activity)}.`}</p>
 
-                <div className="flex px-6">
-                    <div className="flex-none w-16">
-                        <p className="text-sm font-semibold leading-6">{ buyer.branches }</p>
-                        <p className="truncate text-xs leading-4 text-muted-foreground">Branches</p>
-                    </div>
-                    <div className="flex-none w-16">
-                        { buyer.verified ?      
-                            <>                  
-                                <dt>
-                                    <span className="sr-only">Verified</span>
-                                    <Icons.unverified className="h-6 w-5" aria-hidden="true" color="#7CFC00" />
-                                </dt>
-                                <dd className="text-xs font-medium leading-4 text-muted-foreground">Verified</dd> 
-                            </>  
-                        :      
-                        <>                 
-                            <dt>
-                                <span className="sr-only">Unverified</span>
-                                <Icons.unverified className="h-6 w-5" aria-hidden="true" color="#FF0000" />
-                            </dt>
-                            <dd className="text-xs font-medium leading-4 text-muted-foreground">Unverified</dd>
-                        </>
-                    }
+                        <div className="flex mt-2">
+                            <div className="flex-none w-16">
+                                <p className="text-sm font-semibold leading-6">{ buyer.branches <= 1 ? 1 : buyer.branches  }</p>
+                                <p className="truncate text-xs leading-4 text-muted-foreground">{ buyer.branches <= 1 ? "Branch": "Branches" }</p>
+                            </div>
+                            <div className="flex-none w-16">
+                                { buyer.verified ?      
+                                    <>                  
+                                        <dt>
+                                            <span className="sr-only">Verified</span>
+                                            <Icons.unverified className="h-6 w-5" aria-hidden="true" color="#228B22" />
+                                        </dt>
+                                        <dd className="text-xs font-medium leading-4 text-muted-foreground">Verified</dd> 
+                                    </>  
+                                :      
+                                <>                 
+                                    <dt>
+                                        <span className="sr-only">Unverified</span>
+                                        <Icons.unverified className="h-6 w-5" aria-hidden="true" color="#FF0000" />
+                                    </dt>
+                                    <dd className="text-xs font-medium leading-4 text-muted-foreground">Unverified</dd>
+                                </>
+                            }
 
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -225,7 +119,7 @@ export function Buyer({ slug, user }: BuyerPageProps) {
                         <li className="col-span-1">
                             <div className="flex-1 truncate">
                                 <div className="flex items-center space-x-3">
-                                    <h3 className="truncate text-base font-medium">{ capitalizeFirstLetter(buyer.payment_terms) }</h3>
+                                    <h3 className="truncate text-base font-medium">{ buyer.payment_terms ? capitalizeFirstLetter(buyer.payment_terms) : "Has not listed payment terms!"}</h3>
                                 </div>
                                 <p className="mt-1 truncate text-sm text-muted-foreground">Payment Terms</p>
                             </div>
@@ -239,7 +133,7 @@ export function Buyer({ slug, user }: BuyerPageProps) {
                     </div>
                 </div>
 
-                <div className="min-h-[150px] bg-secondary mt-4">
+                <div className="min-h-[100px] bg-secondary">
                     <div className="px-6 py-4 space-y-4">
                         <div className="space-y-2">
                             <h3 className="text-sm text-foreground">Secondary Procurement Activites</h3>
@@ -259,7 +153,7 @@ export function Buyer({ slug, user }: BuyerPageProps) {
                     </div>
                 </div>
 
-
+                <Contacts user={user} buyer={buyer} />
             </section>
 
             <section>

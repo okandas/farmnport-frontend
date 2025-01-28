@@ -8,21 +8,20 @@ import { sendGTMEvent } from '@next/third-parties/google'
 import { useQuery } from "@tanstack/react-query"
 import Link from "next/link"
 
-import { Pagination } from "@/components/generic/pagination"
-import { queryBuyers } from "@/lib/query"
+
+
 import { ApplicationUser, AuthenticatedUser } from "@/lib/schemas"
 import { slug, capitalizeFirstLetter, formatDate, plural } from "@/lib/utilities"
 import { Icons } from "@/components/icons/lucide"
-
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import { Contacts } from "@/components/layouts/contacts"
 
-interface BuyersPageProps {
+interface ContactPageProps {
     user: AuthenticatedUser | null
+    buyer: ApplicationUser
+    quickOverview?: Boolean
 }
 
-export function Buyers({ user }: BuyersPageProps) {
+export function Contacts({ user, buyer, quickOverview }: ContactPageProps) {
 
     const router = useRouter()
     const pathname = usePathname()
@@ -45,32 +44,6 @@ export function Buyers({ user }: BuyersPageProps) {
         },
         [searchParams]
     )
-
-    // Search params
-    const page = Number(searchParams?.get("page")) ?? 1
-
-    const { data, isError, refetch, isFetching } = useQuery({
-        queryKey: ["results-buyers", { p: page }],
-        queryFn: () => queryBuyers({ p: page }),
-        refetchOnWindowFocus: false
-    })
-
-    if (isError) {
-        return null
-    }
-
-    if (isFetching) {
-        return null
-    }
-
-    const buyers = data?.data?.data as ApplicationUser[]
-    const total = data?.data?.total as number
-
-    const pageCount = Math.ceil(total / 10)
-
-    if (buyers === undefined) {
-        return null
-    }
 
     interface Info {
         title: string
@@ -165,28 +138,70 @@ export function Buyers({ user }: BuyersPageProps) {
     }
 
     return (
-        <section className="space-y-8 mt-[21px]">
-            <ul role="list" className="divide-y">
-                {buyers.map((buyer, buyerIndex) => (
-                    <li key={buyerIndex} className="py-4 first:pt-2">
+        <section className="space-y-8">
+           <div className="-my-3 py-4">                   
+                <dl className="grid grid-cols-1 lg:grid-cols-2 text-sm leading-6">
+                    <div className="flex gap-x-4 py-2">
+                        <dt>
+                            <span className="sr-only">Joined</span>
+                            <Icons.calender className="h-6 w-5" aria-hidden="true" />
+                        </dt>
+                        <dd className="text-sm font-medium leading-6 text-muted-foreground">{formatDate(buyer.created)}</dd>
+                    </div>
+                    <div className="flex gap-x-4 py-1">
+                        <dt>
+                            <span className="sr-only">Email</span>
+                            <Icons.mail className="h-6 w-5" aria-hidden="true" />
+                        </dt>
 
-                        <div>
-                            <h4 className="text-lg hover:underline hover:decoration-2">
-                                <Link href={`/buyer/${slug(buyer.name)}`}>{capitalizeFirstLetter(buyer.name)}</Link>
-                            </h4>
-                            {buyer.short_description.length > 0 ? <h4 className="text-muted-foreground text-sm">{capitalizeFirstLetter(buyer.short_description)}</h4> : null}
-                            <Contacts user={user} buyer={buyer} quickOverview={true}/>
-                        </div>
-                    </li>
-                ))}
-            </ul>
+                        {
+                            user !== undefined ? (<ShowEmail email={buyer.email} />) : (<Info info={infoEmail} name={buyer.name} />)
+                        }
+                    </div>
+                    <div className="flex gap-x-4 py-1">
+                        <dt>
+                            <span className="sr-only">Phone</span>
+                            <Icons.phone className="h-6 w-5" aria-hidden="true" />
+                        </dt>
 
-            <div>
-                <Pagination
-                    pageCount={pageCount}
-                    page={page}
-                    createQueryString={createQueryString}
-                />
+                        {
+                            user !== undefined ? (<ShowPhone phone={buyer.phone} />) : (<Info info={infoPhone} name={buyer.name} />)
+                        }
+
+                    </div>
+                    <div className="flex gap-x-4">
+                        <dt>
+                            <span className="sr-only">Address</span>
+                            <Icons.map className="h-6 w-5" aria-hidden="true" />
+                        </dt>
+                        <dd className="text-sm font-medium leading-6 text-muted-foreground">{buyer.address}</dd>
+                    </div>
+
+                    <div className="flex gap-x-4 py-1">
+                        <dt>
+                            <span className="sr-only">City, Province</span>
+                            <Icons.landmark className="h-6 w-5" aria-hidden="true" />
+                        </dt>
+                        <dd className="text-sm font-medium leading-6 text-muted-foreground">{capitalizeFirstLetter(buyer.city)}, {capitalizeFirstLetter(buyer.province)}</dd>
+                    </div>
+                    { quickOverview ?
+                            <div className="flex gap-x-4 py-1">
+                                <dt>
+                                    <span className="sr-only">Quick overview</span>
+                                    <Icons.info className="h-6 w-5" aria-hidden="true" />
+                                </dt>
+                                <div>
+                                    <dd className="text-sm font-medium leading-6 text-muted-foreground">Buyer mainly specializes in <span className="font-semibold text-foreground">{capitalizeFirstLetter(buyer.specialization)}</span></dd>
+                                    <dd className="text-sm font-medium leading-6 text-muted-foreground">Mainly buying <span className="font-semibold text-foreground">{capitalizeFirstLetter(plural(buyer.main_activity))}</span></dd>
+                                    <dd className="text-sm font-medium leading-6 text-muted-foreground">Buys <span className="font-semibold text-foreground">{buyer.specializations.length}</span> other agri produce, see more</dd>
+                                </div>
+
+                            </div> 
+                        :
+                            null 
+                     }
+
+                </dl>             
             </div>
         </section>
 
