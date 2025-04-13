@@ -1,14 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   /* config options here */
+  output: "standalone",
   images: {
     remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '*.tunnelapp.dev',
-        port: '',
-        pathname: '/images/**'
-      },
       {
         protocol: 'https',
         hostname: 's3.farmnport.com',
