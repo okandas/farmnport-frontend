@@ -1,5 +1,4 @@
 import NextAuth, { Session, User } from "next-auth";
-import { useSession } from "next-auth/react"
 import Credentials from 'next-auth/providers/credentials'
 import jwt_decode from "jwt-decode"
 import { Debug } from "@/lib/schemas"
@@ -33,6 +32,7 @@ import { BaseURL } from "@/lib/schemas"
 
 export const { auth, signIn, signOut, handlers } = NextAuth({
     debug: Debug,
+    trustHost: true,
     session: {
         strategy: "jwt"
     },
@@ -63,7 +63,6 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
                     });
 
                     const response = await rawResponse.json();
-                    const check = true
 
                     if (response.code !== 200) {
                         const errObj = {
@@ -79,8 +78,8 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
                     decodedSession.name = decodedSession.username
                     return decodedSession
 
-                  
- 
+
+
                 } catch (error) {
                     const errObj = {
                         message: 'Authorize in the credentials provider',
@@ -93,7 +92,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
         })
     ],
     callbacks: {
-        async signIn({ user }) {
+        async signIn() {
             return true
         },
         async redirect({ url, baseUrl }) {
@@ -139,7 +138,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
 })
 
 export const handleTokenRefresh = async (token: string, session: Session | null) => {
-    
+
     const decodedUser = jwt_decode<User>(token)
     decodedUser.token = token
     decodedUser.name = decodedUser.username
