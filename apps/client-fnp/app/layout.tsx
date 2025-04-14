@@ -36,6 +36,7 @@ interface RootLayoutProps {
 }
 
 const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID as string
+const NEXT_ENV = process.env.NEXT_ENV as string
 
 export default async function RootLayout({ children }: RootLayoutProps) {
   const session = await auth()
@@ -62,7 +63,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
               <GoogleTagManager gtmId={GTM_ID} />
               <Toaster />
               <SpeedInsights />
-              <Analytics />
+              {NEXT_ENV !== 'production' && <Analytics />}
             </QueryProvider>
           </ThemeProvider>
         </body>
