@@ -62,7 +62,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
               {children}
               <GoogleTagManager gtmId={GTM_ID} />
               <Toaster />
-              <SpeedInsights />
+              {NEXT_ENV !== 'production' && <SpeedInsights />}
               {NEXT_ENV !== 'production' && <Analytics />}
             </QueryProvider>
           </ThemeProvider>
