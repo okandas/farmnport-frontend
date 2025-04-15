@@ -20,7 +20,7 @@ import {
 import { Icons } from "@/components/icons/lucide"
 import { MainNav } from "@/components/layouts/main-nav"
 import { MobileNav } from "@/components/layouts/mobile-nav"
-import { AppURL, AuthenticatedUser, BaseURL} from "@/lib/schemas"
+import { AppURL, AuthenticatedUser } from "@/lib/schemas"
 import { capitalizeFirstLetter, makeAbbveriation } from "@/lib/utilities"
 import { signOut } from "next-auth/react"
 
@@ -89,7 +89,7 @@ export function SiteHeader({ user }: SiteHeaderProps) {
                                     <DropdownMenuSeparator />
                                     <DropdownMenuGroup>
                                         <DropdownMenuItem asChild>
-                                            <Link href="#" onClick={() => signOut({ redirectTo: BaseURL })}>
+                                            <Link href="#" onClick={() => signOut({ redirectTo: AppURL })}>
                                                 {/* <DashboardIcon
                                                     className="mr-2 h-4 w-4"
                                                     aria-hidden="true"
