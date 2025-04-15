@@ -23,31 +23,34 @@ api.interceptors.request.use(async(config: InternalAxiosRequestConfig) => {
 })
 
 
-export function queryBuyers(pagintion?: PaginationModel) {
-    var url: string
+export function queryBuyers(pagination?: PaginationModel) {
+    let url: string
 
-    if (pagintion?.p !== undefined && pagintion.p >= 2) {
-        url = `${BaseURL}/buyer/all?p=${pagintion.p}`
+    if (pagination?.p !== undefined && pagination.p >= 2) {
+        url = `${BaseURL}/buyer/all?p=${pagination.p}`
     } else {
         url = `${BaseURL}/buyer/all`
     }
 
-    // if (pagintion?.search !== undefined && pagintion.search.length >= 2) {
-    //     url = `${baseUrl}/buyer/all?search=${pagintion.search}`
+    // if (pagination?.search !== undefined && pagination.search.length >= 2) {
+    //     url = `${baseUrl}/buyer/all?search=${pagination.search}`
     // }
+
+    console.log(url, "queryBuyers")
+    console.log(BaseURL, "baseUrl")
 
     return api.get(url)
 }
 
 export function queryBuyer(slug: string) {
 
-    var url = `${BaseURL}/client/${slug}`
+    let url = `${BaseURL}/client/${slug}`
 
     return api.get(url)
 }
 
 export function clientLogin(data: LoginFormData) {
-    var url = `${BaseURL}/client/login`
+    let url = `${BaseURL}/client/login`
     return api.post(url, data)
 }
 
@@ -58,6 +61,6 @@ export function clientReset(data: ResetFormData) {
 
 
 export async function clientSignup(data: SignUpFormData) {
-    var url = `${BaseURL}/client/signup`
+    let url = `${BaseURL}/client/signup`
     return api.post(url, data)
 }
