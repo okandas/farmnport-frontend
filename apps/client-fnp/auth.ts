@@ -3,6 +3,7 @@ import Credentials from 'next-auth/providers/credentials'
 import jwt_decode from "jwt-decode"
 import { Debug, Secret } from "@/lib/schemas"
 import { captureException } from "@sentry/nextjs";
+import { logtail} from "@/lib/logger";
 
 
 declare module "next-auth" {
@@ -161,6 +162,17 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
 
             return session
         }
+    },
+    logger: {
+      async error(error) {
+        await logtail.error(error)
+      },
+      async warn(code) {
+        await logtail.warn(code)
+      },
+      async debug(code, metadata) {
+        await logtail.debug(code)
+      }
     }
 })
 
