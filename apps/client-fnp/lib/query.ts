@@ -1,15 +1,9 @@
 import axios, { InternalAxiosRequestConfig } from "axios"
-import Cookies from "js-cookie"
-import * as z from "zod"
-import { auth } from "@/auth"
 
-
-
-import { PaginationModel, ResetFormData, LoginFormData, BaseURL, SignUpFormData } from "@/lib/schemas"
-import { resolve } from "path"
+import { PaginationModel, ResetFormData, LoginFormData, SignUpFormData, BaseURL, FeatureFlags } from "@/lib/schemas"
 import { retrieveToken } from "@/lib/actions"
 
-var api = axios.create({})
+let api = axios.create({})
 
 api.interceptors.request.use(async(config: InternalAxiosRequestConfig) => {
 
@@ -38,6 +32,7 @@ export function queryBuyers(pagination?: PaginationModel) {
 
     console.log(url, "queryBuyers")
     console.log(BaseURL, "baseUrl")
+    console.log(FeatureFlags, "featureFlags from configMap")
 
     return api.get(url)
 }

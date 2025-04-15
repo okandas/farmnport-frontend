@@ -89,7 +89,7 @@ export function SiteHeader({ user }: SiteHeaderProps) {
                                     <DropdownMenuSeparator />
                                     <DropdownMenuGroup>
                                         <DropdownMenuItem asChild>
-                                            <Link href="#" onClick={() => signOut()}>
+                                            <Link href="#" onClick={() => signOut({ redirectTo: '/' })}>
                                                 {/* <DashboardIcon
                                                     className="mr-2 h-4 w-4"
                                                     aria-hidden="true"

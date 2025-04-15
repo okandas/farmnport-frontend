@@ -316,4 +316,4 @@ export const BaseURL = base + version
 export const AppURL = process.env.NEXT_PUBLIC_APP_URL
 export const Debug = process.env.NEXT_PUBLIC_DEBUG == 'true'
 export const Secret = process.env.NEXT_AUTH_SECRET
-
+export const FeatureFlags = process.env.NEXT_PUBLIC_FEATURE_FLAGS
