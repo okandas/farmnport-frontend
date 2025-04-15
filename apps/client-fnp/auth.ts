@@ -1,7 +1,7 @@
 import NextAuth, { Session, User } from "next-auth";
 import Credentials from 'next-auth/providers/credentials'
 import jwt_decode from "jwt-decode"
-import { Debug } from "@/lib/schemas"
+import { Debug, Secret } from "@/lib/schemas"
 import { captureException } from "@sentry/nextjs";
 
 
@@ -32,6 +32,7 @@ import { BaseURL } from "@/lib/schemas"
 
 export const { auth, signIn, signOut, handlers } = NextAuth({
     debug: Debug,
+    secret: Secret,
     trustHost: true,
     session: {
         strategy: "jwt"
@@ -48,7 +49,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
 
                 const data = { email, password }
 
-                var url = `${BaseURL}/client/login`
+                const url = `${BaseURL}/client/login`
 
 
                 try {

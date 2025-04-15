@@ -310,9 +310,10 @@ export type LoginFormData = z.infer<typeof AuthSchema>
 export type ResetFormData = z.infer<typeof ResetSchema>
 export type SignUpFormData = z.infer<typeof AuthSignUpSchema>
 
-var base = process.env.NEXT_PUBLIC_BASE_URL
-var version = "/v1"
+const base = process.env.NEXT_PUBLIC_BASE_URL
+const version = "/v1"
 export const BaseURL = base + version
 export const AppURL = process.env.NEXT_PUBLIC_APP_URL
 export const Debug = process.env.NEXT_PUBLIC_DEBUG == 'true'
+export const Secret = process.env.NEXT_AUTH_SECRET
 
