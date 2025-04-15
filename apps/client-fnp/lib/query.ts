@@ -30,10 +30,6 @@ export function queryBuyers(pagination?: PaginationModel) {
     //     url = `${baseUrl}/buyer/all?search=${pagination.search}`
     // }
 
-    console.log(url, "queryBuyers")
-    console.log(BaseURL, "baseUrl")
-    console.log(FeatureFlags, "featureFlags from configMap")
-
     return api.get(url)
 }
 
