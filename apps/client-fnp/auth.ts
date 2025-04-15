@@ -53,7 +53,8 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
 
                 let status = ''
                 let code = 0
-                let headers = null
+                let headers = {}
+                let reqUrl = ''
 
 
                 try {
@@ -70,9 +71,10 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
                     code = rawResponse.status
                     status = rawResponse.statusText
                     headers = rawResponse.headers
+                    reqUrl = rawResponse.url
+
 
                     const response = await rawResponse.json();
-
 
 
                     if (response.code !== 200) {
@@ -81,7 +83,11 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
                             error: response,
                             code: code,
                             status: status,
-                            headers: headers
+                            headers: headers,
+                            requests: {
+                              reqUrl: reqUrl,
+                              url: url
+                            }
                         }
                         captureException(errObj)
                             return null
@@ -100,7 +106,11 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
                         error: error,
                         code: code,
                         status: status,
-                        headers: headers
+                        headers: headers,
+                        requests: {
+                          reqUrl: reqUrl,
+                          url: url
+                        }
                     }
                     captureException(errObj)
                     return null
