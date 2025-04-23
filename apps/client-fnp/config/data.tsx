@@ -25,14 +25,26 @@ export const specializations = [
     "pastures",
 ]
 
+export const produce = [
+  "chicken",
+  "pork",
+  "chilli",
+  "watermelon",
+  "onions",
+  "cattle",
+  "tomatoes",
+  "eggs",
+  "maize"
+]
+
 export const scales = ["small", "medium", "large"]
 
 export const paymentTerms = ["Next Day", "2 weeks", "30 Days", "60 Days"]
 
 export const sideBarFilterData = [
     {
-        name: "specialization",
-        data: specializations
+      name: "produce",
+      data: produce
     },
     {
         name: "payment",
@@ -45,7 +57,11 @@ export const sideBarFilterData = [
     {
         name: "provinces",
         data: provinces
-    }
+    },
+  {
+      name: "specialization",
+      data: specializations
+    },
 ]
 
-export const defaultSideBarData = ["payment", "specialization"]
+export const defaultSideBarData = ["payment", "produce"]

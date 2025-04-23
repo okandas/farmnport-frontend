@@ -1,21 +1,18 @@
 "use client"
 
-import {useCallback, useState} from "react"
+import {useCallback} from "react"
 import {usePathname, useRouter, useSearchParams} from "next/navigation"
 
 
-import {sendGTMEvent} from '@next/third-parties/google'
+
 import {useQuery} from "@tanstack/react-query"
 import Link from "next/link"
 
 import {Pagination} from "@/components/generic/pagination"
 import {queryBuyers, queryBuyersByProduct} from "@/lib/query"
 import {ApplicationUser, AuthenticatedUser} from "@/lib/schemas"
-import {slug, capitalizeFirstLetter, formatDate, plural} from "@/lib/utilities"
-import {Icons} from "@/components/icons/lucide"
+import {slug, capitalizeFirstLetter} from "@/lib/utilities"
 
-import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar"
-import {Button, buttonVariants} from "@/components/ui/button"
 import {Contacts} from "@/components/layouts/contacts"
 
 interface BuyersPageProps {
@@ -49,7 +46,7 @@ export function Buyers({user, queryBy}: BuyersPageProps) {
   // Search params
   const page = Number(searchParams?.get("page")) ?? 1
 
-  const {data, isError, refetch, isFetching} = useQuery({
+  const {data, isError, isFetching} = useQuery({
     queryKey: ["results-buyers", {p: page}],
     queryFn: () => queryBy != undefined ? queryBuyersByProduct(queryBy, {p: page}) : queryBuyers({p: page}),
     refetchOnWindowFocus: false
