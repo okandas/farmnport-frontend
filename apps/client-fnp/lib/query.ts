@@ -40,6 +40,22 @@ export function queryBuyer(slug: string) {
     return api.get(url)
 }
 
+export function queryBuyersByProduct(product: string, pagination?: PaginationModel) {
+  let url: string
+
+  if (pagination?.p !== undefined && pagination.p >= 2) {
+    url = `${BaseURL}/buyer/${product}?p=${pagination.p}`
+  } else {
+    url = `${BaseURL}/buyer/${product}`
+  }
+
+  // if (pagination?.search !== undefined && pagination.search.length >= 2) {
+  //     url = `${baseUrl}/buyer/all?search=${pagination.search}`
+  // }
+
+  return api.get(url)
+}
+
 export function clientLogin(data: LoginFormData) {
     let url = `${BaseURL}/client/login`
     return api.post(url, data)

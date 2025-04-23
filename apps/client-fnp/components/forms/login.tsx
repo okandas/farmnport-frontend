@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
 import { Icons } from "@/components/icons/lucide"
+import { logtail } from "@/lib/logger";
 
 interface AuthFormProps extends React.HTMLAttributes<HTMLDivElement> { }
 
@@ -50,11 +51,13 @@ export function AuthForm({ className, ...props }: AuthFormProps) {
                 router.push("/")
             }
         },
-        onError: (error) => {
+        onError: async (error) => {
 
             toast("Failed to login", {
                 description: "System Failure or Network Failure Please Try Again"
             })
+
+            await logtail.error(error)
 
             captureException(error)
         },
@@ -138,7 +141,7 @@ export function AuthForm({ className, ...props }: AuthFormProps) {
                 <div className="relative mt-10">
                     <div className="absolute inset-0 flex items-center" aria-hidden="true">
                         <div className="w-full border-t border-border" />
-                    </div>  
+                    </div>
                     <div className="relative flex justify-center text-sm font-medium leading-6">
                         <span className="bg-card px-6 text-muted-foreground">Don&apos;t have an account?</span>
                     </div>

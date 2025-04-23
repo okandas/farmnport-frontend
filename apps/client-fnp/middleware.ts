@@ -17,7 +17,7 @@ export default middleware((request: NextAuthRequest) => {
 
   }
 
-  const paths = ['buyers', 'prices']
+  const paths = ['prices']
 
   for (const path of paths) {
     if (pathname.includes(path) && request.auth?.user === undefined) {

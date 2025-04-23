@@ -10,15 +10,15 @@ type Props = {
   params: Promise<{ slug: string }>
   searchParams:  Promise<{ [key: string]: string | string[] | undefined }>
 }
- 
+
 export async function generateMetadata({ params }: Props,  parent: ResolvingMetadata): Promise<Metadata> {
   const { slug } = await params
   const name = unSlug(slug)
- 
+
 
   return {
     alternates: {
-      canonical: `${AppURL}/buyer/${slug}`,
+      canonical: `${AppURL}/buyer/${slug.toLowerCase()}`,
     },
     title: `${name} - Buyer in Zimbabwe | farmnport.com`,
   }
@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: Props,  parent: ResolvingMeta
 type BuyerPageProps ={
     params:  Promise<{ slug: string }>
 }
-  
+
   export default async function BuyerPage({ params }:  BuyerPageProps) {
 
     const user = await retrieveUser()

@@ -1,196 +1,106 @@
 "use client"
 
-import { useCallback, useState } from "react"
-import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import {useCallback, useState} from "react"
+import {usePathname, useRouter, useSearchParams} from "next/navigation"
 
 
-import { sendGTMEvent } from '@next/third-parties/google'
-import { useQuery } from "@tanstack/react-query"
+import {sendGTMEvent} from '@next/third-parties/google'
+import {useQuery} from "@tanstack/react-query"
 import Link from "next/link"
 
-import { Pagination } from "@/components/generic/pagination"
-import { queryBuyers } from "@/lib/query"
-import { ApplicationUser, AuthenticatedUser } from "@/lib/schemas"
-import { slug, capitalizeFirstLetter, formatDate, plural } from "@/lib/utilities"
-import { Icons } from "@/components/icons/lucide"
+import {Pagination} from "@/components/generic/pagination"
+import {queryBuyers, queryBuyersByProduct} from "@/lib/query"
+import {ApplicationUser, AuthenticatedUser} from "@/lib/schemas"
+import {slug, capitalizeFirstLetter, formatDate, plural} from "@/lib/utilities"
+import {Icons} from "@/components/icons/lucide"
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
-import { Contacts } from "@/components/layouts/contacts"
+import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar"
+import {Button, buttonVariants} from "@/components/ui/button"
+import {Contacts} from "@/components/layouts/contacts"
 
 interface BuyersPageProps {
-    user: AuthenticatedUser | null
+  user: AuthenticatedUser | null
+  queryBy?: string
 }
 
-export function Buyers({ user }: BuyersPageProps) {
+export function Buyers({user, queryBy}: BuyersPageProps) {
 
-    const router = useRouter()
-    const pathname = usePathname()
-    const searchParams = useSearchParams()
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
 
-    // Create query string
-    const createQueryString = useCallback(
-        (params: Record<string, string | number | null>) => {
-            const newSearchParams = new URLSearchParams(searchParams?.toString())
+  const createQueryString = useCallback(
+    (params: Record<string, string | number | null>) => {
+      const newSearchParams = new URLSearchParams(searchParams?.toString())
 
-            for (const [key, value] of Object.entries(params)) {
-                if (value === null) {
-                    newSearchParams.delete(key)
-                } else {
-                    newSearchParams.set(key, String(value))
-                }
-            }
+      for (const [key, value] of Object.entries(params)) {
+        if (value === null) {
+          newSearchParams.delete(key)
+        } else {
+          newSearchParams.set(key, String(value))
+        }
+      }
 
-            return newSearchParams.toString()
-        },
-        [searchParams]
-    )
+      return newSearchParams.toString()
+    },
+    [searchParams]
+  )
 
-    // Search params
-    const page = Number(searchParams?.get("page")) ?? 1
+  // Search params
+  const page = Number(searchParams?.get("page")) ?? 1
 
-    const { data, isError, refetch, isFetching } = useQuery({
-        queryKey: ["results-buyers", { p: page }],
-        queryFn: () => queryBuyers({ p: page }),
-        refetchOnWindowFocus: false
-    })
+  const {data, isError, refetch, isFetching} = useQuery({
+    queryKey: ["results-buyers", {p: page}],
+    queryFn: () => queryBy != undefined ? queryBuyersByProduct(queryBy, {p: page}) : queryBuyers({p: page}),
+    refetchOnWindowFocus: false
+  })
 
-    if (isError) {
-        return null
-    }
+  if (isError) {
+    return null
+  }
 
-    if (isFetching) {
-        return null
-    }
+  if (isFetching) {
+    return null
+  }
 
-    const buyers = data?.data?.data as ApplicationUser[]
-    const total = data?.data?.total as number
+  const buyers = data?.data?.data as ApplicationUser[]
+  const total = data?.data?.total as number
 
-    const pageCount = Math.ceil(total / 10)
+  const pageCount = Math.ceil(total / 10)
 
-    if (buyers === undefined) {
-        return null
-    }
+  if (buyers == undefined || buyers == null) {
+    return null
+  }
 
-    interface Info {
-        title: string
-        action: string
-    }
 
-    function Info({ info, name }: { info: Info, name: string }) {
-        const name_slug = slug(name)
-        const queryString = createQueryString({
-            'entity': 'buyer',
-            'wantToSee': `${name_slug}`
-        })
-        return (
-            <dd>
-                <Button variant="outline" onClick={() => {
-                    sendGTMEvent({ event: 'action', value: info.action })
-                    router.push(`/login?${queryString}`)
-                }
-                }>
-                    See {info.title}
-                </Button>
-            </dd>
-
-        )
-    }
-
-    const infoPhone: Info = {
-        title: "Number",
-        action: "LoggedOutViewNumber"
-    }
-
-    const infoEmail: Info = {
-        title: "Email",
-        action: "LoggedOutViewEmail"
-    }
-
-    function ShowEmail({ email }: { email: string }) {
-        const [showDetail, setShowDetail] = useState(false);
-
-        const showDetailButton = () => {
-            setShowDetail(true);
-        };
-
-        return (
-            <>
-                {
-                    showDetail ?
-                        <dd className="text-sm font-medium leading-6 text-muted-foreground hover:underline">
-                            <Link href={`mailto:${email}`}>
-                                {email}
-                            </Link>
-                        </dd>
-                        : (
-                            <Button className="p-0 h-[22px]" variant="link" onClick={() => {
-                                sendGTMEvent({ event: 'action', value: 'LoggedInViewEmail' })
-                                showDetailButton()
-                            }}>
-                                Show email
-                            </Button>
-                        )
-                }
-            </>
-        )
-    }
-    function ShowPhone({ phone }: { phone: string }) {
-        const [showDetail, setShowDetail] = useState(false);
-
-        const showDetailButton = () => {
-            setShowDetail(true);
-        };
-
-        return (
-            <>
-                {
-                    showDetail ?
-                        <dd className="text-sm font-medium leading-6 text-muted-foreground hover:underline">
-                            <Link href={`tel:${phone}`}>
-                                {phone}
-                            </Link>
-                        </dd>
-                        : (
-                            <Button className="p-0 h-[22px]" variant="link" onClick={() => {
-                                sendGTMEvent({ event: 'action', value: 'LoggedInViewPhone' })
-                                showDetailButton()
-                            }}>
-                                Show phone
-                            </Button>
-                        )
-                }
-            </>
-        )
-    }
-
-    return (
-        <section className="space-y-8 mt-[21px]">
-            <ul role="list" className="divide-y">
-                {buyers.map((buyer, buyerIndex) => (
-                    <li key={buyerIndex} className="py-4 first:pt-2">
-
-                        <div>
-                            <h4 className="text-lg hover:underline hover:decoration-2">
-                                <Link href={`/buyer/${slug(buyer.name)}`}>{capitalizeFirstLetter(buyer.name)}</Link>
-                            </h4>
-                            {buyer.short_description.length > 0 ? <h4 className="text-muted-foreground text-sm">{capitalizeFirstLetter(buyer.short_description)}</h4> : null}
-                            <Contacts user={user} buyer={buyer} quickOverview={true}/>
-                        </div>
-                    </li>
-                ))}
-            </ul>
+  return (
+    <section className="space-y-8 mt-[21px]">
+      <ul role="list" className="divide-y">
+        {buyers.map((buyer, buyerIndex) => (
+          <li key={buyerIndex} className="py-4 first:pt-2">
 
             <div>
-                <Pagination
-                    pageCount={pageCount}
-                    page={page}
-                    createQueryString={createQueryString}
-                />
+              <h4 className="text-lg hover:underline hover:decoration-2">
+                <Link href={`/buyer/${slug(buyer.name)}`}>{capitalizeFirstLetter(buyer.name)}</Link>
+              </h4>
+              {buyer.short_description.length > 0 ? <h4
+                className="text-muted-foreground text-sm">{capitalizeFirstLetter(buyer.short_description)}</h4> : null}
+              <Contacts user={user} buyer={buyer} quickOverview={true}/>
             </div>
-        </section>
+          </li>
+        ))}
+      </ul>
 
-    )
+      <div>
+        <Pagination
+          pageCount={pageCount}
+          page={page}
+          createQueryString={createQueryString}
+        />
+      </div>
+    </section>
+
+  )
 }
 
 

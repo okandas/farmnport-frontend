@@ -40,11 +40,19 @@ export function SiteHeader({ user }: SiteHeaderProps) {
                         <Link href="/buyers" onClick={() => sendGTMEvent({ event: 'link', value: 'BuyerTopNavigation' })}
                             className={buttonVariants({
                                 size: "sm",
-                                variant: "secondary"
+                                variant: "link"
                             })}
                         >
                             <Icons.dollar className="mr-2" /> Buyers
                         </Link>
+                        <Link href="/farmers" onClick={() => sendGTMEvent({ event: 'link', value: 'FarmerTopNavigation' })}
+                              className={buttonVariants({
+                                  size: "sm",
+                                  variant: "link"
+                              })}
+                          >
+                              <Icons.tractor className="mr-2" /> Farmers
+                          </Link>
                         {user ? (
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>

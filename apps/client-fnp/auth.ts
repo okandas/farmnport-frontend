@@ -3,7 +3,7 @@ import Credentials from 'next-auth/providers/credentials'
 import jwt_decode from "jwt-decode"
 import { Debug, Secret } from "@/lib/schemas"
 import { captureException } from "@sentry/nextjs";
-import { logtail} from "@/lib/logger";
+import { logtail } from "@/lib/logger";
 
 
 declare module "next-auth" {

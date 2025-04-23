@@ -13,7 +13,7 @@ import Link from "next/link"
 import { ApplicationUser, AuthenticatedUser } from "@/lib/schemas"
 import { slug, capitalizeFirstLetter, formatDate, plural } from "@/lib/utilities"
 import { Icons } from "@/components/icons/lucide"
-import { Button } from "@/components/ui/button"
+import {Button, buttonVariants} from "@/components/ui/button"
 
 interface ContactPageProps {
     user: AuthenticatedUser | null
@@ -58,7 +58,7 @@ export function Contacts({ user, buyer, quickOverview }: ContactPageProps) {
         })
         return (
             <dd>
-                <Button variant="outline" onClick={() => {
+                <Button className="p-0 h-[22px]" variant="link" onClick={() => {
                     sendGTMEvent({ event: 'action', value: info.action })
                     router.push(`/login?${queryString}`)
                 }
@@ -67,8 +67,8 @@ export function Contacts({ user, buyer, quickOverview }: ContactPageProps) {
                 </Button>
             </dd>
 
-        )
-    }
+    )
+  }
 
     const infoPhone: Info = {
         title: "Number",
@@ -139,7 +139,7 @@ export function Contacts({ user, buyer, quickOverview }: ContactPageProps) {
 
     return (
         <section className="space-y-8">
-           <div className="-my-3 py-4">                   
+           <div className="-my-3 py-4">
                 <dl className="grid grid-cols-1 lg:grid-cols-2 text-sm leading-6">
                     <div className="flex gap-x-4 py-2">
                         <dt>
@@ -196,12 +196,12 @@ export function Contacts({ user, buyer, quickOverview }: ContactPageProps) {
                                     <dd className="text-sm font-medium leading-6 text-muted-foreground">Buys <span className="font-semibold text-foreground">{buyer.specializations.length}</span> other agri produce, see more</dd>
                                 </div>
 
-                            </div> 
+                            </div>
                         :
-                            null 
+                            null
                      }
 
-                </dl>             
+                </dl>
             </div>
         </section>
 

@@ -14,12 +14,12 @@ export async function logoutUser() {
 }
 
 export async function retrieveToken() {
-    
+
     const session = await auth()
     const token = session?.access_token
     return token
 
-} 
+}
 
 export async function retrieveUser() {
     const session = await auth()
@@ -31,7 +31,7 @@ export async function retrieveUser() {
         user = {
             ...sessionUser
         }
-             
+
     } else {
         user = undefined
     }

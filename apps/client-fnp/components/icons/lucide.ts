@@ -43,7 +43,8 @@ import {
     Facebook,
     CircleDollarSign,
     ShieldCheck,
-    ShieldX
+    ShieldX,
+    Tractor
 } from "lucide-react"
 
 export type Icon = LucideIcon
@@ -92,5 +93,6 @@ export const Icons = {
     facebook: Facebook,
     circleDollarSign: CircleDollarSign,
     verified: ShieldCheck,
-    unverified: ShieldX
+    unverified: ShieldX,
+    tractor: Tractor,
 }

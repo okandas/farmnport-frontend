@@ -317,3 +317,10 @@ export const AppURL = process.env.NEXT_PUBLIC_APP_URL
 export const Debug = process.env.NEXT_PUBLIC_DEBUG == 'true'
 export const Secret = process.env.NEXT_AUTH_SECRET
 export const FeatureFlags = process.env.NEXT_PUBLIC_FEATURE_FLAGS
+
+
+export type BuyerSeoCategoryKeys = | "beef" | "lamb" | "mutton" | "goat" | "chicken" | "pork"
+
+export const BuyerSeo: Record<string, string>  = {
+  chicken: "Looking for trusted chicken buyers in Zimbabwe? Connect with reliable poultry buyers across the country, in major towns who purchase broiler, free-range, and live chickens in bulk or retail."
+}
