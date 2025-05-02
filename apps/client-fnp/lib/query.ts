@@ -16,14 +16,20 @@ api.interceptors.request.use(async(config: InternalAxiosRequestConfig) => {
     return config
 })
 
+export function queryClient(slug: string) {
 
-export function queryBuyers(pagination?: PaginationModel) {
+  let url = `${BaseURL}/client/${slug}`
+
+  return api.get(url)
+}
+
+export function queryClients(slug: string, pagination?: PaginationModel) {
     let url: string
 
     if (pagination?.p !== undefined && pagination.p >= 2) {
-        url = `${BaseURL}/buyer/all?p=${pagination.p}`
+        url = `${BaseURL}/${slug}/all?p=${pagination.p}`
     } else {
-        url = `${BaseURL}/buyer/all`
+        url = `${BaseURL}/${slug}/all`
     }
 
     // if (pagination?.search !== undefined && pagination.search.length >= 2) {
@@ -33,20 +39,14 @@ export function queryBuyers(pagination?: PaginationModel) {
     return api.get(url)
 }
 
-export function queryBuyer(slug: string) {
 
-    let url = `${BaseURL}/client/${slug}`
-
-    return api.get(url)
-}
-
-export function queryBuyersByProduct(product: string, pagination?: PaginationModel) {
+export function queryClientsByProduct(slug: string, product: string, pagination?: PaginationModel) {
   let url: string
 
   if (pagination?.p !== undefined && pagination.p >= 2) {
-    url = `${BaseURL}/buyer/${product}?p=${pagination.p}`
+    url = `${BaseURL}/${slug}/${product}?p=${pagination.p}`
   } else {
-    url = `${BaseURL}/buyer/${product}`
+    url = `${BaseURL}/${slug}/${product}`
   }
 
   // if (pagination?.search !== undefined && pagination.search.length >= 2) {
@@ -65,7 +65,6 @@ export function clientReset(data: ResetFormData) {
     var url = `${BaseURL}/client/reset`
     return api.post(url, data)
 }
-
 
 export async function clientSignup(data: SignUpFormData) {
     let url = `${BaseURL}/client/signup`

@@ -5,7 +5,6 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation"
 
 
 import { sendGTMEvent } from '@next/third-parties/google'
-import { useQuery } from "@tanstack/react-query"
 import Link from "next/link"
 
 
@@ -17,11 +16,11 @@ import {Button, buttonVariants} from "@/components/ui/button"
 
 interface ContactPageProps {
     user: AuthenticatedUser | null
-    buyer: ApplicationUser
+    client: ApplicationUser
     quickOverview?: Boolean
 }
 
-export function Contacts({ user, buyer, quickOverview }: ContactPageProps) {
+export function Contacts({ user, client, quickOverview }: ContactPageProps) {
 
     const router = useRouter()
     const pathname = usePathname()
@@ -53,7 +52,7 @@ export function Contacts({ user, buyer, quickOverview }: ContactPageProps) {
     function Info({ info, name }: { info: Info, name: string }) {
         const name_slug = slug(name)
         const queryString = createQueryString({
-            'entity': 'buyer',
+            'entity': client.type,
             'wantToSee': `${name_slug}`
         })
         return (
@@ -138,15 +137,15 @@ export function Contacts({ user, buyer, quickOverview }: ContactPageProps) {
     }
 
     return (
-        <section className="space-y-8">
-           <div className="-my-3 py-4">
+        <section className="space-y-8 md:px-6 py-1">
+           <div className="px-6 py-4">
                 <dl className="grid grid-cols-1 lg:grid-cols-2 text-sm leading-6">
                     <div className="flex gap-x-4 py-2">
                         <dt>
                             <span className="sr-only">Joined</span>
                             <Icons.calender className="h-6 w-5" aria-hidden="true" />
                         </dt>
-                        <dd className="text-sm font-medium leading-6 text-muted-foreground">{formatDate(buyer.created)}</dd>
+                        <dd className="text-sm font-medium leading-6 text-muted-foreground">{formatDate(client.created)}</dd>
                     </div>
                     <div className="flex gap-x-4 py-1">
                         <dt>
@@ -155,7 +154,7 @@ export function Contacts({ user, buyer, quickOverview }: ContactPageProps) {
                         </dt>
 
                         {
-                            user !== undefined ? (<ShowEmail email={buyer.email} />) : (<Info info={infoEmail} name={buyer.name} />)
+                            user !== undefined ? (<ShowEmail email={client.email} />) : (<Info info={infoEmail} name={client.name} />)
                         }
                     </div>
                     <div className="flex gap-x-4 py-1">
@@ -165,7 +164,7 @@ export function Contacts({ user, buyer, quickOverview }: ContactPageProps) {
                         </dt>
 
                         {
-                            user !== undefined ? (<ShowPhone phone={buyer.phone} />) : (<Info info={infoPhone} name={buyer.name} />)
+                            user !== undefined ? (<ShowPhone phone={client.phone} />) : (<Info info={infoPhone} name={client.name} />)
                         }
 
                     </div>
@@ -174,7 +173,7 @@ export function Contacts({ user, buyer, quickOverview }: ContactPageProps) {
                             <span className="sr-only">Address</span>
                             <Icons.map className="h-6 w-5" aria-hidden="true" />
                         </dt>
-                        <dd className="text-sm font-medium leading-6 text-muted-foreground">{buyer.address}</dd>
+                        <dd className="text-sm font-medium leading-6 text-muted-foreground">{client.address}</dd>
                     </div>
 
                     <div className="flex gap-x-4 py-1">
@@ -182,7 +181,7 @@ export function Contacts({ user, buyer, quickOverview }: ContactPageProps) {
                             <span className="sr-only">City, Province</span>
                             <Icons.landmark className="h-6 w-5" aria-hidden="true" />
                         </dt>
-                        <dd className="text-sm font-medium leading-6 text-muted-foreground">{capitalizeFirstLetter(buyer.city)}, {capitalizeFirstLetter(buyer.province)}</dd>
+                        <dd className="text-sm font-medium leading-6 text-muted-foreground">{capitalizeFirstLetter(client.city)}, {capitalizeFirstLetter(client.province)}</dd>
                     </div>
                     { quickOverview ?
                             <div className="flex gap-x-4 py-1">
@@ -191,9 +190,11 @@ export function Contacts({ user, buyer, quickOverview }: ContactPageProps) {
                                     <Icons.info className="h-6 w-5" aria-hidden="true" />
                                 </dt>
                                 <div>
-                                    <dd className="text-sm font-medium leading-6 text-muted-foreground">Buyer mainly specializes in <span className="font-semibold text-foreground">{capitalizeFirstLetter(buyer.specialization)}</span></dd>
-                                    <dd className="text-sm font-medium leading-6 text-muted-foreground">Mainly buying <span className="font-semibold text-foreground">{capitalizeFirstLetter(plural(buyer.main_activity))}</span></dd>
-                                    <dd className="text-sm font-medium leading-6 text-muted-foreground">Buys <span className="font-semibold text-foreground">{buyer.specializations.length}</span> other agri produce, see more</dd>
+                                    <dd className="text-sm font-medium leading-6 text-muted-foreground">{capitalizeFirstLetter(client.type)} primarily specializes in <span className="font-semibold text-foreground">{capitalizeFirstLetter(client.specialization)}</span></dd>
+                                    <dd className="text-sm font-medium leading-6 text-muted-foreground">Mainly buying <span className="font-semibold text-foreground">{capitalizeFirstLetter(plural(client.main_activity))}</span></dd>
+                                    <dd className="text-sm font-medium leading-6 text-muted-foreground">and {client.type == 'buyer' ? "sources ": "produces "}
+                                        <span className="font-semibold text-foreground">{client.specializations.length}</span> other agricultural {plural("product", client.specializations.length)}, see more
+                                    </dd>
                                 </div>
 
                             </div>

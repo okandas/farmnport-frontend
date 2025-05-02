@@ -1,12 +1,11 @@
 "use client"
 
-import { useCallback, useState } from "react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { sendGTMEvent } from '@next/third-parties/google'
 import { useQuery } from "@tanstack/react-query"
 import Link from "next/link"
 
-import { queryBuyer } from "@/lib/query"
+import { queryClient } from "@/lib/query"
 import { ApplicationUser, AuthenticatedUser } from "@/lib/schemas"
 import { slug as createSlug, capitalizeFirstLetter, makeAbbveriation, plural } from "@/lib/utilities"
 import { Icons } from "@/components/icons/lucide"
@@ -26,7 +25,7 @@ export function Buyer({ slug, user }: BuyerPageProps) {
 
     const { data, isError, refetch, isFetching } = useQuery({
         queryKey: [`result-buyer-${slug}`, slug],
-        queryFn: () => queryBuyer(slug),
+        queryFn: () => queryClient(slug),
         refetchOnWindowFocus: false
     })
 
@@ -63,16 +62,16 @@ export function Buyer({ slug, user }: BuyerPageProps) {
                                 <p className="truncate text-xs leading-4 text-muted-foreground">{ buyer.branches <= 1 ? "Branch": "Branches" }</p>
                             </div>
                             <div className="flex-none w-16">
-                                { buyer.verified ?      
-                                    <>                  
+                                { buyer.verified ?
+                                    <>
                                         <dt>
                                             <span className="sr-only">Verified</span>
                                             <Icons.unverified className="h-6 w-5" aria-hidden="true" color="#228B22" />
                                         </dt>
-                                        <dd className="text-xs font-medium leading-4 text-muted-foreground">Verified</dd> 
-                                    </>  
-                                :      
-                                <>                 
+                                        <dd className="text-xs font-medium leading-4 text-muted-foreground">Verified</dd>
+                                    </>
+                                :
+                                <>
                                     <dt>
                                         <span className="sr-only">Unverified</span>
                                         <Icons.unverified className="h-6 w-5" aria-hidden="true" color="#FF0000" />
@@ -119,7 +118,7 @@ export function Buyer({ slug, user }: BuyerPageProps) {
                         <li className="col-span-1">
                             <div className="flex-1 truncate">
                                 <div className="flex items-center space-x-3">
-                                    <h3 className="truncate text-base font-medium">{ buyer.payment_terms ? capitalizeFirstLetter(buyer.payment_terms) : "Has not listed payment terms!"}</h3>
+                                    <h3 className="truncate text-base font-medium">{ buyer.payment_terms ? capitalizeFirstLetter(buyer.payment_terms) : "No payment terms!"}</h3>
                                 </div>
                                 <p className="mt-1 truncate text-sm text-muted-foreground">Payment Terms</p>
                             </div>
@@ -140,11 +139,11 @@ export function Buyer({ slug, user }: BuyerPageProps) {
                             <ul className="grid grid-cols-4 gap-1">
                                 {
                                     buyer.specializations.map((specialization, index) => (
-                                        
+
                                         <li className="col-span-1 flex justify-center" key={index}>
                                             <span className="flex justify-center  items-center rounded-md bg-white px-2 py-2 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-400/20 w-full text-center">{ capitalizeFirstLetter(specialization) }</span>
                                         </li>
-                                    
+
                                     ))
                                 }
                              </ul>
@@ -153,7 +152,7 @@ export function Buyer({ slug, user }: BuyerPageProps) {
                     </div>
                 </div>
 
-                <Contacts user={user} buyer={buyer} />
+                <Contacts user={user} client={buyer} />
             </section>
 
             <section>

@@ -1,8 +1,8 @@
-import {capitalizeFirstLetter, plural} from "@/lib/utilities"
-import { Buyers } from "@/components/layouts/buyers"
+import { capitalizeFirstLetter, plural } from "@/lib/utilities"
+import { Farmers } from "@/components/layouts/farmers"
 import { retrieveUser } from "@/lib/actions"
 import type { Metadata, ResolvingMetadata } from "next";
-import { AppURL, BuyerSeo } from "@/lib/schemas";
+import {AppURL, FarmerSeo} from "@/lib/schemas";
 import { FilterSidebar } from "@/components/generic/filterSidebar"
 
 
@@ -14,22 +14,22 @@ type Props = {
 export async function generateMetadata({ params }: Props,  parent: ResolvingMetadata): Promise<Metadata> {
   const { product } = await params
   const name = capitalizeFirstLetter(plural(product))
-  const description = BuyerSeo[product]
+  const description = FarmerSeo[product]
 
   return {
     alternates: {
-      canonical: `${AppURL}/buyers/${product.toLowerCase()}`,
+      canonical: `${AppURL}/farmers/${product.toLowerCase()}`,
     },
-    title: `${name} Buyers in Zimbabwe | farmnport.com`,
+    title: `${name} Farmers in Zimbabwe | farmnport.com`,
     description,
   }
 }
 
-type BuyerProductPageProps ={
+type FarmerProductPageProps ={
   params:  Promise<{ product: string }>
 }
 
-export default async function BuyersProductPage({ params }: BuyerProductPageProps) {
+export default async function FarmersProductPage({ params }: FarmerProductPageProps) {
 
   const user = await retrieveUser()
   const { product } = await params
@@ -44,7 +44,7 @@ export default async function BuyersProductPage({ params }: BuyerProductPageProp
           </div>
 
           <div className="lg:w-2/3">
-            <Buyers user={user} queryBy={product} />
+            <Farmers user={user} queryBy={product} />
           </div>
         </div>
       </div>

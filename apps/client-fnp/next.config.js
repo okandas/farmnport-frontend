@@ -12,10 +12,10 @@ const nextConfig = {
       },
     ],
   },
-  experimental: {
-    turbo: {
+  turbopack: {
 
-    },
+  },
+  experimental: {
   },
 }
 

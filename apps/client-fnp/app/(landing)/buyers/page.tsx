@@ -4,8 +4,9 @@ import { FilterSidebar } from "@/components/generic/filterSidebar"
 
 
 export const metadata = {
-    title: 'Buyers in Zimbabwe | farmnport.com',
-    description: 'Agri produce, fresh produce, buyers buying directly from farmers in Zimbabwe',
+    title: 'Sell Your Farm Produce Directly – Reach Buyers Faster. | farmnport.com',
+    description: `Farmers, sell your fresh produce directly to buyers! Access fairer markets,
+      build customer relationships, and reduce dependency on traditional channels.`,
     alternates: {
         canonical: `/buyers`,
     }

@@ -3,7 +3,7 @@ import { AuthForm } from "@/components/forms/login"
 
 export const metadata = {
     title: 'Sign into Farmnport',
-    description: 'Agri produce, fresh produce, buyers buying directly from farmers in Zimbabwe'
+    description: 'Agricultural produce, fresh produce, buyers buying directly from farmers in Zimbabwe'
 }
 
 export default function LoginPage() {

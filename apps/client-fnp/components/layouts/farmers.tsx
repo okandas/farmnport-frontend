@@ -12,12 +12,12 @@ import {queryClients, queryClientsByProduct} from "@/lib/query"
 import {ApplicationUser, AuthenticatedUser} from "@/lib/schemas"
 import {slug, capitalizeFirstLetter, plural} from "@/lib/utilities"
 
-interface BuyersPageProps {
+interface FarmersPageProps {
   user: AuthenticatedUser | null
   queryBy?: string
 }
 
-export function Buyers({user, queryBy}: BuyersPageProps) {
+export function Farmers({user, queryBy}: FarmersPageProps) {
 
   const router = useRouter()
   const pathname = usePathname()
@@ -44,8 +44,8 @@ export function Buyers({user, queryBy}: BuyersPageProps) {
   const page = Number(searchParams?.get("page")) ?? 1
 
   const {data, isError, isFetching} = useQuery({
-    queryKey: ["results-buyers", {p: page}],
-    queryFn: () => queryBy != undefined ? queryClientsByProduct('buyer', queryBy, {p: page}) : queryClients('buyer', {p: page}),
+    queryKey: ["results-farmers", {p: page}],
+    queryFn: () => queryBy != undefined ? queryClientsByProduct('farmer', queryBy, {p: page}) : queryClients('farmer', {p: page}),
     refetchOnWindowFocus: false
   })
 
@@ -57,12 +57,12 @@ export function Buyers({user, queryBy}: BuyersPageProps) {
     return null
   }
 
-  const buyers = data?.data?.data as ApplicationUser[]
+  const farmers = data?.data?.data as ApplicationUser[]
   const total = data?.data?.total as number
 
   const pageCount = Math.ceil(total / 10)
 
-  if (buyers == undefined || buyers == null) {
+  if (farmers == undefined || farmers == null) {
     return null
   }
 
@@ -72,26 +72,26 @@ export function Buyers({user, queryBy}: BuyersPageProps) {
       {
         queryBy == undefined ?
           <div>
-            <h1 className="text-lg font-medium">{total} Farm Produce Buyers.</h1>
-            <p className="text-base text-muted-foreground pt-1">Connect with farm produce buyers across Zimbabwe.</p>
+            <h1 className="text-lg font-medium">{total} Farm Produce Sellers.</h1>
+            <p className="text-base text-muted-foreground pt-1">Connect with reliable produce sellers near you.</p>
           </div>
           :
           <div>
-            <h1 className="text-lg font-medium">{total} { capitalizeFirstLetter(plural(queryBy)) } Produce Buyers.</h1>
-            <p className="text-base text-muted-foreground pt-1">Sell your {plural(queryBy)} produce with {plural('buyer', total)} across Zimbabwe.</p>
+            <h1 className="text-lg font-medium">{total} { capitalizeFirstLetter(plural(queryBy)) } Produce Sellers.</h1>
+            <p className="text-base text-muted-foreground pt-1">Buy your {plural(queryBy)} produce from {plural('farmer', total)} across Zimbabwe.</p>
           </div>
       }
       <ul role="list" className="divide-y">
-        {buyers.map((buyer, buyerIndex) => (
-          <li key={buyerIndex} className="py-4 first:pt-2">
+        {farmers.map((farmer, farmerIndex) => (
+          <li key={farmerIndex} className="py-4 first:pt-2">
 
             <div>
               <h4 className="text-lg hover:underline hover:decoration-2">
-                <Link href={`/buyer/${slug(buyer.name)}`}>{capitalizeFirstLetter(buyer.name)}</Link>
+                <Link href={`/farmer/${slug(farmer.name)}`}>{capitalizeFirstLetter(farmer.name)}</Link>
               </h4>
-              {buyer.short_description.length > 0 ? <h4
-                className="text-muted-foreground text-sm">{capitalizeFirstLetter(buyer.short_description)}</h4> : null}
-              <Contacts user={user} client={buyer} quickOverview={true}/>
+              {farmer.short_description.length > 0 ? <h4
+                className="text-muted-foreground text-sm">{capitalizeFirstLetter(farmer.short_description)}</h4> : null}
+              <Contacts user={user} client={farmer} quickOverview={true}/>
             </div>
           </li>
         ))}

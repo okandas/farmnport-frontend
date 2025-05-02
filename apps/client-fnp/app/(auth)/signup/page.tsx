@@ -3,7 +3,7 @@ import { SignUpAuthForm } from "@/components/forms/signup"
 
 export const metadata = {
     title: 'Sign Up to Farmnport',
-    description: 'Agri produce, fresh produce, buyers buying directly from farmers in Zimbabwe'
+    description: 'Agricultural produce, fresh produce, buyers buying directly from farmers in Zimbabwe'
 }
 
 export default function SignUpPage() {

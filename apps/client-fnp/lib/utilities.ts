@@ -9,7 +9,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function capitalizeFirstLetter(str?: string): string {
-  if (str === undefined) return "" 
+  if (str === undefined) return ""
   return str.charAt(0).toUpperCase() + str.slice(1)
 }
 
@@ -17,7 +17,8 @@ export function makeAbbveriation(str?: string) {
   if (str === undefined) {
     return "FP"
   }
-  var abbv = ""
+
+  let abbv = ""
   if (typeof str === "string") {
     const words = str.split(" ")
     for (var i = 0; i < words.length; i++) {
@@ -61,7 +62,14 @@ export function plural(word: string, count?: number): string {
   pluralize.addUncountableRule('cattle')
   pluralize.addUncountableRule('asparagus')
   pluralize.addUncountableRule('beetroot')
-  
+  pluralize.addUncountableRule('milk')
+  pluralize.addUncountableRule('chilli')
+  pluralize.addUncountableRule('chicken')
+  pluralize.addUncountableRule('beef')
+
+  pluralize.addIrregularRule('onions', 'onion')
+  pluralize.addIrregularRule('chickens', 'chicken')
+
   if (count == null) {
     return pluralize(word)
   } else {

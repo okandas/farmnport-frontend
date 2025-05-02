@@ -44,7 +44,8 @@ import {
     CircleDollarSign,
     ShieldCheck,
     ShieldX,
-    Tractor
+    Tractor,
+    FileLineChart
 } from "lucide-react"
 
 export type Icon = LucideIcon
@@ -95,4 +96,5 @@ export const Icons = {
     verified: ShieldCheck,
     unverified: ShieldX,
     tractor: Tractor,
+    lineChart: FileLineChart
 }

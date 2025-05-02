@@ -324,3 +324,7 @@ export type BuyerSeoCategoryKeys = | "beef" | "lamb" | "mutton" | "goat" | "chic
 export const BuyerSeo: Record<string, string>  = {
   chicken: "Looking for trusted chicken buyers and  where to sell chickens in Zimbabwe? Connect with reliable poultry buyers across the country, in major towns who purchase broiler, free-range, and live chickens in bulk or retail."
 }
+
+export const FarmerSeo: Record<string, string>  = {
+  chicken: "Looking for trusted chicken farmers and  where to buy chickens in Zimbabwe? Connect with reliable poultry farmers across the country, in major towns who purchase broiler, free-range, and live chickens in bulk or retail."
+}
