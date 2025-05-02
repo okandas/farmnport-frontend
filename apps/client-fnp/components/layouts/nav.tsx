@@ -77,9 +77,10 @@ export function Navigation({ user }: NavigationProps) {
                     {capitalizeFirstLetter(user.username ?? '')}
                   </p>
                   {/*
-                                            <p className="text-xs leading-none text-muted-foreground">
-                                                {email}
-                                            </p> */}
+                    <p className="text-xs leading-none text-muted-foreground">
+                        {email}
+                    </p>
+                   */}
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
@@ -112,10 +113,7 @@ export function Navigation({ user }: NavigationProps) {
         ) : (<>
             <Link
               href="/login"
-              className={buttonVariants({
-                size: "sm",
-                variant: "outline"
-              })}
+              className={`${buttonVariants({ size: "sm", variant: "outline" })}`}
             >
               Login
               <span className="sr-only">Login</span>

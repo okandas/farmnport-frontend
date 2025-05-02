@@ -6,15 +6,16 @@ import { useSelectedLayoutSegment } from "next/navigation"
 
 
 import { siteConfig } from "@/config/site"
-import { cn } from "@/lib/utilities"
 
-import { Button } from "@/components/ui/button"
+import {Button, buttonVariants} from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetHeader } from "@/components/ui/sheet"
 import { Icons } from "@/components/icons/lucide"
-import {AuthenticatedUser} from "@/lib/schemas";
+import {AppURL, AuthenticatedUser} from "@/lib/schemas";
 
-import { Navigation } from "@/components/layouts/nav"
+import {sendGTMEvent} from "@next/third-parties/google";
+import {ThemeSwitcher} from "@/components/ui/theme-switcher";
+import {signOut} from "next-auth/react";
 
 interface MobileNavProps {
   user: AuthenticatedUser | null
@@ -47,6 +48,9 @@ export function MobileNav({ user }: MobileNavProps) {
              </Button>
            </SheetTrigger>
            <SheetContent side="left" className="pl-1 pr-0">
+             <SheetHeader>
+                <SheetTitle></SheetTitle>
+             </SheetHeader>
              <div className="px-7">
                <Link
                  href="/"
@@ -60,6 +64,70 @@ export function MobileNav({ user }: MobileNavProps) {
              </div>
              <ScrollArea className="my-4 h-[calc(100vh-8rem)] pb-10 pl-6">
                <div className="pl-1 pr-7">
+                 <Link href="/prices" onClick={() => {
+                   sendGTMEvent({ event: 'link', value: 'BuyerTopNavigation' })
+                   setIsOpen(false)
+                 }}
+                 className={buttonVariants({
+                   size: "sm",
+                   variant: "link"
+                 })}
+                 >
+                   <Icons.lineChart className="mr-2" /> Prices
+                 </Link>
+                 <Link href="/buyers" onClick={() => {
+                         sendGTMEvent({ event: 'link', value: 'BuyerTopNavigation' })
+                         setIsOpen(false)
+                 }}
+                 className={buttonVariants({
+                   size: "sm",
+                   variant: "link"
+                 })}
+                 >
+                   <Icons.dollar className="mr-2" /> Buyers
+                 </Link>
+                 <Link href="/farmers" onClick={() => {
+                   sendGTMEvent({ event: 'link', value: 'FarmerTopNavigation' })
+                   setIsOpen(false)
+                 }}
+                 className={buttonVariants({
+                   size: "sm",
+                   variant: "link"
+                 })}
+                 >
+                   <Icons.tractor className="mr-2" /> Farmers
+                 </Link>
+                 { user ? <div>
+                   <Link href="#" onClick={() => {
+                     signOut({ redirectTo: AppURL })
+                     setIsOpen(false)
+                   }}>
+                     Logout
+                   </Link>
+                 </div> : (<>
+                     <Link
+                       href="/login"
+                       onClick={() => setIsOpen(false)}
+                       className={`${buttonVariants({ size: "sm", variant: "outline" })} !block py-[4px] px-[17px] mt-2`}
+                     >
+                       Login
+                       <span className="sr-only">Login</span>
+                     </Link>
+                     <Link
+                       href="/signup"
+                       onClick={() => setIsOpen(false)}
+                       className={`${buttonVariants({ size: "sm"})} !block py-[4px] px-[17px] mt-2`}
+                     >
+                       Sign Up
+                       <span className="sr-only">Sign Up</span>
+                     </Link>
+
+                   </>
+
+                 )}
+                 <div className="mt-2 flex justify-end">
+                   < ThemeSwitcher />
+                 </div>
 
                </div>
              </ScrollArea>
@@ -67,34 +135,5 @@ export function MobileNav({ user }: MobileNavProps) {
          </Sheet>
        </div>
       </div>
-    )
-}
-
-interface MobileLinkProps extends React.PropsWithChildren {
-    href: string
-    disabled?: boolean
-    segment: string
-    setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
-}
-
-function MobileLink({
-    children,
-    href,
-    disabled,
-    segment,
-    setIsOpen,
-}: MobileLinkProps) {
-    return (
-        <Link
-            href={href}
-            className={cn(
-                "text-foreground/70 transition-colors hover:text-foreground",
-                href.includes(segment) && "text-foreground",
-                disabled && "pointer-events-none opacity-60"
-            )}
-            onClick={() => setIsOpen(false)}
-        >
-            {children}
-        </Link>
     )
 }
