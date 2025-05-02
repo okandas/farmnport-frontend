@@ -3,8 +3,6 @@
 import * as React from "react"
 import Link from "next/link"
 
-import { siteConfig } from "@/config/site"
-
 import { Icons } from "@/components/icons/lucide"
 import {sendGTMEvent} from "@next/third-parties/google";
 import {Button, buttonVariants} from "@/components/ui/button";
