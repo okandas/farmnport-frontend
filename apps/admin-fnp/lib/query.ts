@@ -13,12 +13,11 @@ import {
   ImageModel,
 } from "@/lib/schemas"
 
+let base = process.env.NEXT_PUBLIC_BASE_URL
+let version = "/v1"
+let baseUrl = base + version
 
-var base = process.env.NEXT_PUBLIC_BASE_URL
-var version = "/v1"
-var baseUrl = base + version
-
-var api = axios.create({})
+let api = axios.create({})
 
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   // Get token in current cookies
@@ -36,26 +35,26 @@ type LoginFormData = z.infer<typeof AuthSchema>
 
 // Administrator
 export function queryLogin(data: LoginFormData) {
-  var url = `${baseUrl}/user/signin`
+  let url = `${baseUrl}/user/signin`
   return api.post<LoginResponse>(url, data)
 }
 
-type pagintion = {
+type pagination = {
   p?: number
   search?: string
 }
 
-export function queryUsers(pagintion?: pagintion) {
-  var url: string
+export function queryUsers(pagination?: pagination) {
+  let url: string
 
-  if (pagintion?.p !== undefined && pagintion.p >= 2) {
-    url = `${baseUrl}/user/clients?p=${pagintion.p}`
+  if (pagination?.p !== undefined && pagination.p >= 2) {
+    url = `${baseUrl}/user/clients?p=${pagination.p}`
   } else {
     url = `${baseUrl}/user/clients`
   }
 
-  if (pagintion?.search !== undefined && pagintion.search.length >= 2) {
-    url = `${baseUrl}/user/clients?search=${pagintion.search}`
+  if (pagination?.search !== undefined && pagination.search.length >= 2) {
+    url = `${baseUrl}/user/clients?search=${pagination.search}`
   }
 
   return api.get(url)
@@ -71,17 +70,17 @@ export function queryLatestProductPriceList(clientID?: string) {
   return api.get(url)
 }
 
-export function queryProducerPriceLists(pagintion?: pagintion) {
-  var url: string
+export function queryProducerPriceLists(pagination?: pagination) {
+  let url: string
 
-  if (pagintion?.p !== undefined && pagintion.p >= 2) {
-    url = `${baseUrl}/prices/get/producer_prices?p=${pagintion.p}`
+  if (pagination?.p !== undefined && pagination.p >= 2) {
+    url = `${baseUrl}/prices/get/producer_prices?p=${pagination.p}`
   } else {
     url = `${baseUrl}/prices/get/producer_prices`
   }
 
-  if (pagintion?.search !== undefined && pagintion.search.length >= 2) {
-    url = `${baseUrl}/prices/get/producer_prices?search=${pagintion.search}`
+  if (pagination?.search !== undefined && pagination.search.length >= 2) {
+    url = `${baseUrl}/prices/get/producer_prices?search=${pagination.search}`
   }
 
   return api.get(url)
@@ -93,53 +92,54 @@ export function queryUser(name: string) {
 }
 
 export function createClient(data: EditApplicationUser) {
-  var url = `${baseUrl}/user/add_client`
+  let url = `${baseUrl}/user/add_client`
   return api.post(url, data)
 }
 
 export function updateClient(data: EditApplicationUser) {
-  var url = `${baseUrl}/user/update_client`
+  let url = `${baseUrl}/user/update_client`
   return api.post(url, data)
 }
 
 export function verifyClient(data: ApplicationUserID) {
-  var url = `${baseUrl}/user/verify_client`
+  let url = `${baseUrl}/user/verify_client`
   return api.post<ApplicationUser>(url, data)
 }
 
 export function badClient(data: ApplicationUserID) {
-  var url = `${baseUrl}/user/bad_client`
+  let url = `${baseUrl}/user/bad_client`
   return api.post<ApplicationUser>(url, data)
 }
 
 export function createClientProductPriceList(data: ProducerPriceList) {
-  var url = `${baseUrl}/prices/add/producer_price`
-  return api.post(url, data)
+  // let url = `${baseUrl}/prices/add/producer_price`
+  // return api.post(url, data)
+  console.log(data, "test new create client product list")
 }
 
 export function updateClientProductPriceList(data: ProducerPriceList) {
-  var url = `${baseUrl}/prices/up/producer_price`
+  let url = `${baseUrl}/prices/up/producer_price`
   return api.post(url, data)
 }
 
-export function queryProducts(pagintion?: pagintion) {
-  var url: string
+export function queryProducts(pagination?: pagination) {
+  let url: string
 
-  if (pagintion?.p !== undefined && pagintion.p >= 2) {
-    url = `${baseUrl}/user/products?p=${pagintion.p}`
+  if (pagination?.p !== undefined && pagination.p >= 2) {
+    url = `${baseUrl}/user/products?p=${pagination.p}`
   } else {
     url = `${baseUrl}/user/products`
   }
 
-  if (pagintion?.search !== undefined && pagintion.search.length >= 2) {
-    url = `${baseUrl}/user/products?search=${pagintion.search}`
+  if (pagination?.search !== undefined && pagination.search.length >= 2) {
+    url = `${baseUrl}/user/products?search=${pagination.search}`
   }
 
   return api.get(url)
 }
 
 export function addProduct(data: FormProductModel) {
-  var url = `${baseUrl}/user/products/add`
+  let url = `${baseUrl}/user/products/add`
   return api.post(url, data)
 }
 
@@ -149,16 +149,16 @@ export function queryProduct(id: string) {
 }
 
 export function updateProduct(data: FormProductModel) {
-  var url = `${baseUrl}/user/products/update`
+  let url = `${baseUrl}/user/products/update`
   return api.post(url, data)
 }
 
 export function uploadImages(data: FormData) {
-  var url = `${baseUrl}/user/image/uploads`
+  let url = `${baseUrl}/user/image/uploads`
   return api.post(url, data)
 }
 
 export function removeImage(data: ImageModel) {
-  var url = `${baseUrl}/user/image/remove`
+  let url = `${baseUrl}/user/image/remove`
   return api.post(url, data)
 }

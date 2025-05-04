@@ -2,20 +2,19 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation, useQuery } from "@tanstack/react-query"
-import { AxiosError, AxiosResponse, isAxiosError } from "axios"
+import { isAxiosError } from "axios"
 import { format } from "date-fns"
-import { useForm, useWatch } from "react-hook-form"
+import { useWatch } from "react-hook-form"
 import { useDebounce } from "use-debounce"
 
 import { createClientProductPriceList, queryUsers } from "@/lib/query"
+import { ApplicationUser, ProducerPriceList } from "@/lib/schemas"
 import {
-  ApplicationUser,
-  ProducerPriceList,
-  ProducerPriceListSchema,
-} from "@/lib/schemas"
-import { centsToDollarsFormInputs, cn, dollarsToCents } from "@/lib/utilities"
+  cn,
+  submitPriceList,
+  useFormCreatePriceListForm,
+} from "@/lib/utilities"
 import { Badge } from "@/components/ui/badge"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
@@ -26,7 +25,6 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-  CommandSeparator,
 } from "@/components/ui/command"
 import {
   Form,
@@ -63,66 +61,7 @@ interface CreateProductPriceFormProps
 export function CreateProductPriceForm({
   priceList,
 }: CreateProductPriceFormProps) {
-  const form = useForm({
-    defaultValues: {
-      id: priceList.id,
-      effectiveDate: new Date(),
-      client_id: priceList.client_id,
-      client_name: priceList.client_name,
-      client_specialization: priceList.client_specialization || 'livestock',
-      beef: {
-        super: centsToDollarsFormInputs(priceList.beef.super),
-        choice: centsToDollarsFormInputs(priceList.beef.choice),
-        commercial: centsToDollarsFormInputs(priceList.beef.commercial),
-        economy: centsToDollarsFormInputs(priceList.beef.economy),
-        manufacturing: centsToDollarsFormInputs(priceList.beef.manufacturing),
-        condemned: centsToDollarsFormInputs(priceList.beef.condemned),
-        detained: priceList.beef.detained,
-        hasPrice: priceList.beef.hasPrice,
-      },
-      lamb: {
-        superPremium: centsToDollarsFormInputs(priceList.lamb.superPremium),
-        choice: centsToDollarsFormInputs(priceList.lamb.choice),
-        standard: centsToDollarsFormInputs(priceList.lamb.standard),
-        inferior: centsToDollarsFormInputs(priceList.lamb.inferior),
-        hasPrice: priceList.lamb.hasPrice,
-      },
-      mutton: {
-        super: centsToDollarsFormInputs(priceList.mutton.super),
-        choice: centsToDollarsFormInputs(priceList.mutton.choice),
-        standard: centsToDollarsFormInputs(priceList.mutton.standard),
-        oridnary: centsToDollarsFormInputs(priceList.mutton.oridnary),
-        inferior: centsToDollarsFormInputs(priceList.mutton.inferior),
-        hasPrice: priceList.mutton.hasPrice,
-      },
-      goat: {
-        super: centsToDollarsFormInputs(priceList.goat.super),
-        choice: centsToDollarsFormInputs(priceList.goat.choice),
-        standard: centsToDollarsFormInputs(priceList.goat.standard),
-        inferior: centsToDollarsFormInputs(priceList.goat.inferior),
-        hasPrice: priceList.goat.hasPrice,
-      },
-      chicken: {
-        below: centsToDollarsFormInputs(priceList.chicken.below),
-        midRange: centsToDollarsFormInputs(priceList.chicken.midRange),
-        above: centsToDollarsFormInputs(priceList.chicken.above),
-        condemned: centsToDollarsFormInputs(priceList.chicken.condemned),
-        hasPrice: priceList.chicken.hasPrice,
-      },
-      pork: {
-        super: centsToDollarsFormInputs(priceList.pork.super),
-        manufacturing: centsToDollarsFormInputs(priceList.pork.manufacturing),
-        head: centsToDollarsFormInputs(priceList.pork.head),
-        hasPrice: priceList.pork.hasPrice,
-      },
-      catering: {
-        chicken: centsToDollarsFormInputs(priceList.catering.chicken),
-        hasPrice: priceList.catering.hasPrice,
-      },
-      unit: priceList.unit,
-    },
-    resolver: zodResolver(ProducerPriceListSchema),
-  })
+  const form = useFormCreatePriceListForm(priceList)
 
   const [searchClient, setSearchClient] = useState("")
   const [selectedClient, setSelectedClient] = useState(priceList.client_name)
@@ -130,6 +69,21 @@ export function CreateProductPriceForm({
 
   const showBeef = useWatch({
     name: "beef.hasPrice",
+    control: form.control,
+  })
+
+  const showBeefCollectionPrice = useWatch({
+    name: "beef.hasCollectedPrice",
+    control: form.control,
+  })
+
+  const showChicken = useWatch({
+    name: "chicken.hasPrice",
+    control: form.control,
+  })
+
+  const showChickenCollectionPrice = useWatch({
+    name: "chicken.hasCollectedPrice",
     control: form.control,
   })
 
@@ -145,11 +99,6 @@ export function CreateProductPriceForm({
 
   const showGoat = useWatch({
     name: "goat.hasPrice",
-    control: form.control,
-  })
-
-  const showChicken = useWatch({
-    name: "chicken.hasPrice",
     control: form.control,
   })
 
@@ -211,7 +160,7 @@ export function CreateProductPriceForm({
     mutationFn: createClientProductPriceList,
     onSuccess: () => {
       toast({
-        description: "Created Product Price List Succesfully",
+        description: "Created Product Price List Successfully",
       })
 
       router.push(`/dashboard/prices`)
@@ -238,48 +187,12 @@ export function CreateProductPriceForm({
     },
   })
 
-  async function onSubmit(payload: ProducerPriceList) {
-    payload.beef.super = dollarsToCents(payload.beef.super)
-    payload.beef.choice = dollarsToCents(payload.beef.choice)
-    payload.beef.commercial = dollarsToCents(payload.beef.commercial)
-    payload.beef.economy = dollarsToCents(payload.beef.economy)
-    payload.beef.manufacturing = dollarsToCents(payload.beef.manufacturing)
-    payload.beef.condemned = dollarsToCents(payload.beef.condemned)
-
-    payload.lamb.superPremium = dollarsToCents(payload.lamb.superPremium)
-    payload.lamb.choice = dollarsToCents(payload.lamb.choice)
-    payload.lamb.standard = dollarsToCents(payload.lamb.standard)
-    payload.lamb.inferior = dollarsToCents(payload.lamb.inferior)
-
-    payload.mutton.super = dollarsToCents(payload.mutton.super)
-    payload.mutton.choice = dollarsToCents(payload.mutton.choice)
-    payload.mutton.standard = dollarsToCents(payload.mutton.standard)
-    payload.mutton.oridnary = dollarsToCents(payload.mutton.oridnary)
-    payload.mutton.inferior = dollarsToCents(payload.mutton.inferior)
-
-    payload.goat.super = dollarsToCents(payload.goat.super)
-    payload.goat.choice = dollarsToCents(payload.goat.choice)
-    payload.goat.standard = dollarsToCents(payload.goat.standard)
-    payload.goat.inferior = dollarsToCents(payload.goat.inferior)
-
-    payload.chicken.below = dollarsToCents(payload.chicken.below)
-    payload.chicken.midRange = dollarsToCents(payload.chicken.midRange)
-    payload.chicken.above = dollarsToCents(payload.chicken.above)
-    payload.chicken.condemned = dollarsToCents(payload.chicken.condemned)
-
-    payload.pork.super = dollarsToCents(payload.pork.super)
-    payload.pork.manufacturing = dollarsToCents(payload.pork.manufacturing)
-    payload.pork.head = dollarsToCents(payload.pork.head)
-
-    payload.catering.chicken = dollarsToCents(payload.catering.chicken)
-
-    mutate(payload)
-  }
-
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(onSubmit)}
+        onSubmit={form.handleSubmit((values) =>
+          submitPriceList(values, mutate),
+        )}
         className="w-3/4 gap-4 mx-auto mb-8"
       >
         <div className="grid grid-cols-2 gap-4 mb-4">
@@ -304,7 +217,7 @@ export function CreateProductPriceForm({
                         ) : (
                           <span>Pick a date</span>
                         )}
-                        <Icons.calender className="w-4 h-4 ml-auto opacity-50" />
+                        <Icons.calender className="size-4 ml-auto opacity-50" />
                       </Button>
                     </FormControl>
                   </PopoverTrigger>
@@ -365,16 +278,16 @@ export function CreateProductPriceForm({
           <FormField
             control={form.control}
             name="client_id"
-            render={({ field }) => (
+            render={() => (
               <FormItem>
                 <FormLabel>Client</FormLabel>
                 <FormMessage />
                 <FormControl>
                   <Popover open={open} onOpenChange={setOpen}>
                     <PopoverTrigger asChild className="w-80">
-                      <div className="group min-h-[2.5rem] rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-0">
+                      <div className="group min-h-10 rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-0">
                         <div className="flex flex-wrap gap-1">
-                          {selectedClient.length > 1 && open === false ? (
+                          {selectedClient.length > 1 && !open ? (
                             <Badge
                               variant="outline"
                               className="flex justify-between text-green-800 bg-green-100 border-green-400"
@@ -428,25 +341,46 @@ export function CreateProductPriceForm({
           Select Pricing forms for price list
         </h4>
 
+        {/*Form Type Selectors*/}
         <div className="grid grid-cols-4 gap-2">
-          <FormField
-            control={form.control}
-            name="beef.hasPrice"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-start p-4 space-x-3 space-y-0 border rounded-md">
-                <FormLabel>Beef Pricing Form</FormLabel>
-                <FormControl>
-                  <Checkbox
-                    checked={field.value}
-                    onCheckedChange={() => {
-                      return field.onChange(!field.value)
-                    }}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="border rounded-md">
+            <FormField
+              control={form.control}
+              name="beef.hasPrice"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-start p-4 space-x-3 space-y-0">
+                  <FormLabel>Beef Pricing Form</FormLabel>
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={() => {
+                        return field.onChange(!field.value)
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="beef.hasCollectedPrice"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-start p-4 space-x-3 space-y-0">
+                  <FormLabel>Add Collection Price</FormLabel>
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={() => {
+                        return field.onChange(!field.value)
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
           <FormField
             control={form.control}
             name="lamb.hasPrice"
@@ -501,24 +435,45 @@ export function CreateProductPriceForm({
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="chicken.hasPrice"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-start p-4 space-x-3 space-y-0 border rounded-md">
-                <FormLabel>Chicken Pricing Form</FormLabel>
-                <FormControl>
-                  <Checkbox
-                    checked={field.value}
-                    onCheckedChange={() => {
-                      return field.onChange(!field.value)
-                    }}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+
+          <div className="border rounded-md">
+            <FormField
+              control={form.control}
+              name="chicken.hasPrice"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-start p-4 space-x-3 space-y-0">
+                  <FormLabel>Chicken Pricing Form</FormLabel>
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={() => {
+                        return field.onChange(!field.value)
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="chicken.hasCollectedPrice"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-start p-4 space-x-3 space-y-0">
+                  <FormLabel>Add Collection Price</FormLabel>
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={() => {
+                        return field.onChange(!field.value)
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
           <FormField
             control={form.control}
             name="pork.hasPrice"
@@ -556,6 +511,7 @@ export function CreateProductPriceForm({
             )}
           />
         </div>
+        {/*End Form Type Selectors*/}
 
         {showBeef ? (
           <Card className="mt-3">
@@ -564,10 +520,12 @@ export function CreateProductPriceForm({
             </CardHeader>
             <CardContent>
               {/* Beef Start */}
+              <h3 className="mt-3">Beef Prices Delivered</h3>
               <div className="grid grid-cols-1 gap-5 mt-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-6">
                 <FormField
                   control={form.control}
-                  name="beef.super"
+                  name="beef.super.pricing.delivered"
+                  rules={{ required: "Super Pricing Required" }}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Super</FormLabel>
@@ -586,7 +544,7 @@ export function CreateProductPriceForm({
                 />
                 <FormField
                   control={form.control}
-                  name="beef.choice"
+                  name="beef.choice.pricing.delivered"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Choice</FormLabel>
@@ -605,7 +563,7 @@ export function CreateProductPriceForm({
                 />
                 <FormField
                   control={form.control}
-                  name="beef.commercial"
+                  name="beef.commercial.pricing.delivered"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Commercial</FormLabel>
@@ -624,7 +582,7 @@ export function CreateProductPriceForm({
                 />
                 <FormField
                   control={form.control}
-                  name="beef.economy"
+                  name="beef.economy.pricing.delivered"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Economy</FormLabel>
@@ -643,7 +601,7 @@ export function CreateProductPriceForm({
                 />
                 <FormField
                   control={form.control}
-                  name="beef.manufacturing"
+                  name="beef.manufacturing.pricing.delivered"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Manufacturing</FormLabel>
@@ -662,7 +620,7 @@ export function CreateProductPriceForm({
                 />
                 <FormField
                   control={form.control}
-                  name="beef.condemned"
+                  name="beef.condemned.pricing.delivered"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Condemned</FormLabel>
@@ -680,6 +638,128 @@ export function CreateProductPriceForm({
                   )}
                 />
               </div>
+
+              {showBeefCollectionPrice ? (
+                <>
+                  <h3 className="mt-2">Beef Prices Collected</h3>
+                  <div className="grid grid-cols-1 gap-5 mt-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-6">
+                    <FormField
+                      control={form.control}
+                      name="beef.super.pricing.collected"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Super</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Price Super Beef"
+                              {...field}
+                              type="number"
+                              min="0"
+                              step="any"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="beef.choice.pricing.collected"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Choice</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Price Choice Beef"
+                              {...field}
+                              type="number"
+                              min="0"
+                              step="any"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="beef.commercial.pricing.collected"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Commercial</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Price Commercial Beef"
+                              {...field}
+                              type="number"
+                              min="0"
+                              step="any"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="beef.economy.pricing.collected"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Economy</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Price Economy Beef"
+                              {...field}
+                              type="number"
+                              min="0"
+                              step="any"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="beef.manufacturing.pricing.collected"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Manufacturing</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Price Manufacturing Beef"
+                              {...field}
+                              type="number"
+                              min="0"
+                              step="any"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="beef.condemned.pricing.collected"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Condemned</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Price Condemned Beef"
+                              {...field}
+                              type="number"
+                              min="0"
+                              step="any"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </>
+              ) : null}
               {/* Beef End */}
             </CardContent>
           </Card>
@@ -695,7 +775,7 @@ export function CreateProductPriceForm({
               <div className="grid grid-cols-1 gap-5 mt-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
                 <FormField
                   control={form.control}
-                  name="lamb.superPremium"
+                  name="lamb.super_premium.pricing.delivered"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Super/Super Premium</FormLabel>
@@ -714,7 +794,7 @@ export function CreateProductPriceForm({
                 />
                 <FormField
                   control={form.control}
-                  name="lamb.choice"
+                  name="lamb.choice.pricing.delivered"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Choice</FormLabel>
@@ -733,7 +813,7 @@ export function CreateProductPriceForm({
                 />
                 <FormField
                   control={form.control}
-                  name="lamb.standard"
+                  name="lamb.standard.pricing.delivered"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Standard</FormLabel>
@@ -752,7 +832,7 @@ export function CreateProductPriceForm({
                 />
                 <FormField
                   control={form.control}
-                  name="lamb.inferior"
+                  name="lamb.inferior.pricing.delivered"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Inferior</FormLabel>
@@ -785,7 +865,7 @@ export function CreateProductPriceForm({
               <div className="grid grid-cols-1 gap-5 mt-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-5">
                 <FormField
                   control={form.control}
-                  name="mutton.super"
+                  name="mutton.super.pricing.delivered"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Super</FormLabel>
@@ -804,7 +884,7 @@ export function CreateProductPriceForm({
                 />
                 <FormField
                   control={form.control}
-                  name="mutton.choice"
+                  name="mutton.choice.pricing.delivered"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Choice</FormLabel>
@@ -823,7 +903,7 @@ export function CreateProductPriceForm({
                 />
                 <FormField
                   control={form.control}
-                  name="mutton.standard"
+                  name="mutton.standard.pricing.delivered"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Standard</FormLabel>
@@ -842,10 +922,10 @@ export function CreateProductPriceForm({
                 />
                 <FormField
                   control={form.control}
-                  name="mutton.oridnary"
+                  name="mutton.ordinary.pricing.delivered"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Oridnary</FormLabel>
+                      <FormLabel>Ordinary</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="Price Oridnary"
@@ -861,7 +941,7 @@ export function CreateProductPriceForm({
                 />
                 <FormField
                   control={form.control}
-                  name="mutton.inferior"
+                  name="mutton.inferior.pricing.delivered"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Inferior</FormLabel>
@@ -894,7 +974,7 @@ export function CreateProductPriceForm({
               <div className="grid grid-cols-1 gap-5 mt-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
                 <FormField
                   control={form.control}
-                  name="goat.super"
+                  name="goat.super.pricing.delivered"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Super</FormLabel>
@@ -913,7 +993,7 @@ export function CreateProductPriceForm({
                 />
                 <FormField
                   control={form.control}
-                  name="goat.choice"
+                  name="goat.choice.pricing.delivered"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Choice</FormLabel>
@@ -932,7 +1012,7 @@ export function CreateProductPriceForm({
                 />
                 <FormField
                   control={form.control}
-                  name="goat.standard"
+                  name="goat.standard.pricing.delivered"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Standard</FormLabel>
@@ -952,7 +1032,7 @@ export function CreateProductPriceForm({
 
                 <FormField
                   control={form.control}
-                  name="goat.inferior"
+                  name="goat.inferior.pricing.delivered"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Inferior</FormLabel>
@@ -982,16 +1062,18 @@ export function CreateProductPriceForm({
             </CardHeader>
             <CardContent>
               {/* Chicken Start */}
-              <div className="grid grid-cols-1 gap-5 mt-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
+
+              <h3>Chicken Prices Delivered</h3>
+              <div className="grid grid-cols-1 gap-5 mt-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-5">
                 <FormField
                   control={form.control}
-                  name="chicken.below"
+                  name="chicken.a_grade_under_1_55.pricing.delivered"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Below</FormLabel>
+                      <FormLabel>Below 1.55 Kgs</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="Price Below"
+                          placeholder="Price Below 1.55kgs"
                           {...field}
                           type="number"
                           min="0"
@@ -1004,13 +1086,13 @@ export function CreateProductPriceForm({
                 />
                 <FormField
                   control={form.control}
-                  name="chicken.midRange"
+                  name="chicken.a_grade_1_55_1_75.pricing.delivered"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Midrange</FormLabel>
+                      <FormLabel>1.55 to 1.75 Kgs</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="Price Midrange"
+                          placeholder="Price Between 1.55 and 1.75 Kgs"
                           {...field}
                           type="number"
                           min="0"
@@ -1023,13 +1105,13 @@ export function CreateProductPriceForm({
                 />
                 <FormField
                   control={form.control}
-                  name="chicken.above"
+                  name="chicken.a_grade_over_1_75.pricing.delivered"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Above</FormLabel>
+                      <FormLabel>Over 1.75 Kgs</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="Price Above"
+                          placeholder="Price For Over 1.75Kgs"
                           {...field}
                           type="number"
                           min="0"
@@ -1043,7 +1125,27 @@ export function CreateProductPriceForm({
 
                 <FormField
                   control={form.control}
-                  name="chicken.condemned"
+                  name="chicken.off_layers.pricing.delivered"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Off Layers</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Price OffLayers Chicken"
+                          {...field}
+                          type="number"
+                          min="0"
+                          step="any"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="chicken.condemned.pricing.delivered"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Condemned</FormLabel>
@@ -1061,6 +1163,110 @@ export function CreateProductPriceForm({
                   )}
                 />
               </div>
+              {showChickenCollectionPrice ? (
+                <>
+                  <h3 className="mt-3">Chicken Prices Collected</h3>
+                  <div className="grid grid-cols-1 gap-5 mt-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-5">
+                    <FormField
+                      control={form.control}
+                      name="chicken.a_grade_under_1_55.pricing.collected"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Below 1.55 Kgs</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Price Below 1.55kgs"
+                              {...field}
+                              type="number"
+                              min="0"
+                              step="any"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="chicken.a_grade_1_55_1_75.pricing.collected"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>1.55 to 1.75 Kgs</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Price Between 1.55 and 1.75 Kgs"
+                              {...field}
+                              type="number"
+                              min="0"
+                              step="any"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="chicken.a_grade_over_1_75.pricing.collected"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Over 1.75 Kgs</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Price For Over 1.75Kgs"
+                              {...field}
+                              type="number"
+                              min="0"
+                              step="any"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="chicken.off_layers.pricing.collected"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Off Layers</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Price OffLayers Chicken"
+                              {...field}
+                              type="number"
+                              min="0"
+                              step="any"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="chicken.condemned.pricing.collected"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Condemned</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Price Condemned Chicken"
+                              {...field}
+                              type="number"
+                              min="0"
+                              step="any"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </>
+              ) : null}
               {/* Chicken End */}
             </CardContent>
           </Card>
@@ -1076,7 +1282,7 @@ export function CreateProductPriceForm({
               <div className="grid grid-cols-1 gap-5 mt-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
                 <FormField
                   control={form.control}
-                  name="pork.super"
+                  name="pork.super.pricing.delivered"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Super</FormLabel>
@@ -1096,7 +1302,7 @@ export function CreateProductPriceForm({
 
                 <FormField
                   control={form.control}
-                  name="pork.manufacturing"
+                  name="pork.manufacturing.pricing.delivered"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Manufacturing</FormLabel>
@@ -1116,7 +1322,7 @@ export function CreateProductPriceForm({
 
                 <FormField
                   control={form.control}
-                  name="pork.head"
+                  name="pork.head.pricing.delivered"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Pork Head</FormLabel>
@@ -1149,7 +1355,7 @@ export function CreateProductPriceForm({
               <div className="grid grid-cols-1 gap-5 mt-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
                 <FormField
                   control={form.control}
-                  name="catering.chicken"
+                  name="catering.chicken.order.price"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Chicken Bird</FormLabel>
@@ -1177,7 +1383,7 @@ export function CreateProductPriceForm({
           className={cn(buttonVariants(), "mt-5")}
           disabled={isPending}
         >
-          {isPending && <Icons.spinner className="w-4 h-4 mr-2 animate-spin" />}
+          {isPending && <Icons.spinner className="size-4 mr-2 animate-spin" />}
           Submit
         </button>
       </form>

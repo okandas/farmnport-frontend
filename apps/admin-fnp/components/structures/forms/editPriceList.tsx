@@ -15,18 +15,12 @@ import {
   ProducerPriceList,
   ProducerPriceListSchema,
 } from "@/lib/schemas"
-import { centsToDollarsFormInputs, cn, dollarsToCents } from "@/lib/utilities"
-import { Badge } from "@/components/ui/badge"
+import {centsToDollarsFormInputs, cn, submitPriceList, useFormCreatePriceListForm} from "@/lib/utilities"
+
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
-import {
-  Command,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command"
 import {
   Form,
   FormControl,
@@ -60,66 +54,7 @@ interface EditProductPriceFormProps
 }
 
 export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
-  const form = useForm({
-    defaultValues: {
-      id: priceList.id,
-      effectiveDate: new Date(priceList.effectiveDate),
-      client_id: priceList.client_id,
-      client_name: priceList.client_name,
-      client_specialization: priceList.client_specialization,
-      beef: {
-        super: centsToDollarsFormInputs(priceList.beef.super),
-        choice: centsToDollarsFormInputs(priceList.beef.choice),
-        commercial: centsToDollarsFormInputs(priceList.beef.commercial),
-        economy: centsToDollarsFormInputs(priceList.beef.economy),
-        manufacturing: centsToDollarsFormInputs(priceList.beef.manufacturing),
-        condemned: centsToDollarsFormInputs(priceList.beef.condemned),
-        detained: priceList.beef.detained,
-        hasPrice: priceList.beef.hasPrice,
-      },
-      lamb: {
-        superPremium: centsToDollarsFormInputs(priceList.lamb.superPremium),
-        choice: centsToDollarsFormInputs(priceList.lamb.choice),
-        standard: centsToDollarsFormInputs(priceList.lamb.standard),
-        inferior: centsToDollarsFormInputs(priceList.lamb.inferior),
-        hasPrice: priceList.lamb.hasPrice,
-      },
-      mutton: {
-        super: centsToDollarsFormInputs(priceList.mutton.super),
-        choice: centsToDollarsFormInputs(priceList.mutton.choice),
-        standard: centsToDollarsFormInputs(priceList.mutton.standard),
-        oridnary: centsToDollarsFormInputs(priceList.mutton.oridnary),
-        inferior: centsToDollarsFormInputs(priceList.mutton.inferior),
-        hasPrice: priceList.mutton.hasPrice,
-      },
-      goat: {
-        super: centsToDollarsFormInputs(priceList.goat.super),
-        choice: centsToDollarsFormInputs(priceList.goat.choice),
-        standard: centsToDollarsFormInputs(priceList.goat.standard),
-        inferior: centsToDollarsFormInputs(priceList.goat.inferior),
-        hasPrice: priceList.goat.hasPrice,
-      },
-      chicken: {
-        below: centsToDollarsFormInputs(priceList.chicken.below),
-        midRange: centsToDollarsFormInputs(priceList.chicken.midRange),
-        above: centsToDollarsFormInputs(priceList.chicken.above),
-        condemned: centsToDollarsFormInputs(priceList.chicken.condemned),
-        hasPrice: priceList.chicken.hasPrice,
-      },
-      pork: {
-        super: centsToDollarsFormInputs(priceList.pork.super),
-        manufacturing: centsToDollarsFormInputs(priceList.pork.manufacturing),
-        head: centsToDollarsFormInputs(priceList.pork.head),
-        hasPrice: priceList.pork.hasPrice,
-      },
-      catering: {
-        chicken: centsToDollarsFormInputs(priceList.catering.chicken),
-        hasPrice: priceList.catering.hasPrice,
-      },
-      unit: priceList.unit,
-    },
-    resolver: zodResolver(ProducerPriceListSchema),
-  })
+  const form = useFormCreatePriceListForm(priceList)
 
   const [searchClient, setSearchClient] = useState("")
   const [selectedClient, setSelectedClient] = useState(priceList.client_name)
@@ -205,48 +140,12 @@ export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
     },
   })
 
-  async function onSubmit(payload: ProducerPriceList) {
-    payload.beef.super = dollarsToCents(payload.beef.super)
-    payload.beef.choice = dollarsToCents(payload.beef.choice)
-    payload.beef.commercial = dollarsToCents(payload.beef.commercial)
-    payload.beef.economy = dollarsToCents(payload.beef.economy)
-    payload.beef.manufacturing = dollarsToCents(payload.beef.manufacturing)
-    payload.beef.condemned = dollarsToCents(payload.beef.condemned)
-
-    payload.lamb.superPremium = dollarsToCents(payload.lamb.superPremium)
-    payload.lamb.choice = dollarsToCents(payload.lamb.choice)
-    payload.lamb.standard = dollarsToCents(payload.lamb.standard)
-    payload.lamb.inferior = dollarsToCents(payload.lamb.inferior)
-
-    payload.mutton.super = dollarsToCents(payload.mutton.super)
-    payload.mutton.choice = dollarsToCents(payload.mutton.choice)
-    payload.mutton.standard = dollarsToCents(payload.mutton.standard)
-    payload.mutton.oridnary = dollarsToCents(payload.mutton.oridnary)
-    payload.mutton.inferior = dollarsToCents(payload.mutton.inferior)
-
-    payload.goat.super = dollarsToCents(payload.goat.super)
-    payload.goat.choice = dollarsToCents(payload.goat.choice)
-    payload.goat.standard = dollarsToCents(payload.goat.standard)
-    payload.goat.inferior = dollarsToCents(payload.goat.inferior)
-
-    payload.chicken.below = dollarsToCents(payload.chicken.below)
-    payload.chicken.midRange = dollarsToCents(payload.chicken.midRange)
-    payload.chicken.above = dollarsToCents(payload.chicken.above)
-    payload.chicken.condemned = dollarsToCents(payload.chicken.condemned)
-
-    payload.pork.super = dollarsToCents(payload.pork.super)
-    payload.pork.manufacturing = dollarsToCents(payload.pork.manufacturing)
-    payload.pork.head = dollarsToCents(payload.pork.head)
-
-    payload.catering.chicken = dollarsToCents(payload.catering.chicken)
-
-    mutate(payload)
-  }
-
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(onSubmit)}
+        onSubmit={form.handleSubmit((values) =>
+          submitPriceList(values, mutate),
+        )}
         className="w-3/4 gap-4 mx-auto mb-8"
       >
         <div className="grid grid-cols-2 gap-4 mb-4">
@@ -271,7 +170,7 @@ export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
                         ) : (
                           <span>Pick a date</span>
                         )}
-                        <Icons.calender className="w-4 h-4 ml-auto opacity-50" />
+                        <Icons.calender className="s-4 ml-auto opacity-50" />
                       </Button>
                     </FormControl>
                   </PopoverTrigger>
@@ -337,7 +236,7 @@ export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
                 <FormLabel>Client</FormLabel>
                 <FormMessage />
                 <FormControl>
-                  <div className="text-green-800 bg-green-100 border-green-400 group min-h-[2.5rem] rounded-md border px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-0">
+                  <div className="text-green-800 bg-green-100 border-green-400 group min-h-10 rounded-md border px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-0">
                     {selectedClient}
                   </div>
                 </FormControl>
@@ -356,7 +255,7 @@ export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
             name="beef.hasPrice"
             render={({ field }) => (
               <FormItem className="flex flex-row items-start p-4 space-x-3 space-y-0 border rounded-md">
-                <FormLabel>Beef Pricing Form</FormLabel>
+                <FormLabel>Beef Form</FormLabel>
                 <FormControl>
                   <Checkbox
                     checked={field.value}
@@ -374,7 +273,7 @@ export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
             name="lamb.hasPrice"
             render={({ field }) => (
               <FormItem className="flex flex-row items-start p-4 space-x-3 space-y-0 border rounded-md">
-                <FormLabel>Lamb Pricing Form</FormLabel>
+                <FormLabel>Lamb Form</FormLabel>
                 <FormControl>
                   <Checkbox
                     checked={field.value}
@@ -392,7 +291,7 @@ export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
             name="mutton.hasPrice"
             render={({ field }) => (
               <FormItem className="flex flex-row items-start p-4 space-x-3 space-y-0 border rounded-md">
-                <FormLabel>Mutton Pricing Form</FormLabel>
+                <FormLabel>Mutton Form</FormLabel>
                 <FormControl>
                   <Checkbox
                     checked={field.value}
@@ -410,7 +309,7 @@ export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
             name="goat.hasPrice"
             render={({ field }) => (
               <FormItem className="flex flex-row items-start p-4 space-x-3 space-y-0 border rounded-md">
-                <FormLabel>Goat Pricing Form</FormLabel>
+                <FormLabel>Goat Form</FormLabel>
                 <FormControl>
                   <Checkbox
                     checked={field.value}
@@ -428,7 +327,7 @@ export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
             name="chicken.hasPrice"
             render={({ field }) => (
               <FormItem className="flex flex-row items-start p-4 space-x-3 space-y-0 border rounded-md">
-                <FormLabel>Chicken Pricing Form</FormLabel>
+                <FormLabel>Chicken Form</FormLabel>
                 <FormControl>
                   <Checkbox
                     checked={field.value}
@@ -446,7 +345,7 @@ export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
             name="pork.hasPrice"
             render={({ field }) => (
               <FormItem className="flex flex-row items-start p-4 space-x-3 space-y-0 border rounded-md">
-                <FormLabel>Pork Pricing Form</FormLabel>
+                <FormLabel>Pork Form</FormLabel>
                 <FormControl>
                   <Checkbox
                     checked={field.value}
@@ -464,7 +363,7 @@ export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
             name="catering.hasPrice"
             render={({ field }) => (
               <FormItem className="flex flex-row items-start p-4 space-x-3 space-y-0 border rounded-md">
-                <FormLabel>Catering Pricing Form</FormLabel>
+                <FormLabel>Catering Form</FormLabel>
                 <FormControl>
                   <Checkbox
                     checked={field.value}
@@ -764,7 +663,7 @@ export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
                 />
                 <FormField
                   control={form.control}
-                  name="mutton.oridnary"
+                  name="mutton.ordinary"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Oridnary</FormLabel>
@@ -1099,7 +998,7 @@ export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
           className={cn(buttonVariants(), "mt-5")}
           disabled={isPending}
         >
-          {isPending && <Icons.spinner className="w-4 h-4 mr-2 animate-spin" />}
+          {isPending && <Icons.spinner className="size-4 mr-2 animate-spin" />}
           Submit
         </button>
       </form>

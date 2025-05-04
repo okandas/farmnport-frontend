@@ -6,7 +6,7 @@ import { isAxiosError } from "axios"
 
 import { queryPriceList } from "@/lib/query"
 import { ProducerPriceList } from "@/lib/schemas"
-import { centsToDollars, cn, formatDate, ucFirst } from "@/lib/utilities"
+import { centsToDollars, cn, ucFirst } from "@/lib/utilities"
 import { Button, buttonVariants } from "@/components/ui/button"
 import {
   Card,
@@ -163,7 +163,7 @@ export default function ViewClientProductListPage({
       <div className={"absolute right-10 top-96"}>
         <Link href={url} className={cn(buttonVariants({ variant: "link" }))}>
           <>
-            <Icons.close className="mr-2 h-4 w-4" />
+            <Icons.close className="mr-2 size-4" />
             Close
           </>
         </Link>
