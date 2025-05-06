@@ -6,9 +6,7 @@ import slugify from "slugify"
 import { twMerge } from "tailwind-merge"
 import { ProducerPriceList, ProducerPriceListSchema } from "@/lib/schemas"
 
-import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { MutationFunction } from "@tanstack/react-query"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -77,11 +75,360 @@ export function dollarsToCents(dollars: number) {
   return Math.round(100 * dollars)
 }
 
-export async function submitPriceList(
-  payload: ProducerPriceList,
-  mutate: MutationFunction<unknown, ProducerPriceList>,
-) {
-  // beef
+export function createPriceListDefaultValues(priceList: ProducerPriceList) {
+  return {
+    defaultValues: {
+      id: priceList.id,
+      effectiveDate: new Date(),
+      client_id: priceList.client_id,
+      client_name: priceList.client_name,
+      client_specialization: priceList.client_specialization || "livestock",
+      beef: {
+        super: {
+          code: priceList.beef.super.code,
+          pricing: {
+            collected: centsToDollarsFormInputs(
+              priceList.beef.super.pricing.collected,
+            ),
+            delivered: centsToDollarsFormInputs(
+              priceList.beef.super.pricing.delivered,
+            ),
+          },
+        },
+        choice: {
+          code: priceList.beef.choice.code,
+          pricing: {
+            collected: centsToDollarsFormInputs(
+              priceList.beef.choice.pricing.collected,
+            ),
+            delivered: centsToDollarsFormInputs(
+              priceList.beef.choice.pricing.delivered,
+            ),
+          },
+        },
+        commercial: {
+          code: priceList.beef.commercial.code,
+          pricing: {
+            collected: centsToDollarsFormInputs(
+              priceList.beef.commercial.pricing.collected,
+            ),
+            delivered: centsToDollarsFormInputs(
+              priceList.beef.commercial.pricing.delivered,
+            ),
+          },
+        },
+        economy: {
+          code: priceList.beef.economy.code,
+          pricing: {
+            collected: centsToDollarsFormInputs(
+              priceList.beef.economy.pricing.collected,
+            ),
+            delivered: centsToDollarsFormInputs(
+              priceList.beef.economy.pricing.delivered,
+            ),
+          },
+        },
+        manufacturing: {
+          code: priceList.beef.manufacturing.code,
+          pricing: {
+            collected: centsToDollarsFormInputs(
+              priceList.beef.manufacturing.pricing.collected,
+            ),
+            delivered: centsToDollarsFormInputs(
+              priceList.beef.manufacturing.pricing.delivered,
+            ),
+          },
+        },
+        condemned: {
+          code: priceList.beef.condemned.code,
+          pricing: {
+            collected: centsToDollarsFormInputs(
+              priceList.beef.condemned.pricing.collected,
+            ),
+            delivered: centsToDollarsFormInputs(
+              priceList.beef.condemned.pricing.delivered,
+            ),
+          },
+        },
+
+        detained: priceList.beef.detained,
+        hasPrice: priceList.beef.hasPrice,
+        hasCollectedPrice: priceList.beef.hasCollectedPrice,
+      },
+      lamb: {
+        super_premium: {
+          code: priceList.lamb.super_premium.code,
+          pricing: {
+            collected: centsToDollarsFormInputs(
+              priceList.lamb.super_premium.pricing.collected,
+            ),
+            delivered: centsToDollarsFormInputs(
+              priceList.lamb.super_premium.pricing.delivered,
+            ),
+          },
+        },
+        choice: {
+          code: priceList.lamb.choice.code,
+          pricing: {
+            collected: centsToDollarsFormInputs(
+              priceList.lamb.choice.pricing.collected,
+            ),
+            delivered: centsToDollarsFormInputs(
+              priceList.lamb.choice.pricing.delivered,
+            ),
+          },
+        },
+        standard: {
+          code: priceList.lamb.standard.code,
+          pricing: {
+            collected: centsToDollarsFormInputs(
+              priceList.lamb.standard.pricing.collected,
+            ),
+            delivered: centsToDollarsFormInputs(
+              priceList.lamb.standard.pricing.delivered,
+            ),
+          },
+        },
+        inferior: {
+          code: priceList.lamb.inferior.code,
+          pricing: {
+            collected: centsToDollarsFormInputs(
+              priceList.lamb.inferior.pricing.collected,
+            ),
+            delivered: centsToDollarsFormInputs(
+              priceList.lamb.inferior.pricing.delivered,
+            ),
+          },
+        },
+        hasPrice: priceList.lamb.hasPrice,
+        hasCollectedPrice: priceList.lamb.hasCollectedPrice,
+      },
+      mutton: {
+        super: {
+          code: priceList.mutton.super.code,
+          pricing: {
+            collected: centsToDollarsFormInputs(
+              priceList.mutton.super.pricing.collected,
+            ),
+            delivered: centsToDollarsFormInputs(
+              priceList.mutton.super.pricing.delivered,
+            ),
+          },
+        },
+        choice: {
+          code: priceList.mutton.choice.code,
+          pricing: {
+            collected: centsToDollarsFormInputs(
+              priceList.mutton.choice.pricing.collected,
+            ),
+            delivered: centsToDollarsFormInputs(
+              priceList.mutton.choice.pricing.delivered,
+            ),
+          },
+        },
+        standard: {
+          code: priceList.mutton.standard.code,
+          pricing: {
+            collected: centsToDollarsFormInputs(
+              priceList.mutton.standard.pricing.collected,
+            ),
+            delivered: centsToDollarsFormInputs(
+              priceList.mutton.standard.pricing.delivered,
+            ),
+          },
+        },
+        ordinary: {
+          code: priceList.mutton.ordinary.code,
+          pricing: {
+            collected: centsToDollarsFormInputs(
+              priceList.mutton.ordinary.pricing.collected,
+            ),
+            delivered: centsToDollarsFormInputs(
+              priceList.mutton.ordinary.pricing.delivered,
+            ),
+          },
+        },
+        inferior: {
+          code: priceList.mutton.inferior.code,
+          pricing: {
+            collected: centsToDollarsFormInputs(
+              priceList.mutton.inferior.pricing.collected,
+            ),
+            delivered: centsToDollarsFormInputs(
+              priceList.mutton.inferior.pricing.delivered,
+            ),
+          },
+        },
+        hasPrice: priceList.mutton.hasPrice,
+        hasCollectedPrice: priceList.mutton.hasCollectedPrice,
+      },
+      goat: {
+        super: {
+          code: priceList.goat.super.code,
+          pricing: {
+            collected: centsToDollarsFormInputs(
+              priceList.goat.super.pricing.collected,
+            ),
+            delivered: centsToDollarsFormInputs(
+              priceList.goat.super.pricing.delivered,
+            ),
+          },
+        },
+        choice: {
+          code: priceList.goat.choice.code,
+          pricing: {
+            collected: centsToDollarsFormInputs(
+              priceList.goat.choice.pricing.collected,
+            ),
+            delivered: centsToDollarsFormInputs(
+              priceList.goat.choice.pricing.delivered,
+            ),
+          },
+        },
+        standard: {
+          code: priceList.goat.standard.code,
+          pricing: {
+            collected: centsToDollarsFormInputs(
+              priceList.goat.standard.pricing.collected,
+            ),
+            delivered: centsToDollarsFormInputs(
+              priceList.goat.standard.pricing.delivered,
+            ),
+          },
+        },
+        inferior: {
+          code: priceList.goat.inferior.code,
+          pricing: {
+            collected: centsToDollarsFormInputs(
+              priceList.goat.inferior.pricing.collected,
+            ),
+            delivered: centsToDollarsFormInputs(
+              priceList.goat.inferior.pricing.delivered,
+            ),
+          },
+        },
+        hasPrice: priceList.goat.hasPrice,
+        hasCollectedPrice: priceList.goat.hasCollectedPrice,
+      },
+      chicken: {
+        a_grade_over_1_75: {
+          code: priceList.chicken.a_grade_over_1_75.code,
+          pricing: {
+            collected: centsToDollarsFormInputs(
+              priceList.chicken.a_grade_over_1_75.pricing.collected,
+            ),
+            delivered: centsToDollarsFormInputs(
+              priceList.chicken.a_grade_over_1_75.pricing.delivered,
+            ),
+          },
+        },
+        a_grade_1_55_1_75: {
+          code: priceList.chicken.a_grade_1_55_1_75.code,
+          pricing: {
+            collected: centsToDollarsFormInputs(
+              priceList.chicken.a_grade_1_55_1_75.pricing.collected,
+            ),
+            delivered: centsToDollarsFormInputs(
+              priceList.chicken.a_grade_1_55_1_75.pricing.delivered,
+            ),
+          },
+        },
+        a_grade_under_1_55: {
+          code: priceList.chicken.a_grade_under_1_55.code,
+          pricing: {
+            collected: centsToDollarsFormInputs(
+              priceList.chicken.a_grade_under_1_55.pricing.collected,
+            ),
+            delivered: centsToDollarsFormInputs(
+              priceList.chicken.a_grade_under_1_55.pricing.delivered,
+            ),
+          },
+        },
+        off_layers: {
+          code: priceList.chicken.off_layers.code,
+          pricing: {
+            collected: centsToDollarsFormInputs(
+              priceList.chicken.off_layers.pricing.collected,
+            ),
+            delivered: centsToDollarsFormInputs(
+              priceList.chicken.off_layers.pricing.delivered,
+            ),
+          },
+        },
+        condemned: {
+          code: priceList.chicken.condemned.code,
+          pricing: {
+            collected: centsToDollarsFormInputs(
+              priceList.chicken.condemned?.pricing.collected,
+            ),
+            delivered: centsToDollarsFormInputs(
+              priceList.chicken.condemned?.pricing.delivered,
+            ),
+          },
+        },
+        hasPrice: priceList.chicken.hasPrice,
+        hasCollectedPrice: priceList.chicken.hasCollectedPrice,
+      },
+      pork: {
+        super: {
+          code: priceList.pork.super.code,
+          pricing: {
+            collected: centsToDollarsFormInputs(
+              priceList.pork.super.pricing.collected,
+            ),
+            delivered: centsToDollarsFormInputs(
+              priceList.pork.super.pricing.delivered,
+            ),
+          },
+        },
+        manufacturing: {
+          code: priceList.pork.manufacturing.code,
+          pricing: {
+            collected: centsToDollarsFormInputs(
+              priceList.pork.manufacturing.pricing.collected,
+            ),
+            delivered: centsToDollarsFormInputs(
+              priceList.pork.manufacturing.pricing.delivered,
+            ),
+          },
+        },
+        head: {
+          code: priceList.pork.head.code,
+          pricing: {
+            collected: centsToDollarsFormInputs(
+              priceList.pork.head.pricing.collected,
+            ),
+            delivered: centsToDollarsFormInputs(
+              priceList.pork.head.pricing.delivered,
+            ),
+          },
+        },
+        hasPrice: priceList.pork.hasPrice,
+        hasCollectedPrice: priceList.pork.hasCollectedPrice,
+      },
+      catering: {
+        chicken: {
+          order: {
+            price: centsToDollarsFormInputs(
+              priceList.catering.chicken.order.price,
+            ),
+            quantity: centsToDollarsFormInputs(
+              priceList.catering.chicken.order.quantity,
+            ),
+          },
+          frequency: priceList.catering.chicken.frequency,
+        },
+        hasPrice: priceList.catering.hasPrice,
+        hasCollectedPrice: priceList.catering.hasCollectedPrice,
+      },
+      unit: priceList.unit,
+    },
+    resolver: zodResolver(ProducerPriceListSchema),
+  }
+}
+
+export function createPriceListPayload(payload: ProducerPriceList) {
+  // Beef Start
   payload.beef.super.pricing.collected = dollarsToCents(
     payload.beef.super.pricing.collected,
   )
@@ -100,7 +447,7 @@ export async function submitPriceList(
   payload.beef.condemned.pricing.collected = dollarsToCents(
     payload.beef.condemned.pricing.collected,
   )
-
+  // Delivered
   payload.beef.super.pricing.delivered = dollarsToCents(
     payload.beef.super.pricing.delivered,
   )
@@ -119,8 +466,9 @@ export async function submitPriceList(
   payload.beef.condemned.pricing.delivered = dollarsToCents(
     payload.beef.condemned.pricing.delivered,
   )
+  // Beef End
 
-  // Lamb
+  // Lamb start
   payload.lamb.super_premium.pricing.collected = dollarsToCents(
     payload.lamb.super_premium.pricing.collected,
   )
@@ -134,6 +482,8 @@ export async function submitPriceList(
     payload.lamb.inferior.pricing.collected,
   )
 
+  // Delivered
+
   payload.lamb.super_premium.pricing.delivered = dollarsToCents(
     payload.lamb.super_premium.pricing.delivered,
   )
@@ -146,6 +496,7 @@ export async function submitPriceList(
   payload.lamb.inferior.pricing.delivered = dollarsToCents(
     payload.lamb.inferior.pricing.delivered,
   )
+  // Lamb end
 
   // mutton
   payload.mutton.super.pricing.collected = dollarsToCents(
@@ -275,331 +626,5 @@ export async function submitPriceList(
   payload.catering.chicken.order.quantity = dollarsToCents(
     payload.catering.chicken.order.quantity,
   )
-
-  await mutate(payload)
-}
-
-export function useFormCreatePriceListForm(priceList: ProducerPriceList) {
-  return useForm({
-    defaultValues: {
-      id: priceList.id,
-      effectiveDate: new Date(),
-      client_id: priceList.client_id,
-      client_name: priceList.client_name,
-      client_specialization: priceList.client_specialization || "livestock",
-      beef: {
-        super: {
-          pricing: {
-            collected: centsToDollarsFormInputs(
-              priceList.beef.super.pricing.collected,
-            ),
-            delivered: centsToDollarsFormInputs(
-              priceList.beef.super.pricing.delivered,
-            ),
-          },
-        },
-        choice: {
-          pricing: {
-            collected: centsToDollarsFormInputs(
-              priceList.beef.choice.pricing.collected,
-            ),
-            delivered: centsToDollarsFormInputs(
-              priceList.beef.choice.pricing.delivered,
-            ),
-          },
-        },
-        commercial: {
-          pricing: {
-            collected: centsToDollarsFormInputs(
-              priceList.beef.commercial.pricing.collected,
-            ),
-            delivered: centsToDollarsFormInputs(
-              priceList.beef.commercial.pricing.delivered,
-            ),
-          },
-        },
-        economy: {
-          pricing: {
-            collected: centsToDollarsFormInputs(
-              priceList.beef.economy.pricing.collected,
-            ),
-            delivered: centsToDollarsFormInputs(
-              priceList.beef.economy.pricing.delivered,
-            ),
-          },
-        },
-        manufacturing: {
-          pricing: {
-            collected: centsToDollarsFormInputs(
-              priceList.beef.manufacturing.pricing.collected,
-            ),
-            delivered: centsToDollarsFormInputs(
-              priceList.beef.manufacturing.pricing.delivered,
-            ),
-          },
-        },
-        condemned: {
-          pricing: {
-            collected: centsToDollarsFormInputs(
-              priceList.beef.condemned.pricing.collected,
-            ),
-            delivered: centsToDollarsFormInputs(
-              priceList.beef.condemned.pricing.delivered,
-            ),
-          },
-        },
-
-        detained: priceList.beef.detained,
-        hasPrice: priceList.beef.hasPrice,
-        hasCollectedPrice: priceList.beef.hasCollectedPrice,
-      },
-      lamb: {
-        super_premium: {
-          pricing: {
-            collected: centsToDollarsFormInputs(
-              priceList.lamb.super_premium.pricing.collected,
-            ),
-            delivered: centsToDollarsFormInputs(
-              priceList.lamb.super_premium.pricing.delivered,
-            ),
-          },
-        },
-        choice: {
-          pricing: {
-            collected: centsToDollarsFormInputs(
-              priceList.lamb.choice.pricing.collected,
-            ),
-            delivered: centsToDollarsFormInputs(
-              priceList.lamb.choice.pricing.delivered,
-            ),
-          },
-        },
-        standard: {
-          pricing: {
-            collected: centsToDollarsFormInputs(
-              priceList.lamb.standard.pricing.collected,
-            ),
-            delivered: centsToDollarsFormInputs(
-              priceList.lamb.standard.pricing.delivered,
-            ),
-          },
-        },
-        inferior: {
-          pricing: {
-            collected: centsToDollarsFormInputs(
-              priceList.lamb.inferior.pricing.collected,
-            ),
-            delivered: centsToDollarsFormInputs(
-              priceList.lamb.inferior.pricing.delivered,
-            ),
-          },
-        },
-        hasPrice: priceList.lamb.hasPrice,
-        hasCollectedPrice: priceList.lamb.hasCollectedPrice,
-      },
-      mutton: {
-        super: {
-          pricing: {
-            collected: centsToDollarsFormInputs(
-              priceList.mutton.super.pricing.collected,
-            ),
-            delivered: centsToDollarsFormInputs(
-              priceList.mutton.super.pricing.delivered,
-            ),
-          },
-        },
-        choice: {
-          pricing: {
-            collected: centsToDollarsFormInputs(
-              priceList.mutton.choice.pricing.collected,
-            ),
-            delivered: centsToDollarsFormInputs(
-              priceList.mutton.choice.pricing.delivered,
-            ),
-          },
-        },
-        standard: {
-          pricing: {
-            collected: centsToDollarsFormInputs(
-              priceList.mutton.standard.pricing.collected,
-            ),
-            delivered: centsToDollarsFormInputs(
-              priceList.mutton.standard.pricing.delivered,
-            ),
-          },
-        },
-        ordinary: {
-          pricing: {
-            collected: centsToDollarsFormInputs(
-              priceList.mutton.ordinary.pricing.collected,
-            ),
-            delivered: centsToDollarsFormInputs(
-              priceList.mutton.ordinary.pricing.delivered,
-            ),
-          },
-        },
-        inferior: {
-          pricing: {
-            collected: centsToDollarsFormInputs(
-              priceList.mutton.inferior.pricing.collected,
-            ),
-            delivered: centsToDollarsFormInputs(
-              priceList.mutton.inferior.pricing.delivered,
-            ),
-          },
-        },
-        hasPrice: priceList.mutton.hasPrice,
-        hasCollectedPrice: priceList.mutton.hasCollectedPrice,
-      },
-      goat: {
-        super: {
-          pricing: {
-            collected: centsToDollarsFormInputs(
-              priceList.goat.super.pricing.collected,
-            ),
-            delivered: centsToDollarsFormInputs(
-              priceList.goat.super.pricing.delivered,
-            ),
-          },
-        },
-        choice: {
-          pricing: {
-            collected: centsToDollarsFormInputs(
-              priceList.goat.choice.pricing.collected,
-            ),
-            delivered: centsToDollarsFormInputs(
-              priceList.goat.choice.pricing.delivered,
-            ),
-          },
-        },
-        standard: {
-          pricing: {
-            collected: centsToDollarsFormInputs(
-              priceList.goat.standard.pricing.collected,
-            ),
-            delivered: centsToDollarsFormInputs(
-              priceList.goat.standard.pricing.delivered,
-            ),
-          },
-        },
-        inferior: {
-          pricing: {
-            collected: centsToDollarsFormInputs(
-              priceList.goat.inferior.pricing.collected,
-            ),
-            delivered: centsToDollarsFormInputs(
-              priceList.goat.inferior.pricing.delivered,
-            ),
-          },
-        },
-        hasPrice: priceList.goat.hasPrice,
-        hasCollectedPrice: priceList.goat.hasCollectedPrice,
-      },
-      chicken: {
-        a_grade_over_1_75: {
-          pricing: {
-            collected: centsToDollarsFormInputs(
-              priceList.chicken.a_grade_over_1_75.pricing.collected,
-            ),
-            delivered: centsToDollarsFormInputs(
-              priceList.chicken.a_grade_over_1_75.pricing.delivered,
-            ),
-          },
-        },
-        a_grade_1_55_1_75: {
-          pricing: {
-            collected: centsToDollarsFormInputs(
-              priceList.chicken.a_grade_1_55_1_75.pricing.collected,
-            ),
-            delivered: centsToDollarsFormInputs(
-              priceList.chicken.a_grade_1_55_1_75.pricing.delivered,
-            ),
-          },
-        },
-        a_grade_under_1_55: {
-          pricing: {
-            collected: centsToDollarsFormInputs(
-              priceList.chicken.a_grade_under_1_55.pricing.collected,
-            ),
-            delivered: centsToDollarsFormInputs(
-              priceList.chicken.a_grade_under_1_55.pricing.delivered,
-            ),
-          },
-        },
-        off_layers: {
-          pricing: {
-            collected: centsToDollarsFormInputs(
-              priceList.chicken.off_layers.pricing.collected,
-            ),
-            delivered: centsToDollarsFormInputs(
-              priceList.chicken.off_layers.pricing.delivered,
-            ),
-          },
-        },
-        condemned: {
-          pricing: {
-            collected: centsToDollarsFormInputs(
-              priceList.chicken.condemned?.pricing.collected,
-            ),
-            delivered: centsToDollarsFormInputs(
-              priceList.chicken.condemned?.pricing.delivered,
-            ),
-          },
-        },
-        hasPrice: priceList.chicken.hasPrice,
-        hasCollectedPrice: priceList.chicken.hasCollectedPrice,
-      },
-      pork: {
-        super: {
-          pricing: {
-            collected: centsToDollarsFormInputs(
-              priceList.pork.super.pricing.collected,
-            ),
-            delivered: centsToDollarsFormInputs(
-              priceList.pork.super.pricing.delivered,
-            ),
-          },
-        },
-        manufacturing: {
-          pricing: {
-            collected: centsToDollarsFormInputs(
-              priceList.pork.manufacturing.pricing.collected,
-            ),
-            delivered: centsToDollarsFormInputs(
-              priceList.pork.manufacturing.pricing.delivered,
-            ),
-          },
-        },
-        head: {
-          pricing: {
-            collected: centsToDollarsFormInputs(
-              priceList.pork.head.pricing.collected,
-            ),
-            delivered: centsToDollarsFormInputs(
-              priceList.pork.head.pricing.delivered,
-            ),
-          },
-        },
-        hasPrice: priceList.pork.hasPrice,
-        hasCollectedPrice: priceList.pork.hasCollectedPrice,
-      },
-      catering: {
-        chicken: {
-          order: {
-            price: centsToDollarsFormInputs(
-              priceList.catering.chicken.order.price,
-            ),
-            quantity: centsToDollarsFormInputs(
-              priceList.catering.chicken.order.quantity,
-            ),
-          },
-          frequency: priceList.catering.chicken.frequency,
-        },
-        hasPrice: priceList.catering.hasPrice,
-        hasCollectedPrice: priceList.catering.hasCollectedPrice,
-      },
-      unit: priceList.unit,
-    },
-    resolver: zodResolver(ProducerPriceListSchema),
-  })
+  return payload
 }

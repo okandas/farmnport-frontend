@@ -115,6 +115,14 @@ export function createClientProductPriceList(data: ProducerPriceList) {
   // let url = `${baseUrl}/prices/add/producer_price`
   // return api.post(url, data)
   console.log(data, "test new create client product list")
+
+  // Tester
+
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(data)
+    }, 100)
+  })
 }
 
 export function updateClientProductPriceList(data: ProducerPriceList) {

@@ -6,7 +6,7 @@ import { isAxiosError } from "axios"
 
 import { queryUser } from "@/lib/query"
 import { ApplicationUser } from "@/lib/schemas"
-import { makeAbbveriation } from "@/lib/utilities"
+import { makeAbbreviation } from "@/lib/utilities"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { ToastAction } from "@/components/ui/toast"
@@ -67,7 +67,7 @@ export default function ViewClientHeader({ params }: ViewClientHeaderProps) {
       <div className="flex max-w-2xl">
         <Avatar className="w-32 h-32 mb-1 mr-4">
           <AvatarImage />
-          <AvatarFallback>{makeAbbveriation(Client?.name)}</AvatarFallback>
+          <AvatarFallback>{makeAbbreviation(Client?.name)}</AvatarFallback>
         </Avatar>
         <p className="mr-2 shrink leading-7 [&:not(:first-child)]:mt-5">
           {Client?.short_description}
