@@ -18,30 +18,30 @@ export async function generateMetadata({ params }: Props,  parent: ResolvingMeta
 
   return {
     alternates: {
-      canonical: `${AppURL}/buyer/${slug.toLowerCase()}`,
+      canonical: `${AppURL}/farmer/${slug.toLowerCase()}`,
     },
-    title: `${name} - Buyer in Zimbabwe | farmnport.com`,
+    title: `${name} - Farmer in Zimbabwe | farmnport.com`,
   }
 }
 
 type BuyerPageProps ={
-    params:  Promise<{ slug: string }>
+  params:  Promise<{ slug: string }>
 }
 
-  export default async function BuyerPage({ params }:  BuyerPageProps) {
+export default async function BuyerPage({ params }:  BuyerPageProps) {
 
-    const user = await retrieveUser()
-    const { slug } = await params
+  const user = await retrieveUser()
+  const { slug } = await params
 
-    return(
+  return(
     <main className="min-h-[70lvh]">
-    <div className="mx-auto max-w-7xl min-h-[70lvh]">
+      <div className="mx-auto max-w-7xl min-h-[70lvh]">
         <div className="lg:flex lg:space-x-10">
           <Client slug={slug} user={user}/>
         </div>
-    </div>
-</main>
-)
-  }
+      </div>
+    </main>
+  )
+}
 
 
