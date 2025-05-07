@@ -59,239 +59,204 @@ export const ApplicationUserSchema = z.object({
   has_prices: z.boolean(),
 })
 
-export const ProducerPriceListSchema = z.object({
-  id: z.string(),
-  client_id: z.string().length(24),
-  client_name: z.string(),
-  client_specialization: z.string(),
-  effectiveDate: z.coerce.date(),
-  beef: z.object({
-    super: z.object({
-      code: z.string(),
-      pricing: z.object({
-        collected: z.coerce.number().nonnegative(),
-        delivered: z.coerce.number().nonnegative(),
-      }),
-    }),
-    choice: z.object({
-      code: z.string(),
-      pricing: z.object({
-        collected: z.coerce.number().nonnegative(),
-        delivered: z.coerce.number().nonnegative(),
-      }),
-    }),
-    commercial: z.object({
-      code: z.string(),
-      pricing: z.object({
-        collected: z.coerce.number().nonnegative(),
-        delivered: z.coerce.number().nonnegative(),
-      }),
-    }),
-    economy: z.object({
-      code: z.string(),
-      pricing: z.object({
-        collected: z.coerce.number().nonnegative(),
-        delivered: z.coerce.number().nonnegative(),
-      }),
-    }),
-    manufacturing: z.object({
-      code: z.string(),
-      pricing: z.object({
-        collected: z.coerce.number().nonnegative(),
-        delivered: z.coerce.number().nonnegative(),
-      }),
-    }),
-    condemned: z.object({
-      code: z.string(),
-      pricing: z.object({
-        collected: z.coerce.number().nonnegative(),
-        delivered: z.coerce.number().nonnegative(),
-      }),
-    }),
-    detained: z.string(),
-    hasPrice: z.boolean(),
-    hasCollectedPrice: z.boolean(),
-  }),
-  chicken: z.object({
-    a_grade_over_1_75: z.object({
-      code: z.string(),
-      pricing: z.object({
-        collected: z.coerce.number().nonnegative(),
-        delivered: z.coerce.number().nonnegative(),
-      }),
-    }),
-    a_grade_1_55_1_75: z.object({
-      code: z.string(),
-      pricing: z.object({
-        collected: z.coerce.number().nonnegative(),
-        delivered: z.coerce.number().nonnegative(),
-      }),
-    }),
-    a_grade_under_1_55: z.object({
-      code: z.string(),
-      pricing: z.object({
-        collected: z.coerce.number().nonnegative(),
-        delivered: z.coerce.number().nonnegative(),
-      }),
-    }),
-    off_layers: z.object({
-      code: z.string(),
-      pricing: z.object({
-        collected: z.coerce.number().nonnegative(),
-        delivered: z.coerce.number().nonnegative(),
-      }),
-    }),
-    condemned: z.object({
-      code: z.string(),
-      pricing: z.object({
-        collected: z.coerce.number().nonnegative(),
-        delivered: z.coerce.number().nonnegative(),
-      }),
-    }),
-    hasPrice: z.boolean(),
-    hasCollectedPrice: z.boolean(),
-  }),
-  pork: z.object({
-    super: z.object({
-      code: z.string(),
-      pricing: z.object({
-        collected: z.coerce.number().nonnegative(),
-        delivered: z.coerce.number().nonnegative(),
-      }),
-    }),
-    manufacturing: z.object({
-      code: z.string(),
-      pricing: z.object({
-        collected: z.coerce.number().nonnegative(),
-        delivered: z.coerce.number().nonnegative(),
-      }),
-    }),
-    head: z.object({
-      code: z.string(),
-      pricing: z.object({
-        collected: z.coerce.number().nonnegative(),
-        delivered: z.coerce.number().nonnegative(),
-      }),
-    }),
-    hasPrice: z.boolean(),
-    hasCollectedPrice: z.boolean(),
-  }),
-  goat: z.object({
-    super: z.object({
-      code: z.string(),
-      pricing: z.object({
-        collected: z.coerce.number().nonnegative(),
-        delivered: z.coerce.number().nonnegative(),
-      }),
-    }),
-    choice: z.object({
-      code: z.string(),
-      pricing: z.object({
-        collected: z.coerce.number().nonnegative(),
-        delivered: z.coerce.number().nonnegative(),
-      }),
-    }),
-    standard: z.object({
-      code: z.string(),
-      pricing: z.object({
-        collected: z.coerce.number().nonnegative(),
-        delivered: z.coerce.number().nonnegative(),
-      }),
-    }),
-    inferior: z.object({
-      code: z.string(),
-      pricing: z.object({
-        collected: z.coerce.number().nonnegative(),
-        delivered: z.coerce.number().nonnegative(),
-      }),
-    }),
-    hasPrice: z.boolean(),
-    hasCollectedPrice: z.boolean(),
-  }),
-  mutton: z.object({
-    super: z.object({
-      code: z.string(),
-      pricing: z.object({
-        collected: z.coerce.number().nonnegative(),
-        delivered: z.coerce.number().nonnegative(),
-      }),
-    }),
-    choice: z.object({
-      code: z.string(),
-      pricing: z.object({
-        collected: z.coerce.number().nonnegative(),
-        delivered: z.coerce.number().nonnegative(),
-      }),
-    }),
-    standard: z.object({
-      code: z.string(),
-      pricing: z.object({
-        collected: z.coerce.number().nonnegative(),
-        delivered: z.coerce.number().nonnegative(),
-      }),
-    }),
-    ordinary: z.object({
-      code: z.string(),
-      pricing: z.object({
-        collected: z.coerce.number().nonnegative(),
-        delivered: z.coerce.number().nonnegative(),
-      }),
-    }),
-    inferior: z.object({
-      code: z.string(),
-      pricing: z.object({
-        collected: z.coerce.number().nonnegative(),
-        delivered: z.coerce.number().nonnegative(),
-      }),
-    }),
-    hasPrice: z.boolean(),
-    hasCollectedPrice: z.boolean(),
-  }),
-  lamb: z.object({
-    super_premium: z.object({
-      code: z.string(),
-      pricing: z.object({
-        collected: z.coerce.number().nonnegative(),
-        delivered: z.coerce.number().nonnegative(),
-      }),
-    }),
-    choice: z.object({
-      code: z.string(),
-      pricing: z.object({
-        collected: z.coerce.number().nonnegative(),
-        delivered: z.coerce.number().nonnegative(),
-      }),
-    }),
-    standard: z.object({
-      code: z.string(),
-      pricing: z.object({
-        collected: z.coerce.number().nonnegative(),
-        delivered: z.coerce.number().nonnegative(),
-      }),
-    }),
-    inferior: z.object({
-      code: z.string(),
-      pricing: z.object({
-        collected: z.coerce.number().nonnegative(),
-        delivered: z.coerce.number().nonnegative(),
-      }),
-    }),
-    hasPrice: z.boolean(),
-    hasCollectedPrice: z.boolean(),
-  }),
-  catering: z.object({
-    chicken: z.object({
-      order: z.object({
-        price: z.coerce.number().nonnegative(),
-        quantity: z.coerce.number().nonnegative(),
-      }),
-      frequency: z.string(),
-    }),
-    hasPrice: z.boolean(),
-    hasCollectedPrice: z.boolean(),
-  }),
-  unit: z.string(),
+const pricingSchema = z.object({
+  collected: z.coerce.number().nonnegative(),
+  delivered: z.coerce.number().nonnegative(),
 })
+
+export const ProducerPriceListSchema = z
+  .object({
+    id: z.string(),
+    client_id: z
+      .string({
+        required_error: "Pricing update should be matched to a client",
+      })
+      .min(1, "Pricing Update Should be matched to a client"),
+    client_name: z.string(),
+    client_specialization: z.string(),
+    effectiveDate: z.coerce.date(),
+    beef: z.object({
+      super: z.object({
+        code: z.string(),
+        pricing: z.object({
+          collected: z.coerce.number().nonnegative(),
+          delivered: z.coerce.number().nonnegative(),
+        }),
+      }),
+      choice: z.object({
+        code: z.string(),
+        pricing: z.object({
+          collected: z.coerce.number().nonnegative(),
+          delivered: z.coerce.number().nonnegative(),
+        }),
+      }),
+      commercial: z.object({
+        code: z.string(),
+        pricing: z.object({
+          collected: z.coerce.number().nonnegative(),
+          delivered: z.coerce.number().nonnegative(),
+        }),
+      }),
+      economy: z.object({
+        code: z.string(),
+        pricing: z.object({
+          collected: z.coerce.number().nonnegative(),
+          delivered: z.coerce.number().nonnegative(),
+        }),
+      }),
+      manufacturing: z.object({
+        code: z.string(),
+        pricing: z.object({
+          collected: z.coerce.number().nonnegative(),
+          delivered: z.coerce.number().nonnegative(),
+        }),
+      }),
+      condemned: z.object({
+        code: z.string(),
+        pricing: z.object({
+          collected: z.coerce.number().nonnegative(),
+          delivered: z.coerce.number().nonnegative(),
+        }),
+      }),
+      detained: z.string(),
+      hasPrice: z.boolean(),
+      hasCollectedPrice: z.boolean(),
+    }),
+    chicken: z.object({
+      a_grade_over_1_75: z.object({
+        code: z.string(),
+        pricing: pricingSchema,
+      }),
+      a_grade_1_55_1_75: z.object({
+        code: z.string(),
+        pricing: pricingSchema,
+      }),
+      a_grade_under_1_55: z.object({
+        code: z.string(),
+        pricing: pricingSchema,
+      }),
+      off_layers: z.object({
+        code: z.string(),
+        pricing: pricingSchema,
+      }),
+      condemned: z.object({
+        code: z.string(),
+        pricing: pricingSchema,
+      }),
+      hasPrice: z.boolean(),
+      hasCollectedPrice: z.boolean(),
+    }),
+    pork: z.object({
+      super: z.object({
+        code: z.string(),
+        pricing: pricingSchema,
+      }),
+      manufacturing: z.object({
+        code: z.string(),
+        pricing: pricingSchema,
+      }),
+      head: z.object({
+        code: z.string(),
+        pricing: pricingSchema,
+      }),
+      hasPrice: z.boolean(),
+      hasCollectedPrice: z.boolean(),
+    }),
+    goat: z.object({
+      super: z.object({
+        code: z.string(),
+        pricing: pricingSchema,
+      }),
+      choice: z.object({
+        code: z.string(),
+        pricing: pricingSchema,
+      }),
+      standard: z.object({
+        code: z.string(),
+        pricing: pricingSchema,
+      }),
+      inferior: z.object({
+        code: z.string(),
+        pricing: pricingSchema,
+      }),
+      hasPrice: z.boolean(),
+      hasCollectedPrice: z.boolean(),
+    }),
+    mutton: z.object({
+      super: z.object({
+        code: z.string(),
+        pricing: pricingSchema,
+      }),
+      choice: z.object({
+        code: z.string(),
+        pricing: pricingSchema,
+      }),
+      standard: z.object({
+        code: z.string(),
+        pricing: pricingSchema,
+      }),
+      ordinary: z.object({
+        code: z.string(),
+        pricing: pricingSchema,
+      }),
+      inferior: z.object({
+        code: z.string(),
+        pricing: pricingSchema,
+      }),
+      hasPrice: z.boolean(),
+      hasCollectedPrice: z.boolean(),
+    }),
+    lamb: z.object({
+      super_premium: z.object({
+        code: z.string(),
+        pricing: pricingSchema,
+      }),
+      choice: z.object({
+        code: z.string(),
+        pricing: pricingSchema,
+      }),
+      standard: z.object({
+        code: z.string(),
+        pricing: pricingSchema,
+      }),
+      inferior: z.object({
+        code: z.string(),
+        pricing: pricingSchema,
+      }),
+      hasPrice: z.boolean(),
+      hasCollectedPrice: z.boolean(),
+    }),
+    catering: z.object({
+      chicken: z.object({
+        order: z.object({
+          price: z.coerce.number().nonnegative(),
+          quantity: z.coerce.number().nonnegative(),
+        }),
+        frequency: z.string(),
+      }),
+      hasPrice: z.boolean(),
+      hasCollectedPrice: z.boolean(),
+    }),
+    unit: z.string(),
+  })
+  .superRefine((data, ctx) => {
+    const chickenUnselected = !data.chicken.hasPrice
+    const beefUnselected = !data.beef.hasPrice
+    const porkUnselected = !data.pork.hasPrice
+    const goatUnselected = !data.goat.hasPrice
+    const muttonUnselected = !data.mutton.hasPrice
+    const lambUnselected = !data.lamb.hasPrice
+    const cateringUnselected = !data.catering.hasPrice
+
+    if (chickenUnselected && porkUnselected && beefUnselected) {
+      ctx.addIssue({
+        path: ["client_id"], // attach to root
+        code: z.ZodIssueCode.custom,
+        message:
+          "At least one form needs must to be selected",
+      })
+    }
+  })
 
 export const ProductSchema = z.object({
   id: z.string(),
@@ -404,12 +369,12 @@ ApplicationUserSchema.required({
   type: true,
 })
 
-ProducerPriceListSchema.required({
-  client_id: true,
-  client_name: true,
-  client_specialization: true,
-  effectiveDate: true,
-})
+// ProducerPriceListSchema.required({
+//   client_id: true,
+//   client_name: true,
+//   client_specialization: true,
+//   effectiveDate: true,
+// })
 
 export const EditApplicationUserSchema = ApplicationUserSchema.pick({
   id: true,
