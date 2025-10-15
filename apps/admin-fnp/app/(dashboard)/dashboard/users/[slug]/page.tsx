@@ -1,5 +1,6 @@
 "use client"
 
+import { use } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { isAxiosError } from "axios"
 
@@ -22,13 +23,14 @@ import { Placeholder } from "@/components/state/placeholder"
 import { ControlDropDown } from "@/components/structures/dropdowns/control-dropdown"
 
 interface ViewClientPageProps {
-  params: {
+  params: Promise<{
     slug: string
-  }
+  }>
 }
 
 export default function ViewClientPage({ params }: ViewClientPageProps) {
-  const name = params.slug
+  const { slug } = use(params)
+  const name = slug
 
   const { isError, isLoading, isFetching, data, refetch } = useQuery({
     queryKey: ["dashboard-client", name],

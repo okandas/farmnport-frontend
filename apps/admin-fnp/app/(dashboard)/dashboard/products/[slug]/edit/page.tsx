@@ -1,5 +1,6 @@
 "use client"
 
+import { use } from "react"
 import Link from "next/link"
 import { useQuery } from "@tanstack/react-query"
 import { isAxiosError } from "axios"
@@ -15,13 +16,14 @@ import { Placeholder } from "@/components/state/placeholder"
 import { EditForm } from "@/components/structures/forms/productEdit"
 
 interface EditProductPageProps {
-  params: {
+  params: Promise<{
     slug: string
-  }
+  }>
 }
 
 export default function EditProductPage({ params }: EditProductPageProps) {
-  const id = params.slug
+  const { slug } = use(params)
+  const id = slug
   const url = `/dashboard/products/${id}`
 
   const { isError, isLoading, isFetching, refetch, data } = useQuery({

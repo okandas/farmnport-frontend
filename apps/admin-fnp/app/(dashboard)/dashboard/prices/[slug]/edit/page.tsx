@@ -1,5 +1,6 @@
 "use client"
 
+import { use } from "react"
 import Link from "next/link"
 import { useQuery } from "@tanstack/react-query"
 import { isAxiosError } from "axios"
@@ -15,15 +16,16 @@ import { Placeholder } from "@/components/state/placeholder"
 import { EditProductPriceForm } from "@/components/structures/forms/editPriceList"
 
 interface EditProductListPriceProps {
-  params: {
+  params: Promise<{
     slug: string
-  }
+  }>
 }
 
 export default function EditProductListPrice({
   params,
 }: EditProductListPriceProps) {
-  const clientID = params.slug
+  const { slug } = use(params)
+  const clientID = slug
   const url = `/dashboard/prices`
 
   const { isError, isLoading, isFetching, refetch, data, isSuccess } = useQuery(

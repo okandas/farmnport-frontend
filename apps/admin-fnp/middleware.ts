@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
-import jwt_decode from "jwt-decode"
+import { jwtDecode } from "jwt-decode"
 
 import { AuthenticatedUser } from "./lib/schemas"
 
@@ -23,7 +23,7 @@ export function middleware(request: NextRequest) {
     if (isToken) {
       const token = cookie?.value
 
-      const decodedSession = jwt_decode<AuthenticatedUser>(token)
+      const decodedSession = jwtDecode<AuthenticatedUser>(token)
 
       // console.log(decodedSession)
 

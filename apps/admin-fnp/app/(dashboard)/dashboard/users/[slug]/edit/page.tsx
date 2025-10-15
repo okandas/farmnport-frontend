@@ -1,5 +1,6 @@
 "use client"
 
+import { use } from "react"
 import Link from "next/link"
 import { useQuery } from "@tanstack/react-query"
 import { isAxiosError } from "axios"
@@ -15,13 +16,14 @@ import { Placeholder } from "@/components/state/placeholder"
 import { EditForm } from "@/components/structures/forms/clientEdit"
 
 interface EditClientPageProps {
-  params: {
+  params: Promise<{
     slug: string
-  }
+  }>
 }
 
 export default function EditClientPage({ params }: EditClientPageProps) {
-  const name = params.slug
+  const { slug } = use(params)
+  const name = slug
   const url = `/dashboard/users/${name}`
 
   const { isError, isLoading, isFetching, data, refetch } = useQuery({

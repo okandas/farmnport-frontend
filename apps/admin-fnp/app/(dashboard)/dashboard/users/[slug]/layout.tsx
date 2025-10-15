@@ -8,15 +8,16 @@ import ViewClientHeader from "@/components/navigation/view-client-header"
 
 interface ViewClientLayoutProps {
   children: ReactNode
-  params: {
+  params: Promise<{
     slug: string
-  }
+  }>
 }
 
 export default async function ViewClientLayout({
   children,
   params,
 }: ViewClientLayoutProps) {
+  const resolvedParams = await params
   return (
     <div className="flex flex-col gap-7">
       <>
@@ -33,7 +34,7 @@ export default async function ViewClientLayout({
           </>
         </Link>
       </>
-      <ViewClientHeader params={params} />
+      <ViewClientHeader params={resolvedParams} />
       <div>{children}</div>
     </div>
   )
