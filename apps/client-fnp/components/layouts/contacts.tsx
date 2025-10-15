@@ -137,8 +137,8 @@ export function Contacts({ user, client, quickOverview }: ContactPageProps) {
     }
 
     return (
-        <section className="space-y-8 md:px-6 py-1">
-           <div className="px-6 py-4">
+        <section className="space-y-8 py-1">
+           <div className="py-4">
                 <dl className="grid grid-cols-1 lg:grid-cols-2 text-sm leading-6">
                     <div className="flex gap-x-4 py-2">
                         <dt>
@@ -192,9 +192,14 @@ export function Contacts({ user, client, quickOverview }: ContactPageProps) {
                                 <div>
                                     <dd className="text-sm font-medium leading-6 text-muted-foreground">{capitalizeFirstLetter(client.type)} primarily specializes in <span className="font-semibold text-foreground">{capitalizeFirstLetter(client.specialization)}</span></dd>
                                     <dd className="text-sm font-medium leading-6 text-muted-foreground">Mainly buying <span className="font-semibold text-foreground">{capitalizeFirstLetter(plural(client.main_activity))}</span></dd>
-                                    <dd className="text-sm font-medium leading-6 text-muted-foreground">and {client.type == 'buyer' ? "sources ": "produces "}
+                                  {client.specializations != null ? (
+                                      <dd className="text-sm font-medium leading-6 text-muted-foreground">and {client.type == 'buyer' ? "sources ": "produces "}
                                         <span className="font-semibold text-foreground">{client.specializations.length}</span> other agricultural {plural("product", client.specializations.length)}, see more
-                                    </dd>
+                                      </dd>
+                                    )
+                                    :
+                                    null
+                                  }
                                 </div>
 
                             </div>

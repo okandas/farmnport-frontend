@@ -736,10 +736,12 @@ export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
             </CardHeader>
             <CardContent>
               {/* Beef Start */}
+              <h3 className="mt-3">Beef Prices Delivered</h3>
               <div className="grid grid-cols-1 gap-5 mt-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-6">
                 <FormField
                   control={form.control}
-                  name="beef.super"
+                  name="beef.super.pricing.delivered"
+                  rules={{ required: "Super Pricing Required" }}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Super</FormLabel>
@@ -758,7 +760,7 @@ export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
                 />
                 <FormField
                   control={form.control}
-                  name="beef.choice"
+                  name="beef.choice.pricing.delivered"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Choice</FormLabel>
@@ -777,7 +779,7 @@ export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
                 />
                 <FormField
                   control={form.control}
-                  name="beef.commercial"
+                  name="beef.commercial.pricing.delivered"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Commercial</FormLabel>
@@ -796,7 +798,7 @@ export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
                 />
                 <FormField
                   control={form.control}
-                  name="beef.economy"
+                  name="beef.economy.pricing.delivered"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Economy</FormLabel>
@@ -815,7 +817,7 @@ export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
                 />
                 <FormField
                   control={form.control}
-                  name="beef.manufacturing"
+                  name="beef.manufacturing.pricing.delivered"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Manufacturing</FormLabel>
@@ -834,7 +836,125 @@ export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
                 />
                 <FormField
                   control={form.control}
-                  name="beef.condemned"
+                  name="beef.condemned.pricing.delivered"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Condemned</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Price Condemned Beef"
+                          {...field}
+                          type="number"
+                          min="0"
+                          step="any"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <h3 className="mt-2">Beef Prices Collected</h3>
+              <div className="grid grid-cols-1 gap-5 mt-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-6">
+                <FormField
+                  control={form.control}
+                  name="beef.super.pricing.collected"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Super</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Price Super Beef"
+                          {...field}
+                          type="number"
+                          min="0"
+                          step="any"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="beef.choice.pricing.collected"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Choice</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Price Choice Beef"
+                          {...field}
+                          type="number"
+                          min="0"
+                          step="any"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="beef.commercial.pricing.collected"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Commercial</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Price Commercial Beef"
+                          {...field}
+                          type="number"
+                          min="0"
+                          step="any"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="beef.economy.pricing.collected"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Economy</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Price Economy Beef"
+                          {...field}
+                          type="number"
+                          min="0"
+                          step="any"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="beef.manufacturing.pricing.collected"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Manufacturing</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Price Manufacturing Beef"
+                          {...field}
+                          type="number"
+                          min="0"
+                          step="any"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="beef.condemned.pricing.collected"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Condemned</FormLabel>
@@ -864,10 +984,11 @@ export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
             </CardHeader>
             <CardContent>
               {/* Lamb Start */}
+              <h3 className="mt-3">Lamb Prices Delivered</h3>
               <div className="grid grid-cols-1 gap-5 mt-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
                 <FormField
                   control={form.control}
-                  name="lamb.superPremium"
+                  name="lamb.super_premium.pricing.delivered"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Super/Super Premium</FormLabel>
@@ -886,7 +1007,7 @@ export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
                 />
                 <FormField
                   control={form.control}
-                  name="lamb.choice"
+                  name="lamb.choice.pricing.delivered"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Choice</FormLabel>
@@ -905,7 +1026,7 @@ export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
                 />
                 <FormField
                   control={form.control}
-                  name="lamb.standard"
+                  name="lamb.standard.pricing.delivered"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Standard</FormLabel>
@@ -924,7 +1045,87 @@ export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
                 />
                 <FormField
                   control={form.control}
-                  name="lamb.inferior"
+                  name="lamb.inferior.pricing.delivered"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Inferior</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Price Inferior Lamb"
+                          {...field}
+                          type="number"
+                          min="0"
+                          step="any"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <h3 className="mt-2">Lamb Prices Collected</h3>
+              <div className="grid grid-cols-1 gap-5 mt-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
+                <FormField
+                  control={form.control}
+                  name="lamb.super_premium.pricing.collected"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Super/Super Premium</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Price Super/Super Premium Lamb"
+                          {...field}
+                          type="number"
+                          min="0"
+                          step="any"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="lamb.choice.pricing.collected"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Choice</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Price Choice Lamb"
+                          {...field}
+                          type="number"
+                          min="0"
+                          step="any"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="lamb.standard.pricing.collected"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Standard</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Price Standard Lamb"
+                          {...field}
+                          type="number"
+                          min="0"
+                          step="any"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="lamb.inferior.pricing.collected"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Inferior</FormLabel>
@@ -954,16 +1155,17 @@ export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
             </CardHeader>
             <CardContent>
               {/* Mutton Start */}
+              <h3 className="mt-3">Mutton Prices Delivered</h3>
               <div className="grid grid-cols-1 gap-5 mt-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-5">
                 <FormField
                   control={form.control}
-                  name="mutton.super"
+                  name="mutton.super.pricing.delivered"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Super</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="Price Super "
+                          placeholder="Price Super"
                           {...field}
                           type="number"
                           min="0"
@@ -976,7 +1178,7 @@ export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
                 />
                 <FormField
                   control={form.control}
-                  name="mutton.choice"
+                  name="mutton.choice.pricing.delivered"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Choice</FormLabel>
@@ -995,7 +1197,7 @@ export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
                 />
                 <FormField
                   control={form.control}
-                  name="mutton.standard"
+                  name="mutton.standard.pricing.delivered"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Standard</FormLabel>
@@ -1014,13 +1216,13 @@ export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
                 />
                 <FormField
                   control={form.control}
-                  name="mutton.ordinary"
+                  name="mutton.ordinary.pricing.delivered"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Oridnary</FormLabel>
+                      <FormLabel>Ordinary</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="Price Oridnary"
+                          placeholder="Price Ordinary"
                           {...field}
                           type="number"
                           min="0"
@@ -1033,7 +1235,106 @@ export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
                 />
                 <FormField
                   control={form.control}
-                  name="mutton.inferior"
+                  name="mutton.inferior.pricing.delivered"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Inferior</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Price Inferior"
+                          {...field}
+                          type="number"
+                          min="0"
+                          step="any"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <h3 className="mt-2">Mutton Prices Collected</h3>
+              <div className="grid grid-cols-1 gap-5 mt-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-5">
+                <FormField
+                  control={form.control}
+                  name="mutton.super.pricing.collected"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Super</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Price Super"
+                          {...field}
+                          type="number"
+                          min="0"
+                          step="any"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="mutton.choice.pricing.collected"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Choice</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Price Choice"
+                          {...field}
+                          type="number"
+                          min="0"
+                          step="any"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="mutton.standard.pricing.collected"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Standard</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Price Standard"
+                          {...field}
+                          type="number"
+                          min="0"
+                          step="any"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="mutton.ordinary.pricing.collected"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Ordinary</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Price Ordinary"
+                          {...field}
+                          type="number"
+                          min="0"
+                          step="any"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="mutton.inferior.pricing.collected"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Inferior</FormLabel>
@@ -1063,10 +1364,11 @@ export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
             </CardHeader>
             <CardContent>
               {/* Goat Start */}
+              <h3 className="mt-3">Goat Prices Delivered</h3>
               <div className="grid grid-cols-1 gap-5 mt-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
                 <FormField
                   control={form.control}
-                  name="goat.super"
+                  name="goat.super.pricing.delivered"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Super</FormLabel>
@@ -1085,7 +1387,7 @@ export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
                 />
                 <FormField
                   control={form.control}
-                  name="goat.choice"
+                  name="goat.choice.pricing.delivered"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Choice</FormLabel>
@@ -1104,7 +1406,7 @@ export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
                 />
                 <FormField
                   control={form.control}
-                  name="goat.standard"
+                  name="goat.standard.pricing.delivered"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Standard</FormLabel>
@@ -1124,7 +1426,88 @@ export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
 
                 <FormField
                   control={form.control}
-                  name="goat.inferior"
+                  name="goat.inferior.pricing.delivered"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Inferior</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Price Inferior"
+                          {...field}
+                          type="number"
+                          min="0"
+                          step="any"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <h3 className="mt-2">Goat Prices Collected</h3>
+              <div className="grid grid-cols-1 gap-5 mt-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
+                <FormField
+                  control={form.control}
+                  name="goat.super.pricing.collected"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Super</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Price Super"
+                          {...field}
+                          type="number"
+                          min="0"
+                          step="any"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="goat.choice.pricing.collected"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Choice</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Price Choice"
+                          {...field}
+                          type="number"
+                          min="0"
+                          step="any"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="goat.standard.pricing.collected"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Standard</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Price Standard"
+                          {...field}
+                          type="number"
+                          min="0"
+                          step="any"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="goat.inferior.pricing.collected"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Inferior</FormLabel>
@@ -1154,16 +1537,18 @@ export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
             </CardHeader>
             <CardContent>
               {/* Chicken Start */}
-              <div className="grid grid-cols-1 gap-5 mt-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
+
+              <h3>Chicken Prices Delivered</h3>
+              <div className="grid grid-cols-1 gap-5 mt-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-5">
                 <FormField
                   control={form.control}
-                  name="chicken.below"
+                  name="chicken.a_grade_under_1_55.pricing.delivered"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Below</FormLabel>
+                      <FormLabel>Below 1.55 Kgs</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="Price Below"
+                          placeholder="Price Below 1.55kgs"
                           {...field}
                           type="number"
                           min="0"
@@ -1176,13 +1561,13 @@ export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
                 />
                 <FormField
                   control={form.control}
-                  name="chicken.midRange"
+                  name="chicken.a_grade_1_55_1_75.pricing.delivered"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Midrange</FormLabel>
+                      <FormLabel>1.55 to 1.75 Kgs</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="Price Midrange"
+                          placeholder="Price Between 1.55 and 1.75 Kgs"
                           {...field}
                           type="number"
                           min="0"
@@ -1195,13 +1580,13 @@ export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
                 />
                 <FormField
                   control={form.control}
-                  name="chicken.above"
+                  name="chicken.a_grade_over_1_75.pricing.delivered"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Above</FormLabel>
+                      <FormLabel>Over 1.75 Kgs</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="Price Above"
+                          placeholder="Price For Over 1.75Kgs"
                           {...field}
                           type="number"
                           min="0"
@@ -1215,7 +1600,128 @@ export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
 
                 <FormField
                   control={form.control}
-                  name="chicken.condemned"
+                  name="chicken.off_layers.pricing.delivered"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Off Layers</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Price OffLayers Chicken"
+                          {...field}
+                          type="number"
+                          min="0"
+                          step="any"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="chicken.condemned.pricing.delivered"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Condemned</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Price Condemned Chicken"
+                          {...field}
+                          type="number"
+                          min="0"
+                          step="any"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <h3 className="mt-3">Chicken Prices Collected</h3>
+              <div className="grid grid-cols-1 gap-5 mt-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-5">
+                <FormField
+                  control={form.control}
+                  name="chicken.a_grade_under_1_55.pricing.collected"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Below 1.55 Kgs</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Price Below 1.55kgs"
+                          {...field}
+                          type="number"
+                          min="0"
+                          step="any"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="chicken.a_grade_1_55_1_75.pricing.collected"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>1.55 to 1.75 Kgs</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Price Between 1.55 and 1.75 Kgs"
+                          {...field}
+                          type="number"
+                          min="0"
+                          step="any"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="chicken.a_grade_over_1_75.pricing.collected"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Over 1.75 Kgs</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Price For Over 1.75Kgs"
+                          {...field}
+                          type="number"
+                          min="0"
+                          step="any"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="chicken.off_layers.pricing.collected"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Off Layers</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Price OffLayers Chicken"
+                          {...field}
+                          type="number"
+                          min="0"
+                          step="any"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="chicken.condemned.pricing.collected"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Condemned</FormLabel>
@@ -1245,10 +1751,11 @@ export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
             </CardHeader>
             <CardContent>
               {/* Pork Start */}
+              <h3 className="mt-3">Pork Prices Delivered</h3>
               <div className="grid grid-cols-1 gap-5 mt-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
                 <FormField
                   control={form.control}
-                  name="pork.super"
+                  name="pork.super.pricing.delivered"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Super</FormLabel>
@@ -1268,7 +1775,7 @@ export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
 
                 <FormField
                   control={form.control}
-                  name="pork.manufacturing"
+                  name="pork.manufacturing.pricing.delivered"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Manufacturing</FormLabel>
@@ -1288,7 +1795,70 @@ export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
 
                 <FormField
                   control={form.control}
-                  name="pork.head"
+                  name="pork.head.pricing.delivered"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Pork Head</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Price Pork Head"
+                          {...field}
+                          type="number"
+                          min="0"
+                          step="any"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <h3 className="mt-2">Pork Prices Collected</h3>
+              <div className="grid grid-cols-1 gap-5 mt-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
+                <FormField
+                  control={form.control}
+                  name="pork.super.pricing.collected"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Super</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Price Super"
+                          {...field}
+                          type="number"
+                          min="0"
+                          step="any"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="pork.manufacturing.pricing.collected"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Manufacturing</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Price Manufacturing"
+                          {...field}
+                          type="number"
+                          min="0"
+                          step="any"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="pork.head.pricing.collected"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Pork Head</FormLabel>
@@ -1318,16 +1888,36 @@ export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
             </CardHeader>
             <CardContent>
               {/* Catering Start */}
+              <h3 className="mt-3">Catering Prices</h3>
               <div className="grid grid-cols-1 gap-5 mt-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
                 <FormField
                   control={form.control}
-                  name="catering.chicken"
+                  name="catering.chicken.order.price"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Chicken Bird</FormLabel>
+                      <FormLabel>Chicken Bird Price</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="Price Chicken Bird"
+                          {...field}
+                          type="number"
+                          min="0"
+                          step="any"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="catering.chicken.order.quantity"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Order Quantity</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Order Quantity"
                           {...field}
                           type="number"
                           min="0"

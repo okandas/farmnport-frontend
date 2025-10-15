@@ -1,5 +1,6 @@
 "use client"
 
+import { use } from "react"
 import Link from "next/link"
 import { useQuery } from "@tanstack/react-query"
 import { isAxiosError } from "axios"
@@ -23,15 +24,16 @@ import { Icons } from "@/components/icons/lucide"
 import { Placeholder } from "@/components/state/placeholder"
 
 interface ViewClientProductListPageProps {
-  params: {
+  params: Promise<{
     slug: string
-  }
+  }>
 }
 
 export default function ViewClientProductListPage({
   params,
 }: ViewClientProductListPageProps) {
-  const clientID = params.slug
+  const { slug } = use(params)
+  const clientID = slug
 
   const { isError, isLoading, isFetching, refetch, data } = useQuery({
     queryKey: ["dashboard-client-price", clientID],
