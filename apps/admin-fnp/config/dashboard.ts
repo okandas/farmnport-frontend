@@ -24,6 +24,11 @@ export const dashboardConfig: DashboardConfig = {
       icon: "billing",
     },
     {
+      title: "Agricultural Produce",
+      href: "/dashboard/produce",
+      icon: "wheat",
+    },
+    {
       title: "Administrators",
       href: "/dashboard/admins",
       icon: "construction",

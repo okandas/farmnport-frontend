@@ -29,7 +29,8 @@ import {
   PackageSearch,
   LucideIcon,
   Trash2,
-  ImagePlus
+  ImagePlus,
+  Wheat
 } from "lucide-react"
 
 export type Icon = LucideIcon
@@ -64,5 +65,6 @@ export const Icons = {
   calender: CalendarIcon,
   productSearch: PackageSearch,
   bin: Trash2,
-  image: ImagePlus
+  image: ImagePlus,
+  wheat: Wheat
 }
