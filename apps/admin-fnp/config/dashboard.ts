@@ -19,6 +19,16 @@ export const dashboardConfig: DashboardConfig = {
       icon: "productSearch",
     },
     {
+      title: "Farm Produce Categories",
+      href: "/dashboard/farmproducecategories",
+      icon: "tractor",
+    },
+    {
+      title: "Farm Produce",
+      href: "/dashboard/farmproduce",
+      icon: "package",
+    },
+    {
       title: "Producer Prices",
       href: "/dashboard/prices",
       icon: "billing",

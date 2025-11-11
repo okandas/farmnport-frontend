@@ -412,3 +412,23 @@ export type ImageModel = {
     src: string
   }
 }
+
+export const FarmProduceCategorySchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  slug: z.string(),
+  description: z.string(),
+})
+
+export type FarmProduceCategory = z.infer<typeof FarmProduceCategorySchema>
+
+export const FarmProduceSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  slug: z.string(),
+  description: z.string(),
+  category_id: z.string(),
+  category_slug: z.string(),
+})
+
+export type FarmProduce = z.infer<typeof FarmProduceSchema>
