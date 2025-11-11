@@ -68,17 +68,16 @@ export function Farmers({user, queryBy}: FarmersPageProps) {
 
 
   return (
-    <section className="space-y-8 mt-[21px]">
+    <section className="space-y-8">
       {
         queryBy == undefined ?
           <div>
-            <h1 className="text-lg font-medium">{total} Farm Produce Sellers.</h1>
+            <h1 className="text-2xl font-semibold">{total} Farm Produce Sellers.</h1>
             <p className="text-base text-muted-foreground pt-1">Connect with reliable produce sellers near you.</p>
           </div>
           :
           <div>
-            <h1 className="text-lg font-medium">{total} { capitalizeFirstLetter(plural(queryBy)) } Produce Sellers.</h1>
-            <p className="text-base text-muted-foreground pt-1">Buy your {plural(queryBy)} produce from {plural('farmer', total)} across Zimbabwe.</p>
+            <h2 className="text-lg font-medium">{total} { capitalizeFirstLetter(plural(queryBy)) } Produce Sellers.</h2>
           </div>
       }
       <ul role="list" className="divide-y">

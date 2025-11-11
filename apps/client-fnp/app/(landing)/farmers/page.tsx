@@ -9,7 +9,29 @@ export const metadata = {
       farm-to-table freshness, and support for Zimbabwean agriculture. Connect with trusted suppliers today!,`,
   alternates: {
     canonical: `/farmers`,
-  }
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://farmnport.com/farmers",
+    siteName: "Farmnport",
+    title: 'Buy Fresh Agricultural Produce Directly from Farmers',
+    description: "Looking for fresh, high-quality agricultural produce in Zimbabwe? Buy directly from local farmers for the best prices, farm-to-table freshness, and support for Zimbabwean agriculture.",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Farmnport Farmers - Buy Fresh Agricultural Produce",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: 'Buy Fresh Agricultural Produce Directly from Farmers',
+    description: "Looking for fresh, high-quality agricultural produce in Zimbabwe? Buy directly from local farmers for the best prices, farm-to-table freshness, and support for Zimbabwean agriculture.",
+    images: ["/og-image.png"],
+  },
 }
 
 export default async function FarmersPage() {

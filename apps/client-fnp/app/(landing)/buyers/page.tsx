@@ -9,7 +9,29 @@ export const metadata = {
       build customer relationships, and reduce dependency on traditional channels.`,
     alternates: {
         canonical: `/buyers`,
-    }
+    },
+    openGraph: {
+        type: "website",
+        locale: "en_US",
+        url: "https://farmnport.com/buyers",
+        siteName: "Farmnport",
+        title: 'Sell Your Farm Produce Directly – Reach Buyers Faster.',
+        description: "Farmers, sell your fresh produce directly to buyers! Access fairer markets, build customer relationships, and reduce dependency on traditional channels.",
+        images: [
+            {
+                url: "/og-image.png",
+                width: 1200,
+                height: 630,
+                alt: "Farmnport Buyers - Sell Your Farm Produce Directly",
+            },
+        ],
+    },
+    twitter: {
+        card: "summary_large_image",
+        title: 'Sell Your Farm Produce Directly – Reach Buyers Faster.',
+        description: "Farmers, sell your fresh produce directly to buyers! Access fairer markets, build customer relationships, and reduce dependency on traditional channels.",
+        images: ["/og-image.png"],
+    },
 }
 
 export default async function BuyersPage() {

@@ -44,6 +44,12 @@ export default async function FarmersProductPage({ params }: FarmerProductPagePr
           </div>
 
           <div className="lg:w-2/3">
+            <div className="space-y-8 mt-[21px]">
+              <div>
+                <h1 className="text-2xl font-semibold">{capitalizeFirstLetter(plural(product))} Farmers in Zimbabwe</h1>
+                <p className="text-base text-muted-foreground pt-1">Buy fresh {plural(product)} produce directly from local farmers.</p>
+              </div>
+            </div>
             <Farmers user={user} queryBy={product} />
           </div>
         </div>

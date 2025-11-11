@@ -44,6 +44,12 @@ export default async function BuyersProductPage({ params }: BuyerProductPageProp
           </div>
 
           <div className="lg:w-2/3">
+            <div className="space-y-8 mt-[21px]">
+              <div>
+                <h1 className="text-2xl font-semibold">{capitalizeFirstLetter(plural(product))} Produce Buyers in Zimbabwe</h1>
+                <p className="text-base text-muted-foreground pt-1">Sell your {plural(product)} produce directly to buyers across Zimbabwe.</p>
+              </div>
+            </div>
             <Buyers user={user} queryBy={product} />
           </div>
         </div>
