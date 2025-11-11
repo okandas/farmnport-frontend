@@ -20,7 +20,7 @@ interface FileInputProps {
 
 
 export function FileInput({ id, value, onChange }: FileInputProps) {
-    const [files, setFiles] = useState<ImageModel[]>(value)
+    const [files, setFiles] = useState<ImageModel[]>(value ?? [])
     const queryClient = useQueryClient()
     const entity_id = id
     const logtail = new Logtail("qBaLFyhMa3oZsq86JuRmfwpo")

@@ -47,7 +47,7 @@ export function EditForm({ product }: EditFormProps) {
             descriptions: product?.descriptions,
             reg_number: product?.reg_number,
             cat: product?.cat,
-            images: product?.images,
+            images: product?.images ?? [],
             unit: product?.unit,
             manufacturer: product?.manufacturer,
             distributor: product?.distributor,

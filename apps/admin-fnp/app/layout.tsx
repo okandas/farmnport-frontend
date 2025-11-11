@@ -19,6 +19,9 @@ const fontSans = FontSans({
 export const metadata = {
   title: "farmnport - Welcome Administrator",
   description: "Manage Farmnport",
+  other: {
+    "facebook-domain-verification": "3stp1ph9qmao37d0k25dqq002nmfd8",
+  },
 }
 interface RootLayoutProps {
   children: React.ReactNode

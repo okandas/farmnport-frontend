@@ -170,3 +170,40 @@ export function removeImage(data: ImageModel) {
   let url = `${baseUrl}/user/image/remove`
   return api.post(url, data)
 }
+
+export function deleteProducts(productIds: string[]) {
+  let url = `${baseUrl}/user/products/delete`
+  return api.post(url, { product_ids: productIds })
+}
+
+export function queryFarmProduceCategories(pagination?: pagination) {
+  let url: string
+
+  if (pagination?.p !== undefined && pagination.p >= 2) {
+    url = `${baseUrl}/farmproducecategories?p=${pagination.p}`
+  } else {
+    url = `${baseUrl}/farmproducecategories`
+  }
+
+  if (pagination?.search !== undefined && pagination.search.length >= 2) {
+    url = `${baseUrl}/farmproducecategories?search=${pagination.search}`
+  }
+
+  return api.get(url)
+}
+
+export function queryFarmProduce(pagination?: pagination) {
+  let url: string
+
+  if (pagination?.p !== undefined && pagination.p >= 2) {
+    url = `${baseUrl}/farmproduce?p=${pagination.p}`
+  } else {
+    url = `${baseUrl}/farmproduce`
+  }
+
+  if (pagination?.search !== undefined && pagination.search.length >= 2) {
+    url = `${baseUrl}/farmproduce?search=${pagination.search}`
+  }
+
+  return api.get(url)
+}
