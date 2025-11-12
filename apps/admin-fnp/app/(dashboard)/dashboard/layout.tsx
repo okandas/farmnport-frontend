@@ -18,7 +18,7 @@ export default async function DashboardLayout({
           <AccountNavigation />
         </div>
       </header>
-      <div className="container flex flex-1 gap-12">
+      <div className="max-w-full flex flex-1 gap-12 px-8">
         <aside className="fixed hidden h-screen w-[200px] flex-col border-r px-4 md:flex">
           <SidebarNavigation
             navigationLinks={dashboardConfig.sidebarNavigation}
