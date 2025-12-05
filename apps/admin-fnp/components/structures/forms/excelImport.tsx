@@ -348,7 +348,7 @@ export function ExcelImport({ setValue, setSelectedFarmProduce, setSelectedClien
               cattle: "Beef",
               sheep: "Mutton",
               pigs: "Pork",
-              chicken: "Chickens (Broilers)"
+              chicken: "Chickens Broilers"
             }
 
             const searchTerm = serviceToProduceMapping[serviceName] || serviceName
@@ -361,7 +361,7 @@ export function ExcelImport({ setValue, setSelectedFarmProduce, setSelectedClien
         } else {
           // For regular categories, map to specific farm produce names
           const categoryToProduceMapping: Record<string, string> = {
-            "chicken": "Chickens (Broilers)",
+            "chicken": "Chickens Broilers",
           }
 
           const searchTerm = categoryToProduceMapping[livestock.toLowerCase()] || livestock
@@ -389,13 +389,24 @@ export function ExcelImport({ setValue, setSelectedFarmProduce, setSelectedClien
           }
         }
 
-        // Find matching farm produce by name
-        const match = farmProduceItems.find((item: FarmProduce) =>
-          item.name.toLowerCase() === name.toLowerCase() ||
-          item.name.toLowerCase().includes(name.toLowerCase())
+        // Log all items returned for this search
+        console.log(`🔍 Search for "${name}" returned ${farmProduceItems.length} items:`,
+          farmProduceItems.map(item => item.name))
+
+        // Find matching farm produce by name - prioritize exact matches
+        // First try exact match
+        let match = farmProduceItems.find((item: FarmProduce) =>
+          item.name.toLowerCase() === name.toLowerCase()
         )
 
-        console.log(`📋 ${name}:`, match ? `ID = ${match.id}` : "No match found")
+        // If no exact match, try partial match
+        if (!match) {
+          match = farmProduceItems.find((item: FarmProduce) =>
+            item.name.toLowerCase().includes(name.toLowerCase())
+          )
+        }
+
+        console.log(`📋 ${name}:`, match ? `ID = ${match.id} (name: "${match.name}")` : "No match found")
 
         return {
           category,
