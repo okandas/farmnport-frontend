@@ -13,6 +13,7 @@ export default function CreateClientPage() {
     client_name: "",
     client_specialization: "livestock",
     beef: {
+      farm_produce_id: "",
       super: {
         code: "S",
         pricing: {
@@ -60,6 +61,7 @@ export default function CreateClientPage() {
       hasCollectedPrice: false,
     },
     lamb: {
+      farm_produce_id: "",
       super_premium: {
         code: "SL",
         pricing: {
@@ -92,6 +94,7 @@ export default function CreateClientPage() {
       hasCollectedPrice: false,
     },
     mutton: {
+      farm_produce_id: "",
       super: {
         code: "SM",
         pricing: {
@@ -131,6 +134,7 @@ export default function CreateClientPage() {
       hasCollectedPrice: false,
     },
     goat: {
+      farm_produce_id: "",
       super: {
         code: "SG",
         pricing: {
@@ -163,6 +167,7 @@ export default function CreateClientPage() {
       hasCollectedPrice: false,
     },
     chicken: {
+      farm_produce_id: "",
       a_grade_over_1_75: {
         code: "A",
         pricing: {
@@ -202,6 +207,7 @@ export default function CreateClientPage() {
       hasCollectedPrice: false,
     },
     pork: {
+      farm_produce_id: "",
       super: {
         code: "SP",
         pricing: {
@@ -227,6 +233,7 @@ export default function CreateClientPage() {
       hasCollectedPrice: false,
     },
     catering: {
+      farm_produce_id: "",
       chicken: {
         order: {
           price: 0,

@@ -11,6 +11,7 @@ import {
   CreditCard,
   File,
   FileText,
+  FileSpreadsheet,
   HelpCircle,
   Image,
   Laptop,
@@ -31,7 +32,20 @@ import {
   Trash2,
   ImagePlus,
   Tractor,
-  Package
+  Package,
+  CheckCircle2,
+  CheckCircle,
+  Circle,
+  AlertCircle,
+  Sparkles,
+  Zap,
+  Info,
+  Beef,
+  Rabbit,
+  Bird,
+  PiggyBank,
+  UtensilsCrossed,
+  Upload
 } from "lucide-react"
 
 export type Icon = LucideIcon
@@ -40,6 +54,7 @@ export const Icons = {
   logo: Command,
   close: X,
   spinner: Loader2,
+  loader: Loader2,
   chevronLeft: ChevronLeft,
   chevronRight: ChevronRight,
   trash: Trash,
@@ -51,6 +66,7 @@ export const Icons = {
   ellipsis: MoreVertical,
   add: Plus,
   warning: AlertTriangle,
+  alertTriangle: AlertTriangle,
   user: User,
   arrowRight: ArrowRight,
   help: HelpCircle,
@@ -68,5 +84,19 @@ export const Icons = {
   bin: Trash2,
   image: ImagePlus,
   tractor: Tractor,
-  package: Package
+  package: Package,
+  checkCircle2: CheckCircle2,
+  checkCircle: CheckCircle,
+  circle: Circle,
+  alertCircle: AlertCircle,
+  sparkles: Sparkles,
+  zap: Zap,
+  info: Info,
+  beef: Beef,
+  rabbit: Rabbit,
+  bird: Bird,
+  piggyBank: PiggyBank,
+  utensilsCrossed: UtensilsCrossed,
+  fileSpreadsheet: FileSpreadsheet,
+  upload: Upload
 }

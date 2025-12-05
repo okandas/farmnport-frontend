@@ -76,6 +76,7 @@ export const ProducerPriceListSchema = z
     client_specialization: z.string(),
     effectiveDate: z.coerce.date(),
     beef: z.object({
+      farm_produce_id: z.string(),
       super: z.object({
         code: z.string(),
         pricing: z.object({
@@ -123,6 +124,7 @@ export const ProducerPriceListSchema = z
       hasCollectedPrice: z.boolean(),
     }),
     chicken: z.object({
+      farm_produce_id: z.string(),
       a_grade_over_1_75: z.object({
         code: z.string(),
         pricing: pricingSchema,
@@ -147,6 +149,7 @@ export const ProducerPriceListSchema = z
       hasCollectedPrice: z.boolean(),
     }),
     pork: z.object({
+      farm_produce_id: z.string(),
       super: z.object({
         code: z.string(),
         pricing: pricingSchema,
@@ -162,7 +165,28 @@ export const ProducerPriceListSchema = z
       hasPrice: z.boolean(),
       hasCollectedPrice: z.boolean(),
     }),
+    slaughter: z.object({
+      cattle: z.object({
+        farm_produce_id: z.string(),
+        pricing: pricingSchema,
+      }),
+      sheep: z.object({
+        farm_produce_id: z.string(),
+        pricing: pricingSchema,
+      }),
+      pigs: z.object({
+        farm_produce_id: z.string(),
+        pricing: pricingSchema,
+      }),
+      chicken: z.object({
+        farm_produce_id: z.string(),
+        pricing: pricingSchema,
+      }),
+      hasPrice: z.boolean(),
+      hasCollectedPrice: z.boolean(),
+    }),
     goat: z.object({
+      farm_produce_id: z.string(),
       super: z.object({
         code: z.string(),
         pricing: pricingSchema,
@@ -183,6 +207,7 @@ export const ProducerPriceListSchema = z
       hasCollectedPrice: z.boolean(),
     }),
     mutton: z.object({
+      farm_produce_id: z.string(),
       super: z.object({
         code: z.string(),
         pricing: pricingSchema,
@@ -207,6 +232,7 @@ export const ProducerPriceListSchema = z
       hasCollectedPrice: z.boolean(),
     }),
     lamb: z.object({
+      farm_produce_id: z.string(),
       super_premium: z.object({
         code: z.string(),
         pricing: pricingSchema,
@@ -227,6 +253,7 @@ export const ProducerPriceListSchema = z
       hasCollectedPrice: z.boolean(),
     }),
     catering: z.object({
+      farm_produce_id: z.string(),
       chicken: z.object({
         order: z.object({
           price: z.coerce.number().nonnegative(),
@@ -238,22 +265,33 @@ export const ProducerPriceListSchema = z
       hasCollectedPrice: z.boolean(),
     }),
     unit: z.string(),
+    notes: z.array(z.string()).default([]),
+    overwrite: z.boolean().default(false),
   })
   .superRefine((data, ctx) => {
     const chickenUnselected = !data.chicken.hasPrice
     const beefUnselected = !data.beef.hasPrice
     const porkUnselected = !data.pork.hasPrice
+    const slaughterUnselected = !data.slaughter.hasPrice
     const goatUnselected = !data.goat.hasPrice
     const muttonUnselected = !data.mutton.hasPrice
     const lambUnselected = !data.lamb.hasPrice
     const cateringUnselected = !data.catering.hasPrice
 
-    if (chickenUnselected && porkUnselected && beefUnselected) {
+    if (
+      chickenUnselected &&
+      porkUnselected &&
+      slaughterUnselected &&
+      beefUnselected &&
+      goatUnselected &&
+      muttonUnselected &&
+      lambUnselected &&
+      cateringUnselected
+    ) {
       ctx.addIssue({
         path: ["client_id"], // attach to root
         code: z.ZodIssueCode.custom,
-        message:
-          "At least one form needs must to be selected",
+        message: "At least one pricing category must be selected",
       })
     }
   })
