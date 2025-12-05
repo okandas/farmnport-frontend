@@ -692,6 +692,16 @@ export function CreateProductPriceForm({
     },
     onError: (error) => {
       if (isAxiosError(error)) {
+        // Check for HTTP 409 Conflict (duplicate price list)
+        if (error.response?.status === 409) {
+          toast({
+            title: "Duplicate Price List",
+            description: error.response?.data?.message || "A price list already exists for this client and effective date. Please enable the 'Overwrite' option to replace it, or choose a different date.",
+            variant: "destructive",
+          })
+          return
+        }
+
         switch (error.code) {
           case "ERR_NETWORK":
             toast({
