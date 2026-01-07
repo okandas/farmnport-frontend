@@ -34,7 +34,7 @@ const categoryConfigs: CategoryConfig[] = [
   {
     key: "lamb",
     name: "Lamb",
-    icon: "sheep",
+    icon: "beef",
     grades: [
       { key: "super_premium", label: "Super Premium" },
       { key: "choice", label: "Choice" },
@@ -45,7 +45,7 @@ const categoryConfigs: CategoryConfig[] = [
   {
     key: "mutton",
     name: "Mutton",
-    icon: "sheep",
+    icon: "beef",
     grades: [
       { key: "super", label: "Super" },
       { key: "choice", label: "Choice" },
@@ -57,7 +57,7 @@ const categoryConfigs: CategoryConfig[] = [
   {
     key: "goat",
     name: "Goat",
-    icon: "rabbit",
+    icon: "beef",
     grades: [
       { key: "super", label: "Super" },
       { key: "choice", label: "Choice" },
@@ -116,7 +116,7 @@ export function PriceListTable({
   if (enabledCategories.length === 0) {
     return (
       <div className="p-8 text-center bg-gray-50 border rounded-lg">
-        <Icons.table className="mx-auto mb-2 size-8 text-muted-foreground" />
+        <Icons.fileSpreadsheet className="mx-auto mb-2 size-8 text-muted-foreground" />
         <p className="text-sm text-muted-foreground">
           No categories selected. Enable pricing categories to see the table.
         </p>

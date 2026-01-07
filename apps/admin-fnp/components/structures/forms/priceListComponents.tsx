@@ -60,6 +60,7 @@ export function PriceInputGrid({
                   <Input
                     placeholder={field.placeholder}
                     {...formField}
+                    value={formField.value as number}
                     type="number"
                     min="0"
                     step="any"

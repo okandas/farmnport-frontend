@@ -475,6 +475,7 @@ export function CreateProductPriceForm({
         hasCollectedPrice: priceList.catering.hasCollectedPrice,
       },
       unit: priceList.unit || "kg",
+      pricing_basis: priceList.pricing_basis || "LWT - Live Weight",
       notes: priceList.notes || [],
       overwrite: false,
     },

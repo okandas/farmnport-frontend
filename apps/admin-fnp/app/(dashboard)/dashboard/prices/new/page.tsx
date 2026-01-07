@@ -244,7 +244,42 @@ export default function CreateClientPage() {
       hasPrice: false,
       hasCollectedPrice: false,
     },
+    slaughter: {
+      cattle: {
+        farm_produce_id: "",
+        pricing: {
+          collected: 0,
+          delivered: 0,
+        },
+      },
+      sheep: {
+        farm_produce_id: "",
+        pricing: {
+          collected: 0,
+          delivered: 0,
+        },
+      },
+      pigs: {
+        farm_produce_id: "",
+        pricing: {
+          collected: 0,
+          delivered: 0,
+        },
+      },
+      chicken: {
+        farm_produce_id: "",
+        pricing: {
+          collected: 0,
+          delivered: 0,
+        },
+      },
+      hasPrice: false,
+      hasCollectedPrice: false,
+    },
     unit: "",
+    pricing_basis: "",
+    notes: [],
+    overwrite: false,
   })
 
   return <CreateProductPriceForm priceList={ProductPriceItem} />
