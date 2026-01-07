@@ -539,14 +539,14 @@ export function createPriceListPayload(payload: ProducerPriceList) {
     payload.goat.choice.pricing.collected,
   )
   payload.goat.standard.pricing.collected = dollarsToCents(
-    payload.mutton.standard.pricing.collected,
+    payload.goat.standard.pricing.collected,
   )
   payload.goat.inferior.pricing.collected = dollarsToCents(
     payload.goat.inferior.pricing.collected,
   )
 
   payload.goat.super.pricing.delivered = dollarsToCents(
-    payload.mutton.super.pricing.delivered,
+    payload.goat.super.pricing.delivered,
   )
   payload.goat.choice.pricing.delivered = dollarsToCents(
     payload.goat.choice.pricing.delivered,

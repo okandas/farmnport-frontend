@@ -570,7 +570,7 @@ export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
         description: "Updated Price Listing Successfully",
       })
 
-      router.push(`/dashboard/prices`)
+      router.push(`/dashboard/prices/${priceList.id}`)
     },
     onError: (error) => {
       if (isAxiosError(error)) {
