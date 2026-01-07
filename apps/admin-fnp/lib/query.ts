@@ -112,22 +112,18 @@ export function badClient(data: ApplicationUserID) {
 }
 
 export function createClientProductPriceList(data: ProducerPriceList) {
-  // let url = `${baseUrl}/prices/add/producer_price`
-  // return api.post(url, data)
-  console.log(data, "test new create client product list")
-
-  // Tester
-
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(data)
-    }, 100)
-  })
+  let url = `${baseUrl}/prices/add/producer_price`
+  return api.post(url, data)
 }
 
 export function updateClientProductPriceList(data: ProducerPriceList) {
   let url = `${baseUrl}/prices/up/producer_price`
   return api.post(url, data)
+}
+
+export function deleteProducerPriceList(priceId: string) {
+  let url = `${baseUrl}/prices/delete/${priceId}`
+  return api.delete(url)
 }
 
 export function queryProducts(pagination?: pagination) {

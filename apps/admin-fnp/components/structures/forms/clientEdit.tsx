@@ -145,7 +145,7 @@ export function EditForm({ client }: EditFormProps) {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="w-3/4 gap-4 mx-auto mb-8"
+        className="w-[92%] gap-4 mx-auto mb-8"
       >
         <div className="grid grid-cols-2 gap-4">
           <FormField

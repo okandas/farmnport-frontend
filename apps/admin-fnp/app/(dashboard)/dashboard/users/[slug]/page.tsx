@@ -261,11 +261,18 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
                               {Object.keys(
                                 latestProducerPriceList[pricingType],
                               ).map((key, index) => {
-                                if (key === "hasPrice") {
+                                if (
+                                  key === "hasPrice" ||
+                                  key === "hasCollectedPrice" ||
+                                  key === "farm_produce_id"
+                                ) {
                                   return null
                                 }
                                 const gradePrices =
                                   latestProducerPriceList[pricingType]
+                                const gradeItem = gradePrices[key as keyof typeof gradePrices] as any
+                                const deliveredPrice = gradeItem?.pricing?.delivered || 0
+                                const collectedPrice = gradeItem?.pricing?.collected || 0
 
                                 return (
                                   <li
@@ -278,11 +285,14 @@ export default function ViewClientPage({ params }: ViewClientPageProps) {
                                           {ucFirst(key)}
                                         </dt>
                                         <dd className="flex items-start gap-x-2">
-                                          <div className="font-medium text-gray-900">
-                                            {centsToDollars(
-                                              gradePrices[
-                                              key as keyof typeof gradePrices
-                                              ],
+                                          <div className="flex flex-col gap-1">
+                                            <div className="font-medium text-gray-900">
+                                              Delivered: {centsToDollars(deliveredPrice)}
+                                            </div>
+                                            {collectedPrice > 0 && (
+                                              <div className="text-sm text-gray-600">
+                                                Collected: {centsToDollars(collectedPrice)}
+                                              </div>
                                             )}
                                           </div>
 

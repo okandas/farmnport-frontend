@@ -88,15 +88,6 @@ export default function EditProductListPrice({
 
   return (
     <>
-      <div className={"absolute right-10 top-96"}>
-        <Link href={url} className={cn(buttonVariants({ variant: "link" }))}>
-          <>
-            <Icons.close className="size-4 mr-2" />
-            Close
-          </>
-        </Link>
-      </div>
-
       {isSuccess ? (
         <EditProductPriceForm priceList={producerPriceList} />
       ) : null}

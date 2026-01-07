@@ -539,14 +539,14 @@ export function createPriceListPayload(payload: ProducerPriceList) {
     payload.goat.choice.pricing.collected,
   )
   payload.goat.standard.pricing.collected = dollarsToCents(
-    payload.mutton.standard.pricing.collected,
+    payload.goat.standard.pricing.collected,
   )
   payload.goat.inferior.pricing.collected = dollarsToCents(
     payload.goat.inferior.pricing.collected,
   )
 
   payload.goat.super.pricing.delivered = dollarsToCents(
-    payload.mutton.super.pricing.delivered,
+    payload.goat.super.pricing.delivered,
   )
   payload.goat.choice.pricing.delivered = dollarsToCents(
     payload.goat.choice.pricing.delivered,
@@ -559,7 +559,7 @@ export function createPriceListPayload(payload: ProducerPriceList) {
     payload.goat.inferior.pricing.delivered,
   )
 
-  // Chicken
+  // Chicken - Collected
   payload.chicken.a_grade_over_1_75.pricing.collected = dollarsToCents(
     payload.chicken.a_grade_over_1_75.pricing.collected,
   )
@@ -569,31 +569,28 @@ export function createPriceListPayload(payload: ProducerPriceList) {
   payload.chicken.a_grade_under_1_55.pricing.collected = dollarsToCents(
     payload.chicken.a_grade_under_1_55.pricing.collected,
   )
-
   payload.chicken.off_layers.pricing.collected = dollarsToCents(
     payload.chicken.off_layers.pricing.collected,
   )
-
   payload.chicken.condemned.pricing.collected = dollarsToCents(
     payload.chicken.condemned.pricing.collected,
   )
 
+  // Chicken - Delivered
   payload.chicken.a_grade_over_1_75.pricing.delivered = dollarsToCents(
-    payload.chicken.a_grade_over_1_75.pricing.collected,
+    payload.chicken.a_grade_over_1_75.pricing.delivered,
   )
-  payload.chicken.a_grade_1_55_1_75.pricing.collected = dollarsToCents(
-    payload.chicken.a_grade_1_55_1_75.pricing.collected,
+  payload.chicken.a_grade_1_55_1_75.pricing.delivered = dollarsToCents(
+    payload.chicken.a_grade_1_55_1_75.pricing.delivered,
   )
-  payload.chicken.a_grade_under_1_55.pricing.collected = dollarsToCents(
-    payload.chicken.a_grade_under_1_55.pricing.collected,
+  payload.chicken.a_grade_under_1_55.pricing.delivered = dollarsToCents(
+    payload.chicken.a_grade_under_1_55.pricing.delivered,
   )
-
   payload.chicken.off_layers.pricing.delivered = dollarsToCents(
-    payload.chicken.off_layers.pricing.collected,
+    payload.chicken.off_layers.pricing.delivered,
   )
-
-  payload.chicken.condemned.pricing.collected = dollarsToCents(
-    payload.chicken.condemned.pricing.collected,
+  payload.chicken.condemned.pricing.delivered = dollarsToCents(
+    payload.chicken.condemned.pricing.delivered,
   )
 
   // Pork
@@ -626,5 +623,35 @@ export function createPriceListPayload(payload: ProducerPriceList) {
   payload.catering.chicken.order.quantity = dollarsToCents(
     payload.catering.chicken.order.quantity,
   )
+
+  // Slaughter
+  payload.slaughter.cattle.pricing.collected = dollarsToCents(
+    payload.slaughter.cattle.pricing.collected,
+  )
+  payload.slaughter.cattle.pricing.delivered = dollarsToCents(
+    payload.slaughter.cattle.pricing.delivered,
+  )
+
+  payload.slaughter.sheep.pricing.collected = dollarsToCents(
+    payload.slaughter.sheep.pricing.collected,
+  )
+  payload.slaughter.sheep.pricing.delivered = dollarsToCents(
+    payload.slaughter.sheep.pricing.delivered,
+  )
+
+  payload.slaughter.pigs.pricing.collected = dollarsToCents(
+    payload.slaughter.pigs.pricing.collected,
+  )
+  payload.slaughter.pigs.pricing.delivered = dollarsToCents(
+    payload.slaughter.pigs.pricing.delivered,
+  )
+
+  payload.slaughter.chicken.pricing.collected = dollarsToCents(
+    payload.slaughter.chicken.pricing.collected,
+  )
+  payload.slaughter.chicken.pricing.delivered = dollarsToCents(
+    payload.slaughter.chicken.pricing.delivered,
+  )
+
   return payload
 }

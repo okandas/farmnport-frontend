@@ -1,9 +1,11 @@
 "use client"
 
+import Link from "next/link"
 import { ColumnDef } from "@tanstack/react-table"
 
 import { ProducerPriceList } from "@/lib/schemas"
 import { formatDate } from "@/lib/utilities"
+import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { PriceControlDropDown } from "@/components/structures/dropdowns/price-dropdown"
 
@@ -43,8 +45,19 @@ export const producerPriceListColumns: ColumnDef<ProducerPriceList>[] = [
     header: "Client Name",
   },
   {
-    accessorKey: "client_id",
-    header: "Client ID",
+    id: "see_price",
+    header: "See Price",
+    cell: ({ row }) => {
+      const priceId = row.original.id
+
+      return (
+        <Link href={`/dashboard/prices/${priceId}`}>
+          <Button variant="ghost" size="sm">
+            View
+          </Button>
+        </Link>
+      )
+    },
   },
   {
     id: "actions",
