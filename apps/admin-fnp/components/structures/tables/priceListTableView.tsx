@@ -149,18 +149,18 @@ export function PriceListTableView({
         </p>
       </div>
 
-      <div className="space-y-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {pricingTypes[producerPriceList?.client_specialization].map(
           (pricingType, typeIndex) => {
             if (producerPriceList[pricingType] === undefined) return null
 
             return (
               <div key={typeIndex} className="rounded-lg border border-gray-200 bg-white shadow-sm">
-                <div className="border-b border-gray-200 bg-gray-50 px-6 py-4">
-                  <h2 className="text-xl font-semibold text-gray-900">
+                <div className="border-b border-gray-200 bg-gray-50 px-4 py-2">
+                  <h2 className="text-lg font-semibold text-gray-900">
                     {ucFirst(pricingType)}
                   </h2>
-                  <p className="mt-1 text-sm text-gray-600">
+                  <p className="text-xs text-gray-600">
                     Prices paid to farmers for {pricingType}
                   </p>
                 </div>
@@ -169,16 +169,16 @@ export function PriceListTableView({
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                       <tr>
-                        <th scope="col" className="w-[30%] px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                        <th scope="col" className="w-[30%] px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                           Grade
                         </th>
-                        <th scope="col" className="w-[20%] px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                        <th scope="col" className="w-[20%] px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                           Symbol
                         </th>
-                        <th scope="col" className="w-[25%] px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">
+                        <th scope="col" className="w-[25%] px-4 py-2 text-right text-xs font-medium uppercase tracking-wider text-gray-500">
                           Delivered Price
                         </th>
-                        <th scope="col" className="w-[25%] px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">
+                        <th scope="col" className="w-[25%] px-4 py-2 text-right text-xs font-medium uppercase tracking-wider text-gray-500">
                           Collected Price
                         </th>
                       </tr>
@@ -200,10 +200,10 @@ export function PriceListTableView({
 
                           return (
                             <tr key={index} className="hover:bg-gray-50">
-                              <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
+                              <td className="whitespace-nowrap px-4 py-2 text-sm font-medium text-gray-900">
                                 {formatGradeName(key)}
                               </td>
-                              <td className="whitespace-nowrap px-6 py-4">
+                              <td className="whitespace-nowrap px-4 py-2">
                                 {grades?.[pricingType]?.[key] ? (
                                   <span
                                     className={cn(
@@ -217,10 +217,10 @@ export function PriceListTableView({
                                   <span className="text-gray-400">-</span>
                                 )}
                               </td>
-                              <td className="whitespace-nowrap px-6 py-4 text-right text-sm text-gray-900">
+                              <td className="whitespace-nowrap px-4 py-2 text-right text-sm text-gray-900">
                                 {centsToDollars(deliveredPrice)}
                               </td>
-                              <td className="whitespace-nowrap px-6 py-4 text-right text-sm text-gray-600">
+                              <td className="whitespace-nowrap px-4 py-2 text-right text-sm text-gray-600">
                                 {collectedPrice > 0 ? centsToDollars(collectedPrice) : "-"}
                               </td>
                             </tr>
