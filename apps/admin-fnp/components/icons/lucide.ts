@@ -45,7 +45,8 @@ import {
   Bird,
   PiggyBank,
   UtensilsCrossed,
-  Upload
+  Upload,
+  Pencil
 } from "lucide-react"
 
 export type Icon = LucideIcon
@@ -98,5 +99,6 @@ export const Icons = {
   piggyBank: PiggyBank,
   utensilsCrossed: UtensilsCrossed,
   fileSpreadsheet: FileSpreadsheet,
-  upload: Upload
+  upload: Upload,
+  edit: Pencil
 }

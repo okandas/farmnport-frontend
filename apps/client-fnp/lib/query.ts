@@ -70,3 +70,15 @@ export async function clientSignup(data: SignUpFormData) {
     let url = `${BaseURL}/client/signup`
     return api.post(url, data)
 }
+
+export function queryProducerPriceLists(pagination?: PaginationModel) {
+  let url: string
+
+  if (pagination?.p !== undefined && pagination.p >= 2) {
+    url = `${BaseURL}/prices/all?p=${pagination.p}`
+  } else {
+    url = `${BaseURL}/prices/all`
+  }
+
+  return api.get(url)
+}

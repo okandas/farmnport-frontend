@@ -267,6 +267,7 @@ export function ExcelImport({ setValue, setSelectedFarmProduce, setSelectedClien
         prices: {},
         errors: [error instanceof Error ? error.message : "Unknown error occurred"],
         warnings: [],
+        notes: []
       })
     } finally {
       setIsLoading(false)

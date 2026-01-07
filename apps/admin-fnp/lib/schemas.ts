@@ -265,6 +265,7 @@ export const ProducerPriceListSchema = z
       hasCollectedPrice: z.boolean(),
     }),
     unit: z.string(),
+    pricing_basis: z.string(),
     notes: z.array(z.string()).default([]),
     overwrite: z.boolean().default(false),
   })

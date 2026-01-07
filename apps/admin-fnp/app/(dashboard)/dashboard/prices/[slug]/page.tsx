@@ -7,21 +7,13 @@ import { isAxiosError } from "axios"
 
 import { queryPriceList } from "@/lib/query"
 import { ProducerPriceList } from "@/lib/schemas"
-import { centsToDollars, cn, ucFirst } from "@/lib/utilities"
-import { Button, buttonVariants } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { cn } from "@/lib/utilities"
+import { buttonVariants } from "@/components/ui/button"
 import { ToastAction } from "@/components/ui/toast"
 import { toast } from "@/components/ui/use-toast"
 import { Icons } from "@/components/icons/lucide"
 import { Placeholder } from "@/components/state/placeholder"
+import { PriceListTableView } from "@/components/structures/tables/priceListTableView"
 
 interface ViewClientProductListPageProps {
   params: Promise<{
@@ -90,175 +82,27 @@ export default function ViewClientProductListPage({
   }
 
   const producerPriceList = data?.data as ProducerPriceList
-
-  const statuses = [
-    "text-green-700 bg-green-50 ring-green-600/20",
-    "text-lime-700 bg-lime-50 ring-lime-600/20",
-    "text-yellow-700 bg-yellow-50 ring-yellow-600/20",
-    "text-amber-700 bg-amber-50 ring-amber-600/20",
-    "text-orange-700 bg-orange-50 ring-orange-600/20",
-    "text-red-700 bg-red-50 ring-red-600/10",
-    "text-stone-600 bg-stone-50 ring-stone-500/10",
-    "text-gray-600 bg-gray-50 ring-gray-500/10",
-  ]
-
-  type ProducerPriceListKeys =
-    | "beef"
-    | "lamb"
-    | "mutton"
-    | "goat"
-    | "chicken"
-    | "pork"
-
-  const beef: ProducerPriceListKeys = "beef"
-  const lamb: ProducerPriceListKeys = "lamb"
-  const mutton: ProducerPriceListKeys = "mutton"
-  const goat: ProducerPriceListKeys = "goat"
-  const chicken: ProducerPriceListKeys = "chicken"
-  const pork: ProducerPriceListKeys = "pork"
-
-  const grades: Record<ProducerPriceListKeys, Record<string, string>> = {
-    beef: {
-      super: "S",
-      choice: "O",
-      commercial: "B",
-      economy: "X",
-      manufacturing: "J",
-      condemned: "CD",
-    },
-    lamb: {
-      superPremium: "SL",
-      choice: "CL",
-      standard: "TL",
-      inferior: "IL",
-    },
-    mutton: {
-      super: "SM",
-      choice: "CM",
-      standard: "TM",
-      ordinary: "OM",
-      inferior: "IM",
-    },
-    goat: {
-      super: "SG",
-      choice: "CG",
-      standard: "TG",
-      inferior: "IG",
-    },
-    chicken: {
-      grade: "A",
-    },
-    pork: {
-      super: "SP",
-      manufacturing: "MP",
-    },
-  }
-
-  const pricingTypes: Record<string, ProducerPriceListKeys[]> = {
-    livestock: [beef, lamb, mutton, goat, chicken, pork],
-  }
-
   const url = `/dashboard/prices`
+  const editUrl = `/dashboard/prices/${clientID}/edit`
 
   return (
     <>
-      <div className={"absolute right-10 top-96"}>
-        <Link href={url} className={cn(buttonVariants({ variant: "link" }))}>
+      <div className={"absolute right-10 top-20 flex gap-2"}>
+        <Link href={editUrl} className={cn(buttonVariants({ variant: "default" }))}>
+          <>
+            <Icons.edit className="mr-2 size-4" />
+            Edit
+          </>
+        </Link>
+        <Link href={url} className={cn(buttonVariants({ variant: "outline" }))}>
           <>
             <Icons.close className="mr-2 size-4" />
             Close
           </>
         </Link>
       </div>
-      <section className="flex min-h-full flex-col items-center justify-center p-8 text-center">
-        <Tabs defaultValue="beef" className="w-[500px]">
-          <TabsList className="grid w-full grid-cols-6">
-            {pricingTypes[producerPriceList?.client_specialization].map(
-              (type, index) => {
-                return (
-                  <TabsTrigger key={index} value={type}>
-                    {type}
-                  </TabsTrigger>
-                )
-              },
-            )}
-          </TabsList>
-          {pricingTypes[producerPriceList?.client_specialization].map(
-            (pricingType, index) => {
-              return (
-                <TabsContent key={index} value={pricingType}>
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>
-                        {ucFirst(producerPriceList.client_name)}{" "}
-                      </CardTitle>
-                      <CardDescription>
-                        {ucFirst(pricingType)} producer Price List they are
-                        paying farmers for the {pricingType} they buy from
-                        clients.
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="min-h-[305px] space-y-2">
-                      {producerPriceList[pricingType] !== undefined ? (
-                        <ul
-                          role="list"
-                          className="grid grid-cols-1 gap-x-2 gap-y-2 lg:grid-cols-2 xl:gap-x-4"
-                        >
-                          {Object.keys(producerPriceList[pricingType]).map(
-                            (key, index) => {
-                              if (key === "hasPrice") {
-                                return null
-                              }
-                              const gradePrices = producerPriceList[pricingType]
-
-                              return (
-                                <li
-                                  className="overflow-hidden rounded-xl border border-gray-200"
-                                  key={index}
-                                >
-                                  <dl className="-my-3 divide-y divide-gray-100 px-6 py-4 text-sm leading-6">
-                                    <div className="flex justify-between gap-x-4 py-3">
-                                      <dt className="text-gray-700">
-                                        {ucFirst(key)}
-                                      </dt>
-                                      <dd className="flex items-start gap-x-2">
-                                        <div className="font-medium text-gray-900">
-                                          {centsToDollars(
-                                            gradePrices[
-                                            key as keyof typeof gradePrices
-                                            ],
-                                          )}
-                                        </div>
-
-                                        {grades?.[pricingType]?.[key] ? (
-                                          <div
-                                            className={cn(
-                                              statuses[index],
-                                              "rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset",
-                                            )}
-                                          >
-                                            {grades[pricingType][key]}
-                                          </div>
-                                        ) : null}
-                                      </dd>
-                                    </div>
-                                  </dl>
-                                </li>
-                              )
-                            },
-                          )}
-                        </ul>
-                      ) : null}
-                    </CardContent>
-                    <CardFooter>
-                      <Button>Book Now</Button>
-                    </CardFooter>
-                  </Card>
-                </TabsContent>
-              )
-            },
-          )}
-        </Tabs>
+      <section className="flex min-h-full flex-col p-8">
+        <PriceListTableView producerPriceList={producerPriceList} />
       </section>
     </>
   )

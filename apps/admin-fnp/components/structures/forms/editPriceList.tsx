@@ -55,7 +55,7 @@ import {
 import { ToastAction } from "@/components/ui/toast"
 import { toast } from "@/components/ui/use-toast"
 import { Icons } from "@/components/icons/lucide"
-import { units } from "@/components/structures/repository/data"
+import { units, pricingBasis } from "@/components/structures/repository/data"
 import { PriceListProgress } from "./priceListProgress"
 
 interface EditProductPriceFormProps
@@ -449,8 +449,9 @@ export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
         hasCollectedPrice: priceList.slaughter?.hasCollectedPrice || false,
       },
       unit: priceList.unit,
+      pricing_basis: priceList.pricing_basis || "LWT - Live Weight",
       notes: priceList.notes || [],
-      overwrite: false,
+      overwrite: true,
     },
     resolver: zodResolver(ProducerPriceListSchema),
   })
@@ -762,6 +763,41 @@ export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
                     </PopoverContent>
                   </Popover>
                 </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="pricing_basis"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Pricing Basis</FormLabel>
+                <FormControl>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select pricing basis" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent className="overflow-visible max-h-44">
+                      {pricingBasis.map((basis) => {
+                        return (
+                          <SelectItem key={basis} value={basis}>
+                            {basis}
+                          </SelectItem>
+                        )
+                      })}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormDescription>
+                  Select the pricing basis for this price list
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
