@@ -297,7 +297,7 @@ export const ProducerPriceListSchema = z
     }
   })
 
-export const ProductSchema = z.object({
+export const AgroChemicalSchema = z.object({
   id: z.string(),
   name: z.string(),
   descriptions: z.array(
@@ -390,7 +390,7 @@ export const ProductSchema = z.object({
   }),
 })
 
-export const FormProductSchema = ProductSchema.omit({
+export const FormAgroChemicalSchema = AgroChemicalSchema.omit({
   admin: true,
 })
 
@@ -442,8 +442,8 @@ export type ApplicationUserID = z.infer<typeof ApplicationUserIDSchema>
 export type EditApplicationUser = z.infer<typeof EditApplicationUserSchema>
 
 export type ProducerPriceList = z.infer<typeof ProducerPriceListSchema>
-export type ProductItem = z.infer<typeof ProductSchema>
-export type FormProductModel = z.infer<typeof FormProductSchema>
+export type AgroChemicalItem = z.infer<typeof AgroChemicalSchema>
+export type FormAgroChemicalModel = z.infer<typeof FormAgroChemicalSchema>
 
 export type ImageModel = {
   img: {

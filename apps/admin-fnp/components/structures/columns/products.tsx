@@ -1,11 +1,11 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { ProductItem } from "@/lib/schemas"
+import { AgroChemicalItem } from "@/lib/schemas"
 import { Checkbox } from "@/components/ui/checkbox"
-import { ProductControlDropDown } from "@/components/structures/dropdowns/product-dropdown"
+import { AgroChemicalControlDropDown } from "@/components/structures/dropdowns/agroChemical-dropdown"
 
-export const productColumns: ColumnDef<ProductItem>[] = [
+export const agroChemicalColumns: ColumnDef<AgroChemicalItem>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -35,7 +35,7 @@ export const productColumns: ColumnDef<ProductItem>[] = [
     id: "actions",
     cell: ({ row }) => {
       const product = row?.original
-      return <ProductControlDropDown product={product} />
+      return <AgroChemicalControlDropDown product={product} />
     },
   },
 ]

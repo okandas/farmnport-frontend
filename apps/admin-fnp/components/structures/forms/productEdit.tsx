@@ -5,10 +5,10 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { isAxiosError } from "axios"
 import { useForm, useFieldArray, FieldErrors } from "react-hook-form"
 
-import { updateProduct } from "@/lib/query"
+import { updateAgroChemical } from "@/lib/query"
 import {
-    FormProductModel,
-    FormProductSchema,
+    FormAgroChemicalModel,
+    FormAgroChemicalSchema,
 } from "@/lib/schemas"
 import { cn } from "@/lib/utilities"
 
@@ -28,17 +28,17 @@ import { Textarea } from "@/components/ui/textarea"
 import { ToastAction } from "@/components/ui/toast"
 import { toast } from "@/components/ui/use-toast"
 import { Icons } from "@/components/icons/lucide"
-import { ProductExamples } from "./productEditNestedArray"
+import { AgroChemicalExamples } from "./productEditNestedArray"
 import { FileInput } from "../controls/file-input"
 import { Button } from "@/components/ui/button"
 
 import { buttonVariants } from "@/components/ui/button"
 
 interface EditFormProps extends React.HTMLAttributes<HTMLDivElement> {
-    product: FormProductModel
+    product: FormAgroChemicalModel
 }
 
-export function EditForm({ product }: EditFormProps) {
+export function EditAgroChemicalForm({ product }: EditFormProps) {
 
     const form = useForm({
         defaultValues: {
@@ -54,7 +54,7 @@ export function EditForm({ product }: EditFormProps) {
             warnings: product?.warnings,
             instructions: product?.instructions,
         },
-        resolver: zodResolver(FormProductSchema),
+        resolver: zodResolver(FormAgroChemicalSchema),
     })
 
     const control = form.control
@@ -100,10 +100,10 @@ export function EditForm({ product }: EditFormProps) {
     });
 
     const { mutate, isPending } = useMutation({
-        mutationFn: updateProduct,
+        mutationFn: updateAgroChemical,
         onSuccess: (data) => {
             toast({
-                description: "Updated Product Succesfully",
+                description: "Updated AgroChemical Successfully",
             })
         },
         onError: (error) => {
@@ -129,7 +129,7 @@ export function EditForm({ product }: EditFormProps) {
 
     })
 
-    async function updateProduct(payload: FormProductModel) {
+    async function updateProduct(payload: FormAgroChemicalModel) {
         // async request which may result error
         try {
             mutate(payload)
@@ -139,7 +139,7 @@ export function EditForm({ product }: EditFormProps) {
         }
     }
 
-    const onError = (errors: FieldErrors<FormProductModel>) => {
+    const onError = (errors: FieldErrors<FormAgroChemicalModel>) => {
         console.log(errors)
     }
 
@@ -158,7 +158,7 @@ export function EditForm({ product }: EditFormProps) {
                             <FormItem >
                                 <FormLabel>Name</FormLabel>
                                 <FormControl className="col-span-3">
-                                    <Input placeholder="Product name" {...field} />
+                                    <Input placeholder="AgroChemical name" {...field} />
                                 </FormControl>
                                 <FormDescription></FormDescription>
                                 <FormMessage />
@@ -184,7 +184,7 @@ export function EditForm({ product }: EditFormProps) {
 
                 <div>
                     <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight sm:my-3">
-                        Product Description
+                        AgroChemical Description
                     </h3>
                     {fields.map((field, index) => {
                         return (
@@ -471,7 +471,7 @@ export function EditForm({ product }: EditFormProps) {
 
                 <div>
                     <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight sm:my-3">
-                        How to use product.
+                        How to use AgroChemical.
                     </h3>
                     {usageFields.map((field, index) => {
                         return (
@@ -877,7 +877,7 @@ export function EditForm({ product }: EditFormProps) {
                                     </div>
 
                                 </div>
-                                <ProductExamples nestedIndex={index} {...{ control }} />
+                                <AgroChemicalExamples nestedIndex={index} {...{ control }} />
                             </div>
                         );
                     })}

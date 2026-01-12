@@ -6,10 +6,10 @@ import { isAxiosError } from "axios"
 import { useForm, useFieldArray, FieldErrors } from "react-hook-form"
 import { useRouter } from "next/navigation"
 
-import { addProduct } from "@/lib/query"
+import { addAgroChemical } from "@/lib/query"
 import {
-    FormProductModel,
-    FormProductSchema,
+    FormAgroChemicalModel,
+    FormAgroChemicalSchema,
 } from "@/lib/schemas"
 import { cn } from "@/lib/utilities"
 
@@ -29,17 +29,17 @@ import { Textarea } from "@/components/ui/textarea"
 import { ToastAction } from "@/components/ui/toast"
 import { toast } from "@/components/ui/use-toast"
 import { Icons } from "@/components/icons/lucide"
-import { ProductExamples } from "./productEditNestedArray"
+import { AgroChemicalExamples } from "./productEditNestedArray"
 import { FileInput } from "../controls/file-input"
 import { Button } from "@/components/ui/button"
 
 import { buttonVariants } from "@/components/ui/button"
 
 interface EditFormProps extends React.HTMLAttributes<HTMLDivElement> {
-    product: FormProductModel
+    product: FormAgroChemicalModel
 }
 
-export function CreateProductForm({ product }: EditFormProps) {
+export function CreateAgroChemicalForm({ product }: EditFormProps) {
 
     const form = useForm({
         defaultValues: {
@@ -55,7 +55,7 @@ export function CreateProductForm({ product }: EditFormProps) {
             warnings: product?.warnings,
             instructions: product?.instructions,
         },
-        resolver: zodResolver(FormProductSchema),
+        resolver: zodResolver(FormAgroChemicalSchema),
     })
 
     const router = useRouter()
@@ -103,10 +103,10 @@ export function CreateProductForm({ product }: EditFormProps) {
     });
 
     const { mutate, isPending } = useMutation({
-        mutationFn: addProduct,
-        onSuccess: (data) => {
+        mutationFn: addAgroChemical,
+        onSuccess: () => {
             toast({
-                description: "Added Product Succesfully",
+                description: "Added AgroChemical Successfully",
             })
 
             router.push(`/dashboard/products`)
@@ -134,11 +134,11 @@ export function CreateProductForm({ product }: EditFormProps) {
 
     })
 
-    async function onSubmit(payload: FormProductModel) {
+    async function onSubmit(payload: FormAgroChemicalModel) {
         mutate(payload)
     }
 
-    const onError = (errors: FieldErrors<FormProductModel>) => {
+    const onError = (errors: FieldErrors<FormAgroChemicalModel>) => {
         console.log(errors)
     }
 
@@ -157,7 +157,7 @@ export function CreateProductForm({ product }: EditFormProps) {
                             <FormItem >
                                 <FormLabel>Name</FormLabel>
                                 <FormControl className="col-span-3">
-                                    <Input placeholder="Product name" {...field} />
+                                    <Input placeholder="AgroChemical name" {...field} />
                                 </FormControl>
                                 <FormDescription></FormDescription>
                                 <FormMessage />
@@ -183,7 +183,7 @@ export function CreateProductForm({ product }: EditFormProps) {
 
                 <div>
                     <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight sm:my-3">
-                        Product Description
+                        AgroChemical Description
                     </h3>
                     {fields.map((field, index) => {
                         return (
@@ -478,7 +478,7 @@ export function CreateProductForm({ product }: EditFormProps) {
 
                 <div>
                     <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight sm:my-3">
-                        How to use product.
+                        How to use AgroChemical.
                     </h3>
                     {usageFields.map((field, index) => {
                         return (
@@ -894,7 +894,7 @@ export function CreateProductForm({ product }: EditFormProps) {
                                     </div>
 
                                 </div>
-                                <ProductExamples nestedIndex={index} {...{ control }} />
+                                <AgroChemicalExamples nestedIndex={index} {...{ control }} />
                             </div>
                         );
                     })}

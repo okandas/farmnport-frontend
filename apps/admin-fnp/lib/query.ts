@@ -126,34 +126,34 @@ export function deleteProducerPriceList(priceId: string) {
   return api.delete(url)
 }
 
-export function queryProducts(pagination?: pagination) {
+export function queryAgroChemicals(pagination?: pagination) {
   let url: string
 
   if (pagination?.p !== undefined && pagination.p >= 2) {
-    url = `${baseUrl}/user/products?p=${pagination.p}`
+    url = `${baseUrl}/user/agrochemicals?p=${pagination.p}`
   } else {
-    url = `${baseUrl}/user/products`
+    url = `${baseUrl}/user/agrochemicals`
   }
 
   if (pagination?.search !== undefined && pagination.search.length >= 2) {
-    url = `${baseUrl}/user/products?search=${pagination.search}`
+    url = `${baseUrl}/user/agrochemicals?search=${pagination.search}`
   }
 
   return api.get(url)
 }
 
-export function addProduct(data: FormProductModel) {
-  let url = `${baseUrl}/user/products/add`
+export function addAgroChemical(data: FormProductModel) {
+  let url = `${baseUrl}/user/agrochemicals/add`
   return api.post(url, data)
 }
 
-export function queryProduct(id: string) {
-  const url = `${baseUrl}/user/products/${id}`
+export function queryAgroChemical(id: string) {
+  const url = `${baseUrl}/user/agrochemicals/${id}`
   return api.get(url)
 }
 
-export function updateProduct(data: FormProductModel) {
-  let url = `${baseUrl}/user/products/update`
+export function updateAgroChemical(data: FormProductModel) {
+  let url = `${baseUrl}/user/agrochemicals/update`
   return api.post(url, data)
 }
 
@@ -167,8 +167,8 @@ export function removeImage(data: ImageModel) {
   return api.post(url, data)
 }
 
-export function deleteProducts(productIds: string[]) {
-  let url = `${baseUrl}/user/products/delete`
+export function deleteAgroChemicals(productIds: string[]) {
+  let url = `${baseUrl}/user/agrochemicals/delete`
   return api.post(url, { product_ids: productIds })
 }
 

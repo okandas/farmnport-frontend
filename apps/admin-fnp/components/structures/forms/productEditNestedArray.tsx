@@ -13,19 +13,19 @@ import {
 import { Input } from "@/components/ui/input"
 
 import {
-    FormProductModel,
+    FormAgroChemicalModel,
 } from "@/lib/schemas"
 
 import { Icons } from "@/components/icons/lucide"
 import { Button } from "@/components/ui/button"
 
 
-interface productExamplesProps {
+interface agroChemicalExamplesProps {
     nestedIndex: number
-    control: Control<FormProductModel>
+    control: Control<FormAgroChemicalModel>
 }
 
-export function ProductExamples({ nestedIndex, control }: productExamplesProps) {
+export function AgroChemicalExamples({ nestedIndex, control }: agroChemicalExamplesProps) {
 
     const { fields, remove, append } = useFieldArray({
         control: control,

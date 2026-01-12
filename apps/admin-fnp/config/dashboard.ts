@@ -14,8 +14,8 @@ export const dashboardConfig: DashboardConfig = {
       icon: "user",
     },
     {
-      title: "Products",
-      href: "/dashboard/products",
+      title: "AgroChemicals",
+      href: "/dashboard/agrochemicals",
       icon: "productSearch",
     },
     {

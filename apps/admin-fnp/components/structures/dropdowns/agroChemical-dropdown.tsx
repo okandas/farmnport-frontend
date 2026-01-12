@@ -4,7 +4,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { MoreHorizontal } from "lucide-react"
 
-import { ProductItem } from "@/lib/schemas"
+import { AgroChemicalItem } from "@/lib/schemas"
 import { slug } from "@/lib/utilities"
 import { Button } from "@/components/ui/button"
 import {
@@ -18,13 +18,13 @@ import {
 import { ToastAction } from "@/components/ui/toast"
 import { toast } from "@/components/ui/use-toast"
 
-interface ProductControlDropDownProps {
-  product?: ProductItem
+interface AgroChemicalControlDropDownProps {
+  product?: AgroChemicalItem
 }
 
-export function ProductControlDropDown({
+export function AgroChemicalControlDropDown({
   product,
-}: ProductControlDropDownProps) {
+}: AgroChemicalControlDropDownProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>

@@ -5,15 +5,15 @@ import Link from "next/link"
 import { useQuery } from "@tanstack/react-query"
 import { isAxiosError } from "axios"
 
-import { queryProduct } from "@/lib/query"
-import { ProductItem } from "@/lib/schemas"
+import { queryAgroChemical } from "@/lib/query"
+import { AgroChemicalItem } from "@/lib/schemas"
 import { cn } from "@/lib/utilities"
 import { buttonVariants } from "@/components/ui/button"
 import { ToastAction } from "@/components/ui/toast"
 import { toast } from "@/components/ui/use-toast"
 import { Icons } from "@/components/icons/lucide"
 import { Placeholder } from "@/components/state/placeholder"
-import { EditForm } from "@/components/structures/forms/productEdit"
+import { EditAgroChemicalForm } from "@/components/structures/forms/productEdit"
 
 interface EditProductPageProps {
   params: Promise<{
@@ -21,18 +21,18 @@ interface EditProductPageProps {
   }>
 }
 
-export default function EditProductPage({ params }: EditProductPageProps) {
+export default function EditAgroChemicalPage({ params }: EditProductPageProps) {
   const { slug } = use(params)
   const id = slug
-  const url = `/dashboard/products/${id}`
+  const url = `/dashboard/agrochemicals/${id}`
 
   const { isError, isLoading, isFetching, refetch, data } = useQuery({
     queryKey: ["dashboard-product", id],
-    queryFn: () => queryProduct(id),
+    queryFn: () => queryAgroChemical(id),
     refetchOnWindowFocus: false
   })
 
-  const product = data?.data as ProductItem
+  const product = data?.data as AgroChemicalItem
 
   if (isError) {
     if (isAxiosError(data)) {
@@ -61,9 +61,9 @@ export default function EditProductPage({ params }: EditProductPageProps) {
       <div className="mt-20">
         <Placeholder>
           <Placeholder.Icon name="close" />
-          <Placeholder.Title>Error Fetching Product</Placeholder.Title>
+          <Placeholder.Title>Error Fetching AgroChemical</Placeholder.Title>
           <Placeholder.Description>
-            Error Fetching product from the database
+            Error Fetching agrochemical from the database
           </Placeholder.Description>
         </Placeholder>
       </div>
@@ -75,9 +75,9 @@ export default function EditProductPage({ params }: EditProductPageProps) {
       <div className="mt-20">
         <Placeholder>
           <Placeholder.Icon name="search" />
-          <Placeholder.Title>Fetching Product</Placeholder.Title>
+          <Placeholder.Title>Fetching AgroChemical</Placeholder.Title>
           <Placeholder.Description>
-            Fetching product from the database
+            Fetching agrochemical from the database
           </Placeholder.Description>
         </Placeholder>
       </div>
@@ -95,7 +95,7 @@ export default function EditProductPage({ params }: EditProductPageProps) {
         </Link>
       </div>
 
-      {product !== undefined ? <EditForm product={product} /> : null}
+      {product !== undefined ? <EditAgroChemicalForm product={product} /> : null}
     </>
   )
 }

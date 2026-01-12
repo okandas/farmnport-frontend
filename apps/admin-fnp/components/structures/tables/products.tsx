@@ -5,15 +5,15 @@ import { useQuery } from "@tanstack/react-query"
 import { PaginationState } from "@tanstack/react-table"
 import { isAxiosError } from "axios"
 
-import { queryProducts } from "@/lib/query"
-import { ProductItem } from "@/lib/schemas"
+import { queryAgroChemicals } from "@/lib/query"
+import { AgroChemicalItem } from "@/lib/schemas"
 import { ToastAction } from "@/components/ui/toast"
 import { toast } from "@/components/ui/use-toast"
 import { Placeholder } from "@/components/state/placeholder"
 import { DataTable } from "@/components/structures/data-table"
-import { productColumns } from "@/components/structures/columns/products"
+import { agroChemicalColumns } from "@/components/structures/columns/products"
 
-export function ProductsTable() {
+export function AgroChemicalsTable() {
   const [searchClient, setSearchClient] = useState("")
 
   const [pagination, setPagination] = useState<PaginationState>({
@@ -24,13 +24,13 @@ export function ProductsTable() {
   const { isError, isLoading, isFetching, refetch, data } = useQuery({
     queryKey: ["dashboard-products", { p: pagination.pageIndex }],
     queryFn: () =>
-      queryProducts({
+      queryAgroChemicals({
         p: pagination.pageIndex,
       }),
     refetchOnWindowFocus: false
   })
 
-  const products = data?.data?.data as ProductItem[]
+  const products = data?.data?.data as AgroChemicalItem[]
   const total = data?.data?.total as number
 
   if (isError) {
@@ -59,9 +59,9 @@ export function ProductsTable() {
     return (
       <Placeholder>
         <Placeholder.Icon name="close" />
-        <Placeholder.Title>Error Fetching Products</Placeholder.Title>
+        <Placeholder.Title>Error Fetching AgroChemicals</Placeholder.Title>
         <Placeholder.Description>
-          Error Fetching users from the database
+          Error Fetching agrochemicals from the database
         </Placeholder.Description>
       </Placeholder>
     )
@@ -78,10 +78,10 @@ export function ProductsTable() {
   return (
     <DataTable
       /* @ts-ignore */ // working on all other table besides this one jeez
-      columns={productColumns}
+      columns={agroChemicalColumns}
       data={products}
       newUrl="/dashboard/products/new"
-      tableName="Product"
+      tableName="AgroChemical"
       total={total}
       pagination={pagination}
       setPagination={setPagination}
