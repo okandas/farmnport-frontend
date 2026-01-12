@@ -10,7 +10,9 @@ import {
   LoginResponse,
   ProducerPriceList,
   FormProductModel,
+  FormAgroChemicalModel,
   ImageModel,
+  Brand,
 } from "@/lib/schemas"
 
 let base = process.env.NEXT_PUBLIC_BASE_URL
@@ -142,7 +144,7 @@ export function queryAgroChemicals(pagination?: pagination) {
   return api.get(url)
 }
 
-export function addAgroChemical(data: FormProductModel) {
+export function addAgroChemical(data: FormAgroChemicalModel) {
   let url = `${baseUrl}/user/agrochemicals/add`
   return api.post(url, data)
 }
@@ -152,7 +154,7 @@ export function queryAgroChemical(id: string) {
   return api.get(url)
 }
 
-export function updateAgroChemical(data: FormProductModel) {
+export function updateAgroChemical(data: FormAgroChemicalModel) {
   let url = `${baseUrl}/user/agrochemicals/update`
   return api.post(url, data)
 }
@@ -170,6 +172,38 @@ export function removeImage(data: ImageModel) {
 export function deleteAgroChemicals(productIds: string[]) {
   let url = `${baseUrl}/user/agrochemicals/delete`
   return api.post(url, { product_ids: productIds })
+}
+
+// Brand functions
+export function queryBrands(pagination?: pagination) {
+  let url: string
+
+  if (pagination?.p !== undefined && pagination.p >= 2) {
+    url = `${baseUrl}/user/brands?p=${pagination.p}`
+  } else {
+    url = `${baseUrl}/user/brands`
+  }
+
+  if (pagination?.search !== undefined && pagination.search.length >= 2) {
+    url = `${baseUrl}/user/brands?search=${pagination.search}`
+  }
+
+  return api.get(url)
+}
+
+export function addBrand(data: { name: string }) {
+  let url = `${baseUrl}/user/brands/add`
+  return api.post(url, data)
+}
+
+export function queryBrand(id: string) {
+  const url = `${baseUrl}/user/brands/${id}`
+  return api.get(url)
+}
+
+export function updateBrand(data: { id: string; name: string }) {
+  let url = `${baseUrl}/user/brands/update`
+  return api.post(url, data)
 }
 
 export function queryFarmProduceCategories(pagination?: pagination) {

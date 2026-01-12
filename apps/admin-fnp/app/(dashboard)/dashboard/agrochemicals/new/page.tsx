@@ -8,7 +8,7 @@ import { FormAgroChemicalModel } from "@/lib/schemas"
 import { cn } from "@/lib/utilities"
 import { buttonVariants } from "@/components/ui/button"
 import { Icons } from "@/components/icons/lucide"
-import { CreateAgroChemicalForm } from "@/components/structures/forms/productCreate"
+import { AgroChemicalForm } from "@/components/structures/forms/agroChemicalForm"
 
 
 
@@ -16,65 +16,10 @@ export default function CreateAgroChemicalPage() {
 
     const url = `/dashboard/agrochemicals`
 
-    const [product, _] = useState<FormAgroChemicalModel>({
+    const [agroChemical, _] = useState<FormAgroChemicalModel>({
         id: "",
         name: "",
-        descriptions: [{ name: "", value: "" }],
-        reg_number: "",
-        cat: "",
-        images: [{
-            img: {
-                id: "",
-                src: ""
-            }
-        }],
-        unit: [{ name: "", value: 0 }],
-        manufacturer: { name: "" },
-        distributor: { name: "" },
-        warnings: [{ name: "", value: "", location: "" }],
-        instructions: {
-            usage: [
-                { name: "", value: "" }
-            ],
-            examples: [
-                {
-                    description: '',
-                    values: [{
-                        dosage: {
-                            unit: "",
-                            value: 0
-                        },
-                        mass: {
-                            unit: "",
-                            weight: 0
-                        },
-                        pack: 0
-                    }]
-                }
-            ]
-            ,
-            efficacy_table: [
-                {
-                    species: "",
-                    third_stage: "",
-                    fourth_stage: "",
-                    adults: ""
-                }
-            ],
-            efficacy: [
-                {
-                    name: "",
-                    value: ""
-                }
-            ],
-            key_map: {
-                type: "",
-                values: [{
-                    name: "",
-                    value: ""
-                }]
-            }
-        }
+        brand_id: ""
     })
 
     return (
@@ -88,7 +33,7 @@ export default function CreateAgroChemicalPage() {
                 </Link>
             </div>
 
-            <CreateAgroChemicalForm product={product} />
+            <AgroChemicalForm agroChemical={agroChemical} mode="create" />
         </>
     )
 }

@@ -5,16 +5,16 @@ import { useQuery } from "@tanstack/react-query"
 import { PaginationState } from "@tanstack/react-table"
 import { isAxiosError } from "axios"
 
-import { queryAgroChemicals } from "@/lib/query"
-import { AgroChemicalItem } from "@/lib/schemas"
+import { queryBrands } from "@/lib/query"
+import { Brand } from "@/lib/schemas"
 import { ToastAction } from "@/components/ui/toast"
 import { toast } from "@/components/ui/use-toast"
 import { Placeholder } from "@/components/state/placeholder"
 import { DataTable } from "@/components/structures/data-table"
-import { agroChemicalColumns } from "@/components/structures/columns/products"
+import { brandColumns } from "@/components/structures/columns/brands"
 
-export function AgroChemicalsTable() {
-  const [searchClient, setSearchClient] = useState("")
+export function BrandsTable() {
+  const [search, setSearch] = useState("")
 
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 1,
@@ -22,15 +22,16 @@ export function AgroChemicalsTable() {
   })
 
   const { isError, isLoading, isFetching, refetch, data } = useQuery({
-    queryKey: ["dashboard-products", { p: pagination.pageIndex }],
+    queryKey: ["dashboard-brands", { p: pagination.pageIndex, search }],
     queryFn: () =>
-      queryAgroChemicals({
+      queryBrands({
         p: pagination.pageIndex,
+        search: search,
       }),
     refetchOnWindowFocus: false
   })
 
-  const products = data?.data?.data as AgroChemicalItem[]
+  const brands = data?.data?.data as Brand[]
   const total = data?.data?.total as number
 
   if (isError) {
@@ -45,7 +46,7 @@ export function AgroChemicalsTable() {
 
         default:
           toast({
-            title: "Uh oh! Failed to fetch clients.",
+            title: "Uh oh! Failed to fetch brands.",
             description: "There was a problem with your request.",
             action: (
               <ToastAction altText="Try again" onClick={() => refetch()}>
@@ -59,9 +60,9 @@ export function AgroChemicalsTable() {
     return (
       <Placeholder>
         <Placeholder.Icon name="close" />
-        <Placeholder.Title>Error Fetching AgroChemicals</Placeholder.Title>
+        <Placeholder.Title>Error Fetching Brands</Placeholder.Title>
         <Placeholder.Description>
-          Error Fetching agrochemicals from the database
+          Error fetching brands from the database
         </Placeholder.Description>
       </Placeholder>
     )
@@ -70,23 +71,22 @@ export function AgroChemicalsTable() {
   if (isLoading || isFetching) {
     return (
       <Placeholder>
-        <Placeholder.Title>Fetching Producer Price Lists</Placeholder.Title>
+        <Placeholder.Title>Fetching Brands</Placeholder.Title>
       </Placeholder>
     )
   }
 
   return (
     <DataTable
-      /* @ts-ignore */ // working on all other table besides this one jeez
-      columns={agroChemicalColumns}
-      data={products}
-      newUrl="/dashboard/agrochemicals/new"
-      tableName="AgroChemical"
+      columns={brandColumns}
+      data={brands}
+      newUrl="/dashboard/brands/new"
+      tableName="Brand"
       total={total}
       pagination={pagination}
       setPagination={setPagination}
-      searchClient={searchClient}
-      setSearchClient={setSearchClient}
+      search={search}
+      setSearch={setSearch}
     />
   )
 }

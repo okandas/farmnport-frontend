@@ -13,7 +13,7 @@ import { ToastAction } from "@/components/ui/toast"
 import { toast } from "@/components/ui/use-toast"
 import { Icons } from "@/components/icons/lucide"
 import { Placeholder } from "@/components/state/placeholder"
-import { EditAgroChemicalForm } from "@/components/structures/forms/productEdit"
+import { AgroChemicalForm } from "@/components/structures/forms/agroChemicalForm"
 
 interface EditProductPageProps {
   params: Promise<{
@@ -32,7 +32,7 @@ export default function EditAgroChemicalPage({ params }: EditProductPageProps) {
     refetchOnWindowFocus: false
   })
 
-  const product = data?.data as AgroChemicalItem
+  const agroChemical = data?.data as AgroChemicalItem
 
   if (isError) {
     if (isAxiosError(data)) {
@@ -46,7 +46,7 @@ export default function EditAgroChemicalPage({ params }: EditProductPageProps) {
 
         default:
           toast({
-            title: "Uh oh! Failed to fetch clients.",
+            title: "Uh oh! Failed to fetch agrochemical.",
             description: "There was a problem with your request.",
             action: (
               <ToastAction altText="Try again" onClick={() => refetch()}>
@@ -95,7 +95,7 @@ export default function EditAgroChemicalPage({ params }: EditProductPageProps) {
         </Link>
       </div>
 
-      {product !== undefined ? <EditAgroChemicalForm product={product} /> : null}
+      {agroChemical !== undefined ? <AgroChemicalForm agroChemical={agroChemical} mode="edit" /> : null}
     </>
   )
 }

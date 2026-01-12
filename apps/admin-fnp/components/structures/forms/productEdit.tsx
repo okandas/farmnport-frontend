@@ -918,7 +918,7 @@ export function EditAgroChemicalForm({ product }: EditFormProps) {
                 </button>
 
 
-                <Link className="w-full" href={`/dashboard/products`}>
+                <Link className="w-full" href={`/dashboard/agrochemicals`}>
                     <button className={cn(buttonVariants({ variant: "outline" }), "ml-2 mt-5")}>
                         Cancel
                     </button>

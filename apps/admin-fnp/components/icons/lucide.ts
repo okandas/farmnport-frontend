@@ -46,7 +46,8 @@ import {
   PiggyBank,
   UtensilsCrossed,
   Upload,
-  Pencil
+  Pencil,
+  Tag
 } from "lucide-react"
 
 export type Icon = LucideIcon
@@ -100,5 +101,6 @@ export const Icons = {
   utensilsCrossed: UtensilsCrossed,
   fileSpreadsheet: FileSpreadsheet,
   upload: Upload,
-  edit: Pencil
+  edit: Pencil,
+  tag: Tag
 }

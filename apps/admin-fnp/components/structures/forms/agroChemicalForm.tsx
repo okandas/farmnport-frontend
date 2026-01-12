@@ -5,11 +5,11 @@ import { useMutation, useQuery } from "@tanstack/react-query"
 import { isAxiosError } from "axios"
 import { useForm, FieldErrors } from "react-hook-form"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useDebounce } from "use-debounce"
 import { Check, ChevronsUpDown } from "lucide-react"
 
-import { addAgroChemical, queryBrands } from "@/lib/query"
+import { addAgroChemical, updateAgroChemical, queryBrands, queryBrand } from "@/lib/query"
 import {
     FormAgroChemicalModel,
     FormAgroChemicalSchema,
@@ -22,7 +22,6 @@ import {
     FormControl,
     FormField,
     FormItem,
-    FormLabel,
     FormMessage,
 } from "@/components/ui/form"
 
@@ -30,7 +29,6 @@ import { Input } from "@/components/ui/input"
 import { ToastAction } from "@/components/ui/toast"
 import { toast } from "@/components/ui/use-toast"
 import { Icons } from "@/components/icons/lucide"
-import { buttonVariants } from "@/components/ui/button"
 import {
     Command,
     CommandInput,
@@ -45,17 +43,19 @@ import {
 } from "@/components/ui/popover"
 import { Button } from "@/components/ui/button"
 
-interface EditFormProps extends React.HTMLAttributes<HTMLDivElement> {
-    product: FormAgroChemicalModel
+interface AgroChemicalFormProps extends React.HTMLAttributes<HTMLDivElement> {
+    agroChemical: FormAgroChemicalModel
+    mode?: "create" | "edit"
 }
 
-export function CreateAgroChemicalForm({ product }: EditFormProps) {
+export function AgroChemicalForm({ agroChemical, mode = "create" }: AgroChemicalFormProps) {
+    const isEditMode = mode === "edit" || !!agroChemical?.id
 
     const form = useForm({
         defaultValues: {
-            id: product?.id,
-            name: product?.name,
-            brand_id: product?.brand_id,
+            id: agroChemical?.id,
+            name: agroChemical?.name,
+            brand_id: agroChemical?.brand_id,
         },
         resolver: zodResolver(FormAgroChemicalSchema),
     })
@@ -65,6 +65,21 @@ export function CreateAgroChemicalForm({ product }: EditFormProps) {
     const [searchBrand, setSearchBrand] = useState("")
     const [selectedBrand, setSelectedBrand] = useState("")
     const [open, setOpen] = useState(false)
+
+    // Fetch the current brand in edit mode
+    const { data: brandData } = useQuery({
+        queryKey: ["brand", agroChemical?.brand_id],
+        queryFn: () => queryBrand(agroChemical.brand_id),
+        enabled: isEditMode && !!agroChemical?.brand_id,
+    })
+
+    // Set the selected brand name when editing
+    useEffect(() => {
+        if (isEditMode && brandData?.data) {
+            const brand = brandData.data as Brand
+            setSelectedBrand(brand.name)
+        }
+    }, [isEditMode, brandData])
 
     // Debounce search query
     const [debouncedSearchQuery] = useDebounce(searchBrand, 1000)
@@ -109,10 +124,12 @@ export function CreateAgroChemicalForm({ product }: EditFormProps) {
     }
 
     const { mutate, isPending } = useMutation({
-        mutationFn: addAgroChemical,
+        mutationFn: isEditMode ? updateAgroChemical : addAgroChemical,
         onSuccess: () => {
             toast({
-                description: "Added AgroChemical Successfully",
+                description: isEditMode
+                    ? "Updated AgroChemical Successfully"
+                    : "Added AgroChemical Successfully",
             })
 
             router.push(`/dashboard/agrochemicals`)
@@ -129,7 +146,7 @@ export function CreateAgroChemicalForm({ product }: EditFormProps) {
 
                     default:
                         toast({
-                            title: "Uh oh! agro chemical creation failed.",
+                            title: `Uh oh! AgroChemical ${isEditMode ? "update" : "creation"} failed.`,
                             description: "There was a problem with your request.",
                             action: <ToastAction altText="Try again">Try again</ToastAction>,
                         })
@@ -159,7 +176,9 @@ export function CreateAgroChemicalForm({ product }: EditFormProps) {
                         AgroChemical Information
                     </h2>
                     <p className="mt-1 max-w-2xl text-sm/6 text-gray-600 dark:text-gray-400">
-                        Add a new agro chemical product to the system.
+                        {isEditMode
+                            ? "Update the agro chemical product information."
+                            : "Add a new agro chemical product to the system."}
                     </p>
 
                     <div className="mt-10 space-y-8 border-b border-gray-900/10 pb-12 sm:space-y-0 sm:divide-y sm:divide-gray-900/10 sm:border-t sm:border-t-gray-900/10 sm:pb-0 dark:border-white/10 dark:sm:divide-white/10 dark:sm:border-t-white/10">
@@ -284,7 +303,7 @@ export function CreateAgroChemicalForm({ product }: EditFormProps) {
                         className="inline-flex justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:bg-indigo-500 dark:shadow-none dark:hover:bg-indigo-400 dark:focus-visible:outline-indigo-500"
                     >
                         {isPending && <Icons.spinner className="w-4 h-4 mr-2 animate-spin" />}
-                        Add AgroChemical
+                        {isEditMode ? "Update AgroChemical" : "Add AgroChemical"}
                     </button>
                 </div>
             </form>

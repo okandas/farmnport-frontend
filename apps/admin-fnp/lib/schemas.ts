@@ -297,102 +297,21 @@ export const ProducerPriceListSchema = z
     }
   })
 
+export const BrandSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  slug: z.string(),
+  created: z.string().optional(),
+  updated: z.string().optional(),
+})
+
 export const AgroChemicalSchema = z.object({
   id: z.string(),
   name: z.string(),
-  descriptions: z.array(
-    z.object({
-      name: z.string(),
-      value: z.string(),
-    }),
-  ),
-  reg_number: z.string(),
-  cat: z.string(),
-  admin: z.object({
-    id: z.string(),
-    name: z.boolean(),
-  }),
-  images: z.array(
-    z.object({
-      img: z.object({
-        id: z.string(),
-        src: z.string(),
-      }),
-    }),
-  ),
-  unit: z.array(
-    z.object({
-      name: z.string(),
-      value: z.coerce.number().nonnegative(),
-    }),
-  ),
-  manufacturer: z.object({
-    name: z.string(),
-  }),
-  distributor: z.object({
-    name: z.string(),
-  }),
-  warnings: z.array(
-    z.object({
-      name: z.string(),
-      value: z.string(),
-      location: z.string(),
-    }),
-  ),
-  instructions: z.object({
-    usage: z.array(
-      z.object({
-        name: z.string(),
-        value: z.string(),
-      }),
-    ),
-    examples: z.array(
-      z.object({
-        description: z.string().optional(),
-        values: z.array(
-          z.object({
-            dosage: z.object({
-              unit: z.string(),
-              value: z.number().nonnegative(),
-            }),
-            mass: z.object({
-              unit: z.string(),
-              weight: z.number().nonnegative(),
-            }),
-            pack: z.number().nonnegative(),
-          }),
-        ),
-      }),
-    ),
-    efficacy_table: z.array(
-      z.object({
-        species: z.string(),
-        third_stage: z.string(),
-        fourth_stage: z.string(),
-        adults: z.string(),
-      }),
-    ),
-    efficacy: z.array(
-      z.object({
-        name: z.string(),
-        value: z.string(),
-      }),
-    ),
-    key_map: z.object({
-      type: z.string(),
-      values: z.array(
-        z.object({
-          name: z.string(),
-          value: z.string(),
-        }),
-      ),
-    }),
-  }),
+  brand_id: z.string().min(1, "Brand is required"),
 })
 
-export const FormAgroChemicalSchema = AgroChemicalSchema.omit({
-  admin: true,
-})
+export const FormAgroChemicalSchema = AgroChemicalSchema
 
 ApplicationUserSchema.required({
   name: true,
@@ -442,6 +361,7 @@ export type ApplicationUserID = z.infer<typeof ApplicationUserIDSchema>
 export type EditApplicationUser = z.infer<typeof EditApplicationUserSchema>
 
 export type ProducerPriceList = z.infer<typeof ProducerPriceListSchema>
+export type Brand = z.infer<typeof BrandSchema>
 export type AgroChemicalItem = z.infer<typeof AgroChemicalSchema>
 export type FormAgroChemicalModel = z.infer<typeof FormAgroChemicalSchema>
 
