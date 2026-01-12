@@ -307,8 +307,18 @@ export const BrandSchema = z.object({
 
 export const AgroChemicalSchema = z.object({
   id: z.string(),
-  name: z.string(),
+  name: z.string().min(1, "Name is required"),
+  slug: z.string().optional(),
   brand_id: z.string().min(1, "Brand is required"),
+  brand: z.object({
+    id: z.string(),
+    name: z.string(),
+  }).optional(),
+  front_label: z.custom<ImageModel>(),
+  back_label: z.custom<ImageModel>(),
+  images: z.array(z.custom<ImageModel>()).min(1, "At least one product image is required").max(5, "Maximum 5 images allowed"),
+  created: z.string().optional(),
+  updated: z.string().optional(),
 })
 
 export const FormAgroChemicalSchema = AgroChemicalSchema

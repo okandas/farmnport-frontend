@@ -2,10 +2,9 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation, useQuery } from "@tanstack/react-query"
-import { isAxiosError } from "axios"
 import { useForm, FieldErrors } from "react-hook-form"
 import { useRouter } from "next/navigation"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useDebounce } from "use-debounce"
 import { Check, ChevronsUpDown } from "lucide-react"
 
@@ -16,6 +15,7 @@ import {
     Brand,
 } from "@/lib/schemas"
 import { cn } from "@/lib/utilities"
+import { handleApiError, handleFetchError } from "@/lib/error-handler"
 
 import {
     Form,
@@ -26,7 +26,6 @@ import {
 } from "@/components/ui/form"
 
 import { Input } from "@/components/ui/input"
-import { ToastAction } from "@/components/ui/toast"
 import { toast } from "@/components/ui/use-toast"
 import { Icons } from "@/components/icons/lucide"
 import {
@@ -42,6 +41,7 @@ import {
     PopoverTrigger,
 } from "@/components/ui/popover"
 import { Button } from "@/components/ui/button"
+import { FileInput } from "@/components/structures/controls/file-input"
 
 interface AgroChemicalFormProps extends React.HTMLAttributes<HTMLDivElement> {
     agroChemical: FormAgroChemicalModel
@@ -56,6 +56,9 @@ export function AgroChemicalForm({ agroChemical, mode = "create" }: AgroChemical
             id: agroChemical?.id,
             name: agroChemical?.name,
             brand_id: agroChemical?.brand_id,
+            front_label: agroChemical?.front_label,
+            back_label: agroChemical?.back_label,
+            images: agroChemical?.images || [],
         },
         resolver: zodResolver(FormAgroChemicalSchema),
     })
@@ -85,7 +88,7 @@ export function AgroChemicalForm({ agroChemical, mode = "create" }: AgroChemical
     const [debouncedSearchQuery] = useDebounce(searchBrand, 1000)
     const enabled = !!debouncedSearchQuery
 
-    const { data, isError, refetch } = useQuery({
+    const { data, isError, refetch, error } = useQuery({
         queryKey: ["dashboard-brands", { search: debouncedSearchQuery }],
         queryFn: () =>
             queryBrands({
@@ -96,32 +99,24 @@ export function AgroChemicalForm({ agroChemical, mode = "create" }: AgroChemical
 
     const brands = data?.data?.data as Brand[]
 
-    if (isError) {
-        if (isAxiosError(data)) {
+    // Show error toast only once when error occurs
+    const hasShownBrandError = useRef(false)
+    useEffect(() => {
+        if (isError && !hasShownBrandError.current) {
+            hasShownBrandError.current = true
             setOpen(false)
-
-            switch (data.code) {
-                case "ERR_NETWORK":
-                    toast({
-                        description: "There seems to be a network error.",
-                        action: <ToastAction altText="Try again">Try again</ToastAction>,
-                    })
-                    break
-
-                default:
-                    toast({
-                        title: "Uh oh! Failed to fetch brands.",
-                        description: "There was a problem with your request.",
-                        action: (
-                            <ToastAction altText="Try again" onClick={() => refetch()}>
-                                Try again
-                            </ToastAction>
-                        ),
-                    })
-                    break
-            }
+            handleFetchError(error, {
+                onRetry: () => {
+                    hasShownBrandError.current = false
+                    refetch()
+                },
+                context: "brands"
+            })
         }
-    }
+        if (!isError) {
+            hasShownBrandError.current = false
+        }
+    }, [isError, error, refetch])
 
     const { mutate, isPending } = useMutation({
         mutationFn: isEditMode ? updateAgroChemical : addAgroChemical,
@@ -135,24 +130,9 @@ export function AgroChemicalForm({ agroChemical, mode = "create" }: AgroChemical
             router.push(`/dashboard/agrochemicals`)
         },
         onError: (error) => {
-            if (isAxiosError(error)) {
-                switch (error.code) {
-                    case "ERR_NETWORK":
-                        toast({
-                            description: "There seems to be a network error.",
-                            action: <ToastAction altText="Try again">Try again</ToastAction>,
-                        })
-                        break
-
-                    default:
-                        toast({
-                            title: `Uh oh! AgroChemical ${isEditMode ? "update" : "creation"} failed.`,
-                            description: "There was a problem with your request.",
-                            action: <ToastAction altText="Try again">Try again</ToastAction>,
-                        })
-                        break
-                }
-            }
+            handleApiError(error, {
+                context: `agrochemical ${isEditMode ? "update" : "creation"}`
+            })
         },
 
     })
@@ -209,6 +189,26 @@ export function AgroChemicalForm({ agroChemical, mode = "create" }: AgroChemical
                                 />
                             </div>
                         </div>
+
+                        {isEditMode && agroChemical?.slug && (
+                            <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
+                                <label
+                                    htmlFor="slug"
+                                    className="block text-sm/6 font-medium text-gray-900 sm:pt-1.5 dark:text-white"
+                                >
+                                    Slug
+                                </label>
+                                <div className="mt-2 sm:col-span-2 sm:mt-0">
+                                    <Input
+                                        id="slug"
+                                        value={agroChemical.slug}
+                                        readOnly
+                                        disabled
+                                        className="block w-full rounded-md bg-gray-50 px-3 py-1.5 text-base text-gray-500 outline outline-1 -outline-offset-1 outline-gray-300 sm:max-w-md sm:text-sm/6 dark:bg-white/5 dark:text-gray-400 dark:outline-white/10 cursor-not-allowed"
+                                    />
+                                </div>
+                            </div>
+                        )}
 
                         <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
                             <label
@@ -285,6 +285,107 @@ export function AgroChemicalForm({ agroChemical, mode = "create" }: AgroChemical
                                     )}
                                 />
                             </div>
+                        </div>
+
+                        <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
+                            <div>
+                                <label
+                                    htmlFor="images"
+                                    className="block text-sm/6 font-medium text-gray-900 dark:text-white"
+                                >
+                                    Product Images <span className="text-red-600">*</span>
+                                </label>
+                                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                                    Upload product images to showcase this agrochemical.
+                                </p>
+                            </div>
+                            <div className="mt-2 sm:col-span-2 sm:mt-0">
+                                <FormField
+                                    control={form.control}
+                                    name="images"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormControl>
+                                                <FileInput
+                                                    id={agroChemical?.id}
+                                                    fieldName="images"
+                                                    value={field.value || []}
+                                                    onChange={field.onChange}
+                                                    maxImages={5}
+                                                    showPlaceholders={true}
+                                                    thumbnailClassName="inline-flex flex-col overflow-hidden border border-gray-200 rounded-lg mt-2 me-2 relative bg-white shadow-sm"
+                                                    imageClassName="flex items-center justify-center w-32 h-32 overflow-hidden bg-gray-50"
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                            <p className="mt-2 text-xs text-gray-500">
+                                                Upload up to 5 product images. At least 1 image is required.
+                                            </p>
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">
+                        Product Labels
+                    </h2>
+                    <p className="mt-1 max-w-2xl text-sm/6 text-gray-600 dark:text-gray-400">
+                        Upload images for the front and back labels of the product.
+                    </p>
+
+                    <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2">
+                        <div>
+                            <label className="block text-sm/6 font-medium text-gray-900 dark:text-white mb-2">
+                                Front Label
+                            </label>
+                            <FormField
+                                control={form.control}
+                                name="front_label"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormControl>
+                                            <FileInput
+                                                id={agroChemical?.id}
+                                                fieldName="front_label"
+                                                value={field.value ? [field.value] : []}
+                                                onChange={(value) => field.onChange(value[0])}
+                                                thumbnailClassName="relative overflow-hidden border border-gray-200 rounded-lg bg-white shadow-sm w-full"
+                                                imageClassName="flex items-center justify-center w-full h-64 overflow-hidden bg-gray-50"
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm/6 font-medium text-gray-900 dark:text-white mb-2">
+                                Back Label
+                            </label>
+                            <FormField
+                                control={form.control}
+                                name="back_label"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormControl>
+                                            <FileInput
+                                                id={agroChemical?.id}
+                                                fieldName="back_label"
+                                                value={field.value ? [field.value] : []}
+                                                onChange={(value) => field.onChange(value[0])}
+                                                thumbnailClassName="relative overflow-hidden border border-gray-200 rounded-lg bg-white shadow-sm w-full"
+                                                imageClassName="flex items-center justify-center w-full h-64 overflow-hidden bg-gray-50"
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
                         </div>
                     </div>
                 </div>

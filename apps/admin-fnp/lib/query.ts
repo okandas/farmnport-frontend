@@ -159,6 +159,11 @@ export function updateAgroChemical(data: FormAgroChemicalModel) {
   return api.post(url, data)
 }
 
+export function uploadImage(data: FormData) {
+  let url = `${baseUrl}/user/image/upload`
+  return api.post(url, data)
+}
+
 export function uploadImages(data: FormData) {
   let url = `${baseUrl}/user/image/uploads`
   return api.post(url, data)

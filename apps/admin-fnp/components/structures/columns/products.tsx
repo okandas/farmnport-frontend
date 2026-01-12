@@ -4,6 +4,7 @@ import { ColumnDef } from "@tanstack/react-table"
 import { AgroChemicalItem } from "@/lib/schemas"
 import { Checkbox } from "@/components/ui/checkbox"
 import { AgroChemicalControlDropDown } from "@/components/structures/dropdowns/agroChemical-dropdown"
+import { formatDate } from "@/lib/utilities"
 
 export const agroChemicalColumns: ColumnDef<AgroChemicalItem>[] = [
   {
@@ -30,6 +31,22 @@ export const agroChemicalColumns: ColumnDef<AgroChemicalItem>[] = [
   {
     accessorKey: "name",
     header: "Name",
+  },
+  {
+    accessorKey: "brand.name",
+    header: "Brand",
+    cell: ({ row }) => {
+      const brand = row.original.brand
+      return <span>{brand?.name || "-"}</span>
+    },
+  },
+  {
+    accessorKey: "created",
+    header: "Date Created",
+    cell: ({ row }) => {
+      const created = row.original.created
+      return <span>{formatDate(created)}</span>
+    },
   },
   {
     id: "actions",

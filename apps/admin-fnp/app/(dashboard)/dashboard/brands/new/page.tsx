@@ -3,7 +3,6 @@
 import Link from "next/link"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation } from "@tanstack/react-query"
-import { isAxiosError } from "axios"
 import { useForm } from "react-hook-form"
 import { useRouter } from "next/navigation"
 import * as z from "zod"
@@ -12,8 +11,8 @@ import { addBrand } from "@/lib/query"
 import { cn } from "@/lib/utilities"
 import { buttonVariants } from "@/components/ui/button"
 import { Icons } from "@/components/icons/lucide"
-import { ToastAction } from "@/components/ui/toast"
 import { toast } from "@/components/ui/use-toast"
+import { handleApiError } from "@/lib/error-handler"
 import {
     Form,
     FormControl,
@@ -48,24 +47,9 @@ export default function NewBrandPage() {
             router.push("/dashboard/brands")
         },
         onError: (error) => {
-            if (isAxiosError(error)) {
-                switch (error.code) {
-                    case "ERR_NETWORK":
-                        toast({
-                            description: "There seems to be a network error.",
-                            action: <ToastAction altText="Try again">Try again</ToastAction>,
-                        })
-                        break
-
-                    default:
-                        toast({
-                            title: "Uh oh! Brand creation failed.",
-                            description: error.response?.data?.message || "There was a problem with your request.",
-                            action: <ToastAction altText="Try again">Try again</ToastAction>,
-                        })
-                        break
-                }
-            }
+            handleApiError(error, {
+                context: "brand creation"
+            })
         },
     })
 

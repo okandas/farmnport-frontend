@@ -1,19 +1,17 @@
 "use client"
 
-import { use } from "react"
+import { use, useEffect, useRef } from "react"
 import Link from "next/link"
 import { useQuery } from "@tanstack/react-query"
-import { isAxiosError } from "axios"
 
 import { queryAgroChemical } from "@/lib/query"
 import { AgroChemicalItem } from "@/lib/schemas"
 import { cn } from "@/lib/utilities"
 import { buttonVariants } from "@/components/ui/button"
-import { ToastAction } from "@/components/ui/toast"
-import { toast } from "@/components/ui/use-toast"
 import { Icons } from "@/components/icons/lucide"
 import { Placeholder } from "@/components/state/placeholder"
 import { AgroChemicalForm } from "@/components/structures/forms/agroChemicalForm"
+import { handleFetchError } from "@/lib/error-handler"
 
 interface EditProductPageProps {
   params: Promise<{
@@ -26,37 +24,33 @@ export default function EditAgroChemicalPage({ params }: EditProductPageProps) {
   const id = slug
   const url = `/dashboard/agrochemicals/${id}`
 
-  const { isError, isLoading, isFetching, refetch, data } = useQuery({
+  const { isError, isLoading, isFetching, refetch, data, error } = useQuery({
     queryKey: ["dashboard-product", id],
     queryFn: () => queryAgroChemical(id),
-    refetchOnWindowFocus: false
+    refetchOnWindowFocus: false,
   })
 
   const agroChemical = data?.data as AgroChemicalItem
 
-  if (isError) {
-    if (isAxiosError(data)) {
-      switch (data.code) {
-        case "ERR_NETWORK":
-          toast({
-            description: "There seems to be a network error.",
-            action: <ToastAction altText="Try again">Try again</ToastAction>,
-          })
-          break
-
-        default:
-          toast({
-            title: "Uh oh! Failed to fetch agrochemical.",
-            description: "There was a problem with your request.",
-            action: (
-              <ToastAction altText="Try again" onClick={() => refetch()}>
-                Try again
-              </ToastAction>
-            ),
-          })
-          break
-      }
+  // Show error toast only once when error occurs
+  const hasShownError = useRef(false)
+  useEffect(() => {
+    if (isError && !hasShownError.current) {
+      hasShownError.current = true
+      handleFetchError(error, {
+        onRetry: () => {
+          hasShownError.current = false
+          refetch()
+        },
+        context: "agrochemical"
+      })
     }
+    if (!isError) {
+      hasShownError.current = false
+    }
+  }, [isError, error, refetch])
+
+  if (isError) {
     return (
       <div className="mt-20">
         <Placeholder>
