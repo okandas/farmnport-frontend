@@ -339,6 +339,23 @@ export const FormAgroChemicalActiveIngredientSchema = AgroChemicalActiveIngredie
   description: true,
 })
 
+export const AgroChemicalTargetSchema = z.object({
+  id: z.string(),
+  name: z.string().min(1, "Name is required"),
+  scientific_name: z.string().optional(),
+  remark: z.string().optional(),
+  slug: z.string().optional(),
+  created: z.string().optional(),
+  updated: z.string().optional(),
+})
+
+export const FormAgroChemicalTargetSchema = AgroChemicalTargetSchema.pick({
+  id: true,
+  name: true,
+  scientific_name: true,
+  remark: true,
+})
+
 export const AgroChemicalSchema = z.object({
   id: z.string(),
   name: z.string().min(1, "Name is required"),
@@ -419,6 +436,8 @@ export type AgroChemicalCategory = z.infer<typeof AgroChemicalCategorySchema>
 export type FormAgroChemicalCategoryModel = z.infer<typeof FormAgroChemicalCategorySchema>
 export type AgroChemicalActiveIngredient = z.infer<typeof AgroChemicalActiveIngredientSchema>
 export type FormAgroChemicalActiveIngredientModel = z.infer<typeof FormAgroChemicalActiveIngredientSchema>
+export type AgroChemicalTarget = z.infer<typeof AgroChemicalTargetSchema>
+export type FormAgroChemicalTargetModel = z.infer<typeof FormAgroChemicalTargetSchema>
 export type AgroChemicalItem = z.infer<typeof AgroChemicalSchema>
 export type FormAgroChemicalModel = z.infer<typeof FormAgroChemicalSchema>
 

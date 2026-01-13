@@ -29,6 +29,11 @@ export const dashboardConfig: DashboardConfig = {
       icon: "beaker",
     },
     {
+      title: "AgroChemical Targets",
+      href: "/dashboard/agrochemical-targets",
+      icon: "bug",
+    },
+    {
       title: "Brands",
       href: "/dashboard/brands",
       icon: "tag",

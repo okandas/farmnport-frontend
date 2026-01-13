@@ -270,6 +270,27 @@ export function queryAgroChemicalActiveIngredient(id: string) {
   return api.get(url)
 }
 
+export function queryAgroChemicalTargets(pagination?: pagination) {
+  let url: string
+
+  if (pagination?.p !== undefined && pagination.p >= 2) {
+    url = `${baseUrl}/user/agrochemical-targets?p=${pagination.p}`
+  } else {
+    url = `${baseUrl}/user/agrochemical-targets`
+  }
+
+  if (pagination?.search !== undefined && pagination.search.length >= 2) {
+    url = `${baseUrl}/user/agrochemical-targets?search=${pagination.search}`
+  }
+
+  return api.get(url)
+}
+
+export function queryAgroChemicalTarget(id: string) {
+  const url = `${baseUrl}/user/agrochemical-targets/${id}`
+  return api.get(url)
+}
+
 export function addAgroChemicalActiveIngredient(data: { name: string; short_description: string; description: string }) {
   let url = `${baseUrl}/user/agrochemical-active-ingredients/add`
   return api.post(url, data)
@@ -283,6 +304,21 @@ export function updateAgroChemicalActiveIngredient(data: { id: string; name: str
 export function deleteAgroChemicalActiveIngredients(ingredientIds: string[]) {
   let url = `${baseUrl}/user/agrochemical-active-ingredients/delete`
   return api.post(url, { ingredient_ids: ingredientIds })
+}
+
+export function addAgroChemicalTarget(data: { name: string; scientific_name?: string; remark?: string }) {
+  let url = `${baseUrl}/user/agrochemical-targets/add`
+  return api.post(url, data)
+}
+
+export function updateAgroChemicalTarget(data: { id: string; name: string; scientific_name?: string; remark?: string }) {
+  let url = `${baseUrl}/user/agrochemical-targets/update`
+  return api.post(url, data)
+}
+
+export function deleteAgroChemicalTargets(targetIds: string[]) {
+  let url = `${baseUrl}/user/agrochemical-targets/delete`
+  return api.post(url, { target_ids: targetIds })
 }
 
 export function queryFarmProduceCategories(pagination?: pagination) {

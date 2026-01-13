@@ -7,8 +7,8 @@ import { useMutation, useQuery } from "@tanstack/react-query"
 import { useForm } from "react-hook-form"
 import { useRouter } from "next/navigation"
 
-import { updateAgroChemicalActiveIngredient, queryAgroChemicalActiveIngredient } from "@/lib/query"
-import { FormAgroChemicalActiveIngredientSchema, FormAgroChemicalActiveIngredientModel, AgroChemicalActiveIngredient } from "@/lib/schemas"
+import { updateAgroChemicalTarget, queryAgroChemicalTarget } from "@/lib/query"
+import { FormAgroChemicalTargetSchema, FormAgroChemicalTargetModel, AgroChemicalTarget } from "@/lib/schemas"
 import { cn } from "@/lib/utilities"
 import { buttonVariants } from "@/components/ui/button"
 import { Icons } from "@/components/icons/lucide"
@@ -24,50 +24,50 @@ import {
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 
-export default function EditAgroChemicalActiveIngredientPage({ params }: { params: Promise<{ slug: string }> }) {
+export default function EditAgroChemicalTargetPage({ params }: { params: Promise<{ slug: string }> }) {
     const router = useRouter()
     const { slug } = use(params)
-    const ingredientId = slug
+    const targetId = slug
 
-    const { data: ingredientData, isLoading } = useQuery({
-        queryKey: ["agrochemical-active-ingredient", ingredientId],
-        queryFn: () => queryAgroChemicalActiveIngredient(ingredientId),
+    const { data: targetData, isLoading } = useQuery({
+        queryKey: ["agrochemical-target", targetId],
+        queryFn: () => queryAgroChemicalTarget(targetId),
     })
 
-    const ingredient = ingredientData?.data as AgroChemicalActiveIngredient
+    const target = targetData?.data as AgroChemicalTarget
 
-    const form = useForm<FormAgroChemicalActiveIngredientModel>({
+    const form = useForm<FormAgroChemicalTargetModel>({
         defaultValues: {
-            id: ingredient?.id || "",
-            name: ingredient?.name || "",
-            short_description: ingredient?.short_description || "",
-            description: ingredient?.description || "",
+            id: target?.id || "",
+            name: target?.name || "",
+            scientific_name: target?.scientific_name || "",
+            remark: target?.remark || "",
         },
-        values: ingredient ? {
-            id: ingredient.id,
-            name: ingredient.name,
-            short_description: ingredient.short_description,
-            description: ingredient.description,
+        values: target ? {
+            id: target.id,
+            name: target.name,
+            scientific_name: target.scientific_name,
+            remark: target.remark,
         } : undefined,
-        resolver: zodResolver(FormAgroChemicalActiveIngredientSchema),
+        resolver: zodResolver(FormAgroChemicalTargetSchema),
     })
 
     const { mutate, isPending } = useMutation({
-        mutationFn: updateAgroChemicalActiveIngredient,
+        mutationFn: updateAgroChemicalTarget,
         onSuccess: () => {
             toast({
-                description: "Active ingredient updated successfully",
+                description: "Target updated successfully",
             })
-            router.push("/dashboard/agrochemical-active-ingredients")
+            router.push("/dashboard/agrochemical-targets")
         },
         onError: (error) => {
             handleApiError(error, {
-                context: "active ingredient update"
+                context: "target update"
             })
         },
     })
 
-    async function onSubmit(data: FormAgroChemicalActiveIngredientModel) {
+    async function onSubmit(data: FormAgroChemicalTargetModel) {
         mutate(data)
     }
 
@@ -79,11 +79,11 @@ export default function EditAgroChemicalActiveIngredientPage({ params }: { param
         )
     }
 
-    if (!ingredient) {
+    if (!target) {
         return (
             <div className="text-center py-12">
                 <p className="text-sm text-red-600 dark:text-red-400">
-                    Active ingredient not found.
+                    Target not found.
                 </p>
             </div>
         )
@@ -94,14 +94,14 @@ export default function EditAgroChemicalActiveIngredientPage({ params }: { param
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-                        Edit AgroChemical Active Ingredient
+                        Edit AgroChemical Target
                     </h1>
                     <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                        Update the active ingredient information.
+                        Update the target information.
                     </p>
                 </div>
                 <Link
-                    href="/dashboard/agrochemical-active-ingredients"
+                    href="/dashboard/agrochemical-targets"
                     className={cn(buttonVariants({ variant: "ghost" }))}
                 >
                     <Icons.close className="w-4 h-4 mr-2" />
@@ -114,10 +114,10 @@ export default function EditAgroChemicalActiveIngredientPage({ params }: { param
                     <div className="space-y-12">
                         <div className="border-b border-gray-900/10 pb-12 dark:border-white/10">
                             <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">
-                                Active Ingredient Information
+                                Target Information
                             </h2>
                             <p className="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">
-                                Active ingredients are the chemical compounds that provide the primary effect in agrochemical products.
+                                Targets are pests, diseases, or organisms that agrochemical products are designed to control.
                             </p>
 
                             <div className="mt-10 space-y-8">
@@ -126,7 +126,7 @@ export default function EditAgroChemicalActiveIngredientPage({ params }: { param
                                         htmlFor="name"
                                         className="block text-sm/6 font-medium text-gray-900 dark:text-white"
                                     >
-                                        Ingredient Name
+                                        Target Name
                                     </label>
                                     <div className="mt-2">
                                         <FormField
@@ -137,7 +137,7 @@ export default function EditAgroChemicalActiveIngredientPage({ params }: { param
                                                     <FormControl>
                                                         <Input
                                                             id="name"
-                                                            placeholder="e.g., Glyphosate, Imidacloprid, Mancozeb"
+                                                            placeholder="e.g., Aphids, Whiteflies, Bolworm"
                                                             className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
                                                             {...field}
                                                         />
@@ -148,27 +148,27 @@ export default function EditAgroChemicalActiveIngredientPage({ params }: { param
                                         />
                                     </div>
                                     <p className="mt-3 text-sm/6 text-gray-600 dark:text-gray-400">
-                                        Enter the name of the active ingredient. The URL-friendly slug will be updated automatically.
+                                        Enter the common English name of the pest or disease. The URL-friendly slug will be updated automatically.
                                     </p>
                                 </div>
 
                                 <div className="px-1">
                                     <label
-                                        htmlFor="short_description"
+                                        htmlFor="scientific_name"
                                         className="block text-sm/6 font-medium text-gray-900 dark:text-white"
                                     >
-                                        Short Description
+                                        Scientific Name (Optional)
                                     </label>
                                     <div className="mt-2">
                                         <FormField
                                             control={form.control}
-                                            name="short_description"
+                                            name="scientific_name"
                                             render={({ field }) => (
                                                 <FormItem>
                                                     <FormControl>
                                                         <Input
-                                                            id="short_description"
-                                                            placeholder="e.g., Non-selective herbicide"
+                                                            id="scientific_name"
+                                                            placeholder="e.g., Aphis gossypii, Helicoverpa armigera"
                                                             className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
                                                             {...field}
                                                         />
@@ -179,28 +179,28 @@ export default function EditAgroChemicalActiveIngredientPage({ params }: { param
                                         />
                                     </div>
                                     <p className="mt-3 text-sm/6 text-gray-600 dark:text-gray-400">
-                                        Brief description for SEO and metadata (max 100 characters).
+                                        Latin scientific name of the pest or disease (if applicable).
                                     </p>
                                 </div>
 
                                 <div className="px-1">
                                     <label
-                                        htmlFor="description"
+                                        htmlFor="remark"
                                         className="block text-sm/6 font-medium text-gray-900 dark:text-white"
                                     >
-                                        Description
+                                        Remarks (Optional)
                                     </label>
                                     <div className="mt-2">
                                         <FormField
                                             control={form.control}
-                                            name="description"
+                                            name="remark"
                                             render={({ field }) => (
                                                 <FormItem>
                                                     <FormControl>
                                                         <Textarea
-                                                            id="description"
-                                                            placeholder="Describe the active ingredient, its mode of action, and common uses"
-                                                            rows={4}
+                                                            id="remark"
+                                                            placeholder="e.g., larvae & adult, including subspecies"
+                                                            rows={3}
                                                             className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
                                                             {...field}
                                                         />
@@ -211,7 +211,7 @@ export default function EditAgroChemicalActiveIngredientPage({ params }: { param
                                         />
                                     </div>
                                     <p className="mt-3 text-sm/6 text-gray-600 dark:text-gray-400">
-                                        Provide a brief description of this active ingredient (max 500 characters).
+                                        Additional notes about the target (e.g., specific life stages, variants).
                                     </p>
                                 </div>
 
@@ -221,21 +221,21 @@ export default function EditAgroChemicalActiveIngredientPage({ params }: { param
                                     </label>
                                     <div className="mt-2">
                                         <div className="block w-full rounded-md bg-gray-50 px-3 py-1.5 text-base text-gray-500 outline outline-1 outline-gray-300 sm:text-sm/6 dark:bg-gray-900 dark:text-gray-400 dark:outline-white/10">
-                                            {ingredient.slug}
+                                            {target.slug}
                                         </div>
                                     </div>
                                     <p className="mt-3 text-sm/6 text-gray-600 dark:text-gray-400">
-                                        This is the URL-friendly version of the ingredient name.
+                                        This is the URL-friendly version of the target name.
                                     </p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div className="mt-6 flex items-center justify-end gap-x-6">
+                    <div className="mt-6 pb-12 flex items-center justify-end gap-x-6">
                         <button
                             type="button"
-                            onClick={() => router.push("/dashboard/agrochemical-active-ingredients")}
+                            onClick={() => router.push("/dashboard/agrochemical-targets")}
                             className="text-sm/6 font-semibold text-gray-900 dark:text-white"
                         >
                             Cancel
