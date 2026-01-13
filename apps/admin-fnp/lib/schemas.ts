@@ -356,6 +356,38 @@ export const FormAgroChemicalTargetSchema = AgroChemicalTargetSchema.pick({
   remark: true,
 })
 
+export type AgroChemicalTarget = z.infer<typeof AgroChemicalTargetSchema>
+export type FormAgroChemicalTargetModel = z.infer<typeof FormAgroChemicalTargetSchema>
+
+export const AgroChemicalDosageRateSchema = z.object({
+  id: z.string(),
+  agrochemical_id: z.string().min(1, "AgroChemical is required"),
+  farm_produce_id: z.string().min(1, "Crop is required"),
+  target_ids: z.array(z.string()).min(1, "At least one target is required"),
+  dosage: z.string().min(1, "Dosage is required"),
+  max_applications: z.coerce.number().positive("Maximum applications must be positive"),
+  application_interval: z.string().min(1, "Application interval is required"),
+  phi: z.string().optional(),
+  remarks: z.string().optional(),
+  created: z.string().optional(),
+  updated: z.string().optional(),
+})
+
+export const FormAgroChemicalDosageRateSchema = AgroChemicalDosageRateSchema.pick({
+  id: true,
+  agrochemical_id: true,
+  farm_produce_id: true,
+  target_ids: true,
+  dosage: true,
+  max_applications: true,
+  application_interval: true,
+  phi: true,
+  remarks: true,
+})
+
+export type AgroChemicalDosageRate = z.infer<typeof AgroChemicalDosageRateSchema>
+export type FormAgroChemicalDosageRateModel = z.infer<typeof FormAgroChemicalDosageRateSchema>
+
 export const AgroChemicalSchema = z.object({
   id: z.string(),
   name: z.string().min(1, "Name is required"),
@@ -379,8 +411,29 @@ export const ActiveIngredientRelationSchema = z.object({
   dosage_unit: z.string().min(1, "Dosage unit is required"),
 })
 
+export const DosageRateSchema = z.object({
+  id: z.string(),
+  crop: z.string(),
+  crop_id: z.string(),
+  targets: z.string(),
+  target_ids: z.array(z.string()),
+  dosage: z.object({
+    value: z.string(),
+    unit: z.string(),
+    per: z.string(),
+  }),
+  max_applications: z.object({
+    max: z.number(),
+    note: z.string(),
+  }),
+  application_interval: z.string(),
+  phi: z.string(),
+  remarks: z.array(z.string()),
+})
+
 export const FormAgroChemicalSchema = AgroChemicalSchema.extend({
-  active_ingredients: z.array(ActiveIngredientRelationSchema).optional(),
+  active_ingredients: z.array(ActiveIngredientRelationSchema),
+  dosage_rates: z.array(DosageRateSchema),
 })
 
 ApplicationUserSchema.required({

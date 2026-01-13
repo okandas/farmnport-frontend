@@ -43,6 +43,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { FileInput } from "@/components/structures/controls/file-input"
 import { ActiveIngredientsSelect } from "@/components/structures/forms/activeIngredientsSelect"
+import { DosageRatesSelect } from "@/components/structures/forms/dosageRatesSelect"
 
 interface AgroChemicalFormProps extends React.HTMLAttributes<HTMLDivElement> {
     agroChemical: FormAgroChemicalModel
@@ -61,6 +62,7 @@ export function AgroChemicalForm({ agroChemical, mode = "create" }: AgroChemical
             back_label: agroChemical?.back_label,
             images: agroChemical?.images || [],
             active_ingredients: agroChemical?.active_ingredients || [],
+            dosage_rates: agroChemical?.dosage_rates || [],
         },
         resolver: zodResolver(FormAgroChemicalSchema),
     })
@@ -409,6 +411,34 @@ export function AgroChemicalForm({ agroChemical, mode = "create" }: AgroChemical
                                 <FormItem>
                                     <FormControl>
                                         <ActiveIngredientsSelect
+                                            value={field.value || []}
+                                            onChange={field.onChange}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+                </div>
+
+                {/* Dosage Rates Section */}
+                <div className="border-b border-gray-900/10 pb-12 dark:border-white/10">
+                    <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">
+                        Dosage Rates
+                    </h2>
+                    <p className="mt-1 max-w-2xl text-sm/6 text-gray-600 dark:text-gray-400">
+                        Add dosage rates for different crops and target pests/diseases.
+                    </p>
+
+                    <div className="mt-6">
+                        <FormField
+                            control={form.control}
+                            name="dosage_rates"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormControl>
+                                        <DosageRatesSelect
                                             value={field.value || []}
                                             onChange={field.onChange}
                                         />

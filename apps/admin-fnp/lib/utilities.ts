@@ -668,4 +668,11 @@ export function logFormPayload<T>(payload: T, formName?: string): void {
 
   console.log(header)
   console.log(JSON.stringify(payload, null, 2))
+
+  // Show toast notification
+  const { toast } = require("@/components/ui/use-toast")
+  toast({
+    title: formName ? `${formName.toUpperCase()} Form Payload Logged` : "Form Payload Logged",
+    description: "Check the console for the complete payload details",
+  })
 }
