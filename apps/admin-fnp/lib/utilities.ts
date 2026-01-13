@@ -655,3 +655,17 @@ export function createPriceListPayload(payload: ProducerPriceList) {
 
   return payload
 }
+
+/**
+ * Logs form payload to console for debugging purposes
+ * @param payload - The form data to log
+ * @param formName - Optional name to identify which form is being logged
+ */
+export function logFormPayload<T>(payload: T, formName?: string): void {
+  const header = formName
+    ? `=== ${formName.toUpperCase()} FORM PAYLOAD ===`
+    : "=== FORM PAYLOAD ==="
+
+  console.log(header)
+  console.log(JSON.stringify(payload, null, 2))
+}

@@ -1,10 +1,16 @@
 import { isAxiosError } from "axios"
+import { FieldErrors, FieldValues } from "react-hook-form"
 import { toast } from "@/components/ui/use-toast"
 import { ToastAction } from "@/components/ui/toast"
 
 interface ErrorHandlerOptions {
     onRetry?: () => void
     context?: string
+}
+
+interface FormErrorHandlerOptions {
+    showToast?: boolean
+    logErrors?: boolean
 }
 
 /**
@@ -136,4 +142,46 @@ export function handleDeleteError(error: unknown, options?: ErrorHandlerOptions)
  */
 export function handleFetchError(error: unknown, options?: ErrorHandlerOptions) {
     handleApiError(error, { ...options, context: "fetch" })
+}
+
+/**
+ * Handles form validation errors by showing a toast notification
+ *
+ * Usage:
+ * ```tsx
+ * const onError = (errors: FieldErrors<MyFormType>) => {
+ *   handleFormErrors(errors)
+ * }
+ *
+ * <form onSubmit={form.handleSubmit(onSubmit, onError)}>
+ * ```
+ */
+export function handleFormErrors<T extends FieldValues>(
+    errors: FieldErrors<T>,
+    options?: FormErrorHandlerOptions
+) {
+    const { showToast = true, logErrors = true } = options || {}
+
+    if (logErrors) {
+        console.log("Form validation errors:", errors)
+    }
+
+    // Get the first error field name
+    const firstErrorField = Object.keys(errors)[0]
+
+    if (!firstErrorField) return
+
+    // Show error toast
+    if (showToast) {
+        // Format field name for display (convert snake_case to Title Case)
+        const fieldName = firstErrorField
+            .replace(/_/g, ' ')
+            .replace(/\b\w/g, (char) => char.toUpperCase())
+
+        toast({
+            title: "Validation Error",
+            description: `Please fix the errors in the form. Check the ${fieldName} field.`,
+            variant: "destructive",
+        })
+    }
 }

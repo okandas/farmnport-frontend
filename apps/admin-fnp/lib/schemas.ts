@@ -355,7 +355,16 @@ export const AgroChemicalSchema = z.object({
   updated: z.string().optional(),
 })
 
-export const FormAgroChemicalSchema = AgroChemicalSchema
+export const ActiveIngredientRelationSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  dosage_value: z.number().min(0, "Dosage value must be positive"),
+  dosage_unit: z.string().min(1, "Dosage unit is required"),
+})
+
+export const FormAgroChemicalSchema = AgroChemicalSchema.extend({
+  active_ingredients: z.array(ActiveIngredientRelationSchema).optional(),
+})
 
 ApplicationUserSchema.required({
   name: true,

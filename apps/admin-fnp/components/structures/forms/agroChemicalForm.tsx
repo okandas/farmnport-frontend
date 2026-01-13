@@ -14,8 +14,8 @@ import {
     FormAgroChemicalSchema,
     Brand,
 } from "@/lib/schemas"
-import { cn } from "@/lib/utilities"
-import { handleApiError, handleFetchError } from "@/lib/error-handler"
+import { cn, logFormPayload } from "@/lib/utilities"
+import { handleApiError, handleFetchError, handleFormErrors } from "@/lib/error-handler"
 
 import {
     Form,
@@ -42,6 +42,7 @@ import {
 } from "@/components/ui/popover"
 import { Button } from "@/components/ui/button"
 import { FileInput } from "@/components/structures/controls/file-input"
+import { ActiveIngredientsSelect } from "@/components/structures/forms/activeIngredientsSelect"
 
 interface AgroChemicalFormProps extends React.HTMLAttributes<HTMLDivElement> {
     agroChemical: FormAgroChemicalModel
@@ -59,6 +60,7 @@ export function AgroChemicalForm({ agroChemical, mode = "create" }: AgroChemical
             front_label: agroChemical?.front_label,
             back_label: agroChemical?.back_label,
             images: agroChemical?.images || [],
+            active_ingredients: agroChemical?.active_ingredients || [],
         },
         resolver: zodResolver(FormAgroChemicalSchema),
     })
@@ -138,18 +140,19 @@ export function AgroChemicalForm({ agroChemical, mode = "create" }: AgroChemical
     })
 
     async function onSubmit(payload: FormAgroChemicalModel) {
+        logFormPayload(payload, "agrochemical")
         mutate(payload)
     }
 
     const onError = (errors: FieldErrors<FormAgroChemicalModel>) => {
-        console.log(errors)
+        handleFormErrors(errors)
     }
 
     return (
         <Form {...form}>
             <form
                 onSubmit={form.handleSubmit(onSubmit, onError)}
-                className="space-y-12 sm:space-y-16"
+                className="space-y-12 sm:space-y-16 pb-16"
             >
                 <div>
                     <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">
@@ -390,7 +393,34 @@ export function AgroChemicalForm({ agroChemical, mode = "create" }: AgroChemical
                     </div>
                 </div>
 
-                <div className="mt-6 flex items-center justify-end gap-x-6">
+                <div>
+                    <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">
+                        Active Ingredients
+                    </h2>
+                    <p className="mt-1 max-w-2xl text-sm/6 text-gray-600 dark:text-gray-400">
+                        Select the active chemical ingredients in this product and specify their dosage amounts.
+                    </p>
+
+                    <div className="mt-6">
+                        <FormField
+                            control={form.control}
+                            name="active_ingredients"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormControl>
+                                        <ActiveIngredientsSelect
+                                            value={field.value || []}
+                                            onChange={field.onChange}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+                </div>
+
+                <div className="mt-6 mb-12 flex items-center justify-end gap-x-6">
                     <button
                         type="button"
                         onClick={() => router.push('/dashboard/agrochemicals')}
