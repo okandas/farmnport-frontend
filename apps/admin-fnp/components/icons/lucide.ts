@@ -47,7 +47,9 @@ import {
   UtensilsCrossed,
   Upload,
   Pencil,
-  Tag
+  Tag,
+  ClipboardList,
+  Beaker
 } from "lucide-react"
 
 export type Icon = LucideIcon
@@ -102,5 +104,7 @@ export const Icons = {
   fileSpreadsheet: FileSpreadsheet,
   upload: Upload,
   edit: Pencil,
-  tag: Tag
+  tag: Tag,
+  clipboardList: ClipboardList,
+  beaker: Beaker
 }

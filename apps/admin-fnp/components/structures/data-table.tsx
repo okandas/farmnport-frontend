@@ -169,9 +169,13 @@ export function DataTable<TData, TValue>({
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center"
+                  className="h-48 text-center"
                 >
-                  No results.
+                  <div className="flex flex-col items-center justify-center space-y-2 text-muted-foreground">
+                    <Icons.alertCircle className="w-8 h-8" />
+                    <p className="text-sm font-medium">No {tableName.toLowerCase()}s found</p>
+                    <p className="text-xs">Click "New {tableName}" above to add your first entry.</p>
+                  </div>
                 </TableCell>
               </TableRow>
             )}

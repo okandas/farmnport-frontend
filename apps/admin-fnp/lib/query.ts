@@ -211,6 +211,80 @@ export function updateBrand(data: { id: string; name: string }) {
   return api.post(url, data)
 }
 
+// AgroChemical Category functions
+export function queryAgroChemicalCategories(pagination?: pagination) {
+  let url: string
+
+  if (pagination?.p !== undefined && pagination.p >= 2) {
+    url = `${baseUrl}/user/agrochemical-categories?p=${pagination.p}`
+  } else {
+    url = `${baseUrl}/user/agrochemical-categories`
+  }
+
+  if (pagination?.search !== undefined && pagination.search.length >= 2) {
+    url = `${baseUrl}/user/agrochemical-categories?search=${pagination.search}`
+  }
+
+  return api.get(url)
+}
+
+export function queryAgroChemicalCategory(id: string) {
+  const url = `${baseUrl}/user/agrochemical-categories/${id}`
+  return api.get(url)
+}
+
+export function addAgroChemicalCategory(data: { name: string; short_description: string; description: string }) {
+  let url = `${baseUrl}/user/agrochemical-categories/add`
+  return api.post(url, data)
+}
+
+export function updateAgroChemicalCategory(data: { id: string; name: string; short_description: string; description: string }) {
+  let url = `${baseUrl}/user/agrochemical-categories/update`
+  return api.post(url, data)
+}
+
+export function deleteAgroChemicalCategories(categoryIds: string[]) {
+  let url = `${baseUrl}/user/agrochemical-categories/delete`
+  return api.post(url, { category_ids: categoryIds })
+}
+
+// AgroChemical Active Ingredient functions
+export function queryAgroChemicalActiveIngredients(pagination?: pagination) {
+  let url: string
+
+  if (pagination?.p !== undefined && pagination.p >= 2) {
+    url = `${baseUrl}/user/agrochemical-active-ingredients?p=${pagination.p}`
+  } else {
+    url = `${baseUrl}/user/agrochemical-active-ingredients`
+  }
+
+  if (pagination?.search !== undefined && pagination.search.length >= 2) {
+    url = `${baseUrl}/user/agrochemical-active-ingredients?search=${pagination.search}`
+  }
+
+  return api.get(url)
+}
+
+export function queryAgroChemicalActiveIngredient(id: string) {
+  const url = `${baseUrl}/user/agrochemical-active-ingredients/${id}`
+  return api.get(url)
+}
+
+export function addAgroChemicalActiveIngredient(data: { name: string; short_description: string; description: string }) {
+  let url = `${baseUrl}/user/agrochemical-active-ingredients/add`
+  return api.post(url, data)
+}
+
+export function updateAgroChemicalActiveIngredient(data: { id: string; name: string; short_description: string; description: string }) {
+  let url = `${baseUrl}/user/agrochemical-active-ingredients/update`
+  return api.post(url, data)
+}
+
+export function deleteAgroChemicalActiveIngredients(ingredientIds: string[]) {
+  let url = `${baseUrl}/user/agrochemical-active-ingredients/delete`
+  return api.post(url, { ingredient_ids: ingredientIds })
+}
+
 export function queryFarmProduceCategories(pagination?: pagination) {
   let url: string
 

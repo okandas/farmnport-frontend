@@ -305,6 +305,40 @@ export const BrandSchema = z.object({
   updated: z.string().optional(),
 })
 
+export const AgroChemicalCategorySchema = z.object({
+  id: z.string(),
+  name: z.string().min(1, "Name is required"),
+  slug: z.string().optional(),
+  short_description: z.string().max(100, "Short description cannot exceed 100 characters"),
+  description: z.string().max(500, "Description cannot exceed 500 characters"),
+  created: z.string().optional(),
+  updated: z.string().optional(),
+})
+
+export const FormAgroChemicalCategorySchema = AgroChemicalCategorySchema.pick({
+  id: true,
+  name: true,
+  short_description: true,
+  description: true,
+})
+
+export const AgroChemicalActiveIngredientSchema = z.object({
+  id: z.string(),
+  name: z.string().min(1, "Name is required"),
+  slug: z.string().optional(),
+  short_description: z.string().max(100, "Short description cannot exceed 100 characters"),
+  description: z.string().max(500, "Description cannot exceed 500 characters"),
+  created: z.string().optional(),
+  updated: z.string().optional(),
+})
+
+export const FormAgroChemicalActiveIngredientSchema = AgroChemicalActiveIngredientSchema.pick({
+  id: true,
+  name: true,
+  short_description: true,
+  description: true,
+})
+
 export const AgroChemicalSchema = z.object({
   id: z.string(),
   name: z.string().min(1, "Name is required"),
@@ -372,6 +406,10 @@ export type EditApplicationUser = z.infer<typeof EditApplicationUserSchema>
 
 export type ProducerPriceList = z.infer<typeof ProducerPriceListSchema>
 export type Brand = z.infer<typeof BrandSchema>
+export type AgroChemicalCategory = z.infer<typeof AgroChemicalCategorySchema>
+export type FormAgroChemicalCategoryModel = z.infer<typeof FormAgroChemicalCategorySchema>
+export type AgroChemicalActiveIngredient = z.infer<typeof AgroChemicalActiveIngredientSchema>
+export type FormAgroChemicalActiveIngredientModel = z.infer<typeof FormAgroChemicalActiveIngredientSchema>
 export type AgroChemicalItem = z.infer<typeof AgroChemicalSchema>
 export type FormAgroChemicalModel = z.infer<typeof FormAgroChemicalSchema>
 
