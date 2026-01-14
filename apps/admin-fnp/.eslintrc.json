@@ -14,7 +14,8 @@
     "tailwindcss/no-custom-classname": "off",
     "tailwindcss/classnames-order": "off",
     "tailwindcss/no-unnecessary-arbitrary-value": "off",
-    "prettier/prettier": "warn"
+    "tailwindcss/enforces-shorthand": "off",
+    "prettier/prettier": "off"
   },
   "settings": {
     "tailwindcss": {

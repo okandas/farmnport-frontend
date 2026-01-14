@@ -174,7 +174,7 @@ export function DataTable<TData, TValue>({
                   <div className="flex flex-col items-center justify-center space-y-2 text-muted-foreground">
                     <Icons.alertCircle className="w-8 h-8" />
                     <p className="text-sm font-medium">No {tableName.toLowerCase()}s found</p>
-                    <p className="text-xs">Click "New {tableName}" above to add your first entry.</p>
+                    <p className="text-xs">Click &quot;New {tableName}&quot; above to add your first entry.</p>
                   </div>
                 </TableCell>
               </TableRow>
