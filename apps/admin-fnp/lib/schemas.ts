@@ -400,6 +400,33 @@ export const AgroChemicalSchema = z.object({
   front_label: z.custom<ImageModel>(),
   back_label: z.custom<ImageModel>(),
   images: z.array(z.custom<ImageModel>()).min(1, "At least one product image is required").max(5, "Maximum 5 images allowed"),
+  active_ingredients: z.array(z.object({
+    id: z.string(),
+    name: z.string(),
+    dosage_value: z.number(),
+    dosage_unit: z.string(),
+  })),
+  dosage_rates: z.array(z.object({
+    id: z.string(),
+    crop: z.string(),
+    crop_id: z.string(),
+    targets: z.string(),
+    target_ids: z.array(z.string()),
+    entries: z.array(z.object({
+      dosage: z.object({
+        value: z.string(),
+        unit: z.string(),
+        per: z.string(),
+      }),
+      max_applications: z.object({
+        max: z.number(),
+        note: z.string(),
+      }),
+      application_interval: z.string(),
+      phi: z.string(),
+      remarks: z.array(z.string()),
+    })),
+  })),
   created: z.string().optional(),
   updated: z.string().optional(),
 })
@@ -433,10 +460,7 @@ export const DosageRateSchema = z.object({
   })),
 })
 
-export const FormAgroChemicalSchema = AgroChemicalSchema.extend({
-  active_ingredients: z.array(ActiveIngredientRelationSchema),
-  dosage_rates: z.array(DosageRateSchema),
-})
+export const FormAgroChemicalSchema = AgroChemicalSchema
 
 ApplicationUserSchema.required({
   name: true,
