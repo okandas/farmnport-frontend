@@ -38,18 +38,20 @@ export interface DosageRate {
     crop_id: string
     targets: string
     target_ids: string[]
-    dosage: {
-        value: string
-        unit: string
-        per: string
-    }
-    max_applications: {
-        max: number
-        note: string
-    }
-    application_interval: string
-    phi: string
-    remarks: string[]
+    entries: Array<{
+        dosage: {
+            value: string
+            unit: string
+            per: string
+        }
+        max_applications: {
+            max: number
+            note: string
+        }
+        application_interval: string
+        phi: string
+        remarks: string[]
+    }>
 }
 
 interface DosageRatesSelectProps {
@@ -59,10 +61,22 @@ interface DosageRatesSelectProps {
 
 export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectProps) {
     const [editingId, setEditingId] = useState<string | null>(null)
+    const [editingEntryIndex, setEditingEntryIndex] = useState<number | null>(null)
     const [cropId, setCropId] = useState("")
     const [cropName, setCropName] = useState("")
     const [targetIds, setTargetIds] = useState<string[]>([])
     const [targetNames, setTargetNames] = useState<string[]>([])
+
+    // Entry fields (dosage + max apps + interval + phi + remarks as one combo)
+    const [entriesList, setEntriesList] = useState<Array<{
+        dosage: { value: string; unit: string; per: string }
+        max_applications: { max: number; note: string }
+        application_interval: string
+        phi: string
+        remarks: string[]
+    }>>([])
+
+    // Temporary fields for building an entry
     const [dosageValue, setDosageValue] = useState("")
     const [dosageUnit, setDosageUnit] = useState("kg")
     const [dosagePer, setDosagePer] = useState("hectare")
@@ -149,7 +163,7 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
     }, [isTargetError, targetError, refetchTargets])
 
     const handleAdd = () => {
-        if (!cropId || !cropName || targetIds.length === 0 || !dosageValue || !interval) {
+        if (!cropId || !cropName || targetIds.length === 0 || entriesList.length === 0) {
             return
         }
 
@@ -159,18 +173,7 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
             crop_id: cropId,
             targets: targetNames.join(", "),
             target_ids: targetIds,
-            dosage: {
-                value: dosageValue,
-                unit: dosageUnit,
-                per: dosagePer,
-            },
-            max_applications: {
-                max: parseInt(maxApplications) || 1,
-                note: maxApplicationsNote,
-            },
-            application_interval: interval,
-            phi,
-            remarks: remarksList,
+            entries: entriesList,
         }
 
         if (editingId) {
@@ -190,6 +193,7 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
         setCropName("")
         setTargetIds([])
         setTargetNames([])
+        setEntriesList([])
         setDosageValue("")
         setDosageUnit("kg")
         setDosagePer("hectare")
@@ -204,27 +208,109 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
 
     const handleEdit = (rate: DosageRate) => {
         console.log("Editing rate:", rate)
-        console.log("Rate remarks:", rate.remarks)
-        console.log("Rate remarks type:", typeof rate.remarks)
-        console.log("Rate remarks is array:", Array.isArray(rate.remarks))
 
         setCropId(rate.crop_id)
         setCropName(rate.crop)
         setTargetIds(rate.target_ids)
         setTargetNames(rate.targets.split(", "))
-        setDosageValue(rate.dosage.value)
-        setDosageUnit(rate.dosage.unit)
-        setDosagePer(rate.dosage.per)
-        setMaxApplications(rate.max_applications.max.toString())
-        setMaxApplicationsNote(rate.max_applications.note || "")
-        setInterval(rate.application_interval)
-        setPhi(rate.phi || "")
 
-        // Ensure remarks is an array
-        const remarksArray = Array.isArray(rate.remarks) ? rate.remarks : []
-        console.log("Setting remarksList to:", remarksArray)
-        setRemarksList(remarksArray)
+        // Load entries
+        const entriesArray = Array.isArray(rate.entries) ? rate.entries : []
+        setEntriesList(entriesArray)
+
         setEditingId(rate.id)
+    }
+
+    const handleAddEntry = () => {
+        if (!dosageValue.trim() || !interval.trim()) {
+            return
+        }
+
+        // If editing an entry, use handleUpdateEntry instead
+        if (editingEntryIndex !== null) {
+            handleUpdateEntry()
+            return
+        }
+
+        const newEntry = {
+            dosage: {
+                value: dosageValue,
+                unit: dosageUnit,
+                per: dosagePer,
+            },
+            max_applications: {
+                max: parseInt(maxApplications) || 1,
+                note: maxApplicationsNote,
+            },
+            application_interval: interval,
+            phi: phi,
+            remarks: remarksList,
+        }
+
+        setEntriesList([...entriesList, newEntry])
+
+        // Reset entry form fields
+        resetEntryForm()
+    }
+
+    const handleRemoveEntry = (index: number) => {
+        setEntriesList(entriesList.filter((_, i) => i !== index))
+        if (editingEntryIndex === index) {
+            setEditingEntryIndex(null)
+            resetEntryForm()
+        }
+    }
+
+    const handleEditEntry = (index: number) => {
+        const entry = entriesList[index]
+        setDosageValue(entry.dosage.value)
+        setDosageUnit(entry.dosage.unit)
+        setDosagePer(entry.dosage.per)
+        setMaxApplications(entry.max_applications.max.toString())
+        setMaxApplicationsNote(entry.max_applications.note)
+        setInterval(entry.application_interval)
+        setPhi(entry.phi)
+        setRemarksList(entry.remarks)
+        setEditingEntryIndex(index)
+    }
+
+    const handleUpdateEntry = () => {
+        if (editingEntryIndex === null || !dosageValue.trim() || !interval.trim()) {
+            return
+        }
+
+        const updatedEntry = {
+            dosage: {
+                value: dosageValue,
+                unit: dosageUnit,
+                per: dosagePer,
+            },
+            max_applications: {
+                max: parseInt(maxApplications) || 1,
+                note: maxApplicationsNote,
+            },
+            application_interval: interval,
+            phi: phi,
+            remarks: remarksList,
+        }
+
+        const newEntriesList = [...entriesList]
+        newEntriesList[editingEntryIndex] = updatedEntry
+        setEntriesList(newEntriesList)
+        setEditingEntryIndex(null)
+        resetEntryForm()
+    }
+
+    const resetEntryForm = () => {
+        setDosageValue("")
+        setDosageUnit("kg")
+        setDosagePer("hectare")
+        setMaxApplications("1")
+        setMaxApplicationsNote("")
+        setInterval("")
+        setPhi("")
+        setRemarkInput("")
+        setRemarksList([])
     }
 
     const handleAddRemark = () => {
@@ -265,31 +351,81 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
                             key={rate.id}
                             className="flex items-start justify-between rounded-md border border-gray-300 bg-gray-50 p-3 dark:border-white/10 dark:bg-gray-900"
                         >
-                            <div className="flex-1 space-y-1">
-                                <div className="flex items-center gap-2">
-                                    <span className="font-medium text-gray-900 dark:text-white">
-                                        {rate.crop}
-                                    </span>
-                                    <span className="text-gray-500">•</span>
-                                    <span className="text-gray-700 dark:text-gray-300">
-                                        {rate.dosage.value} {rate.dosage.unit}/{rate.dosage.per}
-                                    </span>
-                                </div>
-                                <div className="text-sm text-gray-600 dark:text-gray-400">
-                                    Targets: {rate.targets}
-                                </div>
-                                <div className="text-sm text-gray-600 dark:text-gray-400">
-                                    Max: {rate.max_applications.max} applications • Interval: {rate.application_interval}
-                                    {rate.phi && ` • PHI: ${rate.phi}`}
-                                </div>
-                                {rate.max_applications.note && (
-                                    <div className="text-sm text-gray-600 dark:text-gray-400 italic">
-                                        Note: {rate.max_applications.note}
+                            <div className="flex-1 space-y-2">
+                                <div className="flex items-start justify-between">
+                                    <div>
+                                        <div className="font-medium text-gray-900 dark:text-white text-base">
+                                            {rate.crop}
+                                        </div>
+                                        <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                                            <span className="font-medium">Targets:</span> {rate.targets}
+                                        </div>
                                     </div>
-                                )}
-                                {rate.remarks.length > 0 && (
-                                    <div className="text-sm text-gray-600 dark:text-gray-400">
-                                        Remarks: {rate.remarks.join(", ")}
+                                </div>
+
+                                {rate.entries && rate.entries.length > 0 && (
+                                    <div className="mt-3 space-y-3">
+                                        <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                                            Dosage Entries ({rate.entries.length})
+                                        </div>
+                                        {rate.entries.map((entry, i) => (
+                                            <div
+                                                key={i}
+                                                className="pl-4 border-l-4 border-indigo-400 dark:border-indigo-600 bg-white dark:bg-gray-800 p-3 rounded-r space-y-2"
+                                            >
+                                                <div className="grid grid-cols-2 gap-2">
+                                                    <div>
+                                                        <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">Dosage</div>
+                                                        <div className="text-sm text-gray-900 dark:text-white font-semibold">
+                                                            {entry.dosage.value} {entry.dosage.unit}/{entry.dosage.per}
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">Max Applications</div>
+                                                        <div className="text-sm text-gray-900 dark:text-white">
+                                                            {entry.max_applications.max} times
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div className="grid grid-cols-2 gap-2">
+                                                    <div>
+                                                        <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">Application Interval</div>
+                                                        <div className="text-sm text-gray-900 dark:text-white">
+                                                            {entry.application_interval}
+                                                        </div>
+                                                    </div>
+                                                    {entry.phi && (
+                                                        <div>
+                                                            <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">PHI (Pre-Harvest Interval)</div>
+                                                            <div className="text-sm text-gray-900 dark:text-white">
+                                                                {entry.phi}
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                {entry.max_applications.note && (
+                                                    <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
+                                                        <div className="text-xs text-gray-500 dark:text-gray-400 font-medium mb-1">Note</div>
+                                                        <div className="text-sm text-gray-700 dark:text-gray-300 italic">
+                                                            {entry.max_applications.note}
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {entry.remarks.length > 0 && (
+                                                    <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
+                                                        <div className="text-xs text-gray-500 dark:text-gray-400 font-medium mb-1">Remarks</div>
+                                                        <ul className="text-sm text-gray-700 dark:text-gray-300 list-disc list-inside space-y-1">
+                                                            {entry.remarks.map((remark, idx) => (
+                                                                <li key={idx}>{remark}</li>
+                                                            ))}
+                                                        </ul>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))}
                                     </div>
                                 )}
                             </div>
@@ -402,6 +538,36 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
                                                 ? "Type at least 2 characters to search"
                                                 : "No target found."}
                                         </CommandEmpty>
+                                        {/* Show selected targets first */}
+                                        {targetIds.length > 0 && (
+                                            <div className="px-2 py-1.5 text-xs font-semibold text-gray-500 border-b">
+                                                Selected ({targetIds.length}):
+                                            </div>
+                                        )}
+                                        {targetIds.length > 0 && targetNames.map((name, idx) => (
+                                            <div
+                                                key={`selected-${targetIds[idx]}`}
+                                                className="px-2 py-1.5 text-sm bg-blue-50 dark:bg-blue-900/20 border-b last:border-b-0 cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
+                                                onClick={() => {
+                                                    const targetId = targetIds[idx]
+                                                    setTargetIds(targetIds.filter(id => id !== targetId))
+                                                    setTargetNames(targetNames.filter((_, i) => i !== idx))
+                                                }}
+                                            >
+                                                <div className="flex items-center justify-between gap-2">
+                                                    <div className="flex items-center gap-2">
+                                                        <Check className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                                                        <span className="text-gray-700 dark:text-gray-300">{name}</span>
+                                                    </div>
+                                                    <X className="h-3 w-3 text-gray-500 hover:text-red-600" />
+                                                </div>
+                                            </div>
+                                        ))}
+                                        {targetIds.length > 0 && targets && targets.length > 0 && (
+                                            <div className="px-2 py-1.5 text-xs font-semibold text-gray-500 border-b">
+                                                Available:
+                                            </div>
+                                        )}
                                         {targets?.map((target) => (
                                             <CommandItem
                                                 value={target.name}
@@ -431,123 +597,212 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
                     </div>
                 </div>
 
-                <div>
-                    <Label>Dosage</Label>
-                    <div className="grid grid-cols-3 gap-2 mt-2">
-                        <Input
-                            placeholder="0.6"
-                            value={dosageValue}
-                            onChange={(e) => setDosageValue(e.target.value)}
-                        />
-                        <Select value={dosageUnit} onValueChange={setDosageUnit}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Unit" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="kg">kg</SelectItem>
-                                <SelectItem value="g">g</SelectItem>
-                                <SelectItem value="L">L</SelectItem>
-                                <SelectItem value="mL">mL</SelectItem>
-                            </SelectContent>
-                        </Select>
-                        <Select value={dosagePer} onValueChange={setDosagePer}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Per" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="hectare">hectare</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <p className="text-xs text-gray-500 mt-1">Value • Unit • Per (e.g., 0.6 kg/hectare)</p>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
+                {/* Display added entries */}
+                {entriesList.length > 0 && (
                     <div>
-                        <Label>Max Applications</Label>
-                        <Input
-                            type="number"
-                            min="1"
-                            placeholder="3"
-                            value={maxApplications}
-                            onChange={(e) => setMaxApplications(e.target.value)}
-                            className="mt-2"
-                        />
-                    </div>
-                    <div>
-                        <Label>Interval</Label>
-                        <Input
-                            placeholder="e.g., 7 - 14 days"
-                            value={interval}
-                            onChange={(e) => setInterval(e.target.value)}
-                            className="mt-2"
-                        />
-                    </div>
-                </div>
-
-                <div>
-                    <Label>Max Applications Note (optional)</Label>
-                    <Input
-                        placeholder="e.g., Where a drench application has been used only two foliar applications"
-                        value={maxApplicationsNote}
-                        onChange={(e) => setMaxApplicationsNote(e.target.value)}
-                        className="mt-2"
-                    />
-                </div>
-
-                <div>
-                    <Label>PHI - Pre-harvest Interval (optional)</Label>
-                    <Input
-                        placeholder="e.g., 3 days"
-                        value={phi}
-                        onChange={(e) => setPhi(e.target.value)}
-                        className="mt-2"
-                    />
-                </div>
-
-                <div>
-                    <Label>Remarks (optional)</Label>
-                    <div className="space-y-2">
-                        {remarksList.length > 0 && (
-                            <div className="space-y-1">
-                                {remarksList.map((remark, index) => (
-                                    <div
-                                        key={index}
-                                        className="flex items-center justify-between rounded-md border border-gray-300 bg-gray-50 px-3 py-1.5 text-sm dark:border-white/10 dark:bg-gray-900"
-                                    >
-                                        <span className="text-gray-700 dark:text-gray-300">{remark}</span>
+                        <Label>Dosage Entries ({entriesList.length})</Label>
+                        <div className="space-y-2 mt-2">
+                            {entriesList.map((entry, index) => (
+                                <div
+                                    key={index}
+                                    className={cn(
+                                        "flex items-start justify-between rounded-md border p-3",
+                                        editingEntryIndex === index
+                                            ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
+                                            : "border-gray-300 bg-gray-50 dark:border-white/10 dark:bg-gray-900"
+                                    )}
+                                >
+                                    <div className="flex-1 space-y-1">
+                                        <div className="text-sm text-gray-700 dark:text-gray-300">
+                                            <span className="font-medium">Dosage:</span> {entry.dosage.value} {entry.dosage.unit}/{entry.dosage.per}
+                                        </div>
+                                        <div className="text-xs text-gray-600 dark:text-gray-400">
+                                            Max: {entry.max_applications.max} • Interval: {entry.application_interval}
+                                            {entry.phi && ` • PHI: ${entry.phi}`}
+                                        </div>
+                                        {entry.max_applications.note && (
+                                            <div className="text-xs text-gray-600 dark:text-gray-400 italic">
+                                                Note: {entry.max_applications.note}
+                                            </div>
+                                        )}
+                                        {entry.remarks.length > 0 && (
+                                            <div className="text-xs text-gray-600 dark:text-gray-400">
+                                                Remarks: {entry.remarks.join(", ")}
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="flex gap-1">
                                         <Button
                                             type="button"
                                             variant="ghost"
                                             size="sm"
-                                            onClick={() => handleRemoveRemark(index)}
-                                            className="h-6 w-6 p-0"
+                                            onClick={() => handleEditEntry(index)}
+                                            disabled={editingEntryIndex !== null && editingEntryIndex !== index}
                                         >
-                                            <X className="h-3 w-3" />
+                                            <Pencil className="h-4 w-4" />
+                                        </Button>
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => handleRemoveEntry(index)}
+                                        >
+                                            <X className="h-4 w-4" />
                                         </Button>
                                     </div>
-                                ))}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* Add new entry form */}
+                <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+                    <Label className="text-base">Add Dosage Entry</Label>
+                    <div className="mt-4 space-y-4">
+                        <div>
+                            <Label className="text-sm">Dosage</Label>
+                            <div className="grid grid-cols-3 gap-2 mt-2">
+                                <Input
+                                    placeholder="0.6"
+                                    value={dosageValue}
+                                    onChange={(e) => setDosageValue(e.target.value)}
+                                />
+                                <Select value={dosageUnit} onValueChange={setDosageUnit}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Unit" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="kg">kg</SelectItem>
+                                        <SelectItem value="g">g</SelectItem>
+                                        <SelectItem value="l">l</SelectItem>
+                                        <SelectItem value="ml">ml</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <Select value={dosagePer} onValueChange={setDosagePer}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Per" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="hectare">hectare</SelectItem>
+                                    </SelectContent>
+                                </Select>
                             </div>
-                        )}
-                        <div className="flex gap-2">
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <Label className="text-sm">Max Applications</Label>
+                                <Input
+                                    type="number"
+                                    min="1"
+                                    placeholder="3"
+                                    value={maxApplications}
+                                    onChange={(e) => setMaxApplications(e.target.value)}
+                                    className="mt-2"
+                                />
+                            </div>
+                            <div>
+                                <Label className="text-sm">Interval</Label>
+                                <Input
+                                    placeholder="e.g., 7 - 14 days"
+                                    value={interval}
+                                    onChange={(e) => setInterval(e.target.value)}
+                                    className="mt-2"
+                                />
+                            </div>
+                        </div>
+
+                        <div>
+                            <Label className="text-sm">Max Applications Note (optional)</Label>
                             <Input
-                                placeholder="e.g., Foliar application"
-                                value={remarkInput}
-                                onChange={(e) => setRemarkInput(e.target.value)}
-                                onKeyDown={(e) => {
-                                    if (e.key === "Enter") {
-                                        e.preventDefault()
-                                        handleAddRemark()
-                                    }
-                                }}
+                                placeholder="e.g., Where a drench application has been used only two foliar applications"
+                                value={maxApplicationsNote}
+                                onChange={(e) => setMaxApplicationsNote(e.target.value)}
+                                className="mt-2"
                             />
+                        </div>
+
+                        <div>
+                            <Label className="text-sm">PHI - Pre-harvest Interval (optional)</Label>
+                            <Input
+                                placeholder="e.g., 3 days"
+                                value={phi}
+                                onChange={(e) => setPhi(e.target.value)}
+                                className="mt-2"
+                            />
+                        </div>
+
+                        <div>
+                            <Label className="text-sm">Remarks (optional)</Label>
+                            <div className="space-y-2 mt-2">
+                                {remarksList.length > 0 && (
+                                    <div className="space-y-1">
+                                        {remarksList.map((remark, index) => (
+                                            <div
+                                                key={index}
+                                                className="flex items-center justify-between rounded-md border border-gray-300 bg-gray-50 px-3 py-1.5 text-sm dark:border-white/10 dark:bg-gray-900"
+                                            >
+                                                <span className="text-gray-700 dark:text-gray-300">{remark}</span>
+                                                <Button
+                                                    type="button"
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() => handleRemoveRemark(index)}
+                                                    className="h-6 w-6 p-0"
+                                                >
+                                                    <X className="h-3 w-3" />
+                                                </Button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                                <div className="flex gap-2">
+                                    <Input
+                                        placeholder="e.g., Foliar application"
+                                        value={remarkInput}
+                                        onChange={(e) => setRemarkInput(e.target.value)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === "Enter") {
+                                                e.preventDefault()
+                                                handleAddRemark()
+                                            }
+                                        }}
+                                    />
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        onClick={handleAddRemark}
+                                        disabled={!remarkInput.trim()}
+                                    >
+                                        Add
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex gap-2">
+                            {editingEntryIndex !== null && (
+                                <Button
+                                    type="button"
+                                    onClick={() => {
+                                        setEditingEntryIndex(null)
+                                        resetEntryForm()
+                                    }}
+                                    variant="outline"
+                                    className="flex-1"
+                                >
+                                    Cancel
+                                </Button>
+                            )}
                             <Button
                                 type="button"
-                                variant="outline"
-                                onClick={handleAddRemark}
-                                disabled={!remarkInput.trim()}
+                                onClick={handleAddEntry}
+                                disabled={!dosageValue.trim() || !interval.trim()}
+                                variant="secondary"
+                                className={editingEntryIndex !== null ? "flex-1" : "w-full"}
                             >
-                                Add
+                                {editingEntryIndex !== null ? "Update Entry" : "Add Entry"}
                             </Button>
                         </div>
                     </div>
@@ -567,7 +822,7 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
                     <Button
                         type="button"
                         onClick={handleAdd}
-                        disabled={!cropId || targetIds.length === 0 || !dosageValue || !interval}
+                        disabled={!cropId || targetIds.length === 0 || entriesList.length === 0}
                         variant="outline"
                         className={editingId ? "flex-1" : "w-full"}
                     >

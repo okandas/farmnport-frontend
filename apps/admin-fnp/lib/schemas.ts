@@ -417,18 +417,20 @@ export const DosageRateSchema = z.object({
   crop_id: z.string(),
   targets: z.string(),
   target_ids: z.array(z.string()),
-  dosage: z.object({
-    value: z.string(),
-    unit: z.string(),
-    per: z.string(),
-  }),
-  max_applications: z.object({
-    max: z.number(),
-    note: z.string(),
-  }),
-  application_interval: z.string(),
-  phi: z.string(),
-  remarks: z.array(z.string()),
+  entries: z.array(z.object({
+    dosage: z.object({
+      value: z.string(),
+      unit: z.string(),
+      per: z.string(),
+    }),
+    max_applications: z.object({
+      max: z.number(),
+      note: z.string(),
+    }),
+    application_interval: z.string(),
+    phi: z.string(),
+    remarks: z.array(z.string()),
+  })),
 })
 
 export const FormAgroChemicalSchema = AgroChemicalSchema.extend({
