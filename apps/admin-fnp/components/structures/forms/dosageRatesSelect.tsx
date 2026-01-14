@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { X, Check, ChevronsUpDown, Pencil } from "lucide-react"
+import { X, Check, ChevronsUpDown, Pencil, Copy } from "lucide-react"
 import { useQuery } from "@tanstack/react-query"
 import { useDebounce } from "use-debounce"
 
@@ -221,6 +221,25 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
         setEditingId(rate.id)
     }
 
+    const handleDuplicate = (rate: DosageRate) => {
+        // Create a deep copy of the rate with a new ID
+        const duplicatedRate: DosageRate = {
+            id: Date.now().toString(),
+            crop: rate.crop,
+            crop_id: rate.crop_id,
+            targets: rate.targets,
+            target_ids: [...rate.target_ids],
+            entries: rate.entries.map(entry => ({
+                dosage: { ...entry.dosage },
+                max_applications: { ...entry.max_applications },
+                application_interval: entry.application_interval,
+                phi: entry.phi,
+                remarks: [...entry.remarks],
+            })),
+        }
+        onChange([...value, duplicatedRate])
+    }
+
     const handleAddEntry = () => {
         if (!dosageValue.trim() || !interval.trim()) {
             return
@@ -259,6 +278,18 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
             setEditingEntryIndex(null)
             resetEntryForm()
         }
+    }
+
+    const handleDuplicateEntry = (index: number) => {
+        const entryToDuplicate = entriesList[index]
+        const duplicatedEntry = {
+            dosage: { ...entryToDuplicate.dosage },
+            max_applications: { ...entryToDuplicate.max_applications },
+            application_interval: entryToDuplicate.application_interval,
+            phi: entryToDuplicate.phi,
+            remarks: [...entryToDuplicate.remarks],
+        }
+        setEntriesList([...entriesList, duplicatedEntry])
     }
 
     const handleEditEntry = (index: number) => {
@@ -343,8 +374,8 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
 
     return (
         <div className="space-y-6">
-            {/* Display existing rates */}
-            {value.length > 0 && (
+            {/* Display existing rates - hide when editing */}
+            {value.length > 0 && !editingId && (
                 <div className="space-y-3">
                     {value.map((rate) => (
                         <div
@@ -434,8 +465,18 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
                                     type="button"
                                     variant="ghost"
                                     size="sm"
-                                    onClick={() => handleEdit(rate)}
+                                    onClick={() => handleDuplicate(rate)}
                                     className="ml-2"
+                                    title="Duplicate dosage rate"
+                                >
+                                    <Copy className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleEdit(rate)}
+                                    title="Edit dosage rate"
                                 >
                                     <Pencil className="h-4 w-4" />
                                 </Button>
@@ -444,6 +485,7 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
                                     variant="ghost"
                                     size="sm"
                                     onClick={() => handleRemove(rate.id)}
+                                    title="Remove dosage rate"
                                 >
                                     <X className="h-4 w-4" />
                                 </Button>
@@ -597,8 +639,8 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
                     </div>
                 </div>
 
-                {/* Display added entries */}
-                {entriesList.length > 0 && (
+                {/* Display added entries - hide when editing an entry */}
+                {entriesList.length > 0 && editingEntryIndex === null && (
                     <div>
                         <Label>Dosage Entries ({entriesList.length})</Label>
                         <div className="space-y-2 mt-2">
@@ -636,8 +678,18 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
                                             type="button"
                                             variant="ghost"
                                             size="sm"
+                                            onClick={() => handleDuplicateEntry(index)}
+                                            title="Duplicate entry"
+                                        >
+                                            <Copy className="h-4 w-4" />
+                                        </Button>
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="sm"
                                             onClick={() => handleEditEntry(index)}
                                             disabled={editingEntryIndex !== null && editingEntryIndex !== index}
+                                            title="Edit entry"
                                         >
                                             <Pencil className="h-4 w-4" />
                                         </Button>
@@ -646,6 +698,7 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
                                             variant="ghost"
                                             size="sm"
                                             onClick={() => handleRemoveEntry(index)}
+                                            title="Remove entry"
                                         >
                                             <X className="h-4 w-4" />
                                         </Button>
@@ -808,27 +861,30 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
                     </div>
                 </div>
 
-                <div className="flex gap-2">
-                    {editingId && (
+                {/* Hide dosage rate buttons when editing an individual entry */}
+                {editingEntryIndex === null && (
+                    <div className="flex gap-2">
+                        {editingId && (
+                            <Button
+                                type="button"
+                                onClick={resetForm}
+                                variant="outline"
+                                className="flex-1"
+                            >
+                                Cancel
+                            </Button>
+                        )}
                         <Button
                             type="button"
-                            onClick={resetForm}
+                            onClick={handleAdd}
+                            disabled={!cropId || targetIds.length === 0 || entriesList.length === 0}
                             variant="outline"
-                            className="flex-1"
+                            className={editingId ? "flex-1" : "w-full"}
                         >
-                            Cancel
+                            {editingId ? "Update Dosage Rate" : "Add Dosage Rate"}
                         </Button>
-                    )}
-                    <Button
-                        type="button"
-                        onClick={handleAdd}
-                        disabled={!cropId || targetIds.length === 0 || entriesList.length === 0}
-                        variant="outline"
-                        className={editingId ? "flex-1" : "w-full"}
-                    >
-                        {editingId ? "Update Dosage Rate" : "Add Dosage Rate"}
-                    </Button>
-                </div>
+                    </div>
+                )}
             </div>
         </div>
     )
