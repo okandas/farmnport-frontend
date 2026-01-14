@@ -31,6 +31,8 @@ export default function NewAgroChemicalTargetPage() {
             id: "",
             name: "",
             scientific_name: "",
+            description: "",
+            damage_type: "",
             remark: "",
         },
         resolver: zodResolver(FormAgroChemicalTargetSchema),
@@ -146,6 +148,70 @@ export default function NewAgroChemicalTargetPage() {
                                     </div>
                                     <p className="mt-3 text-sm/6 text-gray-600 dark:text-gray-400">
                                         Latin scientific name of the pest or disease (if applicable).
+                                    </p>
+                                </div>
+
+                                <div className="px-1">
+                                    <label
+                                        htmlFor="description"
+                                        className="block text-sm/6 font-medium text-gray-900 dark:text-white"
+                                    >
+                                        Description (Optional)
+                                    </label>
+                                    <div className="mt-2">
+                                        <FormField
+                                            control={form.control}
+                                            name="description"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormControl>
+                                                        <Textarea
+                                                            id="description"
+                                                            placeholder="e.g., Small soft-bodied sap-sucking insects that cluster on young shoots"
+                                                            rows={3}
+                                                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
+                                                            {...field}
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
+                                    <p className="mt-3 text-sm/6 text-gray-600 dark:text-gray-400">
+                                        User-friendly explanation of what the pest or disease is.
+                                    </p>
+                                </div>
+
+                                <div className="px-1">
+                                    <label
+                                        htmlFor="damage_type"
+                                        className="block text-sm/6 font-medium text-gray-900 dark:text-white"
+                                    >
+                                        Damage Type (Optional)
+                                    </label>
+                                    <div className="mt-2">
+                                        <FormField
+                                            control={form.control}
+                                            name="damage_type"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormControl>
+                                                        <Textarea
+                                                            id="damage_type"
+                                                            placeholder="e.g., Causes leaf curling, yellowing, stunted growth, and honeydew secretion"
+                                                            rows={3}
+                                                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
+                                                            {...field}
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
+                                    <p className="mt-3 text-sm/6 text-gray-600 dark:text-gray-400">
+                                        SEO-optimized description of damage symptoms and effects.
                                     </p>
                                 </div>
 

@@ -36,11 +36,11 @@ export const agroChemicalTargetColumns: ColumnDef<AgroChemicalTarget>[] = [
     header: "Name",
   },
   {
-    accessorKey: "scientific_name",
-    header: "Scientific Name",
+    accessorKey: "description",
+    header: "Description",
     cell: ({ row }) => (
       <span className="max-w-md truncate">
-        {row.original.scientific_name || "-"}
+        {row.original.description || "-"}
       </span>
     ),
   },
