@@ -51,11 +51,16 @@ interface EditFormProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export function CreateAgroChemicalForm({ product }: EditFormProps) {
 
-    const form = useForm({
+    const form = useForm<FormAgroChemicalModel>({
         defaultValues: {
             id: product?.id,
             name: product?.name,
             brand_id: product?.brand_id,
+            front_label: product?.front_label,
+            back_label: product?.back_label,
+            images: product?.images || [],
+            active_ingredients: product?.active_ingredients || [],
+            dosage_rates: product?.dosage_rates || [],
         },
         resolver: zodResolver(FormAgroChemicalSchema),
     })

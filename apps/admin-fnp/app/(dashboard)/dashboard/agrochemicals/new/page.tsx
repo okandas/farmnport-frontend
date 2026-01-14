@@ -19,7 +19,12 @@ export default function CreateAgroChemicalPage() {
     const [agroChemical, _] = useState<FormAgroChemicalModel>({
         id: "",
         name: "",
-        brand_id: ""
+        brand_id: "",
+        front_label: { img: { id: "", src: "" } },
+        back_label: { img: { id: "", src: "" } },
+        images: [],
+        active_ingredients: [],
+        dosage_rates: []
     })
 
     return (

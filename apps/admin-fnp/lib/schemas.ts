@@ -356,9 +356,6 @@ export const FormAgroChemicalTargetSchema = AgroChemicalTargetSchema.pick({
   remark: true,
 })
 
-export type AgroChemicalTarget = z.infer<typeof AgroChemicalTargetSchema>
-export type FormAgroChemicalTargetModel = z.infer<typeof FormAgroChemicalTargetSchema>
-
 export const AgroChemicalDosageRateSchema = z.object({
   id: z.string(),
   agrochemical_id: z.string().min(1, "AgroChemical is required"),
