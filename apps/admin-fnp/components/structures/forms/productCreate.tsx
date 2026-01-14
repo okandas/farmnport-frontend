@@ -1,115 +1,126 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import { isAxiosError } from "axios"
-import { useForm, useFieldArray, FieldErrors } from "react-hook-form"
+import { useForm, FieldErrors } from "react-hook-form"
 import { useRouter } from "next/navigation"
+import { useState } from "react"
+import { useDebounce } from "use-debounce"
+import { Check, ChevronsUpDown } from "lucide-react"
 
-import { addProduct } from "@/lib/query"
+import { addAgroChemical, queryBrands } from "@/lib/query"
 import {
-    FormProductModel,
-    FormProductSchema,
+    FormAgroChemicalModel,
+    FormAgroChemicalSchema,
+    Brand,
 } from "@/lib/schemas"
 import { cn } from "@/lib/utilities"
 
 import {
     Form,
     FormControl,
-    FormDescription,
     FormField,
     FormItem,
     FormLabel,
     FormMessage,
 } from "@/components/ui/form"
 
-
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import { ToastAction } from "@/components/ui/toast"
 import { toast } from "@/components/ui/use-toast"
 import { Icons } from "@/components/icons/lucide"
-import { ProductExamples } from "./productEditNestedArray"
-import { FileInput } from "../controls/file-input"
+import { buttonVariants } from "@/components/ui/button"
+import {
+    Command,
+    CommandInput,
+    CommandItem,
+    CommandList,
+    CommandEmpty,
+} from "@/components/ui/command"
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover"
 import { Button } from "@/components/ui/button"
 
-import { buttonVariants } from "@/components/ui/button"
-
 interface EditFormProps extends React.HTMLAttributes<HTMLDivElement> {
-    product: FormProductModel
+    product: FormAgroChemicalModel
 }
 
-export function CreateProductForm({ product }: EditFormProps) {
+export function CreateAgroChemicalForm({ product }: EditFormProps) {
 
-    const form = useForm({
+    const form = useForm<FormAgroChemicalModel>({
         defaultValues: {
             id: product?.id,
             name: product?.name,
-            descriptions: product?.descriptions,
-            reg_number: product?.reg_number,
-            cat: product?.cat,
-            images: product?.images ?? [],
-            unit: product?.unit,
-            manufacturer: product?.manufacturer,
-            distributor: product?.distributor,
-            warnings: product?.warnings,
-            instructions: product?.instructions,
+            brand_id: product?.brand_id,
+            front_label: product?.front_label,
+            back_label: product?.back_label,
+            images: product?.images || [],
+            active_ingredients: product?.active_ingredients || [],
+            dosage_rates: product?.dosage_rates || [],
         },
-        resolver: zodResolver(FormProductSchema),
+        resolver: zodResolver(FormAgroChemicalSchema),
     })
 
     const router = useRouter()
 
-    const control = form.control
+    const [searchBrand, setSearchBrand] = useState("")
+    const [selectedBrand, setSelectedBrand] = useState("")
+    const [open, setOpen] = useState(false)
 
-    const { fields, append, remove } = useFieldArray({
-        name: "descriptions",
-        control: form.control
-    });
+    // Debounce search query
+    const [debouncedSearchQuery] = useDebounce(searchBrand, 1000)
+    const enabled = !!debouncedSearchQuery
 
-    const { fields: unitFields, append: unitAppend, remove: unitRemove } = useFieldArray({
-        name: "unit",
-        control: form.control
-    });
+    const { data, isError, refetch } = useQuery({
+        queryKey: ["dashboard-brands", { search: debouncedSearchQuery }],
+        queryFn: () =>
+            queryBrands({
+                search: debouncedSearchQuery,
+            }),
+        enabled,
+    })
 
-    const { fields: warningFields, append: warningAppend, remove: warningRemove } = useFieldArray({
-        name: "warnings",
-        control: form.control
-    });
+    const brands = data?.data?.data as Brand[]
 
-    const { fields: usageFields, append: usageAppend, remove: usageRemove } = useFieldArray({
-        name: "instructions.usage",
-        control: form.control
-    });
+    if (isError) {
+        if (isAxiosError(data)) {
+            setOpen(false)
 
-    const { fields: examplesField, append: examplesAppend, remove: examplesRemove } = useFieldArray({
-        name: "instructions.examples",
-        control: form.control
-    });
+            switch (data.code) {
+                case "ERR_NETWORK":
+                    toast({
+                        description: "There seems to be a network error.",
+                        action: <ToastAction altText="Try again">Try again</ToastAction>,
+                    })
+                    break
 
-    const { fields: efficacyTableFields, append: efficacyTableAppend, remove: efficacyTableRemove } = useFieldArray({
-        name: "instructions.efficacy_table",
-        control: form.control
-    });
-
-    const { fields: efficacyFields, append: efficacyAppend, remove: efficacyRemove } = useFieldArray({
-        name: "instructions.efficacy",
-        control: form.control
-    });
-
-    const { fields: keyMapValueFields, append: keyMapValueAppend, remove: keyMapValueRemove } = useFieldArray({
-        name: "instructions.key_map.values",
-        control: form.control
-    });
+                default:
+                    toast({
+                        title: "Uh oh! Failed to fetch brands.",
+                        description: "There was a problem with your request.",
+                        action: (
+                            <ToastAction altText="Try again" onClick={() => refetch()}>
+                                Try again
+                            </ToastAction>
+                        ),
+                    })
+                    break
+            }
+        }
+    }
 
     const { mutate, isPending } = useMutation({
-        mutationFn: addProduct,
-        onSuccess: (data) => {
+        mutationFn: addAgroChemical,
+        onSuccess: () => {
             toast({
-                description: "Added Product Succesfully",
+                description: "Added AgroChemical Successfully",
             })
 
-            router.push(`/dashboard/products`)
+            router.push(`/dashboard/agrochemicals`)
         },
         onError: (error) => {
             if (isAxiosError(error)) {
@@ -123,7 +134,7 @@ export function CreateProductForm({ product }: EditFormProps) {
 
                     default:
                         toast({
-                            title: "Uh oh!  client update failed.",
+                            title: "Uh oh! agro chemical creation failed.",
                             description: "There was a problem with your request.",
                             action: <ToastAction altText="Try again">Try again</ToastAction>,
                         })
@@ -134,11 +145,11 @@ export function CreateProductForm({ product }: EditFormProps) {
 
     })
 
-    async function onSubmit(payload: FormProductModel) {
+    async function onSubmit(payload: FormAgroChemicalModel) {
         mutate(payload)
     }
 
-    const onError = (errors: FieldErrors<FormProductModel>) => {
+    const onError = (errors: FieldErrors<FormAgroChemicalModel>) => {
         console.log(errors)
     }
 
@@ -146,800 +157,142 @@ export function CreateProductForm({ product }: EditFormProps) {
         <Form {...form}>
             <form
                 onSubmit={form.handleSubmit(onSubmit, onError)}
-                className="w-full gap-4 mx-auto mb-8 px-3"
+                className="space-y-12 sm:space-y-16"
             >
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <FormField
-                        control={form.control}
-                        name="name"
-
-                        render={({ field }) => (
-                            <FormItem >
-                                <FormLabel>Name</FormLabel>
-                                <FormControl className="col-span-3">
-                                    <Input placeholder="Product name" {...field} />
-                                </FormControl>
-                                <FormDescription></FormDescription>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                </div>
-
                 <div>
-                    <FormField
-                        control={form.control}
-                        name="images"
-                        render={({ field }) => (
-                            <FormItem >
-                                <FormControl>
-                                    <FileInput id={product.id} {...field} onChange={field.onChange} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                </div>
+                    <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">
+                        AgroChemical Information
+                    </h2>
+                    <p className="mt-1 max-w-2xl text-sm/6 text-gray-600 dark:text-gray-400">
+                        Add a new agro chemical product to the system.
+                    </p>
 
-                <div>
-                    <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight sm:my-3">
-                        Product Description
-                    </h3>
-                    {fields.map((field, index) => {
-                        return (
-                            <div className="grid grid-cols-1 gap-2 sm:grid-cols-5 first:mb-2" key={field.id}>
+                    <div className="mt-10 space-y-8 border-b border-gray-900/10 pb-12 sm:space-y-0 sm:divide-y sm:divide-gray-900/10 sm:border-t sm:border-t-gray-900/10 sm:pb-0 dark:border-white/10 dark:sm:divide-white/10 dark:sm:border-t-white/10">
+                        <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
+                            <label
+                                htmlFor="name"
+                                className="block text-sm/6 font-medium text-gray-900 sm:pt-1.5 dark:text-white"
+                            >
+                                Name
+                            </label>
+                            <div className="mt-2 sm:col-span-2 sm:mt-0">
                                 <FormField
                                     control={form.control}
-                                    name={`descriptions.${index}.name`}
+                                    name="name"
                                     render={({ field }) => (
-                                        <FormItem className="sm:col-span-1 mb-1">
-                                            {
-                                                index === 0 ? (<>
-                                                    <FormLabel>
-                                                        Description Name
-                                                    </FormLabel>
-                                                    <FormDescription>
-                                                        Describe the discription name.
-                                                    </FormDescription></>) : null
-                                            }
-                                            <FormControl >
-                                                <Input {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name={`descriptions.${index}.value`}
-                                    render={({ field }) => (
-                                        <FormItem className="sm:col-span-3  mb-1">
-                                            {
-                                                index === 0 ? (<>
-                                                    <FormLabel>
-                                                        Description Value
-                                                    </FormLabel>
-                                                    <FormDescription>
-                                                        Describe the discription name.
-                                                    </FormDescription></>) : null
-                                            }
+                                        <FormItem>
                                             <FormControl>
-                                                <Textarea {...field} />
+                                                <Input
+                                                    id="name"
+                                                    placeholder="Product name"
+                                                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:max-w-md sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
+                                                    {...field}
+                                                />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
                                     )}
                                 />
-
-                                <div className="sm:colspan-1 sm:flex sm:justify-end sm:flex-col pb-2">
-                                    <Button variant="outline" size="icon" onClick={() => remove(index)} >
-                                        <Icons.bin className="h-4 w-4" />
-                                    </Button>
-                                </div>
                             </div>
-                        );
-                    })}
+                        </div>
 
-
-                    <div className="sm:flex justify-end">
-                        <Button onClick={(event) => {
-                            event.preventDefault()
-                            append({
-                                name: "",
-                                value: ""
-                            })
-                        }
-                        }>
-                            <Icons.add className="h-4 w-4" /> Add Description
-                        </Button>
-                    </div>
-
-                </div>
-
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-
-                    <FormField
-                        control={form.control}
-                        name="manufacturer.name"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Manufacturer</FormLabel>
-                                <FormControl>
-                                    <Input placeholder="Manufacturer name" {...field} />
-                                </FormControl>
-                                <FormDescription></FormDescription>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-
-
-                    <FormField
-                        control={form.control}
-                        name="distributor.name"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Distributor</FormLabel>
-                                <FormControl>
-                                    <Input placeholder="Distributor name" {...field} />
-                                </FormControl>
-                                <FormDescription></FormDescription>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-
-                </div>
-
-                <div>
-                    <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight sm:mb-3 sm:mt-6">
-                        Measurement Unit
-                    </h3>
-                    {unitFields.map((field, index) => {
-                        return (
-                            <div className="grid grid-cols-1 gap-2 sm:grid-cols-5 first:mb-2" key={field.id}>
-
+                        <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
+                            <label
+                                htmlFor="brand"
+                                className="block text-sm/6 font-medium text-gray-900 sm:pt-1.5 dark:text-white"
+                            >
+                                Brand
+                            </label>
+                            <div className="mt-2 sm:col-span-2 sm:mt-0">
                                 <FormField
                                     control={form.control}
-                                    name={`unit.${index}.value`}
+                                    name="brand_id"
                                     render={({ field }) => (
-                                        <FormItem className="sm:col-span-1 mb-1">
-                                            {
-                                                index === 0 ? (<>
-                                                    <FormLabel>
-                                                        Unit Value
-                                                    </FormLabel>
-                                                    <FormDescription>
-                                                        Describe the discription name.
-                                                    </FormDescription></>) : null
-                                            }
-                                            <FormControl>
-                                                <Input type="number" {...field} />
-                                            </FormControl>
+                                        <FormItem className="flex flex-col">
+                                            <Popover open={open} onOpenChange={setOpen}>
+                                                <PopoverTrigger asChild>
+                                                    <FormControl>
+                                                        <Button
+                                                            variant="outline"
+                                                            role="combobox"
+                                                            className={cn(
+                                                                "w-full justify-between sm:max-w-md",
+                                                                !field.value && "text-muted-foreground"
+                                                            )}
+                                                        >
+                                                            {field.value
+                                                                ? selectedBrand
+                                                                : "Select brand"}
+                                                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                                        </Button>
+                                                    </FormControl>
+                                                </PopoverTrigger>
+                                                <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
+                                                    <Command>
+                                                        <CommandInput
+                                                            placeholder="Search brand..."
+                                                            onValueChange={(value) => {
+                                                                setSearchBrand(value)
+                                                            }}
+                                                        />
+                                                        <CommandList>
+                                                            <CommandEmpty>
+                                                                {searchBrand.length < 2
+                                                                    ? "Type at least 2 characters to search"
+                                                                    : "No brand found."}
+                                                            </CommandEmpty>
+                                                            {brands?.map((brand) => (
+                                                                <CommandItem
+                                                                    value={brand.name}
+                                                                    key={brand.id}
+                                                                    onSelect={() => {
+                                                                        form.setValue("brand_id", brand.id)
+                                                                        setSelectedBrand(brand.name)
+                                                                        setOpen(false)
+                                                                    }}
+                                                                >
+                                                                    <Check
+                                                                        className={cn(
+                                                                            "mr-2 h-4 w-4",
+                                                                            brand.id === field.value
+                                                                                ? "opacity-100"
+                                                                                : "opacity-0"
+                                                                        )}
+                                                                    />
+                                                                    {brand.name}
+                                                                </CommandItem>
+                                                            ))}
+                                                        </CommandList>
+                                                    </Command>
+                                                </PopoverContent>
+                                            </Popover>
                                             <FormMessage />
                                         </FormItem>
                                     )}
                                 />
-
-                                <FormField
-                                    control={form.control}
-                                    name={`unit.${index}.name`}
-                                    render={({ field }) => (
-                                        <FormItem className="sm:col-span-1 mb-1">
-                                            {
-                                                index === 0 ? (<>
-                                                    <FormLabel>
-                                                        Unit Name
-                                                    </FormLabel>
-                                                    <FormDescription>
-                                                        Describe the discription name.
-                                                    </FormDescription></>) : null
-                                            }
-                                            <FormControl >
-                                                <Input {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-
-                                <div className="sm:colspan-1 sm:flex sm:justify-end sm:flex-col pb-1">
-                                    <Button variant="outline" size="icon" onClick={() => unitRemove(index)} >
-                                        <Icons.bin className="h-4 w-4" />
-                                    </Button>
-                                </div>
                             </div>
-                        );
-                    })}
-
-
-                    <div className="sm:flex justify-end">
-                        <Button onClick={(event) => {
-                            event.preventDefault()
-                            unitAppend({
-                                name: "",
-                                value: 0
-                            })
-                        }
-
-                        }>
-                            <Icons.add className="h-4 w-4" /> Add Unit
-                        </Button>
-                    </div>
-
-                </div>
-
-                <div>
-                    <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight sm:my-3">
-                        Warning Info
-                    </h3>
-                    {warningFields.map((field, index) => {
-                        return (
-                            <div className="grid grid-cols-1 gap-2 sm:grid-cols-5" key={field.id}>
-                                <FormField
-                                    control={form.control}
-                                    name={`warnings.${index}.name`}
-                                    render={({ field }) => (
-                                        <FormItem className="sm:col-span-1 mb-1">
-                                            {
-                                                index === 0 ? (<>
-                                                    <FormLabel className="">
-                                                        Warning Name
-                                                    </FormLabel>
-                                                    <FormDescription>
-                                                        Warning Attribute Name
-                                                    </FormDescription>
-                                                </>) : null
-                                            }
-                                            <FormControl>
-                                                <Input {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-
-                                <FormField
-                                    control={form.control}
-                                    name={`warnings.${index}.location`}
-                                    render={({ field }) => (
-                                        <FormItem className="sm:col-span-1 mb-1">
-
-                                            {
-                                                index === 0 ? (
-                                                    <>
-                                                        <FormLabel className="">
-                                                            Warning Location
-                                                        </FormLabel>
-                                                        <FormDescription>
-                                                            Where the warning is located.
-                                                        </FormDescription>
-                                                    </>
-                                                ) : null
-                                            }
-                                            <FormControl>
-                                                <Input {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-
-                                <FormField
-                                    control={form.control}
-                                    name={`warnings.${index}.value`}
-                                    render={({ field }) => (
-                                        <FormItem className="sm:col-span-2 mb-1">
-
-                                            {
-                                                index === 0 ? (
-                                                    <>
-                                                        <FormLabel className="">
-                                                            Warning Value
-                                                        </FormLabel>
-                                                        <FormDescription>
-                                                            Warning Describe the discription name.
-                                                        </FormDescription>
-                                                    </>) : null
-                                            }
-                                            <FormControl>
-                                                <Textarea {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-
-                                <div className="sm:colspan-1 sm:flex sm:justify-end sm:flex-col pb-2">
-                                    <Button variant="outline" size="icon" onClick={() => warningRemove(index)} >
-                                        <Icons.bin className="h-4 w-4" />
-                                    </Button>
-                                </div>
-                            </div>
-                        );
-                    })}
-
-
-                    <div className="sm:flex justify-end">
-                        <Button onClick={(event) => {
-                            event.preventDefault()
-                            warningAppend({
-                                name: "",
-                                value: "",
-                                location: ""
-                            })
-                        }
-
-                        }>
-                            <Icons.add className="h-4 w-4" /> Add Warning
-                        </Button>
+                        </div>
                     </div>
                 </div>
 
-                <div>
-                    <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight sm:my-3">
-                        How to use product.
-                    </h3>
-                    {usageFields.map((field, index) => {
-                        return (
-                            <div className="grid grid-cols-1 gap-2 sm:grid-cols-5" key={field.id}>
-                                <FormField
-                                    control={form.control}
-                                    name={`instructions.usage.${index}.name`}
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            {
-                                                index === 0 ? (
-                                                    <>
-                                                        <FormLabel className="">
-                                                            Usage Name
-                                                        </FormLabel>
-                                                        <FormDescription className="">
-                                                            Usage Attribute Name
-                                                        </FormDescription>
-                                                    </>
-                                                ) : null
-                                            }
-                                            <FormControl>
-                                                <Input {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name={`instructions.usage.${index}.value`}
-                                    render={({ field }) => (
-                                        <FormItem className="col-span-3">
-                                            {
-                                                index === 0 ? (
-                                                    <>
-                                                        <FormLabel>
-                                                            Usage Value
-                                                        </FormLabel>
-                                                        <FormDescription>
-                                                            Usage the discription value.
-                                                        </FormDescription>
-                                                    </>
-                                                ) : null
-                                            }
-                                            <FormControl>
-                                                <Textarea {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-
-                                <div className="sm:colspan-1 sm:flex sm:justify-end sm:flex-col pb-2">
-                                    <Button variant="outline" size="icon" onClick={() => usageRemove(index)} >
-                                        <Icons.bin className="h-4 w-4" />
-                                    </Button>
-                                </div>
-                            </div>
-                        );
-                    })}
-
-                    <div className="sm:flex justify-end">
-                        <Button onClick={(event) => {
-                            event.preventDefault()
-                            usageAppend({
-                                name: "",
-                                value: ""
-                            })
-                        }
-
-                        }>
-                            <Icons.add className="h-4 w-4" /> Add Usage Instruction
-                        </Button>
-                    </div>
+                <div className="mt-6 flex items-center justify-end gap-x-6">
+                    <button
+                        type="button"
+                        onClick={() => router.push('/dashboard/agrochemicals')}
+                        className="text-sm/6 font-semibold text-gray-900 dark:text-white"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        type="submit"
+                        disabled={isPending}
+                        className="inline-flex justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:bg-indigo-500 dark:shadow-none dark:hover:bg-indigo-400 dark:focus-visible:outline-indigo-500"
+                    >
+                        {isPending && <Icons.spinner className="w-4 h-4 mr-2 animate-spin" />}
+                        Add AgroChemical
+                    </button>
                 </div>
-
-                <div>
-                    <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight sm:my-3">
-                        Efficacy Table
-                    </h3>
-                    {efficacyTableFields.map((field, index) => {
-                        return (
-                            <div className="grid grid-cols-1 gap-2 sm:grid-cols-5 mt-2" key={field.id}>
-                                <FormField
-                                    control={form.control}
-                                    name={`instructions.efficacy_table.${index}.species`}
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            {
-                                                index === 0 ? (
-                                                    <>
-                                                        <FormLabel>
-                                                            Species
-                                                        </FormLabel>
-                                                        <FormDescription>
-                                                            Species Attribute
-                                                        </FormDescription>
-                                                    </>
-                                                ) : null
-                                            }
-                                            <FormControl>
-                                                <Input {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name={`instructions.efficacy_table.${index}.third_stage`}
-                                    render={({ field }) => (
-                                        <FormItem>
-
-                                            {
-                                                index === 0 ? (
-                                                    <>
-                                                        <FormLabel>
-                                                            Third Stage
-                                                        </FormLabel>
-                                                        <FormDescription>
-                                                            Description Third Stage.
-                                                        </FormDescription>
-                                                    </>
-                                                ) : null
-                                            }
-                                            <FormControl>
-                                                <Input {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name={`instructions.efficacy_table.${index}.fourth_stage`}
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            {
-                                                index === 0 ? (
-                                                    <>
-                                                        <FormLabel>
-                                                            Fourth Stage
-                                                        </FormLabel>
-                                                        <FormDescription>
-                                                            Description Fourth Stage.
-                                                        </FormDescription>
-                                                    </>
-                                                ) : null
-                                            }
-                                            <FormControl>
-                                                <Input {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name={`instructions.efficacy_table.${index}.adults`}
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            {
-                                                index === 0 ? (
-                                                    <>
-                                                        <FormLabel>
-                                                            Adults
-                                                        </FormLabel>
-                                                        <FormDescription>
-                                                            Describe Adult Value.
-                                                        </FormDescription>
-                                                    </>
-                                                ) : null
-                                            }
-                                            <FormControl>
-                                                <Input {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-
-                                <div className="sm:colspan-1 sm:flex sm:justify-end sm:flex-col">
-                                    <Button variant="outline" size="icon" onClick={() => efficacyTableRemove(index)} >
-                                        <Icons.bin className="h-4 w-4" />
-                                    </Button>
-                                </div>
-                            </div>
-                        );
-                    })}
-
-                    <div className="sm:flex justify-end">
-                        <Button onClick={(event) => {
-                            event.preventDefault()
-                            efficacyTableAppend({
-                                species: "",
-                                third_stage: "",
-                                fourth_stage: "",
-                                adults: ""
-                            })
-                        }
-                        }>
-                            <Icons.add className="h-4 w-4" /> Add Efficacy
-                        </Button>
-                    </div>
-                </div>
-
-                <div>
-                    <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight sm:my-3">
-                        Efficacy Info
-                    </h3>
-                    {efficacyFields.map((field, index) => {
-                        return (
-                            <div className="grid grid-cols-1 gap-2 sm:grid-cols-3" key={field.id}>
-                                <FormField
-                                    control={form.control}
-                                    name={`instructions.efficacy.${index}.name`}
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className="">
-                                                Efficacy Name
-                                            </FormLabel>
-                                            <FormDescription className="">
-                                                Efficacy Attribute Name
-                                            </FormDescription>
-                                            <FormControl>
-                                                <Input {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name={`instructions.efficacy.${index}.value`}
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>
-                                                Efficacy Value
-                                            </FormLabel>
-                                            <FormDescription>
-                                                Efficacy Describe the discription name.
-                                            </FormDescription>
-                                            <FormControl>
-                                                <Input {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-
-                                <div className="sm:colspan-1 sm:flex sm:justify-end sm:flex-col">
-                                    <Button variant="outline" size="icon" onClick={() => efficacyRemove(index)} >
-                                        <Icons.bin className="h-4 w-4" />
-                                    </Button>
-                                </div>
-                            </div>
-                        );
-                    })}
-
-                    <div className="sm:flex justify-end">
-                        <Button onClick={(event) => {
-                            event.preventDefault()
-                            efficacyAppend({
-                                name: "",
-                                value: ""
-                            })
-                        }
-
-                        }>
-                            <Icons.add className="h-4 w-4" /> Add Efficacy
-                        </Button>
-                    </div>
-                </div>
-
-
-                <div>
-
-                    <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight sm:my-3">
-                        Key Map Values.
-                    </h3>
-
-                    <FormField
-                        control={form.control}
-                        name="instructions.key_map.type"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Key Map Type</FormLabel>
-                                <FormControl className="w-1/2">
-                                    <Input placeholder="Type" {...field} />
-                                </FormControl>
-                                <FormDescription></FormDescription>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-
-                    {keyMapValueFields.map((field, index) => {
-                        return (
-                            <div className="grid grid-cols-1 gap-2 sm:grid-cols-4 mt-2" key={field.id}>
-                                <FormField
-                                    control={form.control}
-                                    name={`instructions.key_map.values.${index}.name`}
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            {
-                                                index === 0 ? (
-                                                    <>
-                                                        <FormLabel className="">
-                                                            Keymap Name
-                                                        </FormLabel>
-                                                        <FormDescription className="">
-                                                            Keymap Description Attribute Name
-                                                        </FormDescription>
-                                                    </>) : null
-                                            }
-                                            <FormControl>
-                                                <Input {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name={`instructions.key_map.values.${index}.value`}
-
-                                    render={({ field }) => (
-                                        <FormItem className="col-span-2">
-                                            {
-                                                index === 0 ? (
-                                                    <>
-                                                        <FormLabel>
-                                                            Keymap Value
-                                                        </FormLabel>
-                                                        <FormDescription>
-                                                            Keymap Describe the discription name.
-                                                        </FormDescription>
-                                                    </>) : null
-                                            }
-                                            <FormControl>
-                                                <Input {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-
-
-                                <div className="sm:colspan-1 sm:flex sm:justify-end sm:flex-col">
-                                    <Button variant="outline" size="icon" onClick={() => keyMapValueRemove(index)} >
-                                        <Icons.bin className="h-4 w-4" />
-                                    </Button>
-                                </div>
-                            </div>
-                        );
-                    })}
-
-
-
-
-                    <div className="sm:flex justify-end">
-                        <Button onClick={(event) => {
-                            event.preventDefault()
-                            keyMapValueAppend({
-                                name: "",
-                                value: ""
-                            })
-                        }
-                        }>
-                            <Icons.add className="h-4 w-4" /> Add Key Map
-                        </Button>
-                    </div>
-                </div>
-
-                <div>
-                    <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight sm:my-3">
-                        Dosage Examples
-                    </h3>
-                    {examplesField.map((field, index) => {
-                        return (
-                            <div key={field.id}>
-                                <div className="grid grid-cols-1 gap-2 sm:grid-cols-3 mb-3">
-                                    <FormField
-                                        control={form.control}
-                                        name={`instructions.examples.${index}.description`}
-                                        render={({ field }) => (
-                                            <FormItem className="col-span-2">
-                                                {
-                                                    index === 0 ? (
-                                                        <>
-                                                            <FormLabel>
-                                                                Dosage
-                                                            </FormLabel>
-                                                            <FormDescription>
-                                                                Description For Dosage
-                                                            </FormDescription>
-                                                        </>
-                                                    ) : null
-                                                }
-                                                <FormControl>
-                                                    <Input {...field} />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-
-                                    <div className="sm:colspan-1 sm:flex sm:justify-end sm:flex-col">
-                                        <Button variant="outline" size="icon" onClick={() => examplesRemove(index)} >
-                                            <Icons.bin className="h-4 w-4" />
-                                        </Button>
-                                    </div>
-
-                                </div>
-                                <ProductExamples nestedIndex={index} {...{ control }} />
-                            </div>
-                        );
-                    })}
-
-
-
-                    <div className="sm:flex justify-start">
-                        <Button onClick={(event) => {
-                            event.preventDefault()
-                            examplesAppend({
-                                description: "",
-                                values: [
-                                    {
-                                        dosage: {
-                                            value: 0,
-                                            unit: ""
-                                        },
-                                        mass: {
-                                            weight: 0,
-                                            unit: ""
-                                        },
-                                        pack: 0
-                                    }
-                                ]
-                            })
-                        }
-
-                        }>
-                            <Icons.add className="h-4 w-4" /> Add Full Dosage
-                        </Button>
-                    </div>
-                </div>
-
-
-                <button
-                    type="submit"
-                    className={cn(buttonVariants(), "mt-5")}
-                    disabled={isPending}
-                >
-                    {isPending && <Icons.spinner className="w-4 h-4 mr-2 animate-spin" />}
-                    Submit
-                </button>
-
             </form>
-
         </Form>
     )
 }

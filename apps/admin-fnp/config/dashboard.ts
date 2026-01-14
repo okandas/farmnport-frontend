@@ -14,9 +14,29 @@ export const dashboardConfig: DashboardConfig = {
       icon: "user",
     },
     {
-      title: "Products",
-      href: "/dashboard/products",
+      title: "AgroChemicals",
+      href: "/dashboard/agrochemicals",
       icon: "productSearch",
+    },
+    {
+      title: "AgroChemical Categories",
+      href: "/dashboard/agrochemical-categories",
+      icon: "clipboardList",
+    },
+    {
+      title: "AgroChemical Active Ingredients",
+      href: "/dashboard/agrochemical-active-ingredients",
+      icon: "beaker",
+    },
+    {
+      title: "AgroChemical Targets",
+      href: "/dashboard/agrochemical-targets",
+      icon: "bug",
+    },
+    {
+      title: "Brands",
+      href: "/dashboard/brands",
+      icon: "tag",
     },
     {
       title: "Farm Produce Categories",

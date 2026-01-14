@@ -655,3 +655,24 @@ export function createPriceListPayload(payload: ProducerPriceList) {
 
   return payload
 }
+
+/**
+ * Logs form payload to console for debugging purposes
+ * @param payload - The form data to log
+ * @param formName - Optional name to identify which form is being logged
+ */
+export function logFormPayload<T>(payload: T, formName?: string): void {
+  const header = formName
+    ? `=== ${formName.toUpperCase()} FORM PAYLOAD ===`
+    : "=== FORM PAYLOAD ==="
+
+  console.log(header)
+  console.log(JSON.stringify(payload, null, 2))
+
+  // Show toast notification
+  const { toast } = require("@/components/ui/use-toast")
+  toast({
+    title: formName ? `${formName.toUpperCase()} Form Payload Logged` : "Form Payload Logged",
+    description: "Check the console for the complete payload details",
+  })
+}

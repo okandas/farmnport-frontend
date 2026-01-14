@@ -1,30 +1,25 @@
 "use client"
 
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import { MoreHorizontal } from "lucide-react"
 
-import { ProductItem } from "@/lib/schemas"
-import { slug } from "@/lib/utilities"
+import { Brand } from "@/lib/schemas"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { ToastAction } from "@/components/ui/toast"
-import { toast } from "@/components/ui/use-toast"
 
-interface ProductControlDropDownProps {
-  product?: ProductItem
+interface BrandControlDropDownProps {
+  brand?: Brand
 }
 
-export function ProductControlDropDown({
-  product,
-}: ProductControlDropDownProps) {
+export function BrandControlDropDown({
+  brand,
+}: BrandControlDropDownProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -38,15 +33,9 @@ export function ProductControlDropDown({
         <DropdownMenuItem>
           <Link
             className="w-full"
-            href={`/dashboard/products/${product?.id}/edit`}
+            href={`/dashboard/brands/${brand?.id}/edit`}
           >
             Edit
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <Link className="w-full" href={`#`}>
-            Editors Choice
           </Link>
         </DropdownMenuItem>
       </DropdownMenuContent>

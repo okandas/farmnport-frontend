@@ -297,102 +297,167 @@ export const ProducerPriceListSchema = z
     }
   })
 
-export const ProductSchema = z.object({
+export const BrandSchema = z.object({
   id: z.string(),
   name: z.string(),
-  descriptions: z.array(
-    z.object({
-      name: z.string(),
-      value: z.string(),
-    }),
-  ),
-  reg_number: z.string(),
-  cat: z.string(),
-  admin: z.object({
-    id: z.string(),
-    name: z.boolean(),
-  }),
-  images: z.array(
-    z.object({
-      img: z.object({
-        id: z.string(),
-        src: z.string(),
-      }),
-    }),
-  ),
-  unit: z.array(
-    z.object({
-      name: z.string(),
-      value: z.coerce.number().nonnegative(),
-    }),
-  ),
-  manufacturer: z.object({
-    name: z.string(),
-  }),
-  distributor: z.object({
-    name: z.string(),
-  }),
-  warnings: z.array(
-    z.object({
-      name: z.string(),
-      value: z.string(),
-      location: z.string(),
-    }),
-  ),
-  instructions: z.object({
-    usage: z.array(
-      z.object({
-        name: z.string(),
-        value: z.string(),
-      }),
-    ),
-    examples: z.array(
-      z.object({
-        description: z.string().optional(),
-        values: z.array(
-          z.object({
-            dosage: z.object({
-              unit: z.string(),
-              value: z.number().nonnegative(),
-            }),
-            mass: z.object({
-              unit: z.string(),
-              weight: z.number().nonnegative(),
-            }),
-            pack: z.number().nonnegative(),
-          }),
-        ),
-      }),
-    ),
-    efficacy_table: z.array(
-      z.object({
-        species: z.string(),
-        third_stage: z.string(),
-        fourth_stage: z.string(),
-        adults: z.string(),
-      }),
-    ),
-    efficacy: z.array(
-      z.object({
-        name: z.string(),
-        value: z.string(),
-      }),
-    ),
-    key_map: z.object({
-      type: z.string(),
-      values: z.array(
-        z.object({
-          name: z.string(),
-          value: z.string(),
-        }),
-      ),
-    }),
-  }),
+  slug: z.string(),
+  created: z.string().optional(),
+  updated: z.string().optional(),
 })
 
-export const FormProductSchema = ProductSchema.omit({
-  admin: true,
+export const AgroChemicalCategorySchema = z.object({
+  id: z.string(),
+  name: z.string().min(1, "Name is required"),
+  slug: z.string().optional(),
+  short_description: z.string().max(100, "Short description cannot exceed 100 characters"),
+  description: z.string().max(500, "Description cannot exceed 500 characters"),
+  created: z.string().optional(),
+  updated: z.string().optional(),
 })
+
+export const FormAgroChemicalCategorySchema = AgroChemicalCategorySchema.pick({
+  id: true,
+  name: true,
+  short_description: true,
+  description: true,
+})
+
+export const AgroChemicalActiveIngredientSchema = z.object({
+  id: z.string(),
+  name: z.string().min(1, "Name is required"),
+  slug: z.string().optional(),
+  short_description: z.string().max(100, "Short description cannot exceed 100 characters"),
+  description: z.string().max(500, "Description cannot exceed 500 characters"),
+  created: z.string().optional(),
+  updated: z.string().optional(),
+})
+
+export const FormAgroChemicalActiveIngredientSchema = AgroChemicalActiveIngredientSchema.pick({
+  id: true,
+  name: true,
+  short_description: true,
+  description: true,
+})
+
+export const AgroChemicalTargetSchema = z.object({
+  id: z.string(),
+  name: z.string().min(1, "Name is required"),
+  scientific_name: z.string().optional(),
+  remark: z.string().optional(),
+  slug: z.string().optional(),
+  created: z.string().optional(),
+  updated: z.string().optional(),
+})
+
+export const FormAgroChemicalTargetSchema = AgroChemicalTargetSchema.pick({
+  id: true,
+  name: true,
+  scientific_name: true,
+  remark: true,
+})
+
+export const AgroChemicalDosageRateSchema = z.object({
+  id: z.string(),
+  agrochemical_id: z.string().min(1, "AgroChemical is required"),
+  farm_produce_id: z.string().min(1, "Crop is required"),
+  target_ids: z.array(z.string()).min(1, "At least one target is required"),
+  dosage: z.string().min(1, "Dosage is required"),
+  max_applications: z.coerce.number().positive("Maximum applications must be positive"),
+  application_interval: z.string().min(1, "Application interval is required"),
+  phi: z.string().optional(),
+  remarks: z.string().optional(),
+  created: z.string().optional(),
+  updated: z.string().optional(),
+})
+
+export const FormAgroChemicalDosageRateSchema = AgroChemicalDosageRateSchema.pick({
+  id: true,
+  agrochemical_id: true,
+  farm_produce_id: true,
+  target_ids: true,
+  dosage: true,
+  max_applications: true,
+  application_interval: true,
+  phi: true,
+  remarks: true,
+})
+
+export type AgroChemicalDosageRate = z.infer<typeof AgroChemicalDosageRateSchema>
+export type FormAgroChemicalDosageRateModel = z.infer<typeof FormAgroChemicalDosageRateSchema>
+
+export const AgroChemicalSchema = z.object({
+  id: z.string(),
+  name: z.string().min(1, "Name is required"),
+  slug: z.string().optional(),
+  brand_id: z.string().min(1, "Brand is required"),
+  brand: z.object({
+    id: z.string(),
+    name: z.string(),
+  }).optional(),
+  front_label: z.custom<ImageModel>(),
+  back_label: z.custom<ImageModel>(),
+  images: z.array(z.custom<ImageModel>()).min(1, "At least one product image is required").max(5, "Maximum 5 images allowed"),
+  active_ingredients: z.array(z.object({
+    id: z.string(),
+    name: z.string(),
+    dosage_value: z.number(),
+    dosage_unit: z.string(),
+  })),
+  dosage_rates: z.array(z.object({
+    id: z.string(),
+    crop: z.string(),
+    crop_id: z.string(),
+    targets: z.string(),
+    target_ids: z.array(z.string()),
+    entries: z.array(z.object({
+      dosage: z.object({
+        value: z.string(),
+        unit: z.string(),
+        per: z.string(),
+      }),
+      max_applications: z.object({
+        max: z.number(),
+        note: z.string(),
+      }),
+      application_interval: z.string(),
+      phi: z.string(),
+      remarks: z.array(z.string()),
+    })),
+  })),
+  created: z.string().optional(),
+  updated: z.string().optional(),
+})
+
+export const ActiveIngredientRelationSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  dosage_value: z.number().min(0, "Dosage value must be positive"),
+  dosage_unit: z.string().min(1, "Dosage unit is required"),
+})
+
+export const DosageRateSchema = z.object({
+  id: z.string(),
+  crop: z.string(),
+  crop_id: z.string(),
+  targets: z.string(),
+  target_ids: z.array(z.string()),
+  entries: z.array(z.object({
+    dosage: z.object({
+      value: z.string(),
+      unit: z.string(),
+      per: z.string(),
+    }),
+    max_applications: z.object({
+      max: z.number(),
+      note: z.string(),
+    }),
+    application_interval: z.string(),
+    phi: z.string(),
+    remarks: z.array(z.string()),
+  })),
+})
+
+export const FormAgroChemicalSchema = AgroChemicalSchema
 
 ApplicationUserSchema.required({
   name: true,
@@ -442,8 +507,15 @@ export type ApplicationUserID = z.infer<typeof ApplicationUserIDSchema>
 export type EditApplicationUser = z.infer<typeof EditApplicationUserSchema>
 
 export type ProducerPriceList = z.infer<typeof ProducerPriceListSchema>
-export type ProductItem = z.infer<typeof ProductSchema>
-export type FormProductModel = z.infer<typeof FormProductSchema>
+export type Brand = z.infer<typeof BrandSchema>
+export type AgroChemicalCategory = z.infer<typeof AgroChemicalCategorySchema>
+export type FormAgroChemicalCategoryModel = z.infer<typeof FormAgroChemicalCategorySchema>
+export type AgroChemicalActiveIngredient = z.infer<typeof AgroChemicalActiveIngredientSchema>
+export type FormAgroChemicalActiveIngredientModel = z.infer<typeof FormAgroChemicalActiveIngredientSchema>
+export type AgroChemicalTarget = z.infer<typeof AgroChemicalTargetSchema>
+export type FormAgroChemicalTargetModel = z.infer<typeof FormAgroChemicalTargetSchema>
+export type AgroChemicalItem = z.infer<typeof AgroChemicalSchema>
+export type FormAgroChemicalModel = z.infer<typeof FormAgroChemicalSchema>
 
 export type ImageModel = {
   img: {

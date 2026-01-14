@@ -1,6 +1,6 @@
 "use client"
 
-import { ChangeEvent, Dispatch, SetStateAction, useState } from "react"
+import { Dispatch, SetStateAction, useState } from "react"
 import Link from "next/link"
 import {
   ColumnDef,
@@ -38,6 +38,7 @@ interface DataTableProps<TData, TValue> {
   setPagination: Dispatch<SetStateAction<PaginationState>>
   search: string
   setSearch: Dispatch<SetStateAction<string>>
+  searchPlaceholder?: string
 }
 
 export function DataTable<TData, TValue>({
@@ -50,6 +51,7 @@ export function DataTable<TData, TValue>({
   setPagination,
   search,
   setSearch,
+  searchPlaceholder,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = useState({})
 
@@ -95,7 +97,7 @@ export function DataTable<TData, TValue>({
           <div className="flex items-center justify-between">
             <div className="flex items-center flex-1 space-x-2">
               <Input
-                placeholder="Search for client..."
+                placeholder={searchPlaceholder || `Search for ${tableName.toLowerCase()}...`}
                 value={search ?? ""}
                 onChange={(event) => {
                   setSearch(event.target.value)
@@ -167,9 +169,13 @@ export function DataTable<TData, TValue>({
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center"
+                  className="h-48 text-center"
                 >
-                  No results.
+                  <div className="flex flex-col items-center justify-center space-y-2 text-muted-foreground">
+                    <Icons.alertCircle className="w-8 h-8" />
+                    <p className="text-sm font-medium">No {tableName.toLowerCase()}s found</p>
+                    <p className="text-xs">Click &quot;New {tableName}&quot; above to add your first entry.</p>
+                  </div>
                 </TableCell>
               </TableRow>
             )}
