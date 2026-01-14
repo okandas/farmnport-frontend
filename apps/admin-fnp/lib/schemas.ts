@@ -343,6 +343,8 @@ export const AgroChemicalTargetSchema = z.object({
   id: z.string(),
   name: z.string().min(1, "Name is required"),
   scientific_name: z.string().optional(),
+  description: z.string().optional(),
+  damage_type: z.string().optional(),
   remark: z.string().optional(),
   slug: z.string().optional(),
   created: z.string().optional(),
@@ -353,6 +355,8 @@ export const FormAgroChemicalTargetSchema = AgroChemicalTargetSchema.pick({
   id: true,
   name: true,
   scientific_name: true,
+  description: true,
+  damage_type: true,
   remark: true,
 })
 
