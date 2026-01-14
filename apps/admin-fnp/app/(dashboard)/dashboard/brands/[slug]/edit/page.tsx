@@ -1,5 +1,6 @@
 "use client"
 
+import { use } from "react"
 import Link from "next/link"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation, useQuery } from "@tanstack/react-query"
@@ -30,9 +31,10 @@ const BrandFormSchema = z.object({
 
 type BrandFormData = z.infer<typeof BrandFormSchema>
 
-export default function EditBrandPage({ params }: { params: { slug: string } }) {
+export default function EditBrandPage({ params }: { params: Promise<{ slug: string }> }) {
     const router = useRouter()
-    const brandId = params.slug
+    const { slug } = use(params)
+    const brandId = slug
 
     const { data: brandData, isLoading } = useQuery({
         queryKey: ["brand", brandId],

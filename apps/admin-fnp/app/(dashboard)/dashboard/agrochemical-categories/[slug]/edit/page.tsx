@@ -1,5 +1,6 @@
 "use client"
 
+import { use } from "react"
 import Link from "next/link"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation, useQuery } from "@tanstack/react-query"
@@ -23,9 +24,10 @@ import {
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 
-export default function EditAgroChemicalCategoryPage({ params }: { params: { slug: string } }) {
+export default function EditAgroChemicalCategoryPage({ params }: { params: Promise<{ slug: string }> }) {
     const router = useRouter()
-    const categoryId = params.slug
+    const { slug } = use(params)
+    const categoryId = slug
 
     const { data: categoryData, isLoading } = useQuery({
         queryKey: ["agrochemical-category", categoryId],
