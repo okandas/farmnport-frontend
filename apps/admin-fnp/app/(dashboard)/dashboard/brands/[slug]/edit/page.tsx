@@ -27,6 +27,7 @@ import { Input } from "@/components/ui/input"
 const BrandFormSchema = z.object({
     id: z.string(),
     name: z.string().min(1, "Brand name is required").max(80, "Brand name cannot exceed 80 characters"),
+    slogan: z.string().optional(),
 })
 
 type BrandFormData = z.infer<typeof BrandFormSchema>
@@ -47,10 +48,12 @@ export default function EditBrandPage({ params }: { params: Promise<{ slug: stri
         defaultValues: {
             id: brand?.id || "",
             name: brand?.name || "",
+            slogan: brand?.slogan || "",
         },
         values: brand ? {
             id: brand.id,
             name: brand.name,
+            slogan: brand.slogan,
         } : undefined,
         resolver: zodResolver(BrandFormSchema),
     })
@@ -152,6 +155,37 @@ export default function EditBrandPage({ params }: { params: Promise<{ slug: stri
                                     </div>
                                     <p className="mt-3 text-sm/6 text-gray-600 dark:text-gray-400">
                                         Enter the official name of the brand. The URL-friendly slug will be updated automatically.
+                                    </p>
+                                </div>
+
+                                <div className="sm:col-span-4">
+                                    <label
+                                        htmlFor="slogan"
+                                        className="block text-sm/6 font-medium text-gray-900 dark:text-white"
+                                    >
+                                        Slogan (Optional)
+                                    </label>
+                                    <div className="mt-2">
+                                        <FormField
+                                            control={form.control}
+                                            name="slogan"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormControl>
+                                                        <Input
+                                                            id="slogan"
+                                                            placeholder="Enter brand slogan"
+                                                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
+                                                            {...field}
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
+                                    <p className="mt-3 text-sm/6 text-gray-600 dark:text-gray-400">
+                                        Enter the brand slogan or marketing tagline.
                                     </p>
                                 </div>
 
