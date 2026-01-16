@@ -82,3 +82,18 @@ export function queryProducerPriceLists(pagination?: PaginationModel) {
 
   return api.get(url)
 }
+
+export function queryFarmProduceCategories() {
+  const url = `${BaseURL}/farmproducecategories/`
+  return api.get(url)
+}
+
+export function queryFarmProduceByCategory(categorySlug: string) {
+  const url = `${BaseURL}/farmproduce/category/${categorySlug}`
+  return api.get(url)
+}
+
+export function queryAllFarmProduce() {
+  const url = `${BaseURL}/farmproduce/`
+  return api.get(url)
+}

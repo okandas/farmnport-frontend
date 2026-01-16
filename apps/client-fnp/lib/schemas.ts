@@ -14,9 +14,12 @@ export const AuthSignUpSchema = z.object({
     address: z.string().min(10),
     city: z.string().min(4),
     province: z.string(),
-    specialization: z.string(),
-    main_activity: z.string().min(1),
-    specializations: z.array(z.string().trim()).optional(),
+    specialization: z.string().optional(), // Deprecated: use primary_produce_id
+    primary_produce_id: z.string().length(24).optional(),
+    main_activity: z.string().optional(), // Deprecated: use main_produce_id
+    main_produce_id: z.string().length(24).optional(),
+    specializations: z.array(z.string().trim()).optional(), // Deprecated: use other_produce_ids
+    other_produce_ids: z.array(z.string().length(24)).optional(),
     type: z.string(),
     scale: z.string(),
 }).superRefine((data, ctx) => {
@@ -25,6 +28,23 @@ export const AuthSignUpSchema = z.object({
         code: z.ZodIssueCode.custom,
         path: ['confirm_password'],
         message: "Passwords should match!",
+      });
+    }
+
+    // Require either old or new fields during transition
+    if (!data.primary_produce_id && !data.specialization) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['primary_produce_id'],
+        message: "Primary focus is required",
+      });
+    }
+
+    if (!data.main_produce_id && !data.main_activity) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['main_produce_id'],
+        message: "Main product is required",
       });
     }
 })
@@ -327,4 +347,34 @@ export const BuyerSeo: Record<string, string>  = {
 
 export const FarmerSeo: Record<string, string>  = {
   chicken: "Looking for trusted chicken farmers and  where to buy chickens in Zimbabwe? Connect with reliable poultry farmers across the country, in major towns who purchase broiler, free-range, and live chickens in bulk or retail."
+}
+
+export type FarmProduceCategory = {
+  id: string
+  name: string
+  slug: string
+  description: string
+  created: string
+  updated: string
+}
+
+export type FarmProduce = {
+  id: string
+  name: string
+  slug: string
+  description: string
+  category_id: string
+  category_slug: string
+  created: string
+  updated: string
+}
+
+export type FarmProduceCategoriesResponse = {
+  total: number
+  data: FarmProduceCategory[]
+}
+
+export type FarmProduceResponse = {
+  total: number
+  data: FarmProduce[]
 }

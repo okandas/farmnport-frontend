@@ -1,11 +1,11 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import axios from 'axios'
 
 import { useRouter, useSearchParams } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import { captureException } from "@sentry/nextjs";
 import { useForm, Controller } from "react-hook-form"
 import Link from "next/link"
@@ -17,19 +17,17 @@ import { Badge } from "@/components/ui/badge"
 import { Icons } from "@/components/icons/lucide"
 import { toast } from "sonner"
 
-import { AuthSignUpSchema, SignUpFormData, LoginFormData } from "@/lib/schemas"
+import { AuthSignUpSchema, SignUpFormData, LoginFormData, FarmProduceCategoriesResponse, FarmProduceResponse, FarmProduce } from "@/lib/schemas"
 import { cn, capitalizeFirstLetter } from "@/lib/utilities"
-import { clientSignup } from "@/lib/query"
+import { clientSignup, queryFarmProduceCategories, queryFarmProduceByCategory } from "@/lib/query"
 import { signIn} from "@/auth"
 
 
 
 import {
     clientTypes,
-    mainActivity,
     provinces,
     scales,
-    specializations,
 } from "@/components/structures/repository/data"
 
 import {
@@ -118,10 +116,59 @@ export function SignUpAuthForm({ className, ...props }: AuthFormProps) {
     })
 
     const selectedSpecializations = watch("specializations") || []
+    const selectedOtherProduceIDs = watch("other_produce_ids") || []
 
     const changingSpecialization = watch("specialization")
+    const changingPrimaryProduceID = watch("primary_produce_id")
 
     const selectedMainActivity = watch("main_activity")
+    const selectedMainProduceID = watch("main_produce_id")
+
+    const selectedType = watch("type")
+
+    // Fetch all categories
+    const { data: categoriesData } = useQuery({
+        queryKey: ["farm-produce-categories"],
+        queryFn: () => queryFarmProduceCategories(),
+    })
+
+    const categories = (categoriesData?.data as FarmProduceCategoriesResponse)?.data || []
+
+    // Fetch produce for selected category
+    const selectedCategory = categories.find(cat => cat.id === changingPrimaryProduceID)
+
+    const { data: produceData } = useQuery({
+        queryKey: ["farm-produce-by-category", selectedCategory?.slug],
+        queryFn: () => queryFarmProduceByCategory(selectedCategory!.slug),
+        enabled: !!selectedCategory?.slug,
+    })
+
+    const produceItems = (produceData?.data as FarmProduceResponse)?.data || []
+
+    // For "Other Activities", we need all produce grouped by category
+    const [allProduceByCategory, setAllProduceByCategory] = useState<Record<string, FarmProduce[]>>({})
+
+    useEffect(() => {
+        const fetchAllProduce = async () => {
+            const produceByCategory: Record<string, FarmProduce[]> = {}
+
+            for (const category of categories) {
+                try {
+                    const response = await queryFarmProduceByCategory(category.slug)
+                    const data = response.data as FarmProduceResponse
+                    produceByCategory[category.id] = data.data
+                } catch (error) {
+                    console.error(`Failed to fetch produce for ${category.name}`, error)
+                }
+            }
+
+            setAllProduceByCategory(produceByCategory)
+        }
+
+        if (categories.length > 0) {
+            fetchAllProduce()
+        }
+    }, [categories])
 
     const submitSignUpForm = async (payload: SignUpFormData) => {
 
@@ -137,7 +184,15 @@ export function SignUpAuthForm({ className, ...props }: AuthFormProps) {
     return (
         <div className={cn("", className)} {...props}>
             <form onSubmit={handleSubmit((data) => submitSignUpForm(data))}>
-                <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 md:col-span-2">
+                <div className="space-y-12">
+                    {/* Business Information Section */}
+                    <div className="border-b border-zinc-900/10 pb-12 dark:border-zinc-700/40">
+                        <h2 className="text-base/7 font-semibold text-zinc-900 dark:text-white">Business Information</h2>
+                        <p className="mt-1 text-sm/6 text-zinc-600 dark:text-zinc-400">
+                            Tell us about your farm or business. This information will be visible to potential partners.
+                        </p>
+
+                        <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
                     <div className="sm:col-span-3">
                         <Label htmlFor="name">
                             Company or Farm Name
@@ -179,7 +234,7 @@ export function SignUpAuthForm({ className, ...props }: AuthFormProps) {
                             </p>
                         )}
                     </div>
-                    <div className="sm:col-span-4">
+                    <div className="sm:col-span-3">
                         <Label htmlFor="email">
                             Email
                         </Label>
@@ -200,6 +255,41 @@ export function SignUpAuthForm({ className, ...props }: AuthFormProps) {
                             </p>
                         )}
                     </div>
+
+                    <div className="sm:col-span-3">
+                        <Label htmlFor="type">
+                            Business Type
+                        </Label>
+                        <Controller
+                            name="type"
+                            control={control}
+                            render={({ field }) =>
+                                <Select
+                                    onValueChange={field.onChange}
+                                    value={field.value}
+                                >
+                                    <SelectTrigger className="mt-2">
+                                        <SelectValue placeholder="Are you a Farmer or Buyer?" />
+                                    </SelectTrigger>
+
+                                    <SelectContent className="overflow-visible max-h-44">
+                                        {clientTypes.map((type) => {
+                                            return (
+                                                <SelectItem key={type} value={type}>
+                                                    {capitalizeFirstLetter(type)}
+                                                </SelectItem>
+                                            )
+                                        })}
+                                    </SelectContent>
+                                </Select>}
+                        />
+                        {errors?.type && (
+                            <p className="px-2 text-xs text-red-600 py-2">
+                                {errors.type.message}
+                            </p>
+                        )}
+                    </div>
+
                     <div className="col-span-full">
                         <Label htmlFor="email">
                             Address
@@ -309,99 +399,83 @@ export function SignUpAuthForm({ className, ...props }: AuthFormProps) {
                             </p>
                         )}
                     </div>
+                        </div>
+                    </div>
 
-                    <div className="sm:col-span-2">
-                        <Label htmlFor="type">
-                            Category
+                    {/* Farming Activities Section */}
+                    <div className="pb-12">
+                        <h2 className="text-base/7 font-semibold text-zinc-900 dark:text-white">
+                            {selectedType === "buyer" ? "Buying Interests" : "Farming Activities"}
+                        </h2>
+                        <p className="mt-1 text-sm/6 text-zinc-600 dark:text-zinc-400">
+                            {selectedType === "buyer"
+                                ? "Select your primary buying focus and the products you're interested in."
+                                : "Select your primary focus and the products you work with."}
+                        </p>
+
+                        <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+
+                    <div className="sm:col-span-3">
+                        <Label htmlFor="primary_produce_id">
+                            Primary Focus
                         </Label>
                         <Controller
-                            name="type"
+                            name="primary_produce_id"
                             control={control}
                             render={({ field }) =>
                                 <Select
                                     onValueChange={field.onChange}
+                                    value={field.value}
                                 >
                                     <SelectTrigger className="mt-2">
-                                        <SelectValue placeholder="Select Category" />
+                                        <SelectValue placeholder="Select Your Primary Focus" />
                                     </SelectTrigger>
 
                                     <SelectContent className="overflow-visible max-h-44">
-                                        {clientTypes.map((type) => {
+                                        {categories.map((category) => {
                                             return (
-                                                <SelectItem key={type} value={type}>
-                                                    {capitalizeFirstLetter(type)}
+                                                <SelectItem key={category.id} value={category.id}>
+                                                    {capitalizeFirstLetter(category.name)}
                                                 </SelectItem>
                                             )
                                         })}
                                     </SelectContent>
                                 </Select>}
                         />
-                        {errors?.type && (
+                        {errors?.primary_produce_id && (
                             <p className="px-2 text-xs text-red-600 py-2">
-                                {errors.type.message}
+                                {errors.primary_produce_id.message}
                             </p>
                         )}
                     </div>
 
                     <div className="sm:col-span-3">
-                        <Label htmlFor="specialization">
-                            Specilization
-                        </Label>
-                        <Controller
-                            name="specialization"
-                            control={control}
-                            render={({ field }) =>
-                                <Select
-                                    onValueChange={field.onChange}
-                                >
-                                    <SelectTrigger className="mt-2">
-                                        <SelectValue placeholder="Pick Your Specialization" />
-                                    </SelectTrigger>
-
-                                    <SelectContent className="overflow-visible max-h-44">
-                                        {specializations.map((specialization) => {
-                                            return (
-                                                <SelectItem key={specialization} value={specialization}>
-                                                    {capitalizeFirstLetter(specialization)}
-                                                </SelectItem>
-                                            )
-                                        })}
-                                    </SelectContent>
-                                </Select>}
-                        />
-                        {errors?.specialization && (
-                            <p className="px-2 text-xs text-red-600 py-2">
-                                {errors.specialization.message}
-                            </p>
-                        )}
-                    </div>
-
-                    <div className="sm:col-span-2 sm:col-start-1">
-                        <Label htmlFor="main_activity">
+                        <Label htmlFor="main_produce_id">
                             Main Product
                         </Label>
                         <Controller
-                            name="main_activity"
+                            name="main_produce_id"
                             control={control}
                             render={({ field }) =>
                                 <Select
                                     onValueChange={field.onChange}
+                                    value={field.value}
                                 >
 
                                     <SelectTrigger
                                         className="mt-2"
-                                        disabled={typeof changingSpecialization === "undefined"}
+                                        disabled={!changingPrimaryProduceID}
                                     >
-                                        <SelectValue placeholder={typeof changingSpecialization === "undefined" ?
-                                            "Pick A Specialization First" : "Select Main Product."
+                                        <SelectValue placeholder={!changingPrimaryProduceID ?
+                                            "Select Primary Focus First" : "Select Your Main Product"
                                         } />
                                     </SelectTrigger>
 
                                     <SelectContent className="overflow-visible max-h-44">
-                                        {mainActivity[changingSpecialization]?.map((activity) => {
+                                        {produceItems.map((produce) => {
                                             return (
-                                                <SelectItem key={activity} value={activity}>
-                                                    {capitalizeFirstLetter(activity)}
+                                                <SelectItem key={produce.id} value={produce.id}>
+                                                    {capitalizeFirstLetter(produce.name)}
                                                 </SelectItem>
                                             )
                                         })}
@@ -409,86 +483,51 @@ export function SignUpAuthForm({ className, ...props }: AuthFormProps) {
                                 </Select>
                             }
                         />
-                        {errors?.main_activity && (
+                        {errors?.main_produce_id && (
                             <p className="px-2 text-xs text-red-600 py-2">
-                                {errors.main_activity.message}
+                                {errors.main_produce_id.message}
                             </p>
                         )}
                     </div>
 
-                    <div className="sm:col-span-2">
-                        <Label htmlFor="password">
-                            Password
-                        </Label>
-                        <Input
-                            className="mt-2"
-                            id="password"
-                            type="password"
-                            autoCapitalize="none"
-                            autoComplete="password"
-                            autoCorrect="off"
-                            disabled={isPending}
-                            {...register("password", { required: true })}
-                        />
-                        {errors?.password && (
-                            <p className="px-2 text-xs text-red-600 py-2">
-                                {errors.password.message}
-                            </p>
-                        )}
-                    </div>
-
-                    <div className="sm:col-span-2">
-                        <Label htmlFor="confirm_password">
-                            Confirm Password
-                        </Label>
-                        <Input
-                            className="mt-2"
-                            id="confirm_password"
-                            type="password"
-                            autoCapitalize="none"
-                            autoComplete="confirm_password"
-                            autoCorrect="off"
-                            disabled={isPending}
-                            {...register("confirm_password", { 
-                                    validate: (value, formValues) =>
-                                        value === formValues.password || "The passwords do not match"
-                                })
-                            }
-                        />
-                        {errors?.confirm_password && (
-                            <p className="px-2 text-xs text-red-600 py-2">
-                                {errors.confirm_password.message}
-                            </p>
-                        )}
-                    </div>
-
-                    <div className="sm:col-span-4">
-                        <Label htmlFor="specializations">
+                    <div className="col-span-full">
+                        <Label htmlFor="other_produce_ids">
                             Other Products
                         </Label>
                         <Controller
-                            name="specializations"
+                            name="other_produce_ids"
                             control={control}
                             render={({ field }) =>
                                 <Popover open={open} onOpenChange={setOpen}>
                                     <PopoverTrigger asChild>
-                                        <div className="group min-h-[2.5rem] rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-0">
+                                        <div className="group mt-2 min-h-[2.5rem] rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-0 cursor-pointer">
                                             <div className="flex flex-wrap gap-1">
-                                                {selectedSpecializations?.length >= 1
-                                                    ? selectedSpecializations?.map((selected) => {
-                                                        if (selected.length !== 0) {
-                                                            return (
-                                                                <Badge
-                                                                    key={selected}
-                                                                    variant="outline"
-                                                                    className="flex justify-between text-green-800 bg-green-100 border-green-400"
-                                                                >
-                                                                    {capitalizeFirstLetter(selected)}
-                                                                </Badge>
-                                                            )
-                                                        }
-                                                    })
-                                                    : "Select Specialization ..."}
+                                                {selectedOtherProduceIDs?.length >= 1
+                                                    ? selectedOtherProduceIDs?.map((produceID) => {
+                                                                // Find the produce name from all produce
+                                                                let produceName = ""
+                                                                for (const categoryID in allProduceByCategory) {
+                                                                    const produce = allProduceByCategory[categoryID].find(p => p.id === produceID)
+                                                                    if (produce) {
+                                                                        produceName = produce.name
+                                                                        break
+                                                                    }
+                                                                }
+
+                                                                if (produceName) {
+                                                                    return (
+                                                                        <Badge
+                                                                            key={produceID}
+                                                                            variant="outline"
+                                                                            className="flex justify-between text-green-800 bg-green-100 border-green-400 dark:text-green-300 dark:bg-green-900/30 dark:border-green-600"
+                                                                        >
+                                                                            {capitalizeFirstLetter(produceName)}
+                                                                        </Badge>
+                                                                    )
+                                                                }
+                                                                return null
+                                                            })
+                                                    : <span className="text-muted-foreground">Select other products you practice...</span>}
                                             </div>
                                         </div>
                                     </PopoverTrigger>
@@ -499,82 +538,38 @@ export function SignUpAuthForm({ className, ...props }: AuthFormProps) {
                                                 <CommandEmpty className="py-3 text-center">
                                                     No results found.
                                                 </CommandEmpty>
-                                                {specializations.map((specialization) => {
+                                                {categories.map((category) => {
+                                                    const categoryProduce = allProduceByCategory[category.id] || []
+
                                                     return (
                                                         <CommandGroup
-                                                            key={specialization}
-                                                            heading={specialization}
+                                                            key={category.id}
+                                                            heading={capitalizeFirstLetter(category.name)}
                                                         >
-                                                            {mainActivity[specialization].map(
-                                                                (activity) => {
-                                                                    if (selectedMainActivity !== activity) {
-                                                                        return (
-                                                                            <CommandItem
-                                                                                key={activity}
-                                                                                onSelect={(value) => {
-                                                                                    if (
-                                                                                        !selectedSpecializations?.includes(
-                                                                                            value,
-                                                                                        )
-                                                                                    ) {
-                                                                                        
-
-        
-                                                                                        if (typeof selectedSpecializations === 'undefined') {
-                                                                                            const NewSpecialization = [
-                                                                                                value,
-                                                                                            ]
-
-                                                                                            setValue(
-                                                                                                "specializations",
-                                                                                                NewSpecialization,
-                                                                                            )
-                                                                                        } else {
-                                                                                            const NewSpecialization = [
-                                                                                                ...selectedSpecializations,
-                                                                                                value,
-                                                                                            ]
-
-                                                                                            setValue(
-                                                                                                "specializations",
-                                                                                                NewSpecialization,
-                                                                                            )
-                                                                                        }
-                                                                                    
-
-                                                                                   
-                                                                                    } else {
-                                                                                        const removeAtIndex =
-                                                                                            selectedSpecializations?.indexOf(
-                                                                                                value,
-                                                                                            )
-
-                                                                                        selectedSpecializations?.splice(
-                                                                                            removeAtIndex,
-                                                                                            1,
-                                                                                        )
-
-                                                                                        setValue(
-                                                                                            "specializations",
-                                                                                            selectedSpecializations,
-                                                                                        )
-                                                                                    }
-                                                                                }}
-                                                                            >
-                                                                                {selectedSpecializations?.includes(
-                                                                                    activity,
-                                                                                ) ? (
-                                                                                    <Icons.check className="w-4 h-4 mr-2" />
-                                                                                ) : null}
-
-                                                                                <span>{capitalizeFirstLetter(activity)}</span>
-                                                                            </CommandItem>
-                                                                        )
-                                                                    } else {
-                                                                        null
-                                                                    }
-                                                                },
-                                                            )}
+                                                            {categoryProduce.map((produce) => {
+                                                                if (produce.id !== selectedMainProduceID) {
+                                                                    return (
+                                                                        <CommandItem
+                                                                            key={produce.id}
+                                                                            onSelect={() => {
+                                                                                if (!selectedOtherProduceIDs?.includes(produce.id)) {
+                                                                                    const newIDs = selectedOtherProduceIDs ? [...selectedOtherProduceIDs, produce.id] : [produce.id]
+                                                                                    setValue("other_produce_ids", newIDs)
+                                                                                } else {
+                                                                                    const newIDs = selectedOtherProduceIDs.filter(id => id !== produce.id)
+                                                                                    setValue("other_produce_ids", newIDs)
+                                                                                }
+                                                                            }}
+                                                                        >
+                                                                            {selectedOtherProduceIDs?.includes(produce.id) ? (
+                                                                                <Icons.check className="w-4 h-4 mr-2" />
+                                                                            ) : null}
+                                                                            <span>{capitalizeFirstLetter(produce.name)}</span>
+                                                                        </CommandItem>
+                                                                    )
+                                                                }
+                                                                return null
+                                                            })}
                                                         </CommandGroup>
                                                     )
                                                 })}
@@ -585,42 +580,91 @@ export function SignUpAuthForm({ className, ...props }: AuthFormProps) {
                                 </Popover>
                             }
                         />
-                        {errors?.specializations && (
+                        {errors?.other_produce_ids && (
                             <p className="px-2 text-xs text-red-600 py-2">
-                                {errors.specializations.message}
+                                {errors.other_produce_ids.message}
                             </p>
                         )}
                     </div>
+                        </div>
+                    </div>
+
+                    {/* Account Security Section */}
+                    <div className="pb-12">
+                        <h2 className="text-base/7 font-semibold text-zinc-900 dark:text-white">Account Security</h2>
+                        <p className="mt-1 text-sm/6 text-zinc-600 dark:text-zinc-400">
+                            Create a secure password for your account.
+                        </p>
+
+                        <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                            <div className="sm:col-span-3">
+                                <Label htmlFor="password">
+                                    Password
+                                </Label>
+                                <Input
+                                    className="mt-2"
+                                    id="password"
+                                    type="password"
+                                    autoCapitalize="none"
+                                    autoComplete="new-password"
+                                    autoCorrect="off"
+                                    disabled={isPending}
+                                    {...register("password", { required: true })}
+                                />
+                                {errors?.password && (
+                                    <p className="px-2 text-xs text-red-600 py-2">
+                                        {errors.password.message}
+                                    </p>
+                                )}
+                            </div>
+
+                            <div className="sm:col-span-3">
+                                <Label htmlFor="confirm_password">
+                                    Confirm Password
+                                </Label>
+                                <Input
+                                    className="mt-2"
+                                    id="confirm_password"
+                                    type="password"
+                                    autoCapitalize="none"
+                                    autoComplete="new-password"
+                                    autoCorrect="off"
+                                    disabled={isPending}
+                                    {...register("confirm_password", {
+                                            validate: (value, formValues) =>
+                                                value === formValues.password || "The passwords do not match"
+                                        })
+                                    }
+                                />
+                                {errors?.confirm_password && (
+                                    <p className="px-2 text-xs text-red-600 py-2">
+                                        {errors.confirm_password.message}
+                                    </p>
+                                )}
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div className="flex items-center justify-end mt-3">
+                <div className="mt-6 flex items-center justify-end gap-x-6">
+                    <Link
+                        href="/login"
+                        className="text-sm/6 font-semibold text-zinc-900 dark:text-white hover:text-orange-600 dark:hover:text-orange-400 transition-colors"
+                    >
+                        Already have an account? Login here
+                    </Link>
                     <button
-                        className={cn(buttonVariants())}
+                        className="rounded-md bg-orange-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-orange-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600 dark:bg-orange-600 dark:hover:bg-orange-500 dark:focus-visible:outline-orange-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                         disabled={isPending || isSuccess}
                         type="submit"
                     >
                         {isPending && (
-                            <Icons.spinner className="w-4 h-4 mr-2 animate-spin" />
+                            <Icons.spinner className="w-4 h-4 mr-2 animate-spin inline" />
                         )}
                         Sign Up
                     </button>
                 </div>
             </form>
-
-
-
-            <div className="flex items-center justify-start mt-3 space-x-2">
-
-                <div className="flex items-center text-sm">
-                    <p>Already have an account ?</p>
-                </div>
-
-                <div className="text-sm leading-6">
-                    <Link href="/login" className="font-semibold text-orange-600 hover:text-orange-500">
-                        Login here!
-                    </Link>
-                </div>
-            </div>
         </div>
     )
 }

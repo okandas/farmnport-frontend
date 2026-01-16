@@ -4,6 +4,7 @@ import {
     ArrowRight,
     BadgeCheck,
     Banknote,
+    BookOpen,
     CalendarIcon,
     Check,
     ChevronLeft,
@@ -96,5 +97,6 @@ export const Icons = {
     verified: ShieldCheck,
     unverified: ShieldX,
     tractor: Tractor,
-    lineChart: FileLineChart
+    lineChart: FileLineChart,
+    bookOpen: BookOpen
 }

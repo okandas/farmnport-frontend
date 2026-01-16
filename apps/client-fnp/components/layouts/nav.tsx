@@ -26,13 +26,21 @@ interface NavigationProps {
 export function Navigation({ user }: NavigationProps) {
   return (
       <nav className="lg:flex lg:space-x-2">
-        <Link href="/prices" onClick={() => sendGTMEvent({ event: 'link', value: 'BuyerTopNavigation' })}
+        <Link href="/prices" onClick={() => sendGTMEvent({ event: 'link', value: 'PricesTopNavigation' })}
               className={buttonVariants({
                 size: "sm",
                 variant: "link"
               })}
         >
           <Icons.lineChart className="mr-2" /> Prices
+        </Link>
+        <Link href="/agrochemical-guides" onClick={() => sendGTMEvent({ event: 'link', value: 'GuidesTopNavigation' })}
+              className={buttonVariants({
+                size: "sm",
+                variant: "link"
+              })}
+        >
+          <Icons.bookOpen className="mr-2" /> Guides
         </Link>
         <Link href="/buyers" onClick={() => sendGTMEvent({ event: 'link', value: 'BuyerTopNavigation' })}
               className={buttonVariants({
