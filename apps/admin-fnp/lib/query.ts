@@ -43,20 +43,28 @@ export function queryLogin(data: LoginFormData) {
 type pagination = {
   p?: number
   search?: string
+  type?: string[]
 }
 
 export function queryUsers(pagination?: pagination) {
-  let url: string
+  const params = new URLSearchParams()
 
   if (pagination?.p !== undefined && pagination.p >= 2) {
-    url = `${baseUrl}/user/clients?p=${pagination.p}`
-  } else {
-    url = `${baseUrl}/user/clients`
+    params.append('p', pagination.p.toString())
   }
 
   if (pagination?.search !== undefined && pagination.search.length >= 2) {
-    url = `${baseUrl}/user/clients?search=${pagination.search}`
+    params.append('search', pagination.search)
   }
+
+  if (pagination?.type !== undefined && pagination.type.length > 0) {
+    params.append('type', pagination.type.join(','))
+  }
+
+  const queryString = params.toString()
+  const url = queryString
+    ? `${baseUrl}/user/clients?${queryString}`
+    : `${baseUrl}/user/clients`
 
   return api.get(url)
 }

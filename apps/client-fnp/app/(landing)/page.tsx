@@ -105,9 +105,9 @@ export default function LandingPage() {
                                         Build a profitable agricultural business with access to verified buyers, market insights, quality inputs and expert guidance all in one platform.
                                     </p>
                                     <Link href="/signup">
-                                        <Button className="bg-orange-600 hover:bg-orange-700 text-white dark:bg-orange-500 dark:hover:bg-orange-600" onClick={() => sendGTMEvent({ event: "link", value: "SignupHeroNavigation" })}>
+                                        <Button className="bg-orange-600 hover:bg-orange-700 text-white dark:bg-orange-500 dark:hover:bg-orange-600 justify-center" onClick={() => sendGTMEvent({ event: "link", value: "SignupHeroNavigation" })}>
                                             Get Started
-                                            <ArrowDownIcon className="ml-2 h-4 w-4" />
+                                            <ArrowDownIcon className="h-4 w-4 text-black dark:text-white" />
                                         </Button>
                                     </Link>
                                 </div>
@@ -127,6 +127,7 @@ function ArrowDownIcon(props: React.ComponentPropsWithoutRef<"svg">) {
         <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" {...props}>
             <path
                 d="M4.75 8.75 8 12.25m0 0 3.25-3.5M8 12.25v-8.5"
+                stroke="currentColor"
                 strokeWidth="1.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
