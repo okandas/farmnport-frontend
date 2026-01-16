@@ -1,8 +1,7 @@
 "use client"
 
 import { sendGTMEvent } from "@next/third-parties/google"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import Image, { ImageProps } from "next/image"
+import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 
@@ -17,70 +16,109 @@ import logoChilli from "@/assets/logos/chilli.svg"
 import logoTomato from "@/assets/logos/tomato.svg"
 import logoOnion from "@/assets/logos/onion.svg"
 
-import { cn } from "@/lib/utilities"
-import { Icons } from "@/components/icons/lucide"
-
-
 export default function LandingPage() {
 
     return (
         <main>
-            <Tabs defaultValue="farmers">
-                <div className="mx-auto max-w-7xl lg:grid lg:grid-cols-12 lg:gap-x-8 lg:px-8">
-                    <div className="px-9 pt-3 pb-6 lg:col-span-7 lg:px-0 lg:pb-16 lg:pt-7 xl:col-span-6">
-                        <div className="mx-auto max-w-2xl lg:mx-0">
+            <div className="py-12 lg:py-16">
+                <div className="mx-auto max-w-7xl px-6 lg:px-8">
+                    <div className="mx-auto max-w-2xl text-center">
+                        <div className="mb-6 inline-flex">
+                            <Link href="/prices" onClick={() => sendGTMEvent({ event: "click", value: "PricingCTAHero" })}>
+                                <div className="relative rounded-full px-3 py-1 text-sm leading-6 bg-gradient-to-r from-green-500 to-emerald-600 text-white ring-2 ring-green-500/50 hover:ring-green-600 transition-all animate-pulse hover:animate-none hover:scale-105 shadow-lg hover:shadow-green-500/50">
+                                    New! <span className="whitespace-nowrap font-semibold">Check Market Prices <span aria-hidden="true">&rarr;</span></span>
+                                </div>
+                            </Link>
+                        </div>
+                        <h1 className="text-4xl font-bold tracking-tight sm:text-6xl font-heading">Getting You To Market.</h1>
+                        <p className="mt-6 text-lg leading-8 text-muted-foreground sm:text-xl sm:leading-8">
+                            Its never been easier to pre plan your harvest sales, with fresh farm produce buyers at the tip of your fingers. Farmnport the best place to find buyers for your agriproduce.
+                        </p>
+                    </div>
 
-                            <div className="mt-12 mb-8 sm:mt-32 sm:flex lg:mt-16">
-                                <div className="relative rounded-full px-3 py-1 text-sm leading-6 ring-1 ring-orange-500 hover:ring-900/20 w-44">
-                                    See <a href="#" className="whitespace-nowrap font-semibold text-orange-600">What&apos;s new!? <span aria-hidden="true">&rarr;</span></a>
+                    {/* Bento Grid */}
+                    <div className="mt-10 grid grid-cols-1 gap-4 sm:mt-16 lg:grid-cols-6 lg:grid-rows-2">
+                        {/* For Farmers - Large Card */}
+                        <div className="flex p-px lg:col-span-4">
+                            <div className="w-full overflow-hidden rounded-lg bg-card shadow outline outline-1 outline-black/5 max-lg:rounded-t-[2rem] lg:rounded-tl-[2rem] dark:shadow-none dark:outline-white/15">
+                                <div className="p-10">
+                                    <h3 className="text-sm/4 font-semibold text-muted-foreground">For Farmers</h3>
+                                    <p className="mt-2 text-lg font-medium tracking-tight">Everything you need to succeed</p>
+                                    <p className="mt-2 max-w-lg text-sm/6 text-muted-foreground">
+                                        Plan your harvest, source affordable inputs, get expert agronomist support, and access the latest seeds, breeds and vaccines.
+                                    </p>
+                                    <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                        {[
+                                            { company: "Planning", title: "Plan, Grow and Sell Produce", logo: logoPlanning },
+                                            { company: "Inputs", title: "Source affordable inputs", logo: logoInputs },
+                                            { company: "Guidance", title: "Expert agronomist support", logo: logoGuidance },
+                                            { company: "Research", title: "Latest seeds, breeds & vaccines", logo: logoResearch },
+                                        ].map((info, index) => (
+                                            <div key={index} className="flex items-start gap-3">
+                                                <div className="relative mt-1 flex h-8 w-8 flex-none items-center justify-center rounded-full shadow-md shadow-zinc-800/5 ring-1 ring-zinc-900/5 dark:border dark:border-zinc-700/50 dark:bg-zinc-800 dark:ring-0">
+                                                    <Image src={info.logo} alt="" className="h-5 w-5" unoptimized />
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-sm font-medium">{info.company}</p>
+                                                    <p className="text-xs text-muted-foreground">{info.title}</p>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
-                            <h1 className="text-4xl font-bold tracking-tight sm:mt-10 sm:text-6xl font-heading">Getting You To Market.</h1>
-                            <p className="mt-6 leading-normal text-muted-foreground sm:text-xl sm:leading-8">Its never been easier to pre plan your harvest sales, with fresh farm produce buyers at the tip of your fingers. Farmnport the best pace to find buyers for your agriproduce.</p>
-                            <div className="mt-10 flex items-center gap-x-6">
-                                <TabsList className="">
-                                    <TabsTrigger value="farmers" onClick={() => sendGTMEvent({ event: "view", value: "FarmerFaqTab" })}><span className="mr-1">For Farmers</span>  <span aria-hidden="true">&rarr;</span></TabsTrigger>
-                                    <TabsTrigger value="buyers" onClick={() => sendGTMEvent({ event: "view", value: "BuyerManagementTab" })}><span className="mr-1">Buyer Management</span>  <span aria-hidden="true">&#8644;</span></TabsTrigger>
-                                </TabsList>
+                        </div>
+
+                        {/* Buyer Trust - Small Card */}
+                        <div className="flex p-px lg:col-span-2">
+                            <div className="w-full overflow-hidden rounded-lg bg-card shadow outline outline-1 outline-black/5 lg:rounded-tr-[2rem] dark:shadow-none dark:outline-white/15">
+                                <div className="p-10">
+                                    <h3 className="text-sm/4 font-semibold text-muted-foreground">Buyer Trust</h3>
+                                    <p className="mt-2 text-lg font-medium tracking-tight">Verified buyers only</p>
+                                    <p className="mt-2 max-w-lg text-sm/6 text-muted-foreground">
+                                        Transparent payment histories, professional standards and fair value for your produce.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Market Prices - Small Card */}
+                        <div className="flex p-px lg:col-span-2">
+                            <div className="w-full overflow-hidden rounded-lg bg-card shadow outline outline-1 outline-black/5 lg:rounded-bl-[2rem] dark:shadow-none dark:outline-white/15">
+                                <div className="p-10">
+                                    <h3 className="text-sm/4 font-semibold text-muted-foreground">Market Prices</h3>
+                                    <p className="mt-2 text-lg font-medium tracking-tight">Real-time pricing data</p>
+                                    <p className="mt-2 max-w-lg text-sm/6 text-muted-foreground">
+                                        Get accurate market prices to plan your harvest sales and maximize profitability.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* CTA Card - Large */}
+                        <div className="flex p-px lg:col-span-4">
+                            <div className="w-full overflow-hidden rounded-lg bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20 shadow outline outline-1 outline-black/5 max-lg:rounded-b-[2rem] lg:rounded-br-[2rem] dark:shadow-none dark:outline-white/15">
+                                <div className="p-10">
+                                    <h3 className="text-sm/4 font-semibold text-orange-600 dark:text-orange-500">Get Started Today</h3>
+                                    <p className="mt-2 text-lg font-medium tracking-tight">Join thousands of successful farmers</p>
+                                    <p className="mt-2 max-w-lg text-sm/6 text-muted-foreground mb-6">
+                                        Build a profitable agricultural business with access to verified buyers, market insights, quality inputs and expert guidance all in one platform.
+                                    </p>
+                                    <Link href="/signup">
+                                        <Button className="bg-orange-600 hover:bg-orange-700 text-white dark:bg-orange-500 dark:hover:bg-orange-600" onClick={() => sendGTMEvent({ event: "link", value: "SignupHeroNavigation" })}>
+                                            Get Started
+                                            <ArrowDownIcon className="ml-2 h-4 w-4" />
+                                        </Button>
+                                    </Link>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div className="relative px-6 pb-10 sm:pb-32 lg:col-span-5 lg:-mr-8 lg:px-0 lg:pb-16 lg:pt-7 xl:col-span-5">
-                        <TabsContent value="farmers">
-                            <FarmerInfo />
-                        </TabsContent>
-                        <TabsContent value="buyers">
-                            <BuyerFaqs />
-                        </TabsContent>
-                    </div>
                 </div>
-            </Tabs>
+            </div>
+            <Featured />
             <FeaturedPopularSection />
-            <CTAPrices />
         </main>
-    )
-}
-
-function BriefcaseIcon(props: React.ComponentPropsWithoutRef<"svg">) {
-    return (
-        <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-            {...props}
-        >
-            <path
-                d="M2.75 9.75a3 3 0 0 1 3-3h12.5a3 3 0 0 1 3 3v8.5a3 3 0 0 1-3 3H5.75a3 3 0 0 1-3-3v-8.5Z"
-                className="fill-zinc-100 stroke-zinc-400 dark:fill-zinc-100/10 dark:stroke-zinc-500"
-            />
-            <path
-                d="M3 14.25h6.249c.484 0 .952-.002 1.316.319l.777.682a.996.996 0 0 0 1.316 0l.777-.682c.364-.32.832-.319 1.316-.319H21M8.75 6.5V4.75a2 2 0 0 1 2-2h2.5a2 2 0 0 1 2 2V6.5"
-                className="stroke-zinc-400 dark:stroke-zinc-500"
-            />
-        </svg>
     )
 }
 
@@ -97,191 +135,79 @@ function ArrowDownIcon(props: React.ComponentPropsWithoutRef<"svg">) {
     )
 }
 
-interface Info {
-    company: string
-    title: string
-    logo: ImageProps["src"]
-    activity: string
-}
-
-function Info({ info }: { info: Info }) {
-
-
-    return (
-        <li className="flex gap-4">
-            <div className="relative mt-1 flex h-10 w-10 flex-none items-center justify-center rounded-full shadow-md shadow-zinc-800/5 ring-1 ring-zinc-900/5 dark:border dark:border-zinc-700/50 dark:bg-zinc-800 dark:ring-0">
-                <Image src={info.logo} alt="" className="h-7 w-7" unoptimized />
-            </div>
-            <dl className="flex flex-auto flex-wrap gap-x-2">
-                <dt className="sr-only">Company</dt>
-                <dd className="w-full flex-none text-sm font-medium text-zinc-900 dark:text-zinc-100">
-                    {info.company}
-                </dd>
-                <dt className="sr-only">Role</dt>
-                <dd className="text-xs text-zinc-500 dark:text-zinc-400">
-                    {info.title}
-                </dd>
-                <dt className="sr-only">Date</dt>
-                <dd
-                    className="ml-auto text-xs text-zinc-400 dark:text-zinc-500"
-                >
-                    {info.activity}
-                </dd>
-            </dl>
-        </li>
-    )
-}
-
-function FarmerInfo() {
-    let details: Array<Info> = [
+function Featured() {
+    const categories = [
         {
-            company: "Planning",
-            title: "Plan, Grow and Sell Produce",
-            logo: logoPlanning,
-            activity: "marketing"
-
+            name: "Pricing",
+            description: "Pricing data and market insights",
+            href: "/prices",
+            icon: (
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" />
+                </svg>
+            ),
         },
         {
-            company: "Inputs",
-            title: "Where, How to source affordable inputs.",
-            logo: logoInputs,
-            activity: "strategy"
-
+            name: "Shop",
+            description: "Quality inputs for your farm",
+            href: "/shop",
+            icon: (
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
+                </svg>
+            ),
         },
         {
-            company: "Guidance",
-            title: "Agronomists, Ministry at your disposal.",
-            logo: logoGuidance,
-            activity: "guidance"
-
-        },
-        {
-            company: "Research",
-            title: "Seed, Breeds, Vaccines available for your use",
-            logo: logoResearch,
-            activity: "information"
-
+            name: "Chemical Guides",
+            description: "Expert agrochemical information",
+            href: "/agrochemical-guides",
+            icon: (
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5" />
+                </svg>
+            ),
         },
     ]
 
     return (
-        <div className="rounded-lg border border-zinc-100 p-6 dark:border-zinc-700/40">
-            <h2 className="flex text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-                <BriefcaseIcon className="h-6 w-6 flex-none" />
-                <span className="ml-3">How we help you succeed.</span>
-            </h2>
-            <ol className="mt-6 space-y-4">
-                {details.map((info, infoIndex) => (
-                    <Info key={infoIndex} info={info} />
-                ))}
-            </ol>
-            <Link href="/signup">
-                <Button variant="secondary" className="group mt-6 w-full" onClick={() => sendGTMEvent({ event: "link", value: "SignupFarmerNavigation" })}>
-                    Get Started
-                    <ArrowDownIcon className="h-4 w-4 stroke-zinc-400 transition group-active:stroke-zinc-600 dark:group-hover:stroke-zinc-50 dark:group-active:stroke-zinc-50" />
-                </Button>
-            </Link>
-        </div>
-    )
-}
-
-
-function BuyerFaqs() {
-
-    const activity = [
-        { id: 1, type: "faq", description: { name: "Do they pay on time ?" } },
-
-        {
-            id: 2,
-            type: "commented",
-            description: {
-                name: "Guides and Reviews",
-                imageUrl: logoGuidance,
-            },
-            comment: "Find out when and how buyers pay their invoices?"
-        },
-        { id: 3, type: "faq", description: { name: "Buyer Standards." } },
-        {
-            id: 2,
-            type: "commented",
-            description: {
-                name: "Trust and Professionalism",
-                imageUrl: logoGuidance,
-            },
-            comment: "Are buyers professional in their operations and give fair value for produce purchased.."
-        },
-        { id: 5, type: "paid", description: { name: "Stay ahead and achieve profitability in agriculture!" } },
-    ]
-
-    return (
-        <>
-            <ul role="list" className="space-y-6">
-                {activity.map((activityItem, activityItemIdx) => (
-                    <li key={activityItem.id} className="relative flex gap-x-4">
-                        <div
-                            className={cn(
-                                activityItemIdx === activity.length - 1 ? "h-6" : "-bottom-6",
-                                "absolute left-0 top-0 flex w-6 justify-center"
-                            )}
-                        >
-                            <div className="w-px bg-gray-200" />
-                        </div>
-                        {activityItem.type === "commented" ? (
-                            <>
-                                <Image src={activityItem.description.imageUrl ?? ""} alt="" className="relative mt-3 h-6 w-6 flex-none rounded-full bg-gray-50" unoptimized />
-                                <div className="flex-auto rounded-md p-3 ring-1 ring-inset ring-orange-500">
-                                    <div className="flex justify-between gap-x-4">
-                                        <div className="py-0.5 text-xs leading-5">
-                                            <span className="font-medium text-muted-foreground">{activityItem.description.name}</span>
-                                        </div>
+        <section className="bg-background py-12 lg:py-16">
+            <div className="mx-auto max-w-7xl px-6 lg:px-8">
+                <div className="grid gap-8 lg:grid-cols-12 lg:gap-12 xl:gap-16">
+                    <div className="content-center lg:col-span-6 order-1 lg:order-2">
+                        <h2 className="mb-4 text-4xl font-bold leading-none tracking-tight sm:text-5xl font-heading">
+                            Your Complete Farm Hub
+                        </h2>
+                        <p className="mb-6 max-w-2xl text-lg text-muted-foreground md:mb-8">
+                            Search active ingredients, discover how pesticides and herbicides work, find what targets specific pests and diseases, then shop for the right products. Find reputable and verified buyers for your produce and get real-time market prices to plan your harvest sales.
+                        </p>
+                    </div>
+                    <div className="lg:col-span-6 order-2 lg:order-1">
+                        <div className="grid gap-4 sm:grid-cols-1">
+                            {categories.map((category) => (
+                                <Link
+                                    key={category.name}
+                                    href={category.href}
+                                    className="group flex items-start gap-4 rounded-lg border bg-card text-card-foreground p-4 shadow-sm transition hover:border-orange-500 hover:shadow-md"
+                                    onClick={() => sendGTMEvent({ event: "click", value: `CategoryCard${category.name.replace(/\s+/g, '')}` })}
+                                >
+                                    <div className="relative mt-1 flex h-10 w-10 flex-none items-center justify-center rounded-full shadow-md shadow-zinc-800/5 ring-1 ring-zinc-900/5 dark:border dark:border-zinc-700/50 dark:bg-zinc-800 dark:ring-0 group-hover:bg-orange-600 group-hover:text-white dark:group-hover:bg-orange-500">
+                                        {category.icon}
                                     </div>
-                                    <p className="text-sm leading-6 text-gray-500">{activityItem.comment}</p>
-                                </div>
-                            </>
-                        ) : (
-                            <>
-                                <div className="relative flex h-6 w-6 flex-none items-center justify-center bg-background">
-                                    {activityItem.type === "paid" ? (
-                                        <Icons.billing className="h-6 w-6 text-green-600" aria-hidden="true" />
-                                    ) : (
-                                        <div className="h-1.5 w-1.5 rounded-full bg-gray-100 ring-1 ring-gray-300" />
-                                    )}
-                                </div>
-                                <p className="flex-auto py-0.5 text-xs leading-5 ">
-                                    <span className="font-medium text-muted-foreground">{activityItem.description.name}</span>
-                                </p>
-                            </>
-                        )}
-                    </li>
-                ))}
-            </ul>
-            <Link href="/signup">
-                <Button variant="secondary" className="group mt-6 w-full" onClick={() => sendGTMEvent({ event: "link", value: "SignupBuyerNavigation" })}>
-                    Get Started
-                    <ArrowDownIcon className="h-4 w-4 stroke-zinc-400 transition group-active:stroke-zinc-600 dark:group-hover:stroke-zinc-50 dark:group-active:stroke-zinc-50" />
-                </Button>
-            </Link>
-
-        </>
-    )
-}
-
-function CTAPrices() {
-    return (
-        <div className="mx-auto max-w-7xl">
-            <div className="px-9 lg:flex lg:items-center lg:justify-between">
-                <h2 className="text-3xl max-w-2xl font-bold tracking-tight sm:text-4xl font-heading">
-                    Prices Anyone?
-                    <br />
-                    See what prices buyers are buying farm produce for today.
-                </h2>
-                <div className="mt-10 flex items-center gap-x-6 lg:mt-0 lg:flex-shrink-0">
-                    <Link href="/prices" className="text-sm font-semibold leading-6 text-muted-foreground">
-                        See more <span aria-hidden="true">→</span>
-                    </Link>
+                                    <div>
+                                        <h3 className="mb-1 text-lg font-semibold">
+                                            {category.name}
+                                        </h3>
+                                        <p className="text-sm text-muted-foreground">
+                                            {category.description}
+                                        </p>
+                                    </div>
+                                </Link>
+                            ))}
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
+        </section>
     )
 }
 
@@ -328,17 +254,17 @@ function FeaturedPopularSection() {
 
 
     return (
-        <div className="">
+        <div className="py-12 lg:py-16">
             <div className="mx-auto max-w-7xl px-6 lg:px-8">
                 <div className="mx-auto max-w-2xl lg:mx-0">
-                    <h2 className="text-3xl font-bold tracking-tight font-heading sm:text-4xl">
+                    <h2 className="mb-4 text-4xl font-bold leading-none tracking-tight sm:text-5xl font-heading">
                         Our most popular markets!
                     </h2>
-                    <p className="mt-6 text-lg leading-8 text-muted-foreground">
+                    <p className="mb-6 max-w-2xl text-lg text-muted-foreground md:mb-8">
                         These agri produce markets are the most searched for by farmers looking to sell, market their fresh produce.
                     </p>
                 </div>
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 pt-4 pb-12 lg:pb-20 lg:pt-12">
+                <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:mt-12">
                     {markets.map((market) => (
                         <div
                             key={market.name}
