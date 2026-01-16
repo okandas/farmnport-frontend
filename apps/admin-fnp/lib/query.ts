@@ -195,7 +195,7 @@ export function queryBrands(pagination?: pagination) {
   return api.get(url)
 }
 
-export function addBrand(data: { name: string }) {
+export function addBrand(data: { name: string; slogan?: string }) {
   let url = `${baseUrl}/user/brands/add`
   return api.post(url, data)
 }
@@ -205,7 +205,7 @@ export function queryBrand(id: string) {
   return api.get(url)
 }
 
-export function updateBrand(data: { id: string; name: string }) {
+export function updateBrand(data: { id: string; name: string; slogan?: string }) {
   let url = `${baseUrl}/user/brands/update`
   return api.post(url, data)
 }
