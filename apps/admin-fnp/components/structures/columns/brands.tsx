@@ -32,6 +32,15 @@ export const brandColumns: ColumnDef<Brand>[] = [
     header: "Name",
   },
   {
+    accessorKey: "slogan",
+    header: "Slogan",
+    cell: ({ row }) => (
+      <span className="max-w-md truncate">
+        {row.original.slogan || "-"}
+      </span>
+    ),
+  },
+  {
     accessorKey: "slug",
     header: "Slug",
   },

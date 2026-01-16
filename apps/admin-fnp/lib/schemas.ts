@@ -300,6 +300,7 @@ export const ProducerPriceListSchema = z
 export const BrandSchema = z.object({
   id: z.string(),
   name: z.string(),
+  slogan: z.string().optional(),
   slug: z.string(),
   created: z.string().optional(),
   updated: z.string().optional(),
