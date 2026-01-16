@@ -306,12 +306,6 @@ export const BrandSchema = z.object({
   updated: z.string().optional(),
 })
 
-export const FormBrandSchema = BrandSchema.pick({
-  id: true,
-  name: true,
-  slogan: true,
-})
-
 export const AgroChemicalCategorySchema = z.object({
   id: z.string(),
   name: z.string().min(1, "Name is required"),
