@@ -101,7 +101,7 @@ export function Client({ slug, user }: ClientPageProps) {
                 <div className="flex items-center space-x-3">
                   <h3 className="truncate text-base font-medium"> { capitalizeFirstLetter(client.specialization) }</h3>
                 </div>
-                <p className="mt-1 truncate text-sm text-muted-foreground">Industry</p>
+                <p className="mt-1 truncate text-sm text-muted-foreground">Farm Produce Category</p>
               </div>
             </li>
           </ul>

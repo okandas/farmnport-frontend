@@ -58,5 +58,10 @@ export const dashboardConfig: DashboardConfig = {
       href: "/dashboard/admins",
       icon: "construction",
     },
+    {
+      title: "Buyer Contacts",
+      href: "/dashboard/buyer-contacts",
+      icon: "badgeCheck",
+    },
   ],
 }

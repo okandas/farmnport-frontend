@@ -47,21 +47,25 @@ export const sideBarFilterData = [
       data: produce
     },
     {
-        name: "payment",
-        data: paymentTerms
+      name: "clients",
+      data: []
     },
-    {
-        name: "scales",
-        data: scales
-    },
-    {
-        name: "provinces",
-        data: provinces
-    },
-  {
-      name: "specialization",
-      data: specializations
-    },
+    // {
+    //     name: "agro categories",
+    //     data: specializations
+    // },
+    // {
+    //     name: "payment",
+    //     data: paymentTerms
+    // },
+    // {
+    //     name: "scales",
+    //     data: scales
+    // },
+    // {
+    //     name: "provinces",
+    //     data: provinces
+    // },
 ]
 
-export const defaultSideBarData = ["payment", "produce"]
+export const defaultSideBarData = ["produce", "clients"]

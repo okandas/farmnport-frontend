@@ -8,6 +8,7 @@ import { QueryProvider } from "@/components/providers/QueryProvider"
 import { ThemeProvider } from "@/components/providers/ThemeProvider"
 import { Toaster } from "@/components/ui/sonner"
 import { SpeedInsights } from "@vercel/speed-insights/next"
+import { NuqsAdapter } from "nuqs/adapters/next/app"
 
 import { cn } from "@/lib/utilities"
 import { auth } from "@/auth"
@@ -30,6 +31,9 @@ const fontHeading = localFont({
 export const metadata = {
   title: "Farmnport - Getting you to market",
   description: "Buyers, Exporters, Farmers, Importers in the livestock, cattle, horticulture, poultry, aquaculture, grain, seed, dairy and plantation Agriculture Agri Business.",
+  other: {
+    'google-adsense-account': 'ca-pub-9685248262342396'
+  }
 }
 interface RootLayoutProps {
   children: React.ReactNode
@@ -59,11 +63,13 @@ export default async function RootLayout({ children }: RootLayoutProps) {
             disableTransitionOnChange
           >
             <QueryProvider>
-              {children}
-              <GoogleTagManager gtmId={GTM_ID} />
-              <Toaster />
-              {NEXT_ENV !== 'production' && <SpeedInsights />}
-              {NEXT_ENV !== 'production' && <Analytics />}
+              <NuqsAdapter>
+                {children}
+                <GoogleTagManager gtmId={GTM_ID} />
+                <Toaster />
+                {NEXT_ENV !== 'production' && <SpeedInsights />}
+                {NEXT_ENV !== 'production' && <Analytics />}
+              </NuqsAdapter>
             </QueryProvider>
           </ThemeProvider>
         </body>

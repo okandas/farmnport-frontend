@@ -97,3 +97,13 @@ export function queryAllFarmProduce() {
   const url = `${BaseURL}/farmproduce/`
   return api.get(url)
 }
+
+export function queryAllFarmProduceUnpaginated() {
+  const url = `${BaseURL}/farmproduce/all`
+  return api.get(url)
+}
+
+export function queryPriceFilterAggregates() {
+  const url = `${BaseURL}/prices/aggregates/filters`
+  return api.get(url)
+}

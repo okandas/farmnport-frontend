@@ -76,3 +76,14 @@ export function plural(word: string, count?: number): string {
     return pluralize(word, count)
   }
 }
+
+export function centsToDollars(cents: number): string {
+  if (cents === 0) return "$0.00"
+  const dollars = cents / 100
+  return `$${dollars.toFixed(2)}`
+}
+
+export function ucFirst(str: string): string {
+  if (!str) return ""
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
+}

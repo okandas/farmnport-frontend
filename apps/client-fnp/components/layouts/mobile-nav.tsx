@@ -64,69 +64,106 @@ export function MobileNav({ user }: MobileNavProps) {
              </div>
              <ScrollArea className="my-4 h-[calc(100vh-8rem)] pb-10 pl-6">
                <div className="pl-1 pr-7">
-                 <Link href="/prices" onClick={() => {
-                   sendGTMEvent({ event: 'link', value: 'BuyerTopNavigation' })
-                   setIsOpen(false)
-                 }}
-                 className={buttonVariants({
-                   size: "sm",
-                   variant: "link"
-                 })}
-                 >
-                   <Icons.lineChart className="mr-2" /> Prices
-                 </Link>
-                 <Link href="/buyers" onClick={() => {
-                         sendGTMEvent({ event: 'link', value: 'BuyerTopNavigation' })
-                         setIsOpen(false)
-                 }}
-                 className={buttonVariants({
-                   size: "sm",
-                   variant: "link"
-                 })}
-                 >
-                   <Icons.dollar className="mr-2" /> Buyers
-                 </Link>
-                 <Link href="/farmers" onClick={() => {
-                   sendGTMEvent({ event: 'link', value: 'FarmerTopNavigation' })
-                   setIsOpen(false)
-                 }}
-                 className={buttonVariants({
-                   size: "sm",
-                   variant: "link"
-                 })}
-                 >
-                   <Icons.tractor className="mr-2" /> Farmers
-                 </Link>
-                 { user ? <div>
-                   <Link href="#" onClick={() => {
-                     signOut({ redirectTo: AppURL })
-                     setIsOpen(false)
-                   }}>
-                     Logout
+                 {/* Main Navigation */}
+                 <nav className="space-y-3 mb-6">
+                   <Link
+                     href="/prices"
+                     onClick={() => {
+                       sendGTMEvent({ event: 'link', value: 'PricesTopNavigation' })
+                       setIsOpen(false)
+                     }}
+                     className="flex items-center gap-3 px-3 py-2 text-base font-medium rounded-md hover:bg-accent transition-colors"
+                   >
+                     <Icons.lineChart className="h-5 w-5" />
+                     <span>Prices</span>
                    </Link>
-                 </div> : (<>
-                     <Link
-                       href="/login"
-                       onClick={() => setIsOpen(false)}
-                       className={`${buttonVariants({ size: "sm", variant: "outline" })} !block py-[4px] px-[17px] mt-2`}
-                     >
-                       Login
-                       <span className="sr-only">Login</span>
-                     </Link>
-                     <Link
-                       href="/signup"
-                       onClick={() => setIsOpen(false)}
-                       className={`${buttonVariants({ size: "sm"})} !block py-[4px] px-[17px] mt-2`}
-                     >
-                       Sign Up
-                       <span className="sr-only">Sign Up</span>
-                     </Link>
 
-                   </>
+                   <Link
+                     href="/agrochemical-guides"
+                     onClick={() => {
+                       sendGTMEvent({ event: 'link', value: 'GuidesTopNavigation' })
+                       setIsOpen(false)
+                     }}
+                     className="flex items-center gap-3 px-3 py-2 text-base font-medium rounded-md hover:bg-accent transition-colors"
+                   >
+                     <Icons.bookOpen className="h-5 w-5" />
+                     <span>Guides</span>
+                   </Link>
 
-                 )}
-                 <div className="mt-2 flex justify-end">
-                   < ThemeSwitcher />
+                   <Link
+                     href="/buyers"
+                     onClick={() => {
+                       sendGTMEvent({ event: 'link', value: 'BuyerTopNavigation' })
+                       setIsOpen(false)
+                     }}
+                     className="flex items-center gap-3 px-3 py-2 text-base font-medium rounded-md hover:bg-accent transition-colors"
+                   >
+                     <Icons.dollar className="h-5 w-5" />
+                     <span>Buyers</span>
+                   </Link>
+
+                   <Link
+                     href="/farmers"
+                     onClick={() => {
+                       sendGTMEvent({ event: 'link', value: 'FarmerTopNavigation' })
+                       setIsOpen(false)
+                     }}
+                     className="flex items-center gap-3 px-3 py-2 text-base font-medium rounded-md hover:bg-accent transition-colors"
+                   >
+                     <Icons.tractor className="h-5 w-5" />
+                     <span>Farmers</span>
+                   </Link>
+                 </nav>
+
+                 {/* Account Section */}
+                 <div className="pt-6 mt-6 border-t space-y-3">
+                   { user ? (
+                     <>
+                       <Link
+                         href="/profile"
+                         onClick={() => setIsOpen(false)}
+                         className="flex items-center gap-3 px-3 py-2 text-base font-medium rounded-md hover:bg-accent transition-colors"
+                       >
+                         <Icons.user className="h-5 w-5" />
+                         <span>Profile</span>
+                       </Link>
+                       <button
+                         onClick={() => {
+                           signOut({ redirectTo: AppURL })
+                           setIsOpen(false)
+                         }}
+                         className="flex items-center gap-3 px-3 py-2 text-base font-medium rounded-md hover:bg-accent transition-colors w-full text-left"
+                       >
+                         <Icons.arrowRight className="h-5 w-5" />
+                         <span>Logout</span>
+                       </button>
+                     </>
+                   ) : (
+                     <>
+                       <Link
+                         href="/login"
+                         onClick={() => setIsOpen(false)}
+                         className={`${buttonVariants({ size: "lg", variant: "outline" })} w-full justify-center font-medium`}
+                       >
+                         Login
+                       </Link>
+                       <Link
+                         href="/signup"
+                         onClick={() => setIsOpen(false)}
+                         className={`${buttonVariants({ size: "lg" })} w-full justify-center font-medium`}
+                       >
+                         Sign Up
+                       </Link>
+                     </>
+                   )}
+                 </div>
+
+                 {/* Theme Switcher */}
+                 <div className="pt-6 mt-6 border-t">
+                   <div className="flex items-center justify-between px-3 py-2">
+                     <span className="text-sm font-medium">Theme</span>
+                     <ThemeSwitcher />
+                   </div>
                  </div>
 
                </div>

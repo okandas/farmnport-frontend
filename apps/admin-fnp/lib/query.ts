@@ -359,3 +359,53 @@ export function queryFarmProduce(pagination?: pagination) {
 
   return api.get(url)
 }
+
+// Buyer Contacts
+type BuyerContactsPagination = {
+  p?: number
+  client_id?: string
+  status?: string
+}
+
+export function queryBuyerContacts(pagination?: BuyerContactsPagination) {
+  const params = new URLSearchParams()
+
+  if (pagination?.p !== undefined && pagination.p >= 2) {
+    params.append('p', pagination.p.toString())
+  }
+
+  if (pagination?.client_id) {
+    params.append('client_id', pagination.client_id)
+  }
+
+  if (pagination?.status) {
+    params.append('status', pagination.status)
+  }
+
+  const queryString = params.toString()
+  const url = queryString
+    ? `${baseUrl}/buyercontacts/list?${queryString}`
+    : `${baseUrl}/buyercontacts/list`
+
+  return api.get(url)
+}
+
+export function queryBuyerContact(id: string) {
+  const url = `${baseUrl}/buyercontacts/get/${id}`
+  return api.get(url)
+}
+
+export function addBuyerContact(data: any) {
+  const url = `${baseUrl}/buyercontacts/add`
+  return api.post(url, data)
+}
+
+export function updateBuyerContact(data: any) {
+  const url = `${baseUrl}/buyercontacts/update`
+  return api.post(url, data)
+}
+
+export function deleteBuyerContact(id: string) {
+  const url = `${baseUrl}/buyercontacts/delete/${id}`
+  return api.delete(url)
+}

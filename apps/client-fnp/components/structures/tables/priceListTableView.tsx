@@ -135,7 +135,7 @@ export function PriceListTableView({
           {ucFirst(producerPriceList.client_name)}
         </h1>
         <p className="mt-2 text-lg text-gray-700">
-          Producer Price List - {ucFirst(producerPriceList.client_specialization)}
+          Farm Produce Category: {ucFirst(producerPriceList.client_specialization)}
         </p>
         {formattedDate && (
           <p className="mt-1 text-sm text-gray-600">
