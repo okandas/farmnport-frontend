@@ -23,18 +23,27 @@ export function queryClient(slug: string) {
   return api.get(url)
 }
 
-export function queryClients(slug: string, pagination?: PaginationModel) {
-    let url: string
+export function queryClients(slug: string, pagination?: PaginationModel & { province?: string[], produce?: string[], category?: string[] }) {
+    const params = new URLSearchParams()
 
+    // Add pagination
     if (pagination?.p !== undefined && pagination.p >= 2) {
-        url = `${BaseURL}/${slug}/all?p=${pagination.p}`
-    } else {
-        url = `${BaseURL}/${slug}/all`
+        params.set('p', pagination.p.toString())
     }
 
-    // if (pagination?.search !== undefined && pagination.search.length >= 2) {
-    //     url = `${baseUrl}/buyer/all?search=${pagination.search}`
-    // }
+    // Add filters
+    if (pagination?.province && pagination.province.length > 0) {
+        pagination.province.forEach(p => params.append('province', p))
+    }
+    if (pagination?.produce && pagination.produce.length > 0) {
+        pagination.produce.forEach(p => params.append('produce', p))
+    }
+    if (pagination?.category && pagination.category.length > 0) {
+        pagination.category.forEach(c => params.append('category', c))
+    }
+
+    const queryString = params.toString()
+    const url = queryString ? `${BaseURL}/${slug}/all?${queryString}` : `${BaseURL}/${slug}/all`
 
     return api.get(url)
 }
@@ -105,5 +114,72 @@ export function queryAllFarmProduceUnpaginated() {
 
 export function queryPriceFilterAggregates() {
   const url = `${BaseURL}/prices/aggregates/filters`
+  return api.get(url)
+}
+
+export function updateUserWantToPay(wantToPay: boolean) {
+  const url = `${BaseURL}/client/want-to-pay`
+  return api.post(url, { wantToPay })
+}
+
+export function queryClientFilterAggregates(type: 'buyers' | 'farmers') {
+  const url = `${BaseURL}/client/aggregates/filters?type=${type}`
+  return api.get(url)
+}
+
+export function queryClientPricing(clientId: string, pagination?: PaginationModel) {
+  let url: string
+
+  if (pagination?.p !== undefined && pagination.p >= 2) {
+    url = `${BaseURL}/prices/client/${clientId}?p=${pagination.p}`
+  } else {
+    url = `${BaseURL}/prices/client/${clientId}`
+  }
+
+  return api.get(url)
+}
+
+export function queryAgroChemicalCategories() {
+  const url = `${BaseURL}/agrochemicalcategories/`
+  return api.get(url)
+}
+
+export function queryAllAgroChemicals(pagination?: PaginationModel & { brand?: string[], target?: string[], active_ingredient?: string[] }) {
+  const params = new URLSearchParams()
+
+  // Add pagination
+  if (pagination?.p !== undefined && pagination.p >= 2) {
+    params.set('p', pagination.p.toString())
+  }
+
+  // Add filters
+  if (pagination?.brand && pagination.brand.length > 0) {
+    pagination.brand.forEach(b => params.append('brand', b))
+  }
+  if (pagination?.target && pagination.target.length > 0) {
+    pagination.target.forEach(t => params.append('target', t))
+  }
+  if (pagination?.active_ingredient && pagination.active_ingredient.length > 0) {
+    pagination.active_ingredient.forEach(ai => params.append('active_ingredient', ai))
+  }
+
+  const queryString = params.toString()
+  const url = queryString ? `${BaseURL}/agrochemical/all?${queryString}` : `${BaseURL}/agrochemical/all`
+
+  return api.get(url)
+}
+
+export function queryAllBrands() {
+  const url = `${BaseURL}/brand/`
+  return api.get(url)
+}
+
+export function queryAllTargets() {
+  const url = `${BaseURL}/agrochemical-target/`
+  return api.get(url)
+}
+
+export function queryAllActiveIngredients() {
+  const url = `${BaseURL}/agrochemical-active-ingredient/`
   return api.get(url)
 }

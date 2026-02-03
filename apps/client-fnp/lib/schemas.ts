@@ -14,8 +14,8 @@ export const AuthSignUpSchema = z.object({
     address: z.string().min(10),
     city: z.string().min(4),
     province: z.string(),
-    specialization: z.string().optional(), // Deprecated: use primary_produce_id
-    primary_produce_id: z.string().length(24).optional(),
+    specialization: z.string().optional(), // Deprecated: use primary_category_id
+    primary_category_id: z.string().length(24).optional(),
     main_activity: z.string().optional(), // Deprecated: use main_produce_id
     main_produce_id: z.string().length(24).optional(),
     specializations: z.array(z.string().trim()).optional(), // Deprecated: use other_produce_ids
@@ -32,10 +32,10 @@ export const AuthSignUpSchema = z.object({
     }
 
     // Require either old or new fields during transition
-    if (!data.primary_produce_id && !data.specialization) {
+    if (!data.primary_category_id && !data.specialization) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        path: ['primary_produce_id'],
+        path: ['primary_category_id'],
         message: "Primary focus is required",
       });
     }
@@ -89,9 +89,36 @@ export const ApplicationUserSchema = z.object({
     address: z.string().min(10),
     city: z.string().min(5).nonempty(),
     province: z.string().nonempty(),
-    specialization: z.string().nonempty(),
-    main_activity: z.string().nonempty(),
-    specializations: z.array(z.string().trim()).min(1),
+
+    // ObjectID references
+    primary_category_id: z.string().optional(),
+    main_produce_id: z.string().optional(),
+    other_produce_ids: z.array(z.string()).optional(),
+
+    // Populated objects from backend
+    primary_category: z.object({
+        id: z.string(),
+        name: z.string(),
+        slug: z.string(),
+        description: z.string(),
+    }).optional(),
+    main_produce: z.object({
+        id: z.string(),
+        name: z.string(),
+        slug: z.string(),
+        description: z.string(),
+        category_id: z.string().optional(),
+        category_slug: z.string().optional(),
+    }).optional(),
+    other_produce: z.array(z.object({
+        id: z.string(),
+        name: z.string(),
+        slug: z.string(),
+        description: z.string(),
+        category_id: z.string().optional(),
+        category_slug: z.string().optional(),
+    })).optional(),
+
     created: z.string(),
     updated: z.string(),
     confirmed: z.boolean(),
@@ -107,6 +134,7 @@ export const ApplicationUserSchema = z.object({
     }),
     verified: z.boolean(),
     payment_terms: z.string(),
+    has_prices: z.boolean().optional(),
 })
 
 export const ProducerPriceListSchema = z.object({
@@ -268,9 +296,6 @@ ApplicationUserSchema.required({
     address: true,
     city: true,
     province: true,
-    main_activity: true,
-    specialization: true,
-    specializations: true,
     type: true,
 })
 
@@ -289,9 +314,9 @@ export const EditApplicationUserSchema = ApplicationUserSchema.pick({
     city: true,
     province: true,
     phone: true,
-    main_activity: true,
-    specialization: true,
-    specializations: true,
+    primary_category_id: true,
+    main_produce_id: true,
+    other_produce_ids: true,
     type: true,
     scale: true,
     branches: true,

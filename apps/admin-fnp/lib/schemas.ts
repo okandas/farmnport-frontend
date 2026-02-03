@@ -40,6 +40,29 @@ export const ApplicationUserSchema = z.object({
   specialization: z.string(),
   main_activity: z.string(),
   specializations: z.array(z.string().trim()).min(1),
+  // New ObjectID reference fields
+  primary_category_id: z.string().optional(),
+  main_produce_id: z.string().optional(),
+  other_produce_ids: z.array(z.string()).optional(),
+  // Populated objects from API (only for display, not for editing)
+  primary_category: z.object({
+    id: z.string(),
+    name: z.string(),
+    slug: z.string(),
+    description: z.string(),
+  }).optional(),
+  main_produce: z.object({
+    id: z.string(),
+    name: z.string(),
+    slug: z.string(),
+    category_id: z.string(),
+  }).optional(),
+  other_produce: z.array(z.object({
+    id: z.string(),
+    name: z.string(),
+    slug: z.string(),
+    category_id: z.string(),
+  })).optional(),
   created: z.string(),
   updated: z.string(),
   confirmed: z.boolean(),
@@ -399,6 +422,12 @@ export const AgroChemicalSchema = z.object({
     id: z.string(),
     name: z.string(),
   }).optional(),
+  agrochemical_category_id: z.string().min(1, "Agrochemical category is required"),
+  agrochemical_category: z.object({
+    id: z.string(),
+    name: z.string(),
+    slug: z.string(),
+  }).optional(),
   front_label: z.custom<ImageModel>(),
   back_label: z.custom<ImageModel>(),
   images: z.array(z.custom<ImageModel>()).min(1, "At least one product image is required").max(5, "Maximum 5 images allowed"),
@@ -493,9 +522,9 @@ export const EditApplicationUserSchema = ApplicationUserSchema.pick({
   city: true,
   province: true,
   phone: true,
-  main_activity: true,
-  specialization: true,
-  specializations: true,
+  primary_category_id: true,
+  main_produce_id: true,
+  other_produce_ids: true,
   type: true,
   scale: true,
   branches: true,
@@ -548,3 +577,13 @@ export const FarmProduceSchema = z.object({
 })
 
 export type FarmProduce = z.infer<typeof FarmProduceSchema>
+
+export type FarmProduceCategoriesResponse = {
+  total: number
+  data: FarmProduceCategory[]
+}
+
+export type FarmProduceResponse = {
+  total: number
+  data: FarmProduce[]
+}

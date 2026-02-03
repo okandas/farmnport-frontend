@@ -130,60 +130,67 @@ export function PriceListTableView({
 
   return (
     <div className="mx-auto w-full max-w-7xl">
-      <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold text-gray-900">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
           {ucFirst(producerPriceList.client_name)}
         </h1>
-        <p className="mt-2 text-lg text-gray-700">
-          Producer Price List - {ucFirst(producerPriceList.client_specialization)}
-        </p>
-        {formattedDate && (
-          <p className="mt-1 text-sm text-gray-600">
-            <time dateTime={new Date(producerPriceList.effectiveDate).toISOString()}>
-              Effective Date: {formattedDate}
-            </time>
-          </p>
-        )}
-        <p className="mt-1 text-sm text-gray-600">
-          Pricing Basis: {producerPriceList.pricing_basis}
-        </p>
+        <div className="mt-4 flex flex-wrap items-center gap-4 text-sm">
+          <div className="flex items-center gap-2">
+            <span className="text-gray-500 dark:text-gray-400">Category:</span>
+            <span className="font-medium text-gray-900 dark:text-white">{ucFirst(producerPriceList.client_specialization)}</span>
+          </div>
+          {formattedDate && (
+            <div className="flex items-center gap-2">
+              <span className="text-gray-500 dark:text-gray-400">Effective:</span>
+              <time dateTime={new Date(producerPriceList.effectiveDate).toISOString()} className="font-medium text-gray-900 dark:text-white">
+                {formattedDate}
+              </time>
+            </div>
+          )}
+          <div className="flex items-center gap-2">
+            <span className="text-gray-500 dark:text-gray-400">Basis:</span>
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-primary/10 text-primary">
+              {ucFirst(producerPriceList.pricing_basis)}
+            </span>
+          </div>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {pricingTypes[producerPriceList?.client_specialization].map(
           (pricingType, typeIndex) => {
             if (producerPriceList[pricingType] === undefined) return null
 
             return (
-              <div key={typeIndex} className="rounded-lg border border-gray-200 bg-white shadow-sm">
-                <div className="border-b border-gray-200 bg-gray-50 px-4 py-2">
-                  <h2 className="text-lg font-semibold text-gray-900">
+              <div key={typeIndex} className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 overflow-hidden shadow-sm">
+                <div className="border-b border-gray-200 dark:border-gray-800 bg-gradient-to-r from-gray-50 to-white dark:from-gray-900 dark:to-gray-950 px-6 py-4">
+                  <h2 className="text-xl font-bold text-gray-900 dark:text-white">
                     {ucFirst(pricingType)}
                   </h2>
-                  <p className="text-xs text-gray-600">
-                    Prices paid to farmers for {pricingType}
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Farmer prices for {pricingType}
                   </p>
                 </div>
 
                 <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th scope="col" className="w-[30%] px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                  <table className="min-w-full">
+                    <thead>
+                      <tr className="border-b border-gray-200 dark:border-gray-800">
+                        <th scope="col" className="w-[30%] px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                           Grade
                         </th>
-                        <th scope="col" className="w-[20%] px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                          Symbol
+                        <th scope="col" className="w-[20%] px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                          Code
                         </th>
-                        <th scope="col" className="w-[25%] px-4 py-2 text-right text-xs font-medium uppercase tracking-wider text-gray-500">
-                          Delivered Price
+                        <th scope="col" className="w-[25%] px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                          Delivered
                         </th>
-                        <th scope="col" className="w-[25%] px-4 py-2 text-right text-xs font-medium uppercase tracking-wider text-gray-500">
-                          Collected Price
+                        <th scope="col" className="w-[25%] px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                          Collected
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-200 bg-white">
+                    <tbody className="divide-y divide-gray-100 dark:divide-gray-900">
                       {Object.keys(producerPriceList[pricingType]).map(
                         (key, index) => {
                           if (
@@ -199,29 +206,45 @@ export function PriceListTableView({
                           const collectedPrice = gradeItem?.pricing?.collected || 0
 
                           return (
-                            <tr key={index} className="hover:bg-gray-50">
-                              <td className="whitespace-nowrap px-4 py-2 text-sm font-medium text-gray-900">
-                                {formatGradeName(key)}
+                            <tr key={index} className="hover:bg-gray-50/50 dark:hover:bg-gray-900/50 transition-colors">
+                              <td className="whitespace-nowrap px-6 py-4">
+                                <div className="flex flex-col">
+                                  <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                                    {formatGradeName(key)}
+                                  </span>
+                                </div>
                               </td>
-                              <td className="whitespace-nowrap px-4 py-2">
+                              <td className="whitespace-nowrap px-6 py-4">
                                 {grades?.[pricingType]?.[key] ? (
                                   <span
                                     className={cn(
                                       statuses[index % statuses.length],
-                                      "inline-flex rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset",
+                                      "inline-flex items-center rounded-md px-2.5 py-1 text-xs font-bold ring-1 ring-inset",
                                     )}
                                   >
                                     {grades[pricingType][key]}
                                   </span>
                                 ) : (
-                                  <span className="text-gray-400">-</span>
+                                  <span className="text-gray-400 dark:text-gray-600">-</span>
                                 )}
                               </td>
-                              <td className="whitespace-nowrap px-4 py-2 text-right text-sm text-gray-900">
-                                {centsToDollars(deliveredPrice)}
+                              <td className="whitespace-nowrap px-6 py-4 text-right">
+                                <div className="flex flex-col items-end">
+                                  <span className="text-sm font-bold text-gray-900 dark:text-white">
+                                    {centsToDollars(deliveredPrice)}
+                                  </span>
+                                  <span className="text-xs text-gray-500 dark:text-gray-400">per kg</span>
+                                </div>
                               </td>
-                              <td className="whitespace-nowrap px-4 py-2 text-right text-sm text-gray-600">
-                                {collectedPrice > 0 ? centsToDollars(collectedPrice) : "-"}
+                              <td className="whitespace-nowrap px-6 py-4 text-right">
+                                <div className="flex flex-col items-end">
+                                  <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                                    {collectedPrice > 0 ? centsToDollars(collectedPrice) : "-"}
+                                  </span>
+                                  {collectedPrice > 0 && (
+                                    <span className="text-xs text-gray-500 dark:text-gray-400">per kg</span>
+                                  )}
+                                </div>
                               </td>
                             </tr>
                           )

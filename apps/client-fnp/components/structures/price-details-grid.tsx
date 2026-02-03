@@ -1,7 +1,6 @@
 "use client"
 
 import { capitalizeFirstLetter, centsToDollars, cn } from "@/lib/utilities"
-import { Badge } from "@/components/ui/badge"
 
 interface PriceListData {
   id: string
@@ -56,7 +55,7 @@ export function PriceDetailsGrid({ priceList }: PriceDetailsGridProps) {
   const categories = pricingTypes[priceList.client_specialization] || []
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <div className="space-y-6">
       {categories.map((pricingType, typeIndex) => {
         if (priceList[pricingType] === undefined) return null
 
@@ -68,60 +67,68 @@ export function PriceDetailsGrid({ priceList }: PriceDetailsGridProps) {
         if (gradeEntries.length === 0) return null
 
         return (
-          <div key={typeIndex} className="rounded-xl border bg-card overflow-hidden">
-            <div className="px-4 py-3 bg-muted/30 border-b">
-              <h3 className="text-base font-semibold text-card-foreground">
+          <div key={typeIndex} className="rounded-xl border bg-card overflow-hidden shadow-sm">
+            <div className="px-6 py-3 bg-gradient-to-r from-muted/30 to-card border-b">
+              <h3 className="text-lg font-bold text-card-foreground">
                 {capitalizeFirstLetter(pricingType)}
               </h3>
             </div>
 
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-border">
-                <thead className="bg-muted/20">
-                  <tr>
-                    <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              <table className="w-full table-fixed">
+                <colgroup>
+                  <col className="w-[40%]" />
+                  <col className="w-[15%]" />
+                  <col className="w-[22.5%]" />
+                  <col className="w-[22.5%]" />
+                </colgroup>
+                <thead>
+                  <tr className="border-b border-border bg-muted/5">
+                    <th className="px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                       Grade
                     </th>
-                    <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    <th className="px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                       Code
                     </th>
-                    <th className="px-4 py-2.5 text-right text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    <th className="px-6 py-2 text-right text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                       Delivered
                     </th>
-                    <th className="px-4 py-2.5 text-right text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    <th className="px-6 py-2 text-right text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                       Collected
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border bg-card">
+                <tbody className="divide-y divide-border/50">
                   {gradeEntries.map(([key, value], index) => {
                     const gradeItem = value as any
                     const deliveredPrice = gradeItem?.pricing?.delivered || 0
                     const collectedPrice = gradeItem?.pricing?.collected || 0
 
                     return (
-                      <tr key={index} className="hover:bg-muted/30 transition-colors duration-150">
-                        <td className="px-4 py-3 text-sm font-medium text-card-foreground w-44 whitespace-nowrap">
-                          {formatGradeName(key)}
+                      <tr key={index} className="hover:bg-muted/5 transition-colors">
+                        <td className="px-6 py-2.5">
+                          <span className="text-sm font-semibold text-card-foreground">
+                            {formatGradeName(key)}
+                          </span>
                         </td>
-                        <td className="px-4 py-3">
+                        <td className="px-6 py-2.5">
                           {grades?.[pricingType]?.[key] ? (
-                            <span className={cn(statuses[index % statuses.length], "inline-flex items-center justify-center rounded-md px-2.5 py-1 text-xs font-bold ring-1 ring-inset min-w-[48px]")}>
+                            <span className={cn(statuses[index % statuses.length], "inline-flex items-center justify-center rounded-md px-2 py-0.5 text-xs font-bold ring-1 ring-inset min-w-[40px]")}>
                               {grades[pricingType][key]}
                             </span>
                           ) : (
-                            <span className="inline-flex items-center justify-center rounded-md px-2.5 py-1 text-xs font-bold ring-1 ring-inset min-w-[48px] text-gray-700 bg-gray-50 ring-gray-600/20 dark:text-gray-400 dark:bg-gray-950/30 dark:ring-gray-500/20">
+                            <span className="inline-flex items-center justify-center rounded-md px-2 py-0.5 text-xs font-bold ring-1 ring-inset min-w-[40px] text-gray-700 bg-gray-50 ring-gray-600/20 dark:text-gray-400 dark:bg-gray-950/30 dark:ring-gray-500/20">
                               NG
                             </span>
                           )}
                         </td>
-                        <td className="px-4 py-3 text-right">
-                          <span className="text-sm font-semibold text-card-foreground">
+                        <td className="px-6 py-2.5 text-right">
+                          <span className="text-sm font-bold text-card-foreground">
                             {centsToDollars(deliveredPrice)}
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-right">
-                          <span className="text-sm font-medium text-muted-foreground">
+                        <td className="px-6 py-2.5 text-right">
+                          <span className="text-sm font-semibold text-muted-foreground">
                             {collectedPrice > 0 ? centsToDollars(collectedPrice) : "-"}
                           </span>
                         </td>

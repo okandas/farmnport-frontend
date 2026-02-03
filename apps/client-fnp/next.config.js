@@ -10,6 +10,12 @@ const nextConfig = {
         port: '',
         pathname: '/images/**'
       },
+      {
+        protocol: 'http',
+        hostname: '127.0.0.1',
+        port: '9000',
+        pathname: '/images/**'
+      },
     ],
   },
   turbopack: {

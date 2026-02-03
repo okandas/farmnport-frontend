@@ -8,11 +8,12 @@ import { useState, useEffect, useRef } from "react"
 import { useDebounce } from "use-debounce"
 import { Check, ChevronsUpDown } from "lucide-react"
 
-import { addAgroChemical, updateAgroChemical, queryBrands, queryBrand } from "@/lib/query"
+import { addAgroChemical, updateAgroChemical, queryBrands, queryBrand, queryAgroChemicalCategories, queryAgroChemicalCategory } from "@/lib/query"
 import {
     FormAgroChemicalModel,
     FormAgroChemicalSchema,
     Brand,
+    AgroChemicalCategory,
 } from "@/lib/schemas"
 import { cn, logFormPayload } from "@/lib/utilities"
 import { handleApiError, handleFetchError, handleFormErrors } from "@/lib/error-handler"
@@ -58,6 +59,7 @@ export function AgroChemicalForm({ agroChemical, mode = "create" }: AgroChemical
             id: agroChemical?.id,
             name: agroChemical?.name,
             brand_id: agroChemical?.brand_id,
+            agrochemical_category_id: agroChemical?.agrochemical_category_id,
             front_label: agroChemical?.front_label,
             back_label: agroChemical?.back_label,
             images: agroChemical?.images || [],
@@ -72,6 +74,10 @@ export function AgroChemicalForm({ agroChemical, mode = "create" }: AgroChemical
     const [searchBrand, setSearchBrand] = useState("")
     const [selectedBrand, setSelectedBrand] = useState("")
     const [open, setOpen] = useState(false)
+
+    const [searchCategory, setSearchCategory] = useState("")
+    const [selectedCategory, setSelectedCategory] = useState("")
+    const [openCategory, setOpenCategory] = useState(false)
 
     // Fetch the current brand in edit mode
     const { data: brandData } = useQuery({
@@ -88,7 +94,22 @@ export function AgroChemicalForm({ agroChemical, mode = "create" }: AgroChemical
         }
     }, [isEditMode, brandData])
 
-    // Debounce search query
+    // Fetch the current agrochemical category in edit mode
+    const { data: categoryData } = useQuery({
+        queryKey: ["agrochemical-category", agroChemical?.agrochemical_category_id],
+        queryFn: () => queryAgroChemicalCategory(agroChemical.agrochemical_category_id),
+        enabled: isEditMode && !!agroChemical?.agrochemical_category_id,
+    })
+
+    // Set the selected category name when editing
+    useEffect(() => {
+        if (isEditMode && categoryData?.data) {
+            const category = categoryData.data as AgroChemicalCategory
+            setSelectedCategory(category.name)
+        }
+    }, [isEditMode, categoryData])
+
+    // Debounce search query for brands
     const [debouncedSearchQuery] = useDebounce(searchBrand, 1000)
     const enabled = !!debouncedSearchQuery
 
@@ -121,6 +142,40 @@ export function AgroChemicalForm({ agroChemical, mode = "create" }: AgroChemical
             hasShownBrandError.current = false
         }
     }, [isError, error, refetch])
+
+    // Debounce search query for categories
+    const [debouncedCategorySearchQuery] = useDebounce(searchCategory, 1000)
+    const enabledCategory = !!debouncedCategorySearchQuery
+
+    const { data: categoriesData, isError: isCategoryError, refetch: refetchCategories, error: categoryError } = useQuery({
+        queryKey: ["dashboard-agrochemical-categories", { search: debouncedCategorySearchQuery }],
+        queryFn: () =>
+            queryAgroChemicalCategories({
+                search: debouncedCategorySearchQuery,
+            }),
+        enabled: enabledCategory,
+    })
+
+    const categories = categoriesData?.data?.data as AgroChemicalCategory[]
+
+    // Show error toast only once when category error occurs
+    const hasShownCategoryError = useRef(false)
+    useEffect(() => {
+        if (isCategoryError && !hasShownCategoryError.current) {
+            hasShownCategoryError.current = true
+            setOpenCategory(false)
+            handleFetchError(categoryError, {
+                onRetry: () => {
+                    hasShownCategoryError.current = false
+                    refetchCategories()
+                },
+                context: "agrochemical categories"
+            })
+        }
+        if (!isCategoryError) {
+            hasShownCategoryError.current = false
+        }
+    }, [isCategoryError, categoryError, refetchCategories])
 
     const { mutate, isPending } = useMutation({
         mutationFn: isEditMode ? updateAgroChemical : addAgroChemical,
@@ -279,6 +334,85 @@ export function AgroChemicalForm({ agroChemical, mode = "create" }: AgroChemical
                                                                         )}
                                                                     />
                                                                     {brand.name}
+                                                                </CommandItem>
+                                                            ))}
+                                                        </CommandList>
+                                                    </Command>
+                                                </PopoverContent>
+                                            </Popover>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
+                            <label
+                                htmlFor="agrochemical_category"
+                                className="block text-sm/6 font-medium text-gray-900 sm:pt-1.5 dark:text-white"
+                            >
+                                Agrochemical Category
+                            </label>
+                            <div className="mt-2 sm:col-span-2 sm:mt-0">
+                                <FormField
+                                    control={form.control}
+                                    name="agrochemical_category_id"
+                                    render={({ field }) => (
+                                        <FormItem className="flex flex-col">
+                                            <Popover open={openCategory} onOpenChange={setOpenCategory}>
+                                                <PopoverTrigger asChild>
+                                                    <FormControl>
+                                                        <Button
+                                                            variant="outline"
+                                                            role="combobox"
+                                                            className={cn(
+                                                                "w-full justify-between sm:max-w-md",
+                                                                !field.value && "text-muted-foreground"
+                                                            )}
+                                                        >
+                                                            <span className="truncate">
+                                                                {field.value
+                                                                    ? selectedCategory
+                                                                    : "Select agrochemical category"}
+                                                            </span>
+                                                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                                        </Button>
+                                                    </FormControl>
+                                                </PopoverTrigger>
+                                                <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
+                                                    <Command>
+                                                        <CommandInput
+                                                            placeholder="Search category..."
+                                                            onValueChange={(value) => {
+                                                                setSearchCategory(value)
+                                                            }}
+                                                        />
+                                                        <CommandList>
+                                                            <CommandEmpty>
+                                                                {searchCategory.length < 2
+                                                                    ? "Type at least 2 characters to search"
+                                                                    : "No category found."}
+                                                            </CommandEmpty>
+                                                            {categories?.map((category) => (
+                                                                <CommandItem
+                                                                    value={category.name}
+                                                                    key={category.id}
+                                                                    onSelect={() => {
+                                                                        form.setValue("agrochemical_category_id", category.id)
+                                                                        setSelectedCategory(category.name)
+                                                                        setOpenCategory(false)
+                                                                    }}
+                                                                >
+                                                                    <Check
+                                                                        className={cn(
+                                                                            "mr-2 h-4 w-4",
+                                                                            category.id === field.value
+                                                                                ? "opacity-100"
+                                                                                : "opacity-0"
+                                                                        )}
+                                                                    />
+                                                                    {category.name}
                                                                 </CommandItem>
                                                             ))}
                                                         </CommandList>

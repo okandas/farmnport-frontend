@@ -1,6 +1,7 @@
 import { Buyers } from "@/components/layouts/buyers"
 import { retrieveUser } from "@/lib/actions"
-import { FilterSidebar } from "@/components/generic/filterSidebar"
+import { ClientFilterSidebar } from "@/components/generic/clientFilterSidebar"
+import { ActionsSidebar } from "@/components/generic/actions-sidebar"
 
 
 export const metadata = {
@@ -21,12 +22,16 @@ export default async function BuyersPage() {
             <div className="mx-auto max-w-7xl px-6 lg:px-8 min-h-[70lvh]">
                 <div className="lg:flex lg:space-x-10">
 
-                    <div className="hidden lg:block lg:w-44 relative">
-                        <FilterSidebar />
+                    <div className="hidden lg:block lg:w-64 relative">
+                        <ClientFilterSidebar type="buyers" />
                     </div>
 
-                    <div className="lg:w-2/3">
+                    <div className="lg:flex-1">
                         <Buyers user={user} />
+                    </div>
+
+                    <div className="hidden lg:block lg:w-80 relative">
+                        <ActionsSidebar type="buyers" />
                     </div>
                 </div>
             </div>

@@ -74,8 +74,19 @@ const columnHelper = createColumnHelper<ApplicationUser>()
       return value.includes(row.getValue(id))
     },
   }),
-  columnHelper.accessor('specialization', {
-    header: "Specialization"
+  columnHelper.accessor('primary_category', {
+    header: "Main Category",
+    cell: ({ row }) => {
+      const category = row.getValue("primary_category") as ApplicationUser['primary_category']
+      return category?.name || '-'
+    },
+  }),
+  columnHelper.accessor('main_produce', {
+    header: "Main Produce",
+    cell: ({ row }) => {
+      const produce = row.getValue("main_produce") as ApplicationUser['main_produce']
+      return produce?.name || '-'
+    },
   }),
   columnHelper.display({
     id: 'actions',

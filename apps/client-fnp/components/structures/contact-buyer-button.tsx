@@ -53,7 +53,7 @@ export function ContactBuyerButton({ user, clientName, clientId }: ContactBuyerB
 
       if (!isPaidUser) {
         sendGTMEvent({ event: 'action', value: 'UnpaidUserContactAttempt' })
-        router.push('/pricing') // Redirect to pricing/subscription page
+        router.push('/waiting-list-paying') // Redirect to waiting list page
       } else {
         sendGTMEvent({ event: 'action', value: 'PaidUserContactBuyer' })
         // Show contact information or open contact modal

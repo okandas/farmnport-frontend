@@ -360,6 +360,11 @@ export function queryFarmProduce(pagination?: pagination) {
   return api.get(url)
 }
 
+export function queryFarmProduceByCategory(categorySlug: string) {
+  const url = `${baseUrl}/farmproduce/category/${categorySlug}`
+  return api.get(url)
+}
+
 // Buyer Contacts
 type BuyerContactsPagination = {
   p?: number
