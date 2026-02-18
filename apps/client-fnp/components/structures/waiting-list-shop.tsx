@@ -46,9 +46,9 @@ export function WaitingListShop({ user }: WaitingListShopProps) {
         <div className="mx-auto w-16 h-16 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center">
           <Check className="w-8 h-8 text-green-600 dark:text-green-400" />
         </div>
-        <h1 className="text-3xl font-bold font-heading">You're on the list!</h1>
+        <h1 className="text-3xl font-bold font-heading">You&apos;re on the list!</h1>
         <p className="text-muted-foreground">
-          We've added you to our shop waiting list. We'll notify you as soon as online shopping becomes available.
+          We&apos;ve added you to our shop waiting list. We&apos;ll notify you as soon as online shopping becomes available.
         </p>
         <Button onClick={() => router.push('/buy-agrochemicals')} variant="outline">
           Back to Products
@@ -69,7 +69,7 @@ export function WaitingListShop({ user }: WaitingListShopProps) {
           Shop Agrochemicals Online
         </h1>
         <p className="text-lg text-muted-foreground max-w-md mx-auto">
-          We're building an online store for agrochemicals. Join the waiting list to be notified when we launch.
+          We&apos;re building an online store for agrochemicals. Join the waiting list to be notified when we launch.
         </p>
       </div>
 
@@ -123,7 +123,7 @@ export function WaitingListShop({ user }: WaitingListShopProps) {
 
       {/* Footer */}
       <p className="text-center text-xs text-muted-foreground">
-        We'll notify you when online shopping is ready. No commitment required.
+        We&apos;ll notify you when online shopping is ready. No commitment required.
       </p>
     </div>
   )

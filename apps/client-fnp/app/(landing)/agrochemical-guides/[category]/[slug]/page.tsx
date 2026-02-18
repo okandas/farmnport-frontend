@@ -53,7 +53,7 @@ export default function AgroChemicalGuidePage({ params }: GuidePageProps) {
                     </div>
                     <h2 className="text-2xl font-semibold mb-2">Guide Not Found</h2>
                     <p className="text-muted-foreground mb-6">
-                        We couldn't find the agrochemical guide you're looking for. It may have been removed or the link might be incorrect.
+                        We couldn&apos;t find the agrochemical guide you&apos;re looking for. It may have been removed or the link might be incorrect.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-3 justify-center">
                         <Link href="/agrochemical-guides/all">

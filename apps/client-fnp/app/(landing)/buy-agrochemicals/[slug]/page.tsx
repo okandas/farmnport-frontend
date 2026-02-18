@@ -96,7 +96,7 @@ export default function BuyAgroChemicalPage({ params }: BuyAgroChemicalPageProps
             <div className="min-h-screen bg-background flex items-center justify-center">
                 <div className="text-center">
                     <h2 className="text-2xl font-bold mb-2">Product Not Found</h2>
-                    <p className="text-muted-foreground">The product you're looking for doesn't exist.</p>
+                    <p className="text-muted-foreground">The product you&apos;re looking for doesn&apos;t exist.</p>
                 </div>
             </div>
         )

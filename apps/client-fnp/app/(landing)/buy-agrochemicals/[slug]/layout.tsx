@@ -62,8 +62,8 @@ export async function generateMetadata({ params }: LayoutProps): Promise<Metadat
             alt: chemical.name,
           },
         ],
-        locale: 'en_US',
-        type: 'product',
+        locale: 'en_ZW',
+        type: 'website',
       },
       twitter: {
         card: 'summary_large_image',

@@ -412,7 +412,7 @@ export function Client({ slug, user }: ClientPageProps) {
                       <Icons.circleDollarSign className="h-16 w-16 text-muted-foreground/30 mb-4" />
                       <h3 className="text-lg font-semibold mb-2">No Pricing Available</h3>
                       <p className="text-sm text-muted-foreground max-w-md">
-                        This buyer hasn't shared pricing information yet. Check back later or contact them directly for pricing details.
+                        This buyer hasn&apos;t shared pricing information yet. Check back later or contact them directly for pricing details.
                       </p>
                     </div>
                   </div>

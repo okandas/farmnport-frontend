@@ -64,7 +64,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Dynamic routes - Fetch product pages
   // Replace this with your actual API call or database query
   const products = await fetchProducts()
-  const productRoutes: MetadataRoute.Sitemap = products.flatMap((product) => [
+  const productRoutes: MetadataRoute.Sitemap = products.flatMap((product: any) => [
     {
       url: `${BASE_URL}/buyers/${product.slug}`,
       lastModified: new Date(product.updatedAt),
@@ -81,7 +81,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Dynamic routes - Fetch farmer and buyer profile pages
   const farmers = await fetchFarmers()
-  const farmerRoutes: MetadataRoute.Sitemap = farmers.map((farmer) => ({
+  const farmerRoutes: MetadataRoute.Sitemap = farmers.map((farmer: any) => ({
     url: `${BASE_URL}/farmer/${farmer.slug}`,
     lastModified: new Date(farmer.updatedAt),
     changeFrequency: 'weekly',
@@ -89,7 +89,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }))
 
   const buyers = await fetchBuyers()
-  const buyerRoutes: MetadataRoute.Sitemap = buyers.map((buyer) => ({
+  const buyerRoutes: MetadataRoute.Sitemap = buyers.map((buyer: any) => ({
     url: `${BASE_URL}/buyer/${buyer.slug}`,
     lastModified: new Date(buyer.updatedAt),
     changeFrequency: 'weekly',
@@ -111,7 +111,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'daily',
       priority: 0.8,
     },
-    ...agroChemicalCategories.map((category) => ({
+    ...agroChemicalCategories.map((category: any) => ({
       url: `${BASE_URL}/agrochemical-guides/${category.slug}`,
       lastModified: new Date(category.updated || category.created),
       changeFrequency: 'weekly' as const,
@@ -121,7 +121,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Individual agrochemical product pages
   const agroChemicals = await fetchAgroChemicals()
-  const agroChemicalRoutes: MetadataRoute.Sitemap = agroChemicals.map((chemical) => ({
+  const agroChemicalRoutes: MetadataRoute.Sitemap = agroChemicals.map((chemical: any) => ({
     url: `${BASE_URL}/agrochemical-guides/${chemical.categorySlug || 'all'}/${chemical.slug}`,
     lastModified: new Date(chemical.updated || chemical.created),
     changeFrequency: 'weekly',
@@ -136,7 +136,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'daily',
       priority: 0.9, // High priority for e-commerce
     },
-    ...agroChemicals.map((chemical) => ({
+    ...agroChemicals.map((chemical: any) => ({
       url: `${BASE_URL}/buy-agrochemicals/${chemical.slug}`,
       lastModified: new Date(chemical.updated || chemical.created),
       changeFrequency: 'daily' as const, // Products/prices change frequently

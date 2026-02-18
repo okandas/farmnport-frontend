@@ -149,7 +149,7 @@ export function PriceListTableView({
       <div className="space-y-8">
         {pricingTypes[producerPriceList?.client_specialization].map(
           (pricingType, typeIndex) => {
-            if (producerPriceList[pricingType] === undefined) return null
+            if ((producerPriceList as any)[pricingType] === undefined) return null
 
             return (
               <div key={typeIndex} className="rounded-lg border border-gray-200 bg-white shadow-sm">
@@ -181,7 +181,7 @@ export function PriceListTableView({
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200 bg-white">
-                      {Object.keys(producerPriceList[pricingType]).map(
+                      {Object.keys((producerPriceList as any)[pricingType]).map(
                         (key, index) => {
                           if (
                             key === "hasPrice" ||
@@ -190,7 +190,7 @@ export function PriceListTableView({
                           ) {
                             return null
                           }
-                          const gradePrices = producerPriceList[pricingType]
+                          const gradePrices = (producerPriceList as any)[pricingType]
                           const gradeItem = gradePrices[key as keyof typeof gradePrices] as any
                           const deliveredPrice = gradeItem?.pricing?.delivered || 0
                           const collectedPrice = gradeItem?.pricing?.collected || 0

@@ -197,7 +197,7 @@ export function PricesSearchView() {
 
                   <div className="flex items-center gap-1">
                     {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                      let pageNumber
+                      let pageNumber: number
                       if (totalPages <= 5) {
                         pageNumber = i + 1
                       } else if (currentPage <= 3) {

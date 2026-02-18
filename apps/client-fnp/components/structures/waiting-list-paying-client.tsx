@@ -46,9 +46,9 @@ export function WaitingListPayingClient({ user }: WaitingListPayingClientProps) 
         <div className="mx-auto w-16 h-16 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center">
           <Check className="w-8 h-8 text-green-600 dark:text-green-400" />
         </div>
-        <h1 className="text-3xl font-bold font-heading">You're on the list!</h1>
+        <h1 className="text-3xl font-bold font-heading">You&apos;re on the list!</h1>
         <p className="text-muted-foreground">
-          We've added you to our premium waiting list. We'll notify you as soon as these features become available.
+          We&apos;ve added you to our premium waiting list. We&apos;ll notify you as soon as these features become available.
         </p>
         <Button onClick={() => router.push('/prices')} variant="outline">
           Back to Prices
@@ -122,7 +122,7 @@ export function WaitingListPayingClient({ user }: WaitingListPayingClientProps) 
 
       {/* Footer */}
       <p className="text-center text-xs text-muted-foreground">
-        We'll notify you when premium features are ready. No commitment required.
+        We&apos;ll notify you when premium features are ready. No commitment required.
       </p>
     </div>
   )

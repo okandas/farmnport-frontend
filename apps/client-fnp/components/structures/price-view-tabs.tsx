@@ -15,7 +15,7 @@ export function PriceViewTabs() {
   )
 
   return (
-    <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+    <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as typeof tabOptions[number])} className="w-full">
       <TabsList className="grid w-full grid-cols-3 mb-8">
         <TabsTrigger value="all">All Prices</TabsTrigger>
         <TabsTrigger value="by-produce">By Produce</TabsTrigger>

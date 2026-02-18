@@ -45,7 +45,7 @@ export function LoggedInDashboard({ user }: LoggedInDashboardProps) {
             Welcome back, {user?.username}!
           </h1>
           <p className="text-lg text-muted-foreground">
-            Here's how you can manage your {businessType} today
+            Here&apos;s how you can manage your {businessType} today
           </p>
         </div>
 
