@@ -90,7 +90,12 @@ export function AgroChemicalCard({ chemical, mode }: AgroChemicalCardProps) {
           </div>
         ) : (
           <Link href={href} className="block pt-2">
-            <Button variant="outline" className="w-full" size="sm">
+            <Button
+              variant="outline"
+              className="w-full"
+              size="sm"
+              onClick={() => sendGTMEvent({ event: 'link', value: 'ViewGuide' })}
+            >
               View Guide
             </Button>
           </Link>
