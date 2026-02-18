@@ -135,7 +135,7 @@ export function SignUpAuthForm({ className, ...props }: AuthFormProps) {
     const categories = (categoriesData?.data as FarmProduceCategoriesResponse)?.data || []
 
     // Fetch produce for selected category
-    const selectedCategory = categories.find(cat => cat.id === changingPrimaryProduceID)
+    const selectedCategory = categories.find(cat => cat.id === changingPrimaryCategoryID)
 
     const { data: produceData } = useQuery({
         queryKey: ["farm-produce-by-category", selectedCategory?.slug],
@@ -464,9 +464,9 @@ export function SignUpAuthForm({ className, ...props }: AuthFormProps) {
 
                                     <SelectTrigger
                                         className="mt-2"
-                                        disabled={!changingPrimaryProduceID}
+                                        disabled={!changingPrimaryCategoryID}
                                     >
-                                        <SelectValue placeholder={!changingPrimaryProduceID ?
+                                        <SelectValue placeholder={!changingPrimaryCategoryID ?
                                             "Select Primary Focus First" : "Select Your Main Product"
                                         } />
                                     </SelectTrigger>
