@@ -46,8 +46,42 @@ export default async function PriceDetailsPage({ params }: PriceDetailsPageProps
 
   const formattedDate = formatDate(priceList.effectiveDate.toString())
 
+  // Generate JSON-LD structured data
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": `${priceList.client_name} Price List`,
+    "description": `Farm produce price list from ${priceList.client_name} effective ${formattedDate}`,
+    "datePublished": priceList.effectiveDate,
+    "publisher": {
+      "@type": "Organization",
+      "name": priceList.client_name
+    },
+    "itemListElement": priceList.entries?.map((entry: any, index: number) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "item": {
+        "@type": "Product",
+        "name": entry.produce_name,
+        "offers": {
+          "@type": "Offer",
+          "price": entry.price,
+          "priceCurrency": "USD",
+          "availability": entry.available ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+          "priceValidUntil": priceList.effectiveDate
+        }
+      }
+    })) || []
+  }
+
   return (
     <main>
+      {/* JSON-LD Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+
       <div className="mx-auto max-w-7xl px-6 lg:px-8 py-12 min-h-[70lvh]">
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-4">

@@ -2,17 +2,17 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Check } from "lucide-react"
+import { Check, ShoppingCart, Package, Truck, CreditCard } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { AuthenticatedUser } from "@/lib/schemas"
 import { sendGTMEvent } from '@next/third-parties/google'
 import { updateUserWantToPay } from "@/lib/query"
 
-interface WaitingListPayingClientProps {
+interface WaitingListShopProps {
   user: AuthenticatedUser | null
 }
 
-export function WaitingListPayingClient({ user }: WaitingListPayingClientProps) {
+export function WaitingListShop({ user }: WaitingListShopProps) {
   const router = useRouter()
   const [submitted, setSubmitted] = useState(user?.want_to_pay || false)
   const [isLoading, setIsLoading] = useState(false)
@@ -20,7 +20,7 @@ export function WaitingListPayingClient({ user }: WaitingListPayingClientProps) 
 
   const handleJoinWaitingList = async () => {
     if (!user) {
-      router.push('/login?redirect=/waiting-list-paying')
+      router.push('/login?redirect=/waiting-list-shop')
       return
     }
 
@@ -30,7 +30,7 @@ export function WaitingListPayingClient({ user }: WaitingListPayingClientProps) 
     try {
       await updateUserWantToPay(true)
 
-      sendGTMEvent({ event: 'action', value: 'JoinedPayingWaitingList' })
+      sendGTMEvent({ event: 'action', value: 'JoinedShopWaitingList' })
       setSubmitted(true)
     } catch (err) {
       setError('Something went wrong. Please try again.')
@@ -48,10 +48,10 @@ export function WaitingListPayingClient({ user }: WaitingListPayingClientProps) 
         </div>
         <h1 className="text-3xl font-bold font-heading">You're on the list!</h1>
         <p className="text-muted-foreground">
-          We've added you to our premium waiting list. We'll notify you as soon as these features become available.
+          We've added you to our shop waiting list. We'll notify you as soon as online shopping becomes available.
         </p>
-        <Button onClick={() => router.push('/prices')} variant="outline">
-          Back to Prices
+        <Button onClick={() => router.push('/buy-agrochemicals')} variant="outline">
+          Back to Products
         </Button>
       </div>
     )
@@ -61,14 +61,15 @@ export function WaitingListPayingClient({ user }: WaitingListPayingClientProps) 
     <div className="max-w-lg w-full space-y-8">
       {/* Header */}
       <div className="text-center space-y-3">
-        <div className="inline-block px-4 py-1.5 bg-primary/10 text-primary rounded-full text-sm font-medium mb-4">
-          Premium Access Coming Soon
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-primary/10 text-primary rounded-full text-sm font-medium mb-4">
+          <ShoppingCart className="w-4 h-4" />
+          Online Shopping Coming Soon
         </div>
         <h1 className="text-4xl md:text-5xl font-bold font-heading tracking-tight">
-          Get Early Access
+          Shop Agrochemicals Online
         </h1>
         <p className="text-lg text-muted-foreground max-w-md mx-auto">
-          Be first in line for premium features. Connect directly with buyers and unlock exclusive benefits.
+          We're building an online store for agrochemicals. Join the waiting list to be notified when we launch.
         </p>
       </div>
 
@@ -76,29 +77,29 @@ export function WaitingListPayingClient({ user }: WaitingListPayingClientProps) 
       <div className="bg-card border rounded-lg p-6 space-y-3">
         <div className="flex items-start gap-3">
           <div className="mt-0.5 w-5 h-5 rounded-full bg-green-100 dark:bg-green-900/20 flex items-center justify-center flex-shrink-0">
-            <Check className="w-3 h-3 text-green-600 dark:text-green-400" />
+            <Package className="w-3 h-3 text-green-600 dark:text-green-400" />
           </div>
           <div>
-            <p className="font-medium">Direct Buyer Contact</p>
-            <p className="text-sm text-muted-foreground">Access phone numbers and email addresses instantly</p>
+            <p className="font-medium">Wide Product Selection</p>
+            <p className="text-sm text-muted-foreground">Access to thousands of agrochemical products</p>
           </div>
         </div>
         <div className="flex items-start gap-3">
           <div className="mt-0.5 w-5 h-5 rounded-full bg-green-100 dark:bg-green-900/20 flex items-center justify-center flex-shrink-0">
-            <Check className="w-3 h-3 text-green-600 dark:text-green-400" />
+            <Truck className="w-3 h-3 text-green-600 dark:text-green-400" />
           </div>
           <div>
-            <p className="font-medium">Priority Visibility</p>
-            <p className="text-sm text-muted-foreground">Stand out with enhanced listing placement</p>
+            <p className="font-medium">Fast Delivery</p>
+            <p className="text-sm text-muted-foreground">Quick shipping directly to your farm</p>
           </div>
         </div>
         <div className="flex items-start gap-3">
           <div className="mt-0.5 w-5 h-5 rounded-full bg-green-100 dark:bg-green-900/20 flex items-center justify-center flex-shrink-0">
-            <Check className="w-3 h-3 text-green-600 dark:text-green-400" />
+            <CreditCard className="w-3 h-3 text-green-600 dark:text-green-400" />
           </div>
           <div>
-            <p className="font-medium">Market Insights</p>
-            <p className="text-sm text-muted-foreground">Advanced analytics and price trend notifications</p>
+            <p className="font-medium">Secure Payment</p>
+            <p className="text-sm text-muted-foreground">Safe and convenient payment options</p>
           </div>
         </div>
       </div>
@@ -122,7 +123,7 @@ export function WaitingListPayingClient({ user }: WaitingListPayingClientProps) 
 
       {/* Footer */}
       <p className="text-center text-xs text-muted-foreground">
-        We'll notify you when premium features are ready. No commitment required.
+        We'll notify you when online shopping is ready. No commitment required.
       </p>
     </div>
   )

@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
+import { sendGTMEvent } from "@next/third-parties/google"
 
 import { queryClient, queryClientPricing } from "@/lib/query"
 import { ApplicationUser, AuthenticatedUser } from "@/lib/schemas"
@@ -331,6 +332,9 @@ export function Client({ slug, user }: ClientPageProps) {
                             })
                             const tagCount = availableProducts.length
 
+                            const priceDate = new Date(priceList.effectiveDate).toISOString().split('T')[0]
+                            const priceListUrl = `/prices/${slug}-${priceDate}`
+
                             return (
                               <tr key={index} className="border-b last:border-b-0 hover:bg-muted/10 transition-colors">
                                 <td className="py-4 px-6">
@@ -348,9 +352,21 @@ export function Client({ slug, user }: ClientPageProps) {
                                   {capitalizeFirstLetter(priceList.client_specialization || client.primary_category?.name || '-')}
                                 </td>
                                 <td className="py-4 px-6 text-right">
-                                  <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
-                                    {tagCount} {tagCount === 1 ? 'Product' : 'Products'}
-                                  </Badge>
+                                  <div className="flex items-center justify-end gap-3">
+                                    <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
+                                      {tagCount} {tagCount === 1 ? 'Product' : 'Products'}
+                                    </Badge>
+                                    <Button asChild variant="ghost" size="sm">
+                                      <a
+                                        href={priceListUrl}
+                                        className="flex items-center gap-1"
+                                        onClick={() => sendGTMEvent({ event: 'link', value: 'ViewPriceFromDetailPage' })}
+                                      >
+                                        View
+                                        <Icons.chevronRight className="h-4 w-4" />
+                                      </a>
+                                    </Button>
+                                  </div>
                                 </td>
                               </tr>
                             )

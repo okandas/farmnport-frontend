@@ -1,36 +1,46 @@
 "use client"
 
+import { use } from "react"
 import { useQuery } from "@tanstack/react-query"
-import { queryAllAgroChemicals } from "@/lib/query"
+import { queryAgroChemicalsByCategory } from "@/lib/query"
 import { Button } from "@/components/ui/button"
 import { Beaker } from "lucide-react"
 import { AgroChemicalFilterSidebar } from "@/components/generic/agroChemicalFilterSidebar"
 import { AgroChemicalCard } from "@/components/agrochemical/AgroChemicalCard"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
+import Link from "next/link"
 
-export default function AllAgroChemicalsPage() {
+interface CategoryPageProps {
+    params: Promise<{
+        category: string
+    }>
+}
+
+export default function AgroChemicalCategoryPage({ params }: CategoryPageProps) {
+    const { category } = use(params)
+
     const [queryState, setQueryState] = useQueryStates({
         brand: parseAsArrayOf(parseAsString),
         target: parseAsArrayOf(parseAsString),
         active_ingredient: parseAsArrayOf(parseAsString),
-        used_on: parseAsArrayOf(parseAsString),
         p: parseAsInteger.withDefault(1),
     })
 
     const { data: chemicalsData, isLoading: chemicalsLoading } = useQuery({
-        queryKey: ["agrochemicals-all", queryState.p, queryState.brand, queryState.target, queryState.active_ingredient, queryState.used_on],
-        queryFn: () => queryAllAgroChemicals({
+        queryKey: ["agrochemicals-category", category, queryState.p, queryState.brand, queryState.target, queryState.active_ingredient],
+        queryFn: () => queryAgroChemicalsByCategory({
+            category,
             p: queryState.p,
             brand: queryState.brand || [],
             target: queryState.target || [],
             active_ingredient: queryState.active_ingredient || [],
-            used_on: queryState.used_on || [],
         }),
         refetchOnWindowFocus: false,
     })
 
     const chemicals = chemicalsData?.data?.data || []
     const totalPages = Math.ceil((chemicalsData?.data?.total || 0) / 20)
+    const categoryName = chemicals[0]?.agrochemical_category?.name || category
 
     const handlePageChange = (newPage: number) => {
         setQueryState({ p: newPage })
@@ -38,21 +48,34 @@ export default function AllAgroChemicalsPage() {
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
+            {/* Breadcrumb */}
+            <div className="border-b bg-muted/30">
+                <div className="max-w-7xl mx-auto px-6 lg:px-8 py-4">
+                    <nav className="flex text-sm text-muted-foreground">
+                        <Link href="/" className="hover:text-foreground">Home</Link>
+                        <span className="mx-2">/</span>
+                        <Link href="/agrochemical-guides" className="hover:text-foreground">Guides</Link>
+                        <span className="mx-2">/</span>
+                        <span className="text-foreground capitalize">{categoryName}</span>
+                    </nav>
+                </div>
+            </div>
+
             <div className="mx-auto max-w-7xl px-6 lg:px-8 py-12">
                 {/* Header */}
                 <div className="mb-8">
-                    <h1 className="text-4xl font-bold tracking-tight font-heading mb-4">
-                        All Agrochemicals
+                    <h1 className="text-4xl font-bold tracking-tight font-heading mb-4 capitalize">
+                        {categoryName}
                     </h1>
                     <p className="text-lg text-muted-foreground">
-                        Browse our complete collection of agrochemical products
+                        Browse our collection of {categoryName.toLowerCase()} products
                     </p>
                 </div>
 
                 <div className="flex flex-col lg:flex-row gap-8">
                     {/* Sidebar Filters */}
                     <aside className="w-full lg:w-64 flex-shrink-0">
-                        <AgroChemicalFilterSidebar />
+                        <AgroChemicalFilterSidebar hideCategory={true} />
                     </aside>
 
                     {/* Main Content */}
@@ -79,7 +102,10 @@ export default function AllAgroChemicalsPage() {
                         ) : chemicals.length === 0 ? (
                             <div className="text-center py-12">
                                 <Beaker className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-                                <p className="text-muted-foreground">No agrochemicals found matching your filters.</p>
+                                <p className="text-muted-foreground mb-4">No {categoryName.toLowerCase()} found matching your filters.</p>
+                                <Link href="/agrochemical-guides/all">
+                                    <Button variant="outline">View All Agrochemicals</Button>
+                                </Link>
                             </div>
                         ) : (
                             <>

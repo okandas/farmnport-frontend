@@ -63,9 +63,11 @@ export type AuthenticatedUser = {
     iss?: string
     subject?: string
     username?: string
+    type?: string
     token?: string
     email?: string | null
     emailVerified?: Date | null
+    want_to_pay?: boolean
 } | undefined
 
 export type LoginResponse = {

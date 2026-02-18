@@ -20,8 +20,34 @@ export async function generateMetadata({ params }: Props,  parent: ResolvingMeta
     alternates: {
       canonical: `${AppURL}/buyers/${product.toLowerCase()}`,
     },
-    title: `${name} Buyers in Zimbabwe | farmnport.com`,
+    title: `${name} Buyers in Zimbabwe | farmnport`,
     description,
+    keywords: `${name} buyers, buy ${product}, ${product} market, Zimbabwe buyers, agricultural buyers, farm produce buyers`,
+    authors: [{ name: 'farmnport' }],
+    openGraph: {
+      title: `${name} Buyers in Zimbabwe`,
+      description,
+      url: `${AppURL}/buyers/${product.toLowerCase()}`,
+      siteName: 'farmnport',
+      locale: 'en_US',
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary',
+      title: `${name} Buyers in Zimbabwe`,
+      description,
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
+    },
   }
 }
 

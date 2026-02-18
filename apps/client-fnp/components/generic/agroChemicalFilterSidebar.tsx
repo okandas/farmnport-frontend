@@ -11,7 +11,7 @@ import { Filter, X, Search } from "lucide-react"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { useQuery } from "@tanstack/react-query"
 import { useState, useMemo } from "react"
-import { queryClientFilterAggregates } from "@/lib/query"
+import { queryAgroChemicalFilterAggregates } from "@/lib/query"
 import { sendGTMEvent } from "@next/third-parties/google"
 
 interface FilterItem {
@@ -20,10 +20,11 @@ interface FilterItem {
   count: number
 }
 
-interface ClientFilterAggregates {
-  provinces: FilterItem[]
-  produce: FilterItem[]
-  categories: FilterItem[]
+interface AgroChemicalFilterAggregates {
+  brands: FilterItem[]
+  targets: FilterItem[]
+  active_ingredients: FilterItem[]
+  used_on: FilterItem[]
 }
 
 function SearchableCheckboxList({
@@ -79,7 +80,7 @@ function SearchableCheckboxList({
         ) : (
           filteredItems.map((item) => {
             const displayName = item.name || item._id
-            const value = displayName.toLowerCase()
+            const value = item._id
             const isChecked = selectedItems.includes(value)
 
             return (
@@ -108,36 +109,39 @@ function SearchableCheckboxList({
 
 function FilterContent({
   onClearAll,
-  type
 }: {
   onClearAll: () => void
-  type: 'buyers' | 'farmers'
 }) {
   const [queryState, setQueryState] = useQueryStates({
-    province: parseAsArrayOf(parseAsString),
-    produce: parseAsArrayOf(parseAsString),
-    category: parseAsArrayOf(parseAsString),
+    brand: parseAsArrayOf(parseAsString),
+    target: parseAsArrayOf(parseAsString),
+    active_ingredient: parseAsArrayOf(parseAsString),
+    used_on: parseAsArrayOf(parseAsString),
   })
 
-  // Fetch aggregate data for clients
+  // Fetch aggregate data for agrochemicals
   const { data: aggregateData, isLoading: isLoadingAggregates } = useQuery({
-    queryKey: ["client-filter-aggregates", type],
+    queryKey: ["agrochemical-filter-aggregates"],
     queryFn: async () => {
-      const response = await queryClientFilterAggregates(type)
-      return response.data as ClientFilterAggregates
+      const response = await queryAgroChemicalFilterAggregates()
+      return response.data as AgroChemicalFilterAggregates
     },
   })
 
-  const provinceItems = useMemo(() => {
-    return aggregateData?.provinces || []
+  const brandItems = useMemo(() => {
+    return aggregateData?.brands || []
   }, [aggregateData])
 
-  const produceItems = useMemo(() => {
-    return aggregateData?.produce || []
+  const targetItems = useMemo(() => {
+    return aggregateData?.targets || []
   }, [aggregateData])
 
-  const categoryItems = useMemo(() => {
-    return aggregateData?.categories || []
+  const activeIngredientItems = useMemo(() => {
+    return aggregateData?.active_ingredients || []
+  }, [aggregateData])
+
+  const usedOnItems = useMemo(() => {
+    return aggregateData?.used_on || []
   }, [aggregateData])
 
   const handleToggle = (filterKey: string, value: string) => {
@@ -149,14 +153,14 @@ function FilterContent({
 
     // Send GTM event
     const filterTypeMap: Record<string, string> = {
-      'province': 'Province',
-      'produce': 'Produce',
-      'category': 'Category'
+      'used_on': 'UsedOn',
+      'target': 'Target',
+      'active_ingredient': 'ActiveIngredient',
+      'brand': 'Brand'
     }
     const filterType = filterTypeMap[filterKey] || filterKey
     const action = isAdding ? 'Add' : 'Remove'
-    const clientType = type === 'buyers' ? 'Buyer' : 'Farmer'
-    sendGTMEvent({ event: 'filter', value: `${action}${clientType}${filterType}Filter` })
+    sendGTMEvent({ event: 'filter', value: `${action}${filterType}Filter` })
 
     setQueryState({
       [filterKey]: newValues.length > 0 ? newValues : null
@@ -167,21 +171,27 @@ function FilterContent({
 
   const filterSections = [
     {
-      name: "Category",
-      key: "category",
-      items: categoryItems,
+      name: "Used On",
+      key: "used_on",
+      items: usedOnItems,
       isLoading: isLoadingAggregates
     },
     {
-      name: "Produce",
-      key: "produce",
-      items: produceItems,
+      name: "Targets",
+      key: "target",
+      items: targetItems,
       isLoading: isLoadingAggregates
     },
     {
-      name: "Province",
-      key: "province",
-      items: provinceItems,
+      name: "Active Ingredients",
+      key: "active_ingredient",
+      items: activeIngredientItems,
+      isLoading: isLoadingAggregates
+    },
+    {
+      name: "Brands",
+      key: "brand",
+      items: brandItems,
       isLoading: isLoadingAggregates
     },
   ]
@@ -205,7 +215,7 @@ function FilterContent({
         </div>
       )}
 
-      <Accordion type="multiple" className="w-full flex-1" defaultValue={["Category", "Produce"]}>
+      <Accordion type="multiple" className="w-full flex-1" defaultValue={["Used On", "Targets", "Active Ingredients"]}>
         {filterSections.map((section) => {
           const selectedFilters = queryState[section.key as keyof typeof queryState] || []
 
@@ -239,19 +249,21 @@ function FilterContent({
   )
 }
 
-export function ClientFilterSidebar({ type }: { type: 'buyers' | 'farmers' }) {
+export function AgroChemicalFilterSidebar({ hideCategory = false }: { hideCategory?: boolean }) {
   const isDesktop = useMediaQuery("(min-width: 1024px)")
   const [, setQueryState] = useQueryStates({
-    province: parseAsArrayOf(parseAsString),
-    produce: parseAsArrayOf(parseAsString),
-    category: parseAsArrayOf(parseAsString),
+    brand: parseAsArrayOf(parseAsString),
+    target: parseAsArrayOf(parseAsString),
+    active_ingredient: parseAsArrayOf(parseAsString),
+    used_on: parseAsArrayOf(parseAsString),
   })
 
   const handleClearAll = () => {
     setQueryState({
-      province: null,
-      produce: null,
-      category: null,
+      brand: null,
+      target: null,
+      active_ingredient: null,
+      used_on: null,
     })
   }
 
@@ -259,7 +271,7 @@ export function ClientFilterSidebar({ type }: { type: 'buyers' | 'farmers' }) {
   if (isDesktop) {
     return (
       <div className="sticky top-20 mt-[20px]">
-        <FilterContent onClearAll={handleClearAll} type={type} />
+        <FilterContent onClearAll={handleClearAll} />
       </div>
     )
   }
@@ -275,9 +287,9 @@ export function ClientFilterSidebar({ type }: { type: 'buyers' | 'farmers' }) {
       </SheetTrigger>
       <SheetContent side="left" className="w-[300px] sm:w-[400px] overflow-y-auto">
         <SheetHeader className="mb-4">
-          <SheetTitle>Filter {type === 'buyers' ? 'Buyers' : 'Farmers'}</SheetTitle>
+          <SheetTitle>Filter Agrochemicals</SheetTitle>
         </SheetHeader>
-        <FilterContent onClearAll={handleClearAll} type={type} />
+        <FilterContent onClearAll={handleClearAll} />
       </SheetContent>
     </Sheet>
   )

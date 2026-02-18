@@ -16,6 +16,7 @@ declare module "next-auth" {
         iss: string
         subject: string
         username: string
+        type: string
         token: string
         email?: string | null
         emailVerified?: Date | null

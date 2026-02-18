@@ -1,7 +1,8 @@
 import axios, { InternalAxiosRequestConfig } from "axios"
+import { toast } from "sonner"
 
 import { PaginationModel, ResetFormData, LoginFormData, SignUpFormData, BaseURL, FeatureFlags } from "@/lib/schemas"
-import { retrieveToken } from "@/lib/actions"
+import { retrieveToken, logoutUser } from "@/lib/actions"
 
 let api = axios.create({})
 
@@ -15,6 +16,33 @@ api.interceptors.request.use(async(config: InternalAxiosRequestConfig) => {
 
     return config
 })
+
+api.interceptors.response.use(
+    (response) => response,
+    async (error) => {
+        if (error.response?.status === 400 || error.response?.status === 401) {
+            const errorMessage = error.response?.data?.message || ""
+
+            // Check if it's a token expiration error
+            if (errorMessage.includes("expired") || errorMessage.includes("not active yet")) {
+                // Logout the user
+                await logoutUser()
+
+                // Show session expired toast
+                toast("Session Expired", {
+                    description: "Your session has expired. Please login again."
+                })
+
+                // Redirect to login page
+                if (typeof window !== "undefined") {
+                    window.location.href = "/login"
+                }
+            }
+        }
+
+        return Promise.reject(error)
+    }
+)
 
 export function queryClient(slug: string) {
 
@@ -144,7 +172,7 @@ export function queryAgroChemicalCategories() {
   return api.get(url)
 }
 
-export function queryAllAgroChemicals(pagination?: PaginationModel & { brand?: string[], target?: string[], active_ingredient?: string[] }) {
+export function queryAllAgroChemicals(pagination?: PaginationModel & { brand?: string[], target?: string[], active_ingredient?: string[], used_on?: string[] }) {
   const params = new URLSearchParams()
 
   // Add pagination
@@ -162,9 +190,37 @@ export function queryAllAgroChemicals(pagination?: PaginationModel & { brand?: s
   if (pagination?.active_ingredient && pagination.active_ingredient.length > 0) {
     pagination.active_ingredient.forEach(ai => params.append('active_ingredient', ai))
   }
+  if (pagination?.used_on && pagination.used_on.length > 0) {
+    pagination.used_on.forEach(uo => params.append('used_on', uo))
+  }
 
   const queryString = params.toString()
   const url = queryString ? `${BaseURL}/agrochemical/all?${queryString}` : `${BaseURL}/agrochemical/all`
+
+  return api.get(url)
+}
+
+export function queryAgroChemicalsByCategory(options: { category: string } & PaginationModel & { brand?: string[], target?: string[], active_ingredient?: string[] }) {
+  const params = new URLSearchParams()
+
+  // Add pagination
+  if (options.p !== undefined && options.p >= 2) {
+    params.set('p', options.p.toString())
+  }
+
+  // Add filters
+  if (options.brand && options.brand.length > 0) {
+    options.brand.forEach(b => params.append('brand', b))
+  }
+  if (options.target && options.target.length > 0) {
+    options.target.forEach(t => params.append('target', t))
+  }
+  if (options.active_ingredient && options.active_ingredient.length > 0) {
+    options.active_ingredient.forEach(ai => params.append('active_ingredient', ai))
+  }
+
+  const queryString = params.toString()
+  const url = queryString ? `${BaseURL}/agrochemical/category/${options.category}?${queryString}` : `${BaseURL}/agrochemical/category/${options.category}`
 
   return api.get(url)
 }
@@ -181,5 +237,20 @@ export function queryAllTargets() {
 
 export function queryAllActiveIngredients() {
   const url = `${BaseURL}/agrochemical-active-ingredient/`
+  return api.get(url)
+}
+
+export function queryAgroChemicalFilterAggregates() {
+  const url = `${BaseURL}/agrochemical/aggregates/filters`
+  return api.get(url)
+}
+
+export function queryAgroChemical(slug: string) {
+  const url = `${BaseURL}/agrochemical/${slug}`
+  return api.get(url)
+}
+
+export function queryDashboardAggregates() {
+  const url = `${BaseURL}/client/aggregates/dashboard`
   return api.get(url)
 }

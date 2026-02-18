@@ -3,28 +3,26 @@
 import { useQuery } from "@tanstack/react-query"
 import { queryAllAgroChemicals } from "@/lib/query"
 import { Button } from "@/components/ui/button"
-import { Beaker } from "lucide-react"
 import { AgroChemicalFilterSidebar } from "@/components/generic/agroChemicalFilterSidebar"
 import { AgroChemicalCard } from "@/components/agrochemical/AgroChemicalCard"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
+import { Beaker } from "lucide-react"
 
-export default function AllAgroChemicalsPage() {
+export default function BuyAgroChemicalsPage() {
     const [queryState, setQueryState] = useQueryStates({
         brand: parseAsArrayOf(parseAsString),
         target: parseAsArrayOf(parseAsString),
         active_ingredient: parseAsArrayOf(parseAsString),
-        used_on: parseAsArrayOf(parseAsString),
         p: parseAsInteger.withDefault(1),
     })
 
     const { data: chemicalsData, isLoading: chemicalsLoading } = useQuery({
-        queryKey: ["agrochemicals-all", queryState.p, queryState.brand, queryState.target, queryState.active_ingredient, queryState.used_on],
+        queryKey: ["agrochemicals-shop", queryState.p, queryState.brand, queryState.target, queryState.active_ingredient],
         queryFn: () => queryAllAgroChemicals({
             p: queryState.p,
             brand: queryState.brand || [],
             target: queryState.target || [],
             active_ingredient: queryState.active_ingredient || [],
-            used_on: queryState.used_on || [],
         }),
         refetchOnWindowFocus: false,
     })
@@ -42,10 +40,10 @@ export default function AllAgroChemicalsPage() {
                 {/* Header */}
                 <div className="mb-8">
                     <h1 className="text-4xl font-bold tracking-tight font-heading mb-4">
-                        All Agrochemicals
+                        Buy Agrochemicals Online
                     </h1>
                     <p className="text-lg text-muted-foreground">
-                        Browse our complete collection of agrochemical products
+                        Shop our complete range of quality agrochemical products with fast delivery
                     </p>
                 </div>
 
@@ -71,6 +69,7 @@ export default function AllAgroChemicalsPage() {
                                                     <div className="h-3 bg-muted rounded w-16" />
                                                     <div className="h-3 bg-muted rounded w-16" />
                                                 </div>
+                                                <div className="h-10 bg-muted rounded mt-4" />
                                             </div>
                                         </div>
                                     </div>
@@ -83,12 +82,17 @@ export default function AllAgroChemicalsPage() {
                             </div>
                         ) : (
                             <>
+                                {/* Results count */}
+                                <div className="mb-4 text-sm text-muted-foreground">
+                                    Showing {chemicals.length} of {chemicalsData?.data?.total || 0} products
+                                </div>
+
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                                     {chemicals.map((chemical: any) => (
                                         <AgroChemicalCard
                                             key={chemical.id}
                                             chemical={chemical}
-                                            mode="guide"
+                                            mode="shop"
                                         />
                                     ))}
                                 </div>
@@ -106,7 +110,6 @@ export default function AllAgroChemicalsPage() {
                                         </Button>
                                         {Array.from({ length: totalPages }, (_, i) => i + 1)
                                             .filter(pageNum => {
-                                                // Show first page, last page, current page, and pages around current
                                                 return (
                                                     pageNum === 1 ||
                                                     pageNum === totalPages ||
