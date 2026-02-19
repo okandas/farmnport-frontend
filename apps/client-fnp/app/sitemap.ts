@@ -211,11 +211,12 @@ async function fetchBuyers() {
 
 async function fetchAgroChemicalCategories() {
   try {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL
-    if (!apiUrl) {
+    const baseURL = process.env.NEXT_PUBLIC_BASE_URL
+    if (!baseURL) {
       console.warn('API URL not configured for sitemap generation')
       return []
     }
+    const apiUrl = `${baseURL}/v1`
 
     const response = await fetch(`${apiUrl}/agrochemicalcategories/all`, {
       next: { revalidate: 86400 }, // Revalidate once per day
@@ -235,11 +236,12 @@ async function fetchAgroChemicalCategories() {
 
 async function fetchAgroChemicals() {
   try {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL
-    if (!apiUrl) {
+    const baseURL = process.env.NEXT_PUBLIC_BASE_URL
+    if (!baseURL) {
       console.warn('API URL not configured for sitemap generation')
       return []
     }
+    const apiUrl = `${baseURL}/v1`
 
     // Fetch all agrochemicals with pagination
     let allChemicals: any[] = []
@@ -287,11 +289,12 @@ async function fetchAgroChemicals() {
 
 async function fetchPriceLists() {
   try {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL
-    if (!apiUrl) {
+    const baseURL = process.env.NEXT_PUBLIC_BASE_URL
+    if (!baseURL) {
       console.warn('API URL not configured for sitemap generation')
       return []
     }
+    const apiUrl = `${baseURL}/v1`
 
     // Fetch price lists with pagination
     let allPriceLists: any[] = []

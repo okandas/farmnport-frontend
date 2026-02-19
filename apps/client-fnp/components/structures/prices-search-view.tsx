@@ -20,7 +20,7 @@ export function PricesSearchView() {
   const { isError, isLoading, data } = useQuery({
     queryKey: ["prices-search", produceQuery, clientQuery, currentPage],
     queryFn: async () => {
-      const baseURL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3744"
+      const baseURL = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3744"
       const params = new URLSearchParams()
       if (produceQuery) params.append("produce", produceQuery)
       if (clientQuery) params.append("client", clientQuery)
