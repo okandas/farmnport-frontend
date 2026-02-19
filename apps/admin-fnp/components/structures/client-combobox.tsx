@@ -4,7 +4,7 @@ import * as React from "react"
 import { Check, ChevronsUpDown } from "lucide-react"
 import { useQuery } from "@tanstack/react-query"
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utilities"
 import { Button } from "@/components/ui/button"
 import {
   Command,
@@ -18,7 +18,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { queryClients } from "@/lib/query"
+import { queryUsers } from "@/lib/query"
 import { capitalizeFirstLetter } from "@/lib/utilities"
 
 interface ClientComboboxProps {
@@ -32,7 +32,7 @@ export function ClientCombobox({ value, onChange }: ClientComboboxProps) {
 
   const { data, isLoading } = useQuery({
     queryKey: ["clients-search", search],
-    queryFn: () => queryClients({ query: search, p: 1 }),
+    queryFn: () => queryUsers({ search: search, p: 1 }),
     enabled: open,
   })
 

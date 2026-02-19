@@ -18,6 +18,7 @@ import { DataTableClientSearch } from "@/components/structures/filters/data-tabl
 export function BuyerContactsList() {
   const [clientId, setClientId] = useState<string>("")
   const [statusFilter, setStatusFilter] = useState<Set<string>>(new Set())
+  const [search, setSearch] = useState<string>("")
 
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -94,6 +95,8 @@ export function BuyerContactsList() {
       total={total}
       pagination={pagination}
       setPagination={setPagination}
+      search={search}
+      setSearch={setSearch}
       filters={
         <div className="flex gap-2">
           <DataTableClientSearch

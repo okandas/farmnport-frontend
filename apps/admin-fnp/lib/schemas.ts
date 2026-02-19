@@ -37,10 +37,7 @@ export const ApplicationUserSchema = z.object({
   address: z.string().min(10),
   city: z.string().min(5),
   province: z.string(),
-  specialization: z.string(),
-  main_activity: z.string(),
-  specializations: z.array(z.string().trim()).min(1),
-  // New ObjectID reference fields
+  // ObjectID reference fields
   primary_category_id: z.string().optional(),
   main_produce_id: z.string().optional(),
   other_produce_ids: z.array(z.string()).optional(),
@@ -501,9 +498,6 @@ ApplicationUserSchema.required({
   address: true,
   city: true,
   province: true,
-  main_activity: true,
-  specialization: true,
-  specializations: true,
   type: true,
 })
 

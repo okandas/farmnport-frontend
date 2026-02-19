@@ -20,6 +20,7 @@ export default function CreateAgroChemicalPage() {
         id: "",
         name: "",
         brand_id: "",
+        agrochemical_category_id: "",
         front_label: { img: { id: "", src: "" } },
         back_label: { img: { id: "", src: "" } },
         images: [],

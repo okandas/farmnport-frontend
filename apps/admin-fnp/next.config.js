@@ -35,6 +35,10 @@ module.exports = withSentryConfig(
     silent: true,
     org: "pajecha",
     project: "frontend-v3",
+
+    // Disable source map uploads if no auth token is available
+    disableServerWebpackPlugin: !process.env.SENTRY_AUTH_TOKEN,
+    disableClientWebpackPlugin: !process.env.SENTRY_AUTH_TOKEN,
   },
   {
     // For all available options, see:
