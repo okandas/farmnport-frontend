@@ -1,17 +1,22 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import { isAxiosError } from "axios"
 import { useForm, useWatch } from "react-hook-form"
 
-import { updateClient } from "@/lib/query"
+import { updateClient, queryFarmProduceCategories, queryFarmProduceByCategory } from "@/lib/query"
 import {
   EditApplicationUser,
   EditApplicationUserSchema,
   ApplicationUser,
+  FarmProduceCategory,
+  FarmProduce,
+  FarmProduceCategoriesResponse,
+  FarmProduceResponse,
 } from "@/lib/schemas"
 import { cn, slug } from "@/lib/utilities"
 import { Badge } from "@/components/ui/badge"
@@ -54,10 +59,8 @@ import { Icons } from "@/components/icons/lucide"
 
 import {
   clientTypes,
-  mainActivity,
   provinces,
   scales,
-  specializations,
   paymentTerms
 } from "@/components/structures/repository/data"
 
@@ -75,9 +78,9 @@ export function EditForm({ client }: EditFormProps) {
       city: client?.city,
       province: client?.province,
       phone: client?.phone,
-      main_activity: client?.main_activity,
-      specialization: client?.specialization,
-      specializations: client?.specializations,
+      primary_category_id: client?.primary_category_id,
+      main_produce_id: client?.main_produce_id,
+      other_produce_ids: client?.other_produce_ids || [],
       type: client?.type,
       scale: client?.scale,
       branches: client?.branches,
@@ -87,17 +90,68 @@ export function EditForm({ client }: EditFormProps) {
     resolver: zodResolver(EditApplicationUserSchema),
   })
 
-  const selectedSpecializations = useWatch({
-    name: "specializations",
+  // Fetch farm produce categories
+  const { data: categoriesData } = useQuery({
+    queryKey: ["farm-produce-categories"],
+    queryFn: async () => {
+      const response = await queryFarmProduceCategories()
+      return response.data as FarmProduceCategoriesResponse
+    },
+  })
+
+  const categories = categoriesData?.data || []
+
+  const selectedOtherProduceIds = useWatch({
+    name: "other_produce_ids",
     control: form.control,
   })
 
-  const selectedMainActivity = useWatch({
-    name: "main_activity",
+  const selectedMainProduceId = useWatch({
+    name: "main_produce_id",
     control: form.control,
   })
 
-  const changingSpecialization = form.watch("specialization")
+  const selectedCategoryId = form.watch("primary_category_id")
+
+  // Find the selected category to get its slug
+  const selectedCategory = categories.find(cat => cat.id === selectedCategoryId)
+
+  // Fetch produce for the selected category dynamically
+  const { data: produceData } = useQuery({
+    queryKey: ["farm-produce-by-category", selectedCategory?.slug],
+    queryFn: async () => {
+      const response = await queryFarmProduceByCategory(selectedCategory!.slug)
+      return response.data as FarmProduceResponse
+    },
+    enabled: !!selectedCategory?.slug,
+  })
+
+  const produceItems = produceData?.data || []
+
+  // For "Other Produce", fetch all produce grouped by category
+  const [allProduceByCategory, setAllProduceByCategory] = useState<Record<string, FarmProduce[]>>({})
+
+  useEffect(() => {
+    const fetchAllProduce = async () => {
+      const produceByCategory: Record<string, FarmProduce[]> = {}
+
+      for (const category of categories) {
+        try {
+          const response = await queryFarmProduceByCategory(category.slug)
+          const data = response.data as FarmProduceResponse
+          produceByCategory[category.id] = data.data
+        } catch (error) {
+          console.error(`Failed to fetch produce for ${category.name}`, error)
+        }
+      }
+
+      setAllProduceByCategory(produceByCategory)
+    }
+
+    if (categories.length > 0) {
+      fetchAllProduce()
+    }
+  }, [categories])
 
   const [open, setOpen] = useState(false)
 
@@ -110,9 +164,7 @@ export function EditForm({ client }: EditFormProps) {
         description: "Updated User Succesfully",
       })
 
-      const name = slug(data.data?.name)
-
-      // router.push(`/dashboard/users/${name}`)
+      router.push(`/dashboard/users`)
     },
     onError: (error) => {
       if (isAxiosError(error)) {
@@ -143,436 +195,478 @@ export function EditForm({ client }: EditFormProps) {
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="w-[92%] gap-4 mx-auto mb-8"
-      >
-        <div className="grid grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="Your name" {...field} />
-                </FormControl>
-                <FormDescription>
-                  This is the name that will be displayed on your profile and in
-                  emails.
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input placeholder="Email Here" {...field} />
-                </FormControl>
-                <FormDescription></FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="short_description"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Short Description</FormLabel>
-                <FormControl>
-                  <Textarea placeholder="Short Description" {...field} />
-                </FormControl>
-                <FormDescription className="">
-                  Your company slogan or Short description of your entity
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <div>
-            <FormField
-              control={form.control}
-              name="phone"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Phone</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Phone Number" {...field} />
-                  </FormControl>
-                  <FormDescription></FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+      <form onSubmit={form.handleSubmit(onSubmit)}>
+        <div className="space-y-12">
+          {/* Basic Information Section */}
+          <div className="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-gray-900/10 pb-12 md:grid-cols-3">
+            <div>
+              <h2 className="text-base/7 font-semibold text-gray-900">Basic Information</h2>
+              <p className="mt-1 text-sm/6 text-gray-600">
+                Primary details about the client including name, contact information, and category.
+              </p>
+            </div>
+
+            <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 md:col-span-2">
+              <div className="sm:col-span-4">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="block text-sm/6 font-medium text-gray-900">Name</FormLabel>
+                      <div className="mt-2">
+                        <FormControl>
+                          <Input
+                            placeholder="Type client name"
+                            className="block w-full rounded-md border-0 bg-white px-3 py-1.5 text-base text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
+                            {...field}
+                          />
+                        </FormControl>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="sm:col-span-4">
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="block text-sm/6 font-medium text-gray-900">Email address</FormLabel>
+                      <div className="mt-2">
+                        <FormControl>
+                          <Input
+                            type="email"
+                            placeholder="client@email.com"
+                            className="block w-full rounded-md border-0 bg-white px-3 py-1.5 text-base text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
+                            {...field}
+                          />
+                        </FormControl>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="sm:col-span-3">
+                <FormField
+                  control={form.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="block text-sm/6 font-medium text-gray-900">Phone</FormLabel>
+                      <div className="mt-2">
+                        <FormControl>
+                          <Input
+                            placeholder="0771234567"
+                            className="block w-full rounded-md border-0 bg-white px-3 py-1.5 text-base text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
+                            {...field}
+                          />
+                        </FormControl>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="sm:col-span-3">
+                <FormField
+                  control={form.control}
+                  name="primary_category_id"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="block text-sm/6 font-medium text-gray-900">Category</FormLabel>
+                      <div className="mt-2">
+                        <Select onValueChange={field.onChange} defaultValue={client?.primary_category_id}>
+                          <FormControl>
+                            <SelectTrigger className="w-full rounded-md border-0 bg-white px-3 py-1.5 text-base text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6">
+                              <SelectValue placeholder="Select category" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {categories.map((category) => (
+                              <SelectItem key={category.id} value={category.id}>
+                                {category.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="sm:col-span-4">
+                <FormField
+                  control={form.control}
+                  name="main_produce_id"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="block text-sm/6 font-medium text-gray-900">Main Produce</FormLabel>
+                      <div className="mt-2">
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={client?.main_produce_id}
+                          disabled={!selectedCategoryId}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="w-full rounded-md border-0 bg-white px-3 py-1.5 text-base text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6">
+                              <SelectValue placeholder={selectedCategoryId ? "Select produce" : "Select category first"} />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {produceItems?.map((produce: FarmProduce) => (
+                              <SelectItem key={produce.id} value={produce.id}>
+                                {produce.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="col-span-full">
+                <FormField
+                  control={form.control}
+                  name="other_produce_ids"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="block text-sm/6 font-medium text-gray-900">Other Produce</FormLabel>
+                      <div className="mt-2">
+                        <FormControl>
+                          <Popover open={open} onOpenChange={setOpen}>
+                            <PopoverTrigger asChild>
+                              <div className="min-h-[2.5rem] rounded-md border-0 bg-white px-3 py-2 text-sm shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 cursor-pointer">
+                                <div className="flex flex-wrap gap-1">
+                                  {selectedOtherProduceIds && selectedOtherProduceIds.length > 0
+                                    ? selectedOtherProduceIds.map((produceId: string) => {
+                                      // Find the produce name from all produce
+                                      let produceName = ""
+                                      for (const categoryID in allProduceByCategory) {
+                                        const produce = allProduceByCategory[categoryID].find(p => p.id === produceId)
+                                        if (produce) {
+                                          produceName = produce.name
+                                          break
+                                        }
+                                      }
+
+                                      if (produceName) {
+                                        return (
+                                          <Badge
+                                            key={produceId}
+                                            className="text-xs bg-green-50 text-green-700 ring-1 ring-inset ring-green-600/20 hover:bg-green-100 hover:text-green-800"
+                                          >
+                                            {produceName}
+                                          </Badge>
+                                        )
+                                      }
+                                      return null
+                                    })
+                                    : <span className="text-gray-400">Select additional produce...</span>}
+                                </div>
+                              </div>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-[320px] p-0">
+                              <Command>
+                                <CommandInput placeholder="Search produce..." />
+                                <CommandList>
+                                  <CommandEmpty>No results found.</CommandEmpty>
+                                  {categories.map((category) => {
+                                    const categoryProduce = allProduceByCategory[category.id] || []
+
+                                    if (categoryProduce.length === 0) return null
+
+                                    return (
+                                      <CommandGroup key={category.id} heading={category.name}>
+                                        {categoryProduce.map((produce) => {
+                                          if (selectedMainProduceId !== produce.id) {
+                                            return (
+                                              <CommandItem
+                                                key={produce.id}
+                                                onSelect={() => {
+                                                  const currentIds = selectedOtherProduceIds || []
+                                                  if (!currentIds.includes(produce.id)) {
+                                                    form.setValue("other_produce_ids", [...currentIds, produce.id])
+                                                  } else {
+                                                    form.setValue("other_produce_ids", currentIds.filter((id: string) => id !== produce.id))
+                                                  }
+                                                }}
+                                              >
+                                                {selectedOtherProduceIds?.includes(produce.id) && (
+                                                  <Icons.check className="w-4 h-4 mr-2" />
+                                                )}
+                                                <span>{produce.name}</span>
+                                              </CommandItem>
+                                            )
+                                          }
+                                          return null
+                                        })}
+                                      </CommandGroup>
+                                    )
+                                  })}
+                                </CommandList>
+                              </Command>
+                            </PopoverContent>
+                          </Popover>
+                        </FormControl>
+                      </div>
+                      <p className="mt-3 text-sm/6 text-gray-600">Select any additional produce this client works with.</p>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="col-span-full">
+                <FormField
+                  control={form.control}
+                  name="short_description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="block text-sm/6 font-medium text-gray-900">Description</FormLabel>
+                      <div className="mt-2">
+                        <FormControl>
+                          <Textarea
+                            placeholder="Write client description here"
+                            rows={3}
+                            className="block w-full rounded-md border-0 bg-white px-3 py-1.5 text-base text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
+                            {...field}
+                          />
+                        </FormControl>
+                      </div>
+                      <p className="mt-3 text-sm/6 text-gray-600">Brief description of the client.</p>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
           </div>
 
-          <FormField
-            control={form.control}
-            name="address"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Address</FormLabel>
-                <FormControl>
-                  <Input placeholder="Address" {...field} />
-                </FormControl>
-                <FormDescription></FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="city"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>City</FormLabel>
-                <FormControl>
-                  <Input placeholder="City" {...field} />
-                </FormControl>
-                <FormDescription></FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          {/* Location & Business Details Section */}
+          <div className="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-gray-900/10 pb-12 md:grid-cols-3">
+            <div>
+              <h2 className="text-base/7 font-semibold text-gray-900">Location & Business Details</h2>
+              <p className="mt-1 text-sm/6 text-gray-600">
+                Address and business operation information.
+              </p>
+            </div>
 
-          <FormField
-            control={form.control}
-            name="specialization"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Specialization</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={client?.specialization}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a specialization" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent className="overflow-visible max-h-44">
-                    {specializations.map((specialization) => {
-                      return (
-                        <SelectItem key={specialization} value={specialization}>
-                          {specialization}
-                        </SelectItem>
-                      )
-                    })}
-                  </SelectContent>
-                </Select>
-                <FormDescription>
-                  {client?.type === "buyer"
-                    ? "This is the main industry you source from."
-                    : "This is the main area of production on you farm"}
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="province"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Province</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={client?.province}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select Province..." />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent className="overflow-visible max-h-44">
-                    {provinces.map((province) => {
-                      return (
-                        <SelectItem key={province} value={province}>
-                          {province}
-                        </SelectItem>
-                      )
-                    })}
-                  </SelectContent>
-                </Select>
-                <FormDescription></FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="main_activity"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Main Activity</FormLabel>
-                <FormControl>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={
-                      client?.main_activity ??
-                      "Please Pick A Specialization First"
-                    }
-                    disabled={changingSpecialization?.length === 0}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="What do you do ?" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent className="overflow-visible max-h-44">
-                      {mainActivity[changingSpecialization]?.map((activity) => {
-                        return (
-                          <SelectItem key={activity} value={activity}>
-                            {activity}
-                          </SelectItem>
-                        )
-                      })}
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-                <FormDescription></FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="specializations"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Specializations</FormLabel>
-                <FormControl>
-                  <Popover open={open} onOpenChange={setOpen}>
-                    <PopoverTrigger asChild>
-                      <div className="group min-h-[2.5rem] rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-0">
-                        <div className="flex flex-wrap gap-1">
-                          {selectedSpecializations?.length > 1
-                            ? selectedSpecializations?.map((selected) => {
-                              if (selected?.length !== 0) {
-                                return (
-                                  <Badge
-                                    key={selected}
-                                    variant="outline"
-                                    className="flex justify-between text-green-800 bg-green-100 border-green-400"
-                                  >
-                                    {selected}
-                                  </Badge>
-                                )
-                              }
-                            })
-                            : "Select Specialization ..."}
-                        </div>
+            <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 md:col-span-2">
+              <div className="col-span-full">
+                <FormField
+                  control={form.control}
+                  name="address"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="block text-sm/6 font-medium text-gray-900">Street address</FormLabel>
+                      <div className="mt-2">
+                        <FormControl>
+                          <Input
+                            placeholder="Street address"
+                            className="block w-full rounded-md border-0 bg-white px-3 py-1.5 text-base text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
+                            {...field}
+                          />
+                        </FormControl>
                       </div>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-[320px] p-0">
-                      <Command className="border rounded-lg shadow-md max-h-52 ">
-                        <CommandInput placeholder="Search..." />
-                        <CommandList>
-                          <CommandEmpty className="py-3 text-center">
-                            No results found.
-                          </CommandEmpty>
-                          {specializations.map((specialization) => {
-                            return (
-                              <CommandGroup
-                                key={specialization}
-                                heading={specialization}
-                              >
-                                {mainActivity[specialization].map(
-                                  (activity) => {
-                                    if (selectedMainActivity !== activity) {
-                                      return (
-                                        <CommandItem
-                                          key={activity}
-                                          onSelect={(value) => {
-                                            if (
-                                              !selectedSpecializations?.includes(
-                                                value,
-                                              )
-                                            ) {
-                                              const NewSpecialization = [
-                                                ...selectedSpecializations,
-                                                value,
-                                              ]
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
-                                              form.setValue(
-                                                "specializations",
-                                                NewSpecialization,
-                                              )
-                                            } else {
-                                              const removeAtIndex =
-                                                selectedSpecializations?.indexOf(
-                                                  value,
-                                                )
+              <div className="sm:col-span-2 sm:col-start-1">
+                <FormField
+                  control={form.control}
+                  name="city"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="block text-sm/6 font-medium text-gray-900">City</FormLabel>
+                      <div className="mt-2">
+                        <FormControl>
+                          <Input
+                            placeholder="Harare"
+                            className="block w-full rounded-md border-0 bg-white px-3 py-1.5 text-base text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
+                            {...field}
+                          />
+                        </FormControl>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
-                                              selectedSpecializations?.splice(
-                                                removeAtIndex,
-                                                1,
-                                              )
+              <div className="sm:col-span-2">
+                <FormField
+                  control={form.control}
+                  name="province"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="block text-sm/6 font-medium text-gray-900">Province</FormLabel>
+                      <div className="mt-2">
+                        <Select onValueChange={field.onChange} defaultValue={client?.province}>
+                          <FormControl>
+                            <SelectTrigger className="w-full rounded-md border-0 bg-white px-3 py-1.5 text-base text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6">
+                              <SelectValue placeholder="Province" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {provinces.map((province) => (
+                              <SelectItem key={province} value={province}>
+                                {province}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
-                                              form.setValue(
-                                                "specializations",
-                                                selectedSpecializations,
-                                              )
-                                            }
-                                          }}
-                                        >
-                                          {selectedSpecializations?.includes(
-                                            activity,
-                                          ) ? (
-                                            <Icons.check className="w-4 h-4 mr-2" />
-                                          ) : null}
+              <div className="sm:col-span-2">
+                <FormField
+                  control={form.control}
+                  name="branches"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="block text-sm/6 font-medium text-gray-900">Branches</FormLabel>
+                      <div className="mt-2">
+                        <FormControl>
+                          <Input
+                            type="number"
+                            placeholder="1"
+                            className="block w-full rounded-md border-0 bg-white px-3 py-1.5 text-base text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
+                            {...field}
+                          />
+                        </FormControl>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
-                                          <span>{activity}</span>
-                                        </CommandItem>
-                                      )
-                                    } else {
-                                      null
-                                    }
-                                  },
-                                )}
-                              </CommandGroup>
-                            )
-                          })}
-                          <CommandSeparator />
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="type"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Type</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={client?.type}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="What user type are you?" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent className="overflow-visible max-h-44">
-                    {clientTypes.map((type) => {
-                      return (
-                        <SelectItem key={type} value={type}>
-                          {type}
-                        </SelectItem>
-                      )
-                    })}
-                  </SelectContent>
-                </Select>
-                <FormDescription></FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="scale"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Scale</FormLabel>
-                <FormControl>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={client?.scale}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="What is your scale ?" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent className="overflow-visible max-h-44">
-                      {scales.map((scale) => {
-                        return (
-                          <SelectItem key={scale} value={scale}>
-                            {scale}
-                          </SelectItem>
-                        )
-                      })}
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-                <FormDescription></FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+              <div className="sm:col-span-2">
+                <FormField
+                  control={form.control}
+                  name="type"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="block text-sm/6 font-medium text-gray-900">Type</FormLabel>
+                      <div className="mt-2">
+                        <Select onValueChange={field.onChange} defaultValue={client?.type}>
+                          <FormControl>
+                            <SelectTrigger className="w-full rounded-md border-0 bg-white px-3 py-1.5 text-base text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6">
+                              <SelectValue placeholder="Select type" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {clientTypes.map((type) => (
+                              <SelectItem key={type} value={type}>
+                                {type}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
-          <FormField
-            control={form.control}
-            name="branches"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Branches</FormLabel>
-                <FormControl>
-                  <Input type="number" placeholder="Branches" {...field} />
-                </FormControl>
-                <FormDescription>
-                  {client?.type === "buyer"
-                    ? "These are total the places of business you sell from ."
-                    : "This are total places of business you supply to."}
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+              <div className="sm:col-span-2">
+                <FormField
+                  control={form.control}
+                  name="scale"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="block text-sm/6 font-medium text-gray-900">Scale</FormLabel>
+                      <div className="mt-2">
+                        <Select onValueChange={field.onChange} defaultValue={client?.scale}>
+                          <FormControl>
+                            <SelectTrigger className="w-full rounded-md border-0 bg-white px-3 py-1.5 text-base text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6">
+                              <SelectValue placeholder="Select scale" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {scales.map((scale) => (
+                              <SelectItem key={scale} value={scale}>
+                                {scale}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
-          <FormField
-            control={form.control}
-            name="payment_terms"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Payment Terms</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={client?.payment_terms}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select Province..." />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent className="overflow-visible max-h-44">
-                    {paymentTerms.map((payment, index) => {
-                      return (
-                        <SelectItem key={index} value={payment}>
-                          {payment}
-                        </SelectItem>
-                      )
-                    })}
-                  </SelectContent>
-                </Select>
-                <FormDescription></FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+              <div className="sm:col-span-2">
+                <FormField
+                  control={form.control}
+                  name="payment_terms"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="block text-sm/6 font-medium text-gray-900">Payment Terms</FormLabel>
+                      <div className="mt-2">
+                        <Select onValueChange={field.onChange} defaultValue={client?.payment_terms}>
+                          <FormControl>
+                            <SelectTrigger className="w-full rounded-md border-0 bg-white px-3 py-1.5 text-base text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6">
+                              <SelectValue placeholder="Select terms" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {paymentTerms.map((payment, index) => (
+                              <SelectItem key={index} value={payment}>
+                                {payment}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+          </div>
         </div>
-        <button
-          type="submit"
-          className={cn(buttonVariants(), "mt-5")}
-          disabled={isPending}
-        >
-          {isPending && <Icons.spinner className="w-4 h-4 mr-2 animate-spin" />}
-          Submit
-        </button>
+
+        <div className="mt-6 mb-6 flex items-center justify-end gap-x-6">
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="text-sm/6 font-semibold text-gray-900"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className="rounded-md bg-gray-900 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900"
+            disabled={isPending}
+          >
+            {isPending && <Icons.spinner className="w-4 h-4 mr-2 animate-spin" />}
+            Save
+          </button>
+        </div>
       </form>
     </Form>
   )

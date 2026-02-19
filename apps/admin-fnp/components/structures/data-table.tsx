@@ -39,6 +39,7 @@ interface DataTableProps<TData, TValue> {
   search: string
   setSearch: Dispatch<SetStateAction<string>>
   searchPlaceholder?: string
+  filters?: React.ReactNode
 }
 
 export function DataTable<TData, TValue>({
@@ -52,6 +53,7 @@ export function DataTable<TData, TValue>({
   search,
   setSearch,
   searchPlaceholder,
+  filters,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = useState({})
 
@@ -93,7 +95,8 @@ export function DataTable<TData, TValue>({
             </>
           </Link>
         </div>
-        <div className="flex justify-end">
+        <div className="flex justify-end items-center gap-2">
+          {filters && <div className="flex items-center gap-2">{filters}</div>}
           <div className="flex items-center justify-between">
             <div className="flex items-center flex-1 space-x-2">
               <Input

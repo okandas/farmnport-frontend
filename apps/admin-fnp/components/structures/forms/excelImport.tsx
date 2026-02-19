@@ -307,7 +307,7 @@ export function ExcelImport({ setValue, setSelectedFarmProduce, setSelectedClien
               console.log(`✅ Found matching client: ${match.name} (ID: ${match.id})`)
               setValue("client_id", match.id)
               setValue("client_name", match.name)
-              setValue("client_specialization", match.specialization || "livestock")
+              setValue("client_specialization", match.primary_category?.slug || "livestock")
               setSelectedClient(match.name)
               console.log(`✅ Called setSelectedClient with: "${match.name}"`)
             } else {

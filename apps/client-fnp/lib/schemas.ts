@@ -14,9 +14,12 @@ export const AuthSignUpSchema = z.object({
     address: z.string().min(10),
     city: z.string().min(4),
     province: z.string(),
-    specialization: z.string(),
-    main_activity: z.string().min(1),
-    specializations: z.array(z.string().trim()).optional(),
+    specialization: z.string().optional(), // Deprecated: use primary_category_id
+    primary_category_id: z.string().length(24).optional(),
+    main_activity: z.string().optional(), // Deprecated: use main_produce_id
+    main_produce_id: z.string().length(24).optional(),
+    specializations: z.array(z.string().trim()).optional(), // Deprecated: use other_produce_ids
+    other_produce_ids: z.array(z.string().length(24)).optional(),
     type: z.string(),
     scale: z.string(),
 }).superRefine((data, ctx) => {
@@ -25,6 +28,23 @@ export const AuthSignUpSchema = z.object({
         code: z.ZodIssueCode.custom,
         path: ['confirm_password'],
         message: "Passwords should match!",
+      });
+    }
+
+    // Require either old or new fields during transition
+    if (!data.primary_category_id && !data.specialization) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['primary_category_id'],
+        message: "Primary focus is required",
+      });
+    }
+
+    if (!data.main_produce_id && !data.main_activity) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['main_produce_id'],
+        message: "Main product is required",
       });
     }
 })
@@ -43,9 +63,11 @@ export type AuthenticatedUser = {
     iss?: string
     subject?: string
     username?: string
+    type?: string
     token?: string
     email?: string | null
     emailVerified?: Date | null
+    want_to_pay?: boolean
 } | undefined
 
 export type LoginResponse = {
@@ -69,9 +91,36 @@ export const ApplicationUserSchema = z.object({
     address: z.string().min(10),
     city: z.string().min(5).nonempty(),
     province: z.string().nonempty(),
-    specialization: z.string().nonempty(),
-    main_activity: z.string().nonempty(),
-    specializations: z.array(z.string().trim()).min(1),
+
+    // ObjectID references
+    primary_category_id: z.string().optional(),
+    main_produce_id: z.string().optional(),
+    other_produce_ids: z.array(z.string()).optional(),
+
+    // Populated objects from backend
+    primary_category: z.object({
+        id: z.string(),
+        name: z.string(),
+        slug: z.string(),
+        description: z.string(),
+    }).optional(),
+    main_produce: z.object({
+        id: z.string(),
+        name: z.string(),
+        slug: z.string(),
+        description: z.string(),
+        category_id: z.string().optional(),
+        category_slug: z.string().optional(),
+    }).optional(),
+    other_produce: z.array(z.object({
+        id: z.string(),
+        name: z.string(),
+        slug: z.string(),
+        description: z.string(),
+        category_id: z.string().optional(),
+        category_slug: z.string().optional(),
+    })).optional(),
+
     created: z.string(),
     updated: z.string(),
     confirmed: z.boolean(),
@@ -87,6 +136,7 @@ export const ApplicationUserSchema = z.object({
     }),
     verified: z.boolean(),
     payment_terms: z.string(),
+    has_prices: z.boolean().optional(),
 })
 
 export const ProducerPriceListSchema = z.object({
@@ -248,9 +298,6 @@ ApplicationUserSchema.required({
     address: true,
     city: true,
     province: true,
-    main_activity: true,
-    specialization: true,
-    specializations: true,
     type: true,
 })
 
@@ -269,9 +316,9 @@ export const EditApplicationUserSchema = ApplicationUserSchema.pick({
     city: true,
     province: true,
     phone: true,
-    main_activity: true,
-    specialization: true,
-    specializations: true,
+    primary_category_id: true,
+    main_produce_id: true,
+    other_produce_ids: true,
     type: true,
     scale: true,
     branches: true,
@@ -327,4 +374,34 @@ export const BuyerSeo: Record<string, string>  = {
 
 export const FarmerSeo: Record<string, string>  = {
   chicken: "Looking for trusted chicken farmers and  where to buy chickens in Zimbabwe? Connect with reliable poultry farmers across the country, in major towns who purchase broiler, free-range, and live chickens in bulk or retail."
+}
+
+export type FarmProduceCategory = {
+  id: string
+  name: string
+  slug: string
+  description: string
+  created: string
+  updated: string
+}
+
+export type FarmProduce = {
+  id: string
+  name: string
+  slug: string
+  description: string
+  category_id: string
+  category_slug: string
+  created: string
+  updated: string
+}
+
+export type FarmProduceCategoriesResponse = {
+  total: number
+  data: FarmProduceCategory[]
+}
+
+export type FarmProduceResponse = {
+  total: number
+  data: FarmProduce[]
 }

@@ -60,6 +60,7 @@ interface DosageRatesSelectProps {
 }
 
 export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectProps) {
+    const [showForm, setShowForm] = useState(false)
     const [editingId, setEditingId] = useState<string | null>(null)
     const [editingEntryIndex, setEditingEntryIndex] = useState<number | null>(null)
     const [cropId, setCropId] = useState("")
@@ -176,6 +177,10 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
             entries: entriesList,
         }
 
+        console.log("Saving dosage rate:", rateData)
+        console.log("Target IDs:", targetIds)
+        console.log("Target Names:", targetNames)
+
         if (editingId) {
             // Update existing rate
             onChange(value.map(rate => rate.id === editingId ? rateData : rate))
@@ -204,6 +209,7 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
         setRemarkInput("")
         setRemarksList([])
         setEditingId(null)
+        setShowForm(false)
     }
 
     const handleEdit = (rate: DosageRate) => {
@@ -212,13 +218,22 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
         setCropId(rate.crop_id)
         setCropName(rate.crop)
         setTargetIds(rate.target_ids)
-        setTargetNames(rate.targets.split(", "))
+        setTargetNames(rate.targets ? rate.targets.split(", ") : [])
 
         // Load entries
         const entriesArray = Array.isArray(rate.entries) ? rate.entries : []
         setEntriesList(entriesArray)
 
         setEditingId(rate.id)
+        setShowForm(true)
+
+        // Trigger a search to load targets so selected ones can be displayed
+        if (rate.targets) {
+            const firstTargetName = rate.targets.split(", ")[0]
+            if (firstTargetName) {
+                setSearchTarget(firstTargetName)
+            }
+        }
     }
 
     const handleDuplicate = (rate: DosageRate) => {
@@ -227,7 +242,7 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
             id: Date.now().toString(),
             crop: rate.crop,
             crop_id: rate.crop_id,
-            targets: rate.targets,
+            targets: rate.targets || "",
             target_ids: [...rate.target_ids],
             entries: rate.entries.map(entry => ({
                 dosage: { ...entry.dosage },
@@ -362,20 +377,26 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
     const handleToggleTarget = (targetId: string, targetName: string, scientificName?: string) => {
         const displayName = scientificName ? `${targetName} (${scientificName})` : targetName
 
+        console.log("Toggle target:", { targetId, targetName, scientificName, displayName })
+
         if (targetIds.includes(targetId)) {
             const index = targetIds.indexOf(targetId)
             setTargetIds(targetIds.filter(id => id !== targetId))
             setTargetNames(targetNames.filter((_, i) => i !== index))
+            console.log("Removed target. New IDs:", targetIds.filter(id => id !== targetId))
+            console.log("Removed target. New names:", targetNames.filter((_, i) => i !== index))
         } else {
             setTargetIds([...targetIds, targetId])
             setTargetNames([...targetNames, displayName])
+            console.log("Added target. New IDs:", [...targetIds, targetId])
+            console.log("Added target. New names:", [...targetNames, displayName])
         }
     }
 
     return (
         <div className="space-y-6">
             {/* Display existing rates - hide when editing */}
-            {value.length > 0 && !editingId && (
+            {value.length > 0 && !showForm && (
                 <div className="space-y-3">
                     {value.map((rate) => (
                         <div
@@ -388,9 +409,16 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
                                         <div className="font-medium text-gray-900 dark:text-white text-base">
                                             {rate.crop}
                                         </div>
-                                        <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                                            <span className="font-medium">Targets:</span> {rate.targets}
-                                        </div>
+                                        {rate.targets && (
+                                            <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                                                <span className="font-medium">Targets:</span> {rate.targets}
+                                            </div>
+                                        )}
+                                        {(!rate.targets && rate.target_ids?.length > 0) && (
+                                            <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                                                <span className="font-medium">Targets:</span> {rate.target_ids.length} selected
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
 
@@ -495,7 +523,35 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
                 </div>
             )}
 
+            {/* Button to show add new dosage rate form */}
+            {!showForm && (
+                <Button
+                    type="button"
+                    onClick={() => setShowForm(true)}
+                    variant="outline"
+                    className="w-full"
+                >
+                    Add New Dosage Rate
+                </Button>
+            )}
+
             {/* Add new rate form */}
+            {showForm && (
+            <div className="border border-gray-300 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-gray-900/50">
+                <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                        {editingId ? "Edit Dosage Rate" : "Add New Dosage Rate"}
+                    </h3>
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={resetForm}
+                        title="Close form"
+                    >
+                        <X className="h-4 w-4" />
+                    </Button>
+                </div>
             <div className="grid gap-4 px-1">
                 <div className="grid grid-cols-2 gap-4">
                     <div>
@@ -510,7 +566,9 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
                                         !cropId && "text-muted-foreground"
                                     )}
                                 >
-                                    {cropId ? cropName : "Select crop"}
+                                    <span className="truncate">
+                                        {cropId ? cropName : "Select crop"}
+                                    </span>
                                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                 </Button>
                             </PopoverTrigger>
@@ -562,9 +620,11 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
                                         targetIds.length === 0 && "text-muted-foreground"
                                     )}
                                 >
-                                    {targetIds.length > 0
-                                        ? `${targetIds.length} selected`
-                                        : "Select targets"}
+                                    <span className="truncate">
+                                        {targetIds.length > 0
+                                            ? targetNames.join(", ")
+                                            : "Select targets"}
+                                    </span>
                                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                 </Button>
                             </PopoverTrigger>
@@ -886,6 +946,8 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
                     </div>
                 )}
             </div>
+            </div>
+            )}
         </div>
     )
 }

@@ -70,9 +70,6 @@ export function CreateForm({ client }: CreateFormProps) {
       city: client?.city,
       province: client?.province,
       phone: client?.phone,
-      main_activity: client?.main_activity,
-      specialization: client?.specialization,
-      specializations: client?.specializations,
       type: client?.type,
       scale: client?.scale,
       branches: client?.branches,
@@ -82,17 +79,6 @@ export function CreateForm({ client }: CreateFormProps) {
     resolver: zodResolver(EditApplicationUserSchema),
   })
 
-  const selectedSpecializations = useWatch({
-    name: "specializations",
-    control: form.control,
-  })
-
-  const selectedMainActivity = useWatch({
-    name: "main_activity",
-    control: form.control,
-  })
-
-  const changingSpecialization = form.watch("specialization")
 
   const [open, setOpen] = useState(false)
 
@@ -232,41 +218,6 @@ export function CreateForm({ client }: CreateFormProps) {
 
           <FormField
             control={form.control}
-            name="specialization"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Specialization</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={client?.specialization}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a specialization" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent className="overflow-visible max-h-44">
-                    {specializations.map((specialization) => {
-                      return (
-                        <SelectItem key={specialization} value={specialization}>
-                          {specialization}
-                        </SelectItem>
-                      )
-                    })}
-                  </SelectContent>
-                </Select>
-                <FormDescription>
-                  {client?.type === "buyer"
-                    ? "This is the main industry you source from."
-                    : "This is the main area of production on you farm"}
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
             name="province"
             render={({ field }) => (
               <FormItem>
@@ -296,151 +247,6 @@ export function CreateForm({ client }: CreateFormProps) {
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="main_activity"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Main Activity</FormLabel>
-                <FormControl>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={
-                      client?.main_activity ??
-                      "Please Pick A Specialization First"
-                    }
-                    disabled={changingSpecialization?.length === 0}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="What do you do ?" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent className="overflow-visible max-h-44">
-                      {mainActivity[changingSpecialization]?.map((activity) => {
-                        return (
-                          <SelectItem key={activity} value={activity}>
-                            {activity}
-                          </SelectItem>
-                        )
-                      })}
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-                <FormDescription></FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="specializations"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Specializations</FormLabel>
-                <FormControl>
-                  <Popover open={open} onOpenChange={setOpen}>
-                    <PopoverTrigger asChild>
-                      <div className="group min-h-[2.5rem] rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-0">
-                        <div className="flex flex-wrap gap-1">
-                          {selectedSpecializations.length > 1
-                            ? selectedSpecializations?.map((selected) => {
-                              if (selected.length !== 0) {
-                                return (
-                                  <Badge
-                                    key={selected}
-                                    variant="outline"
-                                    className="flex justify-between text-green-800 bg-green-100 border-green-400"
-                                  >
-                                    {selected}
-                                  </Badge>
-                                )
-                              }
-                            })
-                            : "Select Specialization ..."}
-                        </div>
-                      </div>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-[320px] p-0">
-                      <Command className="border rounded-lg shadow-md max-h-52">
-                        <CommandInput placeholder="Search..." />
-                        <CommandList>
-                          <CommandEmpty className="py-3 text-center">
-                            No results found.
-                          </CommandEmpty>
-                          {specializations.map((specialization) => {
-                            return (
-                              <CommandGroup
-                                key={specialization}
-                                heading={specialization}
-                              >
-                                {mainActivity[specialization].map(
-                                  (activity) => {
-                                    if (selectedMainActivity !== activity) {
-                                      return (
-                                        <CommandItem
-                                          key={activity}
-                                          onSelect={(value) => {
-                                            if (
-                                              !selectedSpecializations?.includes(
-                                                value,
-                                              )
-                                            ) {
-                                              const NewSpecialization = [
-                                                ...selectedSpecializations,
-                                                value,
-                                              ]
-
-                                              form.setValue(
-                                                "specializations",
-                                                NewSpecialization,
-                                              )
-                                            } else {
-                                              const removeAtIndex =
-                                                selectedSpecializations?.indexOf(
-                                                  value,
-                                                )
-
-                                              selectedSpecializations?.splice(
-                                                removeAtIndex,
-                                                1,
-                                              )
-
-                                              form.setValue(
-                                                "specializations",
-                                                selectedSpecializations,
-                                              )
-                                            }
-                                          }}
-                                        >
-                                          {selectedSpecializations?.includes(
-                                            activity,
-                                          ) ? (
-                                            <Icons.check className="w-4 h-4 mr-2" />
-                                          ) : null}
-
-                                          <span>{activity}</span>
-                                        </CommandItem>
-                                      )
-                                    } else {
-                                      null
-                                    }
-                                  },
-                                )}
-                              </CommandGroup>
-                            )
-                          })}
-                          <CommandSeparator />
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
           <FormField
             control={form.control}
             name="type"

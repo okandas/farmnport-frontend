@@ -4,6 +4,7 @@ import {
     ArrowRight,
     BadgeCheck,
     Banknote,
+    BookOpen,
     CalendarIcon,
     Check,
     ChevronLeft,
@@ -45,7 +46,15 @@ import {
     ShieldCheck,
     ShieldX,
     Tractor,
-    FileLineChart
+    FileLineChart,
+    Building2,
+    Leaf,
+    Tag,
+    TrendingUp,
+    Package,
+    ShoppingBag,
+    Sparkles,
+    BarChart3
 } from "lucide-react"
 
 export type Icon = LucideIcon
@@ -96,5 +105,16 @@ export const Icons = {
     verified: ShieldCheck,
     unverified: ShieldX,
     tractor: Tractor,
-    lineChart: FileLineChart
+    lineChart: FileLineChart,
+    bookOpen: BookOpen,
+    building: Building2,
+    mapPin: MapPin,
+    leaf: Leaf,
+    tag: Tag,
+    trendingUp: TrendingUp,
+    creditCard: CreditCard,
+    package: Package,
+    shoppingBag: ShoppingBag,
+    sparkles: Sparkles,
+    barChart: BarChart3
 }

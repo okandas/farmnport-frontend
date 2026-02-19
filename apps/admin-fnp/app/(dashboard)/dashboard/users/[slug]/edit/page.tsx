@@ -86,15 +86,6 @@ export default function EditClientPage({ params }: EditClientPageProps) {
 
   return (
     <>
-      <div className={"absolute right-10 top-96"}>
-        <Link href={url} className={cn(buttonVariants({ variant: "link" }))}>
-          <>
-            <Icons.close className="w-4 h-4 mr-2" />
-            Close
-          </>
-        </Link>
-      </div>
-
       {client !== undefined ? <EditForm client={client} /> : null}
     </>
   )

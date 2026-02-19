@@ -190,11 +190,11 @@ export function Contacts({ user, client, quickOverview }: ContactPageProps) {
                                     <Icons.info className="h-6 w-5" aria-hidden="true" />
                                 </dt>
                                 <div>
-                                    <dd className="text-sm font-medium leading-6 text-muted-foreground">{capitalizeFirstLetter(client.type)} primarily specializes in <span className="font-semibold text-foreground">{capitalizeFirstLetter(client.specialization)}</span></dd>
-                                    <dd className="text-sm font-medium leading-6 text-muted-foreground">Mainly buying <span className="font-semibold text-foreground">{capitalizeFirstLetter(plural(client.main_activity))}</span></dd>
-                                  {client.specializations != null ? (
+                                    <dd className="text-sm font-medium leading-6 text-muted-foreground">{capitalizeFirstLetter(client.type)} primarily specializes in <span className="font-semibold text-foreground">{client.primary_category?.name ? capitalizeFirstLetter(client.primary_category.name) : 'Agriculture'}</span></dd>
+                                    <dd className="text-sm font-medium leading-6 text-muted-foreground">Mainly buying <span className="font-semibold text-foreground">{client.main_produce?.name ? capitalizeFirstLetter(plural(client.main_produce.name)) : 'various products'}</span></dd>
+                                  {client.other_produce && client.other_produce.length > 0 ? (
                                       <dd className="text-sm font-medium leading-6 text-muted-foreground">and {client.type == 'buyer' ? "sources ": "produces "}
-                                        <span className="font-semibold text-foreground">{client.specializations.length}</span> other agricultural {plural("product", client.specializations.length)}, see more
+                                        <span className="font-semibold text-foreground">{client.other_produce.length}</span> other agricultural {plural("product", client.other_produce.length)}, see more
                                       </dd>
                                     )
                                     :

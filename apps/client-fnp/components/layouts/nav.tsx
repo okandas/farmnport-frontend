@@ -3,7 +3,6 @@
 import * as React from "react"
 import Link from "next/link"
 
-import { Icons } from "@/components/icons/lucide"
 import {sendGTMEvent} from "@next/third-parties/google";
 import {Button, buttonVariants} from "@/components/ui/button";
 import {
@@ -26,13 +25,21 @@ interface NavigationProps {
 export function Navigation({ user }: NavigationProps) {
   return (
       <nav className="lg:flex lg:space-x-2">
-        <Link href="/prices" onClick={() => sendGTMEvent({ event: 'link', value: 'BuyerTopNavigation' })}
+        <Link href="/prices" onClick={() => sendGTMEvent({ event: 'link', value: 'PricesTopNavigation' })}
               className={buttonVariants({
                 size: "sm",
                 variant: "link"
               })}
         >
-          <Icons.lineChart className="mr-2" /> Prices
+          Prices
+        </Link>
+        <Link href="/agrochemical-guides" onClick={() => sendGTMEvent({ event: 'link', value: 'GuidesTopNavigation' })}
+              className={buttonVariants({
+                size: "sm",
+                variant: "link"
+              })}
+        >
+          Guides
         </Link>
         <Link href="/buyers" onClick={() => sendGTMEvent({ event: 'link', value: 'BuyerTopNavigation' })}
               className={buttonVariants({
@@ -40,7 +47,7 @@ export function Navigation({ user }: NavigationProps) {
                 variant: "link"
               })}
         >
-          <Icons.dollar className="mr-2" /> Buyers
+          Buyers
         </Link>
         <Link href="/farmers" onClick={() => sendGTMEvent({ event: 'link', value: 'FarmerTopNavigation' })}
               className={buttonVariants({
@@ -48,7 +55,7 @@ export function Navigation({ user }: NavigationProps) {
                 variant: "link"
               })}
         >
-          <Icons.tractor className="mr-2" /> Farmers
+          Farmers
         </Link>
         {user ? (
           <DropdownMenu>

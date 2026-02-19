@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { PaginationState } from "@tanstack/react-table"
 import { isAxiosError } from "axios"
@@ -13,23 +13,31 @@ import { toast } from "@/components/ui/use-toast"
 import { Placeholder } from "@/components/state/placeholder"
 import { clientColumns } from "@/components/structures/columns/clients"
 import { DataTable } from "@/components/structures/data-table"
+import { DataTableFacetedFilter } from "@/components/structures/filters/data-table-faceted-filter"
 
 export function ClientsTable() {
   const [search, setSearch] = useState("")
+  const [typeFilter, setTypeFilter] = useState<Set<string>>(new Set())
 
   const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: 1,
+    pageIndex: 0,
     pageSize: 20,
   })
 
   const [debouncedSearchQuery] = useDebounce(search, 1000)
 
-  const { isError, isLoading, isFetching, refetch, data } = useQuery({
-    queryKey: ["dashboard-clients", { p: pagination.pageIndex, search: debouncedSearchQuery }],
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setPagination((prev) => ({ ...prev, pageIndex: 0 }))
+  }, [typeFilter, debouncedSearchQuery])
+
+  const { isError, isLoading, isFetching, refetch, data} = useQuery({
+    queryKey: ["dashboard-clients", { p: pagination.pageIndex + 1, search: debouncedSearchQuery, type: Array.from(typeFilter) }],
     queryFn: () =>
       queryUsers({
-        p: pagination.pageIndex,
-        search: debouncedSearchQuery
+        p: pagination.pageIndex + 1,
+        search: debouncedSearchQuery,
+        type: Array.from(typeFilter)
       }),
     refetchOnWindowFocus: false
   })
@@ -71,6 +79,11 @@ export function ClientsTable() {
     )
   }
 
+  const userTypeOptions = [
+    { label: "Buyer", value: "buyer" },
+    { label: "Farmer", value: "farmer" },
+  ]
+
   return (
     <DataTable
       columns={clientColumns}
@@ -82,6 +95,14 @@ export function ClientsTable() {
       setPagination={setPagination}
       search={search}
       setSearch={setSearch}
+      filters={
+        <DataTableFacetedFilter
+          title="Type"
+          options={userTypeOptions}
+          selectedValues={typeFilter}
+          onValueChange={setTypeFilter}
+        />
+      }
     />
   )
 }

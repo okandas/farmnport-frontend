@@ -1,0 +1,411 @@
+"use client"
+
+import { use } from "react"
+import { useQuery } from "@tanstack/react-query"
+import { queryAgroChemical } from "@/lib/query"
+import Image from "next/image"
+import { Beaker, AlertTriangle } from "lucide-react"
+import Link from "next/link"
+
+interface GuidePageProps {
+    params: Promise<{
+        category: string
+        slug: string
+    }>
+}
+
+export default function AgroChemicalGuidePage({ params }: GuidePageProps) {
+    const { category, slug } = use(params)
+
+    const { data, isLoading } = useQuery({
+        queryKey: ["agrochemical-guide", slug],
+        queryFn: () => queryAgroChemical(slug),
+        refetchOnWindowFocus: false,
+    })
+
+    const chemical = data?.data
+
+    if (isLoading) {
+        return (
+            <div className="min-h-screen bg-background">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                    <div className="animate-pulse grid md:grid-cols-2 gap-8">
+                        <div className="aspect-square bg-muted rounded-lg" />
+                        <div className="space-y-4">
+                            <div className="h-8 bg-muted rounded w-3/4" />
+                            <div className="h-4 bg-muted rounded w-1/2" />
+                            <div className="h-12 bg-muted rounded w-1/3" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
+    if (!chemical) {
+        return (
+            <div className="min-h-screen bg-background flex items-center justify-center px-4 pb-4">
+                <div className="text-center max-w-md">
+                    <div className="mb-6">
+                        <div className="mx-auto w-20 h-20 bg-muted rounded-full flex items-center justify-center">
+                            <Beaker className="w-10 h-10 text-muted-foreground" />
+                        </div>
+                    </div>
+                    <h2 className="text-2xl font-semibold mb-2">Guide Not Found</h2>
+                    <p className="text-muted-foreground mb-6">
+                        We couldn&apos;t find the agrochemical guide you&apos;re looking for. It may have been removed or the link might be incorrect.
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                        <Link href="/agrochemical-guides/all">
+                            <button className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
+                                Browse All Guides
+                            </button>
+                        </Link>
+                        <Link href="/agrochemical-guides">
+                            <button className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
+                                Go to Categories
+                            </button>
+                        </Link>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
+    // Generate JSON-LD structured data
+    const generateStructuredData = () => {
+        if (!chemical) return null
+
+        const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://farmnport.com'
+        const url = `${baseUrl}/agrochemical-guides/${category}/${slug}`
+        const imageUrl = chemical.images?.[0]?.img?.src || `${baseUrl}/default-chemical.png`
+
+        const description = chemical.agrochemical_category?.name
+            ? `${chemical.name} is a ${chemical.agrochemical_category.name} for effective pest and disease control. View active ingredients, dosage rates, and application guidelines.`
+            : `Professional agrochemical guide for ${chemical.name}. Complete information on active ingredients, dosage rates, and safe application.`
+
+        const usageInfo = chemical.dosage_rates?.length > 0
+            ? `Dosage rates available for ${chemical.dosage_rates.map((r: any) => r.crop).join(', ')}`
+            : undefined
+
+        return {
+            "@context": "https://schema.org",
+            "@type": "Product",
+            "name": chemical.name,
+            "description": description,
+            "image": imageUrl,
+            "category": chemical.agrochemical_category?.name || "Agrochemical",
+            "url": url,
+            "additionalProperty": [
+                ...(chemical.active_ingredients?.map((ai: any) => ({
+                    "@type": "PropertyValue",
+                    "name": "Active Ingredient",
+                    "value": `${ai.name} (${ai.dosage_value} ${ai.dosage_unit})`
+                })) || []),
+                ...(chemical.targets?.map((target: any) => ({
+                    "@type": "PropertyValue",
+                    "name": "Target Pest/Disease",
+                    "value": target.scientific_name ? `${target.name} (${target.scientific_name})` : target.name
+                })) || [])
+            ],
+            "applicationCategory": "Agricultural Chemical",
+            "usageInfo": usageInfo
+        }
+    }
+
+    const structuredData = generateStructuredData()
+
+    return (
+        <div className="min-h-screen bg-background">
+            {/* JSON-LD Structured Data */}
+            {structuredData && (
+                <script
+                    type="application/ld+json"
+                    dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+                />
+            )}
+
+            {/* Breadcrumb */}
+            <div className="border-b bg-muted/30">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                    <nav className="flex text-sm text-muted-foreground">
+                        <Link href="/" className="hover:text-foreground">Home</Link>
+                        <span className="mx-2">/</span>
+                        <Link href="/agrochemical-guides" className="hover:text-foreground">Guides</Link>
+                        <span className="mx-2">/</span>
+                        <Link href={`/agrochemical-guides/${category}`} className="hover:text-foreground capitalize">{chemical.agrochemical_category?.name || category}</Link>
+                        <span className="mx-2">/</span>
+                        <span className="text-foreground capitalize">{chemical.name}</span>
+                    </nav>
+                </div>
+            </div>
+
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                {/* Header Section */}
+                <div className="grid lg:grid-cols-[450px,1fr] gap-12 mb-16">
+                    {/* Left - Image */}
+                    <div className="space-y-4">
+                        <div className="relative aspect-square bg-white rounded-xl border overflow-hidden shadow-sm">
+                            {chemical.images && chemical.images[0] && chemical.images[0].img?.src ? (
+                                <Image
+                                    src={chemical.images[0].img.src}
+                                    alt={chemical.name}
+                                    fill
+                                    className="object-contain p-8"
+                                    priority
+                                />
+                            ) : (
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <Beaker className="w-24 h-24 text-muted-foreground/30" />
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Thumbnail Gallery - if multiple images */}
+                        {chemical.images && chemical.images.length > 1 && (
+                            <div className="grid grid-cols-4 gap-3">
+                                {chemical.images.slice(0, 4).map((img: any, idx: number) => (
+                                    <button
+                                        key={idx}
+                                        className="relative aspect-square bg-white rounded-lg border hover:border-primary transition-colors"
+                                    >
+                                        {img.img?.src && (
+                                            <Image
+                                                src={img.img.src}
+                                                alt={`${chemical.name} ${idx + 1}`}
+                                                fill
+                                                className="object-contain p-2"
+                                            />
+                                        )}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Right - Product Info */}
+                    <div className="space-y-6">
+                        {/* Product Name */}
+                        <h1 className="text-3xl lg:text-4xl font-bold capitalize leading-tight">
+                            {chemical.name}
+                        </h1>
+
+                        {/* Category Badge & Buy Link */}
+                        <div className="flex items-center gap-3 flex-wrap">
+                            {chemical.agrochemical_category && (
+                                <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                                    {chemical.agrochemical_category.name}
+                                </div>
+                            )}
+                            {/* <Link
+                                href={`/buy-agrochemicals/${slug}`}
+                                className="inline-flex items-center px-4 py-1.5 rounded-full text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                            >
+                                Ready to Buy
+                            </Link> */}
+                        </div>
+
+                        {/* Divider */}
+                        <div className="h-px bg-border" />
+
+                        {/* Overview */}
+                        <div>
+                            <h2 className="text-lg font-semibold mb-3 text-foreground">Overview</h2>
+                            <p className="text-muted-foreground leading-relaxed text-sm">
+                                {chemical.agrochemical_category?.name ? (
+                                    <>This <span className="font-medium capitalize text-foreground">{chemical.agrochemical_category.name}</span> is designed for effective pest and disease control in agricultural applications. It provides targeted protection against a range of pests while ensuring crop safety when used according to recommended guidelines.</>
+                                ) : (
+                                    'Professional agrochemical solution for pest and disease management in agricultural applications.'
+                                )}
+                            </p>
+                        </div>
+
+                        {/* Active Ingredients Section */}
+                        <div>
+                            <h2 className="text-lg font-semibold mb-3 text-foreground">
+                                Active Ingredients
+                            </h2>
+                            {chemical.active_ingredients && chemical.active_ingredients.length > 0 ? (
+                                <div className="space-y-2">
+                                    {chemical.active_ingredients.map((ai: any, idx: number) => (
+                                        <div key={idx} className="flex items-center justify-between p-3 bg-gradient-to-r from-purple-50/50 to-transparent dark:from-purple-950/30 rounded-lg border border-purple-100 dark:border-purple-900 hover:border-purple-300 dark:hover:border-purple-700 transition-colors">
+                                            <div className="font-medium capitalize text-sm text-foreground">{ai.name}</div>
+                                            <div className="text-right">
+                                                <div className="font-bold text-purple-600 dark:text-purple-400">{ai.dosage_value} {ai.dosage_unit}</div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className="text-sm text-muted-foreground p-4 bg-muted/30 rounded-lg border">No active ingredient information available.</p>
+                            )}
+                        </div>
+
+                        {/* Used On Section */}
+                        {chemical.dosage_rates && chemical.dosage_rates.length > 0 && (
+                            <div>
+                                <h2 className="text-lg font-semibold mb-3 text-foreground">
+                                    Used On
+                                </h2>
+                                <div className="space-y-2">
+                                    {Array.from(new Set(chemical.dosage_rates.map((rate: any) => rate.crop))).map((crop: any, idx: number) => (
+                                        <div key={idx} className="p-3 bg-gradient-to-r from-amber-50/50 to-transparent dark:from-amber-950/30 rounded-lg border border-amber-100 dark:border-amber-900 hover:border-amber-300 dark:hover:border-amber-700 transition-colors">
+                                            <div className="text-sm text-foreground font-medium capitalize">{crop}</div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Target Pests & Diseases Section */}
+                        <div>
+                            <h2 className="text-lg font-semibold mb-3 text-foreground">
+                                Target Pests & Diseases
+                            </h2>
+                            {chemical.targets && chemical.targets.length > 0 ? (
+                                <div className="space-y-2">
+                                    {chemical.targets.map((target: any, idx: number) => (
+                                        <div key={idx} className="p-3 bg-gradient-to-r from-green-50/50 to-transparent dark:from-green-950/30 rounded-lg border border-green-100 dark:border-green-900 hover:border-green-300 dark:hover:border-green-700 transition-colors">
+                                            <div className="text-sm text-foreground">
+                                                <span className="font-medium capitalize">{target.name}</span>
+                                                {target.scientific_name && (
+                                                    <span className="text-xs text-muted-foreground italic ml-2">{target.scientific_name}</span>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className="text-sm text-muted-foreground p-4 bg-muted/30 rounded-lg border">No target pest or disease information available.</p>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Dosage Rates & Application Guide Section */}
+                {chemical.dosage_rates && chemical.dosage_rates.length > 0 && (
+                    <div className="mb-12">
+                        <h2 className="text-2xl font-bold mb-6 text-foreground">Dosage Rates & Application Guide</h2>
+                        <div className="overflow-x-auto">
+                            <table className="w-full border-collapse">
+                                <thead>
+                                    <tr className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/50 dark:to-indigo-950/50 border-b-2 border-blue-200 dark:border-blue-800">
+                                        <th className="text-left p-3 text-sm font-semibold text-blue-900 dark:text-blue-100">Crop</th>
+                                        <th className="text-left p-3 text-sm font-semibold text-blue-900 dark:text-blue-100">Target</th>
+                                        <th className="text-left p-3 text-sm font-semibold text-blue-900 dark:text-blue-100">Dosage</th>
+                                        <th className="text-left p-3 text-sm font-semibold text-orange-700 dark:text-orange-300">Max Applications</th>
+                                        <th className="text-left p-3 text-sm font-semibold text-teal-700 dark:text-teal-300">Application Interval</th>
+                                        <th className="text-left p-3 text-sm font-semibold text-rose-700 dark:text-rose-300">PHI</th>
+                                        <th className="text-left p-3 text-sm font-semibold text-blue-900 dark:text-blue-100">Remarks</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {chemical.dosage_rates.map((rate: any, rateIdx: number) => (
+                                        rate.entries && rate.entries.map((entry: any, entryIdx: number) => (
+                                            <tr key={`${rateIdx}-${entryIdx}`} className="border-b border-border hover:bg-muted/30 transition-colors">
+                                                {/* Crop */}
+                                                <td className="p-3 align-top">
+                                                    <div className="font-semibold capitalize text-sm text-foreground">{rate.crop}</div>
+                                                </td>
+                                                {/* Target */}
+                                                <td className="p-3 align-top">
+                                                    <div className="text-sm text-muted-foreground">{rate.targets}</div>
+                                                </td>
+                                                {/* Dosage */}
+                                                <td className="p-3 align-top">
+                                                    <div className="font-bold text-blue-600 dark:text-blue-400 text-base">
+                                                        {entry.dosage.value} {entry.dosage.unit}
+                                                    </div>
+                                                    <div className="text-xs text-muted-foreground">per {entry.dosage.per}</div>
+                                                </td>
+                                                {/* Max Applications */}
+                                                <td className="p-3 align-top">
+                                                    <div className="font-semibold text-orange-700 dark:text-orange-300">{entry.max_applications.max}</div>
+                                                    {entry.max_applications.note && entry.max_applications.note.trim() !== '' && (
+                                                        <div className="text-xs text-muted-foreground mt-1">{entry.max_applications.note}</div>
+                                                    )}
+                                                </td>
+                                                {/* Application Interval */}
+                                                <td className="p-3 align-top">
+                                                    <div className="font-semibold text-teal-700 dark:text-teal-300 text-sm">{entry.application_interval}</div>
+                                                </td>
+                                                {/* PHI */}
+                                                <td className="p-3 align-top">
+                                                    <div className="font-semibold text-rose-700 dark:text-rose-300 text-sm">{entry.phi}</div>
+                                                </td>
+                                                {/* Remarks */}
+                                                <td className="p-3 align-top">
+                                                    {entry.remarks && entry.remarks.length > 0 ? (
+                                                        <ul className="list-disc list-inside space-y-1">
+                                                            {entry.remarks.map((remark: string, remarkIdx: number) => (
+                                                                <li key={remarkIdx} className="text-xs text-foreground">{remark}</li>
+                                                            ))}
+                                                        </ul>
+                                                    ) : (
+                                                        <span className="text-xs text-muted-foreground">—</span>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                )}
+
+                {/* Product Labels Section */}
+                {(chemical.front_label?.img?.src || chemical.back_label?.img?.src) && (
+                    <div className="mb-12">
+                        <h2 className="text-2xl font-bold mb-6">Product Labels</h2>
+                        <div className="grid md:grid-cols-2 gap-6">
+                            {/* Front Label */}
+                            {chemical.front_label?.img?.src && (
+                                <div className="space-y-3">
+                                    <h3 className="text-lg font-semibold">Front Label</h3>
+                                    <div className="relative aspect-[3/4] bg-white rounded-lg border overflow-hidden">
+                                        <Image
+                                            src={chemical.front_label.img.src}
+                                            alt={`${chemical.name} - Front Label`}
+                                            fill
+                                            className="object-contain p-4"
+                                        />
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Back Label */}
+                            {chemical.back_label?.img?.src && (
+                                <div className="space-y-3">
+                                    <h3 className="text-lg font-semibold">Back Label</h3>
+                                    <div className="relative aspect-[3/4] bg-white rounded-lg border overflow-hidden">
+                                        <Image
+                                            src={chemical.back_label.img.src}
+                                            alt={`${chemical.name} - Back Label`}
+                                            fill
+                                            className="object-contain p-4"
+                                        />
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
+
+                {/* Safety Warning */}
+                <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-6">
+                    <div className="flex items-start gap-3">
+                        <AlertTriangle className="w-6 h-6 text-yellow-600 dark:text-yellow-500 flex-shrink-0" />
+                        <div>
+                            <h3 className="font-semibold mb-2 text-yellow-900 dark:text-yellow-100">Safety Information</h3>
+                            <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                                Always read and follow label directions. Wear appropriate personal protective equipment (PPE) when handling agrochemicals.
+                                Store in original containers in a secure location away from children and animals. Dispose of containers properly according to local regulations.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    )
+}

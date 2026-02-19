@@ -43,20 +43,28 @@ export function queryLogin(data: LoginFormData) {
 type pagination = {
   p?: number
   search?: string
+  type?: string[]
 }
 
 export function queryUsers(pagination?: pagination) {
-  let url: string
+  const params = new URLSearchParams()
 
   if (pagination?.p !== undefined && pagination.p >= 2) {
-    url = `${baseUrl}/user/clients?p=${pagination.p}`
-  } else {
-    url = `${baseUrl}/user/clients`
+    params.append('p', pagination.p.toString())
   }
 
   if (pagination?.search !== undefined && pagination.search.length >= 2) {
-    url = `${baseUrl}/user/clients?search=${pagination.search}`
+    params.append('search', pagination.search)
   }
+
+  if (pagination?.type !== undefined && pagination.type.length > 0) {
+    params.append('type', pagination.type.join(','))
+  }
+
+  const queryString = params.toString()
+  const url = queryString
+    ? `${baseUrl}/user/clients?${queryString}`
+    : `${baseUrl}/user/clients`
 
   return api.get(url)
 }
@@ -350,4 +358,59 @@ export function queryFarmProduce(pagination?: pagination) {
   }
 
   return api.get(url)
+}
+
+export function queryFarmProduceByCategory(categorySlug: string) {
+  const url = `${baseUrl}/farmproduce/category/${categorySlug}`
+  return api.get(url)
+}
+
+// Buyer Contacts
+type BuyerContactsPagination = {
+  p?: number
+  client_id?: string
+  status?: string
+}
+
+export function queryBuyerContacts(pagination?: BuyerContactsPagination) {
+  const params = new URLSearchParams()
+
+  if (pagination?.p !== undefined && pagination.p >= 2) {
+    params.append('p', pagination.p.toString())
+  }
+
+  if (pagination?.client_id) {
+    params.append('client_id', pagination.client_id)
+  }
+
+  if (pagination?.status) {
+    params.append('status', pagination.status)
+  }
+
+  const queryString = params.toString()
+  const url = queryString
+    ? `${baseUrl}/buyercontacts/list?${queryString}`
+    : `${baseUrl}/buyercontacts/list`
+
+  return api.get(url)
+}
+
+export function queryBuyerContact(id: string) {
+  const url = `${baseUrl}/buyercontacts/get/${id}`
+  return api.get(url)
+}
+
+export function addBuyerContact(data: any) {
+  const url = `${baseUrl}/buyercontacts/add`
+  return api.post(url, data)
+}
+
+export function updateBuyerContact(data: any) {
+  const url = `${baseUrl}/buyercontacts/update`
+  return api.post(url, data)
+}
+
+export function deleteBuyerContact(id: string) {
+  const url = `${baseUrl}/buyercontacts/delete/${id}`
+  return api.delete(url)
 }
