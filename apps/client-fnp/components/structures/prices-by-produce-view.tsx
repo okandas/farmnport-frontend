@@ -34,7 +34,7 @@ export function PricesByProduceView() {
   const { isError, isLoading, data } = useQuery({
     queryKey: ["prices-by-produce", selectedProduce, currentPage],
     queryFn: async () => {
-      const baseURL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3744"
+      const baseURL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3744"
       const response = await axios.get(
         `${baseURL}/v1/prices/produce/${selectedProduce}?p=${currentPage}`
       )

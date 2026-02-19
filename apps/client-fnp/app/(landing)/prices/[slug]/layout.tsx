@@ -10,7 +10,7 @@ interface LayoutProps {
 
 async function getPriceListBySlug(slug: string) {
   try {
-    const baseURL = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL || "http://localhost:3744"
+    const baseURL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3744"
 
     const response = await axios.get(`${baseURL}/v1/prices/all?p=1&limit=100`)
     const priceLists = response.data?.data || []
