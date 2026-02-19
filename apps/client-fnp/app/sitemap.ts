@@ -1,7 +1,6 @@
 import { MetadataRoute } from 'next'
 
-// Update this with your actual domain
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+const BASE_URL = process.env.APP_URL || 'http://localhost:3000'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Static routes
