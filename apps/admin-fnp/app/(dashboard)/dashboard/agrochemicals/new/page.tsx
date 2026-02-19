@@ -21,8 +21,8 @@ export default function CreateAgroChemicalPage() {
         name: "",
         brand_id: "",
         agrochemical_category_id: "",
-        front_label: { img: { id: "", src: "" } },
-        back_label: { img: { id: "", src: "" } },
+        front_label: undefined,
+        back_label: undefined,
         images: [],
         active_ingredients: [],
         dosage_rates: []

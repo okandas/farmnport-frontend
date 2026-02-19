@@ -425,8 +425,8 @@ export const AgroChemicalSchema = z.object({
     name: z.string(),
     slug: z.string(),
   }).optional(),
-  front_label: z.custom<ImageModel>(),
-  back_label: z.custom<ImageModel>(),
+  front_label: z.custom<ImageModel>().optional(),
+  back_label: z.custom<ImageModel>().optional(),
   images: z.array(z.custom<ImageModel>()).min(1, "At least one product image is required").max(5, "Maximum 5 images allowed"),
   active_ingredients: z.array(z.object({
     id: z.string(),
