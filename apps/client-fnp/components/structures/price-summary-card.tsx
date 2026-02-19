@@ -50,7 +50,7 @@ export function PriceSummaryCard({ priceList }: PriceSummaryCardProps) {
 
   return (
     <Link href={`/prices/${priceSlug}`}>
-      <div className="group rounded-xl border bg-card p-4 sm:p-6 shadow-sm transition-all duration-300 hover:shadow-md hover:border-primary/30 cursor-pointer">
+      <div className="group rounded-xl border bg-card p-4 sm:p-6 shadow-sm transition-all duration-300 hover:shadow-md hover:border-primary/30 cursor-pointer mb-4">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4">
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-3">
@@ -62,7 +62,7 @@ export function PriceSummaryCard({ priceList }: PriceSummaryCardProps) {
                 )}
               </div>
 
-              <div className="space-y-2.5">
+              <div className="space-y-4">
                 <div className="flex items-center gap-2 flex-wrap">
                   <Building2 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                   <span className="text-xs text-muted-foreground uppercase tracking-wide">Farm Produce Category:</span>

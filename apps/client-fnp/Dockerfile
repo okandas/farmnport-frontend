@@ -10,6 +10,8 @@ RUN bun install --no-cache
 FROM base AS builder
 WORKDIR /app
 ENV NODE_ENV=production
+ENV NEXT_PUBLIC_APP_URL=https://farmnport.com
+ENV NEXT_PUBLIC_BASE_URL=https://farmnport.com
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN bun run build

@@ -63,7 +63,7 @@ export function PriceCardsView() {
         </p>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-10">
         {producePriceLists.map((priceList: any) => (
           <PriceSummaryCard key={priceList.id} priceList={priceList} />
         ))}
