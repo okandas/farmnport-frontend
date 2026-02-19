@@ -1,8 +1,9 @@
 import { MetadataRoute } from 'next'
 
-const BASE_URL = process.env.APP_URL || 'http://localhost:3000'
+export const dynamic = 'force-dynamic'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const BASE_URL = process.env.APP_URL || 'http://localhost:3000'
   // Static routes
   const staticRoutes: MetadataRoute.Sitemap = [
     {
