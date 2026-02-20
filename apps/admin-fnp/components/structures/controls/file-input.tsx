@@ -37,7 +37,10 @@ export function FileInput({ id, value, fieldName = "images", onChange, thumbnail
     console.log('[FileInput] fieldName:', fieldName, 'isSingleField:', isSingleField, 'will use:', isSingleField ? 'uploadImage' : 'uploadImages')
 
     const mutationUploadImage = useMutation({
-        mutationFn: isSingleField ? uploadImage : uploadImages,
+        mutationFn: (formData: FormData) => {
+            console.log('[FileInput mutation] About to call:', isSingleField ? 'uploadImage' : 'uploadImages')
+            return isSingleField ? uploadImage(formData) : uploadImages(formData)
+        },
         onSuccess: (data) => {
 
             if (data.data === null) {
