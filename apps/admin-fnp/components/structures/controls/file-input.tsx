@@ -34,6 +34,8 @@ export function FileInput({ id, value, fieldName = "images", onChange, thumbnail
     const isSingleField = fieldName === "front_label" || fieldName === "back_label"
     const effectiveMaxImages = maxImages ?? (isSingleField ? 1 : undefined)
 
+    console.log('[FileInput] fieldName:', fieldName, 'isSingleField:', isSingleField, 'will use:', isSingleField ? 'uploadImage' : 'uploadImages')
+
     const mutationUploadImage = useMutation({
         mutationFn: isSingleField ? uploadImage : uploadImages,
         onSuccess: (data) => {
@@ -115,6 +117,7 @@ export function FileInput({ id, value, fieldName = "images", onChange, thumbnail
 
             // Add field_name to indicate which field to update
             formData.append("field_name", fieldName)
+            console.log('[FileInput onDrop] Appending field_name:', fieldName, 'to FormData')
 
             if (acceptedFiles.length) {
 
