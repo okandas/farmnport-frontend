@@ -34,13 +34,8 @@ export function FileInput({ id, value, fieldName = "images", onChange, thumbnail
     const isSingleField = fieldName === "front_label" || fieldName === "back_label"
     const effectiveMaxImages = maxImages ?? (isSingleField ? 1 : undefined)
 
-    console.log('[FileInput] fieldName:', fieldName, 'isSingleField:', isSingleField, 'will use:', isSingleField ? 'uploadImage' : 'uploadImages')
-
     const mutationUploadImage = useMutation({
-        mutationFn: (formData: FormData) => {
-            console.log('[FileInput mutation] About to call:', isSingleField ? 'uploadImage' : 'uploadImages')
-            return isSingleField ? uploadImage(formData) : uploadImages(formData)
-        },
+        mutationFn: isSingleField ? uploadImage : uploadImages,
         onSuccess: (data) => {
 
             if (data.data === null) {
@@ -120,7 +115,6 @@ export function FileInput({ id, value, fieldName = "images", onChange, thumbnail
 
             // Add field_name to indicate which field to update
             formData.append("field_name", fieldName)
-            console.log('[FileInput onDrop] Appending field_name:', fieldName, 'to FormData')
 
             if (acceptedFiles.length) {
 
@@ -228,7 +222,7 @@ export function FileInput({ id, value, fieldName = "images", onChange, thumbnail
 
             {!isDisabled && (
                 <div className="flex items-center justify-center w-full">
-                    <label htmlFor="dropzone-file"
+                    <label htmlFor={`dropzone-${fieldName}`}
                         className="flex flex-col items-center justify-center w-full h-32 border border-gray-300 border-dashed rounded-lg cursor-pointer hover:bg-gray-50">
                         <div className="flex flex-col items-center justify-center pt-3 pb-3" >
 
@@ -243,7 +237,7 @@ export function FileInput({ id, value, fieldName = "images", onChange, thumbnail
                                     <p className="mt-2 text-xs text-gray-500">Click or drag to upload</p>
                                 </>)}
                             <div {...getRootProps()}>
-                                <input id="dropzone-file" type="file" className="hidden" {...getInputProps()} />
+                                <input id={`dropzone-${fieldName}`} type="file" className="hidden" {...getInputProps()} />
                             </div>
                         </div>
                     </label>
