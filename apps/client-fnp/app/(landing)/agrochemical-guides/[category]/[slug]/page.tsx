@@ -6,6 +6,7 @@ import { queryAgroChemical } from "@/lib/query"
 import Image from "next/image"
 import { Beaker, AlertTriangle } from "lucide-react"
 import Link from "next/link"
+import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
 
 interface GuidePageProps {
     params: Promise<{
@@ -240,6 +241,9 @@ export default function AgroChemicalGuidePage({ params }: GuidePageProps) {
                                 <p className="text-sm text-muted-foreground p-4 bg-muted/30 rounded-lg border">No active ingredient information available.</p>
                             )}
                         </div>
+
+                        {/* AdSense Ad */}
+                        <AdSenseInFeed />
 
                         {/* Used On Section */}
                         {chemical.dosage_rates && chemical.dosage_rates.length > 0 && (
