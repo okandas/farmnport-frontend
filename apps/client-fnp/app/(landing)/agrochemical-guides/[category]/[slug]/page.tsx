@@ -247,43 +247,48 @@ export default function AgroChemicalGuidePage({ params }: GuidePageProps) {
                         {/* AdSense Ad */}
                         <AdSenseInFeed />
 
-                        {/* Used On Section */}
-                        {chemical.dosage_rates && chemical.dosage_rates.length > 0 && (
-                            <div>
-                                <h2 className="text-lg font-semibold mb-3 text-foreground">
-                                    Used On
-                                </h2>
-                                <div className="space-y-2">
-                                    {Array.from(new Set(chemical.dosage_rates.map((rate: any) => rate.crop))).map((crop: any, idx: number) => (
-                                        <div key={idx} className="p-3 bg-gradient-to-r from-amber-50/50 to-transparent dark:from-amber-950/30 rounded-lg border border-amber-100 dark:border-amber-900 hover:border-amber-300 dark:hover:border-amber-700 transition-colors">
-                                            <div className="text-sm text-foreground font-medium capitalize">{crop}</div>
-                                        </div>
-                                    ))}
+                        {/* Used On & Targets Grid */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            {/* Used On Section */}
+                            {chemical.dosage_rates && chemical.dosage_rates.length > 0 && (
+                                <div className="rounded-xl border bg-card p-4">
+                                    <h2 className="text-sm font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-400 mb-3">
+                                        Used On
+                                    </h2>
+                                    <ul className="space-y-1.5">
+                                        {Array.from(new Set(chemical.dosage_rates.map((rate: any) => rate.crop))).map((crop: any, idx: number) => (
+                                            <li key={idx} className="flex items-center gap-2 text-sm text-foreground">
+                                                <span className="h-1.5 w-1.5 rounded-full bg-amber-500 dark:bg-amber-400 flex-shrink-0" />
+                                                <span className="capitalize">{crop}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
                                 </div>
-                            </div>
-                        )}
-
-                        {/* Target Pests & Diseases Section */}
-                        <div>
-                            <h2 className="text-lg font-semibold mb-3 text-foreground">
-                                Target Pests & Diseases
-                            </h2>
-                            {chemical.targets && chemical.targets.length > 0 ? (
-                                <div className="space-y-2">
-                                    {chemical.targets.map((target: any, idx: number) => (
-                                        <div key={idx} className="p-3 bg-gradient-to-r from-green-50/50 to-transparent dark:from-green-950/30 rounded-lg border border-green-100 dark:border-green-900 hover:border-green-300 dark:hover:border-green-700 transition-colors">
-                                            <div className="text-sm text-foreground">
-                                                <span className="font-medium capitalize">{target.name}</span>
-                                                {target.scientific_name && (
-                                                    <span className="text-xs text-muted-foreground italic ml-2">{target.scientific_name}</span>
-                                                )}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <p className="text-sm text-muted-foreground p-4 bg-muted/30 rounded-lg border">No target pest or disease information available.</p>
                             )}
+
+                            {/* Target Pests & Diseases Section */}
+                            <div className="rounded-xl border bg-card p-4">
+                                <h2 className="text-sm font-semibold uppercase tracking-wide text-green-700 dark:text-green-400 mb-3">
+                                    Target Pests & Diseases
+                                </h2>
+                                {chemical.targets && chemical.targets.length > 0 ? (
+                                    <ul className="space-y-1.5">
+                                        {chemical.targets.map((target: any, idx: number) => (
+                                            <li key={idx} className="flex items-start gap-2 text-sm text-foreground">
+                                                <span className="h-1.5 w-1.5 rounded-full bg-green-500 dark:bg-green-400 flex-shrink-0 mt-1.5" />
+                                                <span>
+                                                    <span className="capitalize">{target.name}</span>
+                                                    {target.scientific_name && (
+                                                        <span className="text-xs text-muted-foreground italic ml-1">({target.scientific_name})</span>
+                                                    )}
+                                                </span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    <p className="text-sm text-muted-foreground">No target pest or disease information available.</p>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
