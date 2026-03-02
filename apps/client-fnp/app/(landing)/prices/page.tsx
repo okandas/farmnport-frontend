@@ -3,10 +3,16 @@ import { PriceCardsView } from "@/components/structures/price-cards-view"
 
 export const metadata = {
   title: 'Agricultural Produce Prices – Market Rates | farmnport.com',
-  description: `Stay updated with current market prices for agricultural produce. Trusted by farmers and bulk buyers for pricing on crops, poultry, and livestock across Zimbabwe.`,
+  description: 'Stay updated with current market prices for agricultural produce. Trusted by farmers and bulk buyers for pricing on crops, poultry, and livestock across Zimbabwe.',
   alternates: {
-    canonical: `/prices`,
-  }
+    canonical: '/prices',
+  },
+  openGraph: {
+    title: 'Agricultural Produce Prices – Market Rates',
+    description: 'Stay updated with current market prices for agricultural produce across Zimbabwe.',
+    siteName: 'farmnport',
+    type: 'website',
+  },
 }
 
 export default async function PricesPage() {

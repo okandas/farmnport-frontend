@@ -6,6 +6,7 @@ import { queryAgroChemical } from "@/lib/query"
 import Image from "next/image"
 import { Beaker, AlertTriangle } from "lucide-react"
 import Link from "next/link"
+import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
 
 interface GuidePageProps {
     params: Promise<{
@@ -151,6 +152,7 @@ export default function AgroChemicalGuidePage({ params }: GuidePageProps) {
                                     src={chemical.images[0].img.src}
                                     alt={chemical.name}
                                     fill
+                                    sizes="(max-width: 1024px) 100vw, 450px"
                                     className="object-contain p-8"
                                     priority
                                 />
@@ -174,6 +176,7 @@ export default function AgroChemicalGuidePage({ params }: GuidePageProps) {
                                                 src={img.img.src}
                                                 alt={`${chemical.name} ${idx + 1}`}
                                                 fill
+                                                sizes="(max-width: 1024px) 25vw, 100px"
                                                 className="object-contain p-2"
                                             />
                                         )}
@@ -240,6 +243,9 @@ export default function AgroChemicalGuidePage({ params }: GuidePageProps) {
                                 <p className="text-sm text-muted-foreground p-4 bg-muted/30 rounded-lg border">No active ingredient information available.</p>
                             )}
                         </div>
+
+                        {/* AdSense Ad */}
+                        <AdSenseInFeed />
 
                         {/* Used On Section */}
                         {chemical.dosage_rates && chemical.dosage_rates.length > 0 && (
@@ -368,6 +374,7 @@ export default function AgroChemicalGuidePage({ params }: GuidePageProps) {
                                             src={chemical.front_label.img.src}
                                             alt={`${chemical.name} - Front Label`}
                                             fill
+                                            sizes="(max-width: 768px) 100vw, 50vw"
                                             className="object-contain p-4"
                                         />
                                     </div>
@@ -383,6 +390,7 @@ export default function AgroChemicalGuidePage({ params }: GuidePageProps) {
                                             src={chemical.back_label.img.src}
                                             alt={`${chemical.name} - Back Label`}
                                             fill
+                                            sizes="(max-width: 768px) 100vw, 50vw"
                                             className="object-contain p-4"
                                         />
                                     </div>

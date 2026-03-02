@@ -3,15 +3,45 @@ import { RelatedPricesSidebar } from "@/components/structures/related-prices-sid
 import { ContactBuyerButton } from "@/components/structures/contact-buyer-button"
 import { Badge } from "@/components/ui/badge"
 import { formatDate, capitalizeFirstLetter } from "@/lib/utilities"
+import { AppURL } from "@/lib/schemas"
 import axios from "axios"
 import { notFound } from "next/navigation"
 import { Calendar, Building2, CheckCircle2 } from "lucide-react"
 import { auth } from "@/auth"
+import type { Metadata } from "next"
 
 interface PriceDetailsPageProps {
   params: Promise<{
     slug: string
   }>
+}
+
+export async function generateMetadata({ params }: PriceDetailsPageProps): Promise<Metadata> {
+  const { slug } = await params
+  const { priceList } = await getPriceListBySlug(slug)
+
+  if (!priceList) {
+    return { title: 'Price List Not Found | farmnport.com' }
+  }
+
+  const name = capitalizeFirstLetter(priceList.client_name)
+  const date = formatDate(priceList.effectiveDate.toString())
+  const specialization = priceList.client_specialization ? capitalizeFirstLetter(priceList.client_specialization) : 'Farm Produce'
+
+  return {
+    alternates: {
+      canonical: `${AppURL}/prices/${slug}`,
+    },
+    title: `${name} Price List — ${specialization} Prices | farmnport.com`,
+    description: `${name} ${specialization.toLowerCase()} price list effective ${date}. View current market rates and connect with this buyer on Farmnport.`,
+    openGraph: {
+      title: `${name} — ${specialization} Price List`,
+      description: `${name} ${specialization.toLowerCase()} price list effective ${date}. View current market rates on Farmnport.`,
+      url: `${AppURL}/prices/${slug}`,
+      siteName: 'farmnport',
+      type: 'website',
+    },
+  }
 }
 
 async function getPriceListBySlug(slug: string) {

@@ -136,6 +136,7 @@ export default function BuyAgroChemicalPage({ params }: BuyAgroChemicalPageProps
                                     src={chemical.images[0].img.src}
                                     alt={chemical.name}
                                     fill
+                                    sizes="(max-width: 1024px) 100vw, 450px"
                                     className="object-contain p-4"
                                     priority
                                 />
@@ -159,6 +160,7 @@ export default function BuyAgroChemicalPage({ params }: BuyAgroChemicalPageProps
                                                 src={img.img.src}
                                                 alt={`${chemical.name} ${idx + 1}`}
                                                 fill
+                                                sizes="(max-width: 1024px) 25vw, 100px"
                                                 className="object-contain p-2"
                                             />
                                         )}
