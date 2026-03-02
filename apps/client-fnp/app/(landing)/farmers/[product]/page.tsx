@@ -2,7 +2,7 @@ import { capitalizeFirstLetter, plural } from "@/lib/utilities"
 import { Farmers } from "@/components/layouts/farmers"
 import { retrieveUser } from "@/lib/actions"
 import type { Metadata, ResolvingMetadata } from "next";
-import {AppURL, FarmerSeo} from "@/lib/schemas";
+import {AppURL, getFarmerSeo} from "@/lib/schemas";
 import { FilterSidebar } from "@/components/generic/filterSidebar"
 
 
@@ -14,7 +14,7 @@ type Props = {
 export async function generateMetadata({ params }: Props,  parent: ResolvingMetadata): Promise<Metadata> {
   const { product } = await params
   const name = capitalizeFirstLetter(plural(product))
-  const description = FarmerSeo[product]
+  const description = getFarmerSeo(product)
 
   return {
     alternates: {
@@ -59,10 +59,17 @@ export default async function FarmersProductPage({ params }: FarmerProductPagePr
 
   const user = await retrieveUser()
   const { product } = await params
+  const name = capitalizeFirstLetter(plural(product))
 
   return (
     <main>
       <div className="mx-auto max-w-7xl px-6 lg:px-8 min-h-[70lvh]">
+        <h1 className="text-3xl font-bold font-heading pt-8 pb-4">
+          {name} Farmers in Zimbabwe
+        </h1>
+        <p className="text-muted-foreground mb-6">
+          Buy quality {product} directly from trusted farmers across Zimbabwe at fair farm-gate prices.
+        </p>
         <div className="lg:flex lg:space-x-10">
 
           <div className="hidden lg:block lg:w-44 relative">

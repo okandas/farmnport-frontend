@@ -152,6 +152,7 @@ export default function AgroChemicalGuidePage({ params }: GuidePageProps) {
                                     src={chemical.images[0].img.src}
                                     alt={chemical.name}
                                     fill
+                                    sizes="(max-width: 1024px) 100vw, 450px"
                                     className="object-contain p-8"
                                     priority
                                 />
@@ -175,6 +176,7 @@ export default function AgroChemicalGuidePage({ params }: GuidePageProps) {
                                                 src={img.img.src}
                                                 alt={`${chemical.name} ${idx + 1}`}
                                                 fill
+                                                sizes="(max-width: 1024px) 25vw, 100px"
                                                 className="object-contain p-2"
                                             />
                                         )}
@@ -372,6 +374,7 @@ export default function AgroChemicalGuidePage({ params }: GuidePageProps) {
                                             src={chemical.front_label.img.src}
                                             alt={`${chemical.name} - Front Label`}
                                             fill
+                                            sizes="(max-width: 768px) 100vw, 50vw"
                                             className="object-contain p-4"
                                         />
                                     </div>
@@ -387,6 +390,7 @@ export default function AgroChemicalGuidePage({ params }: GuidePageProps) {
                                             src={chemical.back_label.img.src}
                                             alt={`${chemical.name} - Back Label`}
                                             fill
+                                            sizes="(max-width: 768px) 100vw, 50vw"
                                             className="object-contain p-4"
                                         />
                                     </div>

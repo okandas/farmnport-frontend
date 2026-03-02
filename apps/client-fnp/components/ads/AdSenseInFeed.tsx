@@ -11,9 +11,13 @@ declare global {
 
 export function AdSenseInFeed() {
     const adRef = useRef<HTMLModElement>(null)
+    const hasPushed = useRef(false)
     const [adFilled, setAdFilled] = useState(false)
 
     useEffect(() => {
+        if (hasPushed.current) return
+        hasPushed.current = true
+
         try {
             (window.adsbygoogle = window.adsbygoogle || []).push({})
         } catch (e) {
@@ -49,7 +53,7 @@ export function AdSenseInFeed() {
                 data-ad-client="ca-pub-9685248262342396"
                 data-ad-slot="1965423288"
             />
-            {!adFilled && (
+            {!adFilled && process.env.NODE_ENV === "development" && (
                 <div className="p-4 rounded-lg border border-gray-200 dark:border-zinc-700">
                     <p className="text-[10px] font-medium text-gray-400 dark:text-zinc-500 uppercase tracking-wider mb-2">Sponsored</p>
                     <a href="#" onClick={(e) => e.preventDefault()} className="group block">

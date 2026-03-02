@@ -21,6 +21,14 @@ export async function generateMetadata({ params }: Props,  parent: ResolvingMeta
       canonical: `${AppURL}/buyer/${slug.toLowerCase()}`,
     },
     title: `${name} - Buyer in Zimbabwe | farmnport.com`,
+    description: `View ${name}'s buyer profile on Farmnport. See what produce they're looking for and connect directly.`,
+    openGraph: {
+      title: `${name} - Buyer in Zimbabwe`,
+      description: `View ${name}'s buyer profile on Farmnport. See what produce they're looking for and connect directly.`,
+      url: `${AppURL}/buyer/${slug.toLowerCase()}`,
+      siteName: 'farmnport',
+      type: 'profile',
+    },
   }
 }
 

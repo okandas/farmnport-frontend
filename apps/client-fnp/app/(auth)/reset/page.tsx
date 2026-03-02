@@ -2,8 +2,17 @@ import { ResetAuthForm } from "@/components/forms/reset"
 
 
 export const metadata = {
-    title: 'Reset Password Farmnport',
-    description: 'Agri produce, fresh produce, buyers buying directly from farmers in Zimbabwe'
+    title: 'Reset Password | Farmnport',
+    description: 'Reset your Farmnport account password. Enter your email to receive a password reset link and regain access to your farming marketplace account.',
+    alternates: {
+        canonical: '/reset',
+    },
+    openGraph: {
+        title: 'Reset Password | Farmnport',
+        description: 'Reset your Farmnport account password and regain access to your farming marketplace account.',
+        siteName: 'farmnport',
+        type: 'website',
+    },
 }
 
 export default function ResetPage() {
@@ -12,7 +21,7 @@ export default function ResetPage() {
         <>
             <div className="flex min-h-full flex-1 flex-col justify-center py-16 sm:px-6 lg:px-8">
                 <div className="mx-auto sm:w-full sm:max-w-md h-10 text-center">
-                    <h3 className="text-lg">Reset your Farmnport password</h3>
+                    <h1 className="text-lg">Reset your Farmnport password</h1>
                     <p className="text-muted-foreground text-sm">Sorry you have forgotten your password, but it is quick and easy to reset here using your email.</p>
                 </div>
 
