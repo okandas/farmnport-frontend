@@ -311,17 +311,26 @@ export default function AgroChemicalGuidePage({ params }: GuidePageProps) {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {chemical.dosage_rates.map((rate: any, rateIdx: number) => (
-                                        rate.entries && rate.entries.map((entry: any, entryIdx: number) => (
+                                    {chemical.dosage_rates.map((rate: any, rateIdx: number) => {
+                                        const entries = rate.entries || []
+                                        const entryCount = entries.length || 1
+                                        return entries.map((entry: any, entryIdx: number) => (
                                             <tr key={`${rateIdx}-${entryIdx}`} className="border-b border-border hover:bg-muted/30 transition-colors">
-                                                {/* Crop */}
-                                                <td className="p-3 align-top">
-                                                    <div className="font-semibold capitalize text-sm text-foreground">{rate.crop}</div>
-                                                </td>
-                                                {/* Target */}
-                                                <td className="p-3 align-top">
-                                                    <div className="text-sm text-muted-foreground">{rate.targets}</div>
-                                                </td>
+                                                {/* Crop - only on first entry row, spans all entries */}
+                                                {entryIdx === 0 && (
+                                                    <td className="p-3 align-top" rowSpan={entryCount}>
+                                                        <div className="font-semibold capitalize text-sm text-foreground">{rate.crop}</div>
+                                                        {rate.category_name && (
+                                                            <div className="text-xs text-muted-foreground mt-0.5">{rate.category_name}</div>
+                                                        )}
+                                                    </td>
+                                                )}
+                                                {/* Target - only on first entry row, spans all entries */}
+                                                {entryIdx === 0 && (
+                                                    <td className="p-3 align-top" rowSpan={entryCount}>
+                                                        <div className="text-sm text-muted-foreground">{rate.targets}</div>
+                                                    </td>
+                                                )}
                                                 {/* Dosage */}
                                                 <td className="p-3 align-top">
                                                     <div className="font-bold text-blue-600 dark:text-blue-400 text-base">
@@ -358,7 +367,7 @@ export default function AgroChemicalGuidePage({ params }: GuidePageProps) {
                                                 </td>
                                             </tr>
                                         ))
-                                    ))}
+                                    })}
                                 </tbody>
                             </table>
                         </div>
