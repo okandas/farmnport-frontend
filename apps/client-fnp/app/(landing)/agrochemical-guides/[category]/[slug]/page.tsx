@@ -311,63 +311,108 @@ export default function AgroChemicalGuidePage({ params }: GuidePageProps) {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {chemical.dosage_rates.map((rate: any, rateIdx: number) => {
-                                        const entries = rate.entries || []
-                                        const entryCount = entries.length || 1
-                                        return entries.map((entry: any, entryIdx: number) => (
-                                            <tr key={`${rateIdx}-${entryIdx}`} className="border-b border-border hover:bg-muted/30 transition-colors">
-                                                {/* Crop - only on first entry row, spans all entries */}
-                                                {entryIdx === 0 && (
-                                                    <td className="p-3 align-top" rowSpan={entryCount}>
-                                                        <div className="font-semibold capitalize text-sm text-foreground">{rate.crop}</div>
-                                                        {rate.category_name && (
-                                                            <div className="text-xs text-muted-foreground mt-0.5">{rate.category_name}</div>
+                                    {(() => {
+                                        const grouped = new Map<string, any[]>()
+                                        const ungrouped: any[] = []
+
+                                        chemical.dosage_rates.forEach((rate: any) => {
+                                            if (rate.crop_group_id) {
+                                                const existing = grouped.get(rate.crop_group_id) || []
+                                                existing.push(rate)
+                                                grouped.set(rate.crop_group_id, existing)
+                                            } else {
+                                                ungrouped.push(rate)
+                                            }
+                                        })
+
+                                        const renderEntryRows = (rate: any, rateKey: string, cropCell: React.ReactNode, targetCell: React.ReactNode) => {
+                                            const entries = rate.entries || []
+                                            const lastIdx = entries.length - 1
+                                            return entries.map((entry: any, entryIdx: number) => (
+                                                <tr key={`${rateKey}-${entryIdx}`} className={`hover:bg-muted/30 transition-colors ${entryIdx === 0 ? "border-t border-border" : ""} ${entryIdx === lastIdx ? "border-b border-border" : ""}`}>
+                                                    <td className="p-3 align-top">
+                                                        {entryIdx === 0 ? cropCell : null}
+                                                    </td>
+                                                    <td className="p-3 align-top">
+                                                        {entryIdx === 0 ? targetCell : null}
+                                                    </td>
+                                                    <td className="p-3 align-top">
+                                                        <div className="font-bold text-blue-600 dark:text-blue-400 text-base">
+                                                            {entry.dosage.value} {entry.dosage.unit}
+                                                        </div>
+                                                        <div className="text-xs text-muted-foreground">per {entry.dosage.per}</div>
+                                                    </td>
+                                                    <td className="p-3 align-top">
+                                                        <div className="font-semibold text-orange-700 dark:text-orange-300">{entry.max_applications.max}</div>
+                                                        {entry.max_applications.note && entry.max_applications.note.trim() !== '' && (
+                                                            <div className="text-xs text-muted-foreground mt-1">{entry.max_applications.note}</div>
                                                         )}
                                                     </td>
-                                                )}
-                                                {/* Target - only on first entry row, spans all entries */}
-                                                {entryIdx === 0 && (
-                                                    <td className="p-3 align-top" rowSpan={entryCount}>
-                                                        <div className="text-sm text-muted-foreground">{rate.targets}</div>
+                                                    <td className="p-3 align-top">
+                                                        <div className="font-semibold text-teal-700 dark:text-teal-300 text-sm">{entry.application_interval}</div>
                                                     </td>
-                                                )}
-                                                {/* Dosage */}
-                                                <td className="p-3 align-top">
-                                                    <div className="font-bold text-blue-600 dark:text-blue-400 text-base">
-                                                        {entry.dosage.value} {entry.dosage.unit}
-                                                    </div>
-                                                    <div className="text-xs text-muted-foreground">per {entry.dosage.per}</div>
-                                                </td>
-                                                {/* Max Applications */}
-                                                <td className="p-3 align-top">
-                                                    <div className="font-semibold text-orange-700 dark:text-orange-300">{entry.max_applications.max}</div>
-                                                    {entry.max_applications.note && entry.max_applications.note.trim() !== '' && (
-                                                        <div className="text-xs text-muted-foreground mt-1">{entry.max_applications.note}</div>
-                                                    )}
-                                                </td>
-                                                {/* Application Interval */}
-                                                <td className="p-3 align-top">
-                                                    <div className="font-semibold text-teal-700 dark:text-teal-300 text-sm">{entry.application_interval}</div>
-                                                </td>
-                                                {/* PHI */}
-                                                <td className="p-3 align-top">
-                                                    <div className="font-semibold text-rose-700 dark:text-rose-300 text-sm">{entry.phi}</div>
-                                                </td>
-                                                {/* Remarks */}
-                                                <td className="p-3 align-top">
-                                                    {entry.remarks && entry.remarks.length > 0 ? (
-                                                        <ul className="list-disc list-inside space-y-1">
-                                                            {entry.remarks.map((remark: string, remarkIdx: number) => (
-                                                                <li key={remarkIdx} className="text-xs text-foreground">{remark}</li>
-                                                            ))}
-                                                        </ul>
-                                                    ) : (
-                                                        <span className="text-xs text-muted-foreground">—</span>
-                                                    )}
-                                                </td>
-                                            </tr>
-                                        ))
-                                    })}
+                                                    <td className="p-3 align-top">
+                                                        <div className="font-semibold text-rose-700 dark:text-rose-300 text-sm">{entry.phi}</div>
+                                                    </td>
+                                                    <td className="p-3 align-top">
+                                                        {entry.remarks && entry.remarks.length > 0 ? (
+                                                            <ul className="list-disc list-inside space-y-1">
+                                                                {entry.remarks.map((remark: string, remarkIdx: number) => (
+                                                                    <li key={remarkIdx} className="text-xs text-foreground">{remark}</li>
+                                                                ))}
+                                                            </ul>
+                                                        ) : (
+                                                            <span className="text-xs text-muted-foreground">—</span>
+                                                        )}
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        }
+
+                                        return (
+                                            <>
+                                                {/* Grouped rates - show group name with crops listed */}
+                                                {Array.from(grouped.entries()).map(([groupId, rates]) => {
+                                                    const firstRate = rates[0]
+                                                    const cropCell = (
+                                                        <div>
+                                                            <div className="font-semibold text-sm text-blue-700 dark:text-blue-300">
+                                                                {firstRate.crop_group}
+                                                            </div>
+                                                            <div className="mt-1 space-y-0.5">
+                                                                {rates.map((r: any, idx: number) => (
+                                                                    <div key={idx} className="text-xs text-muted-foreground capitalize flex items-start gap-1">
+                                                                        <span className="h-1 w-1 mt-1.5 rounded-full bg-blue-400 flex-shrink-0" />
+                                                                        <span className="flex-1">{r.crop}</span>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    )
+                                                    const targetCell = (
+                                                        <div className="text-sm text-muted-foreground">{firstRate.targets}</div>
+                                                    )
+                                                    return renderEntryRows(firstRate, `group-${groupId}`, cropCell, targetCell)
+                                                })}
+
+                                                {/* Ungrouped rates - individual rows */}
+                                                {ungrouped.map((rate: any, rateIdx: number) => {
+                                                    const cropCell = (
+                                                        <div>
+                                                            <div className="font-semibold capitalize text-sm text-foreground">{rate.crop}</div>
+                                                            {rate.category_name && (
+                                                                <div className="text-xs text-muted-foreground mt-0.5">{rate.category_name}</div>
+                                                            )}
+                                                        </div>
+                                                    )
+                                                    const targetCell = (
+                                                        <div className="text-sm text-muted-foreground">{rate.targets}</div>
+                                                    )
+                                                    return renderEntryRows(rate, `rate-${rateIdx}`, cropCell, targetCell)
+                                                })}
+                                            </>
+                                        )
+                                    })()}
                                 </tbody>
                             </table>
                         </div>

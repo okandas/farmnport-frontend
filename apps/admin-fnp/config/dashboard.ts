@@ -34,6 +34,11 @@ export const dashboardConfig: DashboardConfig = {
       icon: "bug",
     },
     {
+      title: "Crop Groups",
+      href: "/dashboard/crop-groups",
+      icon: "layers",
+    },
+    {
       title: "Brands",
       href: "/dashboard/brands",
       icon: "tag",
