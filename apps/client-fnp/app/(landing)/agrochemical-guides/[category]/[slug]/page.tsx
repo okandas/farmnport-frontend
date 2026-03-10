@@ -296,14 +296,14 @@ export default function AgroChemicalGuidePage({ params }: GuidePageProps) {
                 {/* Dosage Rates & Application Guide Section */}
                 {chemical.dosage_rates && chemical.dosage_rates.length > 0 && (
                     <div className="mb-12">
-                        <h2 className="text-2xl font-bold mb-6 text-foreground">Dosage Rates & Application Guide</h2>
+                        <h2 className="sticky top-16 z-10 text-2xl font-bold py-4 text-foreground bg-background">Dosage Rates & Application Guide</h2>
                         <div className="overflow-x-auto">
                             <table className="w-full border-collapse">
                                 <thead>
                                     <tr className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/50 dark:to-indigo-950/50 border-b-2 border-blue-200 dark:border-blue-800">
                                         <th className="text-left p-3 text-sm font-semibold text-blue-900 dark:text-blue-100">Crop</th>
                                         <th className="text-left p-3 text-sm font-semibold text-blue-900 dark:text-blue-100">Target</th>
-                                        <th className="text-left p-3 text-sm font-semibold text-blue-900 dark:text-blue-100">Dosage</th>
+                                        <th className="text-left p-3 text-sm font-semibold text-blue-900 dark:text-blue-100 min-w-[200px]">Dosage</th>
                                         <th className="text-left p-3 text-sm font-semibold text-orange-700 dark:text-orange-300">Max Applications</th>
                                         <th className="text-left p-3 text-sm font-semibold text-teal-700 dark:text-teal-300">Application Interval</th>
                                         <th className="text-left p-3 text-sm font-semibold text-rose-700 dark:text-rose-300">PHI</th>
@@ -356,9 +356,12 @@ export default function AgroChemicalGuidePage({ params }: GuidePageProps) {
                                                     </td>
                                                     <td className="p-3 align-top">
                                                         {entry.remarks && entry.remarks.length > 0 ? (
-                                                            <ul className="list-disc list-inside space-y-1">
+                                                            <ul className="space-y-1">
                                                                 {entry.remarks.map((remark: string, remarkIdx: number) => (
-                                                                    <li key={remarkIdx} className="text-xs text-foreground">{remark}</li>
+                                                                    <li key={remarkIdx} className="text-xs text-foreground flex items-start gap-1.5">
+                                                                        <span className="h-1 w-1 mt-1.5 rounded-full bg-foreground/50 flex-shrink-0" />
+                                                                        <span className="flex-1">{remark}</span>
+                                                                    </li>
                                                                 ))}
                                                             </ul>
                                                         ) : (
