@@ -50,7 +50,8 @@ import {
   Tag,
   ClipboardList,
   Beaker,
-  Bug
+  Bug,
+  Layers
 } from "lucide-react"
 
 export type Icon = LucideIcon
@@ -108,5 +109,6 @@ export const Icons = {
   tag: Tag,
   clipboardList: ClipboardList,
   beaker: Beaker,
-  bug: Bug
+  bug: Bug,
+  layers: Layers
 }

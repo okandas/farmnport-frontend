@@ -328,6 +328,43 @@ export function deleteAgroChemicalTargets(targetIds: string[]) {
   return api.post(url, { target_ids: targetIds })
 }
 
+// Crop Group functions
+export function queryCropGroups(pagination?: pagination) {
+  let url: string
+
+  if (pagination?.p !== undefined && pagination.p >= 2) {
+    url = `${baseUrl}/user/crop-groups?p=${pagination.p}`
+  } else {
+    url = `${baseUrl}/user/crop-groups`
+  }
+
+  if (pagination?.search !== undefined && pagination.search.length >= 2) {
+    url = `${baseUrl}/user/crop-groups?search=${pagination.search}`
+  }
+
+  return api.get(url)
+}
+
+export function queryCropGroup(id: string) {
+  const url = `${baseUrl}/user/crop-groups/${id}`
+  return api.get(url)
+}
+
+export function addCropGroup(data: { name: string; description: string; farm_produce_ids: string[] }) {
+  let url = `${baseUrl}/user/crop-groups/add`
+  return api.post(url, data)
+}
+
+export function updateCropGroup(data: { id: string; name: string; description: string; farm_produce_ids: string[] }) {
+  let url = `${baseUrl}/user/crop-groups/update`
+  return api.post(url, data)
+}
+
+export function deleteCropGroups(groupIds: string[]) {
+  let url = `${baseUrl}/user/crop-groups/delete`
+  return api.post(url, { group_ids: groupIds })
+}
+
 export function queryFarmProduceCategories(pagination?: pagination) {
   let url: string
 

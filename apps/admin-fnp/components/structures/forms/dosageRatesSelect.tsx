@@ -9,8 +9,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { cn } from "@/lib/utilities"
-import { queryFarmProduce, queryAgroChemicalTargets } from "@/lib/query"
-import { FarmProduce, AgroChemicalTarget } from "@/lib/schemas"
+import { queryFarmProduce, queryAgroChemicalTargets, queryCropGroups, queryCropGroup } from "@/lib/query"
+import { FarmProduce, AgroChemicalTarget, CropGroup } from "@/lib/schemas"
 import { handleFetchError } from "@/lib/error-handler"
 import {
     Command,
@@ -36,6 +36,8 @@ export interface DosageRate {
     id: string
     crop: string
     crop_id: string
+    crop_group?: string
+    crop_group_id?: string
     targets: string
     target_ids: string[]
     entries: Array<{
@@ -88,6 +90,14 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
     const [remarkInput, setRemarkInput] = useState("")
     const [remarksList, setRemarksList] = useState<string[]>([])
 
+    // Crop group state
+    const [isGroupMode, setIsGroupMode] = useState(false)
+    const [cropGroupId, setCropGroupId] = useState("")
+    const [cropGroupName, setCropGroupName] = useState("")
+    const [groupCrops, setGroupCrops] = useState<Array<{ id: string; name: string }>>([])
+    const [openCropGroup, setOpenCropGroup] = useState(false)
+    const [searchCropGroup, setSearchCropGroup] = useState("")
+
     const [openCrop, setOpenCrop] = useState(false)
     const [openTargets, setOpenTargets] = useState(false)
     const [searchCrop, setSearchCrop] = useState("")
@@ -96,6 +106,31 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
     // Debounce search queries
     const [debouncedCropQuery] = useDebounce(searchCrop, 1000)
     const [debouncedTargetQuery] = useDebounce(searchTarget, 1000)
+    const [debouncedCropGroupQuery] = useDebounce(searchCropGroup, 1000)
+
+    // Fetch crop groups
+    const { data: cropGroupData } = useQuery({
+        queryKey: ["crop-groups-search", { search: debouncedCropGroupQuery }],
+        queryFn: () => queryCropGroups({ search: debouncedCropGroupQuery }),
+        enabled: debouncedCropGroupQuery.length >= 2,
+    })
+    const cropGroups = cropGroupData?.data?.data as CropGroup[]
+
+    // Fetch selected crop group detail
+    const { data: selectedGroupData } = useQuery({
+        queryKey: ["crop-group-detail", cropGroupId],
+        queryFn: () => queryCropGroup(cropGroupId),
+        enabled: !!cropGroupId,
+    })
+
+    useEffect(() => {
+        if (selectedGroupData?.data?.farm_produce_items) {
+            setGroupCrops(selectedGroupData.data.farm_produce_items.map((p: FarmProduce) => ({
+                id: p.id,
+                name: p.name,
+            })))
+        }
+    }, [selectedGroupData])
 
     // Fetch farm produce
     const {
@@ -164,29 +199,52 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
     }, [isTargetError, targetError, refetchTargets])
 
     const handleAdd = () => {
-        if (!cropId || !cropName || targetIds.length === 0 || entriesList.length === 0) {
-            return
-        }
+        if (isGroupMode) {
+            // Group mode: create one DosageRate per crop in the group
+            if (!cropGroupId || groupCrops.length === 0 || targetIds.length === 0 || entriesList.length === 0) {
+                return
+            }
 
-        const rateData: DosageRate = {
-            id: editingId || Date.now().toString(),
-            crop: cropName,
-            crop_id: cropId,
-            targets: targetNames.join(", "),
-            target_ids: targetIds,
-            entries: entriesList,
-        }
+            const newRates: DosageRate[] = groupCrops.map((crop, index) => ({
+                id: editingId ? `${cropGroupId}-${index}` : `${Date.now()}-${index}`,
+                crop: crop.name,
+                crop_id: crop.id,
+                crop_group: cropGroupName,
+                crop_group_id: cropGroupId,
+                targets: targetNames.join(", "),
+                target_ids: targetIds,
+                entries: entriesList,
+            }))
 
-        console.log("Saving dosage rate:", rateData)
-        console.log("Target IDs:", targetIds)
-        console.log("Target Names:", targetNames)
-
-        if (editingId) {
-            // Update existing rate
-            onChange(value.map(rate => rate.id === editingId ? rateData : rate))
+            if (editingId) {
+                // Remove all rates with this crop_group_id, then add new ones
+                const filtered = value.filter(r => r.crop_group_id !== cropGroupId)
+                onChange([...filtered, ...newRates])
+            } else {
+                onChange([...value, ...newRates])
+            }
         } else {
-            // Add new rate
-            onChange([...value, rateData])
+            // Individual mode: existing single-crop logic
+            if (!cropId || !cropName || targetIds.length === 0 || entriesList.length === 0) {
+                return
+            }
+
+            const rateData: DosageRate = {
+                id: editingId || Date.now().toString(),
+                crop: cropName,
+                crop_id: cropId,
+                crop_group: "",
+                crop_group_id: "",
+                targets: targetNames.join(", "),
+                target_ids: targetIds,
+                entries: entriesList,
+            }
+
+            if (editingId) {
+                onChange(value.map(rate => rate.id === editingId ? rateData : rate))
+            } else {
+                onChange([...value, rateData])
+            }
         }
 
         // Reset form
@@ -196,6 +254,10 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
     const resetForm = () => {
         setCropId("")
         setCropName("")
+        setCropGroupId("")
+        setCropGroupName("")
+        setGroupCrops([])
+        setIsGroupMode(false)
         setTargetIds([])
         setTargetNames([])
         setEntriesList([])
@@ -213,14 +275,25 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
     }
 
     const handleEdit = (rate: DosageRate) => {
-        console.log("Editing rate:", rate)
+        if (rate.crop_group_id) {
+            // Group mode: find all rates with same crop_group_id
+            const groupRates = value.filter(r => r.crop_group_id === rate.crop_group_id)
+            setIsGroupMode(true)
+            setCropGroupId(rate.crop_group_id)
+            setCropGroupName(rate.crop_group || "")
+            setGroupCrops(groupRates.map(r => ({ id: r.crop_id, name: r.crop })))
+            setCropId("")
+            setCropName("")
+        } else {
+            setIsGroupMode(false)
+            setCropId(rate.crop_id)
+            setCropName(rate.crop)
+        }
 
-        setCropId(rate.crop_id)
-        setCropName(rate.crop)
         setTargetIds(rate.target_ids)
         setTargetNames(rate.targets ? rate.targets.split(", ") : [])
 
-        // Load entries
+        // Load entries (from first rate — all rates in a group share the same entries)
         const entriesArray = Array.isArray(rate.entries) ? rate.entries : []
         setEntriesList(entriesArray)
 
@@ -242,6 +315,8 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
             id: Date.now().toString(),
             crop: rate.crop,
             crop_id: rate.crop_id,
+            crop_group: rate.crop_group,
+            crop_group_id: rate.crop_group_id,
             targets: rate.targets || "",
             target_ids: [...rate.target_ids],
             entries: rate.entries.map(entry => ({
@@ -398,128 +473,197 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
             {/* Display existing rates - hide when editing */}
             {value.length > 0 && !showForm && (
                 <div className="space-y-3">
-                    {value.map((rate) => (
-                        <div
-                            key={rate.id}
-                            className="flex items-start justify-between rounded-md border border-gray-300 bg-gray-50 p-3 dark:border-white/10 dark:bg-gray-900"
-                        >
-                            <div className="flex-1 space-y-2">
-                                <div className="flex items-start justify-between">
-                                    <div>
-                                        <div className="font-medium text-gray-900 dark:text-white text-base">
-                                            {rate.crop}
-                                        </div>
-                                        {rate.targets && (
-                                            <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                                                <span className="font-medium">Targets:</span> {rate.targets}
-                                            </div>
-                                        )}
-                                        {(!rate.targets && rate.target_ids?.length > 0) && (
-                                            <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                                                <span className="font-medium">Targets:</span> {rate.target_ids.length} selected
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
+                    {(() => {
+                        const grouped = new Map<string, DosageRate[]>()
+                        const ungrouped: DosageRate[] = []
 
-                                {rate.entries && rate.entries.length > 0 && (
-                                    <div className="mt-3 space-y-3">
-                                        <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                                            Dosage Entries ({rate.entries.length})
-                                        </div>
-                                        {rate.entries.map((entry, i) => (
-                                            <div
-                                                key={i}
-                                                className="pl-4 border-l-4 border-indigo-400 dark:border-indigo-600 bg-white dark:bg-gray-800 p-3 rounded-r space-y-2"
-                                            >
-                                                <div className="grid grid-cols-2 gap-2">
-                                                    <div>
-                                                        <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">Dosage</div>
-                                                        <div className="text-sm text-gray-900 dark:text-white font-semibold">
-                                                            {entry.dosage.value} {entry.dosage.unit}/{entry.dosage.per}
-                                                        </div>
-                                                    </div>
-                                                    <div>
-                                                        <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">Max Applications</div>
-                                                        <div className="text-sm text-gray-900 dark:text-white">
-                                                            {entry.max_applications.max} times
-                                                        </div>
+                        value.forEach(rate => {
+                            if (rate.crop_group_id) {
+                                const existing = grouped.get(rate.crop_group_id) || []
+                                existing.push(rate)
+                                grouped.set(rate.crop_group_id, existing)
+                            } else {
+                                ungrouped.push(rate)
+                            }
+                        })
+
+                        const renderEntries = (entries: DosageRate["entries"]) => (
+                            entries.length > 0 && (
+                                <div className="mt-3 space-y-3">
+                                    <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                                        Dosage Entries ({entries.length})
+                                    </div>
+                                    {entries.map((entry, i) => (
+                                        <div
+                                            key={i}
+                                            className="pl-4 border-l-4 border-indigo-400 dark:border-indigo-600 bg-white dark:bg-gray-800 p-3 rounded-r space-y-2"
+                                        >
+                                            <div className="grid grid-cols-2 gap-2">
+                                                <div>
+                                                    <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">Dosage</div>
+                                                    <div className="text-sm text-gray-900 dark:text-white font-semibold">
+                                                        {entry.dosage.value} {entry.dosage.unit}/{entry.dosage.per}
                                                     </div>
                                                 </div>
-
-                                                <div className="grid grid-cols-2 gap-2">
+                                                <div>
+                                                    <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">Max Applications</div>
+                                                    <div className="text-sm text-gray-900 dark:text-white">
+                                                        {entry.max_applications.max} times
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-2">
+                                                <div>
+                                                    <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">Application Interval</div>
+                                                    <div className="text-sm text-gray-900 dark:text-white">
+                                                        {entry.application_interval}
+                                                    </div>
+                                                </div>
+                                                {entry.phi && (
                                                     <div>
-                                                        <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">Application Interval</div>
+                                                        <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">PHI (Pre-Harvest Interval)</div>
                                                         <div className="text-sm text-gray-900 dark:text-white">
-                                                            {entry.application_interval}
+                                                            {entry.phi}
                                                         </div>
                                                     </div>
-                                                    {entry.phi && (
-                                                        <div>
-                                                            <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">PHI (Pre-Harvest Interval)</div>
-                                                            <div className="text-sm text-gray-900 dark:text-white">
-                                                                {entry.phi}
-                                                            </div>
+                                                )}
+                                            </div>
+                                            {entry.max_applications.note && (
+                                                <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
+                                                    <div className="text-xs text-gray-500 dark:text-gray-400 font-medium mb-1">Note</div>
+                                                    <div className="text-sm text-gray-700 dark:text-gray-300 italic">
+                                                        {entry.max_applications.note}
+                                                    </div>
+                                                </div>
+                                            )}
+                                            {entry.remarks.length > 0 && (
+                                                <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
+                                                    <div className="text-xs text-gray-500 dark:text-gray-400 font-medium mb-1">Remarks</div>
+                                                    <ul className="text-sm text-gray-700 dark:text-gray-300 list-disc list-inside space-y-1">
+                                                        {entry.remarks.map((remark, idx) => (
+                                                            <li key={idx}>{remark}</li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            )
+                        )
+
+                        return (
+                            <>
+                                {/* Grouped rates */}
+                                {Array.from(grouped.entries()).map(([groupId, rates]) => (
+                                    <div
+                                        key={groupId}
+                                        className="rounded-md border border-blue-300 bg-blue-50/30 p-3 dark:border-blue-800 dark:bg-blue-950/20"
+                                    >
+                                        <div className="flex items-start justify-between">
+                                            <div className="flex-1 space-y-2">
+                                                <div>
+                                                    <div className="font-medium text-blue-900 dark:text-blue-100 text-base">
+                                                        {rates[0].crop_group} <span className="text-xs font-normal text-blue-600 dark:text-blue-400">(Group)</span>
+                                                    </div>
+                                                    <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                                                        <span className="font-medium">Crops:</span> {rates.map(r => r.crop).join(", ")}
+                                                    </div>
+                                                    {rates[0].targets && (
+                                                        <div className="text-sm text-gray-600 dark:text-gray-400">
+                                                            <span className="font-medium">Targets:</span> {rates[0].targets}
                                                         </div>
                                                     )}
                                                 </div>
-
-                                                {entry.max_applications.note && (
-                                                    <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
-                                                        <div className="text-xs text-gray-500 dark:text-gray-400 font-medium mb-1">Note</div>
-                                                        <div className="text-sm text-gray-700 dark:text-gray-300 italic">
-                                                            {entry.max_applications.note}
-                                                        </div>
-                                                    </div>
-                                                )}
-
-                                                {entry.remarks.length > 0 && (
-                                                    <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
-                                                        <div className="text-xs text-gray-500 dark:text-gray-400 font-medium mb-1">Remarks</div>
-                                                        <ul className="text-sm text-gray-700 dark:text-gray-300 list-disc list-inside space-y-1">
-                                                            {entry.remarks.map((remark, idx) => (
-                                                                <li key={idx}>{remark}</li>
-                                                            ))}
-                                                        </ul>
-                                                    </div>
-                                                )}
+                                                {rates[0].entries && renderEntries(rates[0].entries)}
                                             </div>
-                                        ))}
+                                            <div className="flex gap-1">
+                                                <Button
+                                                    type="button"
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() => handleEdit(rates[0])}
+                                                    title="Edit group dosage rate"
+                                                >
+                                                    <Pencil className="h-4 w-4" />
+                                                </Button>
+                                                <Button
+                                                    type="button"
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() => {
+                                                        onChange(value.filter(r => r.crop_group_id !== groupId))
+                                                    }}
+                                                    title="Remove group dosage rate"
+                                                >
+                                                    <X className="h-4 w-4" />
+                                                </Button>
+                                            </div>
+                                        </div>
                                     </div>
-                                )}
-                            </div>
-                            <div className="flex gap-1">
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => handleDuplicate(rate)}
-                                    className="ml-2"
-                                    title="Duplicate dosage rate"
-                                >
-                                    <Copy className="h-4 w-4" />
-                                </Button>
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => handleEdit(rate)}
-                                    title="Edit dosage rate"
-                                >
-                                    <Pencil className="h-4 w-4" />
-                                </Button>
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => handleRemove(rate.id)}
-                                    title="Remove dosage rate"
-                                >
-                                    <X className="h-4 w-4" />
-                                </Button>
-                            </div>
-                        </div>
-                    ))}
+                                ))}
+
+                                {/* Ungrouped rates */}
+                                {ungrouped.map((rate) => (
+                                    <div
+                                        key={rate.id}
+                                        className="flex items-start justify-between rounded-md border border-gray-300 bg-gray-50 p-3 dark:border-white/10 dark:bg-gray-900"
+                                    >
+                                        <div className="flex-1 space-y-2">
+                                            <div className="flex items-start justify-between">
+                                                <div>
+                                                    <div className="font-medium text-gray-900 dark:text-white text-base">
+                                                        {rate.crop}
+                                                    </div>
+                                                    {rate.targets && (
+                                                        <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                                                            <span className="font-medium">Targets:</span> {rate.targets}
+                                                        </div>
+                                                    )}
+                                                    {(!rate.targets && rate.target_ids?.length > 0) && (
+                                                        <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                                                            <span className="font-medium">Targets:</span> {rate.target_ids.length} selected
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            {rate.entries && renderEntries(rate.entries)}
+                                        </div>
+                                        <div className="flex gap-1">
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => handleDuplicate(rate)}
+                                                className="ml-2"
+                                                title="Duplicate dosage rate"
+                                            >
+                                                <Copy className="h-4 w-4" />
+                                            </Button>
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => handleEdit(rate)}
+                                                title="Edit dosage rate"
+                                            >
+                                                <Pencil className="h-4 w-4" />
+                                            </Button>
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => handleRemove(rate.id)}
+                                                title="Remove dosage rate"
+                                            >
+                                                <X className="h-4 w-4" />
+                                            </Button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </>
+                        )
+                    })()}
                 </div>
             )}
 
@@ -553,60 +697,152 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
                     </Button>
                 </div>
             <div className="grid gap-4 px-1">
+                {/* Mode toggle */}
+                <div>
+                    <Label>Crop Selection Mode</Label>
+                    <div className="flex gap-2 mt-2">
+                        <Button
+                            type="button"
+                            variant={!isGroupMode ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => {
+                                setIsGroupMode(false)
+                                setCropGroupId("")
+                                setCropGroupName("")
+                                setGroupCrops([])
+                            }}
+                        >
+                            Individual Crop
+                        </Button>
+                        <Button
+                            type="button"
+                            variant={isGroupMode ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => {
+                                setIsGroupMode(true)
+                                setCropId("")
+                                setCropName("")
+                            }}
+                        >
+                            Crop Group
+                        </Button>
+                    </div>
+                </div>
+
                 <div className="grid grid-cols-2 gap-4">
                     <div>
-                        <Label>Crop</Label>
-                        <Popover open={openCrop} onOpenChange={setOpenCrop}>
-                            <PopoverTrigger asChild>
-                                <Button
-                                    variant="outline"
-                                    role="combobox"
-                                    className={cn(
-                                        "w-full justify-between mt-2",
-                                        !cropId && "text-muted-foreground"
-                                    )}
-                                >
-                                    <span className="truncate">
-                                        {cropId ? cropName : "Select crop"}
-                                    </span>
-                                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
-                                <Command>
-                                    <CommandInput
-                                        placeholder="Search crop..."
-                                        onValueChange={(value) => setSearchCrop(value)}
-                                    />
-                                    <CommandList>
-                                        <CommandEmpty>
-                                            {searchCrop.length < 2
-                                                ? "Type at least 2 characters to search"
-                                                : "No crop found."}
-                                        </CommandEmpty>
-                                        {crops?.map((crop) => (
-                                            <CommandItem
-                                                value={crop.name}
-                                                key={crop.id}
-                                                onSelect={() => {
-                                                    setCropId(crop.id)
-                                                    setCropName(crop.name)
-                                                    setOpenCrop(false)
-                                                }}
-                                            >
-                                                <Check
-                                                    className={cn(
-                                                        "mr-2 h-4 w-4",
-                                                        crop.id === cropId ? "opacity-100" : "opacity-0"
-                                                    )}
-                                                />
-                                                {crop.name}
-                                            </CommandItem>
-                                        ))}
-                                    </CommandList>
-                                </Command>
-                            </PopoverContent>
-                        </Popover>
+                        {!isGroupMode ? (
+                            <>
+                                <Label>Crop</Label>
+                                <Popover open={openCrop} onOpenChange={setOpenCrop}>
+                                    <PopoverTrigger asChild>
+                                        <Button
+                                            variant="outline"
+                                            role="combobox"
+                                            className={cn(
+                                                "w-full justify-between mt-2",
+                                                !cropId && "text-muted-foreground"
+                                            )}
+                                        >
+                                            <span className="truncate">
+                                                {cropId ? cropName : "Select crop"}
+                                            </span>
+                                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                        </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
+                                        <Command>
+                                            <CommandInput
+                                                placeholder="Search crop..."
+                                                onValueChange={(value) => setSearchCrop(value)}
+                                            />
+                                            <CommandList>
+                                                <CommandEmpty>
+                                                    {searchCrop.length < 2
+                                                        ? "Type at least 2 characters to search"
+                                                        : "No crop found."}
+                                                </CommandEmpty>
+                                                {crops?.map((crop) => (
+                                                    <CommandItem
+                                                        value={crop.name}
+                                                        key={crop.id}
+                                                        onSelect={() => {
+                                                            setCropId(crop.id)
+                                                            setCropName(crop.name)
+                                                            setOpenCrop(false)
+                                                        }}
+                                                    >
+                                                        <Check
+                                                            className={cn(
+                                                                "mr-2 h-4 w-4",
+                                                                crop.id === cropId ? "opacity-100" : "opacity-0"
+                                                            )}
+                                                        />
+                                                        {crop.name}
+                                                    </CommandItem>
+                                                ))}
+                                            </CommandList>
+                                        </Command>
+                                    </PopoverContent>
+                                </Popover>
+                            </>
+                        ) : (
+                            <>
+                                <Label>Crop Group</Label>
+                                <Popover open={openCropGroup} onOpenChange={setOpenCropGroup}>
+                                    <PopoverTrigger asChild>
+                                        <Button
+                                            variant="outline"
+                                            role="combobox"
+                                            className={cn(
+                                                "w-full justify-between mt-2",
+                                                !cropGroupId && "text-muted-foreground"
+                                            )}
+                                        >
+                                            <span className="truncate">
+                                                {cropGroupId ? cropGroupName : "Select crop group"}
+                                            </span>
+                                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                        </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
+                                        <Command shouldFilter={false}>
+                                            <CommandInput
+                                                placeholder="Search crop group..."
+                                                value={searchCropGroup}
+                                                onValueChange={setSearchCropGroup}
+                                            />
+                                            <CommandList>
+                                                <CommandEmpty>
+                                                    {searchCropGroup.length < 2
+                                                        ? "Type at least 2 characters to search"
+                                                        : "No crop group found."}
+                                                </CommandEmpty>
+                                                {cropGroups?.map((group) => (
+                                                    <CommandItem
+                                                        value={group.id}
+                                                        key={group.id}
+                                                        onSelect={() => {
+                                                            setCropGroupId(group.id)
+                                                            setCropGroupName(group.name)
+                                                            setOpenCropGroup(false)
+                                                        }}
+                                                    >
+                                                        <Check
+                                                            className={cn(
+                                                                "mr-2 h-4 w-4",
+                                                                group.id === cropGroupId ? "opacity-100" : "opacity-0"
+                                                            )}
+                                                        />
+                                                        {group.name}
+                                                    </CommandItem>
+                                                ))}
+                                            </CommandList>
+                                        </Command>
+                                    </PopoverContent>
+                                </Popover>
+                            </>
+                        )}
                     </div>
                     <div>
                         <Label>Targets (Pests/Diseases)</Label>
@@ -698,6 +934,23 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
                         </Popover>
                     </div>
                 </div>
+
+                {/* Display group crops when a crop group is selected */}
+                {isGroupMode && cropGroupId && groupCrops.length > 0 && (
+                    <div>
+                        <Label>Crops in Group ({groupCrops.length})</Label>
+                        <div className="flex flex-wrap gap-2 mt-2">
+                            {groupCrops.map(crop => (
+                                <span
+                                    key={crop.id}
+                                    className="inline-flex items-center px-2.5 py-1 rounded-md text-sm bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300"
+                                >
+                                    {crop.name}
+                                </span>
+                            ))}
+                        </div>
+                    </div>
+                )}
 
                 {/* Display added entries - hide when editing an entry */}
                 {entriesList.length > 0 && editingEntryIndex === null && (
@@ -816,7 +1069,7 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
                                 />
                             </div>
                             <div>
-                                <Label className="text-sm">Interval</Label>
+                                <Label className="text-sm">Application Interval</Label>
                                 <Input
                                     placeholder="e.g., 7 - 14 days"
                                     value={interval}
@@ -937,7 +1190,11 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
                         <Button
                             type="button"
                             onClick={handleAdd}
-                            disabled={!cropId || targetIds.length === 0 || entriesList.length === 0}
+                            disabled={
+                                isGroupMode
+                                    ? (!cropGroupId || groupCrops.length === 0 || targetIds.length === 0 || entriesList.length === 0)
+                                    : (!cropId || targetIds.length === 0 || entriesList.length === 0)
+                            }
                             variant="outline"
                             className={editingId ? "flex-1" : "w-full"}
                         >
