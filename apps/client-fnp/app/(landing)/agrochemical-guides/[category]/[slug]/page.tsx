@@ -7,6 +7,7 @@ import Image from "next/image"
 import { Beaker, AlertTriangle } from "lucide-react"
 import Link from "next/link"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
+import { capitalizeFirstLetter } from "@/lib/utilities"
 
 interface GuidePageProps {
     params: Promise<{
@@ -25,6 +26,32 @@ export default function AgroChemicalGuidePage({ params }: GuidePageProps) {
     })
 
     const chemical = data?.data
+
+    const categorySlug = chemical?.agrochemical_category?.slug || ""
+    const targetLabel: Record<string, string> = {
+        herbicides: "Target Weeds",
+        insecticides: "Target Pests",
+        fungicides: "Target Diseases",
+        acaricides: "Target Mites & Ticks",
+        nematicides: "Target Nematodes",
+        rodenticides: "Target Rodents",
+        molluscicides: "Target Molluscs",
+        bactericides: "Target Bacteria",
+    }
+    const overviewDesc: Record<string, string> = {
+        herbicides: "a herbicide used for weed management and control. It helps suppress unwanted weed growth while protecting crops when applied according to recommended guidelines.",
+        insecticides: "an insecticide formulated for effective pest control. It targets harmful insects while maintaining crop safety when used as directed.",
+        fungicides: "a fungicide designed to prevent and control fungal diseases. It provides protective and curative action to keep crops healthy throughout the growing season.",
+        acaricides: "an acaricide developed for mite and tick control. It effectively manages mite populations while being safe for crops when applied correctly.",
+        nematicides: "a nematicide used to control plant-parasitic nematodes. It protects root systems and promotes healthy crop development.",
+        rodenticides: "a rodenticide formulated for rodent control in agricultural settings. It helps protect stored crops and field produce from rodent damage.",
+        molluscicides: "a molluscicide designed to control snails and slugs. It protects crops from mollusc damage during vulnerable growth stages.",
+        bactericides: "a bactericide used to manage bacterial infections in crops. It helps prevent the spread of bacterial diseases and supports plant health.",
+    }
+    const sectionTitle = targetLabel[categorySlug] || "Target Pests & Diseases"
+    const noTargetMsg = targetLabel[categorySlug]
+        ? `No ${sectionTitle.toLowerCase().replace("target ", "")} information available.`
+        : "No target pest or disease information available."
 
     if (isLoading) {
         return (
@@ -105,7 +132,7 @@ export default function AgroChemicalGuidePage({ params }: GuidePageProps) {
                 })) || []),
                 ...(chemical.targets?.map((target: any) => ({
                     "@type": "PropertyValue",
-                    "name": "Target Pest/Disease",
+                    "name": sectionTitle,
                     "value": target.scientific_name ? `${target.name} (${target.scientific_name})` : target.name
                 })) || [])
             ],
@@ -215,10 +242,10 @@ export default function AgroChemicalGuidePage({ params }: GuidePageProps) {
                         <div>
                             <h2 className="text-lg font-semibold mb-3 text-foreground">Overview</h2>
                             <p className="text-muted-foreground leading-relaxed text-sm">
-                                {chemical.agrochemical_category?.name ? (
-                                    <>This <span className="font-medium capitalize text-foreground">{chemical.agrochemical_category.name}</span> is designed for effective pest and disease control in agricultural applications. It provides targeted protection against a range of pests while ensuring crop safety when used according to recommended guidelines.</>
+                                {chemical.agrochemical_category?.slug ? (
+                                    <><span className="font-medium text-foreground">{capitalizeFirstLetter(chemical.name)}</span> is {overviewDesc[chemical.agrochemical_category.slug] || `a ${chemical.agrochemical_category.name.toLowerCase().replace(/s$/, '')} for effective crop protection. It provides targeted action while ensuring crop safety when used according to recommended guidelines.`}</>
                                 ) : (
-                                    'Professional agrochemical solution for pest and disease management in agricultural applications.'
+                                    <><span className="font-medium text-foreground">{chemical.name}</span> is a professional agrochemical solution for crop protection and management in agricultural applications.</>
                                 )}
                             </p>
                         </div>
@@ -269,7 +296,7 @@ export default function AgroChemicalGuidePage({ params }: GuidePageProps) {
                             {/* Target Pests & Diseases Section */}
                             <div className="rounded-xl border bg-card p-4">
                                 <h2 className="text-sm font-semibold uppercase tracking-wide text-green-700 dark:text-green-400 mb-3">
-                                    Target Pests & Diseases
+                                    {sectionTitle}
                                 </h2>
                                 {chemical.targets && chemical.targets.length > 0 ? (
                                     <ul className="space-y-1.5">
@@ -286,7 +313,7 @@ export default function AgroChemicalGuidePage({ params }: GuidePageProps) {
                                         ))}
                                     </ul>
                                 ) : (
-                                    <p className="text-sm text-muted-foreground">No target pest or disease information available.</p>
+                                    <p className="text-sm text-muted-foreground">{noTargetMsg}</p>
                                 )}
                             </div>
                         </div>
