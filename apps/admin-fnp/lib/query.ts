@@ -365,6 +365,43 @@ export function deleteCropGroups(groupIds: string[]) {
   return api.post(url, { group_ids: groupIds })
 }
 
+// Weed Group functions
+export function queryWeedGroups(pagination?: pagination) {
+  let url: string
+
+  if (pagination?.p !== undefined && pagination.p >= 2) {
+    url = `${baseUrl}/user/weed-groups?p=${pagination.p}`
+  } else {
+    url = `${baseUrl}/user/weed-groups`
+  }
+
+  if (pagination?.search !== undefined && pagination.search.length >= 2) {
+    url = `${baseUrl}/user/weed-groups?search=${pagination.search}`
+  }
+
+  return api.get(url)
+}
+
+export function queryWeedGroup(id: string) {
+  const url = `${baseUrl}/user/weed-groups/${id}`
+  return api.get(url)
+}
+
+export function addWeedGroup(data: { name: string; description: string; target_ids: string[] }) {
+  let url = `${baseUrl}/user/weed-groups/add`
+  return api.post(url, data)
+}
+
+export function updateWeedGroup(data: { id: string; name: string; description: string; target_ids: string[] }) {
+  let url = `${baseUrl}/user/weed-groups/update`
+  return api.post(url, data)
+}
+
+export function deleteWeedGroups(groupIds: string[]) {
+  let url = `${baseUrl}/user/weed-groups/delete`
+  return api.post(url, { group_ids: groupIds })
+}
+
 export function queryFarmProduceCategories(pagination?: pagination) {
   let url: string
 

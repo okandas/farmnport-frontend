@@ -9,8 +9,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { cn } from "@/lib/utilities"
-import { queryFarmProduce, queryAgroChemicalTargets, queryCropGroups, queryCropGroup } from "@/lib/query"
-import { FarmProduce, AgroChemicalTarget, CropGroup } from "@/lib/schemas"
+import { queryFarmProduce, queryAgroChemicalTargets, queryCropGroups, queryCropGroup, queryWeedGroups, queryWeedGroup } from "@/lib/query"
+import { FarmProduce, AgroChemicalTarget, CropGroup, WeedGroup } from "@/lib/schemas"
 import { handleFetchError } from "@/lib/error-handler"
 import {
     Command,
@@ -38,6 +38,8 @@ export interface DosageRate {
     crop_id: string
     crop_group?: string
     crop_group_id?: string
+    weed_group?: string
+    weed_group_id?: string
     targets: string
     target_ids: string[]
     entries: Array<{
@@ -98,6 +100,13 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
     const [openCropGroup, setOpenCropGroup] = useState(false)
     const [searchCropGroup, setSearchCropGroup] = useState("")
 
+    // Weed group state
+    const [isWeedGroupMode, setIsWeedGroupMode] = useState(false)
+    const [weedGroupId, setWeedGroupId] = useState("")
+    const [weedGroupName, setWeedGroupName] = useState("")
+    const [openWeedGroup, setOpenWeedGroup] = useState(false)
+    const [searchWeedGroup, setSearchWeedGroup] = useState("")
+
     const [openCrop, setOpenCrop] = useState(false)
     const [openTargets, setOpenTargets] = useState(false)
     const [searchCrop, setSearchCrop] = useState("")
@@ -107,6 +116,7 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
     const [debouncedCropQuery] = useDebounce(searchCrop, 1000)
     const [debouncedTargetQuery] = useDebounce(searchTarget, 1000)
     const [debouncedCropGroupQuery] = useDebounce(searchCropGroup, 1000)
+    const [debouncedWeedGroupQuery] = useDebounce(searchWeedGroup, 1000)
 
     // Fetch crop groups
     const { data: cropGroupData } = useQuery({
@@ -131,6 +141,29 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
             })))
         }
     }, [selectedGroupData])
+
+    // Fetch weed groups
+    const { data: weedGroupData } = useQuery({
+        queryKey: ["weed-groups-search", { search: debouncedWeedGroupQuery }],
+        queryFn: () => queryWeedGroups({ search: debouncedWeedGroupQuery }),
+        enabled: debouncedWeedGroupQuery.length >= 2,
+    })
+    const weedGroups = weedGroupData?.data?.data as WeedGroup[]
+
+    // Fetch selected weed group detail
+    const { data: selectedWeedGroupData } = useQuery({
+        queryKey: ["weed-group-detail", weedGroupId],
+        queryFn: () => queryWeedGroup(weedGroupId),
+        enabled: !!weedGroupId,
+    })
+
+    useEffect(() => {
+        if (selectedWeedGroupData?.data?.target_items) {
+            const items = selectedWeedGroupData.data.target_items as AgroChemicalTarget[]
+            setTargetIds(items.map((t) => t.id))
+            setTargetNames(items.map((t) => t.scientific_name ? `${t.name} (${t.scientific_name})` : t.name))
+        }
+    }, [selectedWeedGroupData])
 
     // Fetch farm produce
     const {
@@ -211,6 +244,8 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
                 crop_id: crop.id,
                 crop_group: cropGroupName,
                 crop_group_id: cropGroupId,
+                weed_group: weedGroupName || "",
+                weed_group_id: weedGroupId || "",
                 targets: targetNames.join(", "),
                 target_ids: targetIds,
                 entries: entriesList,
@@ -235,6 +270,8 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
                 crop_id: cropId,
                 crop_group: "",
                 crop_group_id: "",
+                weed_group: weedGroupName || "",
+                weed_group_id: weedGroupId || "",
                 targets: targetNames.join(", "),
                 target_ids: targetIds,
                 entries: entriesList,
@@ -258,6 +295,9 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
         setCropGroupName("")
         setGroupCrops([])
         setIsGroupMode(false)
+        setWeedGroupId("")
+        setWeedGroupName("")
+        setIsWeedGroupMode(false)
         setTargetIds([])
         setTargetNames([])
         setEntriesList([])
@@ -290,6 +330,16 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
             setCropName(rate.crop)
         }
 
+        if (rate.weed_group_id) {
+            setIsWeedGroupMode(true)
+            setWeedGroupId(rate.weed_group_id)
+            setWeedGroupName(rate.weed_group || "")
+        } else {
+            setIsWeedGroupMode(false)
+            setWeedGroupId("")
+            setWeedGroupName("")
+        }
+
         setTargetIds(rate.target_ids)
         setTargetNames(rate.targets ? rate.targets.split(", ") : [])
 
@@ -317,6 +367,8 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
             crop_id: rate.crop_id,
             crop_group: rate.crop_group,
             crop_group_id: rate.crop_group_id,
+            weed_group: rate.weed_group,
+            weed_group_id: rate.weed_group_id,
             targets: rate.targets || "",
             target_ids: [...rate.target_ids],
             entries: rate.entries.map(entry => ({
@@ -572,6 +624,9 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
                                                     {rates[0].targets && (
                                                         <div className="text-sm text-gray-600 dark:text-gray-400">
                                                             <span className="font-medium">Targets:</span> {rates[0].targets}
+                                                            {rates[0].weed_group && (
+                                                                <span className="ml-2 text-xs font-normal text-green-600 dark:text-green-400">({rates[0].weed_group})</span>
+                                                            )}
                                                         </div>
                                                     )}
                                                 </div>
@@ -618,6 +673,9 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
                                                     {rate.targets && (
                                                         <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                                                             <span className="font-medium">Targets:</span> {rate.targets}
+                                                            {rate.weed_group && (
+                                                                <span className="ml-2 text-xs font-normal text-green-600 dark:text-green-400">({rate.weed_group})</span>
+                                                            )}
                                                         </div>
                                                     )}
                                                     {(!rate.targets && rate.target_ids?.length > 0) && (
@@ -845,6 +903,37 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
                         )}
                     </div>
                     <div>
+                        <Label>Target Selection Mode</Label>
+                        <div className="flex gap-2 mt-2 mb-2">
+                            <Button
+                                type="button"
+                                variant={!isWeedGroupMode ? "default" : "outline"}
+                                size="sm"
+                                onClick={() => {
+                                    setIsWeedGroupMode(false)
+                                    setWeedGroupId("")
+                                    setWeedGroupName("")
+                                    setTargetIds([])
+                                    setTargetNames([])
+                                }}
+                            >
+                                Individual Target
+                            </Button>
+                            <Button
+                                type="button"
+                                variant={isWeedGroupMode ? "default" : "outline"}
+                                size="sm"
+                                onClick={() => {
+                                    setIsWeedGroupMode(true)
+                                    setTargetIds([])
+                                    setTargetNames([])
+                                }}
+                            >
+                                Weed Group
+                            </Button>
+                        </div>
+                        {!isWeedGroupMode ? (
+                        <>
                         <Label>Targets (Pests/Diseases)</Label>
                         <Popover open={openTargets} onOpenChange={setOpenTargets}>
                             <PopoverTrigger asChild>
@@ -932,8 +1021,83 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
                                 </Command>
                             </PopoverContent>
                         </Popover>
+                        </>
+                        ) : (
+                        <>
+                            <Label>Weed Group</Label>
+                            <Popover open={openWeedGroup} onOpenChange={setOpenWeedGroup}>
+                                <PopoverTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        role="combobox"
+                                        className={cn(
+                                            "w-full justify-between mt-2",
+                                            !weedGroupId && "text-muted-foreground"
+                                        )}
+                                    >
+                                        <span className="truncate">
+                                            {weedGroupId ? weedGroupName : "Select weed group"}
+                                        </span>
+                                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
+                                    <Command shouldFilter={false}>
+                                        <CommandInput
+                                            placeholder="Search weed group..."
+                                            value={searchWeedGroup}
+                                            onValueChange={setSearchWeedGroup}
+                                        />
+                                        <CommandList>
+                                            <CommandEmpty>
+                                                {searchWeedGroup.length < 2
+                                                    ? "Type at least 2 characters to search"
+                                                    : "No weed group found."}
+                                            </CommandEmpty>
+                                            {weedGroups?.map((group) => (
+                                                <CommandItem
+                                                    value={group.id}
+                                                    key={group.id}
+                                                    onSelect={() => {
+                                                        setWeedGroupId(group.id)
+                                                        setWeedGroupName(group.name)
+                                                        setOpenWeedGroup(false)
+                                                    }}
+                                                >
+                                                    <Check
+                                                        className={cn(
+                                                            "mr-2 h-4 w-4",
+                                                            group.id === weedGroupId ? "opacity-100" : "opacity-0"
+                                                        )}
+                                                    />
+                                                    {group.name}
+                                                </CommandItem>
+                                            ))}
+                                        </CommandList>
+                                    </Command>
+                                </PopoverContent>
+                            </Popover>
+                        </>
+                        )}
                     </div>
                 </div>
+
+                {/* Display weed group targets when a weed group is selected */}
+                {isWeedGroupMode && weedGroupId && targetIds.length > 0 && (
+                    <div>
+                        <Label>Targets in Group ({targetIds.length})</Label>
+                        <div className="flex flex-wrap gap-2 mt-2">
+                            {targetNames.map((name, idx) => (
+                                <span
+                                    key={targetIds[idx]}
+                                    className="inline-flex items-center px-2.5 py-1 rounded-md text-sm bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-300"
+                                >
+                                    {name}
+                                </span>
+                            ))}
+                        </div>
+                    </div>
+                )}
 
                 {/* Display group crops when a crop group is selected */}
                 {isGroupMode && cropGroupId && groupCrops.length > 0 && (
