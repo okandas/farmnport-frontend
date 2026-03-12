@@ -87,3 +87,12 @@ export function ucFirst(str: string): string {
   if (!str) return ""
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
 }
+
+const unitLabels: Record<string, string> = {
+  "l": "litres",
+}
+
+export function formatUnit(unit?: string): string {
+  if (!unit) return ""
+  return unitLabels[unit.toLowerCase()] || unit
+}

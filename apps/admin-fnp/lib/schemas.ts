@@ -486,7 +486,7 @@ export const AgroChemicalSchema = z.object({
     crop_group_id: z.string().optional(),
     weed_group: z.string().optional(),
     weed_group_id: z.string().optional(),
-    targets: z.string(),
+    targets: z.array(z.string()),
     target_ids: z.array(z.string()),
     entries: z.array(z.object({
       dosage: z.object({
@@ -522,7 +522,7 @@ export const DosageRateSchema = z.object({
   crop_group_id: z.string().optional(),
   weed_group: z.string().optional(),
   weed_group_id: z.string().optional(),
-  targets: z.string(),
+  targets: z.array(z.string()),
   target_ids: z.array(z.string()),
   entries: z.array(z.object({
     dosage: z.object({
