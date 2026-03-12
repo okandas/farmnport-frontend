@@ -403,6 +403,28 @@ export const FormCropGroupSchema = CropGroupSchema.pick({
   farm_produce_ids: true,
 })
 
+export const WeedGroupSchema = z.object({
+  id: z.string(),
+  name: z.string().min(1, "Name is required"),
+  slug: z.string().optional(),
+  description: z.string().max(500, "Description cannot exceed 500 characters"),
+  target_ids: z.array(z.string()).min(1, "At least one target is required"),
+  target_items: z.array(z.object({
+    id: z.string(),
+    name: z.string(),
+    slug: z.string(),
+  })).optional(),
+  created: z.string().optional(),
+  updated: z.string().optional(),
+})
+
+export const FormWeedGroupSchema = WeedGroupSchema.pick({
+  id: true,
+  name: true,
+  description: true,
+  target_ids: true,
+})
+
 export const AgroChemicalDosageRateSchema = z.object({
   id: z.string(),
   agrochemical_id: z.string().min(1, "AgroChemical is required"),
@@ -462,6 +484,8 @@ export const AgroChemicalSchema = z.object({
     crop_id: z.string(),
     crop_group: z.string().optional(),
     crop_group_id: z.string().optional(),
+    weed_group: z.string().optional(),
+    weed_group_id: z.string().optional(),
     targets: z.string(),
     target_ids: z.array(z.string()),
     entries: z.array(z.object({
@@ -496,6 +520,8 @@ export const DosageRateSchema = z.object({
   crop_id: z.string(),
   crop_group: z.string().optional(),
   crop_group_id: z.string().optional(),
+  weed_group: z.string().optional(),
+  weed_group_id: z.string().optional(),
   targets: z.string(),
   target_ids: z.array(z.string()),
   entries: z.array(z.object({
@@ -572,6 +598,8 @@ export type AgroChemicalItem = z.infer<typeof AgroChemicalSchema>
 export type FormAgroChemicalModel = z.infer<typeof FormAgroChemicalSchema>
 export type CropGroup = z.infer<typeof CropGroupSchema>
 export type FormCropGroupModel = z.infer<typeof FormCropGroupSchema>
+export type WeedGroup = z.infer<typeof WeedGroupSchema>
+export type FormWeedGroupModel = z.infer<typeof FormWeedGroupSchema>
 
 export type ImageModel = {
   img: {

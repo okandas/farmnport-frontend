@@ -39,6 +39,11 @@ export const dashboardConfig: DashboardConfig = {
       icon: "layers",
     },
     {
+      title: "Weed Groups",
+      href: "/dashboard/weed-groups",
+      icon: "layers",
+    },
+    {
       title: "Brands",
       href: "/dashboard/brands",
       icon: "tag",
