@@ -40,7 +40,7 @@ export interface DosageRate {
     crop_group_id?: string
     weed_group?: string
     weed_group_id?: string
-    targets: string
+    targets: string[]
     target_ids: string[]
     entries: Array<{
         dosage: {
@@ -246,7 +246,7 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
                 crop_group_id: cropGroupId,
                 weed_group: weedGroupName || "",
                 weed_group_id: weedGroupId || "",
-                targets: targetNames.join(", "),
+                targets: [...targetNames],
                 target_ids: targetIds,
                 entries: entriesList,
             }))
@@ -272,7 +272,7 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
                 crop_group_id: "",
                 weed_group: weedGroupName || "",
                 weed_group_id: weedGroupId || "",
-                targets: targetNames.join(", "),
+                targets: [...targetNames],
                 target_ids: targetIds,
                 entries: entriesList,
             }
@@ -341,7 +341,7 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
         }
 
         setTargetIds(rate.target_ids)
-        setTargetNames(rate.targets ? rate.targets.split(", ") : [])
+        setTargetNames(rate.targets || [])
 
         // Load entries (from first rate — all rates in a group share the same entries)
         const entriesArray = Array.isArray(rate.entries) ? rate.entries : []
@@ -351,8 +351,8 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
         setShowForm(true)
 
         // Trigger a search to load targets so selected ones can be displayed
-        if (rate.targets) {
-            const firstTargetName = rate.targets.split(", ")[0]
+        if (rate.targets?.length) {
+            const firstTargetName = rate.targets[0]
             if (firstTargetName) {
                 setSearchTarget(firstTargetName)
             }
@@ -369,7 +369,7 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
             crop_group_id: rate.crop_group_id,
             weed_group: rate.weed_group,
             weed_group_id: rate.weed_group_id,
-            targets: rate.targets || "",
+            targets: [...(rate.targets || [])],
             target_ids: [...rate.target_ids],
             entries: rate.entries.map(entry => ({
                 dosage: { ...entry.dosage },
@@ -621,9 +621,9 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
                                                     <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                                                         <span className="font-medium">Crops:</span> {rates.map(r => r.crop).join(", ")}
                                                     </div>
-                                                    {rates[0].targets && (
+                                                    {rates[0].targets?.length > 0 && (
                                                         <div className="text-sm text-gray-600 dark:text-gray-400">
-                                                            <span className="font-medium">Targets:</span> {rates[0].targets}
+                                                            <span className="font-medium">Targets:</span> {rates[0].targets.join(", ")}
                                                             {rates[0].weed_group && (
                                                                 <span className="ml-2 text-xs font-normal text-green-600 dark:text-green-400">({rates[0].weed_group})</span>
                                                             )}
@@ -670,15 +670,15 @@ export function DosageRatesSelect({ value = [], onChange }: DosageRatesSelectPro
                                                     <div className="font-medium text-gray-900 dark:text-white text-base">
                                                         {rate.crop}
                                                     </div>
-                                                    {rate.targets && (
+                                                    {rate.targets?.length > 0 && (
                                                         <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                                                            <span className="font-medium">Targets:</span> {rate.targets}
+                                                            <span className="font-medium">Targets:</span> {rate.targets.join(", ")}
                                                             {rate.weed_group && (
                                                                 <span className="ml-2 text-xs font-normal text-green-600 dark:text-green-400">({rate.weed_group})</span>
                                                             )}
                                                         </div>
                                                     )}
-                                                    {(!rate.targets && rate.target_ids?.length > 0) && (
+                                                    {(!rate.targets?.length && rate.target_ids?.length > 0) && (
                                                         <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                                                             <span className="font-medium">Targets:</span> {rate.target_ids.length} selected
                                                         </div>

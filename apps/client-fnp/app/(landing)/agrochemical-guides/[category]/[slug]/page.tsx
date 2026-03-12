@@ -7,7 +7,7 @@ import Image from "next/image"
 import { Beaker, AlertTriangle } from "lucide-react"
 import Link from "next/link"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
-import { capitalizeFirstLetter } from "@/lib/utilities"
+import { capitalizeFirstLetter, formatUnit } from "@/lib/utilities"
 
 interface GuidePageProps {
     params: Promise<{
@@ -159,7 +159,7 @@ export default function AgroChemicalGuidePage({ params }: GuidePageProps) {
                     <nav className="flex text-sm text-muted-foreground">
                         <Link href="/" className="hover:text-foreground">Home</Link>
                         <span className="mx-2">/</span>
-                        <Link href="/agrochemical-guides" className="hover:text-foreground">Guides</Link>
+                        <Link href="/agrochemical-guides/all" className="hover:text-foreground">Guides</Link>
                         <span className="mx-2">/</span>
                         <Link href={`/agrochemical-guides/${category}`} className="hover:text-foreground capitalize">{chemical.agrochemical_category?.name || category}</Link>
                         <span className="mx-2">/</span>
@@ -352,6 +352,25 @@ export default function AgroChemicalGuidePage({ params }: GuidePageProps) {
                                             }
                                         })
 
+                                        const renderTargetGrid = (targets: string[]) => (
+                                            <div className="grid grid-cols-2 gap-x-4 gap-y-0.5">
+                                                {targets.map((t: string, i: number) => {
+                                                    const parenIdx = t.indexOf(" (")
+                                                    const mainName = parenIdx > -1 ? t.slice(0, parenIdx) : t
+                                                    const sciName = parenIdx > -1 ? t.slice(parenIdx) : ""
+                                                    return (
+                                                        <div key={i} className="text-sm flex items-start gap-1">
+                                                            <span className="h-1 w-1 mt-1.5 rounded-full bg-muted-foreground/50 flex-shrink-0" />
+                                                            <span>
+                                                                <span className="text-foreground">{mainName}</span>
+                                                                {sciName && <span className="text-muted-foreground text-xs">{sciName}</span>}
+                                                            </span>
+                                                        </div>
+                                                    )
+                                                })}
+                                            </div>
+                                        )
+
                                         const renderEntryRows = (rate: any, rateKey: string, cropCell: React.ReactNode, targetCell: React.ReactNode) => {
                                             const entries = rate.entries || []
                                             const lastIdx = entries.length - 1
@@ -365,7 +384,7 @@ export default function AgroChemicalGuidePage({ params }: GuidePageProps) {
                                                     </td>
                                                     <td className="p-3 align-top">
                                                         <div className="font-bold text-blue-600 dark:text-blue-400 text-base">
-                                                            {entry.dosage.value} {entry.dosage.unit}
+                                                            {entry.dosage.value} {formatUnit(entry.dosage.unit)}
                                                         </div>
                                                         <div className="text-xs text-muted-foreground">per {entry.dosage.per}</div>
                                                     </td>
@@ -419,27 +438,51 @@ export default function AgroChemicalGuidePage({ params }: GuidePageProps) {
                                                             </div>
                                                         </div>
                                                     )
-                                                    const targetCell = (
-                                                        <div className="text-sm text-muted-foreground">{firstRate.targets}</div>
-                                                    )
+                                                    const targetCell = renderTargetGrid(firstRate.targets || [])
                                                     return renderEntryRows(firstRate, `group-${groupId}`, cropCell, targetCell)
                                                 })}
 
-                                                {/* Ungrouped rates - individual rows */}
-                                                {ungrouped.map((rate: any, rateIdx: number) => {
-                                                    const cropCell = (
-                                                        <div>
-                                                            <div className="font-semibold capitalize text-sm text-foreground">{rate.crop}</div>
-                                                            {rate.category_name && (
-                                                                <div className="text-xs text-muted-foreground mt-0.5">{rate.category_name}</div>
-                                                            )}
-                                                        </div>
-                                                    )
-                                                    const targetCell = (
-                                                        <div className="text-sm text-muted-foreground">{rate.targets}</div>
-                                                    )
-                                                    return renderEntryRows(rate, `rate-${rateIdx}`, cropCell, targetCell)
-                                                })}
+                                                {/* Ungrouped rates - group by matching targets */}
+                                                {(() => {
+                                                    const targetGrouped = new Map<string, any[]>()
+                                                    const targetOrder: string[] = []
+                                                    ungrouped.forEach((rate: any) => {
+                                                        const key = Array.isArray(rate.targets) ? rate.targets.slice().sort().join("|") : ""
+                                                        if (!targetGrouped.has(key)) {
+                                                            targetGrouped.set(key, [])
+                                                            targetOrder.push(key)
+                                                        }
+                                                        targetGrouped.get(key)!.push(rate)
+                                                    })
+                                                    return targetOrder.map((targetKey, tgIdx) => {
+                                                        const rates = targetGrouped.get(targetKey)!
+                                                        if (rates.length === 1) {
+                                                            const rate = rates[0]
+                                                            const cropCell = (
+                                                                <div>
+                                                                    <div className="font-semibold capitalize text-sm text-foreground">{rate.crop}</div>
+                                                                    {rate.category_name && (
+                                                                        <div className="text-xs text-muted-foreground mt-0.5">{rate.category_name}</div>
+                                                                    )}
+                                                                </div>
+                                                            )
+                                                            const targetCell = renderTargetGrid(rate.targets || [])
+                                                            return renderEntryRows(rate, `tg-${tgIdx}`, cropCell, targetCell)
+                                                        }
+                                                        return rates.map((rate: any, rateIdx: number) => {
+                                                            const cropCell = (
+                                                                <div>
+                                                                    <div className="font-semibold capitalize text-sm text-foreground">{rate.crop}</div>
+                                                                    {rate.category_name && (
+                                                                        <div className="text-xs text-muted-foreground mt-0.5">{rate.category_name}</div>
+                                                                    )}
+                                                                </div>
+                                                            )
+                                                            const targetCell = rateIdx === 0 ? renderTargetGrid(rate.targets || []) : null
+                                                            return renderEntryRows(rate, `tg-${tgIdx}-${rateIdx}`, cropCell, targetCell)
+                                                        })
+                                                    })
+                                                })()}
                                             </>
                                         )
                                     })()}

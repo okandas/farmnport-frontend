@@ -54,7 +54,7 @@ export default function AgroChemicalCategoryPage({ params }: CategoryPageProps) 
                     <nav className="flex text-sm text-muted-foreground">
                         <Link href="/" className="hover:text-foreground">Home</Link>
                         <span className="mx-2">/</span>
-                        <Link href="/agrochemical-guides" className="hover:text-foreground">Guides</Link>
+                        <Link href="/agrochemical-guides/all" className="hover:text-foreground">Guides</Link>
                         <span className="mx-2">/</span>
                         <span className="text-foreground capitalize">{categoryName}</span>
                     </nav>
