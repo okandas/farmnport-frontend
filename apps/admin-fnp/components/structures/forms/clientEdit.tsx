@@ -61,7 +61,7 @@ import {
   clientTypes,
   provinces,
   scales,
-  paymentTerms
+  paymentTermsOptions
 } from "@/components/structures/repository/data"
 
 interface EditFormProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -633,9 +633,9 @@ export function EditForm({ client }: EditFormProps) {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {paymentTerms.map((payment, index) => (
-                              <SelectItem key={index} value={payment}>
-                                {payment}
+                            {paymentTermsOptions.map((option) => (
+                              <SelectItem key={option.value} value={option.value}>
+                                {option.label}
                               </SelectItem>
                             ))}
                           </SelectContent>

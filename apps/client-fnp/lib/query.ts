@@ -51,7 +51,7 @@ export function queryClient(slug: string) {
   return api.get(url)
 }
 
-export function queryClients(slug: string, pagination?: PaginationModel & { province?: string[], produce?: string[], category?: string[] }) {
+export function queryClients(slug: string, pagination?: PaginationModel & { province?: string[], produce?: string[], category?: string[], payment_terms?: string[], pricing?: string[] }) {
     const params = new URLSearchParams()
 
     // Add pagination
@@ -69,6 +69,12 @@ export function queryClients(slug: string, pagination?: PaginationModel & { prov
     if (pagination?.category && pagination.category.length > 0) {
         pagination.category.forEach(c => params.append('category', c))
     }
+    if (pagination?.payment_terms && pagination.payment_terms.length > 0) {
+        pagination.payment_terms.forEach(pt => params.append('payment_terms', pt))
+    }
+    if (pagination?.pricing && pagination.pricing.length > 0) {
+        pagination.pricing.forEach(pr => params.append('pricing', pr))
+    }
 
     const queryString = params.toString()
     const url = queryString ? `${BaseURL}/${slug}/all?${queryString}` : `${BaseURL}/${slug}/all`
@@ -77,18 +83,19 @@ export function queryClients(slug: string, pagination?: PaginationModel & { prov
 }
 
 
-export function queryClientsByProduct(slug: string, product: string, pagination?: PaginationModel) {
-  let url: string
+export function queryClientsByProduct(slug: string, product: string, pagination?: PaginationModel & { province?: string[] }) {
+  const params = new URLSearchParams()
 
   if (pagination?.p !== undefined && pagination.p >= 2) {
-    url = `${BaseURL}/${slug}/${product}?p=${pagination.p}`
-  } else {
-    url = `${BaseURL}/${slug}/${product}`
+    params.set('p', pagination.p.toString())
   }
 
-  // if (pagination?.search !== undefined && pagination.search.length >= 2) {
-  //     url = `${baseUrl}/buyer/all?search=${pagination.search}`
-  // }
+  if (pagination?.province && pagination.province.length > 0) {
+    pagination.province.forEach(p => params.append('province', p))
+  }
+
+  const queryString = params.toString()
+  const url = queryString ? `${BaseURL}/${slug}/${product}?${queryString}` : `${BaseURL}/${slug}/${product}`
 
   return api.get(url)
 }
@@ -142,6 +149,11 @@ export function queryAllFarmProduceUnpaginated() {
 
 export function queryPriceFilterAggregates() {
   const url = `${BaseURL}/prices/aggregates/filters`
+  return api.get(url)
+}
+
+export function queryPricesByProduce(produceSlug: string) {
+  const url = `${BaseURL}/prices/produce/${produceSlug}`
   return api.get(url)
 }
 
