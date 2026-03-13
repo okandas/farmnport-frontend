@@ -68,6 +68,7 @@ export type AuthenticatedUser = {
     email?: string | null
     emailVerified?: Date | null
     want_to_pay?: boolean
+    subscription_active?: boolean
 } | undefined
 
 export type LoginResponse = {

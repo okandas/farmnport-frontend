@@ -13,6 +13,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Contacts } from "@/components/layouts/contacts"
+import { BuyerContacts } from "@/components/structures/buyer-contacts"
 
 
 interface ClientPageProps {
@@ -235,6 +236,11 @@ export function Client({ slug, user }: ClientPageProps) {
                 )
                 : <p className="text-sm text-muted-foreground">No additional products listed</p>}
             </div>
+
+            {/* Buyer Contacts (buyers only) */}
+            {client.type === 'buyer' && (
+              <BuyerContacts clientId={client.id} clientName={client.name} user={user} />
+            )}
 
             {/* Pricing (buyers only) */}
             {client.type === 'buyer' && (

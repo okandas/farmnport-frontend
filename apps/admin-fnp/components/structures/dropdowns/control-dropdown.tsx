@@ -6,7 +6,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { isAxiosError } from "axios"
 import { MoreHorizontal } from "lucide-react"
 
-import { verifyClient, badClient } from "@/lib/query"
+import { verifyClient, badClient, archiveClient } from "@/lib/query"
 import { ApplicationUserID, ApplicationUser } from "@/lib/schemas"
 import { slug } from "@/lib/utilities"
 import { Button } from "@/components/ui/button"
@@ -71,7 +71,7 @@ export function ControlDropDown({ client }: ControlDropDownProps) {
     onSuccess: (data) => {
       const participant = data?.data?.bad_participant
         ? "Bad Client Tagged Successfully"
-        : "Bad Clien Untagged Successfully"
+        : "Bad Client Untagged Successfully"
       toast({
         description: participant,
       })
@@ -110,7 +110,32 @@ export function ControlDropDown({ client }: ControlDropDownProps) {
     mutateBadClient(payload)
   }
 
-  const animate = isPending || isPendingBadClient ? "animate-bounce" : ""
+  const { mutate: mutateArchiveClient, isPending: isPendingArchive } = useMutation({
+    mutationFn: archiveClient,
+    onSuccess: (data) => {
+      const message = data?.data?.archived
+        ? "Client Archived Successfully"
+        : "Client Unarchived Successfully"
+      toast({ description: message })
+      queryClient.invalidateQueries({ queryKey: ["dashboard-clients"] })
+      router.refresh()
+    },
+    onError: (error) => {
+      if (isAxiosError(error)) {
+        toast({
+          title: "Uh oh! Archive failed.",
+          description: "There was a problem with your request.",
+          action: <ToastAction altText="Try again">Try again</ToastAction>,
+        })
+      }
+    },
+  })
+
+  async function archive(payload: ApplicationUserID) {
+    mutateArchiveClient(payload)
+  }
+
+  const animate = isPending || isPendingBadClient || isPendingArchive ? "animate-bounce" : ""
 
   const stroke = client?.verified ? "stroke-green-500" : "stroke-red-500"
 
@@ -164,6 +189,18 @@ export function ControlDropDown({ client }: ControlDropDownProps) {
           }}
         >
           {client?.bad_participant === false ? "Mark As Bad Client" : "Mark As Good Client"}
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => {
+            if (client?.id !== undefined) {
+              const payload: ApplicationUserID = {
+                id: client.id,
+              }
+              archive(payload)
+            }
+          }}
+        >
+          {client?.archived === false || !client?.archived ? "Archive Client" : "Unarchive Client"}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
