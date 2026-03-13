@@ -3,7 +3,10 @@ import { Buyers } from "@/components/layouts/buyers"
 import { retrieveUser } from "@/lib/actions"
 import type { Metadata, ResolvingMetadata } from "next";
 import { AppURL, getBuyerSeo } from "@/lib/schemas";
-import { FilterSidebar } from "@/components/generic/filterSidebar"
+import { ClientFilterSidebar } from "@/components/generic/clientFilterSidebar"
+import { ActionsSidebar } from "@/components/generic/actions-sidebar"
+import { CrossSellBanner } from "@/components/monetization/cross-sell-banner"
+import { RelatedMarkets } from "@/components/monetization/related-markets"
 
 
 type Props = {
@@ -70,16 +73,27 @@ export default async function BuyersProductPage({ params }: BuyerProductPageProp
         <p className="text-muted-foreground mb-6">
           Find verified {product} buyers across Zimbabwe. Sell your {product} directly at competitive market prices.
         </p>
-        <div className="lg:flex lg:space-x-10">
 
-          <div className="hidden lg:block lg:w-44 relative">
-            <FilterSidebar />
+        <CrossSellBanner product={product} context="buyer" />
+
+        <div className="lg:flex lg:space-x-10">
+          <div className="hidden lg:block lg:w-64 relative">
+            <ClientFilterSidebar type="buyers" hideProduce hideCategory product={product} />
           </div>
 
-          <div className="lg:w-2/3">
+          <div className="lg:flex-1">
+            <div className="lg:hidden mb-4">
+              <ClientFilterSidebar type="buyers" hideProduce hideCategory product={product} />
+            </div>
             <Buyers user={user} queryBy={product} />
           </div>
+
+          <div className="hidden lg:block lg:w-80 relative">
+            <ActionsSidebar type="buyers" product={product} showPremiumCTA={false} />
+          </div>
         </div>
+
+        <RelatedMarkets currentProduct={product} context="buyer" />
       </div>
     </main>
   )

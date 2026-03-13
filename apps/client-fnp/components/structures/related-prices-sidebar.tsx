@@ -36,14 +36,14 @@ export function RelatedPricesSidebar({ currentClientName, currentPriceId, allPri
           <h3 className="text-sm font-semibold text-card-foreground mb-3 uppercase tracking-wide">
             More from {capitalizeFirstLetter(currentClientName)}
           </h3>
-          <div className="space-y-2">
+          <div className="space-y-3">
             {sameClientPrices.map((price) => {
               const dateSlug = new Date(price.effectiveDate).toISOString().split('T')[0]
               const nameSlug = slug(price.client_name)
               const priceSlug = `${nameSlug}-${dateSlug}`
 
               return (
-                <Link key={price.id} href={`/prices/${priceSlug}`}>
+                <Link key={price.id} href={`/prices/${priceSlug}`} className="block">
                   <div className="rounded-lg border bg-card p-3 hover:bg-muted/50 transition-colors cursor-pointer">
                     <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
                       <Calendar className="h-3 w-3" />
@@ -67,14 +67,14 @@ export function RelatedPricesSidebar({ currentClientName, currentPriceId, allPri
           <h3 className="text-sm font-semibold text-card-foreground mb-3 uppercase tracking-wide">
             Other Buyers & Producers
           </h3>
-          <div className="space-y-2">
+          <div className="space-y-3">
             {otherClientPrices.map((price) => {
               const dateSlug = new Date(price.effectiveDate).toISOString().split('T')[0]
               const nameSlug = slug(price.client_name)
               const priceSlug = `${nameSlug}-${dateSlug}`
 
               return (
-                <Link key={price.id} href={`/prices/${priceSlug}`}>
+                <Link key={price.id} href={`/prices/${priceSlug}`} className="block">
                   <div className="rounded-lg border bg-card p-3 hover:bg-muted/50 transition-colors cursor-pointer">
                     <p className="text-sm font-medium text-card-foreground mb-1">
                       {capitalizeFirstLetter(price.client_name)}

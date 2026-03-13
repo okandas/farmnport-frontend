@@ -38,6 +38,9 @@ export default async function BuyersPage() {
                     </div>
 
                     <div className="lg:flex-1">
+                        <div className="lg:hidden mb-4">
+                            <ClientFilterSidebar type="buyers" />
+                        </div>
                         <Buyers user={user} />
                     </div>
 

@@ -38,6 +38,9 @@ export default async function FarmersPage() {
           </div>
 
           <div className="lg:flex-1">
+            <div className="lg:hidden mb-4">
+              <ClientFilterSidebar type="farmers" />
+            </div>
             <Farmers user={user} />
           </div>
 

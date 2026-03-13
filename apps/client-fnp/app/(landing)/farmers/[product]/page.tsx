@@ -3,7 +3,10 @@ import { Farmers } from "@/components/layouts/farmers"
 import { retrieveUser } from "@/lib/actions"
 import type { Metadata, ResolvingMetadata } from "next";
 import {AppURL, getFarmerSeo} from "@/lib/schemas";
-import { FilterSidebar } from "@/components/generic/filterSidebar"
+import { ClientFilterSidebar } from "@/components/generic/clientFilterSidebar"
+import { ActionsSidebar } from "@/components/generic/actions-sidebar"
+import { CrossSellBanner } from "@/components/monetization/cross-sell-banner"
+import { RelatedMarkets } from "@/components/monetization/related-markets"
 
 
 type Props = {
@@ -70,16 +73,27 @@ export default async function FarmersProductPage({ params }: FarmerProductPagePr
         <p className="text-muted-foreground mb-6">
           Buy quality {product} directly from trusted farmers across Zimbabwe at fair farm-gate prices.
         </p>
-        <div className="lg:flex lg:space-x-10">
 
-          <div className="hidden lg:block lg:w-44 relative">
-            <FilterSidebar />
+        <CrossSellBanner product={product} context="farmer" />
+
+        <div className="lg:flex lg:space-x-10">
+          <div className="hidden lg:block lg:w-64 relative">
+            <ClientFilterSidebar type="farmers" hideProduce hideCategory product={product} />
           </div>
 
-          <div className="lg:w-2/3">
+          <div className="lg:flex-1">
+            <div className="lg:hidden mb-4">
+              <ClientFilterSidebar type="farmers" hideProduce hideCategory product={product} />
+            </div>
             <Farmers user={user} queryBy={product} />
           </div>
+
+          <div className="hidden lg:block lg:w-80 relative">
+            <ActionsSidebar type="farmers" product={product} showPremiumCTA={false} />
+          </div>
         </div>
+
+        <RelatedMarkets currentProduct={product} context="farmer" />
       </div>
     </main>
   )

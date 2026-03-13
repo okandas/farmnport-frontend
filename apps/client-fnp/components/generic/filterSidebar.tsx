@@ -97,9 +97,11 @@ function SearchableCheckboxList({
 }
 
 function FilterContent({
-  onClearAll
+  onClearAll,
+  hideProduce
 }: {
   onClearAll: () => void
+  hideProduce?: boolean
 }) {
   const [queryState, setQueryState] = useQueryStates({
     produce: parseAsArrayOf(parseAsString),
@@ -137,12 +139,12 @@ function FilterContent({
   const totalFilters = Object.values(queryState).reduce((acc, val) => acc + (val?.length || 0), 0)
 
   const filterSections = [
-    {
+    ...(!hideProduce ? [{
       name: "produce",
       key: "produce",
       items: produceItems,
       isLoading: isLoadingAggregates
-    },
+    }] : []),
     {
       name: "clients",
       key: "clients",
@@ -204,7 +206,7 @@ function FilterContent({
   )
 }
 
-export function FilterSidebar() {
+export function FilterSidebar({ hideProduce }: { hideProduce?: boolean } = {}) {
   const isDesktop = useMediaQuery("(min-width: 1024px)")
   const [, setQueryState] = useQueryStates({
     produce: parseAsArrayOf(parseAsString),
@@ -222,7 +224,7 @@ export function FilterSidebar() {
   if (isDesktop) {
     return (
       <div className="sticky top-20 mt-[20px]">
-        <FilterContent onClearAll={handleClearAll} />
+        <FilterContent onClearAll={handleClearAll} hideProduce={hideProduce} />
       </div>
     )
   }
@@ -240,7 +242,7 @@ export function FilterSidebar() {
         <SheetHeader className="mb-4">
           <SheetTitle>Filter Prices</SheetTitle>
         </SheetHeader>
-        <FilterContent onClearAll={handleClearAll} />
+        <FilterContent onClearAll={handleClearAll} hideProduce={hideProduce} />
       </SheetContent>
     </Sheet>
   )
