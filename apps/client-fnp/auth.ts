@@ -11,6 +11,7 @@ declare module "next-auth" {
         bad_participant: boolean
         admin: boolean
         banned: boolean
+        subscription_active: boolean
         exp: number
         iat: number
         iss: string

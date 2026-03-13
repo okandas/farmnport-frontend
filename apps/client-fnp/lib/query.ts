@@ -179,6 +179,11 @@ export function queryClientPricing(clientId: string, pagination?: PaginationMode
   return api.get(url)
 }
 
+export function queryBuyerContacts(clientId: string) {
+  const url = `${BaseURL}/buyercontacts/client/${clientId}`
+  return api.get(url)
+}
+
 export function queryAgroChemicalCategories() {
   const url = `${BaseURL}/agrochemicalcategories/`
   return api.get(url)
@@ -265,4 +270,19 @@ export function queryAgroChemical(slug: string) {
 export function queryDashboardAggregates() {
   const url = `${BaseURL}/client/aggregates/dashboard`
   return api.get(url)
+}
+
+export function initiateSubscription(data: { method: string; phone: string; email: string }) {
+  const url = `${BaseURL}/subscription/initiate`
+  return api.post(url, data)
+}
+
+export function checkSubscriptionStatus() {
+  const url = `${BaseURL}/subscription/status`
+  return api.get(url)
+}
+
+export function pollSubscription(reference: string) {
+  const url = `${BaseURL}/subscription/poll`
+  return api.post(url, { reference })
 }
