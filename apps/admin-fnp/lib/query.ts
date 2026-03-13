@@ -44,6 +44,8 @@ type pagination = {
   p?: number
   search?: string
   type?: string[]
+  category?: string[]
+  produce?: string[]
 }
 
 export function queryUsers(pagination?: pagination) {
@@ -59,6 +61,14 @@ export function queryUsers(pagination?: pagination) {
 
   if (pagination?.type !== undefined && pagination.type.length > 0) {
     params.append('type', pagination.type.join(','))
+  }
+
+  if (pagination?.category !== undefined && pagination.category.length > 0) {
+    params.append('category', pagination.category.join(','))
+  }
+
+  if (pagination?.produce !== undefined && pagination.produce.length > 0) {
+    params.append('produce', pagination.produce.join(','))
   }
 
   const queryString = params.toString()
@@ -431,6 +441,11 @@ export function queryFarmProduce(pagination?: pagination) {
     url = `${baseUrl}/farmproduce?search=${pagination.search}`
   }
 
+  return api.get(url)
+}
+
+export function queryAllFarmProduce() {
+  const url = `${baseUrl}/farmproduce/all`
   return api.get(url)
 }
 

@@ -1,6 +1,7 @@
 "use client"
 
 import { capitalizeFirstLetter, centsToDollars, cn } from "@/lib/utilities"
+import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
 
 interface PriceListData {
   id: string
@@ -54,20 +55,28 @@ const formatGradeName = (key: string): string => {
 export function PriceDetailsGrid({ priceList }: PriceDetailsGridProps) {
   const categories = pricingTypes[priceList.client_specialization] || []
 
+  // Filter to only renderable categories
+  const renderableCategories = categories.filter((pricingType) => {
+    if (priceList[pricingType] === undefined) return false
+    const categoryData = priceList[pricingType]
+    const gradeEntries = Object.entries(categoryData).filter(
+      ([key]) => !["hasPrice", "hasCollectedPrice", "farm_produce_id"].includes(key)
+    )
+    return gradeEntries.length > 0
+  })
+
   return (
     <div className="space-y-6">
-      {categories.map((pricingType, typeIndex) => {
-        if (priceList[pricingType] === undefined) return null
-
+      {renderableCategories.map((pricingType, renderIndex) => {
         const categoryData = priceList[pricingType]
         const gradeEntries = Object.entries(categoryData).filter(
           ([key]) => !["hasPrice", "hasCollectedPrice", "farm_produce_id"].includes(key)
         )
 
-        if (gradeEntries.length === 0) return null
-
         return (
-          <div key={typeIndex} className="rounded-xl border bg-card overflow-hidden shadow-sm">
+          <div key={renderIndex}>
+          {renderIndex > 0 && renderIndex % 2 === 0 && <AdSenseInFeed />}
+          <div className="rounded-xl border bg-card overflow-hidden shadow-sm">
             <div className="px-6 py-3 bg-gradient-to-r from-muted/30 to-card border-b">
               <h3 className="text-lg font-bold text-card-foreground">
                 {capitalizeFirstLetter(pricingType)}
@@ -138,6 +147,7 @@ export function PriceDetailsGrid({ priceList }: PriceDetailsGridProps) {
                 </tbody>
               </table>
             </div>
+          </div>
           </div>
         )
       })}

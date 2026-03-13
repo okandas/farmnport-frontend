@@ -1,13 +1,13 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { PaginationState } from "@tanstack/react-table"
 import { isAxiosError } from "axios"
 import { useDebounce } from "use-debounce"
 
-import { queryUsers } from "@/lib/query"
-import { ApplicationUser } from "@/lib/schemas"
+import { queryUsers, queryFarmProduceCategories, queryAllFarmProduce } from "@/lib/query"
+import { ApplicationUser, FarmProduceCategoriesResponse, FarmProduceResponse } from "@/lib/schemas"
 import { ToastAction } from "@/components/ui/toast"
 import { toast } from "@/components/ui/use-toast"
 import { Placeholder } from "@/components/state/placeholder"
@@ -18,6 +18,8 @@ import { DataTableFacetedFilter } from "@/components/structures/filters/data-tab
 export function ClientsTable() {
   const [search, setSearch] = useState("")
   const [typeFilter, setTypeFilter] = useState<Set<string>>(new Set())
+  const [categoryFilter, setCategoryFilter] = useState<Set<string>>(new Set())
+  const [produceFilter, setProduceFilter] = useState<Set<string>>(new Set())
 
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -26,18 +28,49 @@ export function ClientsTable() {
 
   const [debouncedSearchQuery] = useDebounce(search, 1000)
 
+  // Fetch categories and produce for filter options
+  const { data: categoriesData } = useQuery({
+    queryKey: ["filter-categories"],
+    queryFn: () => queryFarmProduceCategories(),
+    refetchOnWindowFocus: false,
+  })
+
+  const { data: produceData } = useQuery({
+    queryKey: ["filter-produce"],
+    queryFn: () => queryAllFarmProduce(),
+    refetchOnWindowFocus: false,
+  })
+
+  const categoryOptions = useMemo(() => {
+    const categories = (categoriesData?.data as FarmProduceCategoriesResponse)?.data || []
+    return categories.map((c) => ({ label: c.name, value: c.slug }))
+  }, [categoriesData])
+
+  const produceOptions = useMemo(() => {
+    const produce = (produceData?.data as FarmProduceResponse)?.data || []
+    return produce.map((p) => ({ label: p.name, value: p.slug }))
+  }, [produceData])
+
   // Reset to page 1 when filters change
   useEffect(() => {
     setPagination((prev) => ({ ...prev, pageIndex: 0 }))
-  }, [typeFilter, debouncedSearchQuery])
+  }, [typeFilter, categoryFilter, produceFilter, debouncedSearchQuery])
 
   const { isError, isLoading, isFetching, refetch, data} = useQuery({
-    queryKey: ["dashboard-clients", { p: pagination.pageIndex + 1, search: debouncedSearchQuery, type: Array.from(typeFilter) }],
+    queryKey: ["dashboard-clients", {
+      p: pagination.pageIndex + 1,
+      search: debouncedSearchQuery,
+      type: Array.from(typeFilter),
+      category: Array.from(categoryFilter),
+      produce: Array.from(produceFilter),
+    }],
     queryFn: () =>
       queryUsers({
         p: pagination.pageIndex + 1,
         search: debouncedSearchQuery,
-        type: Array.from(typeFilter)
+        type: Array.from(typeFilter),
+        category: Array.from(categoryFilter),
+        produce: Array.from(produceFilter),
       }),
     refetchOnWindowFocus: false
   })
@@ -96,12 +129,26 @@ export function ClientsTable() {
       search={search}
       setSearch={setSearch}
       filters={
-        <DataTableFacetedFilter
-          title="Type"
-          options={userTypeOptions}
-          selectedValues={typeFilter}
-          onValueChange={setTypeFilter}
-        />
+        <>
+          <DataTableFacetedFilter
+            title="Type"
+            options={userTypeOptions}
+            selectedValues={typeFilter}
+            onValueChange={setTypeFilter}
+          />
+          <DataTableFacetedFilter
+            title="Category"
+            options={categoryOptions}
+            selectedValues={categoryFilter}
+            onValueChange={setCategoryFilter}
+          />
+          <DataTableFacetedFilter
+            title="Main Produce"
+            options={produceOptions}
+            selectedValues={produceFilter}
+            onValueChange={setProduceFilter}
+          />
+        </>
       }
     />
   )

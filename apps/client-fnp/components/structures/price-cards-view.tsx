@@ -1,11 +1,12 @@
 "use client"
 
-import { useState } from "react"
+import { Fragment, useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { useQueryStates, parseAsArrayOf, parseAsString } from "nuqs"
 import { queryProducerPriceLists } from "@/lib/query"
 import { Button } from "@/components/ui/button"
 import { PriceSummaryCard } from "@/components/structures/price-summary-card"
+import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 
 export function PriceCardsView() {
@@ -38,9 +39,9 @@ export function PriceCardsView() {
 
   if (isLoading) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-3">
         {[...Array(6)].map((_, i) => (
-          <div key={i} className="h-40 rounded-xl border bg-card animate-pulse" />
+          <div key={i} className="h-16 rounded-xl border bg-card animate-pulse" />
         ))}
       </div>
     )
@@ -59,13 +60,18 @@ export function PriceCardsView() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">
-          Showing {producePriceLists.length} of {total} price lists • Page {currentPage} of {totalPages}
+          Showing {producePriceLists.length} of {total} price lists
         </p>
       </div>
 
-      <div className="space-y-10">
-        {producePriceLists.map((priceList: any) => (
-          <PriceSummaryCard key={priceList.id} priceList={priceList} />
+      <div className="space-y-3">
+        {producePriceLists.map((priceList: any, index: number) => (
+          <Fragment key={priceList.id}>
+            <PriceSummaryCard priceList={priceList} />
+            {(index + 1) % 3 === 0 && index < producePriceLists.length - 1 && (
+              <AdSenseInFeed />
+            )}
+          </Fragment>
         ))}
       </div>
 

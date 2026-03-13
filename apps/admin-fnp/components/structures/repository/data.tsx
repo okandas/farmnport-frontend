@@ -1,5 +1,3 @@
-import { string } from "zod"
-
 export const provinces = [
   "bulawayo",
   "harare",
@@ -13,49 +11,9 @@ export const provinces = [
   "midlands",
 ]
 
-export const specializations = [
-  "horticulture",
-  "dairy",
-  "aquaculture",
-  "plantation",
-  "livestock",
-  "grain",
-  "manufacturing",
-  "hospitality",
-  "poultry",
-  "pastures",
-]
-
 export const clientTypes = ["farmer", "buyer", "exporter", "importer"]
 
 export const scales = ["small", "medium", "large"]
-
-export const mainActivity: Record<string, string[]> = {
-  horticulture: ["tomato", "onion", "lettuce", "potato", "sweet potato"],
-  livestock: ["pork", "beef", "cattle", "goat", "sheep", "pig"],
-  dairy: ["milk"],
-  aquaculture: ["bream", "kapenta"],
-  grain: ["maize", "soya bean", "wheat", "groundnut", "sugar bean"],
-  plantation: [
-    "orange",
-    "apple",
-    "peacan nut",
-    "banana",
-    "mango",
-    "avocado",
-    "pineapple",
-    "blueberry",
-    "plum",
-    "melon",
-    "grape",
-    "passion fruit",
-    "granadilla",
-  ],
-  manufacturing: ["food processing"],
-  hospitality: ["catering"],
-  poultry: ["chicken", "turkey"],
-  pastures: ["katambora"],
-}
 
 export const units = ["kg"]
 
@@ -64,4 +22,23 @@ export const pricingBasis = [
   "CDM - Cold Dressed Mass"
 ]
 
-export const paymentTerms = ["Next Day", "2 weeks", "30 Days", "60 Days"]
+export const paymentTermsOptions = [
+  { value: "cod", label: "Cash on Delivery" },
+  { value: "cbd", label: "Cash Before Delivery" },
+  { value: "7-days", label: "7 Days" },
+  { value: "14-days", label: "14 Days" },
+  { value: "30-days", label: "30 Days" },
+  { value: "60-days", label: "60 Days" },
+  { value: "90-days", label: "90 Days" },
+  { value: "negotiable", label: "Negotiable" },
+  { value: "not-provided", label: "Not Provided" },
+]
+
+const paymentTermsMap: Record<string, string> = Object.fromEntries(
+  paymentTermsOptions.map((o) => [o.value, o.label])
+)
+
+export function paymentTermsLabel(slug: string): string {
+  if (!slug) return "Not Provided"
+  return paymentTermsMap[slug] || slug
+}

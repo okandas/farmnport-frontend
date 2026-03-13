@@ -10,6 +10,7 @@ import {Pagination} from "@/components/generic/pagination"
 import {Icons} from "@/components/icons/lucide"
 
 import {queryClients, queryClientsByProduct} from "@/lib/query"
+import {AdSenseInFeed} from "@/components/ads/AdSenseInFeed"
 import {ApplicationUser, AuthenticatedUser} from "@/lib/schemas"
 import {slug, capitalizeFirstLetter, plural} from "@/lib/utilities"
 
@@ -46,10 +47,12 @@ export function Farmers({user, queryBy}: FarmersPageProps) {
   const provinceFilters = searchParams?.getAll("province") ?? []
   const produceFilters = searchParams?.getAll("produce") ?? []
   const categoryFilters = searchParams?.getAll("category") ?? []
+  const paymentTermsFilters = searchParams?.getAll("payment_terms") ?? []
+  const pricingFilters = searchParams?.getAll("pricing") ?? []
 
   const {data, isError, isFetching} = useQuery({
-    queryKey: ["results-farmers", {p: page, province: provinceFilters, produce: produceFilters, category: categoryFilters}],
-    queryFn: () => queryBy != undefined ? queryClientsByProduct('farmer', queryBy, {p: page}) : queryClients('farmer', {p: page, province: provinceFilters, produce: produceFilters, category: categoryFilters}),
+    queryKey: ["results-farmers", {p: page, province: provinceFilters, produce: produceFilters, category: categoryFilters, payment_terms: paymentTermsFilters, pricing: pricingFilters, queryBy}],
+    queryFn: () => queryBy != undefined ? queryClientsByProduct('farmer', queryBy, {p: page, province: provinceFilters}) : queryClients('farmer', {p: page, province: provinceFilters, produce: produceFilters, category: categoryFilters, payment_terms: paymentTermsFilters, pricing: pricingFilters}),
     refetchOnWindowFocus: false
   })
 
@@ -102,7 +105,9 @@ export function Farmers({user, queryBy}: FarmersPageProps) {
 
       <div className="space-y-3">
         {farmers.map((farmer, farmerIndex) => (
-          <div key={farmerIndex} className="bg-card border rounded-lg p-6 hover:shadow-md hover:border-primary/40 transition-all group">
+          <div key={farmerIndex}>
+          {farmerIndex > 0 && farmerIndex % 3 === 0 && <AdSenseInFeed />}
+          <div className="bg-card border rounded-lg p-6 hover:shadow-md hover:border-primary/40 transition-all group">
             <div className="flex items-start gap-4">
               <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-muted flex items-center justify-center text-muted-foreground">
                 {/* Placeholder for farmer icon/logo */}
@@ -146,6 +151,7 @@ export function Farmers({user, queryBy}: FarmersPageProps) {
                 )}
               </div>
             </div>
+          </div>
           </div>
         ))}
       </div>
