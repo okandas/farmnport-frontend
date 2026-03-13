@@ -130,6 +130,11 @@ export function badClient(data: ApplicationUserID) {
   return api.post<ApplicationUser>(url, data)
 }
 
+export function impersonateClient(clientId: string) {
+  let url = `${baseUrl}/user/impersonate/${clientId}`
+  return api.post<LoginResponse>(url)
+}
+
 export function createClientProductPriceList(data: ProducerPriceList) {
   let url = `${baseUrl}/prices/add/producer_price`
   return api.post(url, data)

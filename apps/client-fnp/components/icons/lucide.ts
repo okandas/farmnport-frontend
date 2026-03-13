@@ -55,7 +55,9 @@ import {
     ShoppingBag,
     Sparkles,
     BarChart3,
-    Lock
+    Lock,
+    Shield,
+    Users
 } from "lucide-react"
 
 export type Icon = LucideIcon
@@ -118,5 +120,7 @@ export const Icons = {
     shoppingBag: ShoppingBag,
     sparkles: Sparkles,
     barChart: BarChart3,
-    lock: Lock
+    lock: Lock,
+    shield: Shield,
+    users: Users
 }

@@ -68,6 +68,7 @@ export type AuthenticatedUser = {
     email?: string | null
     emailVerified?: Date | null
     want_to_pay?: boolean
+    impersonated_by?: string
 } | undefined
 
 export type LoginResponse = {

@@ -6,7 +6,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { isAxiosError } from "axios"
 import { MoreHorizontal } from "lucide-react"
 
-import { verifyClient, badClient } from "@/lib/query"
+import { verifyClient, badClient, impersonateClient } from "@/lib/query"
 import { ApplicationUserID, ApplicationUser } from "@/lib/schemas"
 import { slug } from "@/lib/utilities"
 import { Button } from "@/components/ui/button"
@@ -66,6 +66,29 @@ export function ControlDropDown({ client }: ControlDropDownProps) {
   })
 
 
+  const { mutate: mutateImpersonate, isPending: isPendingImpersonate } = useMutation({
+    mutationFn: (clientId: string) => impersonateClient(clientId),
+    onSuccess: (data) => {
+      const token = data?.data?.token
+      if (token) {
+        const clientUrl = process.env.NEXT_PUBLIC_CLIENT_URL || 'http://localhost:3000'
+        window.open(`${clientUrl}/impersonate?token=${token}`, '_blank')
+        toast({
+          description: `Impersonating ${client?.name}`,
+        })
+      }
+    },
+    onError: (error) => {
+      if (isAxiosError(error)) {
+        toast({
+          title: "Impersonation failed",
+          description: error.response?.data?.message || "There was a problem with your request.",
+          action: <ToastAction altText="Try again">Try again</ToastAction>,
+        })
+      }
+    },
+  })
+
   const { mutate: mutateBadClient, isPending: isPendingBadClient } = useMutation({
     mutationFn: badClient,
     onSuccess: (data) => {
@@ -110,7 +133,7 @@ export function ControlDropDown({ client }: ControlDropDownProps) {
     mutateBadClient(payload)
   }
 
-  const animate = isPending || isPendingBadClient ? "animate-bounce" : ""
+  const animate = isPending || isPendingBadClient || isPendingImpersonate ? "animate-bounce" : ""
 
   const stroke = client?.verified ? "stroke-green-500" : "stroke-red-500"
 
@@ -164,6 +187,16 @@ export function ControlDropDown({ client }: ControlDropDownProps) {
           }}
         >
           {client?.bad_participant === false ? "Mark As Bad Client" : "Mark As Good Client"}
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          onClick={() => {
+            if (client?.id !== undefined) {
+              mutateImpersonate(client.id)
+            }
+          }}
+        >
+          Impersonate Client
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
