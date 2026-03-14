@@ -149,6 +149,12 @@ export function Farmers({user, queryBy}: FarmersPageProps) {
                     {capitalizeFirstLetter(farmer.short_description)}
                   </p>
                 )}
+                {(farmer.contact_views || 0) > 0 && (
+                  <p className="text-orange-600 text-xs font-medium mt-2 flex items-center gap-1">
+                    <Icons.eye className="h-3.5 w-3.5" />
+                    {farmer.contact_views} {farmer.contact_views === 1 ? 'person viewed' : 'people viewed'} this contact recently
+                  </p>
+                )}
               </div>
             </div>
           </div>

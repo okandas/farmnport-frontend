@@ -158,6 +158,12 @@ export function Buyers({user, queryBy}: BuyersPageProps) {
                     {capitalizeFirstLetter(buyer.short_description)}
                   </p>
                 )}
+                {(buyer.contact_views || 0) > 0 && (
+                  <p className="text-orange-600 text-xs font-medium mt-2 flex items-center gap-1">
+                    <Icons.eye className="h-3.5 w-3.5" />
+                    {buyer.contact_views} {buyer.contact_views === 1 ? 'person viewed' : 'people viewed'} this contact recently
+                  </p>
+                )}
               </div>
             </div>
           </div>

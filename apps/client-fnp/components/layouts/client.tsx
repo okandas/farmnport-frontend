@@ -163,6 +163,14 @@ export function Client({ slug, user }: ClientPageProps) {
             </div>
           </div>
 
+          {/* Contact Views */}
+          <div className="bg-card border rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow">
+            <div>
+              <p className="text-xs text-muted-foreground mb-1">Contact Views</p>
+              <p className="text-lg font-bold">{client.contact_views || 0}</p>
+            </div>
+          </div>
+
           {/* Pricing or Category */}
           {client.type === 'buyer' && client.has_prices ? (
             <div className="bg-card border rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow">
@@ -225,7 +233,7 @@ export function Client({ slug, user }: ClientPageProps) {
               </h2>
               {client.other_produce && client.other_produce.length > 0
                 ? (
-                  <ul className="list-disc list-inside space-y-1.5">
+                  <ul className="list-disc list-inside grid grid-cols-2 gap-x-4 gap-y-1.5">
                     {client.other_produce
                       .filter(p => p.name !== client.main_produce?.name)
                       .map((p, i) => (
