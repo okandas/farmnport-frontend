@@ -179,6 +179,15 @@ export default async function PriceDetailsPage({ params }: PriceDetailsPageProps
             </div>
           </aside>
         </div>
+
+        {/* Mobile: Related prices at bottom */}
+        <div className="mt-8 lg:hidden">
+          <RelatedPricesSidebar
+            currentClientName={priceList.client_name}
+            currentPriceId={priceList.id}
+            allPrices={allPrices}
+          />
+        </div>
       </div>
     </main>
   )

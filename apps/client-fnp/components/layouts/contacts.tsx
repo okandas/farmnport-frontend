@@ -10,7 +10,7 @@ import Link from "next/link"
 
 
 import { recordContactView } from "@/lib/query"
-import { ApplicationUser, AuthenticatedUser } from "@/lib/schemas"
+import { ApplicationUser, AuthenticatedUser, FeatureFlags } from "@/lib/schemas"
 import { slug, capitalizeFirstLetter, formatDate, plural } from "@/lib/utilities"
 import { Icons } from "@/components/icons/lucide"
 import {Button, buttonVariants} from "@/components/ui/button"
@@ -26,6 +26,9 @@ export function Contacts({ user, client, quickOverview }: ContactPageProps) {
     const router = useRouter()
     const pathname = usePathname()
     const searchParams = useSearchParams()
+
+    const paywallEnabled = process.env.NEXT_PUBLIC_ENABLE_PAYWALL === "true"
+    const isSubscribed = !paywallEnabled || user?.subscription_active === true
 
     // Create query string
     const createQueryString = useCallback(
@@ -78,6 +81,19 @@ export function Contacts({ user, client, quickOverview }: ContactPageProps) {
     const infoEmail: Info = {
         title: "Email",
         action: "LoggedOutViewEmail"
+    }
+
+    function SubscribeToView({ type }: { type: "phone" | "email" }) {
+        return (
+            <dd>
+                <Button className="p-0 h-[22px]" variant="link" onClick={() => {
+                    sendGTMEvent({ event: 'action', value: `SubscribeToView${capitalizeFirstLetter(type)}` })
+                    router.push('/waiting-list-paying')
+                }}>
+                    Unlock {type === "phone" ? "number" : "email"}
+                </Button>
+            </dd>
+        )
     }
 
     function ShowEmail({ email }: { email: string }) {
@@ -164,7 +180,9 @@ export function Contacts({ user, client, quickOverview }: ContactPageProps) {
                         </dt>
 
                         {
-                            user !== undefined ? (<ShowPhone phone={client.phone} />) : (<Info info={infoPhone} name={client.name} />)
+                            !user ? (<Info info={infoPhone} name={client.name} />)
+                            : !isSubscribed ? (<SubscribeToView type="phone" />)
+                            : (<ShowPhone phone={client.phone} />)
                         }
 
                     </div>
@@ -182,7 +200,9 @@ export function Contacts({ user, client, quickOverview }: ContactPageProps) {
                         </dt>
 
                         {
-                            user !== undefined ? (<ShowEmail email={client.email} />) : (<Info info={infoEmail} name={client.name} />)
+                            !user ? (<Info info={infoEmail} name={client.name} />)
+                            : !isSubscribed ? (<SubscribeToView type="email" />)
+                            : (<ShowEmail email={client.email} />)
                         }
                     </div>
                     { quickOverview ?
