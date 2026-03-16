@@ -115,7 +115,7 @@ export function Contacts({ user, client, quickOverview }: ContactPageProps) {
                         : (
                             <Button className="p-0 h-[22px]" variant="link" onClick={() => {
                                 sendGTMEvent({ event: 'action', value: 'LoggedInViewEmail' })
-                                if (user) recordContactView(user.id, client.id, "email").catch(() => {})
+                                if (user?.id) recordContactView(user.id, client.id, "email").catch(() => {})
                                 showDetailButton()
                             }}>
                                 Show email
@@ -144,7 +144,7 @@ export function Contacts({ user, client, quickOverview }: ContactPageProps) {
                         : (
                             <Button className="p-0 h-[22px]" variant="link" onClick={() => {
                                 sendGTMEvent({ event: 'action', value: 'LoggedInViewPhone' })
-                                if (user) recordContactView(user.id, client.id, "phone").catch(() => {})
+                                if (user?.id) recordContactView(user.id, client.id, "phone").catch(() => {})
                                 showDetailButton()
                             }}>
                                 Show phone
