@@ -169,8 +169,8 @@ export default async function PriceDetailsPage({ params }: PriceDetailsPageProps
             <PriceDetailsGrid priceList={priceList} />
           </div>
 
-          <aside className="hidden lg:block lg:w-72 lg:flex-shrink-0">
-            <div className="sticky top-20">
+          <aside className="hidden lg:block lg:w-72 lg:flex-shrink-0 sticky top-20 self-start">
+            <div>
               <RelatedPricesSidebar
                 currentClientName={priceList.client_name}
                 currentPriceId={priceList.id}
