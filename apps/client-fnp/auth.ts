@@ -21,6 +21,7 @@ declare module "next-auth" {
         token: string
         email?: string | null
         emailVerified?: Date | null
+        impersonated_by?: string
     }
 
     interface Session {
@@ -45,6 +46,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
     },
     providers: [
         Credentials({
+            id: "credentials",
             async authorize(credentials: any) {
 
                 const email = credentials.email as string
@@ -116,6 +118,31 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
                         }
                     }
                     captureException(errObj)
+                    return null
+                }
+            }
+        }),
+        Credentials({
+            id: "impersonate",
+            async authorize(credentials: any) {
+                try {
+                    const token = credentials.token as string
+                    if (!token) return null
+
+                    const decodedSession = jwt_decode<User & { impersonated_by?: string }>(token)
+
+                    if (!decodedSession.impersonated_by) {
+                        return null
+                    }
+
+                    decodedSession.token = token
+                    decodedSession.name = decodedSession.username
+                    return decodedSession
+                } catch (error) {
+                    captureException({
+                        message: 'Error in impersonate credentials provider',
+                        error: error,
+                    })
                     return null
                 }
             }
