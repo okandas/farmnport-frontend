@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation"
 import { SubscriptionCallback } from "@/components/structures/subscription-callback"
 import { retrieveUser } from "@/lib/actions"
 
@@ -7,6 +8,10 @@ export const metadata = {
 }
 
 export default async function SubscriptionCallbackPage() {
+  if (process.env.NEXT_PUBLIC_ENABLE_PAYWALL !== "true") {
+    redirect("/buyers")
+  }
+
   const user = await retrieveUser()
 
   return (

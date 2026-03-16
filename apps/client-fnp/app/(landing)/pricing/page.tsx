@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation"
 import { PricingClient } from "@/components/structures/pricing-client"
 import { retrieveUser } from "@/lib/actions"
 
@@ -10,6 +11,10 @@ export const metadata = {
 }
 
 export default async function PricingPage() {
+  if (process.env.NEXT_PUBLIC_ENABLE_PAYWALL !== "true") {
+    redirect("/buyers")
+  }
+
   const user = await retrieveUser()
 
   return (

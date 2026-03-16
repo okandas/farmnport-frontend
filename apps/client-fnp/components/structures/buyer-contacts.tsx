@@ -89,7 +89,8 @@ export function BuyerContacts({ clientId, clientName, user }: BuyerContactsProps
 
   if (isLoading || contacts.length === 0) return null
 
-  const isSubscribed = contacts[0]?.subscribed === true
+  const paywallEnabled = process.env.NEXT_PUBLIC_ENABLE_PAYWALL === "true"
+  const isSubscribed = !paywallEnabled || contacts[0]?.subscribed === true
   const nameSlug = slug(clientName)
   const queryString = new URLSearchParams(searchParams?.toString())
   queryString.set('entity', 'buyer')
