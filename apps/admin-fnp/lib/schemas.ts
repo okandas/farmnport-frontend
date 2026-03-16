@@ -577,6 +577,8 @@ export const EditApplicationUserSchema = ApplicationUserSchema.pick({
   branches: true,
   short_description: true,
   payment_terms: true,
+}).extend({
+  email: z.string().email().optional().or(z.literal("")),
 })
 
 export const ApplicationUserIDSchema = ApplicationUserSchema.pick({

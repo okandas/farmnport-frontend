@@ -252,7 +252,7 @@ export function Client({ slug, user }: ClientPageProps) {
                   }
                 </p>
                 <p className="text-xs text-lime-700 dark:text-lime-500 mb-4">
-                  Note: Always contact {name} directly to verify payment terms before entering into any supply agreement.
+                  Note: Always contact {name} directly to verify payment terms.
                 </p>
                 {pricingLoading ? (
                   <div className="flex items-center gap-3 py-4 border-t">
