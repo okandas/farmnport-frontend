@@ -107,39 +107,30 @@ export function Farmers({user, queryBy}: FarmersPageProps) {
         {farmers.map((farmer, farmerIndex) => (
           <div key={farmerIndex}>
           {farmerIndex > 0 && farmerIndex % 3 === 0 && <AdSenseInFeed />}
-          <div className="bg-card border rounded-lg p-6 hover:shadow-md hover:border-primary/40 transition-all group">
+          <Link href={`/farmer/${slug(farmer.name)}`} className="block bg-card border rounded-lg p-6 hover:shadow-md hover:border-primary/40 transition-all group">
             <div className="flex items-start gap-4">
               <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-muted flex items-center justify-center text-muted-foreground">
-                {/* Placeholder for farmer icon/logo */}
                 <span className="text-lg font-bold">{farmer.name.charAt(0).toUpperCase()}</span>
               </div>
               <div className="flex-1 min-w-0">
-                <Link href={`/farmer/${slug(farmer.name)}`}>
-                  <div className="flex items-center gap-2">
-                    <h4 className="text-lg font-semibold group-hover:text-primary transition-colors truncate">
-                      {capitalizeFirstLetter(farmer.name)}
-                    </h4>
-                  </div>
-                </Link>
+                <div className="flex items-center gap-2">
+                  <h4 className="text-lg font-semibold group-hover:text-primary transition-colors truncate">
+                    {capitalizeFirstLetter(farmer.name)}
+                  </h4>
+                </div>
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-sm text-muted-foreground">
                   <span className="flex items-center gap-1">
                     <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
-                    {capitalizeFirstLetter(farmer.city)}, {capitalizeFirstLetter(farmer.province)}
+                    {farmer.city?.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}, {farmer.province?.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
                   </span>
                   <span className="hidden sm:inline">•</span>
                   <span>Selling {farmer.main_produce?.name ? capitalizeFirstLetter(plural(farmer.main_produce.name)) : 'Various Products'}</span>
                   {farmer.primary_category && (
                     <>
                       <span className="hidden sm:inline">•</span>
-                      {/* <Link
-                        href={`/farmers/${farmer.primary_category.slug}`}
-                        className="font-medium text-foreground hover:underline hover:text-primary transition-colors"
-                      >
-                        {capitalizeFirstLetter(farmer.primary_category.name)}
-                      </Link> */}
                       <span className="font-medium text-foreground">{capitalizeFirstLetter(farmer.primary_category.name)}</span>
                     </>
                   )}
@@ -157,7 +148,7 @@ export function Farmers({user, queryBy}: FarmersPageProps) {
                 )}
               </div>
             </div>
-          </div>
+          </Link>
           </div>
         ))}
       </div>

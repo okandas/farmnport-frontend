@@ -9,7 +9,8 @@ import Link from "next/link"
 
 
 
-import { ApplicationUser, AuthenticatedUser } from "@/lib/schemas"
+import { recordContactView } from "@/lib/query"
+import { ApplicationUser, AuthenticatedUser, FeatureFlags } from "@/lib/schemas"
 import { slug, capitalizeFirstLetter, formatDate, plural } from "@/lib/utilities"
 import { Icons } from "@/components/icons/lucide"
 import {Button, buttonVariants} from "@/components/ui/button"
@@ -25,6 +26,9 @@ export function Contacts({ user, client, quickOverview }: ContactPageProps) {
     const router = useRouter()
     const pathname = usePathname()
     const searchParams = useSearchParams()
+
+    const paywallEnabled = process.env.NEXT_PUBLIC_ENABLE_PAYWALL === "true"
+    const isSubscribed = !paywallEnabled || user?.subscription_active === true
 
     // Create query string
     const createQueryString = useCallback(
@@ -79,6 +83,19 @@ export function Contacts({ user, client, quickOverview }: ContactPageProps) {
         action: "LoggedOutViewEmail"
     }
 
+    function SubscribeToView({ type }: { type: "phone" | "email" }) {
+        return (
+            <dd>
+                <Button className="p-0 h-[22px]" variant="link" onClick={() => {
+                    sendGTMEvent({ event: 'action', value: `SubscribeToView${capitalizeFirstLetter(type)}` })
+                    router.push('/pricing')
+                }}>
+                    Unlock {type === "phone" ? "number" : "email"}
+                </Button>
+            </dd>
+        )
+    }
+
     function ShowEmail({ email }: { email: string }) {
         const [showDetail, setShowDetail] = useState(false);
 
@@ -98,6 +115,7 @@ export function Contacts({ user, client, quickOverview }: ContactPageProps) {
                         : (
                             <Button className="p-0 h-[22px]" variant="link" onClick={() => {
                                 sendGTMEvent({ event: 'action', value: 'LoggedInViewEmail' })
+                                if (user) recordContactView(user.id, client.id, "email").catch(() => {})
                                 showDetailButton()
                             }}>
                                 Show email
@@ -126,6 +144,7 @@ export function Contacts({ user, client, quickOverview }: ContactPageProps) {
                         : (
                             <Button className="p-0 h-[22px]" variant="link" onClick={() => {
                                 sendGTMEvent({ event: 'action', value: 'LoggedInViewPhone' })
+                                if (user) recordContactView(user.id, client.id, "phone").catch(() => {})
                                 showDetailButton()
                             }}>
                                 Show phone
@@ -147,16 +166,15 @@ export function Contacts({ user, client, quickOverview }: ContactPageProps) {
                         </dt>
                         <dd className="text-sm font-medium leading-6 text-muted-foreground">{formatDate(client.created)}</dd>
                     </div>
-                    <div className="flex gap-x-4 py-1">
-                        <dt>
-                            <span className="sr-only">Email</span>
-                            <Icons.mail className="h-6 w-5" aria-hidden="true" />
-                        </dt>
-
-                        {
-                            user !== undefined ? (<ShowEmail email={client.email} />) : (<Info info={infoEmail} name={client.name} />)
-                        }
-                    </div>
+                    {client.address && (
+                        <div className="flex gap-x-4 py-1">
+                            <dt>
+                                <span className="sr-only">Address</span>
+                                <Icons.map className="h-6 w-5" aria-hidden="true" />
+                            </dt>
+                            <dd className="text-sm font-medium leading-6 text-muted-foreground">{client.address}</dd>
+                        </div>
+                    )}
                     <div className="flex gap-x-4 py-1">
                         <dt>
                             <span className="sr-only">Phone</span>
@@ -164,24 +182,30 @@ export function Contacts({ user, client, quickOverview }: ContactPageProps) {
                         </dt>
 
                         {
-                            user !== undefined ? (<ShowPhone phone={client.phone} />) : (<Info info={infoPhone} name={client.name} />)
+                            !user ? (<Info info={infoPhone} name={client.name} />)
+                            : !isSubscribed ? (<SubscribeToView type="phone" />)
+                            : (<ShowPhone phone={client.phone} />)
                         }
 
                     </div>
-                    <div className="flex gap-x-4">
-                        <dt>
-                            <span className="sr-only">Address</span>
-                            <Icons.map className="h-6 w-5" aria-hidden="true" />
-                        </dt>
-                        <dd className="text-sm font-medium leading-6 text-muted-foreground">{client.address}</dd>
-                    </div>
-
                     <div className="flex gap-x-4 py-1">
                         <dt>
                             <span className="sr-only">City, Province</span>
                             <Icons.landmark className="h-6 w-5" aria-hidden="true" />
                         </dt>
-                        <dd className="text-sm font-medium leading-6 text-muted-foreground">{capitalizeFirstLetter(client.city)}, {capitalizeFirstLetter(client.province)}</dd>
+                        <dd className="text-sm font-medium leading-6 text-muted-foreground">{client.city?.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}, {client.province?.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}</dd>
+                    </div>
+                    <div className="flex gap-x-4 py-1">
+                        <dt>
+                            <span className="sr-only">Email</span>
+                            <Icons.mail className="h-6 w-5" aria-hidden="true" />
+                        </dt>
+
+                        {
+                            !user ? (<Info info={infoEmail} name={client.name} />)
+                            : !isSubscribed ? (<SubscribeToView type="email" />)
+                            : (<ShowEmail email={client.email} />)
+                        }
                     </div>
                     { quickOverview ?
                             <div className="flex gap-x-4 py-1">

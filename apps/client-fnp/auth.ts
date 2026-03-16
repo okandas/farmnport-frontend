@@ -11,6 +11,7 @@ declare module "next-auth" {
         bad_participant: boolean
         admin: boolean
         banned: boolean
+        subscription_active: boolean
         exp: number
         iat: number
         iss: string
@@ -20,6 +21,7 @@ declare module "next-auth" {
         token: string
         email?: string | null
         emailVerified?: Date | null
+        impersonated_by?: string
     }
 
     interface Session {
@@ -44,6 +46,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
     },
     providers: [
         Credentials({
+            id: "credentials",
             async authorize(credentials: any) {
 
                 const email = credentials.email as string
@@ -115,6 +118,49 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
                         }
                     }
                     captureException(errObj)
+                    return null
+                }
+            }
+        }),
+        Credentials({
+            id: "impersonate",
+            async authorize(credentials: any) {
+                try {
+                    const token = credentials.token as string
+                    if (!token) return null
+
+                    // Verify the token is valid by calling a protected backend endpoint
+                    const verifyUrl = `${BaseURL}/client/aggregates/dashboard`
+                    const verifyResponse = await fetch(verifyUrl, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Accept': 'application/json',
+                        },
+                    })
+
+                    if (!verifyResponse.ok) {
+                        captureException({
+                            message: 'Impersonate token failed backend verification',
+                            status: verifyResponse.status,
+                        })
+                        return null
+                    }
+
+                    const decodedSession = jwt_decode<User & { impersonated_by?: string }>(token)
+
+                    if (!decodedSession.impersonated_by) {
+                        return null
+                    }
+
+                    decodedSession.token = token
+                    decodedSession.name = decodedSession.username
+                    return decodedSession
+                } catch (error) {
+                    captureException({
+                        message: 'Error in impersonate credentials provider',
+                        error: error,
+                    })
                     return null
                 }
             }

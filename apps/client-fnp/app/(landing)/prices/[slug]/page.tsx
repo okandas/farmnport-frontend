@@ -146,23 +146,31 @@ export default async function PriceDetailsPage({ params }: PriceDetailsPageProps
               )}
             </div>
 
-            <div>
+          </div>
+        </div>
+
+        <div className="lg:flex lg:items-start lg:gap-8">
+          <div className="flex-1">
+            {/* Direct Buyer Contact Section */}
+            <div className="mb-8 bg-card border rounded-xl p-6">
+              <h2 className="text-xl font-semibold mb-3">
+                Contact {capitalizeFirstLetter(priceList.client_name)} Directly
+              </h2>
+              <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+                Want to sell your produce to {capitalizeFirstLetter(priceList.client_name)}? We can connect you directly with the buyer at this company responsible for {priceList.client_specialization ? capitalizeFirstLetter(priceList.client_specialization).toLowerCase() : 'agricultural'} procurement.
+              </p>
               <ContactBuyerButton
                 user={session?.user}
                 clientName={priceList.client_name}
                 clientId={priceList.client_id}
               />
             </div>
-          </div>
-        </div>
 
-        <div className="lg:flex lg:gap-8">
-          <div className="flex-1">
             <PriceDetailsGrid priceList={priceList} />
           </div>
 
-          <aside className="hidden lg:block lg:w-72 lg:flex-shrink-0">
-            <div className="sticky top-8">
+          <aside className="hidden lg:block lg:w-72 lg:flex-shrink-0 sticky top-20 self-start">
+            <div>
               <RelatedPricesSidebar
                 currentClientName={priceList.client_name}
                 currentPriceId={priceList.id}
@@ -170,6 +178,15 @@ export default async function PriceDetailsPage({ params }: PriceDetailsPageProps
               />
             </div>
           </aside>
+        </div>
+
+        {/* Mobile: Related prices at bottom */}
+        <div className="mt-8 lg:hidden">
+          <RelatedPricesSidebar
+            currentClientName={priceList.client_name}
+            currentPriceId={priceList.id}
+            allPrices={allPrices}
+          />
         </div>
       </div>
     </main>

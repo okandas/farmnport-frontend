@@ -76,6 +76,7 @@ export const ApplicationUserSchema = z.object({
   verified: z.boolean(),
   payment_terms: z.string(),
   bad_participant: z.boolean(),
+  archived: z.boolean().optional(),
   has_prices: z.boolean(),
 })
 
@@ -576,6 +577,8 @@ export const EditApplicationUserSchema = ApplicationUserSchema.pick({
   branches: true,
   short_description: true,
   payment_terms: true,
+}).extend({
+  email: z.string().email().optional().or(z.literal("")),
 })
 
 export const ApplicationUserIDSchema = ApplicationUserSchema.pick({

@@ -132,6 +132,7 @@ function FilterContent({
     category: parseAsArrayOf(parseAsString),
     payment_terms: parseAsArrayOf(parseAsString),
     pricing: parseAsArrayOf(parseAsString),
+    verified: parseAsArrayOf(parseAsString),
   })
 
   // Fetch aggregate data for clients
@@ -212,7 +213,12 @@ function FilterContent({
     return Array.from(byClient.values())
   }, [priceData])
 
-  const singleSelectKeys = ["pricing", "payment_terms"]
+  const verifiedItems: FilterItem[] = [
+    { _id: "true", name: "Verified", count: 0 },
+    { _id: "false", name: "Not Verified", count: 0 },
+  ]
+
+  const singleSelectKeys = ["pricing", "payment_terms", "verified"]
 
   const handleToggle = (filterKey: string, value: string) => {
     const currentValues = queryState[filterKey as keyof typeof queryState] || []
@@ -233,7 +239,8 @@ function FilterContent({
       'produce': 'Produce',
       'category': 'Category',
       'payment_terms': 'PaymentTerms',
-      'pricing': 'Pricing'
+      'pricing': 'Pricing',
+      'verified': 'Verified'
     }
     const filterType = filterTypeMap[filterKey] || filterKey
     const action = isAdding ? 'Add' : 'Remove'
@@ -248,6 +255,12 @@ function FilterContent({
   const totalFilters = Object.values(queryState).reduce((acc, val) => acc + (val?.length || 0), 0)
 
   const filterSections = [
+    ...(type === 'buyers' ? [{
+      name: "Verified",
+      key: "verified",
+      items: verifiedItems,
+      isLoading: false
+    }] : []),
     {
       name: "Payment Terms",
       key: "payment_terms",
@@ -368,6 +381,7 @@ export function ClientFilterSidebar({ type, hideProduce, hideCategory, product }
     category: parseAsArrayOf(parseAsString),
     payment_terms: parseAsArrayOf(parseAsString),
     pricing: parseAsArrayOf(parseAsString),
+    verified: parseAsArrayOf(parseAsString),
   })
 
   const handleClearAll = () => {
@@ -377,6 +391,7 @@ export function ClientFilterSidebar({ type, hideProduce, hideCategory, product }
       category: null,
       payment_terms: null,
       pricing: null,
+      verified: null,
     })
   }
 

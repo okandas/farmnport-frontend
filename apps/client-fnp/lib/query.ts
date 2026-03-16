@@ -51,7 +51,7 @@ export function queryClient(slug: string) {
   return api.get(url)
 }
 
-export function queryClients(slug: string, pagination?: PaginationModel & { province?: string[], produce?: string[], category?: string[], payment_terms?: string[], pricing?: string[] }) {
+export function queryClients(slug: string, pagination?: PaginationModel & { province?: string[], produce?: string[], category?: string[], payment_terms?: string[], pricing?: string[], verified?: string[] }) {
     const params = new URLSearchParams()
 
     // Add pagination
@@ -75,6 +75,9 @@ export function queryClients(slug: string, pagination?: PaginationModel & { prov
     if (pagination?.pricing && pagination.pricing.length > 0) {
         pagination.pricing.forEach(pr => params.append('pricing', pr))
     }
+    if (pagination?.verified && pagination.verified.length > 0) {
+        params.set('verified', pagination.verified[0])
+    }
 
     const queryString = params.toString()
     const url = queryString ? `${BaseURL}/${slug}/all?${queryString}` : `${BaseURL}/${slug}/all`
@@ -83,7 +86,7 @@ export function queryClients(slug: string, pagination?: PaginationModel & { prov
 }
 
 
-export function queryClientsByProduct(slug: string, product: string, pagination?: PaginationModel & { province?: string[] }) {
+export function queryClientsByProduct(slug: string, product: string, pagination?: PaginationModel & { province?: string[], verified?: string[] }) {
   const params = new URLSearchParams()
 
   if (pagination?.p !== undefined && pagination.p >= 2) {
@@ -92,6 +95,10 @@ export function queryClientsByProduct(slug: string, product: string, pagination?
 
   if (pagination?.province && pagination.province.length > 0) {
     pagination.province.forEach(p => params.append('province', p))
+  }
+
+  if (pagination?.verified && pagination.verified.length > 0) {
+    params.set('verified', pagination.verified[0])
   }
 
   const queryString = params.toString()
@@ -177,6 +184,16 @@ export function queryClientPricing(clientId: string, pagination?: PaginationMode
   }
 
   return api.get(url)
+}
+
+export function queryBuyerContacts(clientId: string) {
+  const url = `${BaseURL}/buyercontacts/client/${clientId}`
+  return api.get(url)
+}
+
+export function recordContactView(userId: string, viewedId: string, type: "phone" | "email") {
+  const url = `${BaseURL}/views/viewed`
+  return api.post(url, { user_id: userId, viewed_id: viewedId, type })
 }
 
 export function queryAgroChemicalCategories() {
@@ -265,4 +282,19 @@ export function queryAgroChemical(slug: string) {
 export function queryDashboardAggregates() {
   const url = `${BaseURL}/client/aggregates/dashboard`
   return api.get(url)
+}
+
+export function initiateSubscription(data: { method: string; phone: string; email: string }) {
+  const url = `${BaseURL}/subscription/initiate`
+  return api.post(url, data)
+}
+
+export function checkSubscriptionStatus() {
+  const url = `${BaseURL}/subscription/status`
+  return api.get(url)
+}
+
+export function pollSubscription(reference: string) {
+  const url = `${BaseURL}/subscription/poll`
+  return api.post(url, { reference })
 }

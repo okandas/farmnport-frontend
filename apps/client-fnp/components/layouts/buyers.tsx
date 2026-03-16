@@ -50,10 +50,11 @@ export function Buyers({user, queryBy}: BuyersPageProps) {
   const categoryFilters = searchParams?.getAll("category") ?? []
   const paymentTermsFilters = searchParams?.getAll("payment_terms") ?? []
   const pricingFilters = searchParams?.getAll("pricing") ?? []
+  const verifiedFilters = searchParams?.getAll("verified") ?? []
 
   const {data, isError, isFetching} = useQuery({
-    queryKey: ["results-buyers", {p: page, province: provinceFilters, produce: produceFilters, category: categoryFilters, payment_terms: paymentTermsFilters, pricing: pricingFilters, queryBy}],
-    queryFn: () => queryBy != undefined ? queryClientsByProduct('buyer', queryBy, {p: page, province: provinceFilters}) : queryClients('buyer', {p: page, province: provinceFilters, produce: produceFilters, category: categoryFilters, payment_terms: paymentTermsFilters, pricing: pricingFilters}),
+    queryKey: ["results-buyers", {p: page, province: provinceFilters, produce: produceFilters, category: categoryFilters, payment_terms: paymentTermsFilters, pricing: pricingFilters, verified: verifiedFilters, queryBy}],
+    queryFn: () => queryBy != undefined ? queryClientsByProduct('buyer', queryBy, {p: page, province: provinceFilters, verified: verifiedFilters}) : queryClients('buyer', {p: page, province: provinceFilters, produce: produceFilters, category: categoryFilters, payment_terms: paymentTermsFilters, pricing: pricingFilters, verified: verifiedFilters}),
     refetchOnWindowFocus: false
   })
 
@@ -108,53 +109,44 @@ export function Buyers({user, queryBy}: BuyersPageProps) {
         {buyers.map((buyer, buyerIndex) => (
           <div key={buyerIndex}>
           {buyerIndex > 0 && buyerIndex % 3 === 0 && <AdSenseInFeed />}
-          <div className="bg-card border rounded-lg p-6 hover:shadow-md hover:border-primary/40 transition-all group">
+          <Link href={`/buyer/${slug(buyer.name)}`} className="block bg-card border rounded-lg p-6 hover:shadow-md hover:border-primary/40 transition-all group">
             <div className="flex items-start gap-4">
               <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-muted flex items-center justify-center text-muted-foreground">
-                {/* Placeholder for buyer icon/logo */}
                 <span className="text-lg font-bold">{buyer.name.charAt(0).toUpperCase()}</span>
               </div>
               <div className="flex-1 min-w-0">
-                <Link href={`/buyer/${slug(buyer.name)}`}>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <h4 className="text-lg font-semibold group-hover:text-primary transition-colors truncate">
-                      {capitalizeFirstLetter(buyer.name)}
-                    </h4>
-                    {buyer.verified && (
-                      <Icons.verified className="h-5 w-5 flex-shrink-0" aria-hidden="true" color="#228B22" />
-                    )}
-                    {buyer.has_prices && (
-                      <Badge variant="secondary" className="bg-green-50 text-green-700 border-green-200 hover:bg-green-50 text-xs">
-                        Pricing Available
-                      </Badge>
-                    )}
-                  </div>
-                </Link>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h4 className="text-lg font-semibold group-hover:text-primary transition-colors truncate">
+                    {capitalizeFirstLetter(buyer.name)}
+                  </h4>
+                  {buyer.verified && (
+                    <Icons.verified className="h-5 w-5 flex-shrink-0" aria-hidden="true" color="#228B22" />
+                  )}
+                  {buyer.has_prices && (
+                    <Badge variant="secondary" className="bg-green-50 text-green-700 border-green-200 hover:bg-green-50 text-xs">
+                      Pricing Available
+                    </Badge>
+                  )}
+                </div>
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-sm text-muted-foreground">
                   <span className="flex items-center gap-1">
                     <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
-                    {capitalizeFirstLetter(buyer.city)}, {capitalizeFirstLetter(buyer.province)}
+                    {buyer.city?.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}, {buyer.province?.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
                   </span>
                   <span className="hidden sm:inline">•</span>
                   <span>Buying {buyer.main_produce?.name ? capitalizeFirstLetter(plural(buyer.main_produce.name)) : 'Various Products'}</span>
                   {buyer.primary_category && (
                     <>
                       <span className="hidden sm:inline">•</span>
-                      {/* <Link
-                        href={`/buyers/${buyer.primary_category.slug}`}
-                        className="font-medium text-foreground hover:underline hover:text-primary transition-colors"
-                      >
-                        {capitalizeFirstLetter(buyer.primary_category.name)}
-                      </Link> */}
                       <span className="font-medium text-foreground">{capitalizeFirstLetter(buyer.primary_category.name)}</span>
                     </>
                   )}
                 </div>
                 {buyer.short_description.length > 0 && (
-                  <p className="text-muted-foreground text-sm mt-2 line-clamp-2">
+                  <p className={`text-sm mt-2 line-clamp-2 ${buyer.short_description.toLowerCase().startsWith('note:') ? 'text-lime-700 dark:text-lime-500' : 'text-muted-foreground'}`}>
                     {capitalizeFirstLetter(buyer.short_description)}
                   </p>
                 )}
@@ -166,7 +158,7 @@ export function Buyers({user, queryBy}: BuyersPageProps) {
                 )}
               </div>
             </div>
-          </div>
+          </Link>
           </div>
         ))}
       </div>

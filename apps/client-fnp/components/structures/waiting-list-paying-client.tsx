@@ -10,11 +10,12 @@ import { updateUserWantToPay } from "@/lib/query"
 
 interface WaitingListPayingClientProps {
   user: AuthenticatedUser | null
+  wantToPay?: boolean
 }
 
-export function WaitingListPayingClient({ user }: WaitingListPayingClientProps) {
+export function WaitingListPayingClient({ user, wantToPay }: WaitingListPayingClientProps) {
   const router = useRouter()
-  const [submitted, setSubmitted] = useState(user?.want_to_pay || false)
+  const [submitted, setSubmitted] = useState(wantToPay || user?.want_to_pay || false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
 
