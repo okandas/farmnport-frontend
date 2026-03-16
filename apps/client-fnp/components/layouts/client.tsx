@@ -242,6 +242,25 @@ export function Client({ slug, user }: ClientPageProps) {
               <BuyerContacts clientId={client.id} clientName={client.name} user={user} />
             )}
 
+            {/* SEO Description */}
+            <div className="bg-card border rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                <Icons.info className="h-5 w-5 text-primary" />
+                About {capitalizeFirstLetter(client.name)}
+              </h2>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {capitalizeFirstLetter(client.name)} is a {client.scale} scale {client.type} operating in the {client.primary_category?.name ? capitalizeFirstLetter(client.primary_category.name) : 'Agriculture'} sector
+                {client.city && client.province ? `, based in ${capitalizeFirstLetter(client.city)}, ${capitalizeFirstLetter(client.province)}` : ''}.
+                {' '}They primarily {client.type === 'buyer' ? 'procure' : 'produce'} {client.main_produce?.name ? capitalizeFirstLetter(plural(client.main_produce.name)) : 'various agricultural products'}
+                {client.other_produce && client.other_produce.length > 0
+                  ? ` along with ${client.other_produce.length} other ${plural('product', client.other_produce.length)}`
+                  : ''}.
+                {client.type === 'buyer'
+                  ? ` Connect directly with ${capitalizeFirstLetter(client.name)} through their buyer contacts listed above to discuss pricing and supply arrangements.`
+                  : ` Get in touch with ${capitalizeFirstLetter(client.name)} to discuss supply and trade opportunities.`}
+              </p>
+            </div>
+
             {/* Pricing (buyers only) */}
             {client.type === 'buyer' && (
               <div className="bg-card border rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">

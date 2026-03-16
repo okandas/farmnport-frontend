@@ -9,6 +9,7 @@ import Link from "next/link"
 
 
 
+import { recordContactView } from "@/lib/query"
 import { ApplicationUser, AuthenticatedUser } from "@/lib/schemas"
 import { slug, capitalizeFirstLetter, formatDate, plural } from "@/lib/utilities"
 import { Icons } from "@/components/icons/lucide"
@@ -98,6 +99,7 @@ export function Contacts({ user, client, quickOverview }: ContactPageProps) {
                         : (
                             <Button className="p-0 h-[22px]" variant="link" onClick={() => {
                                 sendGTMEvent({ event: 'action', value: 'LoggedInViewEmail' })
+                                if (user) recordContactView(user.id, client.id, "email").catch(() => {})
                                 showDetailButton()
                             }}>
                                 Show email
@@ -126,6 +128,7 @@ export function Contacts({ user, client, quickOverview }: ContactPageProps) {
                         : (
                             <Button className="p-0 h-[22px]" variant="link" onClick={() => {
                                 sendGTMEvent({ event: 'action', value: 'LoggedInViewPhone' })
+                                if (user) recordContactView(user.id, client.id, "phone").catch(() => {})
                                 showDetailButton()
                             }}>
                                 Show phone

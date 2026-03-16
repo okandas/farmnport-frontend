@@ -184,6 +184,11 @@ export function queryBuyerContacts(clientId: string) {
   return api.get(url)
 }
 
+export function recordContactView(userId: string, viewedId: string, type: "phone" | "email") {
+  const url = `${BaseURL}/views/viewed`
+  return api.post(url, { user_id: userId, viewed_id: viewedId, type })
+}
+
 export function queryAgroChemicalCategories() {
   const url = `${BaseURL}/agrochemicalcategories/`
   return api.get(url)

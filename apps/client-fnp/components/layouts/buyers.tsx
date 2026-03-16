@@ -108,28 +108,25 @@ export function Buyers({user, queryBy}: BuyersPageProps) {
         {buyers.map((buyer, buyerIndex) => (
           <div key={buyerIndex}>
           {buyerIndex > 0 && buyerIndex % 3 === 0 && <AdSenseInFeed />}
-          <div className="bg-card border rounded-lg p-6 hover:shadow-md hover:border-primary/40 transition-all group">
+          <Link href={`/buyer/${slug(buyer.name)}`} className="block bg-card border rounded-lg p-6 hover:shadow-md hover:border-primary/40 transition-all group">
             <div className="flex items-start gap-4">
               <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-muted flex items-center justify-center text-muted-foreground">
-                {/* Placeholder for buyer icon/logo */}
                 <span className="text-lg font-bold">{buyer.name.charAt(0).toUpperCase()}</span>
               </div>
               <div className="flex-1 min-w-0">
-                <Link href={`/buyer/${slug(buyer.name)}`}>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <h4 className="text-lg font-semibold group-hover:text-primary transition-colors truncate">
-                      {capitalizeFirstLetter(buyer.name)}
-                    </h4>
-                    {buyer.verified && (
-                      <Icons.verified className="h-5 w-5 flex-shrink-0" aria-hidden="true" color="#228B22" />
-                    )}
-                    {buyer.has_prices && (
-                      <Badge variant="secondary" className="bg-green-50 text-green-700 border-green-200 hover:bg-green-50 text-xs">
-                        Pricing Available
-                      </Badge>
-                    )}
-                  </div>
-                </Link>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h4 className="text-lg font-semibold group-hover:text-primary transition-colors truncate">
+                    {capitalizeFirstLetter(buyer.name)}
+                  </h4>
+                  {buyer.verified && (
+                    <Icons.verified className="h-5 w-5 flex-shrink-0" aria-hidden="true" color="#228B22" />
+                  )}
+                  {buyer.has_prices && (
+                    <Badge variant="secondary" className="bg-green-50 text-green-700 border-green-200 hover:bg-green-50 text-xs">
+                      Pricing Available
+                    </Badge>
+                  )}
+                </div>
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-sm text-muted-foreground">
                   <span className="flex items-center gap-1">
                     <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -143,12 +140,6 @@ export function Buyers({user, queryBy}: BuyersPageProps) {
                   {buyer.primary_category && (
                     <>
                       <span className="hidden sm:inline">•</span>
-                      {/* <Link
-                        href={`/buyers/${buyer.primary_category.slug}`}
-                        className="font-medium text-foreground hover:underline hover:text-primary transition-colors"
-                      >
-                        {capitalizeFirstLetter(buyer.primary_category.name)}
-                      </Link> */}
                       <span className="font-medium text-foreground">{capitalizeFirstLetter(buyer.primary_category.name)}</span>
                     </>
                   )}
@@ -166,7 +157,7 @@ export function Buyers({user, queryBy}: BuyersPageProps) {
                 )}
               </div>
             </div>
-          </div>
+          </Link>
           </div>
         ))}
       </div>
