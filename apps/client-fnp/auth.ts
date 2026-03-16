@@ -129,6 +129,24 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
                     const token = credentials.token as string
                     if (!token) return null
 
+                    // Verify the token is valid by calling a protected backend endpoint
+                    const verifyUrl = `${BaseURL}/client/aggregates/dashboard`
+                    const verifyResponse = await fetch(verifyUrl, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Accept': 'application/json',
+                        },
+                    })
+
+                    if (!verifyResponse.ok) {
+                        captureException({
+                            message: 'Impersonate token failed backend verification',
+                            status: verifyResponse.status,
+                        })
+                        return null
+                    }
+
                     const decodedSession = jwt_decode<User & { impersonated_by?: string }>(token)
 
                     if (!decodedSession.impersonated_by) {

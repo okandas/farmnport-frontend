@@ -164,14 +164,6 @@ export function Client({ slug, user }: ClientPageProps) {
             </div>
           </div>
 
-          {/* Contact Views */}
-          <div className="bg-card border rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow">
-            <div>
-              <p className="text-xs text-muted-foreground mb-1">Contact Views</p>
-              <p className="text-lg font-bold">{client.contact_views || 0}</p>
-            </div>
-          </div>
-
           {/* Pricing or Category */}
           {client.type === 'buyer' && client.has_prices ? (
             <div className="bg-card border rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow">
@@ -300,6 +292,12 @@ export function Client({ slug, user }: ClientPageProps) {
                 <Icons.phone className="h-5 w-5 text-primary" />
                 Contact
               </h2>
+              {(client.contact_views || 0) > 0 && (
+                <p className="text-orange-600 text-xs font-medium mb-4 flex items-center gap-1">
+                  <Icons.eye className="h-3.5 w-3.5" />
+                  {client.contact_views} {client.contact_views === 1 ? 'person viewed' : 'people viewed'} this contact recently
+                </p>
+              )}
               <Contacts user={user} client={client} />
             </div>
           </div>

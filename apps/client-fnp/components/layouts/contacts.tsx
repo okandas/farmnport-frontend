@@ -149,13 +149,10 @@ export function Contacts({ user, client, quickOverview }: ContactPageProps) {
                     </div>
                     <div className="flex gap-x-4 py-1">
                         <dt>
-                            <span className="sr-only">Email</span>
-                            <Icons.mail className="h-6 w-5" aria-hidden="true" />
+                            <span className="sr-only">Address</span>
+                            <Icons.map className="h-6 w-5" aria-hidden="true" />
                         </dt>
-
-                        {
-                            user !== undefined ? (<ShowEmail email={client.email} />) : (<Info info={infoEmail} name={client.name} />)
-                        }
+                        <dd className="text-sm font-medium leading-6 text-muted-foreground">{client.address}</dd>
                     </div>
                     <div className="flex gap-x-4 py-1">
                         <dt>
@@ -168,20 +165,22 @@ export function Contacts({ user, client, quickOverview }: ContactPageProps) {
                         }
 
                     </div>
-                    <div className="flex gap-x-4">
-                        <dt>
-                            <span className="sr-only">Address</span>
-                            <Icons.map className="h-6 w-5" aria-hidden="true" />
-                        </dt>
-                        <dd className="text-sm font-medium leading-6 text-muted-foreground">{client.address}</dd>
-                    </div>
-
                     <div className="flex gap-x-4 py-1">
                         <dt>
                             <span className="sr-only">City, Province</span>
                             <Icons.landmark className="h-6 w-5" aria-hidden="true" />
                         </dt>
                         <dd className="text-sm font-medium leading-6 text-muted-foreground">{capitalizeFirstLetter(client.city)}, {capitalizeFirstLetter(client.province)}</dd>
+                    </div>
+                    <div className="flex gap-x-4 py-1">
+                        <dt>
+                            <span className="sr-only">Email</span>
+                            <Icons.mail className="h-6 w-5" aria-hidden="true" />
+                        </dt>
+
+                        {
+                            user !== undefined ? (<ShowEmail email={client.email} />) : (<Info info={infoEmail} name={client.name} />)
+                        }
                     </div>
                     { quickOverview ?
                             <div className="flex gap-x-4 py-1">

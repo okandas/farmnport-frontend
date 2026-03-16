@@ -2,7 +2,7 @@
   "name": "admin-farmnport",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --port 3000",
     "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint ."
