@@ -21,10 +21,10 @@ export async function generateMetadata({ params }: Props,  parent: ResolvingMeta
       canonical: `${AppURL}/buyer/${slug.toLowerCase()}`,
     },
     title: `${name} - Buyer in Zimbabwe | farmnport.com`,
-    description: `View ${name}'s buyer profile on Farmnport. See what produce they're looking for and connect directly.`,
+    description: `${name} is an agricultural buyer in Zimbabwe. View what produce they purchase, payment terms, pricing, and contact details on farmnport.com. Sell your farm products directly to ${name} in Zimbabwe.`,
     openGraph: {
       title: `${name} - Buyer in Zimbabwe`,
-      description: `View ${name}'s buyer profile on Farmnport. See what produce they're looking for and connect directly.`,
+      description: `${name} is an agricultural buyer in Zimbabwe. See what produce they purchase, payment terms, and pricing. Sell directly to ${name} on farmnport.com.`,
       url: `${AppURL}/buyer/${slug.toLowerCase()}`,
       siteName: 'farmnport',
       type: 'profile',

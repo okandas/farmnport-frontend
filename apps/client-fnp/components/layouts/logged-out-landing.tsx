@@ -9,14 +9,13 @@ import logoInputs from "@/assets/logos/inputs.svg"
 import logoGuidance from "@/assets/logos/guidance.svg"
 import logoPlanning from "@/assets/logos/planning.svg"
 import logoResearch from "@/assets/logos/research.svg"
-import logoChicken from "@/assets/logos/chicken.svg"
-import logoPig from "@/assets/logos/pig.svg"
-import logoCattle from "@/assets/logos/cattle.svg"
-import logoChilli from "@/assets/logos/chilli.svg"
-import logoTomato from "@/assets/logos/tomato.svg"
-import logoOnion from "@/assets/logos/onion.svg"
 
-export function LoggedOutLanding() {
+interface MarketplaceCounts {
+    buyers: number
+    farmers: number
+}
+
+export function LoggedOutLanding({ counts }: { counts: MarketplaceCounts }) {
     return (
         <main>
             <div className="py-12 lg:py-16">
@@ -33,12 +32,28 @@ export function LoggedOutLanding() {
                         <p className="mt-6 text-lg leading-8 text-muted-foreground sm:text-xl sm:leading-8">
                             Its never been easier to pre plan your harvest sales, with fresh farm produce buyers at the tip of your fingers. Farmnport the best place to find buyers for your agriproduce.
                         </p>
+                        {(counts.buyers > 0 || counts.farmers > 0) && (
+                            <div className="mt-8 flex items-center justify-center gap-x-8 sm:gap-x-12">
+                                {counts.buyers > 0 && (
+                                    <div className="text-center">
+                                        <p className="text-3xl font-bold tracking-tight sm:text-4xl">{counts.buyers.toLocaleString()}+</p>
+                                        <p className="mt-1 text-sm text-muted-foreground">Buyers</p>
+                                    </div>
+                                )}
+                                {counts.farmers > 0 && (
+                                    <div className="text-center">
+                                        <p className="text-3xl font-bold tracking-tight sm:text-4xl">{counts.farmers.toLocaleString()}+</p>
+                                        <p className="mt-1 text-sm text-muted-foreground">Farmers</p>
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
 
                     {/* Bento Grid */}
-                    <div className="mt-10 grid grid-cols-1 gap-4 sm:mt-16 lg:grid-cols-6 lg:grid-rows-2">
+                    <div className="mt-10 grid grid-cols-1 gap-4 sm:mt-16 lg:grid-cols-6">
                         {/* For Farmers - Large Card */}
-                        <div className="flex p-px lg:col-span-4">
+                        <div className="flex p-px lg:col-span-4 lg:row-span-2">
                             <div className="w-full overflow-hidden rounded-lg bg-card shadow outline outline-1 outline-black/5 max-lg:rounded-t-[2rem] lg:rounded-tl-[2rem] dark:shadow-none dark:outline-white/15">
                                 <div className="p-10">
                                     <h3 className="text-sm/4 font-semibold text-muted-foreground">For Farmers</h3>
@@ -68,14 +83,14 @@ export function LoggedOutLanding() {
                             </div>
                         </div>
 
-                        {/* Buyer Trust - Small Card */}
+                        {/* Direct Buyers - Small Card */}
                         <div className="flex p-px lg:col-span-2">
                             <div className="w-full overflow-hidden rounded-lg bg-card shadow outline outline-1 outline-black/5 lg:rounded-tr-[2rem] dark:shadow-none dark:outline-white/15">
-                                <div className="p-10">
-                                    <h3 className="text-sm/4 font-semibold text-muted-foreground">Buyer Trust</h3>
-                                    <p className="mt-2 text-lg font-medium tracking-tight">Verified buyers only</p>
+                                <div className="p-6">
+                                    <h3 className="text-sm/4 font-semibold text-muted-foreground">Direct Buyers</h3>
+                                    <p className="mt-2 text-lg font-medium tracking-tight">Sell directly to buyers</p>
                                     <p className="mt-2 max-w-lg text-sm/6 text-muted-foreground">
-                                        Transparent payment histories, professional standards and fair value for your produce.
+                                        Connect with {counts.buyers > 0 ? `${counts.buyers.toLocaleString()}+` : ''} buyers actively sourcing fresh farm produce across Zimbabwe.
                                     </p>
                                 </div>
                             </div>
@@ -83,8 +98,8 @@ export function LoggedOutLanding() {
 
                         {/* Market Prices - Small Card */}
                         <div className="flex p-px lg:col-span-2">
-                            <div className="w-full overflow-hidden rounded-lg bg-card shadow outline outline-1 outline-black/5 lg:rounded-bl-[2rem] dark:shadow-none dark:outline-white/15">
-                                <div className="p-10">
+                            <div className="w-full overflow-hidden rounded-lg bg-card shadow outline outline-1 outline-black/5 dark:shadow-none dark:outline-white/15">
+                                <div className="p-6">
                                     <h3 className="text-sm/4 font-semibold text-muted-foreground">Market Prices</h3>
                                     <p className="mt-2 text-lg font-medium tracking-tight">Real-time pricing data</p>
                                     <p className="mt-2 max-w-lg text-sm/6 text-muted-foreground">
@@ -94,12 +109,12 @@ export function LoggedOutLanding() {
                             </div>
                         </div>
 
-                        {/* CTA Card - Large */}
-                        <div className="flex p-px lg:col-span-4">
-                            <div className="w-full overflow-hidden rounded-lg bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20 shadow outline outline-1 outline-black/5 max-lg:rounded-b-[2rem] lg:rounded-br-[2rem] dark:shadow-none dark:outline-white/15">
+                        {/* CTA Card - Full Width */}
+                        <div className="flex p-px lg:col-span-6">
+                            <div className="w-full overflow-hidden rounded-lg bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20 shadow outline outline-1 outline-black/5 max-lg:rounded-b-[2rem] lg:rounded-b-[2rem] dark:shadow-none dark:outline-white/15">
                                 <div className="p-10">
                                     <h3 className="text-sm/4 font-semibold text-orange-600 dark:text-orange-500">Get Started Today</h3>
-                                    <p className="mt-2 text-lg font-medium tracking-tight">Join thousands of successful farmers</p>
+                                    <p className="mt-2 text-lg font-medium tracking-tight">Join {counts.farmers > 0 ? `${counts.farmers.toLocaleString()}+` : ''} farmers on the platform</p>
                                     <p className="mt-2 max-w-lg text-sm/6 text-muted-foreground mb-6">
                                         Build a profitable agricultural business with access to verified buyers, market insights, quality inputs and expert guidance all in one platform.
                                     </p>
@@ -115,8 +130,8 @@ export function LoggedOutLanding() {
                     </div>
                 </div>
             </div>
-            <Featured />
             <FeaturedPopularSection />
+            <Featured />
         </main>
     )
 }
@@ -212,42 +227,35 @@ function Featured() {
 }
 
 function FeaturedPopularSection() {
-
     const markets = [
         {
             name: "Chicken",
             message: "Find Chicken, Broiler Buyers in Zimbabwe, Make Poultry Farming Profitable for You.",
-            logo: logoChicken,
             link: "buyers/chicken"
         },
         {
             name: "Pork",
             message: "Find Pig, Pork, Porker Buyers in Zimbabwe, Make Livestock Farming Profitable for You.",
-            logo: logoPig,
             link: "buyers/pork"
         },
         {
             name: "Onions",
             message: "Find Onion Buyers in Zimbabwe, Make Horticulture Farming Profitable for You.",
-            logo: logoOnion,
             link: "buyers/onions"
         },
         {
             name: "Cattle",
             message: "Find Cattle Buyers in Zimbabwe, Make Ranching, Dairy, Livestock Farming Profitable for You.",
-            logo: logoCattle,
             link: "buyers/cattle"
         },
         {
             name: "Tomatoes",
             message: "Find Tomato Buyers in Zimbabwe, Make Horticulture Farming Profitable for You.",
-            logo: logoTomato,
             link: "buyers/tomatoes"
         },
         {
             name: "Chilli",
             message: "Find Chilli Buyers in Zimbabwe, Make Horticulture Farming Profitable for You.",
-            logo: logoChilli,
             link: "buyers/chilli"
         },
     ]
@@ -266,21 +274,15 @@ function FeaturedPopularSection() {
                 </div>
                 <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:mt-12">
                     {markets.map((market) => (
-                        <div
+                        <Link
                             key={market.name}
-                            className="relative flex items-center space-x-3 bg-card text-card-foreground shadow-sm rounded-lg  border border-zinc-100 p-6 dark:border-zinc-700/40 px-6 py-5 "
+                            href={market.link}
+                            className="block rounded-lg border bg-card text-card-foreground p-5 shadow-sm transition hover:border-orange-500 hover:shadow-md"
+                            onClick={() => sendGTMEvent({ event: "view", value: "FeaturedLink" })}
                         >
-                            <div className="relative mt-1 flex h-10 w-10 flex-none items-center justify-center rounded-full shadow-md shadow-zinc-800/5 ring-1 ring-zinc-900/5 dark:border dark:border-zinc-700/50 dark:bg-zinc-800 dark:ring-0">
-                                <Image src={market.logo} alt="" className="h-7 w-7" unoptimized />
-                            </div>
-                            <div className="min-w-0 flex-1">
-                                <Link href={market.link} className="focus:outline-none" onClick={() => sendGTMEvent({ event: "view", value: "FeaturedLink" })}>
-                                    <span className="absolute inset-0" aria-hidden="true" />
-                                    <p className="text-lg font-medium">{market.name}</p>
-                                    <p className="text-base text-muted-foreground pt-1">{market.message}</p>
-                                </Link>
-                            </div>
-                        </div>
+                            <h3 className="text-sm font-semibold">{market.name}</h3>
+                            <p className="text-sm text-muted-foreground mt-1">{market.message}</p>
+                        </Link>
                     ))}
                 </div>
             </div>

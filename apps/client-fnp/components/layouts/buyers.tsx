@@ -50,10 +50,11 @@ export function Buyers({user, queryBy}: BuyersPageProps) {
   const categoryFilters = searchParams?.getAll("category") ?? []
   const paymentTermsFilters = searchParams?.getAll("payment_terms") ?? []
   const pricingFilters = searchParams?.getAll("pricing") ?? []
+  const verifiedFilters = searchParams?.getAll("verified") ?? []
 
   const {data, isError, isFetching} = useQuery({
-    queryKey: ["results-buyers", {p: page, province: provinceFilters, produce: produceFilters, category: categoryFilters, payment_terms: paymentTermsFilters, pricing: pricingFilters, queryBy}],
-    queryFn: () => queryBy != undefined ? queryClientsByProduct('buyer', queryBy, {p: page, province: provinceFilters}) : queryClients('buyer', {p: page, province: provinceFilters, produce: produceFilters, category: categoryFilters, payment_terms: paymentTermsFilters, pricing: pricingFilters}),
+    queryKey: ["results-buyers", {p: page, province: provinceFilters, produce: produceFilters, category: categoryFilters, payment_terms: paymentTermsFilters, pricing: pricingFilters, verified: verifiedFilters, queryBy}],
+    queryFn: () => queryBy != undefined ? queryClientsByProduct('buyer', queryBy, {p: page, province: provinceFilters, verified: verifiedFilters}) : queryClients('buyer', {p: page, province: provinceFilters, produce: produceFilters, category: categoryFilters, payment_terms: paymentTermsFilters, pricing: pricingFilters, verified: verifiedFilters}),
     refetchOnWindowFocus: false
   })
 
@@ -133,7 +134,7 @@ export function Buyers({user, queryBy}: BuyersPageProps) {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
-                    {capitalizeFirstLetter(buyer.city)}, {capitalizeFirstLetter(buyer.province)}
+                    {buyer.city?.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}, {buyer.province?.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
                   </span>
                   <span className="hidden sm:inline">•</span>
                   <span>Buying {buyer.main_produce?.name ? capitalizeFirstLetter(plural(buyer.main_produce.name)) : 'Various Products'}</span>
@@ -145,7 +146,7 @@ export function Buyers({user, queryBy}: BuyersPageProps) {
                   )}
                 </div>
                 {buyer.short_description.length > 0 && (
-                  <p className="text-muted-foreground text-sm mt-2 line-clamp-2">
+                  <p className={`text-sm mt-2 line-clamp-2 ${buyer.short_description.toLowerCase().startsWith('note:') ? 'text-lime-700 dark:text-lime-500' : 'text-muted-foreground'}`}>
                     {capitalizeFirstLetter(buyer.short_description)}
                   </p>
                 )}

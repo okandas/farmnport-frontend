@@ -16,8 +16,32 @@ export const metadata = {
   },
 }
 
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
+
+async function getMarketplaceCounts() {
+  try {
+    const [buyerRes, farmerRes] = await Promise.all([
+      fetch(`${baseUrl}/v1/buyer/count`, { next: { revalidate: 3600 } }),
+      fetch(`${baseUrl}/v1/farmer/count`, { next: { revalidate: 3600 } }),
+    ])
+
+    const buyers = buyerRes.ok ? await buyerRes.json() : { total: 0 }
+    const farmers = farmerRes.ok ? await farmerRes.json() : { total: 0 }
+
+    return {
+      buyers: buyers.total || 0,
+      farmers: farmers.total || 0,
+    }
+  } catch {
+    return { buyers: 0, farmers: 0 }
+  }
+}
+
 export default async function LandingPage() {
-  const session = await auth()
+  const [session, counts] = await Promise.all([
+    auth(),
+    getMarketplaceCounts(),
+  ])
   const user = session?.user
 
   // Show dashboard for logged-in users, landing page for visitors
@@ -25,5 +49,5 @@ export default async function LandingPage() {
     return <LoggedInDashboard user={user} />
   }
 
-  return <LoggedOutLanding />
+  return <LoggedOutLanding counts={counts} />
 }

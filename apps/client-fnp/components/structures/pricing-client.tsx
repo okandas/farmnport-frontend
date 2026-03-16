@@ -17,7 +17,7 @@ interface PricingClientProps {
 
 export function PricingClient({ user }: PricingClientProps) {
   const router = useRouter()
-  const [method, setMethod] = useState<"ecocash" | "onemoney">("ecocash")
+  const [method, setMethod] = useState<"ecocash" | "onemoney" | "web">("ecocash")
   const [phone, setPhone] = useState("")
   const [error, setError] = useState("")
 
@@ -52,15 +52,15 @@ export function PricingClient({ user }: PricingClientProps) {
       return
     }
 
-    if (!phone || phone.length < 10) {
+    if (method !== "web" && (!phone || phone.length < 10)) {
       setError("Please enter a valid phone number (e.g. 0771234567)")
       return
     }
 
     mutate({
-      method,
-      phone,
-      email: user.email || "",
+      method: method === "web" ? "" : method,
+      phone: method === "web" ? "" : phone,
+      email: "",
     })
   }
 
@@ -138,19 +138,29 @@ export function PricingClient({ user }: PricingClientProps) {
                   >
                     OneMoney
                   </Button>
+                  <Button
+                    variant={method === "web" ? "default" : "outline"}
+                    className="flex-1"
+                    onClick={() => setMethod("web")}
+                    type="button"
+                  >
+                    Card
+                  </Button>
                 </div>
               </div>
 
-              <div>
-                <p className="text-sm font-medium mb-2">Phone Number</p>
-                <Input
-                  type="tel"
-                  placeholder="0771234567"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  maxLength={15}
-                />
-              </div>
+              {method !== "web" && (
+                <div>
+                  <p className="text-sm font-medium mb-2">Phone Number</p>
+                  <Input
+                    type="tel"
+                    placeholder="0771234567"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    maxLength={15}
+                  />
+                </div>
+              )}
 
               {error && (
                 <p className="text-sm text-red-500">{error}</p>

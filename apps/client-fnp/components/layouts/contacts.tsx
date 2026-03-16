@@ -88,7 +88,7 @@ export function Contacts({ user, client, quickOverview }: ContactPageProps) {
             <dd>
                 <Button className="p-0 h-[22px]" variant="link" onClick={() => {
                     sendGTMEvent({ event: 'action', value: `SubscribeToView${capitalizeFirstLetter(type)}` })
-                    router.push('/waiting-list-paying')
+                    router.push('/pricing')
                 }}>
                     Unlock {type === "phone" ? "number" : "email"}
                 </Button>
@@ -166,13 +166,15 @@ export function Contacts({ user, client, quickOverview }: ContactPageProps) {
                         </dt>
                         <dd className="text-sm font-medium leading-6 text-muted-foreground">{formatDate(client.created)}</dd>
                     </div>
-                    <div className="flex gap-x-4 py-1">
-                        <dt>
-                            <span className="sr-only">Address</span>
-                            <Icons.map className="h-6 w-5" aria-hidden="true" />
-                        </dt>
-                        <dd className="text-sm font-medium leading-6 text-muted-foreground">{client.address}</dd>
-                    </div>
+                    {client.address && (
+                        <div className="flex gap-x-4 py-1">
+                            <dt>
+                                <span className="sr-only">Address</span>
+                                <Icons.map className="h-6 w-5" aria-hidden="true" />
+                            </dt>
+                            <dd className="text-sm font-medium leading-6 text-muted-foreground">{client.address}</dd>
+                        </div>
+                    )}
                     <div className="flex gap-x-4 py-1">
                         <dt>
                             <span className="sr-only">Phone</span>
@@ -191,7 +193,7 @@ export function Contacts({ user, client, quickOverview }: ContactPageProps) {
                             <span className="sr-only">City, Province</span>
                             <Icons.landmark className="h-6 w-5" aria-hidden="true" />
                         </dt>
-                        <dd className="text-sm font-medium leading-6 text-muted-foreground">{capitalizeFirstLetter(client.city)}, {capitalizeFirstLetter(client.province)}</dd>
+                        <dd className="text-sm font-medium leading-6 text-muted-foreground">{client.city?.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}, {client.province?.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}</dd>
                     </div>
                     <div className="flex gap-x-4 py-1">
                         <dt>

@@ -83,6 +83,11 @@ export function centsToDollars(cents: number): string {
   return `$${dollars.toFixed(2)}`
 }
 
+export function titleCase(str?: string): string {
+  if (!str) return ""
+  return str.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+}
+
 export function ucFirst(str: string): string {
   if (!str) return ""
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()

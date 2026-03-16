@@ -116,10 +116,10 @@ export function ActionsSidebar({type = "buyers", product, showPremiumCTA = true}
             Get direct contact information and connect with {type === "buyers" ? "buyers" : "sellers"} instantly.
           </p>
           <Link
-            href="/waiting-list-paying"
+            href="/pricing"
             className="block w-full bg-primary text-primary-foreground px-4 py-2.5 rounded-lg font-medium hover:bg-primary/90 transition-colors text-sm text-center"
           >
-            Join Waiting List
+            Subscribe
           </Link>
         </div>
       )}
