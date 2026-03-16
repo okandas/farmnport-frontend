@@ -2,6 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query"
 import { sendGTMEvent } from "@next/third-parties/google"
+import Link from "next/link"
 
 import { queryClient, queryClientPricing } from "@/lib/query"
 import { ApplicationUser, AuthenticatedUser } from "@/lib/schemas"
@@ -288,11 +289,13 @@ export function Client({ slug, user }: ClientPageProps) {
                         {pricingTotal} price {pricingTotal === 1 ? 'list' : 'lists'}
                       </p>
                     </div>
-                    <Button
-                      onClick={() => sendGTMEvent({ event: 'link', value: 'SubscribePricingFromDetailPage' })}
+                    <Button asChild
+                      onClick={() => sendGTMEvent({ event: 'link', value: 'ViewPricingFromDetailPage' })}
                     >
-                      <Icons.lock className="h-4 w-4 mr-2" />
-                      Unlock Pricing
+                      <Link href={`/prices?clients=${encodeURIComponent(client.name)}`}>
+                        See Pricing
+                        <Icons.arrowRight className="h-4 w-4 ml-2" />
+                      </Link>
                     </Button>
                   </div>
                 ) : (
