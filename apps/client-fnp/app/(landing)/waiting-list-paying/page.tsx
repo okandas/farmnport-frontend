@@ -6,7 +6,11 @@ export const metadata = {
   description: `Be the first to know when premium features launch. Join our waiting list to access buyer contact information and unlock exclusive farming marketplace benefits.`,
   alternates: {
     canonical: `/waiting-list-paying`,
-  }
+  },
+  robots: {
+    index: false,
+    follow: false,
+  },
 }
 
 export default async function WaitingListPayingPage() {

@@ -4,6 +4,10 @@ import { WaitingListShop } from "@/components/structures/waiting-list-shop"
 export const metadata = {
   title: "Join Shop Waiting List | FarmNPort",
   description: "Be the first to know when our online agrochemical shop launches. Join the waiting list for exclusive early access.",
+  robots: {
+    index: false,
+    follow: false,
+  },
 }
 
 export default async function WaitingListShopPage() {
