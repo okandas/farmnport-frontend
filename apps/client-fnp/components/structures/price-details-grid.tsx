@@ -1,6 +1,15 @@
 "use client"
 
-import { capitalizeFirstLetter, centsToDollars, cn } from "@/lib/utilities"
+import { capitalizeFirstLetter, centsToDollars } from "@/lib/utilities"
+
+const gradeColors = [
+  "text-green-700 bg-green-50 ring-green-600/20 dark:text-green-400 dark:bg-green-950/30 dark:ring-green-500/20",
+  "text-lime-700 bg-lime-50 ring-lime-600/20 dark:text-lime-400 dark:bg-lime-950/30 dark:ring-lime-500/20",
+  "text-yellow-700 bg-yellow-50 ring-yellow-600/20 dark:text-yellow-400 dark:bg-yellow-950/30 dark:ring-yellow-500/20",
+  "text-amber-700 bg-amber-50 ring-amber-600/20 dark:text-amber-400 dark:bg-amber-950/30 dark:ring-amber-500/20",
+  "text-orange-700 bg-orange-50 ring-orange-600/20 dark:text-orange-400 dark:bg-orange-950/30 dark:ring-orange-500/20",
+  "text-red-700 bg-red-50 ring-red-600/10 dark:text-red-400 dark:bg-red-950/30 dark:ring-red-500/20",
+]
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
 
 interface PriceListData {
@@ -24,15 +33,6 @@ interface PriceDetailsGridProps {
 
 type ProducerPriceListKeys = "beef" | "lamb" | "mutton" | "goat" | "chicken" | "pork" | "slaughter"
 
-const statuses = [
-  "text-green-700 bg-green-50 ring-green-600/20 dark:text-green-400 dark:bg-green-950/30 dark:ring-green-500/20",
-  "text-lime-700 bg-lime-50 ring-lime-600/20 dark:text-lime-400 dark:bg-lime-950/30 dark:ring-lime-500/20",
-  "text-yellow-700 bg-yellow-50 ring-yellow-600/20 dark:text-yellow-400 dark:bg-yellow-950/30 dark:ring-yellow-500/20",
-  "text-amber-700 bg-amber-50 ring-amber-600/20 dark:text-amber-400 dark:bg-amber-950/30 dark:ring-amber-500/20",
-  "text-orange-700 bg-orange-50 ring-orange-600/20 dark:text-orange-400 dark:bg-orange-950/30 dark:ring-orange-500/20",
-  "text-red-700 bg-red-50 ring-red-600/10 dark:text-red-400 dark:bg-red-950/30 dark:ring-red-500/20",
-]
-
 const grades: Record<ProducerPriceListKeys, Record<string, string>> = {
   beef: { super: "S", choice: "O", commercial: "B", economy: "X", manufacturing: "J", condemned: "CD" },
   lamb: { superPremium: "SL", choice: "CL", standard: "TL", inferior: "IL" },
@@ -55,7 +55,6 @@ const formatGradeName = (key: string): string => {
 export function PriceDetailsGrid({ priceList }: PriceDetailsGridProps) {
   const categories = pricingTypes[priceList.client_specialization] || []
 
-  // Filter to only renderable categories
   const renderableCategories = categories.filter((pricingType) => {
     if (priceList[pricingType] === undefined) return false
     const categoryData = priceList[pricingType]
@@ -76,9 +75,9 @@ export function PriceDetailsGrid({ priceList }: PriceDetailsGridProps) {
         return (
           <div key={renderIndex}>
           {renderIndex > 0 && renderIndex % 2 === 0 && <AdSenseInFeed />}
-          <div className="rounded-xl border bg-card overflow-hidden shadow-sm">
-            <div className="px-6 py-3 bg-gradient-to-r from-muted/30 to-card border-b">
-              <h3 className="text-lg font-bold text-card-foreground">
+          <div className="rounded-lg border bg-card overflow-hidden">
+            <div className="px-5 py-3 border-b bg-muted/30">
+              <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide">
                 {capitalizeFirstLetter(pricingType)}
               </h3>
             </div>
@@ -92,17 +91,17 @@ export function PriceDetailsGrid({ priceList }: PriceDetailsGridProps) {
                   <col className="w-[22.5%]" />
                 </colgroup>
                 <thead>
-                  <tr className="border-b border-border bg-muted/5">
-                    <th className="px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  <tr className="border-b">
+                    <th className="px-5 py-2 text-left text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
                       Grade
                     </th>
-                    <th className="px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    <th className="px-5 py-2 text-left text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
                       Code
                     </th>
-                    <th className="px-6 py-2 text-right text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    <th className="px-5 py-2 text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
                       Delivered
                     </th>
-                    <th className="px-6 py-2 text-right text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    <th className="px-5 py-2 text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
                       Collected
                     </th>
                   </tr>
@@ -114,31 +113,25 @@ export function PriceDetailsGrid({ priceList }: PriceDetailsGridProps) {
                     const collectedPrice = gradeItem?.pricing?.collected || 0
 
                     return (
-                      <tr key={index} className="hover:bg-muted/5 transition-colors">
-                        <td className="px-6 py-2.5">
-                          <span className="text-sm font-semibold text-card-foreground">
+                      <tr key={index} className="hover:bg-muted/30 transition-colors">
+                        <td className="px-5 py-2.5">
+                          <span className="text-sm font-medium text-foreground">
                             {formatGradeName(key)}
                           </span>
                         </td>
-                        <td className="px-6 py-2.5">
-                          {grades?.[pricingType]?.[key] ? (
-                            <span className={cn(statuses[index % statuses.length], "inline-flex items-center justify-center rounded-md px-2 py-0.5 text-xs font-bold ring-1 ring-inset min-w-[40px]")}>
-                              {grades[pricingType][key]}
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center justify-center rounded-md px-2 py-0.5 text-xs font-bold ring-1 ring-inset min-w-[40px] text-gray-700 bg-gray-50 ring-gray-600/20 dark:text-gray-400 dark:bg-gray-950/30 dark:ring-gray-500/20">
-                              NG
-                            </span>
-                          )}
+                        <td className="px-5 py-2.5">
+                          <span className={`inline-flex items-center justify-center rounded-md px-2 py-0.5 text-xs font-bold ring-1 ring-inset min-w-[36px] ${gradeColors[index % gradeColors.length]}`}>
+                            {grades?.[pricingType]?.[key] || "—"}
+                          </span>
                         </td>
-                        <td className="px-6 py-2.5 text-right">
-                          <span className="text-sm font-bold text-card-foreground">
+                        <td className="px-5 py-2.5 text-right">
+                          <span className="text-sm font-semibold text-foreground">
                             {centsToDollars(deliveredPrice)}
                           </span>
                         </td>
-                        <td className="px-6 py-2.5 text-right">
-                          <span className="text-sm font-semibold text-muted-foreground">
-                            {collectedPrice > 0 ? centsToDollars(collectedPrice) : "-"}
+                        <td className="px-5 py-2.5 text-right">
+                          <span className="text-sm text-muted-foreground">
+                            {collectedPrice > 0 ? centsToDollars(collectedPrice) : "—"}
                           </span>
                         </td>
                       </tr>

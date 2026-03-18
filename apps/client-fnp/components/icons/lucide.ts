@@ -58,7 +58,8 @@ import {
     Lock,
     Eye,
     Shield,
-    Users
+    Users,
+    Sprout
 } from "lucide-react"
 
 export type Icon = LucideIcon
@@ -124,5 +125,6 @@ export const Icons = {
     lock: Lock,
     eye: Eye,
     shield: Shield,
-    users: Users
+    users: Users,
+    sprout: Sprout
 }

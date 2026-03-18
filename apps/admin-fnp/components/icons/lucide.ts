@@ -51,7 +51,8 @@ import {
   ClipboardList,
   Beaker,
   Bug,
-  Layers
+  Layers,
+  Sprout
 } from "lucide-react"
 
 export type Icon = LucideIcon
@@ -110,5 +111,6 @@ export const Icons = {
   clipboardList: ClipboardList,
   beaker: Beaker,
   bug: Bug,
-  layers: Layers
+  layers: Layers,
+  sprout: Sprout
 }

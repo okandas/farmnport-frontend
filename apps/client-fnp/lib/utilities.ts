@@ -101,3 +101,22 @@ export function formatUnit(unit?: string): string {
   if (!unit) return ""
   return unitLabels[unit.toLowerCase()] || unit
 }
+
+const UPPERCASE_TOKENS = new Set([
+  "ec", "sc", "sl", "wg", "wp", "ws", "se", "fs", "zc", "wdg", "od", "ew",
+  "sg", "sp", "gr", "cs", "me", "dc", "ii", "iii", "iv",
+])
+
+export function formatProductName(name?: string): string {
+  if (!name) return ""
+  return name.split(" ").map(word => {
+    if (UPPERCASE_TOKENS.has(word.toLowerCase())) return word.toUpperCase()
+    // Handle joined number+code like "960ec" → "960EC"
+    const numCodeMatch = word.match(/^(\d+\.?\d*)([a-zA-Z]+)$/)
+    if (numCodeMatch && UPPERCASE_TOKENS.has(numCodeMatch[2].toLowerCase())) {
+      return numCodeMatch[1] + numCodeMatch[2].toUpperCase()
+    }
+    if (/^\d/.test(word)) return word
+    return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+  }).join(" ")
+}

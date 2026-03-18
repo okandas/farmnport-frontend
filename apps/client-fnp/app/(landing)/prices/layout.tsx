@@ -1,25 +1,30 @@
 import { Metadata } from 'next'
 
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://farmnport.com'
+
 export const metadata: Metadata = {
-  title: 'Farm Produce Prices | farmnport',
-  description: 'Browse current farm produce price lists from verified buyers and suppliers. Real-time market prices for fresh fruits, vegetables, and agricultural products.',
-  keywords: 'farm produce prices, market prices, agricultural prices, fresh produce, buyer prices, supplier prices, farm products',
+  title: {
+    template: '%s | farmnport',
+    default: 'Agricultural Market Prices Zimbabwe | farmnport',
+  },
+  description: 'Compare current agricultural prices from verified buyers across Zimbabwe. Livestock, cattle, grains and more — updated weekly in USD and ZiG.',
+  keywords: 'agricultural prices zimbabwe, cattle prices, liveweight prices, CDM prices, cold dress mass, beef prices, livestock market, farm produce prices, abattoir rates',
   authors: [{ name: 'farmnport' }],
   openGraph: {
-    title: 'Farm Produce Prices',
-    description: 'Browse current farm produce price lists from verified buyers and suppliers. Real-time market prices for fresh fruits, vegetables, and agricultural products.',
-    url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://farmnport.com'}/prices`,
+    title: 'Agricultural Market Prices Zimbabwe',
+    description: 'Compare current agricultural prices from verified buyers across Zimbabwe.',
+    url: `${baseUrl}/prices`,
     siteName: 'farmnport',
     locale: 'en_US',
     type: 'website',
   },
   twitter: {
     card: 'summary',
-    title: 'Farm Produce Prices',
-    description: 'Browse current farm produce price lists from verified buyers and suppliers.',
+    title: 'Agricultural Market Prices Zimbabwe',
+    description: 'Compare current agricultural prices from verified buyers across Zimbabwe.',
   },
   alternates: {
-    canonical: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://farmnport.com'}/prices`,
+    canonical: `${baseUrl}/prices`,
   },
   robots: {
     index: true,

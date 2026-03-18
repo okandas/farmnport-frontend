@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation"
 import { Bug, Beaker, ShoppingCart } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { sendGTMEvent } from '@next/third-parties/google'
+import { formatProductName } from "@/lib/utilities"
 
 interface AgroChemicalCardProps {
   chemical: any
@@ -49,8 +50,8 @@ export function AgroChemicalCard({ chemical, mode }: AgroChemicalCardProps) {
 
         {/* Product Name */}
         <Link href={href}>
-          <h3 className="font-semibold text-sm leading-tight capitalize line-clamp-2 min-h-[2.5rem] group-hover:text-primary transition-colors">
-            {chemical.name}
+          <h3 className="font-semibold text-sm leading-tight line-clamp-2 min-h-[2.5rem] group-hover:text-primary transition-colors">
+            {formatProductName(chemical.name)}
           </h3>
         </Link>
 

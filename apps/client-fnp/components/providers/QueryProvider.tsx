@@ -11,7 +11,14 @@ type QueryClientProps = {
 }
 
 export function QueryProvider({ children }: QueryClientProps) {
-    const [queryClient] = useState(() => new QueryClient())
+    const [queryClient] = useState(() => new QueryClient({
+        defaultOptions: {
+            queries: {
+                staleTime: process.env.NODE_ENV === "production" ? 5 * 60 * 1000 : 0,
+                refetchOnWindowFocus: false,
+            },
+        },
+    }))
     return (
         <QueryClientProvider client={queryClient}>
             {children}

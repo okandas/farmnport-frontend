@@ -3,13 +3,15 @@
 import { useQuery } from "@tanstack/react-query"
 import { queryAllAgroChemicals } from "@/lib/query"
 import { Button } from "@/components/ui/button"
-import { Beaker } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { Beaker, Search, X } from "lucide-react"
 import { AgroChemicalFilterSidebar } from "@/components/generic/agroChemicalFilterSidebar"
 import { AgroChemicalCard } from "@/components/agrochemical/AgroChemicalCard"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
 
 export default function AllAgroChemicalsPage() {
     const [queryState, setQueryState] = useQueryStates({
+        search: parseAsString.withDefault(""),
         brand: parseAsArrayOf(parseAsString),
         target: parseAsArrayOf(parseAsString),
         active_ingredient: parseAsArrayOf(parseAsString),
@@ -18,9 +20,10 @@ export default function AllAgroChemicalsPage() {
     })
 
     const { data: chemicalsData, isLoading: chemicalsLoading } = useQuery({
-        queryKey: ["agrochemicals-all", queryState.p, queryState.brand, queryState.target, queryState.active_ingredient, queryState.used_on],
+        queryKey: ["agrochemicals-all", queryState.p, queryState.search, queryState.brand, queryState.target, queryState.active_ingredient, queryState.used_on],
         queryFn: () => queryAllAgroChemicals({
             p: queryState.p,
+            search: queryState.search,
             brand: queryState.brand || [],
             target: queryState.target || [],
             active_ingredient: queryState.active_ingredient || [],
@@ -42,11 +45,31 @@ export default function AllAgroChemicalsPage() {
                 {/* Header */}
                 <div className="mb-8">
                     <h1 className="text-4xl font-bold tracking-tight font-heading mb-4">
-                        All Agrochemicals
+                        {queryState.search ? `Results for "${queryState.search}"` : "All Agrochemicals"}
                     </h1>
                     <p className="text-lg text-muted-foreground">
                         Browse our complete collection of agrochemical products
                     </p>
+                    <div className="mt-4 flex items-center gap-2 max-w-md">
+                        <div className="relative flex-1">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                            <Input
+                                placeholder="Search products, active ingredients..."
+                                value={queryState.search}
+                                onChange={(e) => setQueryState({ search: e.target.value, p: 1 })}
+                                className="pl-10"
+                            />
+                        </div>
+                        {queryState.search && (
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => setQueryState({ search: "", p: 1 })}
+                            >
+                                <X className="h-4 w-4" />
+                            </Button>
+                        )}
+                    </div>
                 </div>
 
                 <div className="flex flex-col lg:flex-row gap-8">
@@ -58,8 +81,8 @@ export default function AllAgroChemicalsPage() {
                     {/* Main Content */}
                     <main className="flex-1">
                         {chemicalsLoading ? (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                                {[...Array(6)].map((_, i) => (
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+                                {[...Array(8)].map((_, i) => (
                                     <div key={i} className="animate-pulse">
                                         <div className="bg-card border border-border rounded-lg overflow-hidden">
                                             <div className="aspect-square bg-muted" />
@@ -83,7 +106,7 @@ export default function AllAgroChemicalsPage() {
                             </div>
                         ) : (
                             <>
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
                                     {chemicals.map((chemical: any) => (
                                         <AgroChemicalCard
                                             key={chemical.id}
