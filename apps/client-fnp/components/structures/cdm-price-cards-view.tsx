@@ -2,14 +2,14 @@
 
 import { Fragment, useState, useMemo } from "react"
 import { useQuery } from "@tanstack/react-query"
+import { useQueryStates, parseAsArrayOf, parseAsString } from "nuqs"
 
 import { queryCdmPrices } from "@/lib/query"
 import { CdmPrice } from "@/lib/schemas"
 import { CdmPriceSummaryCard } from "@/components/structures/cdm-price-summary-card"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { ArrowRight, ChevronLeft, ChevronRight, Search, X } from "lucide-react"
+import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react"
 import Link from "next/link"
 
 interface CdmPriceCardsViewProps {
@@ -19,10 +19,13 @@ interface CdmPriceCardsViewProps {
 
 export function CdmPriceCardsView({ limit, viewAllHref }: CdmPriceCardsViewProps = {}) {
   const [currentPage, setCurrentPage] = useState(1)
-  const [search, setSearch] = useState("")
+
+  const [filters] = useQueryStates({
+    clients: parseAsArrayOf(parseAsString),
+  })
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["cdm-prices", { p: currentPage, limit }],
+    queryKey: ["cdm-prices", { p: currentPage, limit, ...filters }],
     queryFn: () => queryCdmPrices({ p: currentPage, ...(limit ? { limit } : {}) }),
     refetchOnWindowFocus: false,
   })
@@ -31,10 +34,11 @@ export function CdmPriceCardsView({ limit, viewAllHref }: CdmPriceCardsViewProps
   const total = data?.data?.total || 0
 
   const prices = useMemo(() => {
-    if (!search || limit) return allPrices
-    const q = search.toLowerCase()
-    return allPrices.filter(p => p.client_name?.toLowerCase().includes(q))
-  }, [allPrices, search, limit])
+    if (limit) return allPrices
+    const clientFilter = filters.clients
+    if (!clientFilter || clientFilter.length === 0) return allPrices
+    return allPrices.filter(p => clientFilter.includes(p.client_name?.toLowerCase()))
+  }, [allPrices, filters.clients, limit])
 
   const totalPages = Math.ceil(total / (limit || 20))
 

@@ -1,4 +1,5 @@
 import { CdmPriceCardsView } from "@/components/structures/cdm-price-cards-view"
+import { FilterSidebar } from "@/components/generic/filterSidebar"
 import { ActionsSidebar } from "@/components/generic/actions-sidebar"
 import Link from "next/link"
 import { ChevronLeft } from "lucide-react"
@@ -39,7 +40,14 @@ export default async function CdmPricesPage() {
         </p>
 
         <div className="lg:flex lg:space-x-10">
+          <div className="hidden lg:block lg:w-64 relative">
+            <FilterSidebar hideProduce />
+          </div>
+
           <div className="lg:flex-1">
+            <div className="lg:hidden mb-6">
+              <FilterSidebar hideProduce />
+            </div>
             <CdmPriceCardsView />
           </div>
 
