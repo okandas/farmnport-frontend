@@ -2,7 +2,7 @@
 
 import { sendGTMEvent } from "@next/third-parties/google"
 import Link from "next/link"
-import { Pill, Syringe, Shield, Heart, Beaker, ArrowRight, Bug, Scissors, Bandage, Zap, Baby } from "lucide-react"
+import { Pill, Syringe, Shield, Heart, Beaker, ArrowRight, Bug, Scissors, Cross, Zap, Baby } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useQuery } from "@tanstack/react-query"
 import { queryAnimalHealthCategories } from "@/lib/query"
@@ -15,7 +15,7 @@ const categoryIcons: Record<string, any> = {
     "biosecurity-disinfectants": Shield,
     "tick-flea-control": Bug,
     "worm-fluke-control": Scissors,
-    "wound-remedies": Bandage,
+    "wound-remedies": Cross,
     "fly-control": Zap,
     "stud-management": Baby,
     "equipment": Beaker,
