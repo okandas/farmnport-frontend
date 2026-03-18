@@ -114,18 +114,10 @@ export default async function CdmPriceDetailPage({ params }: CdmDetailPageProps)
             </span>
           </div>
 
-          <div className="flex flex-wrap items-center gap-4 text-sm">
-            <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-muted-foreground" />
-              <span className="text-muted-foreground">Effective:</span>
-              <span className="font-medium text-foreground">{formattedDate}</span>
-            </div>
-
-            {price.exchange_rate > 0 && (
-              <div className="text-muted-foreground">
-                1 USD = {price.exchange_rate} ZiG
-              </div>
-            )}
+          <div className="flex items-center gap-2 text-sm">
+            <Calendar className="h-4 w-4 text-muted-foreground" />
+            <span className="text-muted-foreground">Effective:</span>
+            <span className="font-medium text-foreground">{formattedDate}</span>
           </div>
         </div>
 
