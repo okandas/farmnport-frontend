@@ -7,9 +7,15 @@ import { queryProducerPriceLists } from "@/lib/query"
 import { Button } from "@/components/ui/button"
 import { PriceSummaryCard } from "@/components/structures/price-summary-card"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
-import { ChevronLeft, ChevronRight } from "lucide-react"
+import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react"
+import Link from "next/link"
 
-export function PriceCardsView() {
+interface PriceCardsViewProps {
+  limit?: number
+  viewAllHref?: string
+}
+
+export function PriceCardsView({ limit, viewAllHref }: PriceCardsViewProps = {}) {
   const [currentPage, setCurrentPage] = useState(1)
 
   const [filters] = useQueryStates({
@@ -19,29 +25,31 @@ export function PriceCardsView() {
   })
 
   const { isError, isLoading, data } = useQuery({
-    queryKey: ["producer-price-lists", { p: currentPage, ...filters }],
-    queryFn: () => queryProducerPriceLists({ p: currentPage }),
+    queryKey: ["producer-price-lists", { p: currentPage, limit, ...filters }],
+    queryFn: () => queryProducerPriceLists({ p: currentPage, ...(limit ? { limit } : {}) }),
     refetchOnWindowFocus: false,
   })
 
   const producePriceLists = data?.data?.data || []
   const total = data?.data?.total || 0
-  const totalPages = Math.ceil(total / 20)
+  const totalPages = Math.ceil(total / (limit || 20))
 
   if (isError) {
     return (
-      <div className="text-center py-12 px-4 border-2 border-dashed border-destructive/30 rounded-xl">
-        <p className="text-lg font-medium mb-2">Error loading price lists</p>
-        <p className="text-sm text-muted-foreground">Please try refreshing the page</p>
+      <div className="text-center py-8 px-4">
+        <p className="text-sm font-medium mb-1">Error loading price lists</p>
+        <p className="text-xs text-muted-foreground">Please try refreshing the page</p>
       </div>
     )
   }
 
   if (isLoading) {
     return (
-      <div className="space-y-3">
-        {[...Array(6)].map((_, i) => (
-          <div key={i} className="h-16 rounded-xl border bg-card animate-pulse" />
+      <div className={limit ? "divide-y" : "space-y-3"}>
+        {[...Array(limit || 6)].map((_, i) => (
+          <div key={i} className={limit ? "py-3 px-1" : ""}>
+            <div className={`h-[52px] rounded-lg ${limit ? "bg-muted/20" : "border bg-muted/30"} animate-pulse`} />
+          </div>
         ))}
       </div>
     )
@@ -49,13 +57,38 @@ export function PriceCardsView() {
 
   if (producePriceLists.length === 0) {
     return (
-      <div className="text-center py-12 px-4 border-2 border-dashed rounded-xl">
-        <p className="text-lg font-medium mb-2">No price lists found</p>
-        <p className="text-sm text-muted-foreground">Check back later for updated prices</p>
+      <div className="text-center py-8 px-4">
+        <p className="text-sm font-medium mb-1">No price lists found</p>
+        <p className="text-xs text-muted-foreground">Check back later for updated prices</p>
       </div>
     )
   }
 
+  // Preview mode — clean divider list inside parent card
+  if (limit) {
+    return (
+      <div>
+        <div className="divide-y">
+          {producePriceLists.map((priceList: any) => (
+            <PriceSummaryCard key={priceList.id} priceList={priceList} />
+          ))}
+        </div>
+        {viewAllHref && total > limit && (
+          <div className="pt-3 mt-1">
+            <Link
+              href={viewAllHref}
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+            >
+              View all liveweight prices
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  // Full paginated mode
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">

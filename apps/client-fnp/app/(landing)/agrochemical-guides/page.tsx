@@ -1,16 +1,13 @@
-"use client"
-
-import { sendGTMEvent } from "@next/third-parties/google"
 import Link from "next/link"
 import Image from "next/image"
 import {
     Pill, Leaf, Bug, Droplet, Rat, TrendingUp, Beaker, Shell, Shield,
-    ArrowRight, Sprout, Layers, ChevronRight, Search, BookOpen, FlaskConical
+    ArrowRight, Sprout, Layers, ChevronRight, BookOpen, FlaskConical
 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { useQuery } from "@tanstack/react-query"
-import { queryAgroChemicalCategories, queryPublishedSprayPrograms } from "@/lib/query"
+import { BaseURL } from "@/lib/schemas"
 import { capitalizeFirstLetter } from "@/lib/utilities"
+import { GuidesSearch } from "@/components/agrochemical/GuidesSearch"
+import { GuidesHeroActions } from "@/components/agrochemical/GuidesHeroActions"
 
 const categoryIcons: Record<string, any> = {
     "insecticides": Bug,
@@ -25,21 +22,33 @@ const categoryIcons: Record<string, any> = {
     "bactericides": Pill,
 }
 
-export default function AgrochemicalGuidesPage() {
-    const { data } = useQuery({
-        queryKey: ["agrochemical-categories"],
-        queryFn: () => queryAgroChemicalCategories(),
-        refetchOnWindowFocus: false,
-    })
+async function getCategories() {
+    try {
+        const res = await fetch(`${BaseURL}/agrochemicalcategories/`, { next: { revalidate: 3600 } })
+        if (!res.ok) return []
+        const data = await res.json()
+        return data?.data || []
+    } catch {
+        return []
+    }
+}
 
-    const { data: sprayData, isLoading: sprayLoading } = useQuery({
-        queryKey: ["spray-programs-landing"],
-        queryFn: () => queryPublishedSprayPrograms(),
-        refetchOnWindowFocus: false,
-    })
+async function getSprayPrograms() {
+    try {
+        const res = await fetch(`${BaseURL}/sprayprograms/`, { next: { revalidate: 3600 } })
+        if (!res.ok) return []
+        const data = await res.json()
+        return data?.data || []
+    } catch {
+        return []
+    }
+}
 
-    const categories = data?.data?.data || []
-    const sprayPrograms = sprayData?.data?.data || []
+export default async function AgrochemicalGuidesPage() {
+    const [categories, sprayPrograms] = await Promise.all([
+        getCategories(),
+        getSprayPrograms(),
+    ])
 
     return (
         <main className="bg-gradient-to-b from-background to-muted/20">
@@ -63,31 +72,13 @@ export default function AgrochemicalGuidesPage() {
                             Search active ingredients, discover how pesticides and herbicides work,
                             and follow step-by-step spray programs for every growth stage.
                         </p>
-                        <div className="flex flex-wrap items-center justify-center gap-3">
-                            <Button
-                                size="lg"
-                                asChild
-                                onClick={() => sendGTMEvent({ event: "click", value: "ReadGuides" })}
-                                className="text-base px-6 py-5 h-auto font-semibold shadow-lg hover:shadow-xl transition-all group"
-                            >
-                                <Link href="/agrochemical-guides/all" className="flex items-center gap-2">
-                                    <Search className="h-5 w-5" />
-                                    Browse All Products
-                                </Link>
-                            </Button>
-                            <Button
-                                size="lg"
-                                variant="outline"
-                                asChild
-                                className="text-base px-6 py-5 h-auto font-semibold transition-all group"
-                            >
-                                <Link href="/spray-programs" className="flex items-center gap-2">
-                                    <Sprout className="h-5 w-5" />
-                                    All Spray Programs
-                                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                                </Link>
-                            </Button>
+
+                        {/* Quick Search */}
+                        <div className="mb-8">
+                            <GuidesSearch />
                         </div>
+
+                        <GuidesHeroActions />
                     </div>
                 </div>
             </section>
@@ -113,7 +104,7 @@ export default function AgrochemicalGuidesPage() {
             </section>
 
             {/* Spray Programs Section */}
-            {(sprayLoading || sprayPrograms.length > 0) && (
+            {sprayPrograms.length > 0 && (
                 <section className="py-14 lg:py-20">
                     <div className="mx-auto max-w-7xl px-6 lg:px-8">
                         <div className="flex items-end justify-between mb-8">
@@ -138,69 +129,54 @@ export default function AgrochemicalGuidesPage() {
                             </Link>
                         </div>
 
-                        {sprayLoading ? (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                                {[1, 2, 3, 4].map((i) => (
-                                    <div key={i} className="animate-pulse rounded-xl border bg-card overflow-hidden">
-                                        <div className="aspect-[16/9] bg-muted" />
-                                        <div className="p-4 space-y-3">
-                                            <div className="h-5 bg-muted rounded w-3/4" />
-                                            <div className="h-4 bg-muted rounded w-full" />
-                                            <div className="h-4 bg-muted rounded w-1/2" />
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                            {sprayPrograms.map((program: any) => (
+                                <Link
+                                    key={program.id}
+                                    href={`/spray-programs/${program.slug}`}
+                                    className="group rounded-xl border bg-card overflow-hidden hover:border-primary hover:shadow-lg transition-all duration-300"
+                                >
+                                    <div className="relative aspect-[16/9] bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30 overflow-hidden">
+                                        {program.cover_image?.img?.src ? (
+                                            <Image
+                                                src={program.cover_image.img.src}
+                                                alt={program.name}
+                                                fill
+                                                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                                                className="object-cover group-hover:scale-105 transition-transform duration-500"
+                                            />
+                                        ) : (
+                                            <div className="absolute inset-0 flex items-center justify-center">
+                                                <Sprout className="w-12 h-12 text-green-300 dark:text-green-800" />
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="p-4">
+                                        <h3 className="font-semibold text-sm mb-1.5 group-hover:text-primary transition-colors line-clamp-1">
+                                            {capitalizeFirstLetter(program.name)}
+                                        </h3>
+                                        {program.farm_produce_name && (
+                                            <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 mb-2">
+                                                <Sprout className="h-2.5 w-2.5" />
+                                                {capitalizeFirstLetter(program.farm_produce_name)}
+                                            </div>
+                                        )}
+                                        {program.description && (
+                                            <p className="text-xs text-muted-foreground line-clamp-2 mb-3">
+                                                {program.description}
+                                            </p>
+                                        )}
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                                <Layers className="h-3 w-3" />
+                                                <span>{program.stages?.length || 0} stages</span>
+                                            </div>
+                                            <ChevronRight className="h-4 w-4 text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
                                         </div>
                                     </div>
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                                {sprayPrograms.map((program: any) => (
-                                    <Link
-                                        key={program.id}
-                                        href={`/spray-programs/${program.slug}`}
-                                        className="group rounded-xl border bg-card overflow-hidden hover:border-primary hover:shadow-lg transition-all duration-300"
-                                    >
-                                        <div className="relative aspect-[16/9] bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30 overflow-hidden">
-                                            {program.cover_image?.img?.src ? (
-                                                <Image
-                                                    src={program.cover_image.img.src}
-                                                    alt={program.name}
-                                                    fill
-                                                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                                                    className="object-cover group-hover:scale-105 transition-transform duration-500"
-                                                />
-                                            ) : (
-                                                <div className="absolute inset-0 flex items-center justify-center">
-                                                    <Sprout className="w-12 h-12 text-green-300 dark:text-green-800" />
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className="p-4">
-                                            <h3 className="font-semibold text-sm mb-1.5 group-hover:text-primary transition-colors line-clamp-1">
-                                                {capitalizeFirstLetter(program.name)}
-                                            </h3>
-                                            {program.farm_produce_name && (
-                                                <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 mb-2">
-                                                    <Sprout className="h-2.5 w-2.5" />
-                                                    {capitalizeFirstLetter(program.farm_produce_name)}
-                                                </div>
-                                            )}
-                                            {program.description && (
-                                                <p className="text-xs text-muted-foreground line-clamp-2 mb-3">
-                                                    {program.description}
-                                                </p>
-                                            )}
-                                            <div className="flex items-center justify-between">
-                                                <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                                                    <Layers className="h-3 w-3" />
-                                                    <span>{program.stages?.length || 0} stages</span>
-                                                </div>
-                                                <ChevronRight className="h-4 w-4 text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
-                                            </div>
-                                        </div>
-                                    </Link>
-                                ))}
-                            </div>
-                        )}
+                                </Link>
+                            ))}
+                        </div>
 
                         <Link
                             href="/spray-programs"

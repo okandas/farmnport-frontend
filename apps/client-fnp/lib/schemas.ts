@@ -352,6 +352,7 @@ export type ImageModel = {
 export const PagintionSchema = z.object({
     p: z.number().optional(),
     search: z.string().optional(),
+    limit: z.number().optional(),
 })
 
 export type PaginationModel = z.infer<typeof PagintionSchema>

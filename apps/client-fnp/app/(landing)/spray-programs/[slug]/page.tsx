@@ -10,6 +10,7 @@ import {
     Bug, Leaf, TrendingUp, Beaker, Shield, X
 } from "lucide-react"
 import { capitalizeFirstLetter } from "@/lib/utilities"
+import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
 
 // Unified stage styling — clean, minimal
 const STAGE_STYLE = {
@@ -402,6 +403,13 @@ export default function SprayProgramDetailPage({ params }: SprayProgramDetailPag
                     </div>
                 )
             })()}
+
+            {/* AdSense after overview */}
+            {stages.length > 0 && (
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+                    <AdSenseInFeed />
+                </div>
+            )}
 
             {/* Stage Sections */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">

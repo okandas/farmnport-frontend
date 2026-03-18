@@ -6,7 +6,8 @@ import { formatDate, capitalizeFirstLetter } from "@/lib/utilities"
 import { AppURL } from "@/lib/schemas"
 import axios from "axios"
 import { notFound } from "next/navigation"
-import { Calendar, Building2, CheckCircle2 } from "lucide-react"
+import Link from "next/link"
+import { Calendar, Building2, CheckCircle2, ArrowLeft } from "lucide-react"
 import { auth } from "@/auth"
 import type { Metadata } from "next"
 
@@ -113,6 +114,14 @@ export default async function PriceDetailsPage({ params }: PriceDetailsPageProps
       />
 
       <div className="mx-auto max-w-7xl px-6 lg:px-8 py-12 min-h-[70lvh]">
+        <Link
+          href="/prices/lwt"
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" />
+          Back to LWT Prices
+        </Link>
+
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-4">
             <h1 className="text-4xl font-bold font-heading">

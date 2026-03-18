@@ -142,12 +142,25 @@ export function CdmExcelImport({ setValue, setSelectedClient }: CdmExcelImportPr
               }
 
               if (weightRange && TEETH_CATEGORIES.includes(gradeCode)) {
+                // Some 6T entries have prices in the notes column (e.g. "6 Teeth - 1.5" means $1.50 USD)
+                let finalDeliveredUsd = deliveredUsd
+                let finalDeliveredZig = deliveredZig
+                let finalNote = notes
+
+                if (!finalDeliveredUsd && notes) {
+                  const priceMatch = notes.match(/(\d+(?:\.\d+)?)$/)
+                  if (priceMatch) {
+                    finalDeliveredUsd = parseFloat(priceMatch[1])
+                    finalNote = ""
+                  }
+                }
+
                 result.liveweight.push({
                   weight_range: weightRange,
                   teeth: gradeCode,
-                  delivered_usd: deliveredUsd,
-                  delivered_zig: deliveredZig,
-                  grade_note: notes,
+                  delivered_usd: finalDeliveredUsd,
+                  delivered_zig: finalDeliveredZig,
+                  grade_note: finalNote,
                 })
               }
             }

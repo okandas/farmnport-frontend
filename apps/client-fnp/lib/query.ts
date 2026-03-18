@@ -123,14 +123,15 @@ export async function clientSignup(data: SignUpFormData) {
 }
 
 export function queryProducerPriceLists(pagination?: PaginationModel) {
-  let url: string
-
+  const params = new URLSearchParams()
   if (pagination?.p !== undefined && pagination.p >= 2) {
-    url = `${BaseURL}/prices/all?p=${pagination.p}`
-  } else {
-    url = `${BaseURL}/prices/all`
+    params.set("p", String(pagination.p))
   }
-
+  if (pagination?.limit) {
+    params.set("limit", String(pagination.limit))
+  }
+  const qs = params.toString()
+  const url = `${BaseURL}/prices/all${qs ? `?${qs}` : ""}`
   return api.get(url)
 }
 
@@ -201,12 +202,17 @@ export function queryAgroChemicalCategories() {
   return api.get(url)
 }
 
-export function queryAllAgroChemicals(pagination?: PaginationModel & { brand?: string[], target?: string[], active_ingredient?: string[], used_on?: string[] }) {
+export function queryAllAgroChemicals(pagination?: PaginationModel & { search?: string, brand?: string[], target?: string[], active_ingredient?: string[], used_on?: string[] }) {
   const params = new URLSearchParams()
 
   // Add pagination
   if (pagination?.p !== undefined && pagination.p >= 2) {
     params.set('p', pagination.p.toString())
+  }
+
+  // Add search
+  if (pagination?.search && pagination.search.length >= 2) {
+    params.set('search', pagination.search)
   }
 
   // Add filters
@@ -383,14 +389,15 @@ export function queryAnimalHealthProduct(slug: string) {
 
 // CDM Prices
 export function queryCdmPrices(pagination?: PaginationModel) {
-  let url: string
-
+  const params = new URLSearchParams()
   if (pagination?.p !== undefined && pagination.p >= 2) {
-    url = `${BaseURL}/cdmprices/all?p=${pagination.p}`
-  } else {
-    url = `${BaseURL}/cdmprices/all`
+    params.set("p", String(pagination.p))
   }
-
+  if (pagination?.limit) {
+    params.set("limit", String(pagination.limit))
+  }
+  const qs = params.toString()
+  const url = `${BaseURL}/cdmprices/all${qs ? `?${qs}` : ""}`
   return api.get(url)
 }
 

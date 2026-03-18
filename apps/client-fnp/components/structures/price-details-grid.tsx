@@ -1,6 +1,15 @@
 "use client"
 
-import { capitalizeFirstLetter, centsToDollars, cn } from "@/lib/utilities"
+import { capitalizeFirstLetter, centsToDollars } from "@/lib/utilities"
+
+const gradeColors = [
+  "text-green-700 bg-green-50 ring-green-600/20 dark:text-green-400 dark:bg-green-950/30 dark:ring-green-500/20",
+  "text-lime-700 bg-lime-50 ring-lime-600/20 dark:text-lime-400 dark:bg-lime-950/30 dark:ring-lime-500/20",
+  "text-yellow-700 bg-yellow-50 ring-yellow-600/20 dark:text-yellow-400 dark:bg-yellow-950/30 dark:ring-yellow-500/20",
+  "text-amber-700 bg-amber-50 ring-amber-600/20 dark:text-amber-400 dark:bg-amber-950/30 dark:ring-amber-500/20",
+  "text-orange-700 bg-orange-50 ring-orange-600/20 dark:text-orange-400 dark:bg-orange-950/30 dark:ring-orange-500/20",
+  "text-red-700 bg-red-50 ring-red-600/10 dark:text-red-400 dark:bg-red-950/30 dark:ring-red-500/20",
+]
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
 
 interface PriceListData {
@@ -111,7 +120,7 @@ export function PriceDetailsGrid({ priceList }: PriceDetailsGridProps) {
                           </span>
                         </td>
                         <td className="px-5 py-2.5">
-                          <span className="inline-flex items-center justify-center rounded px-2 py-0.5 text-xs font-semibold bg-muted text-muted-foreground min-w-[36px]">
+                          <span className={`inline-flex items-center justify-center rounded-md px-2 py-0.5 text-xs font-bold ring-1 ring-inset min-w-[36px] ${gradeColors[index % gradeColors.length]}`}>
                             {grades?.[pricingType]?.[key] || "—"}
                           </span>
                         </td>
