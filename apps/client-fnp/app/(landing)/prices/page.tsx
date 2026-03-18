@@ -133,7 +133,7 @@ export default async function PricesPage() {
         <div className="mx-auto max-w-7xl px-6 lg:px-8 py-8">
           <h2 className="text-base font-bold font-heading mb-2">About Agricultural Pricing in Zimbabwe</h2>
           <p className="text-xs text-muted-foreground">
-            Transparent market prices from verified buyers and abattoirs across Zimbabwe.
+            Transparent market prices from verified buyers across Zimbabwe.
           </p>
         </div>
       </section>
