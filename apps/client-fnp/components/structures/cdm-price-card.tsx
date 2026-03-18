@@ -49,11 +49,6 @@ function formatUSD(value: number): string {
   return `$${value.toFixed(2)}`
 }
 
-function formatZIG(value: number): string {
-  if (!value || value === 0) return "—"
-  return `ZiG ${value.toFixed(2)}`
-}
-
 export function CdmPriceCard({ price, hideHeader }: CdmPriceCardProps) {
   const formattedDate = formatDate(price.effectiveDate)
 
@@ -91,11 +86,6 @@ export function CdmPriceCard({ price, hideHeader }: CdmPriceCardProps) {
               <Calendar className="h-3.5 w-3.5" />
               Effective: {formattedDate}
             </span>
-            {price.exchange_rate > 0 && (
-              <span className="ml-auto">
-                Rate: 1 USD = {price.exchange_rate.toFixed(2)} ZiG
-              </span>
-            )}
           </div>
         </div>
       )}
@@ -116,8 +106,6 @@ export function CdmPriceCard({ price, hideHeader }: CdmPriceCardProps) {
                 <th className="px-4 py-2 text-left text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Code</th>
                 <th className="px-4 py-2 text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Collected USD</th>
                 <th className="px-4 py-2 text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Delivered USD</th>
-                <th className="px-4 py-2 text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Collected ZiG</th>
-                <th className="px-4 py-2 text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Delivered ZiG</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border/50">
@@ -134,8 +122,6 @@ export function CdmPriceCard({ price, hideHeader }: CdmPriceCardProps) {
                     </td>
                     <td className="px-4 py-2.5 text-right text-sm text-muted-foreground">{formatUSD(gradeData.collected_usd)}</td>
                     <td className="px-4 py-2.5 text-right text-sm font-semibold text-foreground">{formatUSD(gradeData.delivered_usd)}</td>
-                    <td className="px-4 py-2.5 text-right text-sm text-muted-foreground">{formatZIG(gradeData.collected_zig)}</td>
-                    <td className="px-4 py-2.5 text-right text-sm font-semibold text-foreground">{formatZIG(gradeData.delivered_zig)}</td>
                   </tr>
                 )
               })}
@@ -230,7 +216,6 @@ export function CdmPriceCard({ price, hideHeader }: CdmPriceCardProps) {
                       <tr className="border-b">
                         <th className="px-4 py-2 text-left text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Weight (kg)</th>
                         <th className="px-4 py-2 text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground">USD</th>
-                        <th className="px-4 py-2 text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground">ZiG</th>
                         {hasAnyNote && (
                           <th className="px-4 py-2 text-left text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Status</th>
                         )}
@@ -250,9 +235,6 @@ export function CdmPriceCard({ price, hideHeader }: CdmPriceCardProps) {
                             <td className="px-4 py-2.5 text-sm font-medium text-foreground whitespace-nowrap">{range}</td>
                             <td className="px-4 py-2.5 text-right text-sm font-semibold text-foreground">
                               {hasPrice ? formatUSD(entry!.delivered_usd) : "—"}
-                            </td>
-                            <td className="px-4 py-2.5 text-right text-sm text-muted-foreground">
-                              {hasPrice ? formatZIG(entry!.delivered_zig) : "—"}
                             </td>
                             {hasAnyNote && (
                               <td className="px-4 py-2.5">
