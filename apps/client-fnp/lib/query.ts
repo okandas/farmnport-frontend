@@ -298,3 +298,110 @@ export function pollSubscription(reference: string) {
   const url = `${BaseURL}/subscription/poll`
   return api.post(url, { reference })
 }
+
+export function queryPublishedSprayPrograms(pagination?: PaginationModel) {
+  let url: string
+
+  if (pagination?.p !== undefined && pagination.p >= 2) {
+    url = `${BaseURL}/sprayprograms/?p=${pagination.p}`
+  } else {
+    url = `${BaseURL}/sprayprograms/`
+  }
+
+  return api.get(url)
+}
+
+export function querySprayProgramBySlug(slug: string) {
+  const url = `${BaseURL}/sprayprograms/${slug}`
+  return api.get(url)
+}
+
+// Animal Health
+export function queryAnimalHealthCategories() {
+  const url = `${BaseURL}/animalhealthcategories/`
+  return api.get(url)
+}
+
+export function queryAllAnimalHealthProducts(pagination?: PaginationModel & { brand?: string[], target?: string[], active_ingredient?: string[], used_on?: string[] }) {
+  const params = new URLSearchParams()
+
+  if (pagination?.p !== undefined && pagination.p >= 2) {
+    params.set('p', pagination.p.toString())
+  }
+
+  if (pagination?.brand && pagination.brand.length > 0) {
+    pagination.brand.forEach(b => params.append('brand', b))
+  }
+  if (pagination?.target && pagination.target.length > 0) {
+    pagination.target.forEach(t => params.append('target', t))
+  }
+  if (pagination?.active_ingredient && pagination.active_ingredient.length > 0) {
+    pagination.active_ingredient.forEach(ai => params.append('active_ingredient', ai))
+  }
+  if (pagination?.used_on && pagination.used_on.length > 0) {
+    pagination.used_on.forEach(uo => params.append('used_on', uo))
+  }
+
+  const queryString = params.toString()
+  const url = queryString ? `${BaseURL}/animalhealth/all?${queryString}` : `${BaseURL}/animalhealth/all`
+
+  return api.get(url)
+}
+
+export function queryAnimalHealthProductsByCategory(options: { category: string } & PaginationModel & { brand?: string[], target?: string[], active_ingredient?: string[] }) {
+  const params = new URLSearchParams()
+
+  if (options.p !== undefined && options.p >= 2) {
+    params.set('p', options.p.toString())
+  }
+
+  if (options.brand && options.brand.length > 0) {
+    options.brand.forEach(b => params.append('brand', b))
+  }
+  if (options.target && options.target.length > 0) {
+    options.target.forEach(t => params.append('target', t))
+  }
+  if (options.active_ingredient && options.active_ingredient.length > 0) {
+    options.active_ingredient.forEach(ai => params.append('active_ingredient', ai))
+  }
+
+  const queryString = params.toString()
+  const url = queryString ? `${BaseURL}/animalhealth/category/${options.category}?${queryString}` : `${BaseURL}/animalhealth/category/${options.category}`
+
+  return api.get(url)
+}
+
+export function queryAnimalHealthFilterAggregates() {
+  const url = `${BaseURL}/animalhealth/aggregates/filters`
+  return api.get(url)
+}
+
+export function queryAnimalHealthProduct(slug: string) {
+  const url = `${BaseURL}/animalhealth/${slug}`
+  return api.get(url)
+}
+
+// CDM Prices
+export function queryCdmPrices(pagination?: PaginationModel) {
+  let url: string
+
+  if (pagination?.p !== undefined && pagination.p >= 2) {
+    url = `${BaseURL}/cdmprices/all?p=${pagination.p}`
+  } else {
+    url = `${BaseURL}/cdmprices/all`
+  }
+
+  return api.get(url)
+}
+
+export function queryCdmPricesByClient(clientId: string, pagination?: PaginationModel) {
+  let url: string
+
+  if (pagination?.p !== undefined && pagination.p >= 2) {
+    url = `${BaseURL}/cdmprices/client/${clientId}?p=${pagination.p}`
+  } else {
+    url = `${BaseURL}/cdmprices/client/${clientId}`
+  }
+
+  return api.get(url)
+}

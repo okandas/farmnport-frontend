@@ -640,3 +640,213 @@ export type FarmProduceResponse = {
   total: number
   data: FarmProduce[]
 }
+
+// Animal Health Schemas
+
+export const AnimalHealthCategorySchema = z.object({
+  id: z.string(),
+  name: z.string().min(1, "Name is required"),
+  slug: z.string().optional(),
+  short_description: z.string().max(100, "Short description cannot exceed 100 characters"),
+  description: z.string().max(500, "Description cannot exceed 500 characters"),
+  created: z.string().optional(),
+  updated: z.string().optional(),
+})
+
+export const FormAnimalHealthCategorySchema = AnimalHealthCategorySchema.pick({
+  id: true,
+  name: true,
+  short_description: true,
+  description: true,
+})
+
+export const AnimalHealthActiveIngredientSchema = z.object({
+  id: z.string(),
+  name: z.string().min(1, "Name is required"),
+  slug: z.string().optional(),
+  short_description: z.string().max(100, "Short description cannot exceed 100 characters"),
+  description: z.string().max(500, "Description cannot exceed 500 characters"),
+  created: z.string().optional(),
+  updated: z.string().optional(),
+})
+
+export const FormAnimalHealthActiveIngredientSchema = AnimalHealthActiveIngredientSchema.pick({
+  id: true,
+  name: true,
+  short_description: true,
+  description: true,
+})
+
+export const AnimalHealthTargetSchema = z.object({
+  id: z.string(),
+  name: z.string().min(1, "Name is required"),
+  scientific_name: z.string().optional(),
+  description: z.string().optional(),
+  damage_type: z.string().optional(),
+  remark: z.string().optional(),
+  slug: z.string().optional(),
+  created: z.string().optional(),
+  updated: z.string().optional(),
+})
+
+export const FormAnimalHealthTargetSchema = AnimalHealthTargetSchema.pick({
+  id: true,
+  name: true,
+  scientific_name: true,
+  description: true,
+  damage_type: true,
+  remark: true,
+})
+
+export const AnimalHealthProductSchema = z.object({
+  id: z.string(),
+  name: z.string().min(1, "Name is required"),
+  slug: z.string().optional(),
+  brand_id: z.string().min(1, "Brand is required"),
+  brand: z.object({
+    id: z.string(),
+    name: z.string(),
+  }).optional(),
+  animal_health_category_id: z.string().min(1, "Animal health category is required"),
+  animal_health_category: z.object({
+    id: z.string(),
+    name: z.string(),
+    slug: z.string(),
+  }).optional(),
+  front_label: z.custom<ImageModel>().optional(),
+  back_label: z.custom<ImageModel>().optional(),
+  images: z.array(z.custom<ImageModel>()).min(1, "At least one product image is required").max(5, "Maximum 5 images allowed"),
+  active_ingredients: z.array(z.object({
+    id: z.string(),
+    name: z.string(),
+    dosage_value: z.number(),
+    dosage_unit: z.string(),
+  })),
+  dosage_rates: z.array(z.object({
+    id: z.string(),
+    animal: z.string(),
+    animal_id: z.string(),
+    animal_group: z.string().optional(),
+    animal_group_id: z.string().optional(),
+    targets: z.array(z.string()),
+    target_ids: z.array(z.string()),
+    entries: z.array(z.object({
+      dosage: z.object({
+        value: z.string(),
+        unit: z.string(),
+        per: z.string(),
+      }),
+      max_applications: z.object({
+        max: z.number(),
+        note: z.string(),
+      }),
+      application_interval: z.string(),
+      withdrawal_period: z.string(),
+      remarks: z.array(z.string()),
+    })),
+  })),
+  created: z.string().optional(),
+  updated: z.string().optional(),
+})
+
+export const FormAnimalHealthProductSchema = AnimalHealthProductSchema
+
+export type AnimalHealthCategory = z.infer<typeof AnimalHealthCategorySchema>
+export type FormAnimalHealthCategoryModel = z.infer<typeof FormAnimalHealthCategorySchema>
+export type AnimalHealthActiveIngredient = z.infer<typeof AnimalHealthActiveIngredientSchema>
+export type FormAnimalHealthActiveIngredientModel = z.infer<typeof FormAnimalHealthActiveIngredientSchema>
+export type AnimalHealthTarget = z.infer<typeof AnimalHealthTargetSchema>
+export type FormAnimalHealthTargetModel = z.infer<typeof FormAnimalHealthTargetSchema>
+export type AnimalHealthProduct = z.infer<typeof AnimalHealthProductSchema>
+export type FormAnimalHealthProductModel = z.infer<typeof FormAnimalHealthProductSchema>
+
+// Spray Program Schemas
+
+export const SprayProgramRecommendationSchema = z.object({
+  agrochemical_id: z.string().min(1, "Agrochemical is required"),
+  agrochemical_name: z.string(),
+  agrochemical_slug: z.string(),
+  purpose: z.string().min(1, "Purpose is required"),
+  dosage: z.object({
+    value: z.string(),
+    unit: z.string(),
+    per: z.string(),
+  }),
+  application_method: z.string(),
+  notes: z.string().optional().default(""),
+})
+
+export const SprayProgramStageSchema = z.object({
+  name: z.string().min(1, "Stage name is required"),
+  order: z.number(),
+  description: z.string().optional().default(""),
+  timing_description: z.string().optional().default(""),
+  recommendations: z.array(SprayProgramRecommendationSchema),
+})
+
+export const SprayProgramSchema = z.object({
+  id: z.string(),
+  name: z.string().min(1, "Name is required").max(100, "Name cannot exceed 100 characters"),
+  slug: z.string().optional(),
+  description: z.string().optional().default(""),
+  farm_produce_id: z.string().min(1, "Crop is required"),
+  farm_produce_name: z.string().optional(),
+  cover_image: z.custom<ImageModel>().optional().nullable(),
+  stages: z.array(SprayProgramStageSchema).min(1, "At least one stage is required"),
+  published: z.boolean().default(false),
+  created: z.string().optional(),
+  updated: z.string().optional(),
+})
+
+export const FormSprayProgramSchema = SprayProgramSchema
+
+export type SprayProgram = z.infer<typeof SprayProgramSchema>
+export type FormSprayProgramModel = z.infer<typeof FormSprayProgramSchema>
+export type SprayProgramStage = z.infer<typeof SprayProgramStageSchema>
+export type SprayProgramRecommendation = z.infer<typeof SprayProgramRecommendationSchema>
+
+// CDM (Cold Dress Mass) Schemas
+
+const CarcassGradePriceSchema = z.object({
+  collected_usd: z.coerce.number().nonnegative(),
+  delivered_usd: z.coerce.number().nonnegative(),
+  collected_zig: z.coerce.number().nonnegative(),
+  delivered_zig: z.coerce.number().nonnegative(),
+})
+
+const CarcassGradesSchema = z.object({
+  commercial: CarcassGradePriceSchema,
+  economy: CarcassGradePriceSchema,
+  manufacturing: CarcassGradePriceSchema,
+})
+
+const LiveweightEntrySchema = z.object({
+  weight_range: z.string().min(1, "Weight range is required"),
+  teeth: z.string().min(1, "Teeth category is required"),
+  delivered_usd: z.coerce.number().nonnegative(),
+  delivered_zig: z.coerce.number().nonnegative(),
+  grade_note: z.string().optional().default(""),
+})
+
+export const CdmPriceSchema = z.object({
+  id: z.string(),
+  created: z.string().optional(),
+  updated: z.string().optional(),
+  client_id: z.string().min(1, "Client is required"),
+  client_name: z.string(),
+  verified: z.boolean().optional(),
+  effectiveDate: z.coerce.date(),
+  exchange_rate: z.coerce.number().positive("Exchange rate must be positive"),
+  carcass_grades: CarcassGradesSchema,
+  liveweight: z.array(LiveweightEntrySchema),
+  notes: z.array(z.string()).default([]),
+})
+
+export type CdmPrice = z.infer<typeof CdmPriceSchema>
+export type CarcassGradePrice = z.infer<typeof CarcassGradePriceSchema>
+export type LiveweightEntry = z.infer<typeof LiveweightEntrySchema>
+
+export type CdmPriceResponse = {
+  total: number
+  data: CdmPrice[]
+}

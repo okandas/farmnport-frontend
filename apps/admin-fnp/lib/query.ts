@@ -513,3 +513,200 @@ export function deleteBuyerContact(id: string) {
   const url = `${baseUrl}/buyercontacts/delete/${id}`
   return api.delete(url)
 }
+
+// Animal Health Product functions
+export function queryAnimalHealthProducts(pagination?: pagination) {
+  let url: string
+  if (pagination?.p !== undefined && pagination.p >= 2) {
+    url = `${baseUrl}/user/animal-health-products?p=${pagination.p}`
+  } else {
+    url = `${baseUrl}/user/animal-health-products`
+  }
+  if (pagination?.search !== undefined && pagination.search.length >= 2) {
+    url = `${baseUrl}/user/animal-health-products?search=${pagination.search}`
+  }
+  return api.get(url)
+}
+
+export function queryAnimalHealthProduct(id: string) {
+  const url = `${baseUrl}/user/animal-health-products/${id}`
+  return api.get(url)
+}
+
+export function addAnimalHealthProduct(data: any) {
+  let url = `${baseUrl}/user/animal-health-products/add`
+  return api.post(url, data)
+}
+
+export function updateAnimalHealthProduct(data: any) {
+  let url = `${baseUrl}/user/animal-health-products/update`
+  return api.post(url, data)
+}
+
+// Animal Health Category functions
+export function queryAnimalHealthCategories(pagination?: pagination) {
+  let url: string
+  if (pagination?.p !== undefined && pagination.p >= 2) {
+    url = `${baseUrl}/user/animal-health-categories?p=${pagination.p}`
+  } else {
+    url = `${baseUrl}/user/animal-health-categories`
+  }
+  if (pagination?.search !== undefined && pagination.search.length >= 2) {
+    url = `${baseUrl}/user/animal-health-categories?search=${pagination.search}`
+  }
+  return api.get(url)
+}
+
+export function queryAnimalHealthCategory(id: string) {
+  const url = `${baseUrl}/user/animal-health-categories/${id}`
+  return api.get(url)
+}
+
+export function addAnimalHealthCategory(data: { name: string; short_description: string; description: string }) {
+  let url = `${baseUrl}/user/animal-health-categories/add`
+  return api.post(url, data)
+}
+
+export function updateAnimalHealthCategory(data: { id: string; name: string; short_description: string; description: string }) {
+  let url = `${baseUrl}/user/animal-health-categories/update`
+  return api.post(url, data)
+}
+
+export function deleteAnimalHealthCategories(categoryIds: string[]) {
+  let url = `${baseUrl}/user/animal-health-categories/delete`
+  return api.post(url, { category_ids: categoryIds })
+}
+
+// Animal Health Active Ingredient functions
+export function queryAnimalHealthActiveIngredients(pagination?: pagination) {
+  let url: string
+  if (pagination?.p !== undefined && pagination.p >= 2) {
+    url = `${baseUrl}/user/animal-health-active-ingredients?p=${pagination.p}`
+  } else {
+    url = `${baseUrl}/user/animal-health-active-ingredients`
+  }
+  if (pagination?.search !== undefined && pagination.search.length >= 2) {
+    url = `${baseUrl}/user/animal-health-active-ingredients?search=${pagination.search}`
+  }
+  return api.get(url)
+}
+
+export function queryAnimalHealthActiveIngredient(id: string) {
+  const url = `${baseUrl}/user/animal-health-active-ingredients/${id}`
+  return api.get(url)
+}
+
+export function addAnimalHealthActiveIngredient(data: { name: string; short_description: string; description: string }) {
+  let url = `${baseUrl}/user/animal-health-active-ingredients/add`
+  return api.post(url, data)
+}
+
+export function updateAnimalHealthActiveIngredient(data: { id: string; name: string; short_description: string; description: string }) {
+  let url = `${baseUrl}/user/animal-health-active-ingredients/update`
+  return api.post(url, data)
+}
+
+export function deleteAnimalHealthActiveIngredients(ingredientIds: string[]) {
+  let url = `${baseUrl}/user/animal-health-active-ingredients/delete`
+  return api.post(url, { ingredient_ids: ingredientIds })
+}
+
+// Animal Health Target functions
+export function queryAnimalHealthTargets(pagination?: pagination) {
+  let url: string
+  if (pagination?.p !== undefined && pagination.p >= 2) {
+    url = `${baseUrl}/user/animal-health-targets?p=${pagination.p}`
+  } else {
+    url = `${baseUrl}/user/animal-health-targets`
+  }
+  if (pagination?.search !== undefined && pagination.search.length >= 2) {
+    url = `${baseUrl}/user/animal-health-targets?search=${pagination.search}`
+  }
+  return api.get(url)
+}
+
+export function queryAnimalHealthTarget(id: string) {
+  const url = `${baseUrl}/user/animal-health-targets/${id}`
+  return api.get(url)
+}
+
+export function addAnimalHealthTarget(data: { name: string; scientific_name?: string; description?: string; damage_type?: string; remark?: string }) {
+  let url = `${baseUrl}/user/animal-health-targets/add`
+  return api.post(url, data)
+}
+
+export function updateAnimalHealthTarget(data: { id: string; name: string; scientific_name?: string; description?: string; damage_type?: string; remark?: string }) {
+  let url = `${baseUrl}/user/animal-health-targets/update`
+  return api.post(url, data)
+}
+
+export function deleteAnimalHealthTargets(targetIds: string[]) {
+  let url = `${baseUrl}/user/animal-health-targets/delete`
+  return api.post(url, { target_ids: targetIds })
+}
+
+// Spray Program functions
+
+export function querySprayPrograms(pagination?: pagination) {
+  let url: string
+  if (pagination?.p !== undefined && pagination.p >= 2) {
+    url = `${baseUrl}/user/spray-programs?p=${pagination.p}`
+  } else {
+    url = `${baseUrl}/user/spray-programs`
+  }
+  if (pagination?.search !== undefined && pagination.search.length >= 2) {
+    url = `${baseUrl}/user/spray-programs?search=${pagination.search}`
+  }
+  return api.get(url)
+}
+
+export function querySprayProgram(id: string) {
+  const url = `${baseUrl}/user/spray-programs/${id}`
+  return api.get(url)
+}
+
+export function addSprayProgram(data: any) {
+  let url = `${baseUrl}/user/spray-programs/add`
+  return api.post(url, data)
+}
+
+export function updateSprayProgram(data: any) {
+  let url = `${baseUrl}/user/spray-programs/update`
+  return api.post(url, data)
+}
+
+export function deleteSprayPrograms(programIds: string[]) {
+  let url = `${baseUrl}/user/spray-programs/delete`
+  return api.post(url, { program_ids: programIds })
+}
+
+// CDM Price functions
+export function queryCdmPrices(pagination?: pagination) {
+  let url: string
+  if (pagination?.p !== undefined && pagination.p >= 2) {
+    url = `${baseUrl}/cdmprices/get?p=${pagination.p}`
+  } else {
+    url = `${baseUrl}/cdmprices/get`
+  }
+  return api.get(url)
+}
+
+export function queryCdmPrice(id: string) {
+  const url = `${baseUrl}/cdmprices/get/${id}`
+  return api.get(url)
+}
+
+export function addCdmPrice(data: any) {
+  let url = `${baseUrl}/cdmprices/add`
+  return api.post(url, data)
+}
+
+export function updateCdmPrice(data: any) {
+  let url = `${baseUrl}/cdmprices/update`
+  return api.post(url, data)
+}
+
+export function deleteCdmPrice(priceId: string) {
+  let url = `${baseUrl}/cdmprices/delete/${priceId}`
+  return api.delete(url)
+}

@@ -604,3 +604,45 @@ export type FarmProduceResponse = {
   total: number
   data: FarmProduce[]
 }
+
+// CDM (Cold Dress Mass) Types
+
+export type CarcassGradePrice = {
+  collected_usd: number
+  delivered_usd: number
+  collected_zig: number
+  delivered_zig: number
+}
+
+export type CarcassGrades = {
+  commercial: CarcassGradePrice
+  economy: CarcassGradePrice
+  manufacturing: CarcassGradePrice
+}
+
+export type LiveweightEntry = {
+  weight_range: string
+  teeth: string
+  delivered_usd: number
+  delivered_zig: number
+  grade_note: string
+}
+
+export type CdmPrice = {
+  id: string
+  created: string
+  updated: string
+  client_id: string
+  client_name: string
+  verified?: boolean
+  effectiveDate: string
+  exchange_rate: number
+  carcass_grades: CarcassGrades
+  liveweight: LiveweightEntry[]
+  notes: string[]
+}
+
+export type CdmPriceResponse = {
+  total: number
+  data: CdmPrice[]
+}

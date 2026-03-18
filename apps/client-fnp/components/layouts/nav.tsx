@@ -41,6 +41,14 @@ export function Navigation({ user }: NavigationProps) {
         >
           Guides
         </Link>
+        <Link href="/spray-programs" onClick={() => sendGTMEvent({ event: 'link', value: 'SprayProgramsTopNavigation' })}
+              className={buttonVariants({
+                size: "sm",
+                variant: "link"
+              })}
+        >
+          Spray Programs
+        </Link>
         <Link href="/buyers" onClick={() => sendGTMEvent({ event: 'link', value: 'BuyerTopNavigation' })}
               className={buttonVariants({
                 size: "sm",

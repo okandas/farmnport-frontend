@@ -4,8 +4,8 @@ import { useQuery } from "@tanstack/react-query"
 import { sendGTMEvent } from "@next/third-parties/google"
 import Link from "next/link"
 
-import { queryClient, queryClientPricing } from "@/lib/query"
-import { ApplicationUser, AuthenticatedUser } from "@/lib/schemas"
+import { queryClient, queryClientPricing, queryCdmPricesByClient } from "@/lib/query"
+import { ApplicationUser, AuthenticatedUser, CdmPrice } from "@/lib/schemas"
 import { capitalizeFirstLetter, makeAbbveriation, plural, titleCase } from "@/lib/utilities"
 import { paymentTermsLabel } from "@/components/structures/repository/data"
 import { Icons } from "@/components/icons/lucide"
@@ -15,6 +15,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Contacts } from "@/components/layouts/contacts"
 import { BuyerContacts } from "@/components/structures/buyer-contacts"
+import { CdmPriceCard } from "@/components/structures/cdm-price-card"
 
 
 interface ClientPageProps {
@@ -38,6 +39,16 @@ export function Client({ slug, user }: ClientPageProps) {
     enabled: !!client?.id && client?.type === 'buyer' && client?.has_prices,
     refetchOnWindowFocus: false
   })
+
+  // Fetch CDM pricing data (for buyers)
+  const { data: cdmData } = useQuery({
+    queryKey: [`client-cdm-pricing-${client?.id}`, client?.id],
+    queryFn: () => queryCdmPricesByClient(client?.id || ''),
+    enabled: !!client?.id && client?.type === 'buyer',
+    refetchOnWindowFocus: false
+  })
+
+  const cdmPrices: CdmPrice[] = cdmData?.data?.data || []
 
   if (isError) {
     return null
@@ -283,6 +294,15 @@ export function Client({ slug, user }: ClientPageProps) {
                     This buyer hasn&apos;t shared pricing information yet. Check back later or contact them directly for pricing details.
                   </p>
                 )}
+              </div>
+            )}
+
+            {/* CDM Pricing */}
+            {cdmPrices.length > 0 && (
+              <div className="space-y-4">
+                {cdmPrices.map((cdmPrice) => (
+                  <CdmPriceCard key={cdmPrice.id} price={cdmPrice} />
+                ))}
               </div>
             )}
 

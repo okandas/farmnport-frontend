@@ -91,6 +91,18 @@ export function MobileNav({ user }: MobileNavProps) {
                    </Link>
 
                    <Link
+                     href="/spray-programs"
+                     onClick={() => {
+                       sendGTMEvent({ event: 'link', value: 'SprayProgramsTopNavigation' })
+                       setIsOpen(false)
+                     }}
+                     className="flex items-center gap-3 px-3 py-2 text-base font-medium rounded-md hover:bg-accent transition-colors"
+                   >
+                     <Icons.sprout className="h-5 w-5" />
+                     <span>Spray Programs</span>
+                   </Link>
+
+                   <Link
                      href="/buyers"
                      onClick={() => {
                        sendGTMEvent({ event: 'link', value: 'BuyerTopNavigation' })

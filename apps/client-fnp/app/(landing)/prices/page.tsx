@@ -1,5 +1,6 @@
 import { FilterSidebar } from "@/components/generic/filterSidebar"
 import { PriceCardsView } from "@/components/structures/price-cards-view"
+import { CdmPriceCardsView } from "@/components/structures/cdm-price-cards-view"
 import { ActionsSidebar } from "@/components/generic/actions-sidebar"
 
 export const metadata = {
@@ -39,6 +40,9 @@ export default async function PricesPage() {
             </div>
 
             <PriceCardsView />
+            <div className="mt-10">
+              <CdmPriceCardsView />
+            </div>
           </div>
 
           <div className="hidden lg:block lg:w-56 shrink-0 relative">

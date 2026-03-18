@@ -16,6 +16,11 @@ export type SidebarNavigationItem = {
     }
 )
 
+export type SidebarNavigationGroup = {
+  label: string
+  items: SidebarNavigationItem[]
+}
+
 export type NavigationItem = {
   title: string
   href: string
@@ -24,5 +29,5 @@ export type NavigationItem = {
 
 export type DashboardConfig = {
   mainNavigation: NavigationItem[]
-  sidebarNavigation: SidebarNavigationItem[]
+  sidebarNavigation: SidebarNavigationGroup[]
 }

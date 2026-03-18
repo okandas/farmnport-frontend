@@ -2,9 +2,10 @@
 
 import { use } from "react"
 import { useQuery } from "@tanstack/react-query"
+import { useSearchParams } from "next/navigation"
 import { queryAgroChemical } from "@/lib/query"
 import Image from "next/image"
-import { Beaker, AlertTriangle } from "lucide-react"
+import { Beaker, AlertTriangle, ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
 import { capitalizeFirstLetter, formatUnit } from "@/lib/utilities"
@@ -18,6 +19,8 @@ interface GuidePageProps {
 
 export default function AgroChemicalGuidePage({ params }: GuidePageProps) {
     const { category, slug } = use(params)
+    const searchParams = useSearchParams()
+    const fromSprayProgram = searchParams.get("from")
 
     const { data, isLoading } = useQuery({
         queryKey: ["agrochemical-guide", slug],
@@ -151,6 +154,21 @@ export default function AgroChemicalGuidePage({ params }: GuidePageProps) {
                     type="application/ld+json"
                     dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
                 />
+            )}
+
+            {/* Back to Spray Program */}
+            {fromSprayProgram && (
+                <div className="border-b bg-primary/5">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5">
+                        <Link
+                            href={`/spray-programs/${fromSprayProgram}`}
+                            className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+                        >
+                            <ArrowLeft className="h-3.5 w-3.5" />
+                            Back to Spray Program
+                        </Link>
+                    </div>
+                </div>
             )}
 
             {/* Breadcrumb */}
