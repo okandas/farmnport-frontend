@@ -151,7 +151,7 @@ export function SprayProgramForm({ sprayProgram, mode = "create" }: SprayProgram
     }
 
     function onError(errors: any) {
-        handleFormErrors(errors, { context: "spray program" })
+        handleFormErrors(errors)
     }
 
     // Stage management

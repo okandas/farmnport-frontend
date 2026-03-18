@@ -1,7 +1,7 @@
 import { PriceCardsView } from "@/components/structures/price-cards-view"
 import { CdmPriceCardsView } from "@/components/structures/cdm-price-cards-view"
 import Link from "next/link"
-import { ArrowRight, Scale, Beef, TrendingUp, RefreshCw, ShieldCheck } from "lucide-react"
+import { ArrowRight, Scale, Beef } from "lucide-react"
 
 export const metadata = {
   title: 'Agricultural Market Prices Zimbabwe – Livestock, Produce & More | farmnport.com',
@@ -51,18 +51,6 @@ export default async function PricesPage() {
           <p className="mt-2 text-sm text-muted-foreground">
             Transparent pricing from verified buyers across Zimbabwe.
           </p>
-          <div className="mt-4 flex flex-wrap gap-4 text-xs text-muted-foreground">
-            {[
-              { icon: RefreshCw, text: "Updated weekly" },
-              { icon: ShieldCheck, text: "Verified sources" },
-              { icon: TrendingUp, text: "USD & ZiG rates" },
-            ].map(({ icon: Icon, text }) => (
-              <div key={text} className="flex items-center gap-1.5">
-                <Icon className="h-3 w-3 text-primary" />
-                <span className="font-medium">{text}</span>
-              </div>
-            ))}
-          </div>
         </div>
       </section>
 
