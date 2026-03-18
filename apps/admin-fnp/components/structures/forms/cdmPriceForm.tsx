@@ -199,7 +199,7 @@ export function CdmPriceForm({ price, mode }: CdmPriceFormProps) {
       </div>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit, handleFormErrors)} className="space-y-8">
+        <form onSubmit={form.handleSubmit(onSubmit, (errors) => handleFormErrors(errors))} className="space-y-8">
           {/* Client & Date Section */}
           <Card>
             <CardHeader>
