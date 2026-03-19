@@ -4,8 +4,9 @@ import { use } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { queryFeedProduct } from "@/lib/query"
 import Image from "next/image"
-import { AlertTriangle } from "lucide-react"
+import { AlertTriangle, ArrowLeft } from "lucide-react"
 import Link from "next/link"
+import { useSearchParams } from "next/navigation"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
 import { capitalizeFirstLetter } from "@/lib/utilities"
 
@@ -15,6 +16,8 @@ interface FeedDetailPageProps {
 
 export default function FeedDetailPage({ params }: FeedDetailPageProps) {
     const { slug } = use(params)
+    const searchParams = useSearchParams()
+    const ref = searchParams.get("ref")
 
     const { data, isLoading } = useQuery({
         queryKey: ["feed-product", slug],
@@ -106,13 +109,20 @@ export default function FeedDetailPage({ params }: FeedDetailPageProps) {
             {/* Breadcrumb */}
             <div className="border-b bg-muted/30">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-                    <nav className="flex text-sm text-muted-foreground">
-                        <Link href="/" className="hover:text-foreground">Home</Link>
-                        <span className="mx-2">/</span>
-                        <Link href="/feeds" className="hover:text-foreground">Feeds</Link>
-                        <span className="mx-2">/</span>
-                        <span className="text-foreground capitalize">{product.name}</span>
-                    </nav>
+                    {ref ? (
+                        <Link href={`/feeding-programs/${ref}`} className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
+                            <ArrowLeft className="h-4 w-4" />
+                            Back to Feeding Program
+                        </Link>
+                    ) : (
+                        <nav className="flex text-sm text-muted-foreground">
+                            <Link href="/" className="hover:text-foreground">Home</Link>
+                            <span className="mx-2">/</span>
+                            <Link href="/feeds" className="hover:text-foreground">Feeds</Link>
+                            <span className="mx-2">/</span>
+                            <span className="text-foreground capitalize">{product.name}</span>
+                        </nav>
+                    )}
                 </div>
             </div>
 

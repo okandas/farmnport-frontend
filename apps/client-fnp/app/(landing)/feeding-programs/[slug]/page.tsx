@@ -466,7 +466,7 @@ export default function FeedingProgramDetailPage({ params }: FeedingProgramDetai
 
                                                 {rec.feed_product_slug && (
                                                     <Link
-                                                        href={`/feeds/${rec.feed_product_slug}`}
+                                                        href={`/feeds/${rec.feed_product_slug}?ref=${slug}`}
                                                         className="flex-shrink-0 text-xs font-medium text-primary hover:text-primary/80 transition-colors flex items-center gap-1"
                                                     >
                                                         View Product
@@ -546,7 +546,7 @@ export default function FeedingProgramDetailPage({ params }: FeedingProgramDetai
                         {quickViewRec.feed_product_slug && (
                             <div className="px-5 pb-5">
                                 <Link
-                                    href={`/feeds/${quickViewRec.feed_product_slug}`}
+                                    href={`/feeds/${quickViewRec.feed_product_slug}?ref=${slug}`}
                                     className="flex items-center justify-center gap-2 w-full py-2 rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
                                     onClick={() => setQuickViewRec(null)}
                                 >
