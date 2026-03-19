@@ -253,6 +253,16 @@ export default function AgroChemicalGuidePage({ params }: GuidePageProps) {
                             </Link> */}
                         </div>
 
+                        {chemical.show_price && chemical.sale_price > 0 && (
+                            <div className="flex items-center gap-3">
+                                <span className="text-sm text-muted-foreground">Guide Price:</span>
+                                {chemical.was_price > 0 && chemical.was_price > chemical.sale_price && (
+                                    <span className="text-lg text-muted-foreground line-through">${chemical.was_price.toFixed(2)}</span>
+                                )}
+                                <span className="text-2xl font-bold text-primary">${chemical.sale_price.toFixed(2)}</span>
+                            </div>
+                        )}
+
                         {/* Divider */}
                         <div className="h-px bg-border" />
 

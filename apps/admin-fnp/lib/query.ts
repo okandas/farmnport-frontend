@@ -710,3 +710,168 @@ export function deleteCdmPrice(priceId: string) {
   let url = `${baseUrl}/cdmprices/delete/${priceId}`
   return api.delete(url)
 }
+
+// Feed Product functions
+export function queryFeedProducts(pagination?: pagination) {
+  let url: string
+  if (pagination?.p !== undefined && pagination.p >= 2) {
+    url = `${baseUrl}/user/feed-products?p=${pagination.p}`
+  } else {
+    url = `${baseUrl}/user/feed-products`
+  }
+  if (pagination?.search !== undefined && pagination.search.length >= 2) {
+    url = `${baseUrl}/user/feed-products?search=${pagination.search}`
+  }
+  return api.get(url)
+}
+
+export function queryFeedProduct(id: string) {
+  const url = `${baseUrl}/user/feed-products/${id}`
+  return api.get(url)
+}
+
+export function addFeedProduct(data: any) {
+  let url = `${baseUrl}/user/feed-products/add`
+  return api.post(url, data)
+}
+
+export function updateFeedProduct(data: any) {
+  let url = `${baseUrl}/user/feed-products/update`
+  return api.post(url, data)
+}
+
+// Feed Category functions
+export function queryFeedCategories(pagination?: pagination) {
+  let url: string
+  if (pagination?.p !== undefined && pagination.p >= 2) {
+    url = `${baseUrl}/user/feed-categories?p=${pagination.p}`
+  } else {
+    url = `${baseUrl}/user/feed-categories`
+  }
+  if (pagination?.search !== undefined && pagination.search.length >= 2) {
+    url = `${baseUrl}/user/feed-categories?search=${pagination.search}`
+  }
+  return api.get(url)
+}
+
+export function queryFeedCategory(id: string) {
+  const url = `${baseUrl}/user/feed-categories/${id}`
+  return api.get(url)
+}
+
+export function addFeedCategory(data: { name: string; short_description: string; description: string }) {
+  let url = `${baseUrl}/user/feed-categories/add`
+  return api.post(url, data)
+}
+
+export function updateFeedCategory(data: { id: string; name: string; short_description: string; description: string }) {
+  let url = `${baseUrl}/user/feed-categories/update`
+  return api.post(url, data)
+}
+
+export function deleteFeedCategories(categoryIds: string[]) {
+  let url = `${baseUrl}/user/feed-categories/delete`
+  return api.post(url, { category_ids: categoryIds })
+}
+
+// Feed Active Ingredient functions
+export function queryFeedActiveIngredients(pagination?: pagination) {
+  let url: string
+  if (pagination?.p !== undefined && pagination.p >= 2) {
+    url = `${baseUrl}/user/feed-active-ingredients?p=${pagination.p}`
+  } else {
+    url = `${baseUrl}/user/feed-active-ingredients`
+  }
+  if (pagination?.search !== undefined && pagination.search.length >= 2) {
+    url = `${baseUrl}/user/feed-active-ingredients?search=${pagination.search}`
+  }
+  return api.get(url)
+}
+
+export function queryFeedActiveIngredient(id: string) {
+  const url = `${baseUrl}/user/feed-active-ingredients/${id}`
+  return api.get(url)
+}
+
+export function addFeedActiveIngredient(data: { name: string; short_description: string; description: string }) {
+  let url = `${baseUrl}/user/feed-active-ingredients/add`
+  return api.post(url, data)
+}
+
+export function updateFeedActiveIngredient(data: { id: string; name: string; short_description: string; description: string }) {
+  let url = `${baseUrl}/user/feed-active-ingredients/update`
+  return api.post(url, data)
+}
+
+export function deleteFeedActiveIngredients(ingredientIds: string[]) {
+  let url = `${baseUrl}/user/feed-active-ingredients/delete`
+  return api.post(url, { ingredient_ids: ingredientIds })
+}
+
+// Feed Target functions
+export function queryFeedTargets(pagination?: pagination) {
+  let url: string
+  if (pagination?.p !== undefined && pagination.p >= 2) {
+    url = `${baseUrl}/user/feed-targets?p=${pagination.p}`
+  } else {
+    url = `${baseUrl}/user/feed-targets`
+  }
+  if (pagination?.search !== undefined && pagination.search.length >= 2) {
+    url = `${baseUrl}/user/feed-targets?search=${pagination.search}`
+  }
+  return api.get(url)
+}
+
+export function queryFeedTarget(id: string) {
+  const url = `${baseUrl}/user/feed-targets/${id}`
+  return api.get(url)
+}
+
+export function addFeedTarget(data: { name: string; scientific_name?: string; description?: string; damage_type?: string; remark?: string }) {
+  let url = `${baseUrl}/user/feed-targets/add`
+  return api.post(url, data)
+}
+
+export function updateFeedTarget(data: { id: string; name: string; scientific_name?: string; description?: string; damage_type?: string; remark?: string }) {
+  let url = `${baseUrl}/user/feed-targets/update`
+  return api.post(url, data)
+}
+
+export function deleteFeedTargets(targetIds: string[]) {
+  let url = `${baseUrl}/user/feed-targets/delete`
+  return api.post(url, { target_ids: targetIds })
+}
+
+// Feeding Program functions
+export function queryFeedingPrograms(pagination?: pagination) {
+  let url: string
+  if (pagination?.p !== undefined && pagination.p >= 2) {
+    url = `${baseUrl}/user/feeding-programs?p=${pagination.p}`
+  } else {
+    url = `${baseUrl}/user/feeding-programs`
+  }
+  if (pagination?.search !== undefined && pagination.search.length >= 2) {
+    url = `${baseUrl}/user/feeding-programs?search=${pagination.search}`
+  }
+  return api.get(url)
+}
+
+export function queryFeedingProgram(id: string) {
+  const url = `${baseUrl}/user/feeding-programs/${id}`
+  return api.get(url)
+}
+
+export function addFeedingProgram(data: any) {
+  let url = `${baseUrl}/user/feeding-programs/add`
+  return api.post(url, data)
+}
+
+export function updateFeedingProgram(data: any) {
+  let url = `${baseUrl}/user/feeding-programs/update`
+  return api.post(url, data)
+}
+
+export function deleteFeedingPrograms(programIds: string[]) {
+  let url = `${baseUrl}/user/feeding-programs/delete`
+  return api.post(url, { program_ids: programIds })
+}

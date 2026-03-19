@@ -387,6 +387,73 @@ export function queryAnimalHealthProduct(slug: string) {
   return api.get(url)
 }
 
+// Feed Products
+export function queryAllFeedProducts(pagination?: PaginationModel & { search?: string, category?: string[], brand?: string[], animal?: string[], phase?: string[] }) {
+  const params = new URLSearchParams()
+
+  if (pagination?.p !== undefined && pagination.p >= 2) {
+    params.set('p', pagination.p.toString())
+  }
+
+  if (pagination?.search && pagination.search.length >= 2) {
+    params.set('search', pagination.search)
+  }
+
+  if (pagination?.category && pagination.category.length > 0) {
+    pagination.category.forEach(c => params.append('category', c))
+  }
+
+  if (pagination?.brand && pagination.brand.length > 0) {
+    pagination.brand.forEach(b => params.append('brand', b))
+  }
+
+  if (pagination?.animal && pagination.animal.length > 0) {
+    pagination.animal.forEach(a => params.append('animal', a))
+  }
+
+  if (pagination?.phase && pagination.phase.length > 0) {
+    pagination.phase.forEach(ph => params.append('phase', ph))
+  }
+
+  const queryString = params.toString()
+  const url = queryString ? `${BaseURL}/feed/all?${queryString}` : `${BaseURL}/feed/all`
+
+  return api.get(url)
+}
+
+export function queryFeedProduct(slug: string) {
+  const url = `${BaseURL}/feed/${slug}`
+  return api.get(url)
+}
+
+export function queryFeedCategories() {
+  const url = `${BaseURL}/feedcategories/`
+  return api.get(url)
+}
+
+export function queryFeedFilterAggregates() {
+  const url = `${BaseURL}/feed/aggregates/filters`
+  return api.get(url)
+}
+
+// Feeding Programs
+export function queryPublishedFeedingPrograms(pagination?: PaginationModel) {
+  let url: string
+
+  if (pagination?.p !== undefined && pagination.p >= 2) {
+    url = `${BaseURL}/feedingprograms/?p=${pagination.p}`
+  } else {
+    url = `${BaseURL}/feedingprograms/`
+  }
+
+  return api.get(url)
+}
+
+export function queryFeedingProgramBySlug(slug: string) {
+  const url = `${BaseURL}/feedingprograms/${slug}`
+  return api.get(url)
+}
+
 // CDM Prices
 export function queryCdmPrices(pagination?: PaginationModel) {
   const params = new URLSearchParams()
