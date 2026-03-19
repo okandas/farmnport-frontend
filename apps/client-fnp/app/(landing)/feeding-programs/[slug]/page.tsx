@@ -1,13 +1,13 @@
 "use client"
 
-import { use, useEffect, useRef, useState } from "react"
+import { use, useEffect, useMemo, useRef, useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { queryFeedingProgramBySlug } from "@/lib/query"
 import Image from "next/image"
 import Link from "next/link"
 import {
     Egg, ChevronRight, TrendingUp, Shield, Heart,
-    ArrowRight, Sprout, Flag, Layers, X, AlertTriangle
+    ArrowRight, Sprout, Flag, X, AlertTriangle
 } from "lucide-react"
 import { capitalizeFirstLetter } from "@/lib/utilities"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
@@ -42,6 +42,7 @@ export default function FeedingProgramDetailPage({ params }: FeedingProgramDetai
     const { slug } = use(params)
     const [activeStage, setActiveStage] = useState(0)
     const [quickViewRec, setQuickViewRec] = useState<any>(null)
+    const [selectedBrand, setSelectedBrand] = useState<string | null>(null)
     const stageRefs = useRef<(HTMLDivElement | null)[]>([])
     const navRef = useRef<HTMLDivElement>(null)
 
@@ -52,6 +53,33 @@ export default function FeedingProgramDetailPage({ params }: FeedingProgramDetai
     })
 
     const program = data?.data
+
+    // Extract unique brands from all recommendations
+    const brands = useMemo(() => {
+        if (!program?.stages) return []
+        const brandMap = new Map<string, string>()
+        program.stages.forEach((stage: any) => {
+            (stage.recommendations || []).forEach((rec: any) => {
+                const brandName = rec.feed_product?.brand?.name
+                if (brandName && !brandMap.has(brandName)) {
+                    brandMap.set(brandName, brandName)
+                }
+            })
+        })
+        return Array.from(brandMap.values()).sort()
+    }, [program?.stages])
+
+    // Filter stages' recommendations by selected brand
+    const filteredStages = useMemo(() => {
+        if (!program?.stages) return []
+        if (!selectedBrand) return program.stages
+        return program.stages.map((stage: any) => ({
+            ...stage,
+            recommendations: (stage.recommendations || []).filter(
+                (rec: any) => rec.feed_product?.brand?.name === selectedBrand
+            ),
+        }))
+    }, [program?.stages, selectedBrand])
 
     useEffect(() => {
         if (!program?.stages?.length) return
@@ -126,7 +154,8 @@ export default function FeedingProgramDetailPage({ params }: FeedingProgramDetai
         )
     }
 
-    const stages = program.stages || []
+    const stages = filteredStages
+    const allStages = program.stages || []
 
     return (
         <div className="min-h-screen bg-background">
@@ -165,7 +194,7 @@ export default function FeedingProgramDetailPage({ params }: FeedingProgramDetai
                                     </span>
                                 )}
                                 <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white/90 text-foreground dark:bg-gray-900/60 dark:text-gray-200 backdrop-blur-sm">
-                                    {stages.length} Feeding {stages.length === 1 ? "Stage" : "Stages"}
+                                    {allStages.length} Feeding {allStages.length === 1 ? "Stage" : "Stages"}
                                 </span>
                             </div>
                             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground">
@@ -189,7 +218,7 @@ export default function FeedingProgramDetailPage({ params }: FeedingProgramDetai
                                     </span>
                                 )}
                                 <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-muted text-muted-foreground">
-                                    {stages.length} Feeding {stages.length === 1 ? "Stage" : "Stages"}
+                                    {allStages.length} Feeding {allStages.length === 1 ? "Stage" : "Stages"}
                                 </span>
                             </div>
                             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold">
@@ -206,7 +235,7 @@ export default function FeedingProgramDetailPage({ params }: FeedingProgramDetai
             </section>
 
             {/* Sticky Stage Navigator */}
-            {stages.length > 0 && (
+            {allStages.length > 0 && (
                 <div ref={navRef} className="sticky top-16 z-20 bg-background/95 backdrop-blur-md border-b shadow-sm">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="flex gap-1 overflow-x-auto py-3 scrollbar-hide">
@@ -223,7 +252,7 @@ export default function FeedingProgramDetailPage({ params }: FeedingProgramDetai
                                     Overview
                                 </span>
                             </button>
-                            {stages.map((stage: any, index: number) => {
+                            {allStages.map((stage: any, index: number) => {
                                 const tabIndex = index + 1
                                 const isActive = activeStage === tabIndex
                                 return (
@@ -250,6 +279,8 @@ export default function FeedingProgramDetailPage({ params }: FeedingProgramDetai
 
             {/* Program Overview Chart */}
             {stages.length > 0 && (() => {
+                const hasBrands = brands.length > 1
+
                 const purposeMap = new Map<string, Map<number, any[]>>()
                 stages.forEach((stage: any, stageIdx: number) => {
                     (stage.recommendations || []).forEach((rec: any) => {
@@ -262,14 +293,44 @@ export default function FeedingProgramDetailPage({ params }: FeedingProgramDetai
                 })
                 const purposes = Array.from(purposeMap.keys())
 
-                if (purposes.length === 0) return null
+                if (purposes.length === 0 && !hasBrands) return null
 
                 return (
                     <div
                         ref={(el) => { stageRefs.current[0] = el }}
                         className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8"
                     >
-                        <h2 className="text-lg font-semibold mb-4 text-foreground">Program Overview</h2>
+                        <div className="flex items-center justify-between mb-4">
+                            <h2 className="text-lg font-semibold text-foreground">Program Overview</h2>
+                            {hasBrands && (
+                                <div className="flex items-center gap-2">
+                                    <span className="text-xs text-muted-foreground">Brand:</span>
+                                    <button
+                                        onClick={() => setSelectedBrand(null)}
+                                        className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                                            !selectedBrand
+                                                ? "bg-foreground text-background"
+                                                : "bg-muted text-muted-foreground hover:text-foreground"
+                                        }`}
+                                    >
+                                        All
+                                    </button>
+                                    {brands.map((brand: string) => (
+                                        <button
+                                            key={brand}
+                                            onClick={() => setSelectedBrand(brand)}
+                                            className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                                                selectedBrand === brand
+                                                    ? "bg-foreground text-background"
+                                                    : "bg-muted text-muted-foreground hover:text-foreground"
+                                            }`}
+                                        >
+                                            {capitalizeFirstLetter(brand)}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
                         <div className="rounded-xl border border-border overflow-hidden">
                             <div className="overflow-x-auto">
                                 <table className="w-full border-collapse min-w-[640px]">
@@ -311,13 +372,13 @@ export default function FeedingProgramDetailPage({ params }: FeedingProgramDetai
                                                                             <button
                                                                                 key={i}
                                                                                 onClick={() => setQuickViewRec(rec)}
-                                                                                className={`block w-full text-left p-1.5 rounded ${style.bg} cursor-pointer hover:ring-1 hover:ring-current transition-all`}
+                                                                                className={`block w-full text-left p-2 rounded ${style.bg} cursor-pointer hover:ring-1 hover:ring-current transition-all`}
                                                                             >
-                                                                                <div className={`text-[11px] font-medium ${style.text} leading-tight`}>
+                                                                                <div className={`text-xs font-medium ${style.text} leading-tight`}>
                                                                                     {capitalizeFirstLetter(rec.feed_product_name)}
                                                                                 </div>
-                                                                                {rec.notes && (
-                                                                                    <div className="text-[9px] text-muted-foreground mt-0.5 line-clamp-1">{rec.notes}</div>
+                                                                                {rec.feed_product?.brand?.name && hasBrands && (
+                                                                                    <div className="text-[10px] text-muted-foreground mt-0.5">{capitalizeFirstLetter(rec.feed_product.brand.name)}</div>
                                                                                 )}
                                                                             </button>
                                                                         ))}
@@ -385,14 +446,6 @@ export default function FeedingProgramDetailPage({ params }: FeedingProgramDetai
 
                                         return (
                                             <div key={recIndex} className="flex items-center gap-4 px-6 py-3 hover:bg-muted/30 transition-colors">
-                                                {/* Feed icon placeholder */}
-                                                <button
-                                                    onClick={() => setQuickViewRec(rec)}
-                                                    className="relative w-10 h-10 rounded-md bg-amber-50 dark:bg-amber-950/30 border overflow-hidden flex-shrink-0 cursor-pointer flex items-center justify-center"
-                                                >
-                                                    <Egg className="w-5 h-5 text-amber-600 dark:text-amber-400" />
-                                                </button>
-
                                                 <div className="flex-1 min-w-0">
                                                     <button
                                                         onClick={() => setQuickViewRec(rec)}
@@ -400,17 +453,16 @@ export default function FeedingProgramDetailPage({ params }: FeedingProgramDetai
                                                     >
                                                         {capitalizeFirstLetter(rec.feed_product_name)}
                                                     </button>
-                                                    <div className={`inline-flex items-center gap-1 mt-0.5 px-1.5 py-0.5 rounded text-[10px] font-medium ${purposeStyle.bg} ${purposeStyle.text}`}>
-                                                        <PurposeIcon className="h-2.5 w-2.5" />
-                                                        {rec.purpose}
+                                                    <div className="flex items-center gap-2 mt-0.5">
+                                                        {rec.feed_product?.brand?.name && (
+                                                            <span className="text-xs text-muted-foreground">{rec.feed_product.brand.name}</span>
+                                                        )}
+                                                        <div className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium ${purposeStyle.bg} ${purposeStyle.text}`}>
+                                                            <PurposeIcon className="h-2.5 w-2.5" />
+                                                            {rec.purpose}
+                                                        </div>
                                                     </div>
                                                 </div>
-
-                                                {rec.notes && (
-                                                    <div className="hidden sm:block text-right flex-shrink-0 max-w-[200px]">
-                                                        <div className="text-xs text-muted-foreground line-clamp-2">{rec.notes}</div>
-                                                    </div>
-                                                )}
 
                                                 {rec.feed_product_slug && (
                                                     <Link
@@ -427,7 +479,9 @@ export default function FeedingProgramDetailPage({ params }: FeedingProgramDetai
                                 </div>
                             ) : (
                                 <div className="p-6 text-sm text-muted-foreground">
-                                    No feed recommendations for this stage yet.
+                                    {selectedBrand
+                                        ? `No ${selectedBrand} recommendations for this stage.`
+                                        : "No feed recommendations for this stage yet."}
                                 </div>
                             )}
                         </div>
@@ -465,9 +519,6 @@ export default function FeedingProgramDetailPage({ params }: FeedingProgramDetai
 
                         <div className="p-5 space-y-4">
                             <div className="flex items-start gap-4">
-                                <div className="w-12 h-12 rounded-lg bg-amber-50 dark:bg-amber-950/30 border flex items-center justify-center flex-shrink-0">
-                                    <Egg className="w-6 h-6 text-amber-600 dark:text-amber-400" />
-                                </div>
                                 <div className="flex-1 min-w-0">
                                     <h3 className="text-lg font-bold leading-tight pr-8">
                                         {capitalizeFirstLetter(quickViewRec.feed_product_name)}
