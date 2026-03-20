@@ -37,6 +37,11 @@ const EditFeedProductSchema = z.object({
     description: z.string().optional().default(""),
     images: z.array(z.any()).default([]),
     active_ingredients: z.array(z.any()).default([]),
+    stock_level: z.coerce.number().int().nonnegative().default(0),
+    available_for_sale: z.boolean().default(false),
+    show_price: z.boolean().default(true),
+    sale_price: z.coerce.number().nonnegative().default(0),
+    was_price: z.coerce.number().nonnegative().default(0),
 })
 
 type EditFeedProductModel = z.infer<typeof EditFeedProductSchema>
