@@ -606,6 +606,96 @@ export type FarmProduceResponse = {
   data: FarmProduce[]
 }
 
+// Feed Product Types
+
+export type FeedCategory = {
+  id: string
+  name: string
+  slug: string
+  short_description: string
+  description: string
+}
+
+export type FeedProduct = {
+  id: string
+  name: string
+  slug: string
+  brand_id: string
+  brand?: {
+    id: string
+    name: string
+  }
+  feed_category_id: string
+  feed_category?: {
+    id: string
+    name: string
+    slug: string
+  }
+  animal: string
+  phase: string
+  form: string
+  description: string
+  images: ImageModel[]
+  front_label?: ImageModel
+  back_label?: ImageModel
+  active_ingredients: {
+    id: string
+    name: string
+    concentration: string
+  }[]
+  targets?: {
+    id: string
+    name: string
+  }[]
+  stock_level?: number
+  available_for_sale?: boolean
+  show_price?: boolean
+  sale_price?: number
+  was_price?: number
+  created: string
+  updated: string
+}
+
+export type FeedProductResponse = {
+  total: number
+  data: FeedProduct[]
+}
+
+export type FeedingProgramRecommendation = {
+  feed_product_id: string
+  feed_product_name: string
+  feed_product_slug: string
+  purpose: string
+  notes: string
+}
+
+export type FeedingProgramStage = {
+  name: string
+  order: number
+  description: string
+  timing_description: string
+  recommendations: FeedingProgramRecommendation[]
+}
+
+export type FeedingProgram = {
+  id: string
+  name: string
+  slug: string
+  description: string
+  farm_produce_id: string
+  farm_produce_name?: string
+  cover_image?: ImageModel
+  stages: FeedingProgramStage[]
+  published: boolean
+  created: string
+  updated: string
+}
+
+export type FeedingProgramResponse = {
+  total: number
+  data: FeedingProgram[]
+}
+
 // CDM (Cold Dress Mass) Types
 
 export type CarcassGradePrice = {

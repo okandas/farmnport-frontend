@@ -52,7 +52,8 @@ import {
   Beaker,
   Bug,
   Layers,
-  Sprout
+  Sprout,
+  Egg
 } from "lucide-react"
 
 export type Icon = LucideIcon
@@ -112,5 +113,6 @@ export const Icons = {
   beaker: Beaker,
   bug: Bug,
   layers: Layers,
-  sprout: Sprout
+  sprout: Sprout,
+  egg: Egg
 }

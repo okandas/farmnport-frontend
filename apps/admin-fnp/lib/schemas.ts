@@ -504,6 +504,11 @@ export const AgroChemicalSchema = z.object({
       remarks: z.array(z.string()),
     })),
   })),
+  stock_level: z.coerce.number().int().nonnegative().default(0),
+  available_for_sale: z.boolean().default(false),
+  show_price: z.boolean().default(true),
+  sale_price: z.coerce.number().nonnegative().default(0),
+  was_price: z.coerce.number().nonnegative().default(0),
   created: z.string().optional(),
   updated: z.string().optional(),
 })
@@ -745,6 +750,11 @@ export const AnimalHealthProductSchema = z.object({
       remarks: z.array(z.string()),
     })),
   })),
+  stock_level: z.coerce.number().int().nonnegative().default(0),
+  available_for_sale: z.boolean().default(false),
+  show_price: z.boolean().default(true),
+  sale_price: z.coerce.number().nonnegative().default(0),
+  was_price: z.coerce.number().nonnegative().default(0),
   created: z.string().optional(),
   updated: z.string().optional(),
 })
@@ -804,6 +814,150 @@ export type SprayProgram = z.infer<typeof SprayProgramSchema>
 export type FormSprayProgramModel = z.infer<typeof FormSprayProgramSchema>
 export type SprayProgramStage = z.infer<typeof SprayProgramStageSchema>
 export type SprayProgramRecommendation = z.infer<typeof SprayProgramRecommendationSchema>
+
+// Feed Schemas
+
+export const FeedCategorySchema = z.object({
+  id: z.string(),
+  name: z.string().min(1, "Name is required"),
+  slug: z.string().optional(),
+  short_description: z.string().max(100, "Short description cannot exceed 100 characters"),
+  description: z.string().max(500, "Description cannot exceed 500 characters"),
+  created: z.string().optional(),
+  updated: z.string().optional(),
+})
+
+export const FormFeedCategorySchema = FeedCategorySchema.pick({
+  id: true,
+  name: true,
+  short_description: true,
+  description: true,
+})
+
+export const FeedActiveIngredientSchema = z.object({
+  id: z.string(),
+  name: z.string().min(1, "Name is required"),
+  slug: z.string().optional(),
+  short_description: z.string().max(100, "Short description cannot exceed 100 characters"),
+  description: z.string().max(500, "Description cannot exceed 500 characters"),
+  created: z.string().optional(),
+  updated: z.string().optional(),
+})
+
+export const FormFeedActiveIngredientSchema = FeedActiveIngredientSchema.pick({
+  id: true,
+  name: true,
+  short_description: true,
+  description: true,
+})
+
+export const FeedTargetSchema = z.object({
+  id: z.string(),
+  name: z.string().min(1, "Name is required"),
+  scientific_name: z.string().optional(),
+  description: z.string().optional(),
+  damage_type: z.string().optional(),
+  remark: z.string().optional(),
+  slug: z.string().optional(),
+  created: z.string().optional(),
+  updated: z.string().optional(),
+})
+
+export const FormFeedTargetSchema = FeedTargetSchema.pick({
+  id: true,
+  name: true,
+  scientific_name: true,
+  description: true,
+  damage_type: true,
+  remark: true,
+})
+
+export const FeedProductSchema = z.object({
+  id: z.string(),
+  name: z.string().min(1, "Name is required"),
+  slug: z.string().optional(),
+  brand_id: z.string().min(1, "Brand is required"),
+  brand: z.object({
+    id: z.string(),
+    name: z.string(),
+  }).optional(),
+  feed_category_id: z.string().min(1, "Feed category is required"),
+  feed_category: z.object({
+    id: z.string(),
+    name: z.string(),
+    slug: z.string(),
+  }).optional(),
+  animal: z.string().min(1, "Animal type is required"),
+  phase: z.string().min(1, "Phase is required"),
+  form: z.string().min(1, "Form is required"),
+  description: z.string().optional().default(""),
+  front_label: z.custom<ImageModel>().optional(),
+  back_label: z.custom<ImageModel>().optional(),
+  images: z.array(z.custom<ImageModel>()).max(5, "Maximum 5 images allowed"),
+  active_ingredients: z.array(z.object({
+    id: z.string(),
+    name: z.string(),
+    concentration: z.string(),
+  })),
+  targets: z.array(z.object({
+    id: z.string(),
+    name: z.string(),
+  })).optional(),
+  stock_level: z.coerce.number().int().nonnegative().default(0),
+  available_for_sale: z.boolean().default(false),
+  show_price: z.boolean().default(true),
+  sale_price: z.coerce.number().nonnegative().default(0),
+  was_price: z.coerce.number().nonnegative().default(0),
+  created: z.string().optional(),
+  updated: z.string().optional(),
+})
+
+export const FormFeedProductSchema = FeedProductSchema
+
+export const FeedingProgramRecommendationSchema = z.object({
+  feed_product_id: z.string().min(1, "Feed product is required"),
+  feed_product_name: z.string(),
+  feed_product_slug: z.string(),
+  purpose: z.string().min(1, "Purpose is required"),
+  notes: z.string().optional().default(""),
+})
+
+export const FeedingProgramStageSchema = z.object({
+  name: z.string().min(1, "Stage name is required"),
+  order: z.number(),
+  description: z.string().optional().default(""),
+  timing_description: z.string().optional().default(""),
+  recommendations: z.array(FeedingProgramRecommendationSchema),
+})
+
+export const FeedingProgramSchema = z.object({
+  id: z.string(),
+  name: z.string().min(1, "Name is required").max(100, "Name cannot exceed 100 characters"),
+  slug: z.string().optional(),
+  description: z.string().optional().default(""),
+  farm_produce_id: z.string().min(1, "Animal type is required"),
+  farm_produce_name: z.string().optional(),
+  cover_image: z.custom<ImageModel>().optional().nullable(),
+  stages: z.array(FeedingProgramStageSchema).min(1, "At least one stage is required"),
+  published: z.boolean().default(false),
+  created: z.string().optional(),
+  updated: z.string().optional(),
+})
+
+export const FormFeedingProgramSchema = FeedingProgramSchema
+
+export type FeedCategory = z.infer<typeof FeedCategorySchema>
+export type FormFeedCategoryModel = z.infer<typeof FormFeedCategorySchema>
+export type FeedActiveIngredient = z.infer<typeof FeedActiveIngredientSchema>
+export type FormFeedActiveIngredientModel = z.infer<typeof FormFeedActiveIngredientSchema>
+export type FeedTarget = z.infer<typeof FeedTargetSchema>
+export type FormFeedTargetModel = z.infer<typeof FormFeedTargetSchema>
+export type FeedProduct = z.infer<typeof FeedProductSchema>
+export type FormFeedProductModel = z.infer<typeof FormFeedProductSchema>
+export type FeedingProgram = z.infer<typeof FeedingProgramSchema>
+export type FormFeedingProgramModel = z.infer<typeof FormFeedingProgramSchema>
+export type FeedingProgramStage = z.infer<typeof FeedingProgramStageSchema>
+export type FeedingProgramRecommendation = z.infer<typeof FeedingProgramRecommendationSchema>
 
 // CDM (Cold Dress Mass) Schemas
 

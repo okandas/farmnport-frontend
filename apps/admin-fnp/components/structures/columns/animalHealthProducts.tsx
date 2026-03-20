@@ -41,6 +41,22 @@ export const animalHealthProductColumns: ColumnDef<AnimalHealthProduct>[] = [
     },
   },
   {
+    accessorKey: "sale_price",
+    header: "Price",
+    cell: ({ row }) => {
+        const price = row.getValue("sale_price") as number
+        return price > 0 ? `$${price.toFixed(2)}` : "—"
+    },
+  },
+  {
+    accessorKey: "stock_level",
+    header: "Stock",
+    cell: ({ row }) => {
+        const stock = row.getValue("stock_level") as number
+        return stock > 0 ? stock : "—"
+    },
+  },
+  {
     accessorKey: "created",
     header: "Date Created",
     cell: ({ row }) => {

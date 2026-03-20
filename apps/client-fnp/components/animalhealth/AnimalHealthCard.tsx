@@ -61,6 +61,16 @@ export function AnimalHealthCard({ product }: AnimalHealthCardProps) {
           </div>
         </div>
 
+        {product.show_price && product.sale_price > 0 && (
+            <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground">Guide Price:</span>
+                {product.was_price > 0 && product.was_price > product.sale_price && (
+                    <span className="text-xs text-muted-foreground line-through">${product.was_price.toFixed(2)}</span>
+                )}
+                <span className="text-sm font-semibold text-primary">${product.sale_price.toFixed(2)}</span>
+            </div>
+        )}
+
         {/* CTA */}
         <Link href={href} className="block pt-2">
           <Button

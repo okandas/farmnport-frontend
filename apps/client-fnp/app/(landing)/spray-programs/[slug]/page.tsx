@@ -111,11 +111,6 @@ export default function SprayProgramDetailPage({ params }: SprayProgramDetailPag
         return (
             <div className="min-h-screen bg-background flex items-center justify-center px-4 pb-4">
                 <div className="text-center max-w-md">
-                    <div className="mb-6">
-                        <div className="mx-auto w-20 h-20 bg-muted rounded-full flex items-center justify-center">
-                            <Sprout className="w-10 h-10 text-muted-foreground" />
-                        </div>
-                    </div>
                     <h2 className="text-2xl font-semibold mb-2">Spray Program Not Found</h2>
                     <p className="text-muted-foreground mb-6">
                         We couldn&apos;t find the spray program you&apos;re looking for.
@@ -124,7 +119,7 @@ export default function SprayProgramDetailPage({ params }: SprayProgramDetailPag
                         href="/spray-programs"
                         className="inline-flex items-center justify-center rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 transition-colors"
                     >
-                        Browse All Programs
+                        View All Spray Programs
                     </Link>
                 </div>
             </div>
@@ -181,18 +176,27 @@ export default function SprayProgramDetailPage({ params }: SprayProgramDetailPag
                         <div className="absolute bottom-0 left-0 right-0 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
                             <div className="flex items-center gap-3 mb-3">
                                 {program.farm_produce_name && (
-                                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-amber-100/90 text-amber-800 dark:bg-amber-900/60 dark:text-amber-300 backdrop-blur-sm">
-                                        <Sprout className="h-3 w-3" />
+                                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-amber-100/90 text-amber-800 dark:bg-amber-900/60 dark:text-amber-300 backdrop-blur-sm">
                                         {capitalizeFirstLetter(program.farm_produce_name)}
                                     </span>
                                 )}
                                 <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white/90 text-foreground dark:bg-gray-900/60 dark:text-gray-200 backdrop-blur-sm">
                                     {stages.length} Growth {stages.length === 1 ? "Stage" : "Stages"}
                                 </span>
+                                {program.crop_group_name && (
+                                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100/90 text-green-800 dark:bg-green-900/60 dark:text-green-300 backdrop-blur-sm">
+                                        {capitalizeFirstLetter(program.crop_group_name)}
+                                    </span>
+                                )}
                             </div>
                             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground">
                                 {capitalizeFirstLetter(program.name)}
                             </h1>
+                            {program.scientific_name && (
+                                <p className="mt-1 text-base sm:text-lg italic text-muted-foreground/80">
+                                    {program.scientific_name}
+                                </p>
+                            )}
                             {program.description && (
                                 <p className="mt-3 text-base sm:text-lg text-muted-foreground max-w-2xl">
                                     {program.description}
@@ -201,22 +205,31 @@ export default function SprayProgramDetailPage({ params }: SprayProgramDetailPag
                         </div>
                     </div>
                 ) : (
-                    <div className="relative bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/20 py-12 lg:py-16">
+                    <div className="relative py-12 lg:py-16">
                         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                             <div className="flex items-center gap-3 mb-3">
                                 {program.farm_produce_name && (
-                                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">
-                                        <Sprout className="h-3 w-3" />
+                                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">
                                         {capitalizeFirstLetter(program.farm_produce_name)}
                                     </span>
                                 )}
                                 <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-muted text-muted-foreground">
                                     {stages.length} Growth {stages.length === 1 ? "Stage" : "Stages"}
                                 </span>
+                                {program.crop_group_name && (
+                                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300">
+                                        {capitalizeFirstLetter(program.crop_group_name)}
+                                    </span>
+                                )}
                             </div>
                             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold">
                                 {capitalizeFirstLetter(program.name)}
                             </h1>
+                            {program.scientific_name && (
+                                <p className="mt-1 text-base sm:text-lg italic text-muted-foreground/80">
+                                    {program.scientific_name}
+                                </p>
+                            )}
                             {program.description && (
                                 <p className="mt-3 text-base sm:text-lg text-muted-foreground max-w-2xl">
                                     {program.description}
@@ -231,11 +244,11 @@ export default function SprayProgramDetailPage({ params }: SprayProgramDetailPag
             {stages.length > 0 && (
                 <div ref={navRef} className="sticky top-16 z-20 bg-background/95 backdrop-blur-md border-b shadow-sm">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="flex gap-1 overflow-x-auto py-3 scrollbar-hide">
+                        <div className="flex flex-wrap gap-1 py-3">
                             {/* Overview tab */}
                             <button
                                 onClick={() => scrollToStage(0)}
-                                className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
                                     activeStage === 0
                                         ? "bg-primary text-primary-foreground"
                                         : "text-muted-foreground hover:text-foreground hover:bg-muted"
@@ -254,7 +267,7 @@ export default function SprayProgramDetailPage({ params }: SprayProgramDetailPag
                                     <button
                                         key={index}
                                         onClick={() => scrollToStage(tabIndex)}
-                                        className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                                        className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
                                             isActive
                                                 ? "bg-primary text-primary-foreground"
                                                 : "text-muted-foreground hover:text-foreground hover:bg-muted"
@@ -267,38 +280,6 @@ export default function SprayProgramDetailPage({ params }: SprayProgramDetailPag
                                     </button>
                                 )
                             })}
-                            {/* Brand Filter - inline after tabs */}
-                            {hasBrands && (
-                                <>
-                                    <div className="flex-shrink-0 w-px h-6 bg-border self-center mx-1" />
-                                    <div className="flex items-center gap-1.5 flex-shrink-0">
-                                        <span className="text-[11px] text-muted-foreground flex-shrink-0">Brand:</span>
-                                        <button
-                                            onClick={() => setSelectedBrand(null)}
-                                            className={`flex-shrink-0 px-2.5 py-1 rounded text-[11px] font-medium transition-all ${
-                                                !selectedBrand
-                                                    ? "bg-foreground text-background"
-                                                    : "bg-muted text-muted-foreground hover:text-foreground"
-                                            }`}
-                                        >
-                                            All
-                                        </button>
-                                        {brands.map((brand) => (
-                                            <button
-                                                key={brand}
-                                                onClick={() => setSelectedBrand(brand)}
-                                                className={`flex-shrink-0 px-2.5 py-1 rounded text-[11px] font-medium transition-all ${
-                                                    selectedBrand === brand
-                                                        ? "bg-foreground text-background"
-                                                        : "bg-muted text-muted-foreground hover:text-foreground"
-                                                }`}
-                                            >
-                                                {capitalizeFirstLetter(brand)}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </>
-                            )}
                         </div>
                     </div>
                 </div>
@@ -326,7 +307,37 @@ export default function SprayProgramDetailPage({ params }: SprayProgramDetailPag
                         ref={(el) => { stageRefs.current[0] = el }}
                         className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8"
                     >
-                        <h2 className="text-lg font-semibold mb-4 text-foreground">Program Overview</h2>
+                        <div className="flex items-center justify-between mb-4">
+                            <h2 className="text-lg font-semibold text-foreground">Program Overview</h2>
+                            {hasBrands && (
+                                <div className="flex items-center gap-2">
+                                    <span className="text-xs text-muted-foreground">Brand:</span>
+                                    <button
+                                        onClick={() => setSelectedBrand(null)}
+                                        className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                                            !selectedBrand
+                                                ? "bg-foreground text-background"
+                                                : "bg-muted text-muted-foreground hover:text-foreground"
+                                        }`}
+                                    >
+                                        All
+                                    </button>
+                                    {brands.map((brand) => (
+                                        <button
+                                            key={brand}
+                                            onClick={() => setSelectedBrand(brand)}
+                                            className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                                                selectedBrand === brand
+                                                    ? "bg-foreground text-background"
+                                                    : "bg-muted text-muted-foreground hover:text-foreground"
+                                            }`}
+                                        >
+                                            {capitalizeFirstLetter(brand)}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
                         <div className="rounded-xl border border-border overflow-hidden">
                             <div className="overflow-x-auto">
                                 <table className="w-full border-collapse min-w-[640px]">

@@ -26,7 +26,6 @@ export function GuidesHeroActions() {
                 className="text-base px-6 py-5 h-auto font-semibold transition-all group"
             >
                 <Link href="/spray-programs" className="flex items-center gap-2">
-                    <Sprout className="h-5 w-5" />
                     All Spray Programs
                     <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </Link>

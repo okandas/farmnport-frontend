@@ -103,6 +103,29 @@ export function MobileNav({ user }: MobileNavProps) {
                    </Link>
 
                    <Link
+                     href="/feeding-programs"
+                     onClick={() => {
+                       sendGTMEvent({ event: 'link', value: 'FeedProgramsTopNavigation' })
+                       setIsOpen(false)
+                     }}
+                     className="flex items-center gap-3 px-3 py-2 text-base font-medium rounded-md hover:bg-accent transition-colors"
+                   >
+                     <Icons.sprout className="h-5 w-5" />
+                     <span>Feed Programs</span>
+                   </Link>
+
+                   <Link
+                     href="/feeds"
+                     onClick={() => {
+                       sendGTMEvent({ event: 'link', value: 'FeedsTopNavigation' })
+                       setIsOpen(false)
+                     }}
+                     className="flex items-center gap-3 px-3 py-2 text-base font-medium rounded-md hover:bg-accent transition-colors"
+                   >
+                     <span>Feeds</span>
+                   </Link>
+
+                   <Link
                      href="/buyers"
                      onClick={() => {
                        sendGTMEvent({ event: 'link', value: 'BuyerTopNavigation' })

@@ -109,12 +109,42 @@ export const dashboardConfig: DashboardConfig = {
       ],
     },
     {
+      label: "Feed",
+      items: [
+        {
+          title: "Products",
+          href: "/dashboard/feed-products",
+          icon: "productSearch",
+        },
+        {
+          title: "Categories",
+          href: "/dashboard/feed-categories",
+          icon: "clipboardList",
+        },
+        {
+          title: "Ingredients",
+          href: "/dashboard/feed-active-ingredients",
+          icon: "beaker",
+        },
+        {
+          title: "Targets",
+          href: "/dashboard/feed-targets",
+          icon: "bug",
+        },
+      ],
+    },
+    {
       label: "Programs & Pricing",
       items: [
         {
           title: "Spray Programs",
           href: "/dashboard/spray-programs",
           icon: "sprout",
+        },
+        {
+          title: "Feeding Programs",
+          href: "/dashboard/feeding-programs",
+          icon: "egg",
         },
         {
           title: "Producer Prices",
