@@ -1,14 +1,25 @@
-"use client"
-
-import { use } from "react"
-import { useQuery } from "@tanstack/react-query"
-import { queryAnimalHealthProduct } from "@/lib/query"
 import Image from "next/image"
-import { Beaker, AlertTriangle, ShoppingCart } from "lucide-react"
+import { Beaker, AlertTriangle } from "lucide-react"
 import Link from "next/link"
-import { sendGTMEvent } from "@next/third-parties/google"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
 import { capitalizeFirstLetter, formatUnit } from "@/lib/utilities"
+import { BaseURL } from "@/lib/schemas"
+import { BuyNowButton } from "./BuyNowButton"
+
+const fetchOptions: RequestInit = process.env.NODE_ENV === "production"
+    ? { next: { revalidate: 3600 } } as RequestInit
+    : { cache: "no-store" }
+
+async function getProduct(slug: string) {
+    try {
+        const res = await fetch(`${BaseURL}/animalhealth/${slug}`, fetchOptions)
+        if (!res.ok) return null
+        const json = await res.json()
+        return json?.data || null
+    } catch {
+        return null
+    }
+}
 
 interface GuidePageProps {
     params: Promise<{
@@ -17,42 +28,17 @@ interface GuidePageProps {
     }>
 }
 
-export default function AnimalHealthGuidePage({ params }: GuidePageProps) {
-    const { category, slug } = use(params)
+const overviewDesc: Record<string, string> = {
+    vaccines: "a vaccine designed to protect poultry and livestock against infectious diseases. It stimulates the immune system to build resistance when administered according to the recommended schedule.",
+    antibiotics: "an antibiotic formulated for the treatment and prevention of bacterial infections in poultry and livestock. It targets harmful bacteria while supporting animal recovery when used as directed.",
+    "nutrition-supplements": "a nutritional supplement formulated to support optimal health and productivity in poultry and livestock. It provides essential vitamins, minerals, and nutrients for growth and well-being.",
+    "anti-protozoa": "an anti-protozoal product developed for the treatment and prevention of protozoal infections such as coccidiosis. It effectively manages parasitic protozoa in poultry and livestock.",
+    "biosecurity-disinfectants": "a biosecurity disinfectant designed for cleaning and sanitizing poultry and livestock housing. It helps eliminate pathogens and maintain a healthy environment.",
+}
 
-    const { data, isLoading } = useQuery({
-        queryKey: ["animal-health-guide", slug],
-        queryFn: () => queryAnimalHealthProduct(slug),
-        refetchOnWindowFocus: false,
-    })
-
-    const product = data?.data
-
-    const categorySlug = product?.animal_health_category?.slug || ""
-    const overviewDesc: Record<string, string> = {
-        vaccines: "a vaccine designed to protect poultry and livestock against infectious diseases. It stimulates the immune system to build resistance when administered according to the recommended schedule.",
-        antibiotics: "an antibiotic formulated for the treatment and prevention of bacterial infections in poultry and livestock. It targets harmful bacteria while supporting animal recovery when used as directed.",
-        "nutrition-supplements": "a nutritional supplement formulated to support optimal health and productivity in poultry and livestock. It provides essential vitamins, minerals, and nutrients for growth and well-being.",
-        "anti-protozoa": "an anti-protozoal product developed for the treatment and prevention of protozoal infections such as coccidiosis. It effectively manages parasitic protozoa in poultry and livestock.",
-        "biosecurity-disinfectants": "a biosecurity disinfectant designed for cleaning and sanitizing poultry and livestock housing. It helps eliminate pathogens and maintain a healthy environment.",
-    }
-
-    if (isLoading) {
-        return (
-            <div className="min-h-screen bg-background">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                    <div className="animate-pulse grid md:grid-cols-2 gap-8">
-                        <div className="aspect-square bg-muted rounded-lg" />
-                        <div className="space-y-4">
-                            <div className="h-8 bg-muted rounded w-3/4" />
-                            <div className="h-4 bg-muted rounded w-1/2" />
-                            <div className="h-12 bg-muted rounded w-1/3" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-        )
-    }
+export default async function AnimalHealthGuidePage({ params }: GuidePageProps) {
+    const { category, slug } = await params
+    const product = await getProduct(slug)
 
     if (!product) {
         return (
@@ -84,58 +70,146 @@ export default function AnimalHealthGuidePage({ params }: GuidePageProps) {
         )
     }
 
+    const categorySlug = product?.animal_health_category?.slug || ""
+
     // Generate JSON-LD structured data
-    const generateStructuredData = () => {
-        if (!product) return null
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://farmnport.com'
+    const url = `${baseUrl}/animal-health-guides/${category}/${slug}`
+    const imageUrl = product.images?.[0]?.img?.src || `${baseUrl}/default-chemical.png`
 
-        const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://farmnport.com'
-        const url = `${baseUrl}/animal-health-guides/${category}/${slug}`
-        const imageUrl = product.images?.[0]?.img?.src || `${baseUrl}/default-chemical.png`
+    const description = product.animal_health_category?.name
+        ? `${product.name} is a ${product.animal_health_category.name} for poultry and livestock health. View active ingredients, dosage rates, and withdrawal periods.`
+        : `Professional animal health product guide for ${product.name}. Complete information on active ingredients, dosage rates, and withdrawal periods.`
 
-        const description = product.animal_health_category?.name
-            ? `${product.name} is a ${product.animal_health_category.name} for poultry and livestock health. View active ingredients, dosage rates, and withdrawal periods.`
-            : `Professional animal health product guide for ${product.name}. Complete information on active ingredients, dosage rates, and withdrawal periods.`
+    const usageInfo = product.dosage_rates?.length > 0
+        ? `Dosage rates available for ${product.dosage_rates.map((r: any) => r.animal).join(', ')}`
+        : undefined
 
-        const usageInfo = product.dosage_rates?.length > 0
-            ? `Dosage rates available for ${product.dosage_rates.map((r: any) => r.animal).join(', ')}`
-            : undefined
-
-        return {
-            "@context": "https://schema.org",
-            "@type": "Product",
-            "name": product.name,
-            "description": description,
-            "image": imageUrl,
-            "category": product.animal_health_category?.name || "Animal Health Product",
-            "url": url,
-            "additionalProperty": [
-                ...(product.active_ingredients?.map((ai: any) => ({
-                    "@type": "PropertyValue",
-                    "name": "Active Ingredient",
-                    "value": `${ai.name} (${ai.dosage_value} ${ai.dosage_unit})`
-                })) || []),
-                ...(product.targets?.map((target: any) => ({
-                    "@type": "PropertyValue",
-                    "name": "Target Disease/Condition",
-                    "value": target.scientific_name ? `${target.name} (${target.scientific_name})` : target.name
-                })) || [])
-            ],
-            "applicationCategory": "Veterinary Product",
-            "usageInfo": usageInfo
-        }
+    const structuredData = {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        "name": product.name,
+        "description": description,
+        "image": imageUrl,
+        "category": product.animal_health_category?.name || "Animal Health Product",
+        "url": url,
+        "additionalProperty": [
+            ...(product.active_ingredients?.map((ai: any) => ({
+                "@type": "PropertyValue",
+                "name": "Active Ingredient",
+                "value": `${ai.name} (${ai.dosage_value} ${ai.dosage_unit})`
+            })) || []),
+            ...(product.targets?.map((target: any) => ({
+                "@type": "PropertyValue",
+                "name": "Target Disease/Condition",
+                "value": target.scientific_name ? `${target.name} (${target.scientific_name})` : target.name
+            })) || [])
+        ],
+        "applicationCategory": "Veterinary Product",
+        "usageInfo": usageInfo
     }
 
-    const structuredData = generateStructuredData()
+    // Pre-process dosage rates grouping for the table
+    const grouped = new Map<string, any[]>()
+    const ungrouped: any[] = []
+
+    if (product.dosage_rates) {
+        product.dosage_rates.forEach((rate: any) => {
+            if (rate.animal_group_id) {
+                const existing = grouped.get(rate.animal_group_id) || []
+                existing.push(rate)
+                grouped.set(rate.animal_group_id, existing)
+            } else {
+                ungrouped.push(rate)
+            }
+        })
+    }
+
+    // Pre-process ungrouped target grouping
+    const targetGrouped = new Map<string, any[]>()
+    const targetOrder: string[] = []
+    ungrouped.forEach((rate: any) => {
+        const key = Array.isArray(rate.targets) ? rate.targets.slice().sort().join("|") : ""
+        if (!targetGrouped.has(key)) {
+            targetGrouped.set(key, [])
+            targetOrder.push(key)
+        }
+        targetGrouped.get(key)!.push(rate)
+    })
+
+    const renderTargetGrid = (targets: string[]) => (
+        <div className="grid grid-cols-2 gap-x-4 gap-y-0.5">
+            {targets.map((t: string, i: number) => {
+                const parenIdx = t.indexOf(" (")
+                const mainName = parenIdx > -1 ? t.slice(0, parenIdx) : t
+                const sciName = parenIdx > -1 ? t.slice(parenIdx) : ""
+                return (
+                    <div key={i} className="text-sm flex items-start gap-1">
+                        <span className="h-1 w-1 mt-1.5 rounded-full bg-muted-foreground/50 flex-shrink-0" />
+                        <span>
+                            <span className="text-foreground">{mainName}</span>
+                            {sciName && <span className="text-muted-foreground text-xs">{sciName}</span>}
+                        </span>
+                    </div>
+                )
+            })}
+        </div>
+    )
+
+    const renderEntryRows = (rate: any, rateKey: string, animalCell: React.ReactNode, targetCell: React.ReactNode) => {
+        const entries = rate.entries || []
+        const lastIdx = entries.length - 1
+        return entries.map((entry: any, entryIdx: number) => (
+            <tr key={`${rateKey}-${entryIdx}`} className={`hover:bg-muted/30 transition-colors ${entryIdx === 0 ? "border-t border-border" : ""} ${entryIdx === lastIdx ? "border-b border-border" : ""}`}>
+                <td className="p-3 align-top">
+                    {entryIdx === 0 ? animalCell : null}
+                </td>
+                <td className="p-3 align-top">
+                    {entryIdx === 0 ? targetCell : null}
+                </td>
+                <td className="p-3 align-top">
+                    <div className="font-bold text-blue-600 dark:text-blue-400 text-base">
+                        {entry.dosage.value} {formatUnit(entry.dosage.unit)}
+                    </div>
+                    <div className="text-xs text-muted-foreground">per {entry.dosage.per}</div>
+                </td>
+                <td className="p-3 align-top">
+                    <div className="font-semibold text-orange-700 dark:text-orange-300">{entry.max_applications.max}</div>
+                    {entry.max_applications.note && entry.max_applications.note.trim() !== '' && (
+                        <div className="text-xs text-muted-foreground mt-1">{entry.max_applications.note}</div>
+                    )}
+                </td>
+                <td className="p-3 align-top">
+                    <div className="font-semibold text-teal-700 dark:text-teal-300 text-sm">{entry.application_interval}</div>
+                </td>
+                <td className="p-3 align-top">
+                    <div className="font-semibold text-rose-700 dark:text-rose-300 text-sm">{entry.withdrawal_period}</div>
+                </td>
+                <td className="p-3 align-top">
+                    {entry.remarks && entry.remarks.length > 0 ? (
+                        <ul className="space-y-1">
+                            {entry.remarks.map((remark: string, remarkIdx: number) => (
+                                <li key={remarkIdx} className="text-xs text-foreground flex items-start gap-1.5">
+                                    <span className="h-1 w-1 mt-1.5 rounded-full bg-foreground/50 flex-shrink-0" />
+                                    <span className="flex-1">{remark}</span>
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <span className="text-xs text-muted-foreground">&mdash;</span>
+                    )}
+                </td>
+            </tr>
+        ))
+    }
 
     return (
         <div className="min-h-screen bg-background">
             {/* JSON-LD Structured Data */}
-            {structuredData && (
-                <script
-                    type="application/ld+json"
-                    dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-                />
-            )}
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+            />
 
             {/* Breadcrumb */}
             <div className="border-b bg-muted/30">
@@ -196,14 +270,7 @@ export default function AnimalHealthGuidePage({ params }: GuidePageProps) {
                             </div>
                         )}
 
-                        <Link
-                            href="/waiting-list-shop"
-                            onClick={() => sendGTMEvent({ event: 'buy_now_click', value: slug, category: 'animal_health' })}
-                            className="flex items-center justify-center gap-2 w-full py-3 px-4 rounded-lg bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-colors"
-                        >
-                            <ShoppingCart className="h-5 w-5" />
-                            Buy Now
-                        </Link>
+                        <BuyNowButton slug={slug} />
                     </div>
 
                     {/* Right - Product Info */}
@@ -325,148 +392,51 @@ export default function AnimalHealthGuidePage({ params }: GuidePageProps) {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {(() => {
-                                        const grouped = new Map<string, any[]>()
-                                        const ungrouped: any[] = []
-
-                                        product.dosage_rates.forEach((rate: any) => {
-                                            if (rate.animal_group_id) {
-                                                const existing = grouped.get(rate.animal_group_id) || []
-                                                existing.push(rate)
-                                                grouped.set(rate.animal_group_id, existing)
-                                            } else {
-                                                ungrouped.push(rate)
-                                            }
-                                        })
-
-                                        const renderTargetGrid = (targets: string[]) => (
-                                            <div className="grid grid-cols-2 gap-x-4 gap-y-0.5">
-                                                {targets.map((t: string, i: number) => {
-                                                    const parenIdx = t.indexOf(" (")
-                                                    const mainName = parenIdx > -1 ? t.slice(0, parenIdx) : t
-                                                    const sciName = parenIdx > -1 ? t.slice(parenIdx) : ""
-                                                    return (
-                                                        <div key={i} className="text-sm flex items-start gap-1">
-                                                            <span className="h-1 w-1 mt-1.5 rounded-full bg-muted-foreground/50 flex-shrink-0" />
-                                                            <span>
-                                                                <span className="text-foreground">{mainName}</span>
-                                                                {sciName && <span className="text-muted-foreground text-xs">{sciName}</span>}
-                                                            </span>
+                                    {/* Grouped rates */}
+                                    {Array.from(grouped.entries()).map(([groupId, rates]) => {
+                                        const firstRate = rates[0]
+                                        const animalCell = (
+                                            <div>
+                                                <div className="font-semibold text-sm text-blue-700 dark:text-blue-300">
+                                                    {firstRate.animal_group}
+                                                </div>
+                                                <div className="mt-1 space-y-0.5">
+                                                    {rates.map((r: any, idx: number) => (
+                                                        <div key={idx} className="text-xs text-muted-foreground capitalize flex items-start gap-1">
+                                                            <span className="h-1 w-1 mt-1.5 rounded-full bg-blue-400 flex-shrink-0" />
+                                                            <span className="flex-1">{r.animal}</span>
                                                         </div>
-                                                    )
-                                                })}
+                                                    ))}
+                                                </div>
                                             </div>
                                         )
+                                        const targetCell = renderTargetGrid(firstRate.targets || [])
+                                        return renderEntryRows(firstRate, `group-${groupId}`, animalCell, targetCell)
+                                    })}
 
-                                        const renderEntryRows = (rate: any, rateKey: string, animalCell: React.ReactNode, targetCell: React.ReactNode) => {
-                                            const entries = rate.entries || []
-                                            const lastIdx = entries.length - 1
-                                            return entries.map((entry: any, entryIdx: number) => (
-                                                <tr key={`${rateKey}-${entryIdx}`} className={`hover:bg-muted/30 transition-colors ${entryIdx === 0 ? "border-t border-border" : ""} ${entryIdx === lastIdx ? "border-b border-border" : ""}`}>
-                                                    <td className="p-3 align-top">
-                                                        {entryIdx === 0 ? animalCell : null}
-                                                    </td>
-                                                    <td className="p-3 align-top">
-                                                        {entryIdx === 0 ? targetCell : null}
-                                                    </td>
-                                                    <td className="p-3 align-top">
-                                                        <div className="font-bold text-blue-600 dark:text-blue-400 text-base">
-                                                            {entry.dosage.value} {formatUnit(entry.dosage.unit)}
-                                                        </div>
-                                                        <div className="text-xs text-muted-foreground">per {entry.dosage.per}</div>
-                                                    </td>
-                                                    <td className="p-3 align-top">
-                                                        <div className="font-semibold text-orange-700 dark:text-orange-300">{entry.max_applications.max}</div>
-                                                        {entry.max_applications.note && entry.max_applications.note.trim() !== '' && (
-                                                            <div className="text-xs text-muted-foreground mt-1">{entry.max_applications.note}</div>
-                                                        )}
-                                                    </td>
-                                                    <td className="p-3 align-top">
-                                                        <div className="font-semibold text-teal-700 dark:text-teal-300 text-sm">{entry.application_interval}</div>
-                                                    </td>
-                                                    <td className="p-3 align-top">
-                                                        <div className="font-semibold text-rose-700 dark:text-rose-300 text-sm">{entry.withdrawal_period}</div>
-                                                    </td>
-                                                    <td className="p-3 align-top">
-                                                        {entry.remarks && entry.remarks.length > 0 ? (
-                                                            <ul className="space-y-1">
-                                                                {entry.remarks.map((remark: string, remarkIdx: number) => (
-                                                                    <li key={remarkIdx} className="text-xs text-foreground flex items-start gap-1.5">
-                                                                        <span className="h-1 w-1 mt-1.5 rounded-full bg-foreground/50 flex-shrink-0" />
-                                                                        <span className="flex-1">{remark}</span>
-                                                                    </li>
-                                                                ))}
-                                                            </ul>
-                                                        ) : (
-                                                            <span className="text-xs text-muted-foreground">—</span>
-                                                        )}
-                                                    </td>
-                                                </tr>
-                                            ))
+                                    {/* Ungrouped rates */}
+                                    {targetOrder.map((targetKey, tgIdx) => {
+                                        const rates = targetGrouped.get(targetKey)!
+                                        if (rates.length === 1) {
+                                            const rate = rates[0]
+                                            const animalCell = (
+                                                <div>
+                                                    <div className="font-semibold capitalize text-sm text-foreground">{rate.animal}</div>
+                                                </div>
+                                            )
+                                            const targetCell = renderTargetGrid(rate.targets || [])
+                                            return renderEntryRows(rate, `tg-${tgIdx}`, animalCell, targetCell)
                                         }
-
-                                        return (
-                                            <>
-                                                {/* Grouped rates */}
-                                                {Array.from(grouped.entries()).map(([groupId, rates]) => {
-                                                    const firstRate = rates[0]
-                                                    const animalCell = (
-                                                        <div>
-                                                            <div className="font-semibold text-sm text-blue-700 dark:text-blue-300">
-                                                                {firstRate.animal_group}
-                                                            </div>
-                                                            <div className="mt-1 space-y-0.5">
-                                                                {rates.map((r: any, idx: number) => (
-                                                                    <div key={idx} className="text-xs text-muted-foreground capitalize flex items-start gap-1">
-                                                                        <span className="h-1 w-1 mt-1.5 rounded-full bg-blue-400 flex-shrink-0" />
-                                                                        <span className="flex-1">{r.animal}</span>
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-                                                        </div>
-                                                    )
-                                                    const targetCell = renderTargetGrid(firstRate.targets || [])
-                                                    return renderEntryRows(firstRate, `group-${groupId}`, animalCell, targetCell)
-                                                })}
-
-                                                {/* Ungrouped rates */}
-                                                {(() => {
-                                                    const targetGrouped = new Map<string, any[]>()
-                                                    const targetOrder: string[] = []
-                                                    ungrouped.forEach((rate: any) => {
-                                                        const key = Array.isArray(rate.targets) ? rate.targets.slice().sort().join("|") : ""
-                                                        if (!targetGrouped.has(key)) {
-                                                            targetGrouped.set(key, [])
-                                                            targetOrder.push(key)
-                                                        }
-                                                        targetGrouped.get(key)!.push(rate)
-                                                    })
-                                                    return targetOrder.map((targetKey, tgIdx) => {
-                                                        const rates = targetGrouped.get(targetKey)!
-                                                        if (rates.length === 1) {
-                                                            const rate = rates[0]
-                                                            const animalCell = (
-                                                                <div>
-                                                                    <div className="font-semibold capitalize text-sm text-foreground">{rate.animal}</div>
-                                                                </div>
-                                                            )
-                                                            const targetCell = renderTargetGrid(rate.targets || [])
-                                                            return renderEntryRows(rate, `tg-${tgIdx}`, animalCell, targetCell)
-                                                        }
-                                                        return rates.map((rate: any, rateIdx: number) => {
-                                                            const animalCell = (
-                                                                <div>
-                                                                    <div className="font-semibold capitalize text-sm text-foreground">{rate.animal}</div>
-                                                                </div>
-                                                            )
-                                                            const targetCell = rateIdx === 0 ? renderTargetGrid(rate.targets || []) : null
-                                                            return renderEntryRows(rate, `tg-${tgIdx}-${rateIdx}`, animalCell, targetCell)
-                                                        })
-                                                    })
-                                                })()}
-                                            </>
-                                        )
-                                    })()}
+                                        return rates.map((rate: any, rateIdx: number) => {
+                                            const animalCell = (
+                                                <div>
+                                                    <div className="font-semibold capitalize text-sm text-foreground">{rate.animal}</div>
+                                                </div>
+                                            )
+                                            const targetCell = rateIdx === 0 ? renderTargetGrid(rate.targets || []) : null
+                                            return renderEntryRows(rate, `tg-${tgIdx}-${rateIdx}`, animalCell, targetCell)
+                                        })
+                                    })}
                                 </tbody>
                             </table>
                         </div>

@@ -1,7 +1,3 @@
-"use client"
-
-import { use } from "react"
-import { useQuery } from "@tanstack/react-query"
 import { queryAgroChemical } from "@/lib/query"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
@@ -16,22 +12,18 @@ interface BuyAgroChemicalPageProps {
     }>
 }
 
-export default function BuyAgroChemicalPage({ params }: BuyAgroChemicalPageProps) {
-    const { slug } = use(params)
+export default async function BuyAgroChemicalPage({ params }: BuyAgroChemicalPageProps) {
+    const { slug } = await params
 
-    const { data, isLoading } = useQuery({
-        queryKey: ["agrochemical-buy", slug],
-        queryFn: () => queryAgroChemical(slug),
-        refetchOnWindowFocus: false,
-    })
+    const response = await queryAgroChemical(slug)
 
-    const chemical = data?.data
+    const chemical = response?.data
 
     // Generate JSON-LD structured data for e-commerce
     const generateStructuredData = () => {
         if (!chemical) return null
 
-        const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://farmnport.com'
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://farmnport.com'
         const url = `${baseUrl}/buy-agrochemicals/${slug}`
         const imageUrl = chemical.images?.[0]?.img?.src || `${baseUrl}/default-chemical.png`
 
@@ -67,23 +59,6 @@ export default function BuyAgroChemicalPage({ params }: BuyAgroChemicalPageProps
     }
 
     const structuredData = generateStructuredData()
-
-    if (isLoading) {
-        return (
-            <div className="min-h-screen bg-background">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                    <div className="animate-pulse grid md:grid-cols-2 gap-8">
-                        <div className="aspect-square bg-muted rounded-lg" />
-                        <div className="space-y-4">
-                            <div className="h-8 bg-muted rounded w-3/4" />
-                            <div className="h-4 bg-muted rounded w-1/2" />
-                            <div className="h-12 bg-muted rounded w-1/3" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-        )
-    }
 
     if (!chemical) {
         return (
@@ -145,7 +120,7 @@ export default function BuyAgroChemicalPage({ params }: BuyAgroChemicalPageProps
                         {chemical.images && chemical.images.length > 1 && (
                             <div className="grid grid-cols-4 gap-2">
                                 {chemical.images.map((img: any, idx: number) => (
-                                    <button
+                                    <div
                                         key={idx}
                                         className="relative aspect-square bg-white rounded border hover:border-primary"
                                     >
@@ -158,7 +133,7 @@ export default function BuyAgroChemicalPage({ params }: BuyAgroChemicalPageProps
                                                 className="object-contain p-2"
                                             />
                                         )}
-                                    </button>
+                                    </div>
                                 ))}
                             </div>
                         )}

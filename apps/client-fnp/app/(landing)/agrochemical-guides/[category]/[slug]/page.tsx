@@ -1,15 +1,11 @@
-"use client"
-
-import { use } from "react"
-import { useQuery } from "@tanstack/react-query"
-import { useSearchParams } from "next/navigation"
 import { queryAgroChemical } from "@/lib/query"
 import Image from "next/image"
-import { Beaker, AlertTriangle, ArrowLeft, ShoppingCart } from "lucide-react"
+import { Beaker, AlertTriangle } from "lucide-react"
 import Link from "next/link"
-import { sendGTMEvent } from "@next/third-parties/google"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
 import { capitalizeFirstLetter, formatUnit } from "@/lib/utilities"
+import { SprayProgramBackLink } from "./SprayProgramBackLink"
+import { BuyNowButton } from "./BuyNowButton"
 
 interface GuidePageProps {
     params: Promise<{
@@ -18,18 +14,11 @@ interface GuidePageProps {
     }>
 }
 
-export default function AgroChemicalGuidePage({ params }: GuidePageProps) {
-    const { category, slug } = use(params)
-    const searchParams = useSearchParams()
-    const fromSprayProgram = searchParams.get("from")
+export default async function AgroChemicalGuidePage({ params }: GuidePageProps) {
+    const { category, slug } = await params
 
-    const { data, isLoading } = useQuery({
-        queryKey: ["agrochemical-guide", slug],
-        queryFn: () => queryAgroChemical(slug),
-        refetchOnWindowFocus: false,
-    })
-
-    const chemical = data?.data
+    const response = await queryAgroChemical(slug)
+    const chemical = response?.data
 
     const categorySlug = chemical?.agrochemical_category?.slug || ""
     const targetLabel: Record<string, string> = {
@@ -56,23 +45,6 @@ export default function AgroChemicalGuidePage({ params }: GuidePageProps) {
     const noTargetMsg = targetLabel[categorySlug]
         ? `No ${sectionTitle.toLowerCase().replace("target ", "")} information available.`
         : "No target pest or disease information available."
-
-    if (isLoading) {
-        return (
-            <div className="min-h-screen bg-background">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                    <div className="animate-pulse grid md:grid-cols-2 gap-8">
-                        <div className="aspect-square bg-muted rounded-lg" />
-                        <div className="space-y-4">
-                            <div className="h-8 bg-muted rounded w-3/4" />
-                            <div className="h-4 bg-muted rounded w-1/2" />
-                            <div className="h-12 bg-muted rounded w-1/3" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-        )
-    }
 
     if (!chemical) {
         return (
@@ -105,72 +77,52 @@ export default function AgroChemicalGuidePage({ params }: GuidePageProps) {
     }
 
     // Generate JSON-LD structured data
-    const generateStructuredData = () => {
-        if (!chemical) return null
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://farmnport.com'
+    const url = `${baseUrl}/agrochemical-guides/${category}/${slug}`
+    const imageUrl = chemical.images?.[0]?.img?.src || `${baseUrl}/default-chemical.png`
 
-        const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://farmnport.com'
-        const url = `${baseUrl}/agrochemical-guides/${category}/${slug}`
-        const imageUrl = chemical.images?.[0]?.img?.src || `${baseUrl}/default-chemical.png`
+    const description = chemical.agrochemical_category?.name
+        ? `${chemical.name} is a ${chemical.agrochemical_category.name} for effective pest and disease control. View active ingredients, dosage rates, and application guidelines.`
+        : `Professional agrochemical guide for ${chemical.name}. Complete information on active ingredients, dosage rates, and safe application.`
 
-        const description = chemical.agrochemical_category?.name
-            ? `${chemical.name} is a ${chemical.agrochemical_category.name} for effective pest and disease control. View active ingredients, dosage rates, and application guidelines.`
-            : `Professional agrochemical guide for ${chemical.name}. Complete information on active ingredients, dosage rates, and safe application.`
+    const usageInfo = chemical.dosage_rates?.length > 0
+        ? `Dosage rates available for ${chemical.dosage_rates.map((r: any) => r.crop).join(', ')}`
+        : undefined
 
-        const usageInfo = chemical.dosage_rates?.length > 0
-            ? `Dosage rates available for ${chemical.dosage_rates.map((r: any) => r.crop).join(', ')}`
-            : undefined
-
-        return {
-            "@context": "https://schema.org",
-            "@type": "Product",
-            "name": chemical.name,
-            "description": description,
-            "image": imageUrl,
-            "category": chemical.agrochemical_category?.name || "Agrochemical",
-            "url": url,
-            "additionalProperty": [
-                ...(chemical.active_ingredients?.map((ai: any) => ({
-                    "@type": "PropertyValue",
-                    "name": "Active Ingredient",
-                    "value": `${ai.name} (${ai.dosage_value} ${ai.dosage_unit})`
-                })) || []),
-                ...(chemical.targets?.map((target: any) => ({
-                    "@type": "PropertyValue",
-                    "name": sectionTitle,
-                    "value": target.scientific_name ? `${target.name} (${target.scientific_name})` : target.name
-                })) || [])
-            ],
-            "applicationCategory": "Agricultural Chemical",
-            "usageInfo": usageInfo
-        }
+    const structuredData = {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        "name": chemical.name,
+        "description": description,
+        "image": imageUrl,
+        "category": chemical.agrochemical_category?.name || "Agrochemical",
+        "url": url,
+        "additionalProperty": [
+            ...(chemical.active_ingredients?.map((ai: any) => ({
+                "@type": "PropertyValue",
+                "name": "Active Ingredient",
+                "value": `${ai.name} (${ai.dosage_value} ${ai.dosage_unit})`
+            })) || []),
+            ...(chemical.targets?.map((target: any) => ({
+                "@type": "PropertyValue",
+                "name": sectionTitle,
+                "value": target.scientific_name ? `${target.name} (${target.scientific_name})` : target.name
+            })) || [])
+        ],
+        "applicationCategory": "Agricultural Chemical",
+        "usageInfo": usageInfo
     }
-
-    const structuredData = generateStructuredData()
 
     return (
         <div className="min-h-screen bg-background">
             {/* JSON-LD Structured Data */}
-            {structuredData && (
-                <script
-                    type="application/ld+json"
-                    dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-                />
-            )}
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+            />
 
             {/* Back to Spray Program */}
-            {fromSprayProgram && (
-                <div className="border-b bg-primary/5">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5">
-                        <Link
-                            href={`/spray-programs/${fromSprayProgram}`}
-                            className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
-                        >
-                            <ArrowLeft className="h-3.5 w-3.5" />
-                            Back to Spray Program
-                        </Link>
-                    </div>
-                </div>
-            )}
+            <SprayProgramBackLink />
 
             {/* Breadcrumb */}
             <div className="border-b bg-muted/30">
@@ -213,7 +165,7 @@ export default function AgroChemicalGuidePage({ params }: GuidePageProps) {
                         {chemical.images && chemical.images.length > 1 && (
                             <div className="grid grid-cols-4 gap-3">
                                 {chemical.images.slice(0, 4).map((img: any, idx: number) => (
-                                    <button
+                                    <div
                                         key={idx}
                                         className="relative aspect-square bg-white rounded-lg border hover:border-primary transition-colors"
                                     >
@@ -226,19 +178,12 @@ export default function AgroChemicalGuidePage({ params }: GuidePageProps) {
                                                 className="object-contain p-2"
                                             />
                                         )}
-                                    </button>
+                                    </div>
                                 ))}
                             </div>
                         )}
 
-                        <Link
-                            href="/waiting-list-shop"
-                            onClick={() => sendGTMEvent({ event: 'buy_now_click', value: slug, category: 'agrochemical' })}
-                            className="flex items-center justify-center gap-2 w-full py-3 px-4 rounded-lg bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-colors"
-                        >
-                            <ShoppingCart className="h-5 w-5" />
-                            Buy Now
-                        </Link>
+                        <BuyNowButton slug={slug} />
                     </div>
 
                     {/* Right - Product Info */}
@@ -449,7 +394,7 @@ export default function AgroChemicalGuidePage({ params }: GuidePageProps) {
                                                                 ))}
                                                             </ul>
                                                         ) : (
-                                                            <span className="text-xs text-muted-foreground">—</span>
+                                                            <span className="text-xs text-muted-foreground">&mdash;</span>
                                                         )}
                                                     </td>
                                                 </tr>

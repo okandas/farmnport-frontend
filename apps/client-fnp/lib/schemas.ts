@@ -655,9 +655,7 @@ export type FeedProduct = {
   }[]
   nutritional_specs?: {
     id: string
-    feed_product_id: string
-    nutritional_spec_id: string
-    name?: string
+    name: string
     value: string
     unit: string
     qualifier: string

@@ -1,11 +1,11 @@
-"use client"
-
-import { sendGTMEvent } from "@next/third-parties/google"
 import Link from "next/link"
 import { Pill, Syringe, Shield, Heart, Beaker, ArrowRight, Bug, Scissors, Cross, Zap, Baby } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useQuery } from "@tanstack/react-query"
-import { queryAnimalHealthCategories } from "@/lib/query"
+import { BaseURL } from "@/lib/schemas"
+
+const fetchOptions: RequestInit = process.env.NODE_ENV === "production"
+    ? { next: { revalidate: 3600 } } as RequestInit
+    : { cache: "no-store" }
 
 const categoryIcons: Record<string, any> = {
     "vaccines": Syringe,
@@ -21,14 +21,19 @@ const categoryIcons: Record<string, any> = {
     "equipment": Beaker,
 }
 
-export default function AnimalHealthGuidesPage() {
-    const { data } = useQuery({
-        queryKey: ["animal-health-categories"],
-        queryFn: () => queryAnimalHealthCategories(),
-        refetchOnWindowFocus: false,
-    })
+async function getCategories() {
+    try {
+        const res = await fetch(`${BaseURL}/animalhealthcategories/`, fetchOptions)
+        if (!res.ok) return []
+        const data = await res.json()
+        return data?.data || []
+    } catch {
+        return []
+    }
+}
 
-    const categories = data?.data?.data || []
+export default async function AnimalHealthGuidesPage() {
+    const categories = await getCategories()
 
     return (
         <main className="bg-gradient-to-b from-background to-muted/20">
@@ -46,7 +51,6 @@ export default function AnimalHealthGuidesPage() {
                         <Button
                             size="lg"
                             asChild
-                            onClick={() => sendGTMEvent({ event: "click", value: "ReadAnimalHealthGuides" })}
                             className="text-base px-6 py-5 h-auto font-semibold shadow-lg hover:shadow-xl transition-all group"
                         >
                             <Link href="/animal-health-guides/all" className="flex items-center gap-2">
