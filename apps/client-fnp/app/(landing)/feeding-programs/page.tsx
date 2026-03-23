@@ -1,19 +1,17 @@
-"use client"
-
 import Link from "next/link"
-import { useQuery } from "@tanstack/react-query"
 import { Egg, Layers, ChevronRight } from "lucide-react"
 import { queryPublishedFeedingPrograms } from "@/lib/query"
 import { capitalizeFirstLetter } from "@/lib/utilities"
 
-export default function FeedingProgramsPage() {
-    const { data, isLoading } = useQuery({
-        queryKey: ["feeding-programs"],
-        queryFn: () => queryPublishedFeedingPrograms(),
-        refetchOnWindowFocus: false,
-    })
+export default async function FeedingProgramsPage() {
+    let programs: any[] = []
 
-    const programs = data?.data?.data || []
+    try {
+        const data = await queryPublishedFeedingPrograms()
+        programs = data?.data?.data || []
+    } catch (error) {
+        console.error("Error fetching feeding programs:", error)
+    }
 
     return (
         <main>
@@ -25,18 +23,7 @@ export default function FeedingProgramsPage() {
                 </div>
             </section>
             <section className="mx-auto max-w-7xl px-6 lg:px-8 py-8">
-                {isLoading && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {[1, 2, 3].map((i) => (
-                            <div key={i} className="animate-pulse rounded-xl border bg-card p-4 space-y-3">
-                                <div className="h-5 bg-muted rounded w-3/4" />
-                                <div className="h-4 bg-muted rounded w-full" />
-                                <div className="h-4 bg-muted rounded w-1/2" />
-                            </div>
-                        ))}
-                    </div>
-                )}
-                {!isLoading && programs.length === 0 && (
+                {programs.length === 0 && (
                     <div className="text-center py-16">
                         <div className="mx-auto w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
                             <Egg className="w-8 h-8 text-muted-foreground" />
@@ -45,7 +32,7 @@ export default function FeedingProgramsPage() {
                         <p className="text-sm text-muted-foreground max-w-md mx-auto">We're working on creating comprehensive feeding programs. Check back soon.</p>
                     </div>
                 )}
-                {!isLoading && programs.length > 0 && (
+                {programs.length > 0 && (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         {programs.map((program: any) => (
                             <Link key={program.id} href={`/feeding-programs/${program.slug}`} className="group rounded-xl border bg-card overflow-hidden hover:shadow-md hover:border-primary/20 transition-all">

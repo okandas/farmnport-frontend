@@ -1,90 +1,35 @@
-"use client"
-
-import { use } from "react"
-import { useQuery } from "@tanstack/react-query"
-import { queryFeedProduct } from "@/lib/query"
 import Image from "next/image"
-import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { ShoppingCart, Heart, Share2, Truck, Shield, RotateCcw, Egg, Beaker, AlertTriangle } from "lucide-react"
+import { Egg, Beaker, AlertTriangle, Shield, Truck, RotateCcw } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Link from "next/link"
-import { useSearchParams } from "next/navigation"
-import { capitalizeFirstLetter } from "@/lib/utilities"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
+import { BaseURL } from "@/lib/schemas"
+import { BuyFeedActions } from "./BuyFeedActions"
+import { BackToProgram } from "./BackToProgram"
 
 interface BuyFeedPageProps {
     params: Promise<{ slug: string }>
 }
 
-export default function BuyFeedPage({ params }: BuyFeedPageProps) {
-    const { slug } = use(params)
-    const searchParams = useSearchParams()
-    const ref = searchParams.get("ref")
+const fetchOptions: RequestInit = process.env.NODE_ENV === "production"
+    ? { next: { revalidate: 3600 } } as RequestInit
+    : { cache: "no-store" }
 
-    const { data, isLoading } = useQuery({
-        queryKey: ["feed-product-buy", slug],
-        queryFn: () => queryFeedProduct(slug),
-        refetchOnWindowFocus: false,
-    })
-
-    const product = data?.data
-
-    const generateStructuredData = () => {
-        if (!product) return null
-
-        const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://farmnport.com'
-        const url = `${baseUrl}/buy-feeds/${slug}`
-        const imageUrl = product.images?.[0]?.img?.src || `${baseUrl}/default-feed.png`
-
-        const price = product.show_price && product.sale_price > 0 ? product.sale_price.toFixed(2) : '0.00'
-        const availability = product.available_for_sale ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock'
-
-        return {
-            "@context": "https://schema.org",
-            "@type": "Product",
-            "name": product.name,
-            "image": imageUrl,
-            "description": product.description || `${product.name} - ${product.animal} ${product.phase} feed in ${product.form} form`,
-            "sku": product.id || slug,
-            "category": product.feed_category?.name || "Livestock Feed",
-            "url": url,
-            "brand": {
-                "@type": "Brand",
-                "name": product.brand?.name || "farmnport"
-            },
-            "offers": {
-                "@type": "Offer",
-                "url": url,
-                "priceCurrency": "USD",
-                "price": price,
-                "availability": availability,
-                "seller": {
-                    "@type": "Organization",
-                    "name": "farmnport"
-                }
-            },
-        }
+async function getFeedProduct(slug: string) {
+    try {
+        const res = await fetch(`${BaseURL}/feed/${slug}`, fetchOptions)
+        if (!res.ok) return null
+        const json = await res.json()
+        return json?.data || null
+    } catch {
+        return null
     }
+}
 
-    const structuredData = generateStructuredData()
-
-    if (isLoading) {
-        return (
-            <div className="min-h-screen bg-background">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                    <div className="animate-pulse grid md:grid-cols-2 gap-8">
-                        <div className="aspect-square bg-muted rounded-lg" />
-                        <div className="space-y-4">
-                            <div className="h-8 bg-muted rounded w-3/4" />
-                            <div className="h-4 bg-muted rounded w-1/2" />
-                            <div className="h-12 bg-muted rounded w-1/3" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-        )
-    }
+export default async function BuyFeedPage({ params }: BuyFeedPageProps) {
+    const { slug } = await params
+    const product = await getFeedProduct(slug)
 
     if (!product) {
         return (
@@ -103,18 +48,49 @@ export default function BuyFeedPage({ params }: BuyFeedPageProps) {
         )
     }
 
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://farmnport.com'
+    const url = `${baseUrl}/buy-feeds/${slug}`
+    const imageUrl = product.images?.[0]?.img?.src || `${baseUrl}/default-feed.png`
+
+    const price = product.show_price && product.sale_price > 0 ? product.sale_price.toFixed(2) : '0.00'
+    const availability = product.available_for_sale ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock'
+
+    const structuredData = {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        "name": product.name,
+        "image": imageUrl,
+        "description": product.description || `${product.name} - ${product.animal} ${product.phase} feed in ${product.form} form`,
+        "sku": product.id || slug,
+        "category": product.feed_category?.name || "Livestock Feed",
+        "url": url,
+        "brand": {
+            "@type": "Brand",
+            "name": product.brand?.name || "farmnport"
+        },
+        "offers": {
+            "@type": "Offer",
+            "url": url,
+            "priceCurrency": "USD",
+            "price": price,
+            "availability": availability,
+            "seller": {
+                "@type": "Organization",
+                "name": "farmnport"
+            }
+        },
+    }
+
     const discountPercent = product.was_price > product.sale_price
         ? Math.round((1 - product.sale_price / product.was_price) * 100)
         : 0
 
     return (
         <div className="min-h-screen bg-background">
-            {structuredData && (
-                <script
-                    type="application/ld+json"
-                    dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-                />
-            )}
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+            />
 
             {/* Breadcrumb */}
             <div className="border-b bg-muted/30">
@@ -263,27 +239,7 @@ export default function BuyFeedPage({ params }: BuyFeedPageProps) {
                         </div>
 
                         {/* Add to Cart Section */}
-                        <div className="space-y-3">
-                            <div className="flex gap-3">
-                                <Link href="/waiting-list-shop" className="flex-1">
-                                    <Button size="lg" className="w-full">
-                                        <ShoppingCart className="w-5 h-5 mr-2" />
-                                        Add to Cart
-                                    </Button>
-                                </Link>
-                                <Button size="lg" variant="outline">
-                                    <Heart className="w-5 h-5" />
-                                </Button>
-                                <Button size="lg" variant="outline">
-                                    <Share2 className="w-5 h-5" />
-                                </Button>
-                            </div>
-                            <Link href="/waiting-list-shop">
-                                <Button size="lg" variant="secondary" className="w-full">
-                                    Buy Now
-                                </Button>
-                            </Link>
-                        </div>
+                        <BuyFeedActions />
 
                         {/* Delivery & Returns Info */}
                         <div className="bg-muted/50 rounded-lg p-4 space-y-3">
@@ -311,15 +267,7 @@ export default function BuyFeedPage({ params }: BuyFeedPageProps) {
                         </div>
 
                         {/* Back to Feeding Program */}
-                        {ref && (
-                            <Link
-                                href={`/feeding-programs/${ref}`}
-                                className="text-sm text-primary hover:underline inline-flex items-center gap-2"
-                            >
-                                Back to Feeding Program
-                                <span>&rarr;</span>
-                            </Link>
-                        )}
+                        <BackToProgram />
                     </div>
                 </div>
 

@@ -934,7 +934,7 @@ export const FeedProductSchema = z.object({
     id: z.string(),
     feed_product_id: z.string(),
     nutritional_spec_id: z.string(),
-    name: z.string().optional(),
+    name: z.string().default(""),
     value: z.string(),
     unit: z.string(),
     qualifier: z.string(),
@@ -946,8 +946,8 @@ export const FeedProductSchema = z.object({
     notes: z.string(),
     ingredients: z.array(z.object({
       name: z.string(),
-      percentage: z.string(),
       quantity: z.string(),
+      unit: z.string(),
     })).optional().default([]),
   })).optional().default([]),
   adaptation_schedule: z.array(z.object({

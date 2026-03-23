@@ -1,49 +1,35 @@
-"use client"
-
-import { use } from "react"
-import { useQuery } from "@tanstack/react-query"
-import { queryFeedProduct } from "@/lib/query"
+import { notFound } from "next/navigation"
 import Image from "next/image"
-import { AlertTriangle, ArrowLeft, ShoppingCart } from "lucide-react"
+import { AlertTriangle } from "lucide-react"
 import Link from "next/link"
-import { useSearchParams } from "next/navigation"
-import { sendGTMEvent } from "@next/third-parties/google"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
 import { capitalizeFirstLetter } from "@/lib/utilities"
+import { BaseURL } from "@/lib/schemas"
+import { BuyNowButton } from "./BuyNowButton"
+import { FeedBreadcrumb } from "./FeedBreadcrumb"
 
 interface FeedDetailPageProps {
     params: Promise<{ slug: string }>
 }
 
-export default function FeedDetailPage({ params }: FeedDetailPageProps) {
-    const { slug } = use(params)
-    const searchParams = useSearchParams()
-    const ref = searchParams.get("ref")
+const fetchOptions: RequestInit = process.env.NODE_ENV === "production"
+    ? { next: { revalidate: 3600 } } as RequestInit
+    : { cache: "no-store" }
 
-    const { data, isLoading } = useQuery({
-        queryKey: ["feed-product", slug],
-        queryFn: () => queryFeedProduct(slug),
-        refetchOnWindowFocus: false,
-    })
-
-    const product = data?.data
-
-    if (isLoading) {
-        return (
-            <div className="min-h-screen bg-background">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                    <div className="animate-pulse grid md:grid-cols-2 gap-8">
-                        <div className="aspect-square bg-muted rounded-lg" />
-                        <div className="space-y-4">
-                            <div className="h-8 bg-muted rounded w-3/4" />
-                            <div className="h-4 bg-muted rounded w-1/2" />
-                            <div className="h-12 bg-muted rounded w-1/3" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-        )
+async function getFeedProduct(slug: string) {
+    try {
+        const res = await fetch(`${BaseURL}/feed/${slug}`, fetchOptions)
+        if (!res.ok) return null
+        const json = await res.json()
+        return json?.data || null
+    } catch {
+        return null
     }
+}
+
+export default async function FeedDetailPage({ params }: FeedDetailPageProps) {
+    const { slug } = await params
+    const product = await getFeedProduct(slug)
 
     if (!product) {
         return (
@@ -64,66 +50,45 @@ export default function FeedDetailPage({ params }: FeedDetailPageProps) {
         )
     }
 
-    const generateStructuredData = () => {
-        if (!product) return null
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://farmnport.com'
+    const url = `${baseUrl}/feeds/${slug}`
+    const imageUrl = product.images?.[0]?.img?.src || `${baseUrl}/default-feed.png`
 
-        const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://farmnport.com'
-        const url = `${baseUrl}/feeds/${slug}`
-        const imageUrl = product.images?.[0]?.img?.src || `${baseUrl}/default-feed.png`
-
-        return {
-            "@context": "https://schema.org",
-            "@type": "Product",
-            "name": product.name,
-            "description": product.description || `${product.name} - ${product.animal} ${product.phase} feed in ${product.form} form`,
-            "image": imageUrl,
-            "category": product.feed_category?.name || "Livestock Feed",
-            "url": url,
-            "brand": product.brand?.name ? {
-                "@type": "Brand",
-                "name": product.brand.name,
-            } : undefined,
-            "additionalProperty": [
-                ...(product.animal ? [{ "@type": "PropertyValue", "name": "Animal", "value": product.animal }] : []),
-                ...(product.phase ? [{ "@type": "PropertyValue", "name": "Phase", "value": product.phase }] : []),
-                ...(product.form ? [{ "@type": "PropertyValue", "name": "Form", "value": product.form }] : []),
-                ...(product.active_ingredients?.map((ai: any) => ({
-                    "@type": "PropertyValue",
-                    "name": "Active Ingredient",
-                    "value": ai.concentration ? `${ai.name} (${ai.concentration})` : ai.name,
-                })) || []),
-            ],
-        }
+    const structuredData = {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        "name": product.name,
+        "description": product.description || `${product.name} - ${product.animal} ${product.phase} feed in ${product.form} form`,
+        "image": imageUrl,
+        "category": product.feed_category?.name || "Livestock Feed",
+        "url": url,
+        "brand": product.brand?.name ? {
+            "@type": "Brand",
+            "name": product.brand.name,
+        } : undefined,
+        "additionalProperty": [
+            ...(product.animal ? [{ "@type": "PropertyValue", "name": "Animal", "value": product.animal }] : []),
+            ...(product.phase ? [{ "@type": "PropertyValue", "name": "Phase", "value": product.phase }] : []),
+            ...(product.form ? [{ "@type": "PropertyValue", "name": "Form", "value": product.form }] : []),
+            ...(product.active_ingredients?.map((ai: any) => ({
+                "@type": "PropertyValue",
+                "name": "Active Ingredient",
+                "value": ai.concentration ? `${ai.name} (${ai.concentration})` : ai.name,
+            })) || []),
+        ],
     }
-
-    const structuredData = generateStructuredData()
 
     return (
         <div className="min-h-screen bg-background">
-            {structuredData && (
-                <script
-                    type="application/ld+json"
-                    dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-                />
-            )}
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+            />
 
             {/* Breadcrumb */}
             <div className="border-b bg-muted/30">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-                    {ref ? (
-                        <Link href={`/feeding-programs/${ref}`} className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
-                            <ArrowLeft className="h-4 w-4" />
-                            Back to Feeding Program
-                        </Link>
-                    ) : (
-                        <nav className="flex text-sm text-muted-foreground">
-                            <Link href="/" className="hover:text-foreground">Home</Link>
-                            <span className="mx-2">/</span>
-                            <Link href="/feeds" className="hover:text-foreground">Feeds</Link>
-                            <span className="mx-2">/</span>
-                            <span className="text-foreground capitalize">{product.name}</span>
-                        </nav>
-                    )}
+                    <FeedBreadcrumb productName={product.name} />
                 </div>
             </div>
 
@@ -168,14 +133,7 @@ export default function FeedDetailPage({ params }: FeedDetailPageProps) {
                             </div>
                         )}
 
-                        <Link
-                            href="/waiting-list-shop"
-                            onClick={() => sendGTMEvent({ event: 'buy_now_click', value: slug, category: 'feed' })}
-                            className="flex items-center justify-center gap-2 w-full py-3 px-4 rounded-lg bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-colors"
-                        >
-                            <ShoppingCart className="h-5 w-5" />
-                            Buy Now
-                        </Link>
+                        <BuyNowButton slug={slug} />
                     </div>
 
                     {/* Right - Product Info */}
