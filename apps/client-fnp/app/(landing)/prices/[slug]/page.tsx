@@ -33,10 +33,10 @@ export async function generateMetadata({ params }: PriceDetailsPageProps): Promi
     alternates: {
       canonical: `${AppURL}/prices/${slug}`,
     },
-    title: `${name} Price List — ${specialization} Prices | farmnport.com`,
+    title: `${name} Price List ${date} — ${specialization} Prices | farmnport.com`,
     description: `${name} ${specialization.toLowerCase()} price list effective ${date}. View current market rates and connect with this buyer on Farmnport.`,
     openGraph: {
-      title: `${name} — ${specialization} Price List`,
+      title: `${name} Price List ${date} — ${specialization}`,
       description: `${name} ${specialization.toLowerCase()} price list effective ${date}. View current market rates on Farmnport.`,
       url: `${AppURL}/prices/${slug}`,
       siteName: 'farmnport',
