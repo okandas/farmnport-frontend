@@ -4,8 +4,9 @@ import { use } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { queryAnimalHealthProduct } from "@/lib/query"
 import Image from "next/image"
-import { Beaker, AlertTriangle } from "lucide-react"
+import { Beaker, AlertTriangle, ShoppingCart } from "lucide-react"
 import Link from "next/link"
+import { sendGTMEvent } from "@next/third-parties/google"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
 import { capitalizeFirstLetter, formatUnit } from "@/lib/utilities"
 
@@ -194,6 +195,15 @@ export default function AnimalHealthGuidePage({ params }: GuidePageProps) {
                                 ))}
                             </div>
                         )}
+
+                        <Link
+                            href="/waiting-list-shop"
+                            onClick={() => sendGTMEvent({ event: 'buy_now_click', value: slug, category: 'animal_health' })}
+                            className="flex items-center justify-center gap-2 w-full py-3 px-4 rounded-lg bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-colors"
+                        >
+                            <ShoppingCart className="h-5 w-5" />
+                            Buy Now
+                        </Link>
                     </div>
 
                     {/* Right - Product Info */}
