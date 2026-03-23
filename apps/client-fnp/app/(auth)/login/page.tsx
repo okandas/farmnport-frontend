@@ -10,6 +10,7 @@ export const metadata = {
     openGraph: {
         title: 'Sign In | Farmnport',
         description: 'Sign in to Farmnport to connect with buyers, track produce prices, and manage your agricultural business.',
+        url: '/login',
         siteName: 'farmnport',
         type: 'website',
     },

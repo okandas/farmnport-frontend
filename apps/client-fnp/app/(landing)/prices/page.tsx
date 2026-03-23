@@ -12,6 +12,7 @@ export const metadata = {
   openGraph: {
     title: 'Agricultural Market Prices Zimbabwe',
     description: 'Compare current agricultural prices from verified buyers across Zimbabwe. Updated weekly in USD and ZiG.',
+    url: '/prices',
     siteName: 'farmnport',
     type: 'website',
   },

@@ -10,6 +10,7 @@ export const metadata = {
     openGraph: {
         title: 'Sign Up | Farmnport — Join Zimbabwe\'s Largest Farming Marketplace',
         description: 'Create a free Farmnport account to buy and sell agricultural produce and connect with farmers and buyers across Zimbabwe.',
+        url: '/signup',
         siteName: 'farmnport',
         type: 'website',
     },
