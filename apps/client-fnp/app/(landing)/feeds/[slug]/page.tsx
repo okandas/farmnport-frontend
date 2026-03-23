@@ -261,10 +261,29 @@ export default function FeedDetailPage({ params }: FeedDetailPageProps) {
                         )}
 
                         {/* Feeding Instructions */}
-                        {product.feeding_instructions && (
+                        {product.feeding_instructions && product.feeding_instructions.length > 0 && (
                             <div>
                                 <h2 className="text-lg font-semibold mb-3 text-foreground">Feeding Instructions</h2>
-                                <p className="text-muted-foreground leading-relaxed text-sm whitespace-pre-line">{product.feeding_instructions}</p>
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-sm">
+                                        <thead>
+                                            <tr className="border-b border-border">
+                                                <th className="text-left py-2 pr-4 font-medium text-foreground">Period</th>
+                                                <th className="text-left py-2 pr-4 font-medium text-foreground">Amount</th>
+                                                <th className="text-left py-2 font-medium text-foreground">Notes</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {product.feeding_instructions.map((instruction: { period: string; amount: string; notes: string }, idx: number) => (
+                                                <tr key={idx} className="border-b border-border/50">
+                                                    <td className="py-2 pr-4 text-muted-foreground">{instruction.period}</td>
+                                                    <td className="py-2 pr-4 text-muted-foreground">{instruction.amount}</td>
+                                                    <td className="py-2 text-muted-foreground">{instruction.notes}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         )}
 
@@ -313,6 +332,108 @@ export default function FeedDetailPage({ params }: FeedDetailPageProps) {
                                         </li>
                                     ))}
                                 </ul>
+                            </div>
+                        )}
+                        {/* Nutritional Specifications */}
+                        {product.nutritional_specs && product.nutritional_specs.length > 0 && (
+                            <div>
+                                <h2 className="text-lg font-semibold mb-3 text-foreground">Nutritional Specifications</h2>
+                                <div className="rounded-lg border overflow-hidden">
+                                    <table className="w-full text-sm">
+                                        <thead>
+                                            <tr className="bg-muted/50">
+                                                <th className="text-left px-4 py-2.5 font-medium text-muted-foreground">Nutrient</th>
+                                                <th className="text-left px-4 py-2.5 font-medium text-muted-foreground">Qualifier</th>
+                                                <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">Value</th>
+                                                <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">Unit</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y">
+                                            {product.nutritional_specs.map((spec: any, idx: number) => (
+                                                <tr key={idx} className="hover:bg-muted/30 transition-colors">
+                                                    <td className="px-4 py-2.5 font-medium text-foreground capitalize">{spec.name}</td>
+                                                    <td className="px-4 py-2.5 text-muted-foreground capitalize">{spec.qualifier || "-"}</td>
+                                                    <td className="px-4 py-2.5 text-right font-semibold text-foreground">{spec.value}</td>
+                                                    <td className="px-4 py-2.5 text-right text-muted-foreground">{spec.unit}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Mixing Recommendations */}
+                        {product.mixing_recommendations && product.mixing_recommendations.length > 0 && (
+                            <div>
+                                <h2 className="text-lg font-semibold mb-3 text-foreground">Mixing Recommendations</h2>
+                                <div className="space-y-4">
+                                    {product.mixing_recommendations.map((mix: any, idx: number) => (
+                                        <div key={idx} className="rounded-lg border p-4">
+                                            <div className="flex items-center justify-between mb-3">
+                                                <h3 className="font-medium text-foreground">{mix.name || `Formulation ${idx + 1}`}</h3>
+                                                {mix.resulting_protein && (
+                                                    <span className="text-xs font-medium px-2 py-1 rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
+                                                        {mix.resulting_protein} Protein
+                                                    </span>
+                                                )}
+                                            </div>
+                                            {mix.batch_size && (
+                                                <p className="text-xs text-muted-foreground mb-3">Batch size: {mix.batch_size}</p>
+                                            )}
+                                            {mix.ingredients && mix.ingredients.length > 0 && (
+                                                <div className="rounded-md border overflow-hidden">
+                                                    <table className="w-full text-sm">
+                                                        <thead>
+                                                            <tr className="bg-muted/50">
+                                                                <th className="text-left px-3 py-2 font-medium text-muted-foreground text-xs">Ingredient</th>
+                                                                <th className="text-right px-3 py-2 font-medium text-muted-foreground text-xs">Quantity</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody className="divide-y">
+                                                            {mix.ingredients.map((ing: any, ingIdx: number) => (
+                                                                <tr key={ingIdx}>
+                                                                    <td className="px-3 py-2 text-foreground">{ing.name}</td>
+                                                                    <td className="px-3 py-2 text-right text-muted-foreground">{ing.quantity} {ing.unit}</td>
+                                                                </tr>
+                                                            ))}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            )}
+                                            {mix.notes && (
+                                                <p className="mt-3 text-xs text-muted-foreground italic">{mix.notes}</p>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Adaptation Schedule */}
+                        {product.adaptation_schedule && product.adaptation_schedule.length > 0 && (
+                            <div>
+                                <h2 className="text-lg font-semibold mb-3 text-foreground">Adaptation Schedule</h2>
+                                <div className="rounded-lg border overflow-hidden">
+                                    <table className="w-full text-sm">
+                                        <thead>
+                                            <tr className="bg-muted/50">
+                                                <th className="text-left px-4 py-2.5 font-medium text-muted-foreground">Day</th>
+                                                <th className="text-left px-4 py-2.5 font-medium text-muted-foreground">Amount</th>
+                                                <th className="text-left px-4 py-2.5 font-medium text-muted-foreground">Notes</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y">
+                                            {product.adaptation_schedule.map((step: any, idx: number) => (
+                                                <tr key={idx} className="hover:bg-muted/30 transition-colors">
+                                                    <td className="px-4 py-2.5 font-medium text-foreground">{step.day}</td>
+                                                    <td className="px-4 py-2.5 text-foreground">{step.amount}</td>
+                                                    <td className="px-4 py-2.5 text-muted-foreground">{step.notes || "-"}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         )}
                     </div>

@@ -851,6 +851,23 @@ export const FormFeedActiveIngredientSchema = FeedActiveIngredientSchema.pick({
   description: true,
 })
 
+export const FeedNutritionalSpecSchema = z.object({
+  id: z.string(),
+  name: z.string().min(1, "Name is required"),
+  slug: z.string().optional(),
+  short_description: z.string().max(100, "Short description cannot exceed 100 characters"),
+  description: z.string().max(500, "Description cannot exceed 500 characters"),
+  created: z.string().optional(),
+  updated: z.string().optional(),
+})
+
+export const FormFeedNutritionalSpecSchema = FeedNutritionalSpecSchema.pick({
+  id: true,
+  name: true,
+  short_description: true,
+  description: true,
+})
+
 export const FeedTargetSchema = z.object({
   id: z.string(),
   name: z.string().min(1, "Name is required"),
@@ -893,7 +910,11 @@ export const FeedProductSchema = z.object({
   description: z.string().optional().default(""),
   sub_type: z.string().optional().default(""),
   breed_recommendations: z.string().optional().default(""),
-  feeding_instructions: z.string().optional().default(""),
+  feeding_instructions: z.array(z.object({
+    period: z.string(),
+    amount: z.string(),
+    notes: z.string(),
+  })).optional().default([]),
   management_tips: z.string().optional().default(""),
   safety_warnings: z.string().optional().default(""),
   package_size: z.string().optional().default(""),
@@ -956,6 +977,8 @@ export type FeedCategory = z.infer<typeof FeedCategorySchema>
 export type FormFeedCategoryModel = z.infer<typeof FormFeedCategorySchema>
 export type FeedActiveIngredient = z.infer<typeof FeedActiveIngredientSchema>
 export type FormFeedActiveIngredientModel = z.infer<typeof FormFeedActiveIngredientSchema>
+export type FeedNutritionalSpec = z.infer<typeof FeedNutritionalSpecSchema>
+export type FormFeedNutritionalSpecModel = z.infer<typeof FormFeedNutritionalSpecSchema>
 export type FeedTarget = z.infer<typeof FeedTargetSchema>
 export type FormFeedTargetModel = z.infer<typeof FormFeedTargetSchema>
 export type FeedProduct = z.infer<typeof FeedProductSchema>

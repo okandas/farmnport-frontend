@@ -637,7 +637,7 @@ export type FeedProduct = {
   description: string
   sub_type?: string
   breed_recommendations?: string
-  feeding_instructions?: string
+  feeding_instructions?: { period: string; amount: string; notes: string }[]
   management_tips?: string
   safety_warnings?: string
   package_size?: string
