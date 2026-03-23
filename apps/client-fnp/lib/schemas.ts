@@ -635,6 +635,12 @@ export type FeedProduct = {
   phase: string
   form: string
   description: string
+  sub_type?: string
+  breed_recommendations?: string
+  feeding_instructions?: string
+  management_tips?: string
+  safety_warnings?: string
+  package_size?: string
   images: ImageModel[]
   front_label?: ImageModel
   back_label?: ImageModel

@@ -523,6 +523,14 @@ export default function FeedingProgramDetailPage({ params }: FeedingProgramDetai
                                     <h3 className="text-lg font-bold leading-tight pr-8">
                                         {capitalizeFirstLetter(quickViewRec.feed_product_name)}
                                     </h3>
+                                    {quickViewRec.feed_product?.show_price && quickViewRec.feed_product?.sale_price > 0 && (
+                                        <div className="mt-2">
+                                            <span className="text-lg font-bold text-foreground">${quickViewRec.feed_product.sale_price.toFixed(2)}</span>
+                                            {quickViewRec.feed_product.was_price > quickViewRec.feed_product.sale_price && (
+                                                <span className="text-sm text-muted-foreground line-through ml-2">${quickViewRec.feed_product.was_price.toFixed(2)}</span>
+                                            )}
+                                        </div>
+                                    )}
                                     {quickViewRec.purpose && (() => {
                                         const style = getPurposeStyle(quickViewRec.purpose)
                                         const Icon = style.icon

@@ -34,6 +34,12 @@ const NewFeedProductSchema = z.object({
     phase: z.string().min(1, "Phase is required"),
     form: z.string().min(1, "Form is required"),
     description: z.string().optional().default(""),
+    sub_type: z.string().optional().default(""),
+    breed_recommendations: z.string().optional().default(""),
+    feeding_instructions: z.string().optional().default(""),
+    management_tips: z.string().optional().default(""),
+    safety_warnings: z.string().optional().default(""),
+    package_size: z.string().optional().default(""),
     images: z.array(z.any()).default([]),
     active_ingredients: z.array(z.any()).default([]),
     stock_level: z.coerce.number().int().nonnegative().default(0),
@@ -57,6 +63,12 @@ export default function NewFeedProductPage() {
             phase: "",
             form: "",
             description: "",
+            sub_type: "",
+            breed_recommendations: "",
+            feeding_instructions: "",
+            management_tips: "",
+            safety_warnings: "",
+            package_size: "",
             images: [],
             active_ingredients: [],
             stock_level: 0,
@@ -324,6 +336,173 @@ export default function NewFeedProductPage() {
                             </div>
                         </div>
                     </div>
+
+                {/* Product Details */}
+                <div className="border-b border-gray-900/10 dark:border-gray-100/10 pb-12">
+                    <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">Product Details</h2>
+                    <p className="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">Additional product information for buyers.</p>
+
+                    <div className="mt-10 space-y-8">
+                        <div className="px-1">
+                            <label htmlFor="sub_type" className="block text-sm/6 font-medium text-gray-900 dark:text-white">
+                                Product Type
+                            </label>
+                            <div className="mt-2">
+                                <FormField
+                                    control={form.control}
+                                    name="sub_type"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormControl>
+                                                <select
+                                                    id="sub_type"
+                                                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
+                                                    {...field}
+                                                >
+                                                    <option value="">Select product type</option>
+                                                    <option value="Finished Feed">Finished Feed</option>
+                                                    <option value="Concentrate">Concentrate</option>
+                                                    <option value="Basemix">Basemix</option>
+                                                    <option value="Premix">Premix</option>
+                                                </select>
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="px-1">
+                            <label htmlFor="package_size" className="block text-sm/6 font-medium text-gray-900 dark:text-white">
+                                Package Size
+                            </label>
+                            <div className="mt-2">
+                                <FormField
+                                    control={form.control}
+                                    name="package_size"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormControl>
+                                                <Input
+                                                    id="package_size"
+                                                    placeholder="e.g., 50 kg"
+                                                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="px-1">
+                            <label htmlFor="breed_recommendations" className="block text-sm/6 font-medium text-gray-900 dark:text-white">
+                                Breed Recommendations
+                            </label>
+                            <div className="mt-2">
+                                <FormField
+                                    control={form.control}
+                                    name="breed_recommendations"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormControl>
+                                                <Textarea
+                                                    id="breed_recommendations"
+                                                    placeholder="e.g., Road Runners, Turkeys, Guinea fowls, Ducklings"
+                                                    rows={3}
+                                                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="px-1">
+                            <label htmlFor="feeding_instructions" className="block text-sm/6 font-medium text-gray-900 dark:text-white">
+                                Feeding Instructions
+                            </label>
+                            <div className="mt-2">
+                                <FormField
+                                    control={form.control}
+                                    name="feeding_instructions"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormControl>
+                                                <Textarea
+                                                    id="feeding_instructions"
+                                                    placeholder="e.g., Feed ad lib from day 0 to day 14. Expected intake: 500g per bird."
+                                                    rows={3}
+                                                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="px-1">
+                            <label htmlFor="management_tips" className="block text-sm/6 font-medium text-gray-900 dark:text-white">
+                                Management Tips
+                            </label>
+                            <div className="mt-2">
+                                <FormField
+                                    control={form.control}
+                                    name="management_tips"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormControl>
+                                                <Textarea
+                                                    id="management_tips"
+                                                    placeholder="e.g., 40 chicks per sqm during brooding. Use infrared lamp ~1m from floor."
+                                                    rows={3}
+                                                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="px-1">
+                            <label htmlFor="safety_warnings" className="block text-sm/6 font-medium text-gray-900 dark:text-white">
+                                Safety Warnings
+                            </label>
+                            <div className="mt-2">
+                                <FormField
+                                    control={form.control}
+                                    name="safety_warnings"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormControl>
+                                                <Textarea
+                                                    id="safety_warnings"
+                                                    placeholder="e.g., Contains feed grade Urea. Must be fed strictly according to recommendations."
+                                                    rows={3}
+                                                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 {/* Pricing & Stock */}
                 <div className="border-b border-gray-900/10 dark:border-gray-100/10 pb-12">

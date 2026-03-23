@@ -388,7 +388,7 @@ export function queryAnimalHealthProduct(slug: string) {
 }
 
 // Feed Products
-export function queryAllFeedProducts(pagination?: PaginationModel & { search?: string, category?: string[], brand?: string[], animal?: string[], phase?: string[] }) {
+export function queryAllFeedProducts(pagination?: PaginationModel & { search?: string, category?: string[], brand?: string[], animal?: string[], phase?: string[], sub_type?: string[] }) {
   const params = new URLSearchParams()
 
   if (pagination?.p !== undefined && pagination.p >= 2) {
@@ -413,6 +413,10 @@ export function queryAllFeedProducts(pagination?: PaginationModel & { search?: s
 
   if (pagination?.phase && pagination.phase.length > 0) {
     pagination.phase.forEach(ph => params.append('phase', ph))
+  }
+
+  if (pagination?.sub_type && pagination.sub_type.length > 0) {
+    pagination.sub_type.forEach(st => params.append('sub_type', st))
   }
 
   const queryString = params.toString()

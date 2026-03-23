@@ -188,7 +188,7 @@ export default function FeedDetailPage({ params }: FeedDetailPageProps) {
                             )}
                         </div>
 
-                        {product.show_price && product.sale_price > 0 && (
+                        {product.available_for_sale && product.show_price && product.sale_price > 0 && (
                             <div className="flex items-center gap-3">
                                 <span className="text-sm text-muted-foreground">Price:</span>
                                 {product.was_price > 0 && product.was_price > product.sale_price && (
@@ -200,7 +200,7 @@ export default function FeedDetailPage({ params }: FeedDetailPageProps) {
 
                         <div className="h-px bg-border" />
 
-                        {/* Animal / Phase / Form */}
+                        {/* Animal / Phase / Form / Sub Type */}
                         <div className="flex flex-wrap gap-2">
                             {product.animal && (
                                 <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-600/10 dark:bg-amber-950/30 dark:text-amber-400">
@@ -217,6 +217,11 @@ export default function FeedDetailPage({ params }: FeedDetailPageProps) {
                                     {product.form}
                                 </span>
                             )}
+                            {product.sub_type && (
+                                <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium bg-violet-50 text-violet-700 ring-1 ring-inset ring-violet-600/10 dark:bg-violet-950/30 dark:text-violet-400">
+                                    {product.sub_type}
+                                </span>
+                            )}
                         </div>
 
                         {/* Description */}
@@ -229,12 +234,44 @@ export default function FeedDetailPage({ params }: FeedDetailPageProps) {
                             </div>
                         )}
 
-                        {/* Active Ingredients */}
-                        <div>
-                            <h2 className="text-lg font-semibold mb-3 text-foreground">
-                                Active Ingredients
-                            </h2>
-                            {product.active_ingredients && product.active_ingredients.length > 0 ? (
+                        {/* Package Size */}
+                        {product.package_size && (
+                            <div>
+                                <h2 className="text-lg font-semibold mb-3 text-foreground">Package Size</h2>
+                                <p className="text-muted-foreground leading-relaxed text-sm">{product.package_size}</p>
+                            </div>
+                        )}
+
+                        {/* Breed Recommendations */}
+                        {product.breed_recommendations && (
+                            <div>
+                                <h2 className="text-lg font-semibold mb-3 text-foreground">Breed Recommendations</h2>
+                                <p className="text-muted-foreground leading-relaxed text-sm whitespace-pre-line">{product.breed_recommendations}</p>
+                            </div>
+                        )}
+
+                        {/* Feeding Instructions */}
+                        {product.feeding_instructions && (
+                            <div>
+                                <h2 className="text-lg font-semibold mb-3 text-foreground">Feeding Instructions</h2>
+                                <p className="text-muted-foreground leading-relaxed text-sm whitespace-pre-line">{product.feeding_instructions}</p>
+                            </div>
+                        )}
+
+                        {/* Management Tips */}
+                        {product.management_tips && (
+                            <div>
+                                <h2 className="text-lg font-semibold mb-3 text-foreground">Management Tips</h2>
+                                <p className="text-muted-foreground leading-relaxed text-sm whitespace-pre-line">{product.management_tips}</p>
+                            </div>
+                        )}
+
+                        {/* Active Ingredients - only show if product has them */}
+                        {product.active_ingredients && product.active_ingredients.length > 0 && (
+                            <div>
+                                <h2 className="text-lg font-semibold mb-3 text-foreground">
+                                    Active Ingredients
+                                </h2>
                                 <div className="space-y-2">
                                     {product.active_ingredients.map((ai: any, idx: number) => (
                                         <div key={idx} className="flex items-center justify-between p-3 bg-gradient-to-r from-purple-50/50 to-transparent dark:from-purple-950/30 rounded-lg border border-purple-100 dark:border-purple-900 hover:border-purple-300 dark:hover:border-purple-700 transition-colors">
@@ -247,10 +284,8 @@ export default function FeedDetailPage({ params }: FeedDetailPageProps) {
                                         </div>
                                     ))}
                                 </div>
-                            ) : (
-                                <p className="text-sm text-muted-foreground p-4 bg-muted/30 rounded-lg border">No active ingredient information available.</p>
-                            )}
-                        </div>
+                            </div>
+                        )}
 
                         <AdSenseInFeed />
 
@@ -306,6 +341,21 @@ export default function FeedDetailPage({ params }: FeedDetailPageProps) {
                                     </div>
                                 </div>
                             )}
+                        </div>
+                    </div>
+                )}
+
+                {/* Product-Specific Safety Warnings */}
+                {product.safety_warnings && (
+                    <div className="mb-6 bg-red-500/10 border border-red-500/20 rounded-lg p-6">
+                        <div className="flex items-start gap-3">
+                            <AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-500 flex-shrink-0" />
+                            <div>
+                                <h3 className="font-semibold mb-2 text-red-900 dark:text-red-100">Safety Warning</h3>
+                                <p className="text-sm text-red-800 dark:text-red-200 whitespace-pre-line">
+                                    {product.safety_warnings}
+                                </p>
+                            </div>
                         </div>
                     </div>
                 )}

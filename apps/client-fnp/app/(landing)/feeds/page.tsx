@@ -13,17 +13,19 @@ export default function FeedProductsPage() {
         brand: parseAsArrayOf(parseAsString),
         animal: parseAsArrayOf(parseAsString),
         phase: parseAsArrayOf(parseAsString),
+        sub_type: parseAsArrayOf(parseAsString),
         p: parseAsInteger.withDefault(1),
     })
 
     const { data: productsData, isLoading: productsLoading } = useQuery({
-        queryKey: ["feed-products", queryState.p, queryState.category, queryState.brand, queryState.animal, queryState.phase],
+        queryKey: ["feed-products", queryState.p, queryState.category, queryState.brand, queryState.animal, queryState.phase, queryState.sub_type],
         queryFn: () => queryAllFeedProducts({
             p: queryState.p,
             category: queryState.category || [],
             brand: queryState.brand || [],
             animal: queryState.animal || [],
             phase: queryState.phase || [],
+            sub_type: queryState.sub_type || [],
         }),
         refetchOnWindowFocus: false,
     })
@@ -112,6 +114,11 @@ export default function FeedProductsPage() {
                                                     {product.form && (
                                                         <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-green-50 text-green-700 ring-1 ring-inset ring-green-600/10 dark:bg-green-950/30 dark:text-green-400">
                                                             {product.form}
+                                                        </span>
+                                                    )}
+                                                    {product.sub_type && (
+                                                        <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-violet-50 text-violet-700 ring-1 ring-inset ring-violet-600/10 dark:bg-violet-950/30 dark:text-violet-400">
+                                                            {product.sub_type}
                                                         </span>
                                                     )}
                                                 </div>
