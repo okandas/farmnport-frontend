@@ -653,6 +653,31 @@ export type FeedProduct = {
     id: string
     name: string
   }[]
+  nutritional_specs?: {
+    id: string
+    feed_product_id: string
+    nutritional_spec_id: string
+    name?: string
+    value: string
+    unit: string
+    qualifier: string
+  }[]
+  mixing_recommendations?: {
+    name: string
+    batch_size: string
+    resulting_protein: string
+    notes: string
+    ingredients?: {
+      name: string
+      percentage: string
+      quantity: string
+    }[]
+  }[]
+  adaptation_schedule?: {
+    day: string
+    amount: string
+    notes: string
+  }[]
   stock_level?: number
   available_for_sale?: boolean
   show_price?: boolean
