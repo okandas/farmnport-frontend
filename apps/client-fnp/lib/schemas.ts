@@ -667,8 +667,8 @@ export type FeedProduct = {
     notes: string
     ingredients?: {
       name: string
-      percentage: string
       quantity: string
+      unit: string
     }[]
   }[]
   adaptation_schedule?: {
