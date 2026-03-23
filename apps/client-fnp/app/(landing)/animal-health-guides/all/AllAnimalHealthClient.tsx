@@ -39,7 +39,7 @@ export function AllAnimalHealthClient({ initialProducts, initialTotal }: AllAnim
             used_on: queryState.used_on || [],
         }),
         refetchOnWindowFocus: false,
-        initialData: !hasFilters ? { data: { data: initialProducts, total: initialTotal } } : undefined,
+        placeholderData: !hasFilters ? { data: { data: initialProducts, total: initialTotal } } as any : undefined,
     })
 
     const products = productsData?.data?.data || []

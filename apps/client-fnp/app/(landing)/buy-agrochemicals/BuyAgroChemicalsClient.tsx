@@ -36,7 +36,7 @@ export function BuyAgroChemicalsClient({ initialChemicals, initialTotal }: BuyAg
             active_ingredient: queryState.active_ingredient || [],
         }),
         refetchOnWindowFocus: false,
-        initialData: !hasFilters ? { data: { data: initialChemicals, total: initialTotal } } : undefined,
+        placeholderData: !hasFilters ? { data: { data: initialChemicals, total: initialTotal } } as any : undefined,
     })
 
     const chemicals = chemicalsData?.data?.data || []

@@ -40,7 +40,7 @@ export function FeedListingClient({ initialData, initialTotal }: FeedListingClie
             sub_type: queryState.sub_type || [],
         }),
         refetchOnWindowFocus: false,
-        initialData: !hasFilters ? { data: { data: initialData, total: initialTotal } } : undefined,
+        placeholderData: !hasFilters ? { data: { data: initialData, total: initialTotal } } as any : undefined,
     })
 
     const products = productsData?.data?.data || []

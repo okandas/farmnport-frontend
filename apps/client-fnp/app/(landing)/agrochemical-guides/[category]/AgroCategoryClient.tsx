@@ -40,7 +40,7 @@ export function AgroCategoryClient({ category, categoryName, initialChemicals, i
             active_ingredient: queryState.active_ingredient || [],
         }),
         refetchOnWindowFocus: false,
-        initialData: !hasFilters ? { data: { data: initialChemicals, total: initialTotal } } : undefined,
+        placeholderData: !hasFilters ? { data: { data: initialChemicals, total: initialTotal } } as any : undefined,
     })
 
     const chemicals = chemicalsData?.data?.data || []
