@@ -15,15 +15,15 @@ export function AgroChemicalCategoriesTable() {
   const [search, setSearch] = useState("")
 
   const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: 1,
+    pageIndex: 0,
     pageSize: 20,
   })
 
   const { isError, isLoading, isFetching, refetch, data, error } = useQuery({
-    queryKey: ["dashboard-agrochemical-categories", { p: pagination.pageIndex, search }],
+    queryKey: ["dashboard-agrochemical-categories", { p: pagination.pageIndex + 1, search }],
     queryFn: () =>
       queryAgroChemicalCategories({
-        p: pagination.pageIndex,
+        p: pagination.pageIndex + 1,
         search: search,
       }),
     refetchOnWindowFocus: false

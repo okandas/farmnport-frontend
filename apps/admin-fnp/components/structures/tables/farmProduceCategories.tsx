@@ -17,15 +17,15 @@ export function FarmProduceCategoriesTable() {
   const [search, setSearch] = useState("")
 
   const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: 1,
+    pageIndex: 0,
     pageSize: 20,
   })
 
   const { isError, isLoading, isFetching, refetch, data } = useQuery({
-    queryKey: ["dashboard-farm-produce-categories", { p: pagination.pageIndex, search }],
+    queryKey: ["dashboard-farm-produce-categories", { p: pagination.pageIndex + 1, search }],
     queryFn: () =>
       queryFarmProduceCategories({
-        p: pagination.pageIndex,
+        p: pagination.pageIndex + 1,
         search: search,
       }),
     refetchOnWindowFocus: false
