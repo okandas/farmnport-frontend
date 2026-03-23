@@ -13,6 +13,7 @@ export const metadata = {
     openGraph: {
         title: 'Sell Your Farm Produce Directly – Reach Buyers Faster',
         description: 'Farmers, sell your fresh produce directly to buyers across Zimbabwe. Access fairer markets and build customer relationships.',
+        url: '/buyers',
         siteName: 'farmnport',
         type: 'website',
     },

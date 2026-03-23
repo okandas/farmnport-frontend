@@ -105,6 +105,7 @@ function FeedFilterContent({ onClearAll }: { onClearAll: () => void }) {
     brand: parseAsArrayOf(parseAsString),
     animal: parseAsArrayOf(parseAsString),
     phase: parseAsArrayOf(parseAsString),
+    sub_type: parseAsArrayOf(parseAsString),
     p: parseAsInteger.withDefault(1),
   })
 
@@ -152,6 +153,14 @@ function FeedFilterContent({ onClearAll }: { onClearAll: () => void }) {
     }))
   }, [filtersData])
 
+  const subTypeItems: FilterItem[] = useMemo(() => {
+    return (filtersData?.data?.sub_types || []).map((st: any) => ({
+      _id: st._id,
+      name: st._id,
+      count: st.count,
+    }))
+  }, [filtersData])
+
   const handleToggle = (filterKey: string, value: string) => {
     if (filterKey === "phase") {
       const currentValues = queryState.phase || []
@@ -174,7 +183,7 @@ function FeedFilterContent({ onClearAll }: { onClearAll: () => void }) {
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
 
-  const totalFilters = (queryState.category?.length || 0) + (queryState.brand?.length || 0) + (queryState.animal?.length || 0) + (queryState.phase?.length || 0)
+  const totalFilters = (queryState.category?.length || 0) + (queryState.brand?.length || 0) + (queryState.animal?.length || 0) + (queryState.phase?.length || 0) + (queryState.sub_type?.length || 0)
 
   const filterSections = [
     {
@@ -202,6 +211,13 @@ function FeedFilterContent({ onClearAll }: { onClearAll: () => void }) {
       name: "Livestock Type",
       key: "animal",
       items: animalItems,
+      isLoading: filtersLoading,
+      useIdAsValue: true,
+    },
+    {
+      name: "Product Type",
+      key: "sub_type",
+      items: subTypeItems,
       isLoading: filtersLoading,
       useIdAsValue: true,
     },
@@ -268,6 +284,7 @@ export function FeedFilterSidebar() {
     brand: parseAsArrayOf(parseAsString),
     animal: parseAsArrayOf(parseAsString),
     phase: parseAsArrayOf(parseAsString),
+    sub_type: parseAsArrayOf(parseAsString),
     p: parseAsInteger.withDefault(1),
   })
 
@@ -277,6 +294,7 @@ export function FeedFilterSidebar() {
       brand: null,
       animal: null,
       phase: null,
+      sub_type: null,
       p: 1,
     })
   }

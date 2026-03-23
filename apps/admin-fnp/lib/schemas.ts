@@ -851,6 +851,23 @@ export const FormFeedActiveIngredientSchema = FeedActiveIngredientSchema.pick({
   description: true,
 })
 
+export const FeedNutritionalSpecSchema = z.object({
+  id: z.string(),
+  name: z.string().min(1, "Name is required"),
+  slug: z.string().optional(),
+  short_description: z.string().max(100, "Short description cannot exceed 100 characters"),
+  description: z.string().max(500, "Description cannot exceed 500 characters"),
+  created: z.string().optional(),
+  updated: z.string().optional(),
+})
+
+export const FormFeedNutritionalSpecSchema = FeedNutritionalSpecSchema.pick({
+  id: true,
+  name: true,
+  short_description: true,
+  description: true,
+})
+
 export const FeedTargetSchema = z.object({
   id: z.string(),
   name: z.string().min(1, "Name is required"),
@@ -891,6 +908,16 @@ export const FeedProductSchema = z.object({
   phase: z.string().min(1, "Phase is required"),
   form: z.string().min(1, "Form is required"),
   description: z.string().optional().default(""),
+  sub_type: z.string().optional().default(""),
+  breed_recommendations: z.string().optional().default(""),
+  feeding_instructions: z.array(z.object({
+    period: z.string(),
+    amount: z.string(),
+    notes: z.string(),
+  })).optional().default([]),
+  management_tips: z.string().optional().default(""),
+  safety_warnings: z.string().optional().default(""),
+  package_size: z.string().optional().default(""),
   front_label: z.custom<ImageModel>().optional(),
   back_label: z.custom<ImageModel>().optional(),
   images: z.array(z.custom<ImageModel>()).max(5, "Maximum 5 images allowed"),
@@ -903,6 +930,31 @@ export const FeedProductSchema = z.object({
     id: z.string(),
     name: z.string(),
   })).optional(),
+  nutritional_specs: z.array(z.object({
+    id: z.string(),
+    feed_product_id: z.string(),
+    nutritional_spec_id: z.string(),
+    name: z.string().optional(),
+    value: z.string(),
+    unit: z.string(),
+    qualifier: z.string(),
+  })).optional().default([]),
+  mixing_recommendations: z.array(z.object({
+    name: z.string(),
+    batch_size: z.string(),
+    resulting_protein: z.string(),
+    notes: z.string(),
+    ingredients: z.array(z.object({
+      name: z.string(),
+      percentage: z.string(),
+      quantity: z.string(),
+    })).optional().default([]),
+  })).optional().default([]),
+  adaptation_schedule: z.array(z.object({
+    day: z.string(),
+    amount: z.string(),
+    notes: z.string(),
+  })).optional().default([]),
   stock_level: z.coerce.number().int().nonnegative().default(0),
   available_for_sale: z.boolean().default(false),
   show_price: z.boolean().default(true),
@@ -950,6 +1002,8 @@ export type FeedCategory = z.infer<typeof FeedCategorySchema>
 export type FormFeedCategoryModel = z.infer<typeof FormFeedCategorySchema>
 export type FeedActiveIngredient = z.infer<typeof FeedActiveIngredientSchema>
 export type FormFeedActiveIngredientModel = z.infer<typeof FormFeedActiveIngredientSchema>
+export type FeedNutritionalSpec = z.infer<typeof FeedNutritionalSpecSchema>
+export type FormFeedNutritionalSpecModel = z.infer<typeof FormFeedNutritionalSpecSchema>
 export type FeedTarget = z.infer<typeof FeedTargetSchema>
 export type FormFeedTargetModel = z.infer<typeof FormFeedTargetSchema>
 export type FeedProduct = z.infer<typeof FeedProductSchema>

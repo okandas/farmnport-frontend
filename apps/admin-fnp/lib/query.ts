@@ -156,17 +156,20 @@ export function deleteProducerPriceList(priceId: string) {
 }
 
 export function queryAgroChemicals(pagination?: pagination) {
-  let url: string
+  const params = new URLSearchParams()
 
   if (pagination?.p !== undefined && pagination.p >= 2) {
-    url = `${baseUrl}/user/agrochemicals?p=${pagination.p}`
-  } else {
-    url = `${baseUrl}/user/agrochemicals`
+    params.append("p", pagination.p.toString())
   }
 
   if (pagination?.search !== undefined && pagination.search.length >= 2) {
-    url = `${baseUrl}/user/agrochemicals?search=${pagination.search}`
+    params.append("search", pagination.search)
   }
+
+  const query = params.toString()
+  const url = query
+    ? `${baseUrl}/user/agrochemicals?${query}`
+    : `${baseUrl}/user/agrochemicals`
 
   return api.get(url)
 }
@@ -806,6 +809,40 @@ export function updateFeedActiveIngredient(data: { id: string; name: string; sho
 export function deleteFeedActiveIngredients(ingredientIds: string[]) {
   let url = `${baseUrl}/user/feed-active-ingredients/delete`
   return api.post(url, { ingredient_ids: ingredientIds })
+}
+
+// Feed Nutritional Spec functions
+export function queryFeedNutritionalSpecs(pagination?: pagination) {
+  let url: string
+  if (pagination?.p !== undefined && pagination.p >= 2) {
+    url = `${baseUrl}/user/feed-nutritional-specs?p=${pagination.p}`
+  } else {
+    url = `${baseUrl}/user/feed-nutritional-specs`
+  }
+  if (pagination?.search !== undefined && pagination.search.length >= 2) {
+    url = `${baseUrl}/user/feed-nutritional-specs?search=${pagination.search}`
+  }
+  return api.get(url)
+}
+
+export function queryFeedNutritionalSpec(id: string) {
+  const url = `${baseUrl}/user/feed-nutritional-specs/${id}`
+  return api.get(url)
+}
+
+export function addFeedNutritionalSpec(data: { name: string; short_description: string; description: string }) {
+  let url = `${baseUrl}/user/feed-nutritional-specs/add`
+  return api.post(url, data)
+}
+
+export function updateFeedNutritionalSpec(data: { id: string; name: string; short_description: string; description: string }) {
+  let url = `${baseUrl}/user/feed-nutritional-specs/update`
+  return api.post(url, data)
+}
+
+export function deleteFeedNutritionalSpecs(specIds: string[]) {
+  let url = `${baseUrl}/user/feed-nutritional-specs/delete`
+  return api.post(url, { spec_ids: specIds })
 }
 
 // Feed Target functions

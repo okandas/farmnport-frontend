@@ -4,9 +4,10 @@ import { use } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { queryFeedProduct } from "@/lib/query"
 import Image from "next/image"
-import { AlertTriangle, ArrowLeft } from "lucide-react"
+import { AlertTriangle, ArrowLeft, ShoppingCart } from "lucide-react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
+import { sendGTMEvent } from "@next/third-parties/google"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
 import { capitalizeFirstLetter } from "@/lib/utilities"
 
@@ -166,6 +167,15 @@ export default function FeedDetailPage({ params }: FeedDetailPageProps) {
                                 ))}
                             </div>
                         )}
+
+                        <Link
+                            href="/waiting-list-shop"
+                            onClick={() => sendGTMEvent({ event: 'buy_now_click', value: slug, category: 'feed' })}
+                            className="flex items-center justify-center gap-2 w-full py-3 px-4 rounded-lg bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-colors"
+                        >
+                            <ShoppingCart className="h-5 w-5" />
+                            Buy Now
+                        </Link>
                     </div>
 
                     {/* Right - Product Info */}
@@ -188,7 +198,7 @@ export default function FeedDetailPage({ params }: FeedDetailPageProps) {
                             )}
                         </div>
 
-                        {product.show_price && product.sale_price > 0 && (
+                        {product.available_for_sale && product.show_price && product.sale_price > 0 && (
                             <div className="flex items-center gap-3">
                                 <span className="text-sm text-muted-foreground">Price:</span>
                                 {product.was_price > 0 && product.was_price > product.sale_price && (
@@ -200,7 +210,7 @@ export default function FeedDetailPage({ params }: FeedDetailPageProps) {
 
                         <div className="h-px bg-border" />
 
-                        {/* Animal / Phase / Form */}
+                        {/* Animal / Phase / Form / Sub Type */}
                         <div className="flex flex-wrap gap-2">
                             {product.animal && (
                                 <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-600/10 dark:bg-amber-950/30 dark:text-amber-400">
@@ -217,6 +227,11 @@ export default function FeedDetailPage({ params }: FeedDetailPageProps) {
                                     {product.form}
                                 </span>
                             )}
+                            {product.sub_type && (
+                                <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium bg-violet-50 text-violet-700 ring-1 ring-inset ring-violet-600/10 dark:bg-violet-950/30 dark:text-violet-400">
+                                    {product.sub_type}
+                                </span>
+                            )}
                         </div>
 
                         {/* Description */}
@@ -229,12 +244,63 @@ export default function FeedDetailPage({ params }: FeedDetailPageProps) {
                             </div>
                         )}
 
-                        {/* Active Ingredients */}
-                        <div>
-                            <h2 className="text-lg font-semibold mb-3 text-foreground">
-                                Active Ingredients
-                            </h2>
-                            {product.active_ingredients && product.active_ingredients.length > 0 ? (
+                        {/* Package Size */}
+                        {product.package_size && (
+                            <div>
+                                <h2 className="text-lg font-semibold mb-3 text-foreground">Package Size</h2>
+                                <p className="text-muted-foreground leading-relaxed text-sm">{product.package_size}</p>
+                            </div>
+                        )}
+
+                        {/* Breed Recommendations */}
+                        {product.breed_recommendations && (
+                            <div>
+                                <h2 className="text-lg font-semibold mb-3 text-foreground">Breed Recommendations</h2>
+                                <p className="text-muted-foreground leading-relaxed text-sm whitespace-pre-line">{product.breed_recommendations}</p>
+                            </div>
+                        )}
+
+                        {/* Feeding Instructions */}
+                        {product.feeding_instructions && product.feeding_instructions.length > 0 && (
+                            <div>
+                                <h2 className="text-lg font-semibold mb-3 text-foreground">Feeding Instructions</h2>
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-sm">
+                                        <thead>
+                                            <tr className="border-b border-border">
+                                                <th className="text-left py-2 pr-4 font-medium text-foreground">Period</th>
+                                                <th className="text-left py-2 pr-4 font-medium text-foreground">Amount</th>
+                                                <th className="text-left py-2 font-medium text-foreground">Notes</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {product.feeding_instructions.map((instruction: { period: string; amount: string; notes: string }, idx: number) => (
+                                                <tr key={idx} className="border-b border-border/50">
+                                                    <td className="py-2 pr-4 text-muted-foreground">{instruction.period}</td>
+                                                    <td className="py-2 pr-4 text-muted-foreground">{instruction.amount}</td>
+                                                    <td className="py-2 text-muted-foreground">{instruction.notes}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Management Tips */}
+                        {product.management_tips && (
+                            <div>
+                                <h2 className="text-lg font-semibold mb-3 text-foreground">Management Tips</h2>
+                                <p className="text-muted-foreground leading-relaxed text-sm whitespace-pre-line">{product.management_tips}</p>
+                            </div>
+                        )}
+
+                        {/* Active Ingredients - only show if product has them */}
+                        {product.active_ingredients && product.active_ingredients.length > 0 && (
+                            <div>
+                                <h2 className="text-lg font-semibold mb-3 text-foreground">
+                                    Active Ingredients
+                                </h2>
                                 <div className="space-y-2">
                                     {product.active_ingredients.map((ai: any, idx: number) => (
                                         <div key={idx} className="flex items-center justify-between p-3 bg-gradient-to-r from-purple-50/50 to-transparent dark:from-purple-950/30 rounded-lg border border-purple-100 dark:border-purple-900 hover:border-purple-300 dark:hover:border-purple-700 transition-colors">
@@ -247,10 +313,8 @@ export default function FeedDetailPage({ params }: FeedDetailPageProps) {
                                         </div>
                                     ))}
                                 </div>
-                            ) : (
-                                <p className="text-sm text-muted-foreground p-4 bg-muted/30 rounded-lg border">No active ingredient information available.</p>
-                            )}
-                        </div>
+                            </div>
+                        )}
 
                         <AdSenseInFeed />
 
@@ -268,6 +332,108 @@ export default function FeedDetailPage({ params }: FeedDetailPageProps) {
                                         </li>
                                     ))}
                                 </ul>
+                            </div>
+                        )}
+                        {/* Nutritional Specifications */}
+                        {product.nutritional_specs && product.nutritional_specs.length > 0 && (
+                            <div>
+                                <h2 className="text-lg font-semibold mb-3 text-foreground">Nutritional Specifications</h2>
+                                <div className="rounded-lg border overflow-hidden">
+                                    <table className="w-full text-sm">
+                                        <thead>
+                                            <tr className="bg-muted/50">
+                                                <th className="text-left px-4 py-2.5 font-medium text-muted-foreground">Nutrient</th>
+                                                <th className="text-left px-4 py-2.5 font-medium text-muted-foreground">Qualifier</th>
+                                                <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">Value</th>
+                                                <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">Unit</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y">
+                                            {product.nutritional_specs.map((spec: any, idx: number) => (
+                                                <tr key={idx} className="hover:bg-muted/30 transition-colors">
+                                                    <td className="px-4 py-2.5 font-medium text-foreground capitalize">{spec.name}</td>
+                                                    <td className="px-4 py-2.5 text-muted-foreground capitalize">{spec.qualifier || "-"}</td>
+                                                    <td className="px-4 py-2.5 text-right font-semibold text-foreground">{spec.value}</td>
+                                                    <td className="px-4 py-2.5 text-right text-muted-foreground">{spec.unit}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Mixing Recommendations */}
+                        {product.mixing_recommendations && product.mixing_recommendations.length > 0 && (
+                            <div>
+                                <h2 className="text-lg font-semibold mb-3 text-foreground">Mixing Recommendations</h2>
+                                <div className="space-y-4">
+                                    {product.mixing_recommendations.map((mix: any, idx: number) => (
+                                        <div key={idx} className="rounded-lg border p-4">
+                                            <div className="flex items-center justify-between mb-3">
+                                                <h3 className="font-medium text-foreground">{mix.name || `Formulation ${idx + 1}`}</h3>
+                                                {mix.resulting_protein && (
+                                                    <span className="text-xs font-medium px-2 py-1 rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
+                                                        {mix.resulting_protein} Protein
+                                                    </span>
+                                                )}
+                                            </div>
+                                            {mix.batch_size && (
+                                                <p className="text-xs text-muted-foreground mb-3">Batch size: {mix.batch_size}</p>
+                                            )}
+                                            {mix.ingredients && mix.ingredients.length > 0 && (
+                                                <div className="rounded-md border overflow-hidden">
+                                                    <table className="w-full text-sm">
+                                                        <thead>
+                                                            <tr className="bg-muted/50">
+                                                                <th className="text-left px-3 py-2 font-medium text-muted-foreground text-xs">Ingredient</th>
+                                                                <th className="text-right px-3 py-2 font-medium text-muted-foreground text-xs">Quantity</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody className="divide-y">
+                                                            {mix.ingredients.map((ing: any, ingIdx: number) => (
+                                                                <tr key={ingIdx}>
+                                                                    <td className="px-3 py-2 text-foreground">{ing.name}</td>
+                                                                    <td className="px-3 py-2 text-right text-muted-foreground">{ing.quantity} {ing.unit}</td>
+                                                                </tr>
+                                                            ))}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            )}
+                                            {mix.notes && (
+                                                <p className="mt-3 text-xs text-muted-foreground italic">{mix.notes}</p>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Adaptation Schedule */}
+                        {product.adaptation_schedule && product.adaptation_schedule.length > 0 && (
+                            <div>
+                                <h2 className="text-lg font-semibold mb-3 text-foreground">Adaptation Schedule</h2>
+                                <div className="rounded-lg border overflow-hidden">
+                                    <table className="w-full text-sm">
+                                        <thead>
+                                            <tr className="bg-muted/50">
+                                                <th className="text-left px-4 py-2.5 font-medium text-muted-foreground">Day</th>
+                                                <th className="text-left px-4 py-2.5 font-medium text-muted-foreground">Amount</th>
+                                                <th className="text-left px-4 py-2.5 font-medium text-muted-foreground">Notes</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y">
+                                            {product.adaptation_schedule.map((step: any, idx: number) => (
+                                                <tr key={idx} className="hover:bg-muted/30 transition-colors">
+                                                    <td className="px-4 py-2.5 font-medium text-foreground">{step.day}</td>
+                                                    <td className="px-4 py-2.5 text-foreground">{step.amount}</td>
+                                                    <td className="px-4 py-2.5 text-muted-foreground">{step.notes || "-"}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         )}
                     </div>
@@ -306,6 +472,21 @@ export default function FeedDetailPage({ params }: FeedDetailPageProps) {
                                     </div>
                                 </div>
                             )}
+                        </div>
+                    </div>
+                )}
+
+                {/* Product-Specific Safety Warnings */}
+                {product.safety_warnings && (
+                    <div className="mb-6 bg-red-500/10 border border-red-500/20 rounded-lg p-6">
+                        <div className="flex items-start gap-3">
+                            <AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-500 flex-shrink-0" />
+                            <div>
+                                <h3 className="font-semibold mb-2 text-red-900 dark:text-red-100">Safety Warning</h3>
+                                <p className="text-sm text-red-800 dark:text-red-200 whitespace-pre-line">
+                                    {product.safety_warnings}
+                                </p>
+                            </div>
                         </div>
                     </div>
                 )}

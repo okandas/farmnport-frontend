@@ -29,8 +29,21 @@ const fontHeading = localFont({
 })
 
 export const metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://farmnport.com'),
   title: "Farmnport - Getting you to market",
   description: "Buyers, Exporters, Farmers, Importers in the livestock, cattle, horticulture, poultry, aquaculture, grain, seed, dairy and plantation Agriculture Agri Business.",
+  openGraph: {
+    title: 'Farmnport - Buy & Sell Farm Produce Directly in Zimbabwe',
+    description: 'Connect farmers and buyers across Zimbabwe. Browse produce prices, find buyers and sellers, and access agrochemical guides.',
+    siteName: 'farmnport',
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Farmnport - Buy & Sell Farm Produce Directly in Zimbabwe',
+    description: 'Connect farmers and buyers across Zimbabwe. Browse produce prices, find buyers and sellers, and access agrochemical guides.',
+  },
   other: {
     'google-adsense-account': 'ca-pub-9685248262342396'
   }

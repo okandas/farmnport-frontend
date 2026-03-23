@@ -127,6 +127,11 @@ export const dashboardConfig: DashboardConfig = {
           icon: "beaker",
         },
         {
+          title: "Nutritional Specs",
+          href: "/dashboard/feed-nutritional-specs",
+          icon: "fileSpreadsheet",
+        },
+        {
           title: "Targets",
           href: "/dashboard/feed-targets",
           icon: "bug",

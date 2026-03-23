@@ -2,352 +2,283 @@ import { MetadataRoute } from 'next'
 
 export const dynamic = 'force-dynamic'
 
+function getApiUrl() {
+  const baseURL = process.env.NEXT_PUBLIC_BASE_URL
+  if (!baseURL) return null
+  return `${baseURL}/v1`
+}
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+
   // Static routes
   const staticRoutes: MetadataRoute.Sitemap = [
-    {
-      url: BASE_URL,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 1,
-    },
-    {
-      url: `${BASE_URL}/buyers`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    },
-    {
-      url: `${BASE_URL}/farmers`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    },
-    {
-      url: `${BASE_URL}/prices`,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.7,
-    },
-    {
-      url: `${BASE_URL}/about`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.5,
-    },
-    {
-      url: `${BASE_URL}/contact`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.5,
-    },
-    {
-      url: `${BASE_URL}/privacy`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.3,
-    },
-    {
-      url: `${BASE_URL}/terms`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.3,
-    },
+    { url: BASE_URL, lastModified: new Date(), changeFrequency: 'daily', priority: 1 },
+    { url: `${BASE_URL}/buyers`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.8 },
+    { url: `${BASE_URL}/farmers`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.8 },
+    { url: `${BASE_URL}/prices`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.7 },
+    { url: `${BASE_URL}/feeds`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.8 },
+    { url: `${BASE_URL}/feeding-programs`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.8 },
+    { url: `${BASE_URL}/spray-programs`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.8 },
+    { url: `${BASE_URL}/agrochemical-guides`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.8 },
+    { url: `${BASE_URL}/agrochemical-guides/all`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.8 },
+    { url: `${BASE_URL}/animal-health-guides`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.8 },
+    { url: `${BASE_URL}/animal-health-guides/all`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.8 },
+    { url: `${BASE_URL}/waiting-list-paying`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.4 },
+    { url: `${BASE_URL}/waiting-list-shop`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.4 },
+    { url: `${BASE_URL}/about`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.5 },
+    { url: `${BASE_URL}/contact`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.5 },
+    { url: `${BASE_URL}/privacy`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.3 },
+    { url: `${BASE_URL}/terms`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.3 },
   ]
 
-  // Price list routes
-  const priceLists = await fetchPriceLists()
-  const priceRoutes: MetadataRoute.Sitemap = [
-    {
-      url: `${BASE_URL}/prices`,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.8,
-    },
-    ...priceLists.map((priceList) => ({
-      url: `${BASE_URL}/prices/${priceList.slug}`,
-      lastModified: new Date(priceList.effectiveDate),
-      changeFrequency: 'weekly' as const,
-      priority: 0.7,
-    })),
-  ]
-
-  // Dynamic routes - Fetch product pages
-  // Replace this with your actual API call or database query
-  const products = await fetchProducts()
-  const productRoutes: MetadataRoute.Sitemap = products.flatMap((product: any) => [
-    {
-      url: `${BASE_URL}/buyers/${product.slug}`,
-      lastModified: new Date(product.updatedAt),
-      changeFrequency: 'weekly',
-      priority: 0.7,
-    },
-    {
-      url: `${BASE_URL}/farmers/${product.slug}`,
-      lastModified: new Date(product.updatedAt),
-      changeFrequency: 'weekly',
-      priority: 0.7,
-    },
+  // Fetch all dynamic data in parallel
+  const [
+    priceLists,
+    farmProduce,
+    agroChemicalCategories,
+    agroChemicals,
+    animalHealthCategories,
+    animalHealthProducts,
+    feedProducts,
+    feedingPrograms,
+    sprayPrograms,
+  ] = await Promise.all([
+    fetchPriceLists(),
+    fetchFarmProduce(),
+    fetchAgroChemicalCategories(),
+    fetchAgroChemicals(),
+    fetchAnimalHealthCategories(),
+    fetchAnimalHealthProducts(),
+    fetchFeedProducts(),
+    fetchFeedingPrograms(),
+    fetchSprayPrograms(),
   ])
 
-  // Dynamic routes - Fetch farmer and buyer profile pages
-  const farmers = await fetchFarmers()
-  const farmerRoutes: MetadataRoute.Sitemap = farmers.map((farmer: any) => ({
-    url: `${BASE_URL}/farmer/${farmer.slug}`,
-    lastModified: new Date(farmer.updatedAt),
-    changeFrequency: 'weekly',
-    priority: 0.6,
+  // Price list routes
+  const priceRoutes: MetadataRoute.Sitemap = priceLists.map((pl) => ({
+    url: `${BASE_URL}/prices/${pl.slug}`,
+    lastModified: new Date(pl.effectiveDate),
+    changeFrequency: 'weekly' as const,
+    priority: 0.7,
   }))
 
-  const buyers = await fetchBuyers()
-  const buyerRoutes: MetadataRoute.Sitemap = buyers.map((buyer: any) => ({
-    url: `${BASE_URL}/buyer/${buyer.slug}`,
-    lastModified: new Date(buyer.updatedAt),
-    changeFrequency: 'weekly',
-    priority: 0.6,
+  // Farm produce → /buyers/{slug} and /farmers/{slug}
+  const farmProduceRoutes: MetadataRoute.Sitemap = farmProduce.flatMap((fp: any) => [
+    { url: `${BASE_URL}/buyers/${fp.slug}`, lastModified: new Date(fp.updated || fp.created), changeFrequency: 'weekly' as const, priority: 0.7 },
+    { url: `${BASE_URL}/farmers/${fp.slug}`, lastModified: new Date(fp.updated || fp.created), changeFrequency: 'weekly' as const, priority: 0.7 },
+  ])
+
+  // Agrochemical category routes
+  const agroChemicalCategoryRoutes: MetadataRoute.Sitemap = agroChemicalCategories.map((category: any) => ({
+    url: `${BASE_URL}/agrochemical-guides/${category.slug}`,
+    lastModified: new Date(category.updated || category.created),
+    changeFrequency: 'weekly' as const,
+    priority: 0.7,
   }))
 
-  // Agrochemical guide routes
-  const agroChemicalCategories = await fetchAgroChemicalCategories()
-  const agroChemicalCategoryRoutes: MetadataRoute.Sitemap = [
-    {
-      url: `${BASE_URL}/agrochemical-guides`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    },
-    {
-      url: `${BASE_URL}/agrochemical-guides/all`,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.8,
-    },
-    ...agroChemicalCategories.map((category: any) => ({
-      url: `${BASE_URL}/agrochemical-guides/${category.slug}`,
-      lastModified: new Date(category.updated || category.created),
-      changeFrequency: 'weekly' as const,
-      priority: 0.7,
-    })),
+  // Individual agrochemical guide + buy pages
+  const agroChemicalRoutes: MetadataRoute.Sitemap = agroChemicals.flatMap((chemical: any) => [
+    { url: `${BASE_URL}/agrochemical-guides/${chemical.categorySlug || 'all'}/${chemical.slug}`, lastModified: new Date(chemical.updated || chemical.created), changeFrequency: 'weekly' as const, priority: 0.6 },
+    { url: `${BASE_URL}/buy-agrochemicals/${chemical.slug}`, lastModified: new Date(chemical.updated || chemical.created), changeFrequency: 'daily' as const, priority: 0.8 },
+  ])
+
+  // Buy agrochemicals listing
+  const buyAgroChemicalListingRoutes: MetadataRoute.Sitemap = [
+    { url: `${BASE_URL}/buy-agrochemicals`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
   ]
 
-  // Individual agrochemical product pages
-  const agroChemicals = await fetchAgroChemicals()
-  const agroChemicalRoutes: MetadataRoute.Sitemap = agroChemicals.map((chemical: any) => ({
-    url: `${BASE_URL}/agrochemical-guides/${chemical.categorySlug || 'all'}/${chemical.slug}`,
-    lastModified: new Date(chemical.updated || chemical.created),
-    changeFrequency: 'weekly',
+  // Animal health category routes
+  const animalHealthCategoryRoutes: MetadataRoute.Sitemap = animalHealthCategories.map((category: any) => ({
+    url: `${BASE_URL}/animal-health-guides/${category.slug}`,
+    lastModified: new Date(category.updated || category.created),
+    changeFrequency: 'weekly' as const,
+    priority: 0.7,
+  }))
+
+  // Individual animal health guide pages
+  const animalHealthRoutes: MetadataRoute.Sitemap = animalHealthProducts.map((product: any) => ({
+    url: `${BASE_URL}/animal-health-guides/${product.categorySlug || 'all'}/${product.slug}`,
+    lastModified: new Date(product.updated || product.created),
+    changeFrequency: 'weekly' as const,
     priority: 0.6,
   }))
 
-  // Buy agrochemicals shop routes
-  const buyAgroChemicalRoutes: MetadataRoute.Sitemap = [
-    {
-      url: `${BASE_URL}/buy-agrochemicals`,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.9, // High priority for e-commerce
-    },
-    ...agroChemicals.map((chemical: any) => ({
-      url: `${BASE_URL}/buy-agrochemicals/${chemical.slug}`,
-      lastModified: new Date(chemical.updated || chemical.created),
-      changeFrequency: 'daily' as const, // Products/prices change frequently
-      priority: 0.8, // High priority for product pages
-    })),
-  ]
+  // Feed product routes
+  const feedRoutes: MetadataRoute.Sitemap = feedProducts.map((fp: any) => ({
+    url: `${BASE_URL}/feeds/${fp.slug}`,
+    lastModified: new Date(fp.updated || fp.created),
+    changeFrequency: 'weekly' as const,
+    priority: 0.6,
+  }))
+
+  // Feeding program routes
+  const feedingProgramRoutes: MetadataRoute.Sitemap = feedingPrograms.map((fp: any) => ({
+    url: `${BASE_URL}/feeding-programs/${fp.slug}`,
+    lastModified: new Date(fp.updated || fp.created),
+    changeFrequency: 'weekly' as const,
+    priority: 0.7,
+  }))
+
+  // Spray program routes
+  const sprayProgramRoutes: MetadataRoute.Sitemap = sprayPrograms.map((sp: any) => ({
+    url: `${BASE_URL}/spray-programs/${sp.slug}`,
+    lastModified: new Date(sp.updated || sp.created),
+    changeFrequency: 'weekly' as const,
+    priority: 0.7,
+  }))
 
   return [
     ...staticRoutes,
     ...priceRoutes,
-    ...productRoutes,
-    ...farmerRoutes,
-    ...buyerRoutes,
+    ...farmProduceRoutes,
     ...agroChemicalCategoryRoutes,
     ...agroChemicalRoutes,
-    ...buyAgroChemicalRoutes,
+    ...buyAgroChemicalListingRoutes,
+    ...animalHealthCategoryRoutes,
+    ...animalHealthRoutes,
+    ...feedRoutes,
+    ...feedingProgramRoutes,
+    ...sprayProgramRoutes,
   ]
 }
 
-// Helper functions to fetch dynamic content
-// Replace these with your actual data fetching logic
-async function fetchProducts() {
+// --- Fetchers ---
+
+async function fetchPaginatedApi(endpoint: string, maxPages = 50, maxItems = 1000) {
+  const apiUrl = getApiUrl()
+  if (!apiUrl) return []
+
   try {
-    // Example: Fetch from your API
-    // const response = await fetch(`${process.env.API_URL}/products`, {
-    //   next: { revalidate: 3600 } // Revalidate every hour
-    // })
-    // const data = await response.json()
-    // return data.products
+    let all: any[] = []
+    let page = 1
 
-    // For now, return empty array - replace with actual implementation
-    return []
-  } catch (error) {
-    console.error('Error fetching products for sitemap:', error)
-    return []
-  }
-}
+    while (page <= maxPages && all.length < maxItems) {
+      const response = await fetch(`${apiUrl}/${endpoint}${endpoint.includes('?') ? '&' : '?'}p=${page}`, {
+        next: { revalidate: 86400 },
+      })
+      if (!response.ok) break
 
-async function fetchFarmers() {
-  try {
-    // Example: Fetch from your API
-    // const response = await fetch(`${process.env.API_URL}/farmers`, {
-    //   next: { revalidate: 3600 }
-    // })
-    // const data = await response.json()
-    // return data.farmers
+      const data = await response.json()
+      const items = data.data || []
+      if (items.length === 0) break
 
-    // For now, return empty array - replace with actual implementation
-    return []
-  } catch (error) {
-    console.error('Error fetching farmers for sitemap:', error)
-    return []
-  }
-}
-
-async function fetchBuyers() {
-  try {
-    // Example: Fetch from your API
-    // const response = await fetch(`${process.env.API_URL}/buyers`, {
-    //   next: { revalidate: 3600 }
-    // })
-    // const data = await response.json()
-    // return data.buyers
-
-    // For now, return empty array - replace with actual implementation
-    return []
-  } catch (error) {
-    console.error('Error fetching buyers for sitemap:', error)
-    return []
-  }
-}
-
-async function fetchAgroChemicalCategories() {
-  try {
-    const baseURL = process.env.NEXT_PUBLIC_BASE_URL
-    if (!baseURL) {
-      console.warn('API URL not configured for sitemap generation')
-      return []
-    }
-    const apiUrl = `${baseURL}/v1`
-
-    const response = await fetch(`${apiUrl}/agrochemicalcategories/all`, {
-      next: { revalidate: 86400 }, // Revalidate once per day
-    })
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch categories: ${response.status}`)
+      all = [...all, ...items]
+      page++
     }
 
+    return all
+  } catch (error) {
+    console.error(`Error fetching ${endpoint} for sitemap:`, error)
+    return []
+  }
+}
+
+async function fetchSimpleApi(endpoint: string) {
+  const apiUrl = getApiUrl()
+  if (!apiUrl) return []
+
+  try {
+    const response = await fetch(`${apiUrl}/${endpoint}`, { next: { revalidate: 86400 } })
+    if (!response.ok) return []
     const data = await response.json()
     return data.data || []
   } catch (error) {
-    console.error('Error fetching agrochemical categories for sitemap:', error)
+    console.error(`Error fetching ${endpoint} for sitemap:`, error)
     return []
   }
+}
+
+async function fetchFarmProduce() {
+  return fetchSimpleApi('farmproduce/all')
+}
+
+async function fetchAgroChemicalCategories() {
+  return fetchSimpleApi('agrochemicalcategories/all')
 }
 
 async function fetchAgroChemicals() {
-  try {
-    const baseURL = process.env.NEXT_PUBLIC_BASE_URL
-    if (!baseURL) {
-      console.warn('API URL not configured for sitemap generation')
-      return []
-    }
-    const apiUrl = `${baseURL}/v1`
+  const chemicals = await fetchPaginatedApi('agrochemical/all')
+  return chemicals.map((c: any) => ({
+    slug: c.slug,
+    categorySlug: c.agrochemical_category?.slug,
+    updated: c.updated,
+    created: c.created,
+  }))
+}
 
-    // Fetch all agrochemicals with pagination
-    let allChemicals: any[] = []
-    let page = 1
-    let hasMore = true
+async function fetchAnimalHealthCategories() {
+  return fetchSimpleApi('animalhealthcategories/')
+}
 
-    while (hasMore) {
-      const response = await fetch(`${apiUrl}/agrochemical/all?p=${page}`, {
-        next: { revalidate: 86400 }, // Revalidate once per day
-      })
+async function fetchAnimalHealthProducts() {
+  const products = await fetchPaginatedApi('animalhealth/all')
+  return products.map((p: any) => ({
+    slug: p.slug,
+    categorySlug: p.animal_health_category?.slug,
+    updated: p.updated,
+    created: p.created,
+  }))
+}
 
-      if (!response.ok) {
-        throw new Error(`Failed to fetch agrochemicals: ${response.status}`)
-      }
+async function fetchFeedProducts() {
+  const feeds = await fetchPaginatedApi('feed/all')
+  return feeds.map((f: any) => ({
+    slug: f.slug,
+    updated: f.updated,
+    created: f.created,
+  }))
+}
 
-      const data = await response.json()
-      const chemicals = data.data || []
+async function fetchFeedingPrograms() {
+  const programs = await fetchSimpleApi('feedingprograms/')
+  return (programs || []).map((p: any) => ({
+    slug: p.slug,
+    updated: p.updated,
+    created: p.created,
+  }))
+}
 
-      if (chemicals.length === 0) {
-        hasMore = false
-      } else {
-        // Map chemicals to include category slug
-        const mappedChemicals = chemicals.map((chemical: any) => ({
-          slug: chemical.slug,
-          categorySlug: chemical.agrochemical_category?.slug,
-          updated: chemical.updated,
-          created: chemical.created,
-        }))
-        allChemicals = [...allChemicals, ...mappedChemicals]
-        page++
-
-        // Limit to prevent infinite loops (adjust as needed)
-        if (page > 50 || allChemicals.length >= 1000) {
-          hasMore = false
-        }
-      }
-    }
-
-    return allChemicals
-  } catch (error) {
-    console.error('Error fetching agrochemicals for sitemap:', error)
-    return []
-  }
+async function fetchSprayPrograms() {
+  const data = await fetchSimpleApi('sprayprograms/')
+  const programs = Array.isArray(data) ? data : (data?.data || data || [])
+  return (Array.isArray(programs) ? programs : []).map((p: any) => ({
+    slug: p.slug,
+    updated: p.updated,
+    created: p.created,
+  }))
 }
 
 async function fetchPriceLists() {
+  const apiUrl = getApiUrl()
+  if (!apiUrl) return []
+
   try {
-    const baseURL = process.env.NEXT_PUBLIC_BASE_URL
-    if (!baseURL) {
-      console.warn('API URL not configured for sitemap generation')
-      return []
-    }
-    const apiUrl = `${baseURL}/v1`
-
-    // Fetch price lists with pagination
-    let allPriceLists: any[] = []
+    let all: any[] = []
     let page = 1
-    let hasMore = true
 
-    while (hasMore) {
+    while (page <= 20 && all.length < 500) {
       const response = await fetch(`${apiUrl}/prices/all?p=${page}&limit=100`, {
-        next: { revalidate: 3600 }, // Revalidate every hour (prices change frequently)
+        next: { revalidate: 3600 },
       })
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch price lists: ${response.status}`)
-      }
+      if (!response.ok) break
 
       const data = await response.json()
       const priceLists = data.data || []
+      if (priceLists.length === 0) break
 
-      if (priceLists.length === 0) {
-        hasMore = false
-      } else {
-        // Map price lists to generate slugs
-        const mappedPriceLists = priceLists.map((pl: any) => {
-          const plDate = new Date(pl.effectiveDate).toISOString().split('T')[0]
-          const slug = `${pl.client_name.toLowerCase().replace(/\s+/g, '-')}-${plDate}`
-          return {
-            slug,
-            effectiveDate: pl.effectiveDate,
-          }
-        })
-        allPriceLists = [...allPriceLists, ...mappedPriceLists]
-        page++
-
-        // Limit to prevent infinite loops
-        if (page > 20 || allPriceLists.length >= 500) {
-          hasMore = false
+      const mapped = priceLists.map((pl: any) => {
+        const plDate = new Date(pl.effectiveDate).toISOString().split('T')[0]
+        return {
+          slug: `${pl.client_name.toLowerCase().replace(/\s+/g, '-')}-${plDate}`,
+          effectiveDate: pl.effectiveDate,
         }
-      }
+      })
+      all = [...all, ...mapped]
+      page++
     }
 
-    return allPriceLists
+    return all
   } catch (error) {
     console.error('Error fetching price lists for sitemap:', error)
     return []

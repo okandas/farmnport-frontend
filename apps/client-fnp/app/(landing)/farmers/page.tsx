@@ -13,6 +13,7 @@ export const metadata = {
   openGraph: {
     title: 'Buy Fresh Agricultural Produce Directly from Farmers',
     description: 'Buy fresh, high-quality agricultural produce directly from local farmers across Zimbabwe at the best prices.',
+    url: '/farmers',
     siteName: 'farmnport',
     type: 'website',
   },

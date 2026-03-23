@@ -10,6 +10,7 @@ export const metadata = {
     openGraph: {
         title: 'Reset Password | Farmnport',
         description: 'Reset your Farmnport account password and regain access to your farming marketplace account.',
+        url: '/reset',
         siteName: 'farmnport',
         type: 'website',
     },

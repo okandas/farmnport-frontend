@@ -4,34 +4,35 @@ import { useState, useEffect, useRef } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { PaginationState } from "@tanstack/react-table"
 
-import { queryAgroChemicals } from "@/lib/query"
-import { AgroChemicalItem } from "@/lib/schemas"
+import { queryFeedNutritionalSpecs } from "@/lib/query"
+import { FeedNutritionalSpec } from "@/lib/schemas"
 import { handleFetchError } from "@/lib/error-handler"
 import { Placeholder } from "@/components/state/placeholder"
 import { DataTable } from "@/components/structures/data-table"
-import { agroChemicalColumns } from "@/components/structures/columns/products"
+import { feedNutritionalSpecColumns } from "@/components/structures/columns/feedNutritionalSpecs"
 
-export function AgroChemicalsTable() {
+export function FeedNutritionalSpecsTable() {
   const [search, setSearch] = useState("")
 
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 1,
-    pageSize: 10,
+    pageSize: 20,
   })
 
   const { isError, isLoading, isFetching, refetch, data, error } = useQuery({
-    queryKey: ["dashboard-products", { p: pagination.pageIndex, search }],
+    queryKey: ["dashboard-feed-nutritional-specs", { p: pagination.pageIndex, search }],
     queryFn: () =>
-      queryAgroChemicals({
+      queryFeedNutritionalSpecs({
         p: pagination.pageIndex,
         search: search,
       }),
     refetchOnWindowFocus: false
   })
 
-  const products = data?.data?.data as AgroChemicalItem[]
+  const specs = data?.data?.data as FeedNutritionalSpec[]
   const total = data?.data?.total as number
 
+  // Show error toast only once when error occurs
   const hasShownError = useRef(false)
   useEffect(() => {
     if (isError && !hasShownError.current) {
@@ -41,7 +42,7 @@ export function AgroChemicalsTable() {
           hasShownError.current = false
           refetch()
         },
-        context: "agrochemicals"
+        context: "feed nutritional specs"
       })
     }
     if (!isError) {
@@ -53,9 +54,9 @@ export function AgroChemicalsTable() {
     return (
       <Placeholder>
         <Placeholder.Icon name="close" />
-        <Placeholder.Title>Error Fetching AgroChemicals</Placeholder.Title>
+        <Placeholder.Title>Error Fetching Nutritional Specs</Placeholder.Title>
         <Placeholder.Description>
-          Error fetching agrochemicals from the database
+          Error fetching feed nutritional specs from the database
         </Placeholder.Description>
       </Placeholder>
     )
@@ -64,17 +65,17 @@ export function AgroChemicalsTable() {
   if (isLoading || isFetching) {
     return (
       <Placeholder>
-        <Placeholder.Title>Fetching AgroChemicals</Placeholder.Title>
+        <Placeholder.Title>Fetching Nutritional Specs</Placeholder.Title>
       </Placeholder>
     )
   }
 
   return (
     <DataTable
-      columns={agroChemicalColumns}
-      data={products}
-      newUrl="/dashboard/agrochemicals/new"
-      tableName="AgroChemical"
+      columns={feedNutritionalSpecColumns}
+      data={specs}
+      newUrl="/dashboard/feed-nutritional-specs/new"
+      tableName="Feed Nutritional Spec"
       total={total}
       pagination={pagination}
       setPagination={setPagination}

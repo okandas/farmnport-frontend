@@ -635,6 +635,12 @@ export type FeedProduct = {
   phase: string
   form: string
   description: string
+  sub_type?: string
+  breed_recommendations?: string
+  feeding_instructions?: { period: string; amount: string; notes: string }[]
+  management_tips?: string
+  safety_warnings?: string
+  package_size?: string
   images: ImageModel[]
   front_label?: ImageModel
   back_label?: ImageModel
@@ -646,6 +652,31 @@ export type FeedProduct = {
   targets?: {
     id: string
     name: string
+  }[]
+  nutritional_specs?: {
+    id: string
+    feed_product_id: string
+    nutritional_spec_id: string
+    name?: string
+    value: string
+    unit: string
+    qualifier: string
+  }[]
+  mixing_recommendations?: {
+    name: string
+    batch_size: string
+    resulting_protein: string
+    notes: string
+    ingredients?: {
+      name: string
+      percentage: string
+      quantity: string
+    }[]
+  }[]
+  adaptation_schedule?: {
+    day: string
+    amount: string
+    notes: string
   }[]
   stock_level?: number
   available_for_sale?: boolean

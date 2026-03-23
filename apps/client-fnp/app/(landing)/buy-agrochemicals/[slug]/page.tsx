@@ -35,9 +35,8 @@ export default function BuyAgroChemicalPage({ params }: BuyAgroChemicalPageProps
         const url = `${baseUrl}/buy-agrochemicals/${slug}`
         const imageUrl = chemical.images?.[0]?.img?.src || `${baseUrl}/default-chemical.png`
 
-        // TODO: Replace with actual pricing when implemented
-        const price = '25.00'
-        const availability = 'https://schema.org/InStock'
+        const price = chemical.show_price && chemical.sale_price > 0 ? chemical.sale_price.toFixed(2) : '0.00'
+        const availability = chemical.available_for_sale ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock'
 
         return {
             "@context": "https://schema.org",
@@ -64,11 +63,6 @@ export default function BuyAgroChemicalPage({ params }: BuyAgroChemicalPageProps
                     "name": "farmnport"
                 }
             },
-            "aggregateRating": {
-                "@type": "AggregateRating",
-                "ratingValue": "4.5",
-                "reviewCount": "12"
-            }
         }
     }
 
@@ -217,28 +211,45 @@ export default function BuyAgroChemicalPage({ params }: BuyAgroChemicalPageProps
                         <div className="h-px bg-border w-full" />
 
                         {/* Price Section */}
-                        <div className="space-y-2">
-                            <div className="flex items-baseline gap-3">
-                                <span className="text-4xl font-bold text-primary">$25.00</span>
-                                <span className="text-lg text-muted-foreground line-through">$35.00</span>
-                                <Badge variant="destructive">29% OFF</Badge>
+                        {chemical.show_price && chemical.sale_price > 0 && (
+                            <div className="space-y-2">
+                                <div className="flex items-baseline gap-3">
+                                    <span className="text-4xl font-bold text-primary">${chemical.sale_price.toFixed(2)}</span>
+                                    {chemical.was_price > chemical.sale_price && (
+                                        <>
+                                            <span className="text-lg text-muted-foreground line-through">${chemical.was_price.toFixed(2)}</span>
+                                            <Badge variant="destructive">{Math.round((1 - chemical.sale_price / chemical.was_price) * 100)}% OFF</Badge>
+                                        </>
+                                    )}
+                                </div>
+                                <p className="text-sm text-muted-foreground">Incl. Tax</p>
                             </div>
-                            <p className="text-sm text-muted-foreground">Incl. Tax</p>
-                        </div>
+                        )}
 
                         {/* Stock Status */}
                         <div className="flex items-center gap-2">
-                            <div className="h-2 w-2 rounded-full bg-green-500"></div>
-                            <span className="text-sm font-medium text-green-700 dark:text-green-400">In Stock</span>
+                            {chemical.available_for_sale ? (
+                                <>
+                                    <div className="h-2 w-2 rounded-full bg-green-500"></div>
+                                    <span className="text-sm font-medium text-green-700 dark:text-green-400">In Stock</span>
+                                </>
+                            ) : (
+                                <>
+                                    <div className="h-2 w-2 rounded-full bg-red-500"></div>
+                                    <span className="text-sm font-medium text-red-700 dark:text-red-400">Out of Stock</span>
+                                </>
+                            )}
                         </div>
 
                         {/* Add to Cart Section */}
                         <div className="space-y-3">
                             <div className="flex gap-3">
-                                <Button size="lg" className="flex-1">
-                                    <ShoppingCart className="w-5 h-5 mr-2" />
-                                    Add to Cart
-                                </Button>
+                                <Link href="/waiting-list-shop" className="flex-1">
+                                    <Button size="lg" className="w-full">
+                                        <ShoppingCart className="w-5 h-5 mr-2" />
+                                        Add to Cart
+                                    </Button>
+                                </Link>
                                 <Button size="lg" variant="outline">
                                     <Heart className="w-5 h-5" />
                                 </Button>
@@ -246,9 +257,11 @@ export default function BuyAgroChemicalPage({ params }: BuyAgroChemicalPageProps
                                     <Share2 className="w-5 h-5" />
                                 </Button>
                             </div>
-                            <Button size="lg" variant="secondary" className="w-full">
-                                Buy Now
-                            </Button>
+                            <Link href="/waiting-list-shop">
+                                <Button size="lg" variant="secondary" className="w-full">
+                                    Buy Now
+                                </Button>
+                            </Link>
                         </div>
 
                         {/* Delivery & Returns Info */}
@@ -257,7 +270,7 @@ export default function BuyAgroChemicalPage({ params }: BuyAgroChemicalPageProps
                                 <Truck className="w-5 h-5 text-primary mt-0.5" />
                                 <div>
                                     <div className="font-medium text-sm">Free Delivery</div>
-                                    <div className="text-xs text-muted-foreground">On orders over R500</div>
+                                    <div className="text-xs text-muted-foreground">On orders over $50</div>
                                 </div>
                             </div>
                             <div className="flex items-start gap-3">
