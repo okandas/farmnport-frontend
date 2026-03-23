@@ -156,17 +156,20 @@ export function deleteProducerPriceList(priceId: string) {
 }
 
 export function queryAgroChemicals(pagination?: pagination) {
-  let url: string
+  const params = new URLSearchParams()
 
   if (pagination?.p !== undefined && pagination.p >= 2) {
-    url = `${baseUrl}/user/agrochemicals?p=${pagination.p}`
-  } else {
-    url = `${baseUrl}/user/agrochemicals`
+    params.append("p", pagination.p.toString())
   }
 
   if (pagination?.search !== undefined && pagination.search.length >= 2) {
-    url = `${baseUrl}/user/agrochemicals?search=${pagination.search}`
+    params.append("search", pagination.search)
   }
+
+  const query = params.toString()
+  const url = query
+    ? `${baseUrl}/user/agrochemicals?${query}`
+    : `${baseUrl}/user/agrochemicals`
 
   return api.get(url)
 }

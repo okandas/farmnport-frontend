@@ -16,7 +16,7 @@ export function AgroChemicalsTable() {
 
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 1,
-    pageSize: 20,
+    pageSize: 10,
   })
 
   const { isError, isLoading, isFetching, refetch, data, error } = useQuery({
