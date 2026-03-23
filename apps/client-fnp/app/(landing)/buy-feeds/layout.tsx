@@ -22,14 +22,11 @@ export const metadata: Metadata = {
     canonical: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://farmnport.com'}/buy-feeds`,
   },
   robots: {
-    index: true,
+    index: false,
     follow: true,
     googleBot: {
-      index: true,
+      index: false,
       follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
     },
   },
 }

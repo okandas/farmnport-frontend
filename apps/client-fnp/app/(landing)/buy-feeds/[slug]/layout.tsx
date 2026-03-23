@@ -72,14 +72,11 @@ export async function generateMetadata({ params }: LayoutProps): Promise<Metadat
         canonical: url,
       },
       robots: {
-        index: true,
+        index: false,
         follow: true,
         googleBot: {
-          index: true,
+          index: false,
           follow: true,
-          'max-video-preview': -1,
-          'max-image-preview': 'large',
-          'max-snippet': -1,
         },
       },
     }
