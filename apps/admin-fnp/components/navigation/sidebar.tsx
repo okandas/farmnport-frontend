@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { ChevronDown } from "lucide-react"
@@ -16,11 +16,15 @@ interface SidebarNavigationProps {
 export function SidebarNavigation({ navigationGroups }: SidebarNavigationProps) {
   const path = usePathname()
 
-  // "Overview" group (single item like Dashboard) stays always open, rest are collapsible
+  const isActive = (href: string) =>
+    path === href || (href !== "/dashboard" && path.startsWith(href))
+
   // Auto-expand the group that contains the active route
   const initialOpen = navigationGroups.reduce<Record<number, boolean>>(
     (acc, group, index) => {
-      const hasActiveItem = group.items.some((item) => item.href === path)
+      const hasActiveItem = group.items.some(
+        (item) => item.href && isActive(item.href)
+      )
       acc[index] = hasActiveItem || group.items.length <= 1
       return acc
     },
@@ -28,6 +32,18 @@ export function SidebarNavigation({ navigationGroups }: SidebarNavigationProps) 
   )
 
   const [openGroups, setOpenGroups] = useState<Record<number, boolean>>(initialOpen)
+
+  // Open the active group, close the rest
+  useEffect(() => {
+    const next: Record<number, boolean> = {}
+    navigationGroups.forEach((group, index) => {
+      const hasActiveItem = group.items.some(
+        (item) => item.href && isActive(item.href)
+      )
+      next[index] = hasActiveItem || group.items.length <= 1
+    })
+    setOpenGroups(next)
+  }, [path])
 
   const toggleGroup = (index: number) => {
     setOpenGroups((prev) => ({ ...prev, [index]: !prev[index] }))
@@ -69,7 +85,7 @@ export function SidebarNavigation({ navigationGroups }: SidebarNavigationProps) 
                         <span
                           className={cn(
                             "group flex items-center rounded-md px-3 py-1.5 text-sm font-medium hover:bg-accent hover:text-accent-foreground",
-                            path === navLink.href ? "bg-accent" : "transparent",
+                            navLink.href && isActive(navLink.href) ? "bg-accent" : "transparent",
                             navLink.disabled && "cursor-not-allowed opacity-80"
                           )}
                         >

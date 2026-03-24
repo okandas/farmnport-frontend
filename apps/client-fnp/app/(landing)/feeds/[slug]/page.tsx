@@ -20,8 +20,7 @@ async function getFeedProduct(slug: string) {
     try {
         const res = await fetch(`${BaseURL}/feed/${slug}`, fetchOptions)
         if (!res.ok) return null
-        const json = await res.json()
-        return json?.data || null
+        return await res.json()
     } catch {
         return null
     }
