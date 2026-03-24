@@ -10,7 +10,7 @@ async function getFeedProducts() {
         const res = await fetch(`${BaseURL}/feed/all`, fetchOptions)
         if (!res.ok) return { data: [], total: 0 }
         const json = await res.json()
-        return { data: json?.data?.data || [], total: json?.data?.total || 0 }
+        return { data: json?.data || [], total: json?.total || 0 }
     } catch {
         return { data: [], total: 0 }
     }

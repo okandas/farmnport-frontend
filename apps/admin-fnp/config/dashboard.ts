@@ -9,6 +9,16 @@ export const dashboardConfig: DashboardConfig = {
   ],
   sidebarNavigation: [
     {
+      label: "Overview",
+      items: [
+        {
+          title: "Dashboard",
+          href: "/dashboard",
+          icon: "dashboard",
+        },
+      ],
+    },
+    {
       label: "Management",
       items: [
         {
