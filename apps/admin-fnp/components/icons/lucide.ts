@@ -24,7 +24,6 @@ import {
   Settings,
   SunMedium,
   Trash,
-  Twitter,
   User,
   X,
   PackageSearch,
@@ -53,7 +52,8 @@ import {
   Bug,
   Layers,
   Sprout,
-  Egg
+  Egg,
+  LayoutDashboard,
 } from "lucide-react"
 
 export type Icon = LucideIcon
@@ -82,7 +82,7 @@ export const Icons = {
   sun: SunMedium,
   moon: Moon,
   laptop: Laptop,
-  twitter: Twitter,
+
   check: Check,
   construction: Construction,
   badgeCheck: BadgeCheck,
@@ -114,5 +114,6 @@ export const Icons = {
   bug: Bug,
   layers: Layers,
   sprout: Sprout,
-  egg: Egg
+  egg: Egg,
+  dashboard: LayoutDashboard,
 }

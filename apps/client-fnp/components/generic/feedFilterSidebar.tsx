@@ -205,7 +205,6 @@ function FeedFilterContent({ onClearAll }: { onClearAll: () => void }) {
       key: "brand",
       items: brandItems,
       isLoading: filtersLoading,
-      useIdAsValue: true,
     },
     {
       name: "Livestock Type",

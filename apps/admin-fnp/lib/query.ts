@@ -912,3 +912,8 @@ export function deleteFeedingPrograms(programIds: string[]) {
   let url = `${baseUrl}/user/feeding-programs/delete`
   return api.post(url, { program_ids: programIds })
 }
+
+export function queryDashboardStats() {
+  let url = `${baseUrl}/user/dashboard-stats`
+  return api.get(url)
+}
