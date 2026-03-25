@@ -101,8 +101,8 @@ export function SprayProgramDetailClient({ program, slug }: SprayProgramDetailCl
     return (
         <div className="min-h-screen bg-background">
             {/* Breadcrumb */}
-            <div className="border-b bg-muted/30">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div className="border-b">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
                     <nav className="flex text-sm text-muted-foreground">
                         <Link href="/" className="hover:text-foreground">Home</Link>
                         <span className="mx-2">/</span>

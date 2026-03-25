@@ -29,6 +29,7 @@ interface PriceListData {
 
 interface PriceDetailsGridProps {
   priceList: PriceListData
+  produce?: string
 }
 
 type ProducerPriceListKeys = "beef" | "lamb" | "mutton" | "goat" | "chicken" | "pork" | "slaughter"
@@ -47,15 +48,37 @@ const pricingTypes: Record<string, ProducerPriceListKeys[]> = {
   livestock: ["beef", "lamb", "mutton", "goat", "chicken", "pork", "slaughter"],
 }
 
+const gradeLabels: Record<string, string> = {
+  super: "Super",
+  choice: "Choice",
+  commercial: "Commercial",
+  economy: "Economy",
+  manufacturing: "Manufacturing",
+  condemned: "Condemned",
+  superPremium: "Super Premium",
+  standard: "Standard",
+  ordinary: "Ordinary",
+  inferior: "Inferior",
+  a_grade_over_1_75: "A Grade Over 1.75 kgs",
+  a_grade_1_55_1_75: "A Grade 1.55 – 1.75 kgs",
+  a_grade_under_1_55: "A Grade Under 1.55 kgs",
+  off_layers: "Off Layers",
+  cattle: "Cattle",
+  sheep: "Sheep",
+  pigs: "Pigs",
+  chicken: "Chicken",
+}
+
 const formatGradeName = (key: string): string => {
-  if (key === "superPremium") return "Super Premium"
+  if (gradeLabels[key]) return gradeLabels[key]
   return key.split("_").map((word) => capitalizeFirstLetter(word)).join(" ")
 }
 
-export function PriceDetailsGrid({ priceList }: PriceDetailsGridProps) {
+export function PriceDetailsGrid({ priceList, produce }: PriceDetailsGridProps) {
   const categories = pricingTypes[priceList.client_specialization] || []
 
   const renderableCategories = categories.filter((pricingType) => {
+    if (produce && pricingType !== produce) return false
     if (priceList[pricingType] === undefined) return false
     const categoryData = priceList[pricingType]
     const gradeEntries = Object.entries(categoryData).filter(
@@ -75,10 +98,10 @@ export function PriceDetailsGrid({ priceList }: PriceDetailsGridProps) {
         return (
           <div key={renderIndex}>
           {renderIndex > 0 && renderIndex % 2 === 0 && <AdSenseInFeed />}
-          <div className="rounded-lg border bg-card overflow-hidden">
-            <div className="px-5 py-3 border-b bg-muted/30">
-              <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide">
-                {capitalizeFirstLetter(pricingType)}
+          <div className="rounded-xl border bg-card shadow-sm">
+            <div className="px-5 pt-4 pb-2">
+              <h3 className="text-sm font-bold tracking-tight">
+                {capitalizeFirstLetter(pricingType)} Prices
               </h3>
             </div>
 

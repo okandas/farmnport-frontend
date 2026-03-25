@@ -141,10 +141,12 @@ export function ExcelImport({ setValue, setSelectedFarmProduce, setSelectedClien
 
             // Update current category
             if (category) {
-              // Normalize category name - map "SERVICE SLAUGHTER" to "slaughter"
+              // Normalize category name
               currentCategory = category.toLowerCase()
               if (currentCategory === "service slaughter") {
                 currentCategory = "slaughter"
+              } else if (currentCategory === "chickens") {
+                currentCategory = "chicken"
               }
 
               // Add to livestock list using display name
@@ -186,7 +188,13 @@ export function ExcelImport({ setValue, setSelectedFarmProduce, setSelectedClien
               "a_grade_over_1_75kg": "a_grade_over_1_75",
               "a_grade_under_1_55kg_average_liveweight": "a_grade_under_1_55",
               "a_grade_under_1_55kg": "a_grade_under_1_55",
+              // Surrey format - missing weight numbers in grade names
+              "a_grade_per_kg_live_kg_average_liveweight": "a_grade_1_55_1_75",
+              "a_grade_per_kg_live_over_kg_average_liveweight": "a_grade_over_1_75",
+              "a_grade_per_kg_live_under_kg_average_liveweight": "a_grade_under_1_55",
+              "off_layers_per_kg": "off_layers",
               "off_layers": "off_layers",
+              "condemned_doa_pet_food_grade": "condemned",
               "head": "head",
               // Slaughter services
               "cattle": "cattle",
@@ -363,6 +371,7 @@ export function ExcelImport({ setValue, setSelectedFarmProduce, setSelectedClien
           // For regular categories, map to specific farm produce names
           const categoryToProduceMapping: Record<string, string> = {
             "chicken": "Chickens Broilers",
+            "chickens": "Chickens Broilers",
           }
 
           const searchTerm = categoryToProduceMapping[livestock.toLowerCase()] || livestock

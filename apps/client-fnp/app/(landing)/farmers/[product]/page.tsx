@@ -6,6 +6,7 @@ import {AppURL, getFarmerSeo} from "@/lib/schemas";
 import { ClientFilterSidebar } from "@/components/generic/clientFilterSidebar"
 import { ActionsSidebar } from "@/components/generic/actions-sidebar"
 import { CrossSellBanner } from "@/components/monetization/cross-sell-banner"
+import { ProductResources } from "@/components/monetization/product-resources"
 import { RelatedMarkets } from "@/components/monetization/related-markets"
 
 
@@ -75,6 +76,7 @@ export default async function FarmersProductPage({ params }: FarmerProductPagePr
         </p>
 
         <CrossSellBanner product={product} context="farmer" />
+        <ProductResources product={product} />
 
         <div className="lg:flex lg:space-x-10">
           <div className="hidden lg:block lg:w-64 relative">

@@ -26,19 +26,19 @@ const productActions: Record<string, ActionItem[]> = {
     {
       title: "Order New Chicks Online",
       description: "Source day-old chicks and point-of-lay hens from trusted hatcheries across Zimbabwe.",
-      cta: "Browse Chick Suppliers",
-      href: "/buyers/chicken",
+      cta: "Join Waiting List",
+      href: "/waiting-list",
       event: "ActionOrderChicks",
       bg: "bg-emerald-50 dark:bg-emerald-950/30",
       border: "border-emerald-200 dark:border-emerald-800/50",
       button: "bg-emerald-600 hover:bg-emerald-700",
     },
     {
-      title: "Poultry Health Guides",
-      description: "Vaccines, antibiotics & nutrition guides to keep your flock healthy and productive.",
-      cta: "View Guides",
-      href: "/agrochemical-guides/all",
-      event: "ActionPoultryGuides",
+      title: "Poultry Feed Programs",
+      description: "Broiler, layer and free-range feeding programs to maximise growth and production.",
+      cta: "View Feed Programs",
+      href: "/feeding-programs",
+      event: "ActionPoultryFeedPrograms",
       bg: "bg-sky-50 dark:bg-sky-950/30",
       border: "border-sky-200 dark:border-sky-800/50",
       button: "bg-sky-600 hover:bg-sky-700",
@@ -109,7 +109,7 @@ export function ActionsSidebar({type = "buyers", product, showPremiumCTA = true}
         </div>
       ))}
 
-      {showPremiumCTA && (
+      {/* {showPremiumCTA && (
         <div className="bg-primary/5 border-2 border-primary/20 rounded-lg p-6">
           <h3 className="text-lg font-semibold mb-2">Unlock Premium Features</h3>
           <p className="text-sm text-muted-foreground mb-4">
@@ -122,7 +122,7 @@ export function ActionsSidebar({type = "buyers", product, showPremiumCTA = true}
             Subscribe
           </Link>
         </div>
-      )}
+      )} */}
     </aside>
   )
 }

@@ -93,46 +93,45 @@ export default async function CdmPriceDetailPage({ params }: CdmDetailPageProps)
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
 
-      <div className="mx-auto max-w-7xl px-6 lg:px-8 py-12 min-h-[70lvh]">
-        {/* Back link */}
-        <Link
-          href="/prices/cdm"
-          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6"
-        >
-          <ArrowLeft className="h-3.5 w-3.5" />
-          Back to CDM Prices
-        </Link>
-
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-4">
-            <h1 className="text-3xl font-bold font-heading">
-              {capitalizeFirstLetter(price.client_name)}
-            </h1>
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider bg-muted px-2.5 py-1 rounded">
-              CDM
-            </span>
+      <section className="border-b">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8 pt-6 pb-8">
+          <Link
+            href="/prices/cdm"
+            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" />
+            Back to CDM Prices
+          </Link>
+          <div className="flex items-center gap-3">
+            <div>
+              <p className="text-xs font-semibold text-primary tracking-wide uppercase">Cold Dress Mass Pricing</p>
+              <h1 className="mt-1 text-3xl font-bold font-heading tracking-tight">
+                {capitalizeFirstLetter(price.client_name)}
+              </h1>
+            </div>
           </div>
-
-          <div className="flex items-center gap-2 text-sm">
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-            <span className="text-muted-foreground">Effective:</span>
-            <span className="font-medium text-foreground">{formattedDate}</span>
+          <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
+            <Calendar className="h-4 w-4" />
+            <span>Effective {formattedDate}</span>
           </div>
         </div>
+      </section>
 
-        <div className="lg:flex lg:items-start lg:gap-8">
-          <div className="flex-1">
+      <section className="mx-auto max-w-7xl px-6 lg:px-8 py-8 min-h-[50lvh]">
+        <div className="lg:grid lg:grid-cols-[1fr_260px] lg:gap-8">
+          <div className="min-w-0">
             <CdmPriceCard price={price} hideHeader />
           </div>
 
-          <aside className="hidden lg:block lg:w-72 lg:flex-shrink-0 sticky top-20 self-start">
-            <RelatedCdmPricesSidebar
-              currentClientName={price.client_name}
-              currentPriceId={price.id}
-              allPrices={allPrices}
-            />
-          </aside>
+          <div className="hidden lg:block">
+            <div className="sticky top-20">
+              <RelatedCdmPricesSidebar
+                currentClientName={price.client_name}
+                currentPriceId={price.id}
+                allPrices={allPrices}
+              />
+            </div>
+          </div>
         </div>
 
         {/* Mobile: Related prices at bottom */}
@@ -143,7 +142,7 @@ export default async function CdmPriceDetailPage({ params }: CdmDetailPageProps)
             allPrices={allPrices}
           />
         </div>
-      </div>
+      </section>
     </main>
   )
 }

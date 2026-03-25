@@ -70,7 +70,7 @@ export function CdmPriceCard({ price, hideHeader }: CdmPriceCardProps) {
     <div className="space-y-6">
       {/* Header */}
       {!hideHeader && (
-        <div className="rounded-lg border bg-card px-5 py-4">
+        <div className="rounded-xl border bg-card shadow-sm px-5 py-4">
           <div className="flex items-start justify-between">
             <div>
               <h3 className="text-lg font-semibold text-foreground">
@@ -81,7 +81,7 @@ export function CdmPriceCard({ price, hideHeader }: CdmPriceCardProps) {
                 <span>Cold Dress Mass Pricing</span>
               </div>
             </div>
-            <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider bg-muted px-2 py-1 rounded">
+            <span className="text-[10px] font-semibold text-primary uppercase tracking-wider bg-primary/10 px-2 py-1 rounded-md">
               CDM
             </span>
           </div>
@@ -96,8 +96,8 @@ export function CdmPriceCard({ price, hideHeader }: CdmPriceCardProps) {
       )}
 
       {/* Carcass Grades */}
-      <div className="rounded-lg border bg-card overflow-hidden">
-        <div className="px-5 py-2.5 bg-muted/30 border-b">
+      <div className="rounded-xl border bg-card shadow-sm">
+        <div className="px-5 py-2.5 border-b">
           <h4 className="text-sm font-semibold text-foreground">
             Carcass Grades (per kg)
           </h4>
@@ -158,8 +158,8 @@ export function CdmPriceCard({ price, hideHeader }: CdmPriceCardProps) {
             // Classification-only (no prices) — table with Weight + Status
             if (!hasAnyPrice && hasAnyNote) {
               return (
-                <div key={teeth} className="rounded-lg border bg-card overflow-hidden">
-                  <div className="px-5 py-2.5 bg-muted/30 border-b flex items-center gap-3">
+                <div key={teeth} className="rounded-xl border bg-card shadow-sm">
+                  <div className="px-5 py-2.5 border-b flex items-center gap-3">
                     <h5 className="text-sm font-semibold text-foreground">{info.name}</h5>
                     <span className={cn(info.color, "rounded-md px-2 py-0.5 text-[10px] font-bold ring-1 ring-inset")}>
                       {teeth}
@@ -211,8 +211,8 @@ export function CdmPriceCard({ price, hideHeader }: CdmPriceCardProps) {
 
             // Has prices — full table
             return (
-              <div key={teeth} className="rounded-lg border bg-card overflow-hidden">
-                <div className="px-5 py-2.5 bg-muted/30 border-b flex items-center gap-3">
+              <div key={teeth} className="rounded-xl border bg-card shadow-sm">
+                <div className="px-5 py-2.5 border-b flex items-center gap-3">
                   <h5 className="text-sm font-semibold text-foreground">{info.name}</h5>
                   <span className={cn(info.color, "rounded-md px-2 py-0.5 text-[10px] font-bold ring-1 ring-inset")}>
                     {teeth}
@@ -283,7 +283,7 @@ export function CdmPriceCard({ price, hideHeader }: CdmPriceCardProps) {
 
       {/* Notes */}
       {price.notes && price.notes.length > 0 && (
-        <div className="rounded-lg border bg-card px-5 py-4">
+        <div className="rounded-xl border bg-card shadow-sm px-5 py-4">
           <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Important Notes</h4>
           <div className="space-y-2">
             {price.notes.map((note, i) => (

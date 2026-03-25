@@ -28,6 +28,14 @@ export function Pagination({
     const router = useRouter()
     const pathname = usePathname()
     const [isPending, startTransition] = React.useTransition()
+    const prevPage = React.useRef(page)
+
+    React.useEffect(() => {
+        if (prevPage.current !== page) {
+            window.scrollTo({ top: 0, behavior: "smooth" })
+            prevPage.current = page
+        }
+    }, [page])
 
     // Memoize pagination range to avoid unnecessary re-renders
     const paginationRange = React.useMemo(() => {
@@ -78,7 +86,8 @@ export function Pagination({
                                 page: Number(page) - 1,
                                 per_page: per_page ?? null,
                                 sort: sort ?? null,
-                            })}`
+                            })}`,
+                            { scroll: false }
                         )
                     })
                 }}
@@ -110,7 +119,8 @@ export function Pagination({
                                 router.push(
                                     `${pathname}?${createQueryString({
                                         page: pageNumber
-                                    })}`
+                                    })}`,
+                                    { scroll: false }
                                 )
                             })
                         }}
@@ -130,7 +140,8 @@ export function Pagination({
                         router.push(
                             `${pathname}?${createQueryString({
                                 page: Number(page) + 1
-                            })}`
+                            })}`,
+                            { scroll: false }
                         )
                     })
                 }}

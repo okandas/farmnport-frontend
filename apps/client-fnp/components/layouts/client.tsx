@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button"
 import { Contacts } from "@/components/layouts/contacts"
 import { BuyerContacts } from "@/components/structures/buyer-contacts"
 import { CdmPriceCard } from "@/components/structures/cdm-price-card"
+import { ProductResources } from "@/components/monetization/product-resources"
 
 
 interface ClientPageProps {
@@ -265,7 +266,7 @@ export function Client({ slug, user }: ClientPageProps) {
                 <p className="text-xs text-lime-700 dark:text-lime-500 mb-4">
                   Note: Always contact {name} directly to verify payment terms.
                 </p>
-                {pricingLoading ? (
+                {/* {pricingLoading ? (
                   <div className="flex items-center gap-3 py-4 border-t">
                     <Icons.spinner className="h-5 w-5 animate-spin text-primary" />
                     <p className="text-sm text-muted-foreground">Loading pricing data...</p>
@@ -293,7 +294,7 @@ export function Client({ slug, user }: ClientPageProps) {
                   <p className="text-sm text-muted-foreground py-4 border-t">
                     This buyer hasn&apos;t shared pricing information yet. Check back later or contact them directly for pricing details.
                   </p>
-                )}
+                )} */}
               </div>
             )}
 
@@ -305,6 +306,7 @@ export function Client({ slug, user }: ClientPageProps) {
                 ))}
               </div>
             )}
+
 
           </div>
 

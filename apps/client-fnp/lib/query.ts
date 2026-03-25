@@ -160,8 +160,16 @@ export function queryPriceFilterAggregates() {
   return api.get(url)
 }
 
-export function queryPricesByProduce(produceSlug: string) {
-  const url = `${BaseURL}/prices/produce/${produceSlug}`
+export function queryPricesByProduce(produceSlug: string, pagination?: PaginationModel) {
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) {
+    params.set("p", String(pagination.p))
+  }
+  if (pagination?.limit) {
+    params.set("limit", String(pagination.limit))
+  }
+  const qs = params.toString()
+  const url = `${BaseURL}/prices/produce/${produceSlug}${qs ? `?${qs}` : ""}`
   return api.get(url)
 }
 
@@ -323,8 +331,13 @@ export function querySprayProgramBySlug(slug: string) {
 }
 
 // Animal Health
-export function queryAnimalHealthCategories() {
-  const url = `${BaseURL}/animalhealthcategories/`
+export function queryAnimalHealthCategories(usedOn?: string) {
+  const params = new URLSearchParams()
+  if (usedOn) {
+    params.set('used_on', usedOn)
+  }
+  const qs = params.toString()
+  const url = `${BaseURL}/animalhealthcategories/${qs ? `?${qs}` : ''}`
   return api.get(url)
 }
 
@@ -354,7 +367,7 @@ export function queryAllAnimalHealthProducts(pagination?: PaginationModel & { br
   return api.get(url)
 }
 
-export function queryAnimalHealthProductsByCategory(options: { category: string } & PaginationModel & { brand?: string[], target?: string[], active_ingredient?: string[] }) {
+export function queryAnimalHealthProductsByCategory(options: { category: string } & PaginationModel & { brand?: string[], target?: string[], active_ingredient?: string[], used_on?: string[] }) {
   const params = new URLSearchParams()
 
   if (options.p !== undefined && options.p >= 2) {
@@ -369,6 +382,9 @@ export function queryAnimalHealthProductsByCategory(options: { category: string 
   }
   if (options.active_ingredient && options.active_ingredient.length > 0) {
     options.active_ingredient.forEach(ai => params.append('active_ingredient', ai))
+  }
+  if (options.used_on && options.used_on.length > 0) {
+    options.used_on.forEach(u => params.append('used_on', u))
   }
 
   const queryString = params.toString()
