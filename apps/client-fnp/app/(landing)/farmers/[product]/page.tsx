@@ -7,7 +7,6 @@ import { ClientFilterSidebar } from "@/components/generic/clientFilterSidebar"
 import { ActionsSidebar } from "@/components/generic/actions-sidebar"
 import { CrossSellBanner } from "@/components/monetization/cross-sell-banner"
 import { ProductResources } from "@/components/monetization/product-resources"
-import { RelatedMarkets } from "@/components/monetization/related-markets"
 
 
 type Props = {
@@ -95,7 +94,6 @@ export default async function FarmersProductPage({ params }: FarmerProductPagePr
           </div>
         </div>
 
-        <RelatedMarkets currentProduct={product} context="farmer" />
       </div>
     </main>
   )

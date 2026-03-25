@@ -4,7 +4,7 @@ import {useCallback} from "react"
 import {usePathname, useRouter, useSearchParams} from "next/navigation"
 import {useQuery} from "@tanstack/react-query"
 import Link from "next/link"
-import {Search} from "lucide-react"
+import {Search, Users} from "lucide-react"
 
 import {Pagination} from "@/components/generic/pagination"
 import {Icons} from "@/components/icons/lucide"
@@ -73,6 +73,24 @@ export function Farmers({user, queryBy}: FarmersPageProps) {
     return null
   }
 
+  if (farmers.length === 0) {
+    const produceName = queryBy ? capitalizeFirstLetter(plural(queryBy)) : "Produce"
+    return (
+      <section className="mt-[21px]">
+        <div className="flex flex-col items-center justify-center py-16 px-6 text-center border rounded-lg bg-muted/30">
+          <Users className="h-12 w-12 text-muted-foreground/40 mb-4" />
+          <h3 className="text-lg font-semibold mb-1">No {produceName} Farmers Yet</h3>
+          <p className="text-sm text-muted-foreground max-w-md">
+            There are currently no registered {queryBy ? plural(queryBy) : ""} farmers on the platform.
+            Check back soon as new farmers join regularly.
+          </p>
+          <Link href="/farmers" className="mt-4 text-sm text-primary hover:underline">
+            Browse all farmers
+          </Link>
+        </div>
+      </section>
+    )
+  }
 
   return (
     <section className="space-y-8 mt-[21px]">
