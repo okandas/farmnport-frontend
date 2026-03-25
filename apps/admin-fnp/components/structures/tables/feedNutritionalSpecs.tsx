@@ -74,7 +74,7 @@ export function FeedNutritionalSpecsTable() {
     <DataTable
       columns={feedNutritionalSpecColumns}
       data={specs}
-      newUrl="/dashboard/feed-nutritional-specs/new"
+      newUrl="/dashboard/farmnport/feed-nutritional-specs/new"
       tableName="Feed Nutritional Spec"
       total={total}
       pagination={pagination}

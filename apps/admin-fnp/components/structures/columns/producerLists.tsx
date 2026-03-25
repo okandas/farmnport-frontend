@@ -51,7 +51,7 @@ export const producerPriceListColumns: ColumnDef<ProducerPriceList>[] = [
       const priceId = row.original.id
 
       return (
-        <Link href={`/dashboard/prices/${priceId}`}>
+        <Link href={`/dashboard/farmnport/prices/${priceId}`}>
           <Button variant="ghost" size="sm">
             View
           </Button>

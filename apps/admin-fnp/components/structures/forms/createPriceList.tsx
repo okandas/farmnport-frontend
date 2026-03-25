@@ -689,7 +689,7 @@ export function CreateProductPriceForm({
         description: "Created Product Price List Successfully",
       })
 
-      router.push(`/dashboard/prices`)
+      router.push(`/dashboard/farmnport/prices`)
     },
     onError: (error) => {
       if (isAxiosError(error)) {

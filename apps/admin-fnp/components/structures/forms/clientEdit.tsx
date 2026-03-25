@@ -164,7 +164,7 @@ export function EditForm({ client }: EditFormProps) {
         description: "Updated User Succesfully",
       })
 
-      router.push(`/dashboard/users`)
+      router.push(`/dashboard/farmnport/users`)
     },
     onError: (error) => {
       if (isAxiosError(error)) {

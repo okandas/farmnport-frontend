@@ -33,7 +33,7 @@ export function WeedGroupControlDropDown({
         <DropdownMenuItem>
           <Link
             className="w-full"
-            href={`/dashboard/weed-groups/${weedGroup?.id}/edit`}
+            href={`/dashboard/farmnport/weed-groups/${weedGroup?.id}/edit`}
           >
             Edit
           </Link>

@@ -74,7 +74,7 @@ export function FeedActiveIngredientsTable() {
     <DataTable
       columns={feedActiveIngredientColumns}
       data={ingredients}
-      newUrl="/dashboard/feed-active-ingredients/new"
+      newUrl="/dashboard/farmnport/feed-active-ingredients/new"
       tableName="Feed Active Ingredient"
       total={total}
       pagination={pagination}

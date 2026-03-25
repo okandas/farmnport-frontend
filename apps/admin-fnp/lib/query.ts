@@ -651,15 +651,15 @@ export function deleteAnimalHealthTargets(targetIds: string[]) {
 // Spray Program functions
 
 export function querySprayPrograms(pagination?: pagination) {
-  let url: string
+  const params = new URLSearchParams()
   if (pagination?.p !== undefined && pagination.p >= 2) {
-    url = `${baseUrl}/user/spray-programs?p=${pagination.p}`
-  } else {
-    url = `${baseUrl}/user/spray-programs`
+    params.set("p", String(pagination.p))
   }
   if (pagination?.search !== undefined && pagination.search.length >= 2) {
-    url = `${baseUrl}/user/spray-programs?search=${pagination.search}`
+    params.set("search", pagination.search)
   }
+  const qs = params.toString()
+  const url = `${baseUrl}/user/spray-programs${qs ? `?${qs}` : ""}`
   return api.get(url)
 }
 

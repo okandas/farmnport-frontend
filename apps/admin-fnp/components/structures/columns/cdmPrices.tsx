@@ -57,7 +57,7 @@ export const cdmPriceColumns: ColumnDef<CdmPrice>[] = [
     cell: ({ row }) => {
       const priceId = row.original.id
       return (
-        <Link href={`/dashboard/cdm-prices/${priceId}/edit`}>
+        <Link href={`/dashboard/farmnport/cdm-prices/${priceId}/edit`}>
           <Button variant="ghost" size="sm">
             View
           </Button>

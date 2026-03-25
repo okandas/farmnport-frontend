@@ -74,7 +74,7 @@ export function WeedGroupsTable() {
     <DataTable
       columns={weedGroupColumns}
       data={groups}
-      newUrl="/dashboard/weed-groups/new"
+      newUrl="/dashboard/farmnport/weed-groups/new"
       tableName="Weed Group"
       total={total}
       pagination={pagination}

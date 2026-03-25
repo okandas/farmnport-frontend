@@ -62,7 +62,7 @@ const proxyColumns = [
     header: "Client",
     cell: ({ row }) => {
       return (
-        <Link href={`/dashboard/users/${row.original.client_id}`} className="hover:underline">
+        <Link href={`/dashboard/farmnport/users/${row.original.client_id}`} className="hover:underline">
           {capitalizeFirstLetter(row.getValue("client_name"))}
         </Link>
       )

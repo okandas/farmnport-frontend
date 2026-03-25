@@ -17,7 +17,7 @@ export function SidebarNavigation({ navigationGroups }: SidebarNavigationProps) 
   const path = usePathname()
 
   const isActive = (href: string) =>
-    path === href || (href !== "/dashboard" && path.startsWith(href))
+    path === href || path.startsWith(href + "/")
 
   // Auto-expand the group that contains the active route
   const initialOpen = navigationGroups.reduce<Record<number, boolean>>(

@@ -175,7 +175,7 @@ export function ControlDropDown({ client }: ControlDropDownProps) {
         <DropdownMenuItem>
           <Link
             className="w-full"
-            href={`/dashboard/users/${slug(client?.name)}/edit`}
+            href={`/dashboard/farmnport/users/${slug(client?.name)}/edit`}
           >
             Edit
           </Link>
@@ -184,7 +184,7 @@ export function ControlDropDown({ client }: ControlDropDownProps) {
         <DropdownMenuItem>
           <Link
             className="w-full"
-            href={`/dashboard/users/${slug(client?.name)}`}
+            href={`/dashboard/farmnport/users/${slug(client?.name)}`}
           >
             View Client Details
           </Link>

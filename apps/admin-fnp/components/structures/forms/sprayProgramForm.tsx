@@ -140,7 +140,7 @@ export function SprayProgramForm({ sprayProgram, mode = "create" }: SprayProgram
         mutationFn: isEditMode ? updateSprayProgram : addSprayProgram,
         onSuccess: () => {
             toast({ description: isEditMode ? "Spray program updated!" : "Spray program created!" })
-            router.push("/dashboard/spray-programs")
+            router.push("/dashboard/farmnport/spray-programs")
         },
         onError: (error) => handleApiError(error, { context: "spray program" }),
     })

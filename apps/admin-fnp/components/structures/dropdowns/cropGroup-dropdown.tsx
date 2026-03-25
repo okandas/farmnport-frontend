@@ -33,7 +33,7 @@ export function CropGroupControlDropDown({
         <DropdownMenuItem>
           <Link
             className="w-full"
-            href={`/dashboard/crop-groups/${cropGroup?.id}/edit`}
+            href={`/dashboard/farmnport/crop-groups/${cropGroup?.id}/edit`}
           >
             Edit
           </Link>

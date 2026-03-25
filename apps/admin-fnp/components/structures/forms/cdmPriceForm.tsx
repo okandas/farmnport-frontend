@@ -133,7 +133,7 @@ export function CdmPriceForm({ price, mode }: CdmPriceFormProps) {
     mutationFn: addCdmPrice,
     onSuccess: () => {
       toast({ description: "CDM price created successfully" })
-      router.push("/dashboard/cdm-prices")
+      router.push("/dashboard/farmnport/cdm-prices")
     },
     onError: (error) => {
       handleApiError(error, { context: "CDM price creation" })
@@ -144,7 +144,7 @@ export function CdmPriceForm({ price, mode }: CdmPriceFormProps) {
     mutationFn: updateCdmPrice,
     onSuccess: () => {
       toast({ description: "CDM price updated successfully" })
-      router.push("/dashboard/cdm-prices")
+      router.push("/dashboard/farmnport/cdm-prices")
     },
     onError: (error) => {
       handleApiError(error, { context: "CDM price update" })
@@ -541,7 +541,7 @@ export function CdmPriceForm({ price, mode }: CdmPriceFormProps) {
             <Button
               type="button"
               variant="ghost"
-              onClick={() => router.push("/dashboard/cdm-prices")}
+              onClick={() => router.push("/dashboard/farmnport/cdm-prices")}
             >
               Cancel
             </Button>

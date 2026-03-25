@@ -73,7 +73,7 @@ export function ProducePriceLists() {
     <DataTable
       columns={producerPriceListColumns}
       data={producePriceLists}
-      newUrl="/dashboard/prices/new"
+      newUrl="/dashboard/farmnport/prices/new"
       tableName="Price"
       total={total}
       pagination={pagination}

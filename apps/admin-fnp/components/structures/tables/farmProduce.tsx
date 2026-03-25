@@ -80,7 +80,7 @@ export function FarmProduceTable() {
     <DataTable
       columns={farmProduceColumns}
       data={items}
-      newUrl="/dashboard/farmproduce/new"
+      newUrl="/dashboard/farmnport/farmproduce/new"
       tableName="Farm Produce"
       total={total}
       pagination={pagination}
