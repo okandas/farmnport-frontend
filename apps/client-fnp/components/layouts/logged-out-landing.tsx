@@ -151,11 +151,34 @@ function ArrowDownIcon(props: React.ComponentPropsWithoutRef<"svg">) {
 }
 
 function Featured() {
-    const categories = [
+    const resources = [
         {
-            name: "Pricing",
-            description: "Pricing data and market insights",
+            name: "Feeding Programs",
+            description: "Structured feeding schedules for optimal livestock growth at every stage.",
+            href: "/feeding-programs",
+            event: "LandingFeedingPrograms",
+            icon: (
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
+                </svg>
+            ),
+        },
+        {
+            name: "Animal Health Guides",
+            description: "Vaccines, antibiotics, dips and nutrition supplements for your livestock.",
+            href: "/animal-health-guides/all",
+            event: "LandingAnimalHealth",
+            icon: (
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5" />
+                </svg>
+            ),
+        },
+        {
+            name: "Market Prices",
+            description: "Real-time livestock pricing data to plan your sales and maximize profit.",
             href: "/prices",
+            event: "LandingMarketPrices",
             icon: (
                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" />
@@ -163,22 +186,13 @@ function Featured() {
             ),
         },
         {
-            name: "Shop",
-            description: "Quality inputs for your farm",
-            href: "/waiting-list-shop",
-            icon: (
-                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
-                </svg>
-            ),
-        },
-        {
-            name: "Chemical Guides",
-            description: "Expert agrochemical information",
+            name: "Agrochemical Guides",
+            description: "Crop protection products, herbicides, fungicides and insecticides.",
             href: "/agrochemical-guides",
+            event: "LandingAgrochemicalGuides",
             icon: (
                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
                 </svg>
             ),
         },
@@ -187,39 +201,31 @@ function Featured() {
     return (
         <section className="bg-background py-12 lg:py-16">
             <div className="mx-auto max-w-7xl px-6 lg:px-8">
-                <div className="grid gap-8 lg:grid-cols-12 lg:gap-12 xl:gap-16">
-                    <div className="content-center lg:col-span-6 order-1 lg:order-2">
-                        <h2 className="mb-4 text-4xl font-bold leading-none tracking-tight sm:text-5xl font-heading">
-                            Your Complete Farm Hub
-                        </h2>
-                        <p className="mb-6 max-w-2xl text-lg text-muted-foreground md:mb-8">
-                            Search active ingredients, discover how pesticides and herbicides work, find what targets specific pests and diseases, then shop for the right products. Find reputable and verified buyers for your produce and get real-time market prices to plan your harvest sales.
-                        </p>
-                    </div>
-                    <div className="lg:col-span-6 order-2 lg:order-1">
-                        <div className="grid gap-4 sm:grid-cols-1">
-                            {categories.map((category) => (
-                                <Link
-                                    key={category.name}
-                                    href={category.href}
-                                    className="group flex items-start gap-4 rounded-lg border bg-card text-card-foreground p-4 shadow-sm transition hover:border-orange-500 hover:shadow-md"
-                                    onClick={() => sendGTMEvent({ event: "click", value: `CategoryCard${category.name.replace(/\s+/g, '')}` })}
-                                >
-                                    <div className="relative mt-1 flex h-10 w-10 flex-none items-center justify-center rounded-full shadow-md shadow-zinc-800/5 ring-1 ring-zinc-900/5 dark:border dark:border-zinc-700/50 dark:bg-zinc-800 dark:ring-0 group-hover:bg-orange-600 group-hover:text-white dark:group-hover:bg-orange-500">
-                                        {category.icon}
-                                    </div>
-                                    <div>
-                                        <h3 className="mb-1 text-lg font-semibold">
-                                            {category.name}
-                                        </h3>
-                                        <p className="text-sm text-muted-foreground">
-                                            {category.description}
-                                        </p>
-                                    </div>
-                                </Link>
-                            ))}
-                        </div>
-                    </div>
+                <div className="mx-auto max-w-2xl lg:mx-0">
+                    <h2 className="mb-4 text-4xl font-bold leading-none tracking-tight sm:text-5xl font-heading">
+                        Your Complete Farm Hub
+                    </h2>
+                    <p className="mb-6 max-w-2xl text-lg text-muted-foreground md:mb-8">
+                        Access feeding programs, animal health guides, market prices and crop protection information to grow your farm.
+                    </p>
+                </div>
+                <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:mt-12">
+                    {resources.map((resource) => (
+                        <Link
+                            key={resource.name}
+                            href={resource.href}
+                            className="group flex items-start gap-4 rounded-lg border bg-card text-card-foreground p-5 shadow-sm transition hover:border-orange-500 hover:shadow-md"
+                            onClick={() => sendGTMEvent({ event: "click", value: resource.event })}
+                        >
+                            <div className="relative mt-1 flex h-10 w-10 flex-none items-center justify-center rounded-full shadow-md shadow-zinc-800/5 ring-1 ring-zinc-900/5 dark:border dark:border-zinc-700/50 dark:bg-zinc-800 dark:ring-0 group-hover:bg-orange-600 group-hover:text-white dark:group-hover:bg-orange-500 transition-colors">
+                                {resource.icon}
+                            </div>
+                            <div>
+                                <h3 className="text-sm font-semibold">{resource.name}</h3>
+                                <p className="text-xs text-muted-foreground mt-1">{resource.description}</p>
+                            </div>
+                        </Link>
+                    ))}
                 </div>
             </div>
         </section>
@@ -289,3 +295,4 @@ function FeaturedPopularSection() {
         </div>
     )
 }
+

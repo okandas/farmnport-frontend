@@ -12,9 +12,6 @@ import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
 
 const STAGE_STYLE = {
     dot: "bg-amber-600 dark:bg-amber-500",
-    bg: "bg-muted/40",
-    text: "text-foreground",
-    border: "border-border",
 }
 
 const PURPOSE_COLORS: Record<string, { bg: string; text: string; icon: any }> = {
@@ -44,7 +41,6 @@ export function FeedingProgramDetailClient({ program, slug }: FeedingProgramDeta
     const stageRefs = useRef<(HTMLDivElement | null)[]>([])
     const navRef = useRef<HTMLDivElement>(null)
 
-    // Extract unique brands from all recommendations
     const brands = useMemo(() => {
         if (!program?.stages) return []
         const brandMap = new Map<string, string>()
@@ -59,7 +55,6 @@ export function FeedingProgramDetailClient({ program, slug }: FeedingProgramDeta
         return Array.from(brandMap.values()).sort()
     }, [program?.stages])
 
-    // Filter stages' recommendations by selected brand
     const filteredStages = useMemo(() => {
         if (!program?.stages) return []
         if (!selectedBrand) return program.stages
@@ -108,20 +103,20 @@ export function FeedingProgramDetailClient({ program, slug }: FeedingProgramDeta
     return (
         <div className="min-h-screen bg-background">
             {/* Breadcrumb */}
-            <div className="border-b bg-muted/30">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div className="border-b">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
                     <nav className="flex text-sm text-muted-foreground">
-                        <Link href="/" className="hover:text-foreground">Home</Link>
+                        <Link href="/" className="hover:text-foreground transition-colors">Home</Link>
                         <span className="mx-2">/</span>
-                        <Link href="/feeding-programs" className="hover:text-foreground">Feeding Programs</Link>
+                        <Link href="/feeding-programs" className="hover:text-foreground transition-colors">Feeding Programs</Link>
                         <span className="mx-2">/</span>
                         <span className="text-foreground">{capitalizeFirstLetter(program.name)}</span>
                     </nav>
                 </div>
             </div>
 
-            {/* Hero Header */}
-            <section className="relative overflow-hidden">
+            {/* Hero */}
+            <section className="border-b">
                 {program.cover_image?.img?.src ? (
                     <div className="relative h-56 sm:h-72 lg:h-80">
                         <Image
@@ -134,69 +129,67 @@ export function FeedingProgramDetailClient({ program, slug }: FeedingProgramDeta
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
                         <div className="absolute bottom-0 left-0 right-0 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
-                            <div className="flex items-center gap-3 mb-3">
+                            <div className="flex items-center gap-2 mb-3">
                                 {program.farm_produce_name && (
-                                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-amber-100/90 text-amber-800 dark:bg-amber-900/60 dark:text-amber-300 backdrop-blur-sm">
+                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-100/90 text-amber-800 dark:bg-amber-900/60 dark:text-amber-300 backdrop-blur-sm">
                                         <Egg className="h-3 w-3" />
                                         {capitalizeFirstLetter(program.farm_produce_name)}
                                     </span>
                                 )}
-                                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white/90 text-foreground dark:bg-gray-900/60 dark:text-gray-200 backdrop-blur-sm">
-                                    {allStages.length} Feeding {allStages.length === 1 ? "Stage" : "Stages"}
+                                <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-white/90 text-foreground dark:bg-gray-900/60 dark:text-gray-200 backdrop-blur-sm">
+                                    {allStages.length} {allStages.length === 1 ? "Stage" : "Stages"}
                                 </span>
                             </div>
-                            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground">
+                            <h1 className="text-3xl sm:text-4xl font-bold font-heading tracking-tight">
                                 {capitalizeFirstLetter(program.name)}
                             </h1>
                             {program.description && (
-                                <p className="mt-3 text-base sm:text-lg text-muted-foreground max-w-2xl">
+                                <p className="mt-2 text-sm sm:text-base text-muted-foreground max-w-2xl">
                                     {program.description}
                                 </p>
                             )}
                         </div>
                     </div>
                 ) : (
-                    <div className="relative bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/20 py-12 lg:py-16">
-                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                            <div className="flex items-center gap-3 mb-3">
-                                {program.farm_produce_name && (
-                                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">
-                                        <Egg className="h-3 w-3" />
-                                        {capitalizeFirstLetter(program.farm_produce_name)}
-                                    </span>
-                                )}
-                                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-muted text-muted-foreground">
-                                    {allStages.length} Feeding {allStages.length === 1 ? "Stage" : "Stages"}
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-8">
+                        <div className="flex items-center gap-2 mb-3">
+                            {program.farm_produce_name && (
+                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-600/10 dark:bg-amber-950/30 dark:text-amber-400">
+                                    <Egg className="h-3 w-3" />
+                                    {capitalizeFirstLetter(program.farm_produce_name)}
                                 </span>
-                            </div>
-                            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold">
-                                {capitalizeFirstLetter(program.name)}
-                            </h1>
-                            {program.description && (
-                                <p className="mt-3 text-base sm:text-lg text-muted-foreground max-w-2xl">
-                                    {program.description}
-                                </p>
                             )}
+                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-muted text-muted-foreground">
+                                {allStages.length} {allStages.length === 1 ? "Stage" : "Stages"}
+                            </span>
                         </div>
+                        <h1 className="text-3xl sm:text-4xl font-bold font-heading tracking-tight">
+                            {capitalizeFirstLetter(program.name)}
+                        </h1>
+                        {program.description && (
+                            <p className="mt-2 text-sm text-muted-foreground max-w-2xl">
+                                {program.description}
+                            </p>
+                        )}
                     </div>
                 )}
             </section>
 
-            {/* Sticky Stage Navigator */}
+            {/* Sticky Stage Nav */}
             {allStages.length > 0 && (
-                <div ref={navRef} className="sticky top-16 z-20 bg-background/95 backdrop-blur-md border-b shadow-sm">
+                <div ref={navRef} className="sticky top-16 z-20 bg-background/95 backdrop-blur-md border-b">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="flex gap-1 overflow-x-auto py-3 scrollbar-hide">
                             <button
                                 onClick={() => scrollToStage(0)}
-                                className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                                className={`flex-shrink-0 px-3.5 py-1.5 rounded-full text-sm font-medium transition-all ${
                                     activeStage === 0
-                                        ? "bg-primary text-primary-foreground"
+                                        ? "bg-primary text-primary-foreground shadow-sm"
                                         : "text-muted-foreground hover:text-foreground hover:bg-muted"
                                 }`}
                             >
                                 <span className="flex items-center gap-2">
-                                    <span className={`w-2 h-2 rounded-full ${activeStage === 0 ? "bg-primary-foreground" : STAGE_STYLE.dot}`} />
+                                    <span className={`w-1.5 h-1.5 rounded-full ${activeStage === 0 ? "bg-primary-foreground" : STAGE_STYLE.dot}`} />
                                     Overview
                                 </span>
                             </button>
@@ -207,14 +200,14 @@ export function FeedingProgramDetailClient({ program, slug }: FeedingProgramDeta
                                     <button
                                         key={index}
                                         onClick={() => scrollToStage(tabIndex)}
-                                        className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                                        className={`flex-shrink-0 px-3.5 py-1.5 rounded-full text-sm font-medium transition-all ${
                                             isActive
-                                                ? "bg-primary text-primary-foreground"
+                                                ? "bg-primary text-primary-foreground shadow-sm"
                                                 : "text-muted-foreground hover:text-foreground hover:bg-muted"
                                         }`}
                                     >
                                         <span className="flex items-center gap-2">
-                                            <span className={`w-2 h-2 rounded-full ${isActive ? "bg-primary-foreground" : STAGE_STYLE.dot}`} />
+                                            <span className={`w-1.5 h-1.5 rounded-full ${isActive ? "bg-primary-foreground" : STAGE_STYLE.dot}`} />
                                             {capitalizeFirstLetter(stage.name)}
                                         </span>
                                     </button>
@@ -225,7 +218,7 @@ export function FeedingProgramDetailClient({ program, slug }: FeedingProgramDeta
                 </div>
             )}
 
-            {/* Program Overview Chart */}
+            {/* Overview Table */}
             {stages.length > 0 && (() => {
                 const hasBrands = brands.length > 1
 
@@ -249,16 +242,16 @@ export function FeedingProgramDetailClient({ program, slug }: FeedingProgramDeta
                         className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8"
                     >
                         <div className="flex items-center justify-between mb-4">
-                            <h2 className="text-lg font-semibold text-foreground">Program Overview</h2>
+                            <h2 className="text-lg font-semibold">Program Overview</h2>
                             {hasBrands && (
-                                <div className="flex items-center gap-2">
-                                    <span className="text-xs text-muted-foreground">Brand:</span>
+                                <div className="flex items-center gap-1.5">
+                                    <span className="text-xs text-muted-foreground mr-1">Brand:</span>
                                     <button
                                         onClick={() => setSelectedBrand(null)}
                                         className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
                                             !selectedBrand
-                                                ? "bg-foreground text-background"
-                                                : "bg-muted text-muted-foreground hover:text-foreground"
+                                                ? "bg-primary text-primary-foreground shadow-sm"
+                                                : "border bg-card text-muted-foreground hover:text-foreground hover:border-primary/20"
                                         }`}
                                     >
                                         All
@@ -269,8 +262,8 @@ export function FeedingProgramDetailClient({ program, slug }: FeedingProgramDeta
                                             onClick={() => setSelectedBrand(brand)}
                                             className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
                                                 selectedBrand === brand
-                                                    ? "bg-foreground text-background"
-                                                    : "bg-muted text-muted-foreground hover:text-foreground"
+                                                    ? "bg-primary text-primary-foreground shadow-sm"
+                                                    : "border bg-card text-muted-foreground hover:text-foreground hover:border-primary/20"
                                             }`}
                                         >
                                             {capitalizeFirstLetter(brand)}
@@ -279,33 +272,33 @@ export function FeedingProgramDetailClient({ program, slug }: FeedingProgramDeta
                                 </div>
                             )}
                         </div>
-                        <div className="rounded-xl border border-border overflow-hidden">
+                        <div className="rounded-xl border bg-card shadow-sm overflow-hidden">
                             <div className="overflow-x-auto">
-                                <table className="w-full border-collapse min-w-[640px]">
+                                <table className="w-full text-sm min-w-[640px]">
                                     <thead>
-                                        <tr className="bg-muted/60">
-                                            <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide p-3 w-36 border-r border-border sticky left-0 bg-muted/60 z-10">
+                                        <tr className="bg-muted/50">
+                                            <th className="text-left text-[11px] font-medium text-muted-foreground uppercase tracking-wider px-4 py-3 w-36 sticky left-0 bg-muted/50 z-10">
                                                 Purpose
                                             </th>
                                             {stages.map((stage: any, idx: number) => (
-                                                <th key={idx} className="text-center p-3 border-r border-border last:border-r-0 min-w-[140px]">
-                                                    <div className="text-xs font-semibold text-foreground">{capitalizeFirstLetter(stage.name)}</div>
+                                                <th key={idx} className="text-center px-4 py-3 min-w-[140px]">
+                                                    <div className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">{capitalizeFirstLetter(stage.name)}</div>
                                                     {stage.timing_description && (
-                                                        <div className="text-[10px] text-muted-foreground font-normal mt-0.5">{stage.timing_description}</div>
+                                                        <div className="text-[10px] text-muted-foreground/70 font-normal mt-0.5">{stage.timing_description}</div>
                                                     )}
                                                 </th>
                                             ))}
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-border">
+                                    <tbody className="divide-y">
                                         {purposes.map((purpose) => {
                                             const stageMap = purposeMap.get(purpose)!
                                             const style = getPurposeStyle(purpose)
                                             const Icon = style.icon
                                             return (
-                                                <tr key={purpose} className="hover:bg-muted/20 transition-colors">
-                                                    <td className="p-3 border-r border-border sticky left-0 bg-background z-10">
-                                                        <div className={`inline-flex items-center gap-1.5 px-2 py-1 rounded text-[11px] font-medium ${style.bg} ${style.text}`}>
+                                                <tr key={purpose} className="group/row hover:bg-muted/30 transition-colors">
+                                                    <td className="px-4 py-3 sticky left-0 bg-card group-hover/row:bg-muted/30 z-10 transition-colors">
+                                                        <div className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] font-medium ${style.bg} ${style.text}`}>
                                                             <Icon className="h-3 w-3" />
                                                             {purpose}
                                                         </div>
@@ -313,14 +306,14 @@ export function FeedingProgramDetailClient({ program, slug }: FeedingProgramDeta
                                                     {stages.map((_: any, stageIdx: number) => {
                                                         const recs = stageMap.get(stageIdx) || []
                                                         return (
-                                                            <td key={stageIdx} className="p-2 border-r border-border last:border-r-0 align-top">
+                                                            <td key={stageIdx} className="px-3 py-2.5 align-top">
                                                                 {recs.length > 0 ? (
                                                                     <div className="space-y-1.5">
                                                                         {recs.map((rec: any, i: number) => (
                                                                             <button
                                                                                 key={i}
                                                                                 onClick={() => setQuickViewRec(rec)}
-                                                                                className={`block w-full text-left p-2 rounded ${style.bg} cursor-pointer hover:ring-1 hover:ring-current transition-all`}
+                                                                                className={`block w-full text-left px-2.5 py-1.5 rounded-md ${style.bg} cursor-pointer hover:ring-1 hover:ring-current transition-all`}
                                                                             >
                                                                                 <div className={`text-xs font-medium ${style.text} leading-tight`}>
                                                                                     {capitalizeFirstLetter(rec.feed_product_name)}
@@ -355,8 +348,8 @@ export function FeedingProgramDetailClient({ program, slug }: FeedingProgramDeta
                 </div>
             )}
 
-            {/* Stage Sections */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
+            {/* Stage Cards */}
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
                 {stages.map((stage: any, stageIndex: number) => {
                     const recommendations = stage.recommendations || []
 
@@ -364,12 +357,12 @@ export function FeedingProgramDetailClient({ program, slug }: FeedingProgramDeta
                         <div
                             key={stageIndex}
                             ref={(el) => { stageRefs.current[stageIndex + 1] = el }}
-                            className="rounded-xl border border-border overflow-hidden"
+                            className="rounded-xl border bg-card shadow-sm overflow-hidden"
                         >
-                            <div className="bg-muted/40 px-6 py-5">
+                            <div className="px-5 pt-5 pb-3">
                                 <div className="flex items-start justify-between flex-wrap gap-3">
                                     <div>
-                                        <h2 className="text-xl sm:text-2xl font-bold text-foreground">
+                                        <h2 className="text-lg font-bold font-heading tracking-tight">
                                             {capitalizeFirstLetter(stage.name)}
                                         </h2>
                                         {stage.description && (
@@ -379,7 +372,7 @@ export function FeedingProgramDetailClient({ program, slug }: FeedingProgramDeta
                                         )}
                                     </div>
                                     {stage.timing_description && (
-                                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-muted text-muted-foreground border border-border">
+                                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-muted text-muted-foreground">
                                             {stage.timing_description}
                                         </span>
                                     )}
@@ -387,17 +380,17 @@ export function FeedingProgramDetailClient({ program, slug }: FeedingProgramDeta
                             </div>
 
                             {recommendations.length > 0 ? (
-                                <div className="divide-y divide-border">
+                                <div className="divide-y">
                                     {recommendations.map((rec: any, recIndex: number) => {
                                         const purposeStyle = getPurposeStyle(rec.purpose)
                                         const PurposeIcon = purposeStyle.icon
 
                                         return (
-                                            <div key={recIndex} className="flex items-center gap-4 px-6 py-3 hover:bg-muted/30 transition-colors">
+                                            <div key={recIndex} className="flex items-center gap-4 px-5 py-3 hover:bg-muted/30 transition-colors group">
                                                 <div className="flex-1 min-w-0">
                                                     <button
                                                         onClick={() => setQuickViewRec(rec)}
-                                                        className="text-sm font-medium text-foreground hover:text-primary transition-colors text-left truncate block w-full cursor-pointer"
+                                                        className="text-sm font-medium text-foreground hover:text-primary transition-colors text-left truncate block w-full cursor-pointer group-hover:text-primary"
                                                     >
                                                         {capitalizeFirstLetter(rec.feed_product_name)}
                                                     </button>
@@ -405,7 +398,7 @@ export function FeedingProgramDetailClient({ program, slug }: FeedingProgramDeta
                                                         {rec.feed_product?.brand?.name && (
                                                             <span className="text-xs text-muted-foreground">{rec.feed_product.brand.name}</span>
                                                         )}
-                                                        <div className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium ${purposeStyle.bg} ${purposeStyle.text}`}>
+                                                        <div className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium ${purposeStyle.bg} ${purposeStyle.text}`}>
                                                             <PurposeIcon className="h-2.5 w-2.5" />
                                                             {rec.purpose}
                                                         </div>
@@ -415,9 +408,9 @@ export function FeedingProgramDetailClient({ program, slug }: FeedingProgramDeta
                                                 {rec.feed_product_slug && (
                                                     <Link
                                                         href={`/feeds/${rec.feed_product_slug}?ref=${slug}`}
-                                                        className="flex-shrink-0 text-xs font-medium text-primary hover:text-primary/80 transition-colors flex items-center gap-1"
+                                                        className="flex-shrink-0 text-xs font-medium text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 opacity-0 group-hover:opacity-100"
                                                     >
-                                                        View Product
+                                                        View
                                                         <ChevronRight className="h-3 w-3" />
                                                     </Link>
                                                 )}
@@ -426,7 +419,7 @@ export function FeedingProgramDetailClient({ program, slug }: FeedingProgramDeta
                                     })}
                                 </div>
                             ) : (
-                                <div className="p-6 text-sm text-muted-foreground">
+                                <div className="px-5 pb-5 text-sm text-muted-foreground">
                                     {selectedBrand
                                         ? `No ${selectedBrand} recommendations for this stage.`
                                         : "No feed recommendations for this stage yet."}
@@ -437,12 +430,12 @@ export function FeedingProgramDetailClient({ program, slug }: FeedingProgramDeta
                 })}
 
                 {/* Disclaimer */}
-                <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-6">
+                <div className="rounded-xl border border-yellow-200 dark:border-yellow-800/30 bg-yellow-50 dark:bg-yellow-950/20 p-5">
                     <div className="flex items-start gap-3">
-                        <AlertTriangle className="w-6 h-6 text-yellow-600 dark:text-yellow-500 flex-shrink-0" />
+                        <AlertTriangle className="w-5 h-5 text-yellow-600 dark:text-yellow-500 flex-shrink-0 mt-0.5" />
                         <div>
-                            <h3 className="font-semibold mb-2 text-yellow-900 dark:text-yellow-100">Important Notice</h3>
-                            <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                            <h3 className="text-sm font-semibold text-yellow-900 dark:text-yellow-100 mb-1">Important Notice</h3>
+                            <p className="text-xs text-yellow-800 dark:text-yellow-200 leading-relaxed">
                                 Always follow the manufacturer&apos;s feeding guidelines and recommended quantities. Feeding requirements may vary based on breed, climate, and individual animal condition. Consult a veterinarian or animal nutritionist for advice specific to your livestock operation.
                             </p>
                         </div>
@@ -457,44 +450,42 @@ export function FeedingProgramDetailClient({ program, slug }: FeedingProgramDeta
                         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
                         onClick={() => setQuickViewRec(null)}
                     />
-                    <div className="relative bg-background rounded-xl border shadow-2xl max-w-md w-full">
+                    <div className="relative bg-card rounded-xl border shadow-lg max-w-md w-full">
                         <button
                             onClick={() => setQuickViewRec(null)}
-                            className="absolute right-3 top-3 z-10 p-1.5 rounded-full bg-muted hover:bg-muted/80 transition-colors"
+                            className="absolute right-3 top-3 z-10 p-1.5 rounded-md hover:bg-muted transition-colors"
                         >
-                            <X className="h-4 w-4" />
+                            <X className="h-4 w-4 text-muted-foreground" />
                         </button>
 
                         <div className="p-5 space-y-4">
-                            <div className="flex items-start gap-4">
-                                <div className="flex-1 min-w-0">
-                                    <h3 className="text-lg font-bold leading-tight pr-8">
-                                        {capitalizeFirstLetter(quickViewRec.feed_product_name)}
-                                    </h3>
-                                    {quickViewRec.feed_product?.show_price && quickViewRec.feed_product?.sale_price > 0 && (
-                                        <div className="mt-2">
-                                            <span className="text-lg font-bold text-foreground">${quickViewRec.feed_product.sale_price.toFixed(2)}</span>
-                                            {quickViewRec.feed_product.was_price > quickViewRec.feed_product.sale_price && (
-                                                <span className="text-sm text-muted-foreground line-through ml-2">${quickViewRec.feed_product.was_price.toFixed(2)}</span>
-                                            )}
+                            <div>
+                                <h3 className="text-base font-bold leading-tight pr-8">
+                                    {capitalizeFirstLetter(quickViewRec.feed_product_name)}
+                                </h3>
+                                {quickViewRec.feed_product?.show_price && quickViewRec.feed_product?.sale_price > 0 && (
+                                    <div className="mt-2">
+                                        <span className="text-lg font-bold text-foreground">${quickViewRec.feed_product.sale_price.toFixed(2)}</span>
+                                        {quickViewRec.feed_product.was_price > quickViewRec.feed_product.sale_price && (
+                                            <span className="text-sm text-muted-foreground line-through ml-2">${quickViewRec.feed_product.was_price.toFixed(2)}</span>
+                                        )}
+                                    </div>
+                                )}
+                                {quickViewRec.purpose && (() => {
+                                    const style = getPurposeStyle(quickViewRec.purpose)
+                                    const Icon = style.icon
+                                    return (
+                                        <div className={`inline-flex items-center gap-1 mt-2 px-2 py-0.5 rounded-md text-[11px] font-medium ${style.bg} ${style.text}`}>
+                                            <Icon className="h-3 w-3" />
+                                            {quickViewRec.purpose}
                                         </div>
-                                    )}
-                                    {quickViewRec.purpose && (() => {
-                                        const style = getPurposeStyle(quickViewRec.purpose)
-                                        const Icon = style.icon
-                                        return (
-                                            <div className={`inline-flex items-center gap-1 mt-2 px-2 py-0.5 rounded text-[11px] font-medium ${style.bg} ${style.text}`}>
-                                                <Icon className="h-3 w-3" />
-                                                {quickViewRec.purpose}
-                                            </div>
-                                        )
-                                    })()}
-                                </div>
+                                    )
+                                })()}
                             </div>
 
                             {quickViewRec.notes && (
-                                <div className="bg-muted/30 rounded-lg p-3 border">
-                                    <p className="text-sm text-foreground">{quickViewRec.notes}</p>
+                                <div className="rounded-lg bg-muted/50 p-3">
+                                    <p className="text-sm text-muted-foreground">{quickViewRec.notes}</p>
                                 </div>
                             )}
                         </div>
@@ -503,7 +494,7 @@ export function FeedingProgramDetailClient({ program, slug }: FeedingProgramDeta
                             <div className="px-5 pb-5">
                                 <Link
                                     href={`/feeds/${quickViewRec.feed_product_slug}?ref=${slug}`}
-                                    className="flex items-center justify-center gap-2 w-full py-2 rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                                    className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
                                     onClick={() => setQuickViewRec(null)}
                                 >
                                     View Full Product

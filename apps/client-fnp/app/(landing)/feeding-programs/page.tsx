@@ -1,7 +1,6 @@
-import Link from "next/link"
-import { Egg, Layers, ChevronRight } from "lucide-react"
+import { Egg } from "lucide-react"
 import { queryPublishedFeedingPrograms } from "@/lib/query"
-import { capitalizeFirstLetter } from "@/lib/utilities"
+import { FeedingProgramsGrid } from "@/components/structures/feeding-programs-grid"
 
 export default async function FeedingProgramsPage() {
     let programs: any[] = []
@@ -23,7 +22,7 @@ export default async function FeedingProgramsPage() {
                 </div>
             </section>
             <section className="mx-auto max-w-7xl px-6 lg:px-8 py-8">
-                {programs.length === 0 && (
+                {programs.length === 0 ? (
                     <div className="text-center py-16">
                         <div className="mx-auto w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
                             <Egg className="w-8 h-8 text-muted-foreground" />
@@ -31,30 +30,8 @@ export default async function FeedingProgramsPage() {
                         <h2 className="text-lg font-semibold mb-1">No Feeding Programs Yet</h2>
                         <p className="text-sm text-muted-foreground max-w-md mx-auto">We're working on creating comprehensive feeding programs. Check back soon.</p>
                     </div>
-                )}
-                {programs.length > 0 && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {programs.map((program: any) => (
-                            <Link key={program.id} href={`/feeding-programs/${program.slug}`} className="group rounded-xl border bg-card overflow-hidden hover:shadow-md hover:border-primary/20 transition-all">
-                                <div className="p-4">
-                                    <h2 className="text-sm font-bold font-heading mb-1 group-hover:text-primary transition-colors">{capitalizeFirstLetter(program.name)}</h2>
-                                    {program.farm_produce_name && (
-                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-600/10 dark:bg-amber-950/30 dark:text-amber-400 mb-2">{capitalizeFirstLetter(program.farm_produce_name)}</span>
-                                    )}
-                                    {program.description && (
-                                        <p className="text-xs text-muted-foreground line-clamp-2 mb-3">{program.description}</p>
-                                    )}
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                                            <Layers className="h-3 w-3" />
-                                            <span>{program.stages?.length || 0} stages</span>
-                                        </div>
-                                        <ChevronRight className="h-3.5 w-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                                    </div>
-                                </div>
-                            </Link>
-                        ))}
-                    </div>
+                ) : (
+                    <FeedingProgramsGrid programs={programs} />
                 )}
             </section>
         </main>

@@ -60,10 +60,8 @@ export function PriceCard({ priceList }: PriceCardProps) {
   const categories = pricingTypes[priceList.client_specialization] || []
 
   return (
-    <div className="group relative rounded-2xl border bg-card shadow-sm transition-all duration-300 hover:shadow-md hover:border-primary/30 overflow-hidden">
-      <div className="h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500" />
-
-      <div className="p-6 border-b bg-muted/20">
+    <div className="group relative rounded-xl border bg-card shadow-sm transition-all duration-200 hover:shadow-md hover:border-primary/20">
+      <div className="p-6">
         <div className="flex items-start justify-between mb-3">
           <div className="flex-1">
             <h3 className="text-2xl font-bold font-heading text-card-foreground mb-2">
@@ -107,16 +105,16 @@ export function PriceCard({ priceList }: PriceCardProps) {
           if (gradeEntries.length === 0) return null
 
           return (
-            <div key={typeIndex} className="rounded-xl border bg-card/50 overflow-hidden">
-              <div className="px-4 py-3 bg-muted/30 border-b">
-                <h4 className="text-base font-semibold text-card-foreground">
-                  {capitalizeFirstLetter(pricingType)}
+            <div key={typeIndex} className="rounded-xl border bg-card/50">
+              <div className="px-4 pt-3 pb-1">
+                <h4 className="text-sm font-bold tracking-tight">
+                  {capitalizeFirstLetter(pricingType)} Prices
                 </h4>
               </div>
 
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-border">
-                  <thead className="bg-muted/20">
+                  <thead>
                     <tr>
                       <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                         Grade
@@ -173,7 +171,7 @@ export function PriceCard({ priceList }: PriceCardProps) {
         })}
       </div>
 
-      <div className="px-6 py-4 bg-muted/20 border-t">
+      <div className="px-6 py-4 border-t">
         <Link href={`/prices/${priceList.id}`}>
           <Button variant="ghost" className="w-full group/btn" size="sm">
             <span>View Detailed Breakdown</span>

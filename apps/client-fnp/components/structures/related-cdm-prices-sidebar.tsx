@@ -42,7 +42,7 @@ export function RelatedCdmPricesSidebar({ currentClientName, currentPriceId, all
           <div className="space-y-3">
             {sameClientPrices.map((price) => (
               <Link key={price.id} href={`/prices/cdm/${getCdmSlug(price)}`} className="block">
-                <div className="rounded-lg border bg-card p-3 hover:bg-muted/50 transition-colors">
+                <div className="rounded-xl border bg-card p-3 shadow-sm hover:shadow-md hover:border-primary/20 transition-all duration-200">
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <Calendar className="h-3 w-3" />
                     <span>{formatDate(price.effectiveDate)}</span>
@@ -62,7 +62,7 @@ export function RelatedCdmPricesSidebar({ currentClientName, currentPriceId, all
           <div className="space-y-3">
             {otherClientPrices.map((price) => (
               <Link key={price.id} href={`/prices/cdm/${getCdmSlug(price)}`} className="block">
-                <div className="rounded-lg border bg-card p-3 hover:bg-muted/50 transition-colors">
+                <div className="rounded-xl border bg-card p-3 shadow-sm hover:shadow-md hover:border-primary/20 transition-all duration-200">
                   <p className="text-sm font-medium text-foreground mb-1">
                     {capitalizeFirstLetter(price.client_name)}
                   </p>

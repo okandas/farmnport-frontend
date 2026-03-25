@@ -1,5 +1,6 @@
 import { PriceCardsView } from "@/components/structures/price-cards-view"
 import { CdmPriceCardsView } from "@/components/structures/cdm-price-cards-view"
+import { ProduceCategoriesView } from "@/components/structures/produce-categories-view"
 import Link from "next/link"
 import { ArrowRight, Scale, Beef } from "lucide-react"
 
@@ -18,27 +19,6 @@ export const metadata = {
   },
 }
 
-const categories = [
-  {
-    title: "Liveweight Prices",
-    tag: "LWT",
-    description: "Per kg delivered rates for cattle, sheep, goats and pigs — by grade, teeth category and weight range.",
-    href: "/prices/lwt",
-    icon: Scale,
-    gradient: "from-emerald-500 to-teal-600",
-    iconBg: "bg-emerald-500",
-  },
-  {
-    title: "Cold Dress Mass",
-    tag: "CDM",
-    description: "Carcass grade pricing from abattoirs — commercial, economy and manufacturing grades, ex leakage.",
-    href: "/prices/cdm",
-    icon: Beef,
-    gradient: "from-blue-500 to-indigo-600",
-    iconBg: "bg-blue-500",
-  },
-]
-
 export default async function PricesPage() {
   return (
     <main>
@@ -55,74 +35,50 @@ export default async function PricesPage() {
         </div>
       </section>
 
-      {/* Categories */}
+      {/* Prices by Produce */}
       <section className="mx-auto max-w-7xl px-6 lg:px-8 py-8">
-        <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">Browse by type</h2>
-
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {categories.map((cat) => {
-            const Icon = cat.icon
-            return (
-              <Link key={cat.href} href={cat.href} className="group block">
-                <div className="relative h-full rounded-xl border bg-card p-4 hover:shadow-md hover:border-primary/20 transition-all">
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className={`flex items-center justify-center h-8 w-8 rounded-lg bg-gradient-to-br ${cat.gradient}`}>
-                      <Icon className="h-4 w-4 text-white" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-sm font-bold font-heading group-hover:text-primary transition-colors">
-                        {cat.title}
-                      </h3>
-                      <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">
-                        {cat.tag}
-                      </span>
-                    </div>
-                    <ArrowRight className="h-3.5 w-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
-                  </div>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    {cat.description}
-                  </p>
-                </div>
-              </Link>
-            )
-          })}
-
-          <div className="relative h-full rounded-xl border border-dashed bg-muted/20 p-4 flex flex-col items-center justify-center text-center">
-            <p className="text-xs font-semibold text-muted-foreground">More coming soon</p>
-            <p className="mt-0.5 text-[11px] text-muted-foreground">
-              Grains, vegetables, dairy and more
-            </p>
-          </div>
-        </div>
+        <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">Prices by produce</h2>
+        <ProduceCategoriesView />
       </section>
 
-      {/* Latest Prices */}
-      <section className="border-t bg-muted/20">
+      {/* Price List Categories */}
+      <section className="border-t">
         <div className="mx-auto max-w-7xl px-6 lg:px-8 py-8">
-          <h2 className="text-lg font-bold font-heading mb-5">Latest Prices</h2>
-
-          <div className="grid md:grid-cols-2 gap-6">
-            <div>
-              <div className="flex items-center gap-2 mb-3">
-                <div className="flex items-center justify-center h-6 w-6 rounded-md bg-gradient-to-br from-emerald-500 to-teal-600">
-                  <Scale className="h-3 w-3 text-white" />
+          <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">Price lists by type</h2>
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="group rounded-xl border bg-card shadow-sm hover:shadow-md hover:border-primary/20 transition-all duration-200">
+              <div className="flex items-center justify-between px-4 pt-4 pb-2">
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-center h-5 w-5 rounded-md bg-gradient-to-br from-emerald-500 to-teal-600">
+                    <Scale className="h-2.5 w-2.5 text-white" />
+                  </div>
+                  <h3 className="text-sm font-bold tracking-tight">Liveweight Prices</h3>
                 </div>
-                <h3 className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Liveweight</h3>
+                <Link href="/prices/lwt" className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-primary transition-colors">
+                  View all
+                  <ArrowRight className="h-3 w-3 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                </Link>
               </div>
-              <div className="rounded-lg border bg-card px-3">
-                <PriceCardsView limit={4} viewAllHref="/prices/lwt" />
+              <div className="px-3 pb-1">
+                <PriceCardsView limit={4} />
               </div>
             </div>
 
-            <div>
-              <div className="flex items-center gap-2 mb-3">
-                <div className="flex items-center justify-center h-6 w-6 rounded-md bg-gradient-to-br from-blue-500 to-indigo-600">
-                  <Beef className="h-3 w-3 text-white" />
+            <div className="group rounded-xl border bg-card shadow-sm hover:shadow-md hover:border-primary/20 transition-all duration-200">
+              <div className="flex items-center justify-between px-4 pt-4 pb-2">
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-center h-5 w-5 rounded-md bg-gradient-to-br from-blue-500 to-indigo-600">
+                    <Beef className="h-2.5 w-2.5 text-white" />
+                  </div>
+                  <h3 className="text-sm font-bold tracking-tight">Cold Dress Mass Prices</h3>
                 </div>
-                <h3 className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Cold Dress Mass</h3>
+                <Link href="/prices/cdm" className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-primary transition-colors">
+                  View all
+                  <ArrowRight className="h-3 w-3 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                </Link>
               </div>
-              <div className="rounded-lg border bg-card px-3">
-                <CdmPriceCardsView limit={4} viewAllHref="/prices/cdm" />
+              <div className="px-3 pb-1">
+                <CdmPriceCardsView limit={4} />
               </div>
             </div>
           </div>

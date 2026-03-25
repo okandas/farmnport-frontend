@@ -3,6 +3,7 @@ const nextConfig = {
   /* config options here */
   output: "standalone",
   images: {
+    dangerouslyAllowLocalIP: true,
     remotePatterns: [
       {
         protocol: 'https',

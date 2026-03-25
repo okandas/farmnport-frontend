@@ -85,8 +85,8 @@ export default async function FeedDetailPage({ params }: FeedDetailPageProps) {
             />
 
             {/* Breadcrumb */}
-            <div className="border-b bg-muted/30">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div className="border-b">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
                     <FeedBreadcrumb productName={product.name} />
                 </div>
             </div>

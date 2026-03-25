@@ -87,25 +87,6 @@ export default async function AgrochemicalGuidesPage() {
                 </div>
             </section>
 
-            {/* Quick Stats */}
-            <section className="border-y bg-card/50">
-                <div className="mx-auto max-w-7xl px-6 lg:px-8">
-                    <div className="grid grid-cols-3 divide-x">
-                        <div className="py-6 text-center">
-                            <div className="text-2xl sm:text-3xl font-bold text-primary">{categories.length || "10"}+</div>
-                            <div className="text-xs sm:text-sm text-muted-foreground mt-1">Product Categories</div>
-                        </div>
-                        <div className="py-6 text-center">
-                            <div className="text-2xl sm:text-3xl font-bold text-primary">{sprayPrograms.length || "0"}</div>
-                            <div className="text-xs sm:text-sm text-muted-foreground mt-1">Spray Programs</div>
-                        </div>
-                        <div className="py-6 text-center">
-                            <div className="text-2xl sm:text-3xl font-bold text-primary">Free</div>
-                            <div className="text-xs sm:text-sm text-muted-foreground mt-1">Always Free Access</div>
-                        </div>
-                    </div>
-                </div>
-            </section>
 
             {/* Spray Programs Section */}
             {sprayPrograms.length > 0 && (
@@ -137,7 +118,7 @@ export default async function AgrochemicalGuidesPage() {
                                 <Link
                                     key={program.id}
                                     href={`/spray-programs/${program.slug}`}
-                                    className="group rounded-lg border bg-card overflow-hidden hover:border-primary hover:shadow-md transition-all duration-300"
+                                    className="group rounded-xl border bg-card shadow-sm hover:shadow-md hover:border-primary/20 transition-all duration-200"
                                 >
                                     <div className="p-3">
                                         <h3 className="font-semibold text-sm mb-1 group-hover:text-primary transition-colors line-clamp-1">
