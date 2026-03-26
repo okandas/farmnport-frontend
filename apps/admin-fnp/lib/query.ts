@@ -917,3 +917,71 @@ export function queryDashboardStats() {
   let url = `${baseUrl}/user/dashboard-stats`
   return api.get(url)
 }
+
+// Restaurants
+export function addRestaurant(data: { name: string; status: string }) {
+  let url = `${baseUrl}/restaurants/add`
+  return api.post(url, data)
+}
+
+export function queryRestaurants(pagination?: pagination) {
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) {
+    params.set("p", String(pagination.p))
+  }
+  if (pagination?.search !== undefined && pagination.search.length >= 2) {
+    params.set("search", pagination.search)
+  }
+  const qs = params.toString()
+  const url = `${baseUrl}/restaurants/list${qs ? `?${qs}` : ""}`
+  return api.get(url)
+}
+
+export function queryRestaurant(id: string) {
+  let url = `${baseUrl}/restaurants/get/${id}`
+  return api.get(url)
+}
+
+export function updateRestaurant(data: any) {
+  let url = `${baseUrl}/restaurants/update`
+  return api.post(url, data)
+}
+
+export function deleteRestaurant(id: string) {
+  let url = `${baseUrl}/restaurants/delete/${id}`
+  return api.delete(url)
+}
+
+// Restaurant Locations
+export function addRestaurantLocation(data: any) {
+  let url = `${baseUrl}/restaurant-locations/add`
+  return api.post(url, data)
+}
+
+export function queryRestaurantLocations(pagination?: pagination) {
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) {
+    params.set("p", String(pagination.p))
+  }
+  if (pagination?.search !== undefined && pagination.search.length >= 2) {
+    params.set("search", pagination.search)
+  }
+  const qs = params.toString()
+  const url = `${baseUrl}/restaurant-locations/list${qs ? `?${qs}` : ""}`
+  return api.get(url)
+}
+
+export function queryRestaurantLocation(id: string) {
+  let url = `${baseUrl}/restaurant-locations/get/${id}`
+  return api.get(url)
+}
+
+export function updateRestaurantLocation(data: any) {
+  let url = `${baseUrl}/restaurant-locations/update`
+  return api.post(url, data)
+}
+
+export function deleteRestaurantLocation(id: string) {
+  let url = `${baseUrl}/restaurant-locations/delete/${id}`
+  return api.delete(url)
+}

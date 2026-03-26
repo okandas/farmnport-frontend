@@ -25,12 +25,12 @@ export default function AppSelectorPage() {
           </Link>
 
           <Link
-            href="/dashboard/menus"
+            href="/dashboard/restaurants"
             className="rounded-lg border bg-card p-6 text-card-foreground shadow-sm hover:bg-accent transition-colors"
           >
-            <h2 className="text-lg font-semibold">menus</h2>
+            <h2 className="text-lg font-semibold">restaurants</h2>
             <p className="text-sm text-muted-foreground">
-              Manage restaurant menus and items
+              Manage restaurant listings and locations
             </p>
           </Link>
         </div>

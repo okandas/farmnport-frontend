@@ -1058,3 +1058,77 @@ export type CdmPriceResponse = {
   total: number
   data: CdmPrice[]
 }
+
+// Restaurant
+export const RestaurantSchema = z.object({
+  id: z.string(),
+  name: z.string().min(1, "Restaurant name is required").max(120, "Name cannot exceed 120 characters"),
+  slug: z.string().optional(),
+  status: z.enum(["active", "inactive", "closed"]).default("active"),
+  created: z.string().optional(),
+  updated: z.string().optional(),
+})
+
+export const FormRestaurantSchema = RestaurantSchema.pick({
+  name: true,
+  status: true,
+})
+
+export type Restaurant = z.infer<typeof RestaurantSchema>
+export type FormRestaurantModel = z.infer<typeof FormRestaurantSchema>
+
+export type RestaurantResponse = {
+  total: number
+  data: Restaurant[]
+}
+
+// Restaurant Location
+export const OperatingHourSchema = z.object({
+  day: z.string(),
+  open: z.string().default("07:00"),
+  close: z.string().default("23:00"),
+  closed: z.boolean().default(false),
+})
+
+export const RestaurantLocationSchema = z.object({
+  id: z.string(),
+  restaurant_id: z.string().min(1, "Restaurant is required"),
+  restaurant_name: z.string().optional(),
+  name: z.string().min(1, "Location name is required").max(120, "Name cannot exceed 120 characters"),
+  address: z.string().min(1, "Address is required"),
+  phone: z.string().min(1, "Phone number is required"),
+  email: z.string().email().optional().or(z.literal("")),
+  latitude: z.coerce.number().optional().default(0),
+  longitude: z.coerce.number().optional().default(0),
+  place_id: z.string().optional().default(""),
+  whatsapp_available: z.boolean().default(false),
+  show_number: z.boolean().default(false),
+  is_main: z.boolean().default(false),
+  operating_hours: z.array(OperatingHourSchema).default([]),
+  status: z.enum(["active", "inactive", "closed"]).default("active"),
+  created: z.string().optional(),
+  updated: z.string().optional(),
+})
+
+export const FormRestaurantLocationSchema = RestaurantLocationSchema.pick({
+  restaurant_id: true,
+  name: true,
+  address: true,
+  phone: true,
+  email: true,
+  latitude: true,
+  longitude: true,
+  place_id: true,
+  operating_hours: true,
+  status: true,
+})
+
+export type OperatingHour = z.infer<typeof OperatingHourSchema>
+
+export type RestaurantLocation = z.infer<typeof RestaurantLocationSchema>
+export type FormRestaurantLocationModel = z.infer<typeof FormRestaurantLocationSchema>
+
+export type RestaurantLocationResponse = {
+  total: number
+  data: RestaurantLocation[]
+}

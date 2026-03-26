@@ -1,16 +1,16 @@
 import Link from "next/link"
-import { menusDashboardConfig } from "@/config/menus-dashboard"
+import { restaurantsDashboardConfig } from "@/config/restaurants-dashboard"
 import { AccountNavigation } from "@/components/navigation/account"
 import { SidebarNavigation } from "@/components/navigation/sidebar"
 import { ScrollArea } from "@/components/ui/scroll-area"
 
-interface MenusDashboardLayoutProps {
+interface RestaurantsDashboardLayoutProps {
   children?: React.ReactNode
 }
 
-export default async function MenusDashboardLayout({
+export default async function RestaurantsDashboardLayout({
   children,
-}: MenusDashboardLayoutProps) {
+}: RestaurantsDashboardLayoutProps) {
   return (
     <div className="flex flex-col min-h-screen">
       <header className="sticky top-0 z-40 border-b shadow-sm bg-background">
@@ -25,7 +25,7 @@ export default async function MenusDashboardLayout({
         <aside className="fixed top-16 hidden h-[calc(100vh-4rem)] w-[220px] flex-col border-r md:flex">
           <ScrollArea className="flex-1 px-4 py-4">
             <SidebarNavigation
-              navigationGroups={menusDashboardConfig.sidebarNavigation}
+              navigationGroups={restaurantsDashboardConfig.sidebarNavigation}
             />
           </ScrollArea>
         </aside>
