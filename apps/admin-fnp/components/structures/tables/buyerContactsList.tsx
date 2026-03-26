@@ -90,7 +90,7 @@ export function BuyerContactsList() {
     <DataTable
       columns={buyerContactsColumns}
       data={buyerContacts}
-      newUrl="/dashboard/buyer-contacts/new"
+      newUrl="/dashboard/farmnport/buyer-contacts/new"
       tableName="Buyer Contact"
       total={total}
       pagination={pagination}

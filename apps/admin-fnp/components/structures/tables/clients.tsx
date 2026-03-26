@@ -121,7 +121,7 @@ export function ClientsTable() {
     <DataTable
       columns={clientColumns}
       data={clients}
-      newUrl="/dashboard/users/new"
+      newUrl="/dashboard/farmnport/users/new"
       tableName="Client"
       total={total}
       pagination={pagination}

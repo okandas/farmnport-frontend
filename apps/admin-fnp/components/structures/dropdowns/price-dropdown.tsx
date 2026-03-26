@@ -66,7 +66,7 @@ export function PriceControlDropDown({ priceItem }: PriceControlDropDownProps) {
         <DropdownMenuItem>
           <Link
             className="w-full"
-            href={`/dashboard/prices/${priceItem?.id}/edit`}
+            href={`/dashboard/farmnport/prices/${priceItem?.id}/edit`}
           >
             Edit
           </Link>

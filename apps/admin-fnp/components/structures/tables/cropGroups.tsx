@@ -74,7 +74,7 @@ export function CropGroupsTable() {
     <DataTable
       columns={cropGroupColumns}
       data={groups}
-      newUrl="/dashboard/crop-groups/new"
+      newUrl="/dashboard/farmnport/crop-groups/new"
       tableName="Crop Group"
       total={total}
       pagination={pagination}

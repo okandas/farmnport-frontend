@@ -74,7 +74,7 @@ export function AnimalHealthCategoriesTable() {
     <DataTable
       columns={animalHealthCategoryColumns}
       data={categories}
-      newUrl="/dashboard/animal-health-categories/new"
+      newUrl="/dashboard/farmnport/animal-health-categories/new"
       tableName="Animal Health Category"
       total={total}
       pagination={pagination}

@@ -192,7 +192,7 @@ export function AgroChemicalForm({ agroChemical, mode = "create" }: AgroChemical
                     : "Added AgroChemical Successfully",
             })
 
-            router.push(`/dashboard/agrochemicals`)
+            router.push(`/dashboard/farmnport/agrochemicals`)
         },
         onError: (error) => {
             handleApiError(error, {

@@ -65,7 +65,7 @@ export function CdmPriceControlDropDown({ price }: CdmPriceControlDropDownProps)
         <DropdownMenuItem>
           <Link
             className="w-full"
-            href={`/dashboard/cdm-prices/${price?.id}/edit`}
+            href={`/dashboard/farmnport/cdm-prices/${price?.id}/edit`}
           >
             Edit
           </Link>

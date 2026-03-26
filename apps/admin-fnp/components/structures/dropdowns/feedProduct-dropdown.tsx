@@ -34,7 +34,7 @@ export function FeedProductControlDropDown({
         <DropdownMenuItem>
           <Link
             className="w-full"
-            href={`/dashboard/feed-products/${product?.id}/edit`}
+            href={`/dashboard/farmnport/feed-products/${product?.id}/edit`}
           >
             Edit
           </Link>

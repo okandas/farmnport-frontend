@@ -74,7 +74,7 @@ export function FeedCategoriesTable() {
     <DataTable
       columns={feedCategoryColumns}
       data={categories}
-      newUrl="/dashboard/feed-categories/new"
+      newUrl="/dashboard/farmnport/feed-categories/new"
       tableName="Feed Category"
       total={total}
       pagination={pagination}

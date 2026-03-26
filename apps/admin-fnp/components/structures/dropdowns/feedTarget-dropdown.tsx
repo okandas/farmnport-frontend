@@ -31,7 +31,7 @@ export function FeedTargetControlDropDown({
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>Actions</DropdownMenuLabel>
         <DropdownMenuItem>
-          <Link className="w-full" href={`/dashboard/feed-targets/${target?.id}/edit`}>
+          <Link className="w-full" href={`/dashboard/farmnport/feed-targets/${target?.id}/edit`}>
             Edit
           </Link>
         </DropdownMenuItem>

@@ -161,7 +161,7 @@ export function CreateForm({ client }: CreateFormProps) {
         description: "Created User Succesfully",
       })
 
-      router.push(`/dashboard/users`)
+      router.push(`/dashboard/farmnport/users`)
     },
     onError: (error) => {
       if (isAxiosError(error)) {

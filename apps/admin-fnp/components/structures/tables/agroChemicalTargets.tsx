@@ -74,7 +74,7 @@ export function AgroChemicalTargetsTable() {
     <DataTable
       columns={agroChemicalTargetColumns}
       data={targets}
-      newUrl="/dashboard/agrochemical-targets/new"
+      newUrl="/dashboard/farmnport/agrochemical-targets/new"
       tableName="AgroChemical Target"
       total={total}
       pagination={pagination}

@@ -16,7 +16,7 @@ export function SprayProgramsTable() {
 
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
-    pageSize: 20,
+    pageSize: 10,
   })
 
   const { isError, isLoading, isFetching, refetch, data, error } = useQuery({
@@ -73,7 +73,7 @@ export function SprayProgramsTable() {
     <DataTable
       columns={sprayProgramColumns}
       data={programs}
-      newUrl="/dashboard/spray-programs/new"
+      newUrl="/dashboard/farmnport/spray-programs/new"
       tableName="Spray Program"
       total={total}
       pagination={pagination}

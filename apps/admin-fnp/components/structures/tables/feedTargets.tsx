@@ -74,7 +74,7 @@ export function FeedTargetsTable() {
     <DataTable
       columns={feedTargetColumns}
       data={targets}
-      newUrl="/dashboard/feed-targets/new"
+      newUrl="/dashboard/farmnport/feed-targets/new"
       tableName="Feed Target"
       total={total}
       pagination={pagination}

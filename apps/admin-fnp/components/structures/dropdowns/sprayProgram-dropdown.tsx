@@ -33,7 +33,7 @@ export function SprayProgramControlDropDown({
         <DropdownMenuItem>
           <Link
             className="w-full"
-            href={`/dashboard/spray-programs/${program?.slug || program?.id}/edit`}
+            href={`/dashboard/farmnport/spray-programs/${program?.slug || program?.id}/edit`}
           >
             Edit
           </Link>

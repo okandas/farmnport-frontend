@@ -72,7 +72,7 @@ export function CdmPriceLists() {
     <DataTable
       columns={cdmPriceColumns}
       data={cdmPrices}
-      newUrl="/dashboard/cdm-prices/new"
+      newUrl="/dashboard/farmnport/cdm-prices/new"
       tableName="CDM Price"
       total={total}
       pagination={pagination}

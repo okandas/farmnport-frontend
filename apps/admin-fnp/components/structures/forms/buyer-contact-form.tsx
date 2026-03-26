@@ -62,7 +62,7 @@ export function BuyerContactForm() {
         title: "Success",
         description: "Buyer contact has been created successfully.",
       })
-      router.push("/dashboard/buyer-contacts")
+      router.push("/dashboard/farmnport/buyer-contacts")
       router.refresh()
     },
     onError: (error: any) => {

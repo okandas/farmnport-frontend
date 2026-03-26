@@ -35,7 +35,7 @@ export function BuyerContactDropDown({
         <DropdownMenuItem>
           <Link
             className="w-full"
-            href={`/dashboard/buyer-contacts/${contact?.id}/edit`}
+            href={`/dashboard/farmnport/buyer-contacts/${contact?.id}/edit`}
           >
             Edit
           </Link>

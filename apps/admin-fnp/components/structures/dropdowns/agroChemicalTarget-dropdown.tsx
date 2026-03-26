@@ -33,7 +33,7 @@ export function AgroChemicalTargetControlDropDown({
         <DropdownMenuItem>
           <Link
             className="w-full"
-            href={`/dashboard/agrochemical-targets/${target?.id}/edit`}
+            href={`/dashboard/farmnport/agrochemical-targets/${target?.id}/edit`}
           >
             Edit
           </Link>

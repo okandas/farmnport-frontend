@@ -570,7 +570,7 @@ export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
         description: "Updated Price Listing Successfully",
       })
 
-      router.push(`/dashboard/prices/${priceList.id}`)
+      router.push(`/dashboard/farmnport/prices/${priceList.id}`)
     },
     onError: (error) => {
       if (isAxiosError(error)) {
@@ -619,7 +619,7 @@ export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
           <Button
             type="button"
             variant="outline"
-            onClick={() => router.push("/dashboard/prices")}
+            onClick={() => router.push("/dashboard/farmnport/prices")}
             className="w-full"
           >
             <Icons.chevronLeft className="size-4 mr-2" />

@@ -74,7 +74,7 @@ export function AgroChemicalActiveIngredientsTable() {
     <DataTable
       columns={agroChemicalActiveIngredientColumns}
       data={ingredients}
-      newUrl="/dashboard/agrochemical-active-ingredients/new"
+      newUrl="/dashboard/farmnport/agrochemical-active-ingredients/new"
       tableName="AgroChemical Active Ingredient"
       total={total}
       pagination={pagination}

@@ -74,7 +74,7 @@ export function BrandsTable() {
     <DataTable
       columns={brandColumns}
       data={brands}
-      newUrl="/dashboard/brands/new"
+      newUrl="/dashboard/farmnport/brands/new"
       tableName="Brand"
       total={total}
       pagination={pagination}

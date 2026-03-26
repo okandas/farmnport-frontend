@@ -33,7 +33,7 @@ export function BrandControlDropDown({
         <DropdownMenuItem>
           <Link
             className="w-full"
-            href={`/dashboard/brands/${brand?.id}/edit`}
+            href={`/dashboard/farmnport/brands/${brand?.id}/edit`}
           >
             Edit
           </Link>

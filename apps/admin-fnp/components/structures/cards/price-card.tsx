@@ -244,7 +244,7 @@ export function PriceCard({ priceList }: PriceCardProps) {
 
       {/* Footer with action */}
       <div className="px-6 py-4 bg-gray-50/50 border-t border-gray-100">
-        <Link href={`/dashboard/prices/${priceList.id}`}>
+        <Link href={`/dashboard/farmnport/prices/${priceList.id}`}>
           <Button
             variant="ghost"
             className="w-full group/btn hover:bg-gray-900 hover:text-white transition-colors duration-200"

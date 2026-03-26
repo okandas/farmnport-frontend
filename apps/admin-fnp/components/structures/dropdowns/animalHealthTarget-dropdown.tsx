@@ -33,7 +33,7 @@ export function AnimalHealthTargetControlDropDown({
         <DropdownMenuItem>
           <Link
             className="w-full"
-            href={`/dashboard/animal-health-targets/${target?.id}/edit`}
+            href={`/dashboard/farmnport/animal-health-targets/${target?.id}/edit`}
           >
             Edit
           </Link>

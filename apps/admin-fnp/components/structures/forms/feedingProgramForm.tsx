@@ -129,7 +129,7 @@ export function FeedingProgramForm({ feedingProgram, mode = "create" }: FeedingP
         mutationFn: isEditMode ? updateFeedingProgram : addFeedingProgram,
         onSuccess: () => {
             toast({ description: isEditMode ? "Feeding program updated!" : "Feeding program created!" })
-            router.push("/dashboard/feeding-programs")
+            router.push("/dashboard/farmnport/feeding-programs")
         },
         onError: (error) => handleApiError(error, { context: "feeding program" }),
     })
