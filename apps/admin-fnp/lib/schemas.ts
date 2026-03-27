@@ -1132,3 +1132,133 @@ export type RestaurantLocationResponse = {
   total: number
   data: RestaurantLocation[]
 }
+
+// Menu
+export const MenuLocationEntrySchema = z.object({
+  location_id: z.string(),
+  location_name: z.string(),
+})
+
+export const MenuSchema = z.object({
+  id: z.string(),
+  locations: z.array(MenuLocationEntrySchema).default([]),
+  name: z.string().min(1, "Menu name is required").max(120, "Name cannot exceed 120 characters"),
+  note: z.string().optional().default(""),
+  slug: z.string().optional(),
+  category_notes: z.record(z.string(), z.string()).optional().default({}),
+  status: z.enum(["active", "inactive"]).default("active"),
+  created: z.string().optional(),
+  updated: z.string().optional(),
+})
+
+export const FormMenuSchema = MenuSchema.pick({
+  name: true,
+  note: true,
+  status: true,
+}).extend({
+  locations: z.array(MenuLocationEntrySchema).default([]),
+  category_notes: z.record(z.string(), z.string()).optional().default({}),
+})
+
+export type MenuLocationEntry = z.infer<typeof MenuLocationEntrySchema>
+
+export type Menu = z.infer<typeof MenuSchema>
+export type FormMenuModel = z.infer<typeof FormMenuSchema>
+
+export type MenuResponse = {
+  total: number
+  data: Menu[]
+}
+
+// Menu Item Category
+export const MenuItemCategorySchema = z.object({
+  id: z.string(),
+  name: z.string().min(1, "Name is required").max(120, "Name cannot exceed 120 characters"),
+  slug: z.string().optional(),
+  created: z.string().optional(),
+  updated: z.string().optional(),
+})
+
+export const FormMenuItemCategorySchema = MenuItemCategorySchema.pick({
+  name: true,
+})
+
+export type MenuItemCategory = z.infer<typeof MenuItemCategorySchema>
+export type FormMenuItemCategoryModel = z.infer<typeof FormMenuItemCategorySchema>
+
+export type MenuItemCategoryResponse = {
+  total: number
+  data: MenuItemCategory[]
+}
+
+// Menu Item Component
+export const MenuItemComponentSchema = z.object({
+  id: z.string(),
+  name: z.string().min(1, "Name is required").max(120, "Name cannot exceed 120 characters"),
+  slug: z.string().optional(),
+  created: z.string().optional(),
+  updated: z.string().optional(),
+})
+
+export const FormMenuItemComponentSchema = MenuItemComponentSchema.pick({
+  name: true,
+})
+
+export type MenuItemComponent = z.infer<typeof MenuItemComponentSchema>
+export type FormMenuItemComponentModel = z.infer<typeof FormMenuItemComponentSchema>
+
+export type MenuItemComponentResponse = {
+  total: number
+  data: MenuItemComponent[]
+}
+
+// Menu Item
+export const CompositionEntrySchema = z.object({
+  component_id: z.string(),
+  component_name: z.string(),
+})
+
+export const MenuItemSizeSchema = z.object({
+  name: z.string().min(1),
+  price_cents: z.number().default(0),
+})
+
+export const MenuItemSchema = z.object({
+  id: z.string(),
+  menu_id: z.string().min(1, "Menu is required"),
+  menu_name: z.string().optional(),
+  name: z.string().min(1, "Name is required").max(120, "Name cannot exceed 120 characters"),
+  slug: z.string().optional(),
+  description: z.string().optional().default(""),
+  price_cents: z.number().default(0),
+  category_id: z.string().min(1, "Category is required"),
+  category_name: z.string().optional(),
+  composition: z.array(CompositionEntrySchema).default([]),
+  sizes: z.array(MenuItemSizeSchema).default([]),
+  tags: z.array(z.string()).default([]),
+  status: z.enum(["active", "inactive"]).default("active"),
+  created: z.string().optional(),
+  updated: z.string().optional(),
+})
+
+export const FormMenuItemSchema = MenuItemSchema.pick({
+  menu_id: true,
+  name: true,
+  description: true,
+  price_cents: true,
+  category_id: true,
+  status: true,
+}).extend({
+  composition: z.array(CompositionEntrySchema).default([]),
+  sizes: z.array(MenuItemSizeSchema).default([]),
+  tags: z.array(z.string()).default([]),
+})
+
+export type CompositionEntry = z.infer<typeof CompositionEntrySchema>
+export type MenuItem = z.infer<typeof MenuItemSchema>
+export type FormMenuItemModel = z.infer<typeof FormMenuItemSchema>
+
+export type MenuItemResponse = {
+  total: number
+  data: MenuItem[]
+}
