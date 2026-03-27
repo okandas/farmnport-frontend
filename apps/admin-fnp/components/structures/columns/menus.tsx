@@ -37,11 +37,20 @@ export const menuColumns: ColumnDef<Menu>[] = [
     cell: ({ row }) => row.original.note || "-",
   },
   {
-    accessorKey: "location_name",
+    accessorKey: "locations",
     header: "Location",
-    cell: ({ row }) => (
-      <span className="capitalize">{row.original.location_name || "-"}</span>
-    ),
+    cell: ({ row }) => {
+      const locations = row.original.locations
+      if (!locations || locations.length === 0) return "-"
+      if (locations.length === 1) {
+        return <span className="capitalize">{locations[0].location_name}</span>
+      }
+      return (
+        <span className="capitalize" title={locations.map((l) => l.location_name).join(", ")}>
+          {locations[0].location_name}, {locations.length - 1}+
+        </span>
+      )
+    },
   },
   {
     accessorKey: "status",

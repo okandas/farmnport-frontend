@@ -42,7 +42,17 @@ export const menuItemColumns: ColumnDef<MenuItem>[] = [
   {
     accessorKey: "price_cents",
     header: "Price",
-    cell: ({ row }) => centsToDollars(row.original.price_cents || 0),
+    cell: ({ row }) => {
+      const sizes = row.original.sizes
+      if (sizes && sizes.length > 0) {
+        const prices = sizes.map(s => s.price_cents)
+        const min = Math.min(...prices)
+        const max = Math.max(...prices)
+        if (min === max) return centsToDollars(min)
+        return `${centsToDollars(min)} – ${centsToDollars(max)}`
+      }
+      return centsToDollars(row.original.price_cents || 0)
+    },
   },
   {
     accessorKey: "category_name",
@@ -55,15 +65,6 @@ export const menuItemColumns: ColumnDef<MenuItem>[] = [
       const composition = row.original.composition
       if (!composition || composition.length === 0) return "-"
       return composition.map(c => c.component_name).join(", ")
-    },
-  },
-  {
-    accessorKey: "tags",
-    header: "Tags",
-    cell: ({ row }) => {
-      const tags = row.original.tags
-      if (!tags || tags.length === 0) return "-"
-      return tags.join(", ")
     },
   },
   {

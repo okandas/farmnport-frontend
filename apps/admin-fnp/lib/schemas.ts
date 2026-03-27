@@ -1134,24 +1134,33 @@ export type RestaurantLocationResponse = {
 }
 
 // Menu
+export const MenuLocationEntrySchema = z.object({
+  location_id: z.string(),
+  location_name: z.string(),
+})
+
 export const MenuSchema = z.object({
   id: z.string(),
-  location_id: z.string().min(1, "Location is required"),
-  location_name: z.string().optional(),
+  locations: z.array(MenuLocationEntrySchema).default([]),
   name: z.string().min(1, "Menu name is required").max(120, "Name cannot exceed 120 characters"),
   note: z.string().optional().default(""),
   slug: z.string().optional(),
+  category_notes: z.record(z.string(), z.string()).optional().default({}),
   status: z.enum(["active", "inactive"]).default("active"),
   created: z.string().optional(),
   updated: z.string().optional(),
 })
 
 export const FormMenuSchema = MenuSchema.pick({
-  location_id: true,
   name: true,
   note: true,
   status: true,
+}).extend({
+  locations: z.array(MenuLocationEntrySchema).default([]),
+  category_notes: z.record(z.string(), z.string()).optional().default({}),
 })
+
+export type MenuLocationEntry = z.infer<typeof MenuLocationEntrySchema>
 
 export type Menu = z.infer<typeof MenuSchema>
 export type FormMenuModel = z.infer<typeof FormMenuSchema>
@@ -1209,6 +1218,11 @@ export const CompositionEntrySchema = z.object({
   component_name: z.string(),
 })
 
+export const MenuItemSizeSchema = z.object({
+  name: z.string().min(1),
+  price_cents: z.number().default(0),
+})
+
 export const MenuItemSchema = z.object({
   id: z.string(),
   menu_id: z.string().min(1, "Menu is required"),
@@ -1220,6 +1234,7 @@ export const MenuItemSchema = z.object({
   category_id: z.string().min(1, "Category is required"),
   category_name: z.string().optional(),
   composition: z.array(CompositionEntrySchema).default([]),
+  sizes: z.array(MenuItemSizeSchema).default([]),
   tags: z.array(z.string()).default([]),
   status: z.enum(["active", "inactive"]).default("active"),
   created: z.string().optional(),
@@ -1235,6 +1250,7 @@ export const FormMenuItemSchema = MenuItemSchema.pick({
   status: true,
 }).extend({
   composition: z.array(CompositionEntrySchema).default([]),
+  sizes: z.array(MenuItemSizeSchema).default([]),
   tags: z.array(z.string()).default([]),
 })
 

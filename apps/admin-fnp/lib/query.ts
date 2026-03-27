@@ -43,6 +43,7 @@ export function queryLogin(data: LoginFormData) {
 type pagination = {
   p?: number
   search?: string
+  limit?: number
   type?: string[]
   category?: string[]
   produce?: string[]
@@ -994,6 +995,9 @@ export function queryMenuItemCategories(pagination?: pagination) {
   }
   if (pagination?.search !== undefined && pagination.search.length >= 2) {
     params.set("search", pagination.search)
+  }
+  if (pagination?.limit !== undefined) {
+    params.set("limit", String(pagination.limit))
   }
   const qs = params.toString()
   const url = `${baseUrl}/menu-item-categories/list${qs ? `?${qs}` : ""}`

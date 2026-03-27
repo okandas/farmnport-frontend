@@ -145,6 +145,7 @@ export default function EditMenuItemCategoryPage() {
                                         />
                                     </div>
                                 </div>
+
                             </div>
                         </div>
                     </div>

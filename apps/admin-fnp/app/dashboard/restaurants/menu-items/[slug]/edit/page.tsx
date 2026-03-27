@@ -8,7 +8,7 @@ import { useDebounce } from "use-debounce"
 
 import { queryMenuItem, updateMenuItem, queryMenuItemCategories, queryMenuItemComponents, queryMenus } from "@/lib/query"
 import { MenuItem, MenuItemCategory, MenuItemComponent, CompositionEntry, Menu } from "@/lib/schemas"
-import { cn, dollarsToCents, centsToDollarsFormInputs } from "@/lib/utilities"
+import { cn, dollarsToCents, centsToDollarsFormInputs, centsToDollars } from "@/lib/utilities"
 import { buttonVariants } from "@/components/ui/button"
 import { Button } from "@/components/ui/button"
 import { Icons } from "@/components/icons/lucide"
@@ -52,9 +52,10 @@ export default function EditMenuItemPage() {
     const [searchComponent, setSearchComponent] = useState("")
     const [openComponents, setOpenComponents] = useState(false)
     const [selectedTags, setSelectedTags] = useState<string[]>([])
+    const [sizes, setSizes] = useState<{ name: string; price_cents: string }[]>([])
     const [initialized, setInitialized] = useState(false)
 
-    const availableTags = ["Vegetarian", "Gluten Free"]
+    const availableTags = ["Vegetarian", "Vegetarian On Request", "Gluten Free", "Scrambled", "Fried", "Grilled"]
 
     const handleToggleTag = (tag: string) => {
         setSelectedTags(prev =>
@@ -93,6 +94,10 @@ export default function EditMenuItemPage() {
             setStatus(menuItem.status || "active")
             setSelectedComponents(menuItem.composition || [])
             setSelectedTags(menuItem.tags || [])
+            setSizes((menuItem.sizes || []).map(s => ({
+                name: s.name,
+                price_cents: String(centsToDollarsFormInputs(s.price_cents || 0)),
+            })))
             setInitialized(true)
         }
     }, [menuItem, initialized])
@@ -100,7 +105,7 @@ export default function EditMenuItemPage() {
     // Fetch categories for dropdown
     const { data: categoryData } = useQuery({
         queryKey: ["menu-item-categories-all"],
-        queryFn: () => queryMenuItemCategories({ p: 1 }),
+        queryFn: () => queryMenuItemCategories({ p: 1, limit: 100 }),
         refetchOnWindowFocus: false,
     })
 
@@ -187,6 +192,10 @@ export default function EditMenuItemPage() {
             price_cents: dollarsToCents(parseFloat(priceCents || "0")),
             category_id: effectiveCategoryId,
             composition: selectedComponents,
+            sizes: sizes.filter(s => s.name.trim()).map(s => ({
+                name: s.name.trim(),
+                price_cents: dollarsToCents(parseFloat(s.price_cents || "0")),
+            })),
             tags: selectedTags,
             status,
         })
@@ -331,6 +340,60 @@ export default function EditMenuItemPage() {
                                             ))}
                                         </SelectContent>
                                     </Select>
+                                </div>
+                            </div>
+
+                            <div className="col-span-full">
+                                <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">
+                                    Size Options
+                                </label>
+                                <p className="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">
+                                    Add size variants if this item comes in multiple sizes (e.g. Small, Medium, Large).
+                                </p>
+                                <div className="mt-3 space-y-3">
+                                    {sizes.map((size, index) => (
+                                        <div key={index} className="flex items-center gap-3">
+                                            <Input
+                                                placeholder="Size name (e.g. Medium)"
+                                                value={size.name}
+                                                onChange={(e) => {
+                                                    const updated = [...sizes]
+                                                    updated[index] = { ...updated[index], name: e.target.value }
+                                                    setSizes(updated)
+                                                }}
+                                                className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
+                                            />
+                                            <Input
+                                                type="number"
+                                                step="0.01"
+                                                min="0"
+                                                placeholder="Price ($)"
+                                                value={size.price_cents}
+                                                onChange={(e) => {
+                                                    const updated = [...sizes]
+                                                    updated[index] = { ...updated[index], price_cents: e.target.value }
+                                                    setSizes(updated)
+                                                }}
+                                                className="block w-40 rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => setSizes(sizes.filter((_, i) => i !== index))}
+                                                className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+                                            >
+                                                <Icons.close className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    ))}
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => setSizes([...sizes, { name: "", price_cents: "" }])}
+                                    >
+                                        <Icons.add className="w-4 h-4 mr-1" />
+                                        Add Size
+                                    </Button>
                                 </div>
                             </div>
 

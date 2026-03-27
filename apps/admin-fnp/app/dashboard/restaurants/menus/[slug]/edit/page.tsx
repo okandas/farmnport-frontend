@@ -1,14 +1,15 @@
 "use client"
 
-import { useEffect } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { useForm } from "react-hook-form"
 import { useRouter, useParams } from "next/navigation"
+import { Check, ChevronsUpDown, X } from "lucide-react"
 
-import { queryMenu, updateMenu, queryRestaurantLocations } from "@/lib/query"
-import { Menu, RestaurantLocation } from "@/lib/schemas"
+import { queryMenu, updateMenu, queryRestaurantLocations, queryMenuItemCategories } from "@/lib/query"
+import { FormMenuSchema, FormMenuModel, Menu, RestaurantLocation, MenuLocationEntry, MenuItemCategory } from "@/lib/schemas"
 import { cn } from "@/lib/utilities"
 import { buttonVariants } from "@/components/ui/button"
 import { Icons } from "@/components/icons/lucide"
@@ -30,22 +31,22 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-
-import * as z from "zod"
-
-const EditFormSchema = z.object({
-    location_id: z.string().min(1, "Location is required"),
-    name: z.string().min(1, "Name is required").max(120),
-    note: z.string().optional().default(""),
-    status: z.enum(["active", "inactive"]),
-})
-
-type EditFormModel = z.infer<typeof EditFormSchema>
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import {
+    Command,
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem,
+    CommandList,
+} from "@/components/ui/command"
+import { Badge } from "@/components/ui/badge"
 
 export default function EditMenuPage() {
     const router = useRouter()
     const params = useParams()
     const menuId = params.slug as string
+    const [locationsOpen, setLocationsOpen] = useState(false)
 
     const { data, isLoading, isError } = useQuery({
         queryKey: ["menu", menuId],
@@ -63,23 +64,33 @@ export default function EditMenuPage() {
 
     const locations = (locationsData?.data?.data as RestaurantLocation[]) || []
 
-    const form = useForm<EditFormModel>({
+    const { data: categoriesData } = useQuery({
+        queryKey: ["categories-for-notes"],
+        queryFn: () => queryMenuItemCategories({ limit: 100 }),
+        refetchOnWindowFocus: false,
+    })
+
+    const categories = (categoriesData?.data?.data as MenuItemCategory[]) || []
+
+    const form = useForm<FormMenuModel>({
         defaultValues: {
-            location_id: "",
+            locations: [],
             name: "",
             note: "",
             status: "active",
+            category_notes: {},
         },
-        resolver: zodResolver(EditFormSchema),
+        resolver: zodResolver(FormMenuSchema),
     })
 
     useEffect(() => {
         if (menu) {
             form.reset({
-                location_id: menu.location_id || "",
+                locations: menu.locations || [],
                 name: menu.name || "",
                 note: menu.note || "",
                 status: (menu.status as "active" | "inactive") || "active",
+                category_notes: menu.category_notes || {},
             })
         }
     }, [menu, form])
@@ -99,11 +110,19 @@ export default function EditMenuPage() {
         },
     })
 
-    async function onSubmit(data: EditFormModel) {
+    async function onSubmit(data: FormMenuModel) {
         mutate({
             id: menuId,
             ...data,
         })
+    }
+
+    function toggleLocation(loc: RestaurantLocation, currentLocations: MenuLocationEntry[]) {
+        const exists = currentLocations.some((l) => l.location_id === loc.id)
+        if (exists) {
+            return currentLocations.filter((l) => l.location_id !== loc.id)
+        }
+        return [...currentLocations, { location_id: loc.id, location_name: loc.name }]
     }
 
     if (isLoading) {
@@ -156,28 +175,86 @@ export default function EditMenuPage() {
                                     <label
                                         className="block text-sm/6 font-medium text-gray-900 dark:text-white"
                                     >
-                                        Location
+                                        Locations
                                     </label>
                                     <div className="mt-2">
                                         <FormField
                                             control={form.control}
-                                            name="location_id"
+                                            name="locations"
                                             render={({ field }) => (
                                                 <FormItem>
-                                                    <Select onValueChange={field.onChange} value={field.value}>
-                                                        <FormControl>
-                                                            <SelectTrigger className="w-full">
-                                                                <SelectValue placeholder="Select a location" />
-                                                            </SelectTrigger>
-                                                        </FormControl>
-                                                        <SelectContent>
-                                                            {locations.map((loc) => (
-                                                                <SelectItem key={loc.id} value={loc.id}>
-                                                                    <span className="capitalize">{loc.name}</span>
-                                                                </SelectItem>
+                                                    <Popover open={locationsOpen} onOpenChange={setLocationsOpen}>
+                                                        <PopoverTrigger asChild>
+                                                            <button
+                                                                type="button"
+                                                                role="combobox"
+                                                                aria-expanded={locationsOpen}
+                                                                className="flex w-full items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 hover:bg-gray-50 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
+                                                            >
+                                                                <span className="text-gray-400 dark:text-gray-500">
+                                                                    {field.value?.length
+                                                                        ? `${field.value.length} location${field.value.length > 1 ? "s" : ""} selected`
+                                                                        : "Select locations"}
+                                                                </span>
+                                                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                                            </button>
+                                                        </PopoverTrigger>
+                                                        <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+                                                            <Command>
+                                                                <CommandInput placeholder="Search locations..." />
+                                                                <CommandList>
+                                                                    <CommandEmpty>No locations found.</CommandEmpty>
+                                                                    <CommandGroup>
+                                                                        {locations.map((loc) => {
+                                                                            const isSelected = field.value?.some(
+                                                                                (l) => l.location_id === loc.id
+                                                                            )
+                                                                            return (
+                                                                                <CommandItem
+                                                                                    key={loc.id}
+                                                                                    value={loc.name}
+                                                                                    onSelect={() => {
+                                                                                        field.onChange(
+                                                                                            toggleLocation(loc, field.value || [])
+                                                                                        )
+                                                                                    }}
+                                                                                >
+                                                                                    <Check
+                                                                                        className={cn(
+                                                                                            "mr-2 h-4 w-4",
+                                                                                            isSelected ? "opacity-100" : "opacity-0"
+                                                                                        )}
+                                                                                    />
+                                                                                    <span className="capitalize">{loc.name}</span>
+                                                                                </CommandItem>
+                                                                            )
+                                                                        })}
+                                                                    </CommandGroup>
+                                                                </CommandList>
+                                                            </Command>
+                                                        </PopoverContent>
+                                                    </Popover>
+                                                    {field.value && field.value.length > 0 && (
+                                                        <div className="flex flex-wrap gap-1.5 mt-2">
+                                                            {field.value.map((loc) => (
+                                                                <Badge
+                                                                    key={loc.location_id}
+                                                                    variant="secondary"
+                                                                    className="capitalize cursor-pointer"
+                                                                    onClick={() => {
+                                                                        field.onChange(
+                                                                            field.value?.filter(
+                                                                                (l) => l.location_id !== loc.location_id
+                                                                            ) || []
+                                                                        )
+                                                                    }}
+                                                                >
+                                                                    {loc.location_name}
+                                                                    <X className="ml-1 h-3 w-3" />
+                                                                </Badge>
                                                             ))}
-                                                        </SelectContent>
-                                                    </Select>
+                                                        </div>
+                                                    )}
                                                     <FormMessage />
                                                 </FormItem>
                                             )}
@@ -272,6 +349,45 @@ export default function EditMenuPage() {
                                 </div>
                             </div>
                         </div>
+
+                        {categories.length > 0 && (
+                            <div className="border-b border-gray-900/10 pb-12 dark:border-white/10">
+                                <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">
+                                    Category Notes
+                                </h2>
+                                <p className="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">
+                                    Add notes for specific categories on this menu. e.g. &quot;All steaks are 14-day aged and served with your choice of sides&quot;
+                                </p>
+
+                                <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
+                                    {categories.map((cat) => (
+                                        <div key={cat.id} className="sm:col-span-4 px-1">
+                                            <label
+                                                className="block text-sm/6 font-medium text-gray-900 dark:text-white capitalize"
+                                            >
+                                                {cat.name}
+                                            </label>
+                                            <div className="mt-2">
+                                                <Input
+                                                    placeholder={`Note for ${cat.name} (optional)`}
+                                                    value={form.watch("category_notes")?.[cat.id] || ""}
+                                                    onChange={(e) => {
+                                                        const current = form.getValues("category_notes") || {}
+                                                        if (e.target.value === "") {
+                                                            const { [cat.id]: _, ...rest } = current
+                                                            form.setValue("category_notes", rest, { shouldDirty: true })
+                                                        } else {
+                                                            form.setValue("category_notes", { ...current, [cat.id]: e.target.value }, { shouldDirty: true })
+                                                        }
+                                                    }}
+                                                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
+                                                />
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     <div className="mt-6 flex items-center justify-end gap-x-6">

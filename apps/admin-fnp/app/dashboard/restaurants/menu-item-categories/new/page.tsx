@@ -110,6 +110,7 @@ export default function NewMenuItemCategoryPage() {
                                         />
                                     </div>
                                 </div>
+
                             </div>
                         </div>
                     </div>

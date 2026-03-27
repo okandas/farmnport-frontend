@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { PaginationState } from "@tanstack/react-table"
+import { useDebounce } from "use-debounce"
 
 import { queryMenuItems } from "@/lib/query"
 import { MenuItem } from "@/lib/schemas"
@@ -13,6 +14,7 @@ import { menuItemColumns } from "@/components/structures/columns/menu-items"
 
 export function MenuItemsTable() {
   const [search, setSearch] = useState("")
+  const [debouncedSearch] = useDebounce(search, 500)
 
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -20,11 +22,11 @@ export function MenuItemsTable() {
   })
 
   const { isError, isLoading, isFetching, refetch, data, error } = useQuery({
-    queryKey: ["dashboard-menu-items", { p: pagination.pageIndex + 1, search }],
+    queryKey: ["dashboard-menu-items", { p: pagination.pageIndex + 1, search: debouncedSearch }],
     queryFn: () =>
       queryMenuItems({
         p: pagination.pageIndex + 1,
-        search: search,
+        search: debouncedSearch,
       }),
     refetchOnWindowFocus: false
   })
