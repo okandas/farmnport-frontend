@@ -1132,3 +1132,86 @@ export type RestaurantLocationResponse = {
   total: number
   data: RestaurantLocation[]
 }
+
+// Menu Item Category
+export const MenuItemCategorySchema = z.object({
+  id: z.string(),
+  name: z.string().min(1, "Name is required").max(120, "Name cannot exceed 120 characters"),
+  slug: z.string().optional(),
+  created: z.string().optional(),
+  updated: z.string().optional(),
+})
+
+export const FormMenuItemCategorySchema = MenuItemCategorySchema.pick({
+  name: true,
+})
+
+export type MenuItemCategory = z.infer<typeof MenuItemCategorySchema>
+export type FormMenuItemCategoryModel = z.infer<typeof FormMenuItemCategorySchema>
+
+export type MenuItemCategoryResponse = {
+  total: number
+  data: MenuItemCategory[]
+}
+
+// Menu Item Component
+export const MenuItemComponentSchema = z.object({
+  id: z.string(),
+  name: z.string().min(1, "Name is required").max(120, "Name cannot exceed 120 characters"),
+  slug: z.string().optional(),
+  status: z.enum(["active", "inactive"]).default("active"),
+  created: z.string().optional(),
+  updated: z.string().optional(),
+})
+
+export const FormMenuItemComponentSchema = MenuItemComponentSchema.pick({
+  name: true,
+  status: true,
+})
+
+export type MenuItemComponent = z.infer<typeof MenuItemComponentSchema>
+export type FormMenuItemComponentModel = z.infer<typeof FormMenuItemComponentSchema>
+
+export type MenuItemComponentResponse = {
+  total: number
+  data: MenuItemComponent[]
+}
+
+// Menu Item
+export const CompositionEntrySchema = z.object({
+  component_id: z.string(),
+  component_name: z.string(),
+})
+
+export const MenuItemSchema = z.object({
+  id: z.string(),
+  name: z.string().min(1, "Name is required").max(120, "Name cannot exceed 120 characters"),
+  slug: z.string().optional(),
+  description: z.string().optional().default(""),
+  price_cents: z.number().default(0),
+  category_id: z.string().min(1, "Category is required"),
+  category_name: z.string().optional(),
+  composition: z.array(CompositionEntrySchema).default([]),
+  status: z.enum(["active", "inactive"]).default("active"),
+  created: z.string().optional(),
+  updated: z.string().optional(),
+})
+
+export const FormMenuItemSchema = MenuItemSchema.pick({
+  name: true,
+  description: true,
+  price_cents: true,
+  category_id: true,
+  status: true,
+}).extend({
+  composition: z.array(CompositionEntrySchema).default([]),
+})
+
+export type CompositionEntry = z.infer<typeof CompositionEntrySchema>
+export type MenuItem = z.infer<typeof MenuItemSchema>
+export type FormMenuItemModel = z.infer<typeof FormMenuItemSchema>
+
+export type MenuItemResponse = {
+  total: number
+  data: MenuItem[]
+}
