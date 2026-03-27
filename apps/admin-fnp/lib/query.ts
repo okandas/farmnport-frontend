@@ -1054,9 +1054,51 @@ export function deleteMenuItemComponent(id: string) {
   return api.delete(url)
 }
 
+// Menus
+type menuPagination = pagination & {
+  location_id?: string
+}
+
+export function queryMenus(pagination?: menuPagination) {
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) {
+    params.set("p", String(pagination.p))
+  }
+  if (pagination?.search !== undefined && pagination.search.length >= 2) {
+    params.set("search", pagination.search)
+  }
+  if (pagination?.location_id) {
+    params.set("location_id", pagination.location_id)
+  }
+  const qs = params.toString()
+  const url = `${baseUrl}/menus/list${qs ? `?${qs}` : ""}`
+  return api.get(url)
+}
+
+export function queryMenu(id: string) {
+  let url = `${baseUrl}/menus/get/${id}`
+  return api.get(url)
+}
+
+export function addMenu(data: any) {
+  let url = `${baseUrl}/menus/add`
+  return api.post(url, data)
+}
+
+export function updateMenu(data: any) {
+  let url = `${baseUrl}/menus/update`
+  return api.post(url, data)
+}
+
+export function deleteMenu(id: string) {
+  let url = `${baseUrl}/menus/delete/${id}`
+  return api.delete(url)
+}
+
 // Menu Items
 type menuItemPagination = pagination & {
   category_id?: string
+  menu_id?: string
 }
 
 export function queryMenuItems(pagination?: menuItemPagination) {
@@ -1069,6 +1111,9 @@ export function queryMenuItems(pagination?: menuItemPagination) {
   }
   if (pagination?.category_id) {
     params.set("category_id", pagination.category_id)
+  }
+  if (pagination?.menu_id) {
+    params.set("menu_id", pagination.menu_id)
   }
   const qs = params.toString()
   const url = `${baseUrl}/menu-items/list${qs ? `?${qs}` : ""}`

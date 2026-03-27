@@ -33,6 +33,13 @@ export const menuItemColumns: ColumnDef<MenuItem>[] = [
     header: "Name",
   },
   {
+    accessorKey: "menu_name",
+    header: "Menu",
+    cell: ({ row }) => (
+      <span className="capitalize">{row.original.menu_name || "-"}</span>
+    ),
+  },
+  {
     accessorKey: "price_cents",
     header: "Price",
     cell: ({ row }) => centsToDollars(row.original.price_cents || 0),
@@ -48,6 +55,15 @@ export const menuItemColumns: ColumnDef<MenuItem>[] = [
       const composition = row.original.composition
       if (!composition || composition.length === 0) return "-"
       return composition.map(c => c.component_name).join(", ")
+    },
+  },
+  {
+    accessorKey: "tags",
+    header: "Tags",
+    cell: ({ row }) => {
+      const tags = row.original.tags
+      if (!tags || tags.length === 0) return "-"
+      return tags.join(", ")
     },
   },
   {

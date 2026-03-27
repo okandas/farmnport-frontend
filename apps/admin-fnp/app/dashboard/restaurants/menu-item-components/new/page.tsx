@@ -21,13 +21,6 @@ import {
     FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
 
 export default function NewMenuItemComponentPage() {
     const router = useRouter()
@@ -35,7 +28,6 @@ export default function NewMenuItemComponentPage() {
     const form = useForm<FormMenuItemComponentModel>({
         defaultValues: {
             name: "",
-            status: "active",
         },
         resolver: zodResolver(FormMenuItemComponentSchema),
     })
@@ -119,36 +111,6 @@ export default function NewMenuItemComponentPage() {
                                     </div>
                                 </div>
 
-                                <div className="sm:col-span-4 px-1">
-                                    <label
-                                        htmlFor="status"
-                                        className="block text-sm/6 font-medium text-gray-900 dark:text-white"
-                                    >
-                                        Status
-                                    </label>
-                                    <div className="mt-2">
-                                        <FormField
-                                            control={form.control}
-                                            name="status"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                        <FormControl>
-                                                            <SelectTrigger className="w-full">
-                                                                <SelectValue placeholder="Select status" />
-                                                            </SelectTrigger>
-                                                        </FormControl>
-                                                        <SelectContent>
-                                                            <SelectItem value="active">Active</SelectItem>
-                                                            <SelectItem value="inactive">Inactive</SelectItem>
-                                                        </SelectContent>
-                                                    </Select>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>

@@ -24,17 +24,22 @@ export const restaurantsDashboardConfig: DashboardConfig = {
         {
           title: "Categories",
           href: "/dashboard/restaurants/menu-item-categories",
-          icon: "layers",
+          icon: "tag",
         },
         {
           title: "Components",
           href: "/dashboard/restaurants/menu-item-components",
-          icon: "layers",
+          icon: "egg",
+        },
+        {
+          title: "Menus",
+          href: "/dashboard/restaurants/menus",
+          icon: "clipboardList",
         },
         {
           title: "Menu Items",
           href: "/dashboard/restaurants/menu-items",
-          icon: "layers",
+          icon: "utensilsCrossed",
         },
       ],
     },

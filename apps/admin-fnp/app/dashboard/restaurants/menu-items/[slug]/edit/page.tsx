@@ -6,8 +6,8 @@ import { useMutation, useQuery } from "@tanstack/react-query"
 import { useRouter, useParams } from "next/navigation"
 import { useDebounce } from "use-debounce"
 
-import { queryMenuItem, updateMenuItem, queryMenuItemCategories, queryMenuItemComponents } from "@/lib/query"
-import { MenuItem, MenuItemCategory, MenuItemComponent, CompositionEntry } from "@/lib/schemas"
+import { queryMenuItem, updateMenuItem, queryMenuItemCategories, queryMenuItemComponents, queryMenus } from "@/lib/query"
+import { MenuItem, MenuItemCategory, MenuItemComponent, CompositionEntry, Menu } from "@/lib/schemas"
 import { cn, dollarsToCents, centsToDollarsFormInputs } from "@/lib/utilities"
 import { buttonVariants } from "@/components/ui/button"
 import { Button } from "@/components/ui/button"
@@ -42,6 +42,7 @@ export default function EditMenuItemPage() {
     const params = useParams()
     const menuItemId = params.slug as string
 
+    const [menuId, setMenuId] = useState("")
     const [name, setName] = useState("")
     const [description, setDescription] = useState("")
     const [priceCents, setPriceCents] = useState("")
@@ -50,7 +51,16 @@ export default function EditMenuItemPage() {
     const [selectedComponents, setSelectedComponents] = useState<CompositionEntry[]>([])
     const [searchComponent, setSearchComponent] = useState("")
     const [openComponents, setOpenComponents] = useState(false)
+    const [selectedTags, setSelectedTags] = useState<string[]>([])
     const [initialized, setInitialized] = useState(false)
+
+    const availableTags = ["Vegetarian", "Gluten Free"]
+
+    const handleToggleTag = (tag: string) => {
+        setSelectedTags(prev =>
+            prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
+        )
+    }
 
     const [debouncedComponentQuery] = useDebounce(searchComponent, 1000)
 
@@ -63,15 +73,26 @@ export default function EditMenuItemPage() {
 
     const menuItem = menuItemData?.data as MenuItem
 
+    // Fetch menus for dropdown
+    const { data: menuData } = useQuery({
+        queryKey: ["menus-all"],
+        queryFn: () => queryMenus({ p: 1 }),
+        refetchOnWindowFocus: false,
+    })
+
+    const menus = (menuData?.data?.data as Menu[]) || []
+
     // Populate form when data loads
     useEffect(() => {
         if (menuItem && !initialized) {
+            setMenuId(menuItem.menu_id || "")
             setName(menuItem.name || "")
             setDescription(menuItem.description || "")
             setPriceCents(String(centsToDollarsFormInputs(menuItem.price_cents || 0)))
             setCategoryId(menuItem.category_id || "")
             setStatus(menuItem.status || "active")
             setSelectedComponents(menuItem.composition || [])
+            setSelectedTags(menuItem.tags || [])
             setInitialized(true)
         }
     }, [menuItem, initialized])
@@ -83,7 +104,7 @@ export default function EditMenuItemPage() {
         refetchOnWindowFocus: false,
     })
 
-    const categories = categoryData?.data?.data as MenuItemCategory[]
+    const categories = (categoryData?.data?.data as MenuItemCategory[]) || []
 
     // Search components for composition
     const hasShownError = useRef(false)
@@ -140,23 +161,33 @@ export default function EditMenuItemPage() {
     function onSubmit(e: React.FormEvent) {
         e.preventDefault()
 
+        const effectiveMenuId = menuId || menuItem?.menu_id || ""
+        const effectiveCategoryId = categoryId || menuItem?.category_id || ""
+
+        if (!effectiveMenuId) {
+            toast({ description: "Menu is required", variant: "destructive" })
+            return
+        }
+
         if (!name.trim()) {
             toast({ description: "Name is required", variant: "destructive" })
             return
         }
 
-        if (!categoryId) {
+        if (!effectiveCategoryId) {
             toast({ description: "Category is required", variant: "destructive" })
             return
         }
 
         mutate({
             id: menuItemId,
+            menu_id: effectiveMenuId,
             name: name.trim(),
             description: description.trim(),
             price_cents: dollarsToCents(parseFloat(priceCents || "0")),
-            category_id: categoryId,
+            category_id: effectiveCategoryId,
             composition: selectedComponents,
+            tags: selectedTags,
             status,
         })
     }
@@ -180,7 +211,7 @@ export default function EditMenuItemPage() {
 
     return (
         <div className="space-y-10">
-            <div className="flex items-center justify-between">
+<div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
                         Edit Menu Item
@@ -200,17 +231,42 @@ export default function EditMenuItemPage() {
 
             <form onSubmit={onSubmit}>
                 <div className="space-y-12">
-                    <div className="border-b border-gray-900/10 pb-12 dark:border-white/10">
-                        <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">
-                            Menu Item Information
-                        </h2>
+                    <div className="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-gray-900/10 pb-12 md:grid-cols-3 dark:border-white/10">
+                        <div>
+                            <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">
+                                Menu Item Details
+                            </h2>
+                            <p className="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">
+                                Update the menu, name, pricing and category for this item.
+                            </p>
+                        </div>
 
-                        <div className="mt-10 space-y-8">
-                            <div className="px-1">
-                                <label
-                                    htmlFor="name"
-                                    className="block text-sm/6 font-medium text-gray-900 dark:text-white"
-                                >
+                        <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 md:col-span-2">
+                            <div className="sm:col-span-4">
+                                <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">
+                                    Menu
+                                </label>
+                                <div className="mt-2">
+                                    <Select onValueChange={setMenuId} value={menuId || menuItem?.menu_id || ""}>
+                                        <SelectTrigger className="w-full">
+                                            <SelectValue placeholder="Select a menu" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {menus.map((menu) => (
+                                                <SelectItem key={menu.id} value={menu.id}>
+                                                    <span className="capitalize">{menu.name}</span>
+                                                    {menu.location_name && (
+                                                        <span className="ml-1 text-gray-500 dark:text-gray-400">— {menu.location_name}</span>
+                                                    )}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </div>
+
+                            <div className="sm:col-span-4">
+                                <label htmlFor="name" className="block text-sm/6 font-medium text-gray-900 dark:text-white">
                                     Name
                                 </label>
                                 <div className="mt-2">
@@ -219,16 +275,13 @@ export default function EditMenuItemPage() {
                                         placeholder="Enter menu item name"
                                         value={name}
                                         onChange={(e) => setName(e.target.value)}
-                                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
+                                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
                                     />
                                 </div>
                             </div>
 
-                            <div className="px-1">
-                                <label
-                                    htmlFor="description"
-                                    className="block text-sm/6 font-medium text-gray-900 dark:text-white"
-                                >
+                            <div className="col-span-full">
+                                <label htmlFor="description" className="block text-sm/6 font-medium text-gray-900 dark:text-white">
                                     Description
                                 </label>
                                 <div className="mt-2">
@@ -238,16 +291,13 @@ export default function EditMenuItemPage() {
                                         rows={3}
                                         value={description}
                                         onChange={(e) => setDescription(e.target.value)}
-                                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
+                                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
                                     />
                                 </div>
                             </div>
 
-                            <div className="px-1">
-                                <label
-                                    htmlFor="price"
-                                    className="block text-sm/6 font-medium text-gray-900 dark:text-white"
-                                >
+                            <div className="sm:col-span-3">
+                                <label htmlFor="price" className="block text-sm/6 font-medium text-gray-900 dark:text-white">
                                     Price ($)
                                 </label>
                                 <div className="mt-2">
@@ -259,24 +309,22 @@ export default function EditMenuItemPage() {
                                         placeholder="e.g. 9.99"
                                         value={priceCents}
                                         onChange={(e) => setPriceCents(e.target.value)}
-                                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
+                                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
                                     />
                                 </div>
                             </div>
 
-                            <div className="px-1">
-                                <label
-                                    className="block text-sm/6 font-medium text-gray-900 dark:text-white"
-                                >
+                            <div className="sm:col-span-3">
+                                <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">
                                     Category
                                 </label>
                                 <div className="mt-2">
-                                    <Select onValueChange={setCategoryId} value={categoryId}>
+                                    <Select onValueChange={setCategoryId} value={categoryId || menuItem?.category_id || ""}>
                                         <SelectTrigger className="w-full">
                                             <SelectValue placeholder="Select a category" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            {categories?.map((cat) => (
+                                            {categories.map((cat) => (
                                                 <SelectItem key={cat.id} value={cat.id}>
                                                     {cat.name}
                                                 </SelectItem>
@@ -286,7 +334,37 @@ export default function EditMenuItemPage() {
                                 </div>
                             </div>
 
-                            <div className="px-1">
+                            <div className="sm:col-span-4">
+                                <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">
+                                    Status
+                                </label>
+                                <div className="mt-2">
+                                    <Select onValueChange={setStatus} value={status}>
+                                        <SelectTrigger className="w-full">
+                                            <SelectValue placeholder="Select status" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="active">Active</SelectItem>
+                                            <SelectItem value="inactive">Inactive</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-gray-900/10 pb-12 md:grid-cols-3 dark:border-white/10">
+                        <div>
+                            <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">
+                                Composition & Tags
+                            </h2>
+                            <p className="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">
+                                Add the ingredients that make up this dish and any dietary tags.
+                            </p>
+                        </div>
+
+                        <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 md:col-span-2">
+                            <div className="col-span-full">
                                 <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">
                                     Composition
                                 </label>
@@ -319,7 +397,7 @@ export default function EditMenuItemPage() {
                                             Search and add components...
                                         </Button>
                                     </PopoverTrigger>
-                                    <PopoverContent className="w-full p-0" align="start">
+                                    <PopoverContent className="p-0" align="start" style={{ width: 'var(--radix-popover-trigger-width)' }}>
                                         <Command shouldFilter={false}>
                                             <CommandInput
                                                 placeholder="Type component name (min 2 chars)..."
@@ -362,22 +440,27 @@ export default function EditMenuItemPage() {
                                 </p>
                             </div>
 
-                            <div className="px-1">
-                                <label
-                                    className="block text-sm/6 font-medium text-gray-900 dark:text-white"
-                                >
-                                    Status
+                            <div className="col-span-full">
+                                <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">
+                                    Tags
                                 </label>
-                                <div className="mt-2">
-                                    <Select onValueChange={setStatus} value={status}>
-                                        <SelectTrigger className="w-full">
-                                            <SelectValue placeholder="Select status" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="active">Active</SelectItem>
-                                            <SelectItem value="inactive">Inactive</SelectItem>
-                                        </SelectContent>
-                                    </Select>
+                                <div className="flex flex-wrap gap-2 mt-2">
+                                    {availableTags.map(tag => (
+                                        <button
+                                            key={tag}
+                                            type="button"
+                                            onClick={() => handleToggleTag(tag)}
+                                            className={cn(
+                                                "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium border transition-colors",
+                                                selectedTags.includes(tag)
+                                                    ? "bg-indigo-50 border-indigo-300 text-indigo-700 dark:bg-indigo-900/20 dark:border-indigo-600 dark:text-indigo-300"
+                                                    : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50 dark:bg-white/5 dark:border-white/10 dark:text-gray-300 dark:hover:bg-white/10"
+                                            )}
+                                        >
+                                            {selectedTags.includes(tag) && <Icons.check className="w-3.5 h-3.5" />}
+                                            {tag}
+                                        </button>
+                                    ))}
                                 </div>
                             </div>
                         </div>

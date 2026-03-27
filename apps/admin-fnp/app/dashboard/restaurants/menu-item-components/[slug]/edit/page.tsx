@@ -23,19 +23,10 @@ import {
     FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
-
 import * as z from "zod"
 
 const EditFormSchema = z.object({
     name: z.string().min(1, "Name is required").max(120),
-    status: z.enum(["active", "inactive"]),
 })
 
 type EditFormModel = z.infer<typeof EditFormSchema>
@@ -56,7 +47,6 @@ export default function EditMenuItemComponentPage() {
     const form = useForm<EditFormModel>({
         defaultValues: {
             name: "",
-            status: "active",
         },
         resolver: zodResolver(EditFormSchema),
     })
@@ -65,7 +55,6 @@ export default function EditMenuItemComponentPage() {
         if (component) {
             form.reset({
                 name: component.name || "",
-                status: (component.status as "active" | "inactive") || "active",
             })
         }
     }, [component, form])
@@ -166,36 +155,6 @@ export default function EditMenuItemComponentPage() {
                                     </div>
                                 </div>
 
-                                <div className="sm:col-span-4 px-1">
-                                    <label
-                                        htmlFor="status"
-                                        className="block text-sm/6 font-medium text-gray-900 dark:text-white"
-                                    >
-                                        Status
-                                    </label>
-                                    <div className="mt-2">
-                                        <FormField
-                                            control={form.control}
-                                            name="status"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <Select onValueChange={field.onChange} value={field.value}>
-                                                        <FormControl>
-                                                            <SelectTrigger className="w-full">
-                                                                <SelectValue placeholder="Select status" />
-                                                            </SelectTrigger>
-                                                        </FormControl>
-                                                        <SelectContent>
-                                                            <SelectItem value="active">Active</SelectItem>
-                                                            <SelectItem value="inactive">Inactive</SelectItem>
-                                                        </SelectContent>
-                                                    </Select>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>

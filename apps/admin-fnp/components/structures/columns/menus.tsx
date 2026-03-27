@@ -1,11 +1,11 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { MenuItemComponent } from "@/lib/schemas"
+import { Menu } from "@/lib/schemas"
 import { Checkbox } from "@/components/ui/checkbox"
-import { MenuItemComponentDropDown } from "@/components/structures/dropdowns/menu-item-component-dropdown"
+import { MenuDropDown } from "@/components/structures/dropdowns/menu-dropdown"
 
-export const menuItemComponentColumns: ColumnDef<MenuItemComponent>[] = [
+export const menuColumns: ColumnDef<Menu>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -32,8 +32,23 @@ export const menuItemComponentColumns: ColumnDef<MenuItemComponent>[] = [
     header: "Name",
   },
   {
-    accessorKey: "slug",
-    header: "Slug",
+    accessorKey: "note",
+    header: "Note",
+    cell: ({ row }) => row.original.note || "-",
+  },
+  {
+    accessorKey: "location_name",
+    header: "Location",
+    cell: ({ row }) => (
+      <span className="capitalize">{row.original.location_name || "-"}</span>
+    ),
+  },
+  {
+    accessorKey: "status",
+    header: "Status",
+    cell: ({ row }) => (
+      <span className="capitalize">{row.original.status || "-"}</span>
+    ),
   },
   {
     accessorKey: "created",
@@ -50,6 +65,6 @@ export const menuItemComponentColumns: ColumnDef<MenuItemComponent>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => <MenuItemComponentDropDown component={row.original} />,
+    cell: ({ row }) => <MenuDropDown menu={row.original} />,
   },
 ]
