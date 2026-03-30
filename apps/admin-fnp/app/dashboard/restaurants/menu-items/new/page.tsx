@@ -214,8 +214,8 @@ export default function NewMenuItemPage() {
                                             {menus?.map((menu) => (
                                                 <SelectItem key={menu.id} value={menu.id}>
                                                     <span className="capitalize">{menu.name}</span>
-                                                    {menu.location_name && (
-                                                        <span className="ml-1 text-gray-500 dark:text-gray-400">— {menu.location_name}</span>
+                                                    {menu.locations?.length > 0 && (
+                                                        <span className="ml-1 text-gray-500 dark:text-gray-400">— {menu.locations.map(l => l.location_name).join(", ")}</span>
                                                     )}
                                                 </SelectItem>
                                             ))}

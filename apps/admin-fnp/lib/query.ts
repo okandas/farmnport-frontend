@@ -1043,12 +1043,12 @@ export function queryMenuItemComponent(id: string) {
   return api.get(url)
 }
 
-export function addMenuItemComponent(data: { name: string; status: string }) {
+export function addMenuItemComponent(data: { name: string }) {
   let url = `${baseUrl}/menu-item-components/add`
   return api.post(url, data)
 }
 
-export function updateMenuItemComponent(data: { id: string; name: string; status: string }) {
+export function updateMenuItemComponent(data: { id: string; name: string }) {
   let url = `${baseUrl}/menu-item-components/update`
   return api.post(url, data)
 }
