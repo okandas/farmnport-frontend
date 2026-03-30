@@ -126,4 +126,21 @@ export const orderColumns: ColumnDef<OrderRow>[] = [
       return <span className="text-sm">{formatDate(row.original.created)}</span>
     },
   },
+  {
+    id: "actions",
+    header: "Actions",
+    cell: ({ row }) => {
+      const order = row.original
+      return (
+        <Link
+          href={`/dashboard/restaurants/sales/orders/${order.id}`}
+          className="text-sm font-medium text-blue-600 hover:text-blue-800"
+        >
+          View
+        </Link>
+      )
+    },
+    enableSorting: false,
+    enableHiding: false,
+  },
 ]

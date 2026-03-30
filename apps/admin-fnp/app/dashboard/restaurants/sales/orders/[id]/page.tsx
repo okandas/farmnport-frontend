@@ -242,16 +242,18 @@ export default function RestaurantOrderDetailPage() {
       {/* Actions */}
       {actions.length > 0 && (
         <div className="flex gap-2">
-          {actions.map((action) => (
-            <Button
-              key={action.status}
-              variant={action.variant}
-              onClick={() => statusMutation.mutate(action.status)}
-              disabled={statusMutation.isPending}
-            >
-              {action.label}
-            </Button>
-          ))}
+          {actions
+            .filter((action) => action.status !== "cancelled")
+            .map((action) => (
+              <Button
+                key={action.status}
+                variant={action.variant}
+                onClick={() => statusMutation.mutate(action.status)}
+                disabled={statusMutation.isPending}
+              >
+                {action.label}
+              </Button>
+            ))}
         </div>
       )}
 
@@ -368,6 +370,19 @@ export default function RestaurantOrderDetailPage() {
             </div>
           </CardContent>
         </Card>
+      )}
+
+      {/* Cancel Order */}
+      {order.status !== "delivered" && order.status !== "cancelled" && (
+        <div className="flex gap-2 pt-4 border-t">
+          <Button
+            variant="destructive"
+            onClick={() => statusMutation.mutate("cancelled")}
+            disabled={statusMutation.isPending}
+          >
+            Cancel Order
+          </Button>
+        </div>
       )}
     </div>
   )
