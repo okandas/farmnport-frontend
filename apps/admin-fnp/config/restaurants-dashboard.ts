@@ -19,8 +19,28 @@ export const restaurantsDashboardConfig: DashboardConfig = {
       ],
     },
     {
+      label: "Sales",
+      items: [
+        {
+          title: "Overview",
+          href: "/dashboard/restaurants/sales",
+          icon: "barChart",
+        },
+        {
+          title: "Orders",
+          href: "/dashboard/restaurants/sales/orders",
+          icon: "shoppingCart",
+        },
+      ],
+    },
+    {
       label: "Menu Catalog",
       items: [
+        {
+          title: "Menu Categories",
+          href: "/dashboard/restaurants/menu-categories",
+          icon: "layers",
+        },
         {
           title: "Menus",
           href: "/dashboard/restaurants/menus",

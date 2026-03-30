@@ -54,6 +54,9 @@ import {
   Sprout,
   Egg,
   LayoutDashboard,
+  ShoppingCart,
+  Bell,
+  BarChart3,
 } from "lucide-react"
 
 export type Icon = LucideIcon
@@ -116,4 +119,7 @@ export const Icons = {
   sprout: Sprout,
   egg: Egg,
   dashboard: LayoutDashboard,
+  shoppingCart: ShoppingCart,
+  bell: Bell,
+  barChart: BarChart3,
 }

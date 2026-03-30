@@ -919,6 +919,73 @@ export function queryDashboardStats() {
   return api.get(url)
 }
 
+// Orders & Sales
+type orderPagination = {
+  p?: number
+  search?: string
+  limit?: number
+  status?: string
+  order_type?: string
+}
+
+export function queryOrders(pagination?: orderPagination) {
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) {
+    params.append("p", pagination.p.toString())
+  }
+  if (pagination?.search !== undefined && pagination.search.length >= 2) {
+    params.append("search", pagination.search)
+  }
+  if (pagination?.limit !== undefined) {
+    params.append("limit", pagination.limit.toString())
+  }
+  if (pagination?.status) {
+    params.append("status", pagination.status)
+  }
+  if (pagination?.order_type) {
+    params.append("order_type", pagination.order_type)
+  }
+  const qs = params.toString()
+  const url = `${baseUrl}/user/orders${qs ? `?${qs}` : ""}`
+  return api.get(url)
+}
+
+export function queryOrder(id: string) {
+  const url = `${baseUrl}/user/orders/${id}`
+  return api.get(url)
+}
+
+export function updateOrderStatus(data: { order_id: string; status: string; note?: string }) {
+  const url = `${baseUrl}/user/orders/update-status`
+  return api.post(url, data)
+}
+
+export function querySalesStats(orderType?: string) {
+  const params = new URLSearchParams()
+  if (orderType) {
+    params.append("order_type", orderType)
+  }
+  const qs = params.toString()
+  const url = `${baseUrl}/user/sales-stats${qs ? `?${qs}` : ""}`
+  return api.get(url)
+}
+
+// Notifications
+export function queryUnreadNotificationCount() {
+  const url = `${baseUrl}/user/notifications/unread-count`
+  return api.get(url)
+}
+
+export function queryRecentNotifications() {
+  const url = `${baseUrl}/user/notifications/recent`
+  return api.get(url)
+}
+
+export function markNotificationsRead(data: { ids?: string[]; all?: boolean }) {
+  const url = `${baseUrl}/user/notifications/mark-read`
+  return api.post(url, data)
+}
+
 // Restaurants
 export function addRestaurant(data: { name: string; status: string }) {
   let url = `${baseUrl}/restaurants/add`
@@ -987,6 +1054,43 @@ export function deleteRestaurantLocation(id: string) {
   return api.delete(url)
 }
 
+// Menu Categories
+export function queryMenuCategories(pagination?: pagination) {
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) {
+    params.set("p", String(pagination.p))
+  }
+  if (pagination?.search !== undefined && pagination.search.length >= 2) {
+    params.set("search", pagination.search)
+  }
+  if (pagination?.limit !== undefined) {
+    params.set("limit", String(pagination.limit))
+  }
+  const qs = params.toString()
+  const url = `${baseUrl}/menu-categories/list${qs ? `?${qs}` : ""}`
+  return api.get(url)
+}
+
+export function queryMenuCategory(id: string) {
+  let url = `${baseUrl}/menu-categories/get/${id}`
+  return api.get(url)
+}
+
+export function addMenuCategory(data: { name: string; description: string }) {
+  let url = `${baseUrl}/menu-categories/add`
+  return api.post(url, data)
+}
+
+export function updateMenuCategory(data: { id: string; name: string; description: string }) {
+  let url = `${baseUrl}/menu-categories/update`
+  return api.post(url, data)
+}
+
+export function deleteMenuCategory(id: string) {
+  let url = `${baseUrl}/menu-categories/delete/${id}`
+  return api.delete(url)
+}
+
 // Menu Item Categories
 export function queryMenuItemCategories(pagination?: pagination) {
   const params = new URLSearchParams()
@@ -1043,12 +1147,12 @@ export function queryMenuItemComponent(id: string) {
   return api.get(url)
 }
 
-export function addMenuItemComponent(data: { name: string; status: string }) {
+export function addMenuItemComponent(data: { name: string }) {
   let url = `${baseUrl}/menu-item-components/add`
   return api.post(url, data)
 }
 
-export function updateMenuItemComponent(data: { id: string; name: string; status: string }) {
+export function updateMenuItemComponent(data: { id: string; name: string }) {
   let url = `${baseUrl}/menu-item-components/update`
   return api.post(url, data)
 }

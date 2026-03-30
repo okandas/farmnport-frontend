@@ -19,6 +19,21 @@ export const dashboardConfig: DashboardConfig = {
       ],
     },
     {
+      label: "Sales",
+      items: [
+        {
+          title: "Overview",
+          href: "/dashboard/farmnport/sales",
+          icon: "barChart",
+        },
+        {
+          title: "Orders",
+          href: "/dashboard/farmnport/sales/orders",
+          icon: "shoppingCart",
+        },
+      ],
+    },
+    {
       label: "Management",
       items: [
         {
