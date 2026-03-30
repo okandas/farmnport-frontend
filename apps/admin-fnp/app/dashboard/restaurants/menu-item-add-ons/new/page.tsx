@@ -6,17 +6,15 @@ import { useMutation, useQuery } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
 import { useDebounce } from "use-debounce"
 
-import { addMenuItem, queryMenuItemCategories, queryMenuItemComponents, queryMenus } from "@/lib/query"
+import { addMenuItemAddOn, queryMenuItemCategories, queryMenuItemComponents, queryMenus } from "@/lib/query"
 import { MenuItemCategory, MenuItemComponent, CompositionEntry, Menu } from "@/lib/schemas"
 import { cn, dollarsToCents } from "@/lib/utilities"
-import { Checkbox } from "@/components/ui/checkbox"
 import { buttonVariants } from "@/components/ui/button"
 import { Button } from "@/components/ui/button"
 import { Icons } from "@/components/icons/lucide"
 import { toast } from "@/components/ui/use-toast"
 import { handleApiError, handleFetchError } from "@/lib/error-handler"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import {
     Select,
     SelectContent,
@@ -37,29 +35,17 @@ import {
     CommandList,
 } from "@/components/ui/command"
 
-export default function NewMenuItemPage() {
+export default function NewMenuItemAddOnPage() {
     const router = useRouter()
 
     const [menuId, setMenuId] = useState("")
-    const [name, setName] = useState("")
-    const [description, setDescription] = useState("")
-    const [priceCents, setPriceCents] = useState("")
-    const [priceOnRequest, setPriceOnRequest] = useState(false)
     const [categoryId, setCategoryId] = useState("")
+    const [name, setName] = useState("")
+    const [priceCents, setPriceCents] = useState("")
     const [status, setStatus] = useState("active")
     const [selectedComponents, setSelectedComponents] = useState<CompositionEntry[]>([])
     const [searchComponent, setSearchComponent] = useState("")
     const [openComponents, setOpenComponents] = useState(false)
-    const [selectedTags, setSelectedTags] = useState<string[]>([])
-    const [sizes, setSizes] = useState<{ name: string; price_cents: string }[]>([])
-
-    const availableTags = ["Vegetarian", "Vegetarian On Request", "Gluten Free", "Scrambled", "Fried", "Grilled"]
-
-    const handleToggleTag = (tag: string) => {
-        setSelectedTags(prev =>
-            prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
-        )
-    }
 
     const [debouncedComponentQuery] = useDebounce(searchComponent, 1000)
 
@@ -119,16 +105,16 @@ export default function NewMenuItemPage() {
     }
 
     const { mutate, isPending } = useMutation({
-        mutationFn: addMenuItem,
+        mutationFn: addMenuItemAddOn,
         onSuccess: () => {
             toast({
-                description: "Menu item added successfully",
+                description: "Add-on created successfully",
             })
-            router.push("/dashboard/restaurants/menu-items")
+            router.push("/dashboard/restaurants/menu-item-add-ons")
         },
         onError: (error) => {
             handleApiError(error, {
-                context: "menu item creation"
+                context: "add-on creation"
             })
         },
     })
@@ -141,29 +127,22 @@ export default function NewMenuItemPage() {
             return
         }
 
-        if (!name.trim()) {
-            toast({ description: "Name is required", variant: "destructive" })
-            return
-        }
-
         if (!categoryId) {
             toast({ description: "Category is required", variant: "destructive" })
             return
         }
 
+        if (!name.trim()) {
+            toast({ description: "Name is required", variant: "destructive" })
+            return
+        }
+
         mutate({
             menu_id: menuId,
-            name: name.trim(),
-            description: description.trim(),
-            price_cents: priceOnRequest ? 0 : dollarsToCents(parseFloat(priceCents || "0")),
-            price_on_request: priceOnRequest,
             category_id: categoryId,
+            name: name.trim(),
+            price_cents: dollarsToCents(parseFloat(priceCents || "0")),
             composition: selectedComponents,
-            sizes: sizes.filter(s => s.name.trim()).map(s => ({
-                name: s.name.trim(),
-                price_cents: dollarsToCents(parseFloat(s.price_cents || "0")),
-            })),
-            tags: selectedTags,
             status,
         })
     }
@@ -173,14 +152,14 @@ export default function NewMenuItemPage() {
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-                        Add Menu Item
+                        Add Add-On
                     </h1>
                     <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                        Create a new menu item (dish).
+                        Create a new menu item add-on.
                     </p>
                 </div>
                 <Link
-                    href="/dashboard/restaurants/menu-items"
+                    href="/dashboard/restaurants/menu-item-add-ons"
                     className={cn(buttonVariants({ variant: "ghost" }))}
                 >
                     <Icons.close className="w-4 h-4 mr-2" />
@@ -193,10 +172,10 @@ export default function NewMenuItemPage() {
                     <div className="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-gray-900/10 pb-12 md:grid-cols-3 dark:border-white/10">
                         <div>
                             <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">
-                                Menu Item Details
+                                Add-On Details
                             </h2>
                             <p className="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">
-                                Select which menu this item belongs to and provide the basic details.
+                                Select the menu and category this add-on applies to, then provide the name and price.
                             </p>
                         </div>
 
@@ -214,9 +193,6 @@ export default function NewMenuItemPage() {
                                             {menus?.map((menu) => (
                                                 <SelectItem key={menu.id} value={menu.id}>
                                                     <span className="capitalize">{menu.name}</span>
-                                                    {menu.location_name && (
-                                                        <span className="ml-1 text-gray-500 dark:text-gray-400">— {menu.location_name}</span>
-                                                    )}
                                                 </SelectItem>
                                             ))}
                                         </SelectContent>
@@ -224,93 +200,7 @@ export default function NewMenuItemPage() {
                                 </div>
                             </div>
 
-                            {(() => {
-                                const selectedMenu = menus?.find(m => m.id === menuId)
-                                const locations = selectedMenu?.locations || []
-                                if (locations.length === 0) return null
-                                return (
-                                    <div className="sm:col-span-4">
-                                        <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">
-                                            Served At
-                                        </label>
-                                        <div className="mt-2 flex flex-wrap gap-2">
-                                            {locations.map(loc => (
-                                                <span
-                                                    key={loc.location_id}
-                                                    className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 ring-1 ring-inset ring-indigo-700/10 dark:bg-indigo-400/10 dark:text-indigo-400 dark:ring-indigo-400/30"
-                                                >
-                                                    {loc.location_name}
-                                                </span>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )
-                            })()}
-
                             <div className="sm:col-span-4">
-                                <label htmlFor="name" className="block text-sm/6 font-medium text-gray-900 dark:text-white">
-                                    Name
-                                </label>
-                                <div className="mt-2">
-                                    <Input
-                                        id="name"
-                                        placeholder="Enter menu item name"
-                                        value={name}
-                                        onChange={(e) => setName(e.target.value)}
-                                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="col-span-full">
-                                <label htmlFor="description" className="block text-sm/6 font-medium text-gray-900 dark:text-white">
-                                    Description
-                                </label>
-                                <div className="mt-2">
-                                    <Textarea
-                                        id="description"
-                                        placeholder="e.g. Sirloin steak grilled to your liking served with eggs and chips"
-                                        rows={3}
-                                        value={description}
-                                        onChange={(e) => setDescription(e.target.value)}
-                                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="sm:col-span-3">
-                                <label htmlFor="price" className="block text-sm/6 font-medium text-gray-900 dark:text-white">
-                                    Price ($)
-                                </label>
-                                <div className="mt-2">
-                                    <Input
-                                        id="price"
-                                        type="number"
-                                        step="0.01"
-                                        min="0"
-                                        placeholder="e.g. 9.99"
-                                        value={priceOnRequest ? "" : priceCents}
-                                        onChange={(e) => setPriceCents(e.target.value)}
-                                        disabled={priceOnRequest}
-                                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
-                                    />
-                                </div>
-                                <div className="flex items-center gap-2 mt-2">
-                                    <Checkbox
-                                        id="price_on_request"
-                                        checked={priceOnRequest}
-                                        onCheckedChange={(checked) => {
-                                            setPriceOnRequest(!!checked)
-                                            if (checked) setPriceCents("")
-                                        }}
-                                    />
-                                    <label htmlFor="price_on_request" className="text-sm text-gray-600 dark:text-gray-400 cursor-pointer">
-                                        Price on request
-                                    </label>
-                                </div>
-                            </div>
-
-                            <div className="sm:col-span-3">
                                 <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">
                                     Category
                                 </label>
@@ -330,90 +220,39 @@ export default function NewMenuItemPage() {
                                 </div>
                             </div>
 
-                            <div className="col-span-full">
-                                <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">
-                                    Size Options
-                                </label>
-                                <p className="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">
-                                    Add size variants if this item comes in multiple sizes (e.g. Small, Medium, Large).
-                                </p>
-                                <div className="mt-3 space-y-3">
-                                    {sizes.map((size, index) => (
-                                        <div key={index} className="flex items-center gap-3">
-                                            <Input
-                                                placeholder="Size name (e.g. Medium)"
-                                                value={size.name}
-                                                onChange={(e) => {
-                                                    const updated = [...sizes]
-                                                    updated[index] = { ...updated[index], name: e.target.value }
-                                                    setSizes(updated)
-                                                }}
-                                                className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
-                                            />
-                                            <Input
-                                                type="number"
-                                                step="0.01"
-                                                min="0"
-                                                placeholder="Price ($)"
-                                                value={size.price_cents}
-                                                onChange={(e) => {
-                                                    const updated = [...sizes]
-                                                    updated[index] = { ...updated[index], price_cents: e.target.value }
-                                                    setSizes(updated)
-                                                }}
-                                                className="block w-40 rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
-                                            />
-                                            <button
-                                                type="button"
-                                                onClick={() => setSizes(sizes.filter((_, i) => i !== index))}
-                                                className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
-                                            >
-                                                <Icons.close className="w-4 h-4" />
-                                            </button>
-                                        </div>
-                                    ))}
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => setSizes([...sizes, { name: "", price_cents: "" }])}
-                                    >
-                                        <Icons.add className="w-4 h-4 mr-1" />
-                                        Add Size
-                                    </Button>
-                                </div>
-                            </div>
-
                             <div className="sm:col-span-4">
-                                <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">
-                                    Status
+                                <label htmlFor="name" className="block text-sm/6 font-medium text-gray-900 dark:text-white">
+                                    Name
                                 </label>
                                 <div className="mt-2">
-                                    <Select onValueChange={setStatus} value={status}>
-                                        <SelectTrigger className="w-full">
-                                            <SelectValue placeholder="Select status" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="active">Active</SelectItem>
-                                            <SelectItem value="inactive">Inactive</SelectItem>
-                                        </SelectContent>
-                                    </Select>
+                                    <Input
+                                        id="name"
+                                        placeholder="e.g. French Fries"
+                                        value={name}
+                                        onChange={(e) => setName(e.target.value)}
+                                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
+                                    />
                                 </div>
                             </div>
-                        </div>
-                    </div>
 
-                    <div className="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-gray-900/10 pb-12 md:grid-cols-3 dark:border-white/10">
-                        <div>
-                            <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">
-                                Composition & Tags
-                            </h2>
-                            <p className="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">
-                                Add the ingredients that make up this dish and any dietary tags.
-                            </p>
-                        </div>
+                            <div className="sm:col-span-3">
+                                <label htmlFor="price" className="block text-sm/6 font-medium text-gray-900 dark:text-white">
+                                    Price ($)
+                                </label>
+                                <div className="mt-2">
+                                    <Input
+                                        id="price"
+                                        type="number"
+                                        step="0.01"
+                                        min="0"
+                                        placeholder="e.g. 2.00"
+                                        value={priceCents}
+                                        onChange={(e) => setPriceCents(e.target.value)}
+                                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
+                                    />
+                                </div>
+                            </div>
 
-                        <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 md:col-span-2">
                             <div className="col-span-full">
                                 <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">
                                     Composition
@@ -486,31 +325,24 @@ export default function NewMenuItemPage() {
                                     </PopoverContent>
                                 </Popover>
                                 <p className="mt-3 text-sm/6 text-gray-600 dark:text-gray-400">
-                                    Select the components that make up this dish (e.g. Steak, Eggs, Chips).
+                                    Select the components that make up this add-on (e.g. Chips, Salad).
                                 </p>
                             </div>
 
-                            <div className="col-span-full">
+                            <div className="sm:col-span-4">
                                 <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">
-                                    Tags
+                                    Status
                                 </label>
-                                <div className="flex flex-wrap gap-2 mt-2">
-                                    {availableTags.map(tag => (
-                                        <button
-                                            key={tag}
-                                            type="button"
-                                            onClick={() => handleToggleTag(tag)}
-                                            className={cn(
-                                                "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium border transition-colors",
-                                                selectedTags.includes(tag)
-                                                    ? "bg-indigo-50 border-indigo-300 text-indigo-700 dark:bg-indigo-900/20 dark:border-indigo-600 dark:text-indigo-300"
-                                                    : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50 dark:bg-white/5 dark:border-white/10 dark:text-gray-300 dark:hover:bg-white/10"
-                                            )}
-                                        >
-                                            {selectedTags.includes(tag) && <Icons.check className="w-3.5 h-3.5" />}
-                                            {tag}
-                                        </button>
-                                    ))}
+                                <div className="mt-2">
+                                    <Select onValueChange={setStatus} value={status}>
+                                        <SelectTrigger className="w-full">
+                                            <SelectValue placeholder="Select status" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="active">Active</SelectItem>
+                                            <SelectItem value="inactive">Inactive</SelectItem>
+                                        </SelectContent>
+                                    </Select>
                                 </div>
                             </div>
                         </div>
@@ -520,7 +352,7 @@ export default function NewMenuItemPage() {
                 <div className="mt-6 flex items-center justify-end gap-x-6">
                     <button
                         type="button"
-                        onClick={() => router.push("/dashboard/restaurants/menu-items")}
+                        onClick={() => router.push("/dashboard/restaurants/menu-item-add-ons")}
                         className="text-sm/6 font-semibold text-gray-900 dark:text-white"
                     >
                         Cancel

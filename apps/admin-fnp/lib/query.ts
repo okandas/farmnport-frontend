@@ -1143,3 +1143,48 @@ export function deleteMenuItem(id: string) {
   let url = `${baseUrl}/menu-items/delete/${id}`
   return api.delete(url)
 }
+
+// Menu Item Add-Ons
+type menuItemAddOnPagination = pagination & {
+  menu_id?: string
+  category_id?: string
+}
+
+export function queryMenuItemAddOns(pagination?: menuItemAddOnPagination) {
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) {
+    params.set("p", String(pagination.p))
+  }
+  if (pagination?.search !== undefined && pagination.search.length >= 2) {
+    params.set("search", pagination.search)
+  }
+  if (pagination?.menu_id) {
+    params.set("menu_id", pagination.menu_id)
+  }
+  if (pagination?.category_id) {
+    params.set("category_id", pagination.category_id)
+  }
+  const qs = params.toString()
+  const url = `${baseUrl}/menu-item-add-ons/list${qs ? `?${qs}` : ""}`
+  return api.get(url)
+}
+
+export function queryMenuItemAddOn(id: string) {
+  let url = `${baseUrl}/menu-item-add-ons/get/${id}`
+  return api.get(url)
+}
+
+export function addMenuItemAddOn(data: any) {
+  let url = `${baseUrl}/menu-item-add-ons/add`
+  return api.post(url, data)
+}
+
+export function updateMenuItemAddOn(data: any) {
+  let url = `${baseUrl}/menu-item-add-ons/update`
+  return api.post(url, data)
+}
+
+export function deleteMenuItemAddOn(id: string) {
+  let url = `${baseUrl}/menu-item-add-ons/delete/${id}`
+  return api.delete(url)
+}

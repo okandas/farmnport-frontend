@@ -9,6 +9,7 @@ import { useDebounce } from "use-debounce"
 import { queryMenuItem, updateMenuItem, queryMenuItemCategories, queryMenuItemComponents, queryMenus } from "@/lib/query"
 import { MenuItem, MenuItemCategory, MenuItemComponent, CompositionEntry, Menu } from "@/lib/schemas"
 import { cn, dollarsToCents, centsToDollarsFormInputs, centsToDollars } from "@/lib/utilities"
+import { Checkbox } from "@/components/ui/checkbox"
 import { buttonVariants } from "@/components/ui/button"
 import { Button } from "@/components/ui/button"
 import { Icons } from "@/components/icons/lucide"
@@ -46,6 +47,7 @@ export default function EditMenuItemPage() {
     const [name, setName] = useState("")
     const [description, setDescription] = useState("")
     const [priceCents, setPriceCents] = useState("")
+    const [priceOnRequest, setPriceOnRequest] = useState(false)
     const [categoryId, setCategoryId] = useState("")
     const [status, setStatus] = useState("active")
     const [selectedComponents, setSelectedComponents] = useState<CompositionEntry[]>([])
@@ -90,6 +92,7 @@ export default function EditMenuItemPage() {
             setName(menuItem.name || "")
             setDescription(menuItem.description || "")
             setPriceCents(String(centsToDollarsFormInputs(menuItem.price_cents || 0)))
+            setPriceOnRequest(menuItem.price_on_request || false)
             setCategoryId(menuItem.category_id || "")
             setStatus(menuItem.status || "active")
             setSelectedComponents(menuItem.composition || [])
@@ -189,7 +192,8 @@ export default function EditMenuItemPage() {
             menu_id: effectiveMenuId,
             name: name.trim(),
             description: description.trim(),
-            price_cents: dollarsToCents(parseFloat(priceCents || "0")),
+            price_cents: priceOnRequest ? 0 : dollarsToCents(parseFloat(priceCents || "0")),
+            price_on_request: priceOnRequest,
             category_id: effectiveCategoryId,
             composition: selectedComponents,
             sizes: sizes.filter(s => s.name.trim()).map(s => ({
@@ -274,6 +278,29 @@ export default function EditMenuItemPage() {
                                 </div>
                             </div>
 
+                            {(() => {
+                                const selectedMenu = menus.find(m => m.id === (menuId || menuItem?.menu_id))
+                                const locations = selectedMenu?.locations || []
+                                if (locations.length === 0) return null
+                                return (
+                                    <div className="sm:col-span-4">
+                                        <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">
+                                            Served At
+                                        </label>
+                                        <div className="mt-2 flex flex-wrap gap-2">
+                                            {locations.map(loc => (
+                                                <span
+                                                    key={loc.location_id}
+                                                    className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 ring-1 ring-inset ring-indigo-700/10 dark:bg-indigo-400/10 dark:text-indigo-400 dark:ring-indigo-400/30"
+                                                >
+                                                    {loc.location_name}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )
+                            })()}
+
                             <div className="sm:col-span-4">
                                 <label htmlFor="name" className="block text-sm/6 font-medium text-gray-900 dark:text-white">
                                     Name
@@ -316,10 +343,24 @@ export default function EditMenuItemPage() {
                                         step="0.01"
                                         min="0"
                                         placeholder="e.g. 9.99"
-                                        value={priceCents}
+                                        value={priceOnRequest ? "" : priceCents}
                                         onChange={(e) => setPriceCents(e.target.value)}
+                                        disabled={priceOnRequest}
                                         className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
                                     />
+                                </div>
+                                <div className="flex items-center gap-2 mt-2">
+                                    <Checkbox
+                                        id="price_on_request"
+                                        checked={priceOnRequest}
+                                        onCheckedChange={(checked) => {
+                                            setPriceOnRequest(!!checked)
+                                            if (checked) setPriceCents("")
+                                        }}
+                                    />
+                                    <label htmlFor="price_on_request" className="text-sm text-gray-600 dark:text-gray-400 cursor-pointer">
+                                        Price on request
+                                    </label>
                                 </div>
                             </div>
 
