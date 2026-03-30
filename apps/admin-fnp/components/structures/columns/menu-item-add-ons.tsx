@@ -1,12 +1,12 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { MenuItem } from "@/lib/schemas"
+import { MenuItemAddOn } from "@/lib/schemas"
 import { centsToDollars } from "@/lib/utilities"
 import { Checkbox } from "@/components/ui/checkbox"
-import { MenuItemDropDown } from "@/components/structures/dropdowns/menu-item-dropdown"
+import { MenuItemAddOnDropDown } from "@/components/structures/dropdowns/menu-item-add-on-dropdown"
 
-export const menuItemColumns: ColumnDef<MenuItem>[] = [
+export const menuItemAddOnColumns: ColumnDef<MenuItemAddOn>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -40,43 +40,16 @@ export const menuItemColumns: ColumnDef<MenuItem>[] = [
     ),
   },
   {
-    accessorKey: "price_cents",
-    header: "Price",
-    cell: ({ row }) => {
-      if (row.original.price_on_request) {
-        return <span className="text-amber-600 dark:text-amber-400 font-medium">P.O.R</span>
-      }
-      const sizes = row.original.sizes
-      if (sizes && sizes.length > 0) {
-        const prices = sizes.map(s => s.price_cents)
-        const min = Math.min(...prices)
-        const max = Math.max(...prices)
-        if (min === max) return centsToDollars(min)
-        return `${centsToDollars(min)} – ${centsToDollars(max)}`
-      }
-      return centsToDollars(row.original.price_cents || 0)
-    },
-  },
-  {
     accessorKey: "category_name",
     header: "Category",
+    cell: ({ row }) => (
+      <span className="capitalize">{row.original.category_name || "-"}</span>
+    ),
   },
   {
-    id: "locations",
-    header: "Served At",
-    cell: ({ row }) => {
-      const locations = (row.original as any).location_names as string[] | undefined
-      if (!locations || locations.length === 0) return "-"
-      return (
-        <div className="flex flex-wrap gap-1">
-          {locations.map((name, i) => (
-            <span key={i} className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 ring-1 ring-inset ring-indigo-700/10 dark:bg-indigo-400/10 dark:text-indigo-400 dark:ring-indigo-400/30">
-              {name}
-            </span>
-          ))}
-        </div>
-      )
-    },
+    accessorKey: "price_cents",
+    header: "Price",
+    cell: ({ row }) => centsToDollars(row.original.price_cents || 0),
   },
   {
     accessorKey: "status",
@@ -98,6 +71,6 @@ export const menuItemColumns: ColumnDef<MenuItem>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => <MenuItemDropDown menuItem={row.original} />,
+    cell: ({ row }) => <MenuItemAddOnDropDown addOn={row.original} />,
   },
 ]

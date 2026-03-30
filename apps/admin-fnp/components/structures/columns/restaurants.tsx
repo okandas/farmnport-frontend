@@ -3,6 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { Restaurant } from "@/lib/schemas"
 import { Checkbox } from "@/components/ui/checkbox"
+import { RestaurantDropDown } from "@/components/structures/dropdowns/restaurant-dropdown"
 
 export const restaurantColumns: ColumnDef<Restaurant>[] = [
   {
@@ -53,5 +54,9 @@ export const restaurantColumns: ColumnDef<Restaurant>[] = [
         year: "numeric",
       })
     },
+  },
+  {
+    id: "actions",
+    cell: ({ row }) => <RestaurantDropDown restaurant={row.original} />,
   },
 ]

@@ -22,16 +22,6 @@ export const restaurantsDashboardConfig: DashboardConfig = {
       label: "Menu Catalog",
       items: [
         {
-          title: "Categories",
-          href: "/dashboard/restaurants/menu-item-categories",
-          icon: "tag",
-        },
-        {
-          title: "Components",
-          href: "/dashboard/restaurants/menu-item-components",
-          icon: "egg",
-        },
-        {
           title: "Menus",
           href: "/dashboard/restaurants/menus",
           icon: "clipboardList",
@@ -40,6 +30,21 @@ export const restaurantsDashboardConfig: DashboardConfig = {
           title: "Menu Items",
           href: "/dashboard/restaurants/menu-items",
           icon: "utensilsCrossed",
+        },
+        {
+          title: "Categories",
+          href: "/dashboard/restaurants/menu-item-categories",
+          icon: "tag",
+        },
+        {
+          title: "Add-Ons",
+          href: "/dashboard/restaurants/menu-item-add-ons",
+          icon: "sparkles",
+        },
+        {
+          title: "Components",
+          href: "/dashboard/restaurants/menu-item-components",
+          icon: "egg",
         },
       ],
     },

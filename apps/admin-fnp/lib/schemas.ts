@@ -1174,6 +1174,7 @@ export type MenuResponse = {
 export const MenuItemCategorySchema = z.object({
   id: z.string(),
   name: z.string().min(1, "Name is required").max(120, "Name cannot exceed 120 characters"),
+  description: z.string().default(""),
   slug: z.string().optional(),
   created: z.string().optional(),
   updated: z.string().optional(),
@@ -1231,6 +1232,7 @@ export const MenuItemSchema = z.object({
   slug: z.string().optional(),
   description: z.string().optional().default(""),
   price_cents: z.number().default(0),
+  price_on_request: z.boolean().default(false),
   category_id: z.string().min(1, "Category is required"),
   category_name: z.string().optional(),
   composition: z.array(CompositionEntrySchema).default([]),
@@ -1246,6 +1248,7 @@ export const FormMenuItemSchema = MenuItemSchema.pick({
   name: true,
   description: true,
   price_cents: true,
+  price_on_request: true,
   category_id: true,
   status: true,
 }).extend({
@@ -1261,4 +1264,38 @@ export type FormMenuItemModel = z.infer<typeof FormMenuItemSchema>
 export type MenuItemResponse = {
   total: number
   data: MenuItem[]
+}
+
+// Menu Item Add-On
+export const MenuItemAddOnSchema = z.object({
+  id: z.string(),
+  menu_id: z.string().min(1, "Menu is required"),
+  menu_name: z.string().optional(),
+  category_id: z.string().min(1, "Category is required"),
+  category_name: z.string().optional(),
+  name: z.string().min(1, "Name is required").max(120, "Name cannot exceed 120 characters"),
+  slug: z.string().optional(),
+  price_cents: z.number().default(0),
+  composition: z.array(CompositionEntrySchema).default([]),
+  status: z.enum(["active", "inactive"]).default("active"),
+  created: z.string().optional(),
+  updated: z.string().optional(),
+})
+
+export const FormMenuItemAddOnSchema = MenuItemAddOnSchema.pick({
+  menu_id: true,
+  category_id: true,
+  name: true,
+  price_cents: true,
+  status: true,
+}).extend({
+  composition: z.array(CompositionEntrySchema).default([]),
+})
+
+export type MenuItemAddOn = z.infer<typeof MenuItemAddOnSchema>
+export type FormMenuItemAddOnModel = z.infer<typeof FormMenuItemAddOnSchema>
+
+export type MenuItemAddOnResponse = {
+  total: number
+  data: MenuItemAddOn[]
 }

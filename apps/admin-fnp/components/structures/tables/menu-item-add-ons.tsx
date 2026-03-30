@@ -5,14 +5,14 @@ import { useQuery } from "@tanstack/react-query"
 import { PaginationState } from "@tanstack/react-table"
 import { useDebounce } from "use-debounce"
 
-import { queryMenuItems, queryMenus } from "@/lib/query"
-import { MenuItem, Menu } from "@/lib/schemas"
+import { queryMenuItemAddOns } from "@/lib/query"
+import { MenuItemAddOn } from "@/lib/schemas"
 import { handleFetchError } from "@/lib/error-handler"
 import { Placeholder } from "@/components/state/placeholder"
 import { DataTable } from "@/components/structures/data-table"
-import { menuItemColumns } from "@/components/structures/columns/menu-items"
+import { menuItemAddOnColumns } from "@/components/structures/columns/menu-item-add-ons"
 
-export function MenuItemsTable() {
+export function MenuItemAddOnsTable() {
   const [search, setSearch] = useState("")
   const [debouncedSearch] = useDebounce(search, 500)
 
@@ -22,31 +22,17 @@ export function MenuItemsTable() {
   })
 
   const { isError, isLoading, isFetching, refetch, data, error } = useQuery({
-    queryKey: ["dashboard-menu-items", { p: pagination.pageIndex + 1, search: debouncedSearch }],
+    queryKey: ["dashboard-menu-item-add-ons", { p: pagination.pageIndex + 1, search: debouncedSearch }],
     queryFn: () =>
-      queryMenuItems({
+      queryMenuItemAddOns({
         p: pagination.pageIndex + 1,
         search: debouncedSearch,
       }),
     refetchOnWindowFocus: false
   })
 
-  const { data: menuData } = useQuery({
-    queryKey: ["menus-all"],
-    queryFn: () => queryMenus({ p: 1 }),
-    refetchOnWindowFocus: false,
-  })
-
-  const menus = (menuData?.data?.data as Menu[]) || []
-
-  const rawMenuItems = data?.data?.data as MenuItem[]
+  const addOns = data?.data?.data as MenuItemAddOn[]
   const total = data?.data?.total as number
-
-  const menuItems = rawMenuItems?.map(item => {
-    const menu = menus.find(m => m.id === item.menu_id)
-    const locationNames = menu?.locations?.map(l => l.location_name) || []
-    return { ...item, location_names: locationNames }
-  })
 
   const hasShownError = useRef(false)
   useEffect(() => {
@@ -57,7 +43,7 @@ export function MenuItemsTable() {
           hasShownError.current = false
           refetch()
         },
-        context: "menu items"
+        context: "menu item add-ons"
       })
     }
     if (!isError) {
@@ -69,9 +55,9 @@ export function MenuItemsTable() {
     return (
       <Placeholder>
         <Placeholder.Icon name="close" />
-        <Placeholder.Title>Error Fetching Menu Items</Placeholder.Title>
+        <Placeholder.Title>Error Fetching Add-Ons</Placeholder.Title>
         <Placeholder.Description>
-          Error fetching menu items from the database
+          Error fetching menu item add-ons from the database
         </Placeholder.Description>
       </Placeholder>
     )
@@ -80,17 +66,17 @@ export function MenuItemsTable() {
   if (isLoading || isFetching) {
     return (
       <Placeholder>
-        <Placeholder.Title>Fetching Menu Items</Placeholder.Title>
+        <Placeholder.Title>Fetching Add-Ons</Placeholder.Title>
       </Placeholder>
     )
   }
 
   return (
     <DataTable
-      columns={menuItemColumns}
-      data={menuItems}
-      newUrl="/dashboard/restaurants/menu-items/new"
-      tableName="Menu Item"
+      columns={menuItemAddOnColumns}
+      data={addOns}
+      newUrl="/dashboard/restaurants/menu-item-add-ons/new"
+      tableName="Add-On"
       total={total}
       pagination={pagination}
       setPagination={setPagination}
