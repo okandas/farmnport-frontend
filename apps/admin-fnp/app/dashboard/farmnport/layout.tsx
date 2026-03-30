@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { dashboardConfig } from "@/config/dashboard"
 import { AccountNavigation } from "@/components/navigation/account"
+import { NotificationBell } from "@/components/notifications/notification-bell"
 import { SidebarNavigation } from "@/components/navigation/sidebar"
 import { ScrollArea } from "@/components/ui/scroll-area"
 
@@ -18,7 +19,10 @@ export default async function DashboardLayout({
           <Link href="/dashboard" className="text-sm font-medium hover:text-muted-foreground transition-colors">
             farmnport
           </Link>
-          <AccountNavigation />
+          <div className="flex items-center gap-2">
+            <NotificationBell />
+            <AccountNavigation />
+          </div>
         </div>
       </header>
       <div className="max-w-full flex flex-1 px-8">
