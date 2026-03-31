@@ -38,7 +38,7 @@ export function AdSenseInFeed() {
     }, [])
 
     return (
-        <div className="my-4">
+        <div className="my-4 min-h-[100px]">
             <Script
                 async
                 src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9685248262342396"
@@ -47,7 +47,7 @@ export function AdSenseInFeed() {
             />
             <ins className="adsbygoogle"
                 ref={adRef}
-                style={{ display: adFilled ? "block" : "none" }}
+                style={{ display: "block" }}
                 data-ad-format="fluid"
                 data-ad-layout-key="-gw-3+1f-3d+2z"
                 data-ad-client="ca-pub-9685248262342396"

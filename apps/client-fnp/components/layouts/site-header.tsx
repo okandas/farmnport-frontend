@@ -1,14 +1,13 @@
 'use client'
 
+import { useSession } from "next-auth/react"
 import { MainNav } from "@/components/layouts/main-nav"
 import { MobileNav } from "@/components/layouts/mobile-nav"
-import {  AuthenticatedUser } from "@/lib/schemas"
+import { AuthenticatedUser } from "@/lib/schemas"
 
-interface SiteHeaderProps {
-  user: AuthenticatedUser | null
-}
-
-export function SiteHeader({ user }: SiteHeaderProps) {
+export function SiteHeader() {
+  const { data: session } = useSession()
+  const user = (session?.user as AuthenticatedUser) ?? undefined
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background">
