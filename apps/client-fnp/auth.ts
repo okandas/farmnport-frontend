@@ -172,18 +172,24 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
         },
         async redirect({ url, baseUrl }) {
 
-            const newURL = new URL(url)
-            const entity = newURL.searchParams.get('entity')
-            const wantToSee = newURL.searchParams.get('wantToSee')
+            // Allow relative callback URLs first (before URL parsing)
+            if (url.startsWith("/")) return `${baseUrl}${url}`
 
-            if (wantToSee !== null && entity !== null) {
-                return `${newURL.origin}/${entity}/${wantToSee}`
+            try {
+                const newURL = new URL(url)
+                const entity = newURL.searchParams.get('entity')
+                const wantToSee = newURL.searchParams.get('wantToSee')
+
+                if (wantToSee !== null && entity !== null) {
+                    return `${newURL.origin}/${entity}/${wantToSee}`
+                }
+
+                // Allows callback URLs on the same origin
+                if (newURL.origin === baseUrl) return url
+            } catch {
+                // Fall through to default
             }
 
-            // Allows relative callback URLs
-            if (url.startsWith("/")) return `${baseUrl}${url}`
-            // Allows callback URLs on the same origin
-            else if (new URL(url).origin === baseUrl) return url
             return baseUrl
         },
         async jwt({ token, user }) {

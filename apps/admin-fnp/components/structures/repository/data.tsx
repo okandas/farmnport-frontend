@@ -25,6 +25,7 @@ export const pricingBasis = [
 export const paymentTermsOptions = [
   { value: "cod", label: "Cash on Delivery" },
   { value: "cbd", label: "Cash Before Delivery" },
+  { value: "ndad", label: "Next Day After Delivery" },
   { value: "7-days", label: "7 Days" },
   { value: "14-days", label: "14 Days" },
   { value: "30-days", label: "30 Days" },

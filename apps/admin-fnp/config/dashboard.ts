@@ -51,6 +51,11 @@ export const dashboardConfig: DashboardConfig = {
           href: "/dashboard/farmnport/buyer-contacts",
           icon: "badgeCheck",
         },
+        {
+          title: "Contact Views",
+          href: "/dashboard/farmnport/contact-views",
+          icon: "eye",
+        },
       ],
     },
     {

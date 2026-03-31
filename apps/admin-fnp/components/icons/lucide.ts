@@ -57,6 +57,7 @@ import {
   ShoppingCart,
   Bell,
   BarChart3,
+  Eye,
 } from "lucide-react"
 
 export type Icon = LucideIcon
@@ -122,4 +123,5 @@ export const Icons = {
   shoppingCart: ShoppingCart,
   bell: Bell,
   barChart: BarChart3,
+  eye: Eye,
 }

@@ -16,6 +16,11 @@ export const restaurantsDashboardConfig: DashboardConfig = {
           href: "/dashboard/restaurants/locations",
           icon: "layers",
         },
+        {
+          title: "Cuisine Categories",
+          href: "/dashboard/restaurants/cuisine-categories",
+          icon: "tag",
+        },
       ],
     },
     {

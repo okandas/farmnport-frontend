@@ -46,6 +46,19 @@ export const restaurantLocationColumns: ColumnDef<RestaurantLocation>[] = [
     header: "Phone",
   },
   {
+    accessorKey: "cuisine_categories",
+    header: "Cuisines",
+    cell: ({ row }) => {
+      const cuisines = row.original.cuisine_categories
+      if (!cuisines || cuisines.length === 0) return "-"
+      return (
+        <span className="capitalize">
+          {cuisines.map((c) => c.cuisine_category_name).join(", ")}
+        </span>
+      )
+    },
+  },
+  {
     accessorKey: "is_main",
     header: "Main",
     cell: ({ row }) => (

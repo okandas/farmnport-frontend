@@ -205,6 +205,16 @@ export function recordContactView(userId: string, viewedId: string, type: "phone
   return api.post(url, { user_id: userId, viewed_id: viewedId, type })
 }
 
+export function queryViewersCount() {
+  const url = `${BaseURL}/views/viewers`
+  return api.get(url)
+}
+
+export function queryViewersList() {
+  const url = `${BaseURL}/views/viewers/list`
+  return api.get(url)
+}
+
 export function queryAgroChemicalCategories() {
   const url = `${BaseURL}/agrochemicalcategories/`
   return api.get(url)
