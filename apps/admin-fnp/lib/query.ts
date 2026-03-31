@@ -47,6 +47,7 @@ type pagination = {
   type?: string[]
   category?: string[]
   produce?: string[]
+  sort?: string
 }
 
 export function queryUsers(pagination?: pagination) {
@@ -70,6 +71,10 @@ export function queryUsers(pagination?: pagination) {
 
   if (pagination?.produce !== undefined && pagination.produce.length > 0) {
     params.append('produce', pagination.produce.join(','))
+  }
+
+  if (pagination?.sort !== undefined && pagination.sort.length > 0) {
+    params.append('sort', pagination.sort)
   }
 
   const queryString = params.toString()
@@ -934,13 +939,13 @@ export function queryTopViewers(page: number, limit: number) {
   return api.get(url)
 }
 
-export function queryContactViewDetail(contactId: string) {
-  const url = `${baseUrl}/views/admin/contact/${contactId}`
+export function queryContactViewDetail(contactId: string, page: number, limit: number) {
+  const url = `${baseUrl}/views/admin/contact/${contactId}?page=${page}&limit=${limit}`
   return api.get(url)
 }
 
-export function queryViewerDetail(viewerId: string) {
-  const url = `${baseUrl}/views/admin/viewer/${viewerId}`
+export function queryViewerDetail(viewerId: string, page: number, limit: number) {
+  const url = `${baseUrl}/views/admin/viewer/${viewerId}?page=${page}&limit=${limit}`
   return api.get(url)
 }
 

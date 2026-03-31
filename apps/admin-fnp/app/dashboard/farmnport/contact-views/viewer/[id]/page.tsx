@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 
-const PAGE_SIZE = 20
+const PAGE_SIZE = 10
 
 export default function ViewerDetailPage() {
   const params = useParams()
@@ -21,13 +21,17 @@ export default function ViewerDetailPage() {
   const [page, setPage] = useState(1)
 
   const { data, isLoading } = useQuery({
-    queryKey: ["viewer-detail", viewerId],
-    queryFn: () => queryViewerDetail(viewerId),
+    queryKey: ["viewer-detail", viewerId, page],
+    queryFn: () => queryViewerDetail(viewerId, page, PAGE_SIZE),
     refetchOnWindowFocus: false,
     enabled: !!viewerId,
   })
 
   const detail = data?.data
+  const viewer = detail?.viewer
+  const viewed = detail?.viewed || []
+  const total: number = detail?.total || 0
+  const totalPages: number = detail?.total_pages || 1
 
   if (isLoading) {
     return (
@@ -43,7 +47,7 @@ export default function ViewerDetailPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {Array.from({ length: 8 }).map((_, i) => (
+              {Array.from({ length: PAGE_SIZE }).map((_, i) => (
                 <Skeleton key={i} className="h-10 w-full" />
               ))}
             </div>
@@ -53,12 +57,7 @@ export default function ViewerDetailPage() {
     )
   }
 
-  if (!detail) return null
-
-  const viewer = detail.viewer
-  const viewed = detail.viewed || []
-  const totalPages = Math.ceil(viewed.length / PAGE_SIZE)
-  const paged = viewed.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
+  if (!detail || !viewer) return null
 
   return (
     <div className="flex flex-col gap-6">
@@ -76,7 +75,7 @@ export default function ViewerDetailPage() {
           <Badge variant="secondary" className="capitalize">{viewer.type}</Badge>
           {viewer.city && <span className="text-sm text-muted-foreground">{viewer.city}</span>}
           <span className="text-sm text-muted-foreground">
-            &middot; Viewed {detail.total} contact{detail.total !== 1 ? "s" : ""}
+            &middot; Viewed {total} contact{total !== 1 ? "s" : ""}
           </span>
         </div>
       </div>
@@ -99,7 +98,7 @@ export default function ViewerDetailPage() {
                 <span>Type</span>
                 <span className="text-right">Date</span>
               </div>
-              {paged.map((contact: any, i: number) => (
+              {viewed.map((contact: any, i: number) => (
                 <Link
                   key={`${contact.viewed_id}-${contact.date}-${i}`}
                   href={`/dashboard/farmnport/contact-views/contact/${contact.viewed_id}`}
@@ -117,7 +116,7 @@ export default function ViewerDetailPage() {
               {totalPages > 1 && (
                 <div className="flex items-center justify-between pt-3 border-t">
                   <span className="text-xs text-muted-foreground">
-                    Page {page} of {totalPages} ({viewed.length} total)
+                    Page {page} of {totalPages} ({total} total)
                   </span>
                   <div className="flex gap-1">
                     <Button
