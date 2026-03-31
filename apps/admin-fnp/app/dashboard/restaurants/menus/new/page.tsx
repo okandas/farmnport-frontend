@@ -8,8 +8,8 @@ import { useForm } from "react-hook-form"
 import { useRouter } from "next/navigation"
 import { Check, ChevronsUpDown, X } from "lucide-react"
 
-import { addMenu, queryRestaurantLocations, queryMenuItemCategories } from "@/lib/query"
-import { FormMenuSchema, FormMenuModel, RestaurantLocation, MenuLocationEntry, MenuItemCategory } from "@/lib/schemas"
+import { addMenu, queryRestaurantLocations, queryMenuItemCategories, queryMenuCategories } from "@/lib/query"
+import { FormMenuSchema, FormMenuModel, RestaurantLocation, MenuLocationEntry, MenuItemCategory, MenuCategory } from "@/lib/schemas"
 import { cn } from "@/lib/utilities"
 import { buttonVariants } from "@/components/ui/button"
 import { Icons } from "@/components/icons/lucide"
@@ -53,6 +53,14 @@ export default function NewMenuPage() {
 
     const locations = (locationsData?.data?.data as RestaurantLocation[]) || []
 
+    const { data: menuCategoriesData } = useQuery({
+        queryKey: ["menu-categories-for-select"],
+        queryFn: () => queryMenuCategories({ limit: 100 }),
+        refetchOnWindowFocus: false,
+    })
+
+    const menuCategories = (menuCategoriesData?.data?.data as MenuCategory[]) || []
+
     const { data: categoriesData } = useQuery({
         queryKey: ["categories-for-notes"],
         queryFn: () => queryMenuItemCategories({ limit: 100 }),
@@ -64,6 +72,8 @@ export default function NewMenuPage() {
     const form = useForm<FormMenuModel>({
         defaultValues: {
             locations: [],
+            menu_category_id: "",
+            menu_category_name: "",
             name: "",
             note: "",
             status: "active",
@@ -215,6 +225,46 @@ export default function NewMenuPage() {
                                                             ))}
                                                         </div>
                                                     )}
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="sm:col-span-4 px-1">
+                                    <label
+                                        className="block text-sm/6 font-medium text-gray-900 dark:text-white"
+                                    >
+                                        Menu Category
+                                    </label>
+                                    <div className="mt-2">
+                                        <FormField
+                                            control={form.control}
+                                            name="menu_category_id"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <Select
+                                                        onValueChange={(value) => {
+                                                            const selected = menuCategories.find((c) => c.id === value)
+                                                            field.onChange(value)
+                                                            form.setValue("menu_category_name", selected?.name || "")
+                                                        }}
+                                                        defaultValue={field.value}
+                                                    >
+                                                        <FormControl>
+                                                            <SelectTrigger className="w-full">
+                                                                <SelectValue placeholder="Select a menu category" />
+                                                            </SelectTrigger>
+                                                        </FormControl>
+                                                        <SelectContent>
+                                                            {menuCategories.map((cat) => (
+                                                                <SelectItem key={cat.id} value={cat.id}>
+                                                                    <span className="capitalize">{cat.name}</span>
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
                                                     <FormMessage />
                                                 </FormItem>
                                             )}

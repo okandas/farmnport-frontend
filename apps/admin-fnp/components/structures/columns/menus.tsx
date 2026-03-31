@@ -32,6 +32,15 @@ export const menuColumns: ColumnDef<Menu>[] = [
     header: "Name",
   },
   {
+    accessorKey: "menu_category_name",
+    header: "Category",
+    cell: ({ row }) => {
+      const name = row.original.menu_category_name
+      if (!name) return "-"
+      return <span className="capitalize">{name}</span>
+    },
+  },
+  {
     accessorKey: "note",
     header: "Note",
     cell: ({ row }) => row.original.note || "-",

@@ -1142,6 +1142,8 @@ export const MenuLocationEntrySchema = z.object({
 export const MenuSchema = z.object({
   id: z.string(),
   locations: z.array(MenuLocationEntrySchema).default([]),
+  menu_category_id: z.string().min(1, "Menu category is required"),
+  menu_category_name: z.string().default(""),
   name: z.string().min(1, "Menu name is required").max(120, "Name cannot exceed 120 characters"),
   note: z.string().optional().default(""),
   slug: z.string().optional(),
@@ -1157,6 +1159,8 @@ export const FormMenuSchema = MenuSchema.pick({
   status: true,
 }).extend({
   locations: z.array(MenuLocationEntrySchema).default([]),
+  menu_category_id: z.string().min(1, "Menu category is required"),
+  menu_category_name: z.string().default(""),
   category_notes: z.record(z.string(), z.string()).optional().default({}),
 })
 
@@ -1168,6 +1172,29 @@ export type FormMenuModel = z.infer<typeof FormMenuSchema>
 export type MenuResponse = {
   total: number
   data: Menu[]
+}
+
+// Menu Category (top-level category for menus e.g. Breakfast, Drinks)
+export const MenuCategorySchema = z.object({
+  id: z.string(),
+  name: z.string().min(1, "Name is required").max(120, "Name cannot exceed 120 characters"),
+  description: z.string().default(""),
+  slug: z.string().optional(),
+  created: z.string().optional(),
+  updated: z.string().optional(),
+})
+
+export const FormMenuCategorySchema = MenuCategorySchema.pick({
+  name: true,
+  description: true,
+})
+
+export type MenuCategory = z.infer<typeof MenuCategorySchema>
+export type FormMenuCategoryModel = z.infer<typeof FormMenuCategorySchema>
+
+export type MenuCategoryResponse = {
+  total: number
+  data: MenuCategory[]
 }
 
 // Menu Item Category
