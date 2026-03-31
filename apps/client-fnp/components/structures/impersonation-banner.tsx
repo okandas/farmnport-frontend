@@ -1,15 +1,13 @@
 "use client"
 
-import { signOut } from "next-auth/react"
+import { useSession, signOut } from "next-auth/react"
 import { Icons } from "@/components/icons/lucide"
 import { Button } from "@/components/ui/button"
-import { AuthenticatedUser } from "@/lib/schemas"
 
-interface ImpersonationBannerProps {
-  user: AuthenticatedUser
-}
+export function ImpersonationBanner() {
+  const { data: session } = useSession()
+  const user = session?.user
 
-export function ImpersonationBanner({ user }: ImpersonationBannerProps) {
   if (!user?.impersonated_by) return null
 
   return (

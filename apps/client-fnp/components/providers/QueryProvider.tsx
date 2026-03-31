@@ -14,7 +14,8 @@ export function QueryProvider({ children }: QueryClientProps) {
     const [queryClient] = useState(() => new QueryClient({
         defaultOptions: {
             queries: {
-                staleTime: process.env.NODE_ENV === "production" ? 5 * 60 * 1000 : 0,
+                staleTime: process.env.NODE_ENV === "production" ? 30 * 60 * 1000 : 0,
+                gcTime: 60 * 60 * 1000,
                 refetchOnWindowFocus: false,
             },
         },

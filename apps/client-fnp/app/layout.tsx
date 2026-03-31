@@ -12,7 +12,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next"
 import { NuqsAdapter } from "nuqs/adapters/next/app"
 
 import { cn } from "@/lib/utilities"
-import { auth } from "@/auth"
+import { AuthSessionProvider } from "@/components/providers/AuthSessionProvider"
 
 
 import "@/styles/globals.css"
@@ -56,9 +56,7 @@ interface RootLayoutProps {
 const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID as string
 const NEXT_ENV = process.env.NEXT_ENV as string
 
-export default async function RootLayout({ children }: RootLayoutProps) {
-  const session = await auth()
-
+export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <>
       <html lang="en" suppressHydrationWarning>
@@ -70,6 +68,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
             fontHeading.variable
           )}
         >
+          <AuthSessionProvider>
           <ThemeProvider
             attribute="class"
             defaultTheme="light"
@@ -111,6 +110,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
               </NuqsAdapter>
             </QueryProvider>
           </ThemeProvider>
+          </AuthSessionProvider>
         </body>
       </html>
     </>

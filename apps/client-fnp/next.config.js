@@ -3,6 +3,7 @@ const nextConfig = {
   /* config options here */
   output: "standalone",
   images: {
+    minimumCacheTTL: 86400,
     dangerouslyAllowLocalIP: true,
     remotePatterns: [
       {
