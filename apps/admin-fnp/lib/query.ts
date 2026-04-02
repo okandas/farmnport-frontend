@@ -431,6 +431,16 @@ export function deleteWeedGroups(groupIds: string[]) {
   return api.post(url, { group_ids: groupIds })
 }
 
+export function queryFarmProduceCategory(slug: string) {
+  const url = `${baseUrl}/farmproducecategories/${slug}`
+  return api.get(url)
+}
+
+export function updateFarmProduceCategory(data: { slug: string; name: string; description: string }) {
+  const url = `${baseUrl}/farmproducecategories/${data.slug}`
+  return api.put(url, { name: data.name, description: data.description })
+}
+
 export function queryFarmProduceCategories(pagination?: pagination) {
   let url: string
 
