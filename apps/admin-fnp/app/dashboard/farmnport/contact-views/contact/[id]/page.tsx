@@ -7,6 +7,7 @@ import Link from "next/link"
 import { ArrowLeft, Eye, ChevronLeft, ChevronRight } from "lucide-react"
 
 import { queryContactViewDetail } from "@/lib/query"
+import { formatDate } from "@/lib/utilities"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -92,26 +93,30 @@ export default function ContactDetailPage() {
             <p className="text-sm text-muted-foreground py-4 text-center">No viewers yet</p>
           ) : (
             <div className="space-y-2">
-              <div className="grid grid-cols-[2rem_1fr_5rem_5rem_7rem] gap-2 text-xs font-medium text-muted-foreground pb-1 border-b">
+              <div className="grid grid-cols-[2rem_1fr_5rem_5rem_5rem_9rem] gap-2 text-xs font-medium text-muted-foreground pb-1 border-b">
                 <span>#</span>
-                <span>Viewer</span>
+                <span>Name</span>
                 <span>Type</span>
-                <span>Via</span>
-                <span className="text-right">Date</span>
+                <span>City</span>
+                <span>Channel</span>
+                <span className="text-right">Last View</span>
               </div>
               {viewers.map((viewer: any, i: number) => (
                 <Link
                   key={`${viewer.user_id}-${viewer.date}-${i}`}
                   href={`/dashboard/farmnport/contact-views/viewer/${viewer.user_id}`}
-                  className="grid grid-cols-[2rem_1fr_5rem_5rem_7rem] gap-2 items-center rounded-lg p-2 text-sm hover:bg-muted/50 transition-colors"
+                  className="grid grid-cols-[2rem_1fr_5rem_5rem_5rem_9rem] gap-2 items-center rounded-lg p-2 text-sm hover:bg-muted/50 transition-colors"
                 >
                   <span className="text-muted-foreground text-xs">{(page - 1) * PAGE_SIZE + i + 1}</span>
                   <span className="font-medium truncate capitalize">{viewer.name}</span>
                   <Badge variant="secondary" className="text-xs w-fit capitalize">
-                    {viewer.client_type || viewer.type}
+                    {viewer.client_type}
                   </Badge>
-                  <span className="text-muted-foreground text-xs capitalize">{viewer.type}</span>
-                  <span className="text-right text-muted-foreground text-xs">{viewer.date || "—"}</span>
+                  <span className="text-muted-foreground text-xs truncate capitalize">{viewer.city || "—"}</span>
+                  <Badge variant="outline" className="text-xs w-fit capitalize">
+                    {viewer.type || "—"}
+                  </Badge>
+                  <span className="text-right text-muted-foreground text-xs">{formatDate(viewer.date) || "—"}</span>
                 </Link>
               ))}
 

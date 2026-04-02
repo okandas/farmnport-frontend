@@ -7,6 +7,7 @@ import Link from "next/link"
 import { ArrowLeft, Users, ChevronLeft, ChevronRight } from "lucide-react"
 
 import { queryViewerDetail } from "@/lib/query"
+import { formatDate } from "@/lib/utilities"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -92,24 +93,30 @@ export default function ViewerDetailPage() {
             <p className="text-sm text-muted-foreground py-4 text-center">No contacts viewed yet</p>
           ) : (
             <div className="space-y-2">
-              <div className="grid grid-cols-[2rem_1fr_5rem_7rem] gap-2 text-xs font-medium text-muted-foreground pb-1 border-b">
+              <div className="grid grid-cols-[2rem_1fr_5rem_5rem_5rem_9rem] gap-2 text-xs font-medium text-muted-foreground pb-1 border-b">
                 <span>#</span>
-                <span>Contact</span>
+                <span>Name</span>
                 <span>Type</span>
-                <span className="text-right">Date</span>
+                <span>City</span>
+                <span>Channel</span>
+                <span className="text-right">Last View</span>
               </div>
               {viewed.map((contact: any, i: number) => (
                 <Link
                   key={`${contact.viewed_id}-${contact.date}-${i}`}
                   href={`/dashboard/farmnport/contact-views/contact/${contact.viewed_id}`}
-                  className="grid grid-cols-[2rem_1fr_5rem_7rem] gap-2 items-center rounded-lg p-2 text-sm hover:bg-muted/50 transition-colors"
+                  className="grid grid-cols-[2rem_1fr_5rem_5rem_5rem_9rem] gap-2 items-center rounded-lg p-2 text-sm hover:bg-muted/50 transition-colors"
                 >
                   <span className="text-muted-foreground text-xs">{(page - 1) * PAGE_SIZE + i + 1}</span>
                   <span className="font-medium truncate capitalize">{contact.name}</span>
                   <Badge variant="secondary" className="text-xs w-fit capitalize">
                     {contact.type}
                   </Badge>
-                  <span className="text-right text-muted-foreground text-xs">{contact.date || "—"}</span>
+                  <span className="text-muted-foreground text-xs truncate capitalize">{contact.city || "—"}</span>
+                  <Badge variant="outline" className="text-xs w-fit capitalize">
+                    {contact.contact_type || "—"}
+                  </Badge>
+                  <span className="text-right text-muted-foreground text-xs">{formatDate(contact.date) || "—"}</span>
                 </Link>
               ))}
 

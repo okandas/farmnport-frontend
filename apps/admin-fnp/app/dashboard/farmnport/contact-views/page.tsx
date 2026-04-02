@@ -5,6 +5,7 @@ import Link from "next/link"
 import { Eye, Users, UserCheck, TrendingUp } from "lucide-react"
 
 import { queryContactViewsStats } from "@/lib/query"
+import { formatDate } from "@/lib/utilities"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -141,7 +142,7 @@ export default function ContactViewsPage() {
               <p className="text-sm text-muted-foreground py-4 text-center">No data yet</p>
             ) : (
               <div className="space-y-2">
-                <div className="grid grid-cols-[2rem_1fr_5rem_5rem_6rem_3.5rem] gap-2 text-xs font-medium text-muted-foreground pb-1 border-b">
+                <div className="grid grid-cols-[2rem_1fr_5rem_5rem_9rem_3.5rem] gap-2 text-xs font-medium text-muted-foreground pb-1 border-b">
                   <span>#</span>
                   <span>Name</span>
                   <span>Type</span>
@@ -153,7 +154,7 @@ export default function ContactViewsPage() {
                   <Link
                     key={contact.viewed_id || i}
                     href={`/dashboard/farmnport/contact-views/contact/${contact.viewed_id}`}
-                    className="grid grid-cols-[2rem_1fr_5rem_5rem_6rem_3.5rem] gap-2 items-center rounded-lg p-2 text-sm hover:bg-muted/50 transition-colors"
+                    className="grid grid-cols-[2rem_1fr_5rem_5rem_9rem_3.5rem] gap-2 items-center rounded-lg p-2 text-sm hover:bg-muted/50 transition-colors"
                   >
                     <span className="text-muted-foreground text-xs">{i + 1}</span>
                     <span className="font-medium truncate capitalize">{contact.name}</span>
@@ -161,7 +162,7 @@ export default function ContactViewsPage() {
                       {contact.type}
                     </Badge>
                     <span className="text-muted-foreground text-xs truncate">{contact.city || "—"}</span>
-                    <span className="text-muted-foreground text-xs">{contact.last_date || "—"}</span>
+                    <span className="text-muted-foreground text-xs">{formatDate(contact.last_date) || "—"}</span>
                     <span className="text-right font-semibold">{contact.view_count}</span>
                   </Link>
                 ))}
@@ -186,7 +187,7 @@ export default function ContactViewsPage() {
               <p className="text-sm text-muted-foreground py-4 text-center">No data yet</p>
             ) : (
               <div className="space-y-2">
-                <div className="grid grid-cols-[2rem_1fr_5rem_6rem_4rem] gap-2 text-xs font-medium text-muted-foreground pb-1 border-b">
+                <div className="grid grid-cols-[2rem_1fr_5rem_9rem_4rem] gap-2 text-xs font-medium text-muted-foreground pb-1 border-b">
                   <span>#</span>
                   <span>Name</span>
                   <span>Type</span>
@@ -197,14 +198,14 @@ export default function ContactViewsPage() {
                   <Link
                     key={viewer.user_id || i}
                     href={`/dashboard/farmnport/contact-views/viewer/${viewer.user_id}`}
-                    className="grid grid-cols-[2rem_1fr_5rem_6rem_4rem] gap-2 items-center rounded-lg p-2 text-sm hover:bg-muted/50 transition-colors"
+                    className="grid grid-cols-[2rem_1fr_5rem_9rem_4rem] gap-2 items-center rounded-lg p-2 text-sm hover:bg-muted/50 transition-colors"
                   >
                     <span className="text-muted-foreground text-xs">{i + 1}</span>
                     <span className="font-medium truncate capitalize">{viewer.name}</span>
                     <Badge variant="secondary" className="text-xs w-fit capitalize">
                       {viewer.type}
                     </Badge>
-                    <span className="text-muted-foreground text-xs">{viewer.last_date || "—"}</span>
+                    <span className="text-muted-foreground text-xs">{formatDate(viewer.last_date) || "—"}</span>
                     <span className="text-right font-semibold">{viewer.contacts_viewed}</span>
                   </Link>
                 ))}
