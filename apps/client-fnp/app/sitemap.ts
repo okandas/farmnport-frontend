@@ -24,6 +24,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/agrochemical-guides/all`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.8 },
     { url: `${BASE_URL}/animal-health-guides`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.8 },
     { url: `${BASE_URL}/animal-health-guides/all`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.8 },
+    { url: `${BASE_URL}/pricing`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
+    { url: `${BASE_URL}/prices/lwt`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.7 },
+    { url: `${BASE_URL}/prices/cdm`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.7 },
+    { url: `${BASE_URL}/prices/produce`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.7 },
     { url: `${BASE_URL}/waiting-list-paying`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.4 },
     { url: `${BASE_URL}/waiting-list-shop`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.4 },
     { url: `${BASE_URL}/about`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.5 },
@@ -43,6 +47,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     feedProducts,
     feedingPrograms,
     sprayPrograms,
+    cdmPrices,
+    clients,
   ] = await Promise.all([
     fetchPriceLists(),
     fetchFarmProduce(),
@@ -53,6 +59,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     fetchFeedProducts(),
     fetchFeedingPrograms(),
     fetchSprayPrograms(),
+    fetchCdmPrices(),
+    fetchClients(),
   ])
 
   // Price list routes
@@ -87,6 +95,40 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const buyAgroChemicalListingRoutes: MetadataRoute.Sitemap = [
     { url: `${BASE_URL}/buy-agrochemicals`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
   ]
+
+  // Buy feeds routes (individual feed product buy pages)
+  const buyFeedRoutes: MetadataRoute.Sitemap = feedProducts.map((fp: any) => ({
+    url: `${BASE_URL}/buy-feeds/${fp.slug}`,
+    lastModified: new Date(fp.updated || fp.created),
+    changeFrequency: 'weekly' as const,
+    priority: 0.7,
+  }))
+
+  // CDM price routes
+  const cdmPriceRoutes: MetadataRoute.Sitemap = cdmPrices.map((cp: any) => ({
+    url: `${BASE_URL}/prices/cdm/${cp.slug}`,
+    lastModified: new Date(cp.effectiveDate),
+    changeFrequency: 'weekly' as const,
+    priority: 0.6,
+  }))
+
+  // Produce price category routes
+  const producePriceCategories = ['beef', 'lamb', 'mutton', 'goat', 'chicken', 'pork']
+  const producePriceRoutes: MetadataRoute.Sitemap = producePriceCategories.map((slug) => ({
+    url: `${BASE_URL}/prices/produce/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.7,
+  }))
+
+  // Farmer and buyer profile routes
+  const clientRoutes: MetadataRoute.Sitemap = clients.flatMap((client: any) => {
+    const clientSlug = client.name.toLowerCase().replace(/\s+/g, '-')
+    const route = client.type === 'farmer'
+      ? { url: `${BASE_URL}/farmer/${clientSlug}`, lastModified: new Date(client.updated || client.created), changeFrequency: 'weekly' as const, priority: 0.6 }
+      : { url: `${BASE_URL}/buyer/${clientSlug}`, lastModified: new Date(client.updated || client.created), changeFrequency: 'weekly' as const, priority: 0.6 }
+    return [route]
+  })
 
   // Animal health category routes
   const animalHealthCategoryRoutes: MetadataRoute.Sitemap = animalHealthCategories.map((category: any) => ({
@@ -131,6 +173,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     ...staticRoutes,
     ...priceRoutes,
+    ...cdmPriceRoutes,
+    ...producePriceRoutes,
     ...farmProduceRoutes,
     ...agroChemicalCategoryRoutes,
     ...agroChemicalRoutes,
@@ -138,8 +182,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...animalHealthCategoryRoutes,
     ...animalHealthRoutes,
     ...feedRoutes,
+    ...buyFeedRoutes,
     ...feedingProgramRoutes,
     ...sprayProgramRoutes,
+    ...clientRoutes,
   ]
 }
 
@@ -247,6 +293,58 @@ async function fetchSprayPrograms() {
     updated: p.updated,
     created: p.created,
   }))
+}
+
+async function fetchCdmPrices() {
+  const apiUrl = getApiUrl()
+  if (!apiUrl) return []
+
+  try {
+    const response = await fetch(`${apiUrl}/cdmprices/all?p=1&limit=100`, { next: { revalidate: 86400 } })
+    if (!response.ok) return []
+    const data = await response.json()
+    const prices = data.data || []
+    return prices.map((p: any) => {
+      const pDate = new Date(p.effectiveDate).toISOString().split('T')[0]
+      return {
+        slug: `${p.client_name.toLowerCase().replace(/\s+/g, '-')}-${pDate}`,
+        effectiveDate: p.effectiveDate,
+      }
+    })
+  } catch (error) {
+    console.error('Error fetching CDM prices for sitemap:', error)
+    return []
+  }
+}
+
+async function fetchClients() {
+  const apiUrl = getApiUrl()
+  if (!apiUrl) return []
+
+  try {
+    let all: any[] = []
+    let page = 1
+
+    while (page <= 50 && all.length < 1000) {
+      const response = await fetch(`${apiUrl}/client/all?p=${page}`, { next: { revalidate: 86400 } })
+      if (!response.ok) break
+      const data = await response.json()
+      const items = data.data || []
+      if (items.length === 0) break
+      all = [...all, ...items.map((c: any) => ({
+        name: c.name,
+        type: c.type,
+        updated: c.updated,
+        created: c.created,
+      }))]
+      page++
+    }
+
+    return all
+  } catch (error) {
+    console.error('Error fetching clients for sitemap:', error)
+    return []
+  }
 }
 
 async function fetchPriceLists() {

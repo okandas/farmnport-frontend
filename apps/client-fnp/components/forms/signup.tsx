@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import axios from 'axios'
 
 import { useRouter, useSearchParams } from "next/navigation"
@@ -59,6 +59,9 @@ interface AuthFormProps extends React.HTMLAttributes<HTMLDivElement> { }
 
 export function SignUpAuthForm({ className, ...props }: AuthFormProps) {
 
+    const router = useRouter()
+    const duplicateEmailAttempts = useRef(0)
+
     const { register, handleSubmit, formState, control, watch, setValue, setError  } = useForm<SignUpFormData>({
         resolver: zodResolver(AuthSignUpSchema)
     })
@@ -90,21 +93,33 @@ export function SignUpAuthForm({ className, ...props }: AuthFormProps) {
 
                 if (error.response?.data.message == "This name has already been registered") {
 
-                    setError('name', { message: "Change this name"}, {shouldFocus: true})
+                    setError('name', { message: "This name is already taken"}, {shouldFocus: true})
 
                 } else if (error.response?.data.message == "This email has already been registered")  {
 
-                    setError('email', { message: "Change this email"}, {shouldFocus: true})
-                
+                    duplicateEmailAttempts.current += 1
+
+                    if (duplicateEmailAttempts.current >= 3) {
+                        toast("Account already exists", {
+                            description: "An account with this email already exists. Redirecting you to reset your password...",
+                            duration: 4000,
+                        })
+                        setTimeout(() => {
+                            router.push("/reset")
+                        }, 2000)
+                    } else {
+                        setError('email', { message: "This email is already registered. Try resetting your password instead."}, {shouldFocus: true})
+                    }
+
                 } else if (error.response?.data.message == "This phone has already been registered") {
-                
-                    setError('phone', { message: "Change this phone number "}, {shouldFocus: true})
+
+                    setError('phone', { message: "This phone number is already taken"}, {shouldFocus: true})
 
                 } else {
                     toast("Failed to signup", {
                           description: `(${error?.message}) Please Try Again`
                     })
-                }                
+                }
             } else {
                 toast("Failed to signup", {
                     description: `(${error?.message}) Please Try Again`

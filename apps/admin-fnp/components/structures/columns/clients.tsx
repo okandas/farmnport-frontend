@@ -2,6 +2,7 @@
 
 import { createColumnHelper, ColumnDef } from "@tanstack/react-table"
 import { PhoneNumberFormat } from "google-libphonenumber"
+import { Phone, MessageCircle, Mail } from "lucide-react"
 
 import { ApplicationUser } from "@/lib/schemas"
 import { phoneUtility, formatDate } from "@/lib/utilities"
@@ -51,19 +52,28 @@ const columnHelper = createColumnHelper<ApplicationUser>()
     },
   }),
   columnHelper.accessor('phone', {
-    header: () => <div className="text-right">Phone</div>,
+    header: () => <div className="text-center">Contact</div>,
     cell: ({ row }) => {
-      const phone = phoneUtility.parseAndKeepRawInput(
-        row.getValue("phone"),
-        "ZW",
-      )
-      const formatted = phoneUtility.format(
-        phone,
-        PhoneNumberFormat.INTERNATIONAL,
-      )
+      const rawPhone = row.getValue("phone") as string
+      const email = row.original.email
+      let formatted = rawPhone
+      let waNumber = rawPhone
+      try {
+        const parsed = phoneUtility.parseAndKeepRawInput(rawPhone, "ZW")
+        formatted = phoneUtility.format(parsed, PhoneNumberFormat.INTERNATIONAL)
+        waNumber = phoneUtility.format(parsed, PhoneNumberFormat.E164).replace("+", "")
+      } catch {}
       return (
-        <div className="font-medium text-right w-40">
-          <a href={`tel:${formatted}`}>{formatted}</a>
+        <div className="flex items-center justify-center gap-2">
+          <a href={`tel:${formatted}`} title={`Call ${formatted}`} className="p-1.5 rounded-md hover:bg-green-50 dark:hover:bg-green-900/20 text-green-600 dark:text-green-400">
+            <Phone className="w-4 h-4" />
+          </a>
+          <a href={`https://wa.me/${waNumber}`} target="_blank" rel="noopener noreferrer" title={`WhatsApp ${formatted}`} className="p-1.5 rounded-md hover:bg-emerald-50 dark:hover:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400">
+            <MessageCircle className="w-4 h-4" />
+          </a>
+          <a href={`mailto:${email}`} title={`Email ${email}`} className="p-1.5 rounded-md hover:bg-blue-50 dark:hover:bg-blue-900/20 text-blue-600 dark:text-blue-400">
+            <Mail className="w-4 h-4" />
+          </a>
         </div>
       )
     },

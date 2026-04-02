@@ -69,11 +69,9 @@ export function DataTable<TData, TValue>({
     getFilteredRowModel: getFilteredRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
-    initialState: {
-      pagination,
-    },
     state: {
       rowSelection,
+      pagination,
     },
     manualPagination: true,
     pageCount: pageCount,

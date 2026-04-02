@@ -47,6 +47,7 @@ type pagination = {
   type?: string[]
   category?: string[]
   produce?: string[]
+  sort?: string
 }
 
 export function queryUsers(pagination?: pagination) {
@@ -70,6 +71,10 @@ export function queryUsers(pagination?: pagination) {
 
   if (pagination?.produce !== undefined && pagination.produce.length > 0) {
     params.append('produce', pagination.produce.join(','))
+  }
+
+  if (pagination?.sort !== undefined && pagination.sort.length > 0) {
+    params.append('sort', pagination.sort)
   }
 
   const queryString = params.toString()
@@ -424,6 +429,21 @@ export function updateWeedGroup(data: { id: string; name: string; description: s
 export function deleteWeedGroups(groupIds: string[]) {
   let url = `${baseUrl}/user/weed-groups/delete`
   return api.post(url, { group_ids: groupIds })
+}
+
+export function queryFarmProduceCategory(slug: string) {
+  const url = `${baseUrl}/farmproducecategories/${slug}`
+  return api.get(url)
+}
+
+export function updateFarmProduceCategory(data: { slug: string; name: string; description: string }) {
+  const url = `${baseUrl}/farmproducecategories/${data.slug}`
+  return api.put(url, { name: data.name, description: data.description })
+}
+
+export function addFarmProduceCategory(data: { name: string; description: string }) {
+  const url = `${baseUrl}/farmproducecategories`
+  return api.post(url, data)
 }
 
 export function queryFarmProduceCategories(pagination?: pagination) {
@@ -919,6 +939,31 @@ export function queryDashboardStats() {
   return api.get(url)
 }
 
+export function queryContactViewsStats() {
+  const url = `${baseUrl}/views/admin/stats`
+  return api.get(url)
+}
+
+export function queryTopViewedContacts(page: number, limit: number) {
+  const url = `${baseUrl}/views/admin/top-viewed?page=${page}&limit=${limit}`
+  return api.get(url)
+}
+
+export function queryTopViewers(page: number, limit: number) {
+  const url = `${baseUrl}/views/admin/top-viewers?page=${page}&limit=${limit}`
+  return api.get(url)
+}
+
+export function queryContactViewDetail(contactId: string, page: number, limit: number) {
+  const url = `${baseUrl}/views/admin/contact/${contactId}?page=${page}&limit=${limit}`
+  return api.get(url)
+}
+
+export function queryViewerDetail(viewerId: string, page: number, limit: number) {
+  const url = `${baseUrl}/views/admin/viewer/${viewerId}?page=${page}&limit=${limit}`
+  return api.get(url)
+}
+
 // Orders & Sales
 type orderPagination = {
   p?: number
@@ -1088,6 +1133,43 @@ export function updateMenuCategory(data: { id: string; name: string; description
 
 export function deleteMenuCategory(id: string) {
   let url = `${baseUrl}/menu-categories/delete/${id}`
+  return api.delete(url)
+}
+
+// Cuisine Categories
+export function queryCuisineCategories(pagination?: pagination) {
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) {
+    params.set("p", String(pagination.p))
+  }
+  if (pagination?.search !== undefined && pagination.search.length >= 2) {
+    params.set("search", pagination.search)
+  }
+  if (pagination?.limit !== undefined) {
+    params.set("limit", String(pagination.limit))
+  }
+  const qs = params.toString()
+  const url = `${baseUrl}/cuisine-categories/list${qs ? `?${qs}` : ""}`
+  return api.get(url)
+}
+
+export function queryCuisineCategory(id: string) {
+  let url = `${baseUrl}/cuisine-categories/get/${id}`
+  return api.get(url)
+}
+
+export function addCuisineCategory(data: { name: string; description: string }) {
+  let url = `${baseUrl}/cuisine-categories/add`
+  return api.post(url, data)
+}
+
+export function updateCuisineCategory(data: { id: string; name: string; description: string }) {
+  let url = `${baseUrl}/cuisine-categories/update`
+  return api.post(url, data)
+}
+
+export function deleteCuisineCategory(id: string) {
+  let url = `${baseUrl}/cuisine-categories/delete/${id}`
   return api.delete(url)
 }
 

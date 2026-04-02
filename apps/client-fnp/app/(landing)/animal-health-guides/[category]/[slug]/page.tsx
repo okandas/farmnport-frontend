@@ -382,13 +382,13 @@ export default async function AnimalHealthGuidePage({ params }: GuidePageProps) 
                             <table className="w-full border-collapse">
                                 <thead>
                                     <tr className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/50 dark:to-indigo-950/50 border-b-2 border-blue-200 dark:border-blue-800">
-                                        <th className="text-left p-3 text-sm font-semibold text-blue-900 dark:text-blue-100">Animal</th>
-                                        <th className="text-left p-3 text-sm font-semibold text-blue-900 dark:text-blue-100">Target</th>
-                                        <th className="text-left p-3 text-sm font-semibold text-blue-900 dark:text-blue-100 min-w-[200px]">Dosage</th>
-                                        <th className="text-left p-3 text-sm font-semibold text-orange-700 dark:text-orange-300">Max Applications</th>
-                                        <th className="text-left p-3 text-sm font-semibold text-teal-700 dark:text-teal-300">Application Interval</th>
-                                        <th className="text-left p-3 text-sm font-semibold text-rose-700 dark:text-rose-300">Withdrawal Period</th>
-                                        <th className="text-left p-3 text-sm font-semibold text-blue-900 dark:text-blue-100">Remarks</th>
+                                        <th className="text-left p-3 text-sm font-semibold text-blue-900 dark:text-blue-100 min-w-[120px]">Animal</th>
+                                        <th className="text-left p-3 text-sm font-semibold text-blue-900 dark:text-blue-100 min-w-[180px]">Target</th>
+                                        <th className="text-left p-3 text-sm font-semibold text-blue-900 dark:text-blue-100 min-w-[140px]">Dosage</th>
+                                        <th className="text-left p-3 text-sm font-semibold text-orange-700 dark:text-orange-300 min-w-[120px] whitespace-nowrap">Max Applications</th>
+                                        <th className="text-left p-3 text-sm font-semibold text-teal-700 dark:text-teal-300 min-w-[130px] whitespace-nowrap">Application Interval</th>
+                                        <th className="text-left p-3 text-sm font-semibold text-rose-700 dark:text-rose-300 min-w-[120px] whitespace-nowrap">Withdrawal Period</th>
+                                        <th className="text-left p-3 text-sm font-semibold text-blue-900 dark:text-blue-100 min-w-[180px]">Remarks</th>
                                     </tr>
                                 </thead>
                                 <tbody>

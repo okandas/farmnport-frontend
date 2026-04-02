@@ -625,6 +625,13 @@ export const FarmProduceCategorySchema = z.object({
 
 export type FarmProduceCategory = z.infer<typeof FarmProduceCategorySchema>
 
+export const FormFarmProduceCategorySchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  description: z.string().max(500, "Description must be 500 characters or less").optional().default(""),
+})
+
+export type FormFarmProduceCategoryModel = z.infer<typeof FormFarmProduceCategorySchema>
+
 export const FarmProduceSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -1104,6 +1111,10 @@ export const RestaurantLocationSchema = z.object({
   whatsapp_available: z.boolean().default(false),
   show_number: z.boolean().default(false),
   is_main: z.boolean().default(false),
+  cuisine_categories: z.array(z.object({
+    cuisine_category_id: z.string(),
+    cuisine_category_name: z.string(),
+  })).default([]),
   operating_hours: z.array(OperatingHourSchema).default([]),
   status: z.enum(["active", "inactive", "closed"]).default("active"),
   created: z.string().optional(),
@@ -1119,6 +1130,7 @@ export const FormRestaurantLocationSchema = RestaurantLocationSchema.pick({
   latitude: true,
   longitude: true,
   place_id: true,
+  cuisine_categories: true,
   operating_hours: true,
   status: true,
 })
@@ -1190,6 +1202,29 @@ export type FormMenuItemCategoryModel = z.infer<typeof FormMenuItemCategorySchem
 export type MenuItemCategoryResponse = {
   total: number
   data: MenuItemCategory[]
+}
+
+// Cuisine Category
+export const CuisineCategorySchema = z.object({
+  id: z.string(),
+  name: z.string().min(1, "Name is required").max(120, "Name cannot exceed 120 characters"),
+  description: z.string().default(""),
+  slug: z.string().optional(),
+  created: z.string().optional(),
+  updated: z.string().optional(),
+})
+
+export const FormCuisineCategorySchema = CuisineCategorySchema.pick({
+  name: true,
+  description: true,
+})
+
+export type CuisineCategory = z.infer<typeof CuisineCategorySchema>
+export type FormCuisineCategoryModel = z.infer<typeof FormCuisineCategorySchema>
+
+export type CuisineCategoryResponse = {
+  total: number
+  data: CuisineCategory[]
 }
 
 // Menu Item Component

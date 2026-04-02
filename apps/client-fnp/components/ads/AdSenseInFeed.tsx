@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import Script from "next/script"
+import { useTheme } from "next-themes"
 
 declare global {
     interface Window {
@@ -13,6 +14,7 @@ export function AdSenseInFeed() {
     const adRef = useRef<HTMLModElement>(null)
     const hasPushed = useRef(false)
     const [adFilled, setAdFilled] = useState(false)
+    const { resolvedTheme } = useTheme()
 
     useEffect(() => {
         if (hasPushed.current) return
@@ -37,8 +39,10 @@ export function AdSenseInFeed() {
         return () => observer.disconnect()
     }, [])
 
+    const isDark = resolvedTheme === "dark"
+
     return (
-        <div className="my-4 min-h-[100px]">
+        <div className={`my-4 min-h-[100px] ${isDark ? "rounded-lg overflow-hidden bg-white p-1" : ""}`}>
             <Script
                 async
                 src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9685248262342396"

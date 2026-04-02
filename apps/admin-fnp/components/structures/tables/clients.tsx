@@ -5,18 +5,21 @@ import { useQuery } from "@tanstack/react-query"
 import { PaginationState } from "@tanstack/react-table"
 import { isAxiosError } from "axios"
 import { useDebounce } from "use-debounce"
+import { ArrowUpDown } from "lucide-react"
 
 import { queryUsers, queryFarmProduceCategories, queryAllFarmProduce } from "@/lib/query"
 import { ApplicationUser, FarmProduceCategoriesResponse, FarmProduceResponse } from "@/lib/schemas"
 import { ToastAction } from "@/components/ui/toast"
 import { toast } from "@/components/ui/use-toast"
 import { Placeholder } from "@/components/state/placeholder"
+import { Button } from "@/components/ui/button"
 import { clientColumns } from "@/components/structures/columns/clients"
 import { DataTable } from "@/components/structures/data-table"
 import { DataTableFacetedFilter } from "@/components/structures/filters/data-table-faceted-filter"
 
 export function ClientsTable() {
   const [search, setSearch] = useState("")
+  const [sortBy, setSortBy] = useState("")
   const [typeFilter, setTypeFilter] = useState<Set<string>>(new Set())
   const [categoryFilter, setCategoryFilter] = useState<Set<string>>(new Set())
   const [produceFilter, setProduceFilter] = useState<Set<string>>(new Set())
@@ -51,10 +54,10 @@ export function ClientsTable() {
     return produce.map((p) => ({ label: p.name, value: p.slug }))
   }, [produceData])
 
-  // Reset to page 1 when filters change
+  // Reset to page 1 when filters or sort change
   useEffect(() => {
     setPagination((prev) => ({ ...prev, pageIndex: 0 }))
-  }, [typeFilter, categoryFilter, produceFilter, debouncedSearchQuery])
+  }, [typeFilter, categoryFilter, produceFilter, debouncedSearchQuery, sortBy])
 
   const { isError, isLoading, isFetching, refetch, data} = useQuery({
     queryKey: ["dashboard-clients", {
@@ -63,6 +66,7 @@ export function ClientsTable() {
       type: Array.from(typeFilter),
       category: Array.from(categoryFilter),
       produce: Array.from(produceFilter),
+      sort: sortBy,
     }],
     queryFn: () =>
       queryUsers({
@@ -71,6 +75,7 @@ export function ClientsTable() {
         type: Array.from(typeFilter),
         category: Array.from(categoryFilter),
         produce: Array.from(produceFilter),
+        sort: sortBy,
       }),
     refetchOnWindowFocus: false
   })
@@ -148,6 +153,15 @@ export function ClientsTable() {
             selectedValues={produceFilter}
             onValueChange={setProduceFilter}
           />
+          <Button
+            variant={sortBy === "last_viewed" ? "default" : "outline"}
+            size="sm"
+            className="h-8"
+            onClick={() => setSortBy(sortBy === "last_viewed" ? "" : "last_viewed")}
+          >
+            <ArrowUpDown className="mr-2 h-4 w-4" />
+            Last Viewed
+          </Button>
         </>
       }
     />
