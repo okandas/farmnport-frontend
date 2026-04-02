@@ -441,6 +441,11 @@ export function updateFarmProduceCategory(data: { slug: string; name: string; de
   return api.put(url, { name: data.name, description: data.description })
 }
 
+export function addFarmProduceCategory(data: { name: string; description: string }) {
+  const url = `${baseUrl}/farmproducecategories`
+  return api.post(url, data)
+}
+
 export function queryFarmProduceCategories(pagination?: pagination) {
   let url: string
 

@@ -625,6 +625,13 @@ export const FarmProduceCategorySchema = z.object({
 
 export type FarmProduceCategory = z.infer<typeof FarmProduceCategorySchema>
 
+export const FormFarmProduceCategorySchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  description: z.string().max(500, "Description must be 500 characters or less").optional().default(""),
+})
+
+export type FormFarmProduceCategoryModel = z.infer<typeof FormFarmProduceCategorySchema>
+
 export const FarmProduceSchema = z.object({
   id: z.string(),
   name: z.string(),
