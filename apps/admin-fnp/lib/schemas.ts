@@ -1103,6 +1103,7 @@ export const RestaurantLocationSchema = z.object({
   restaurant_name: z.string().optional(),
   name: z.string().min(1, "Location name is required").max(120, "Name cannot exceed 120 characters"),
   address: z.string().min(1, "Address is required"),
+  city: z.string().default(""),
   phone: z.string().min(1, "Phone number is required"),
   email: z.string().email().optional().or(z.literal("")),
   latitude: z.coerce.number().optional().default(0),
@@ -1125,6 +1126,7 @@ export const FormRestaurantLocationSchema = RestaurantLocationSchema.pick({
   restaurant_id: true,
   name: true,
   address: true,
+  city: true,
   phone: true,
   email: true,
   latitude: true,
@@ -1133,6 +1135,8 @@ export const FormRestaurantLocationSchema = RestaurantLocationSchema.pick({
   cuisine_categories: true,
   operating_hours: true,
   status: true,
+}).extend({
+  city: z.string().min(1, "City is required"),
 })
 
 export type OperatingHour = z.infer<typeof OperatingHourSchema>

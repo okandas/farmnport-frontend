@@ -1045,6 +1045,9 @@ export function queryRestaurants(pagination?: pagination) {
   if (pagination?.search !== undefined && pagination.search.length >= 2) {
     params.set("search", pagination.search)
   }
+  if (pagination?.limit !== undefined) {
+    params.set("limit", String(pagination.limit))
+  }
   const qs = params.toString()
   const url = `${baseUrl}/restaurants/list${qs ? `?${qs}` : ""}`
   return api.get(url)
