@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation"
 import dynamic from "next/dynamic"
 
 import { updateRestaurantLocation, queryRestaurantLocation, queryRestaurants, queryCuisineCategories } from "@/lib/query"
+import { z } from "zod"
 import { RestaurantLocationSchema, RestaurantLocation, Restaurant, CuisineCategory } from "@/lib/schemas"
 import { cn } from "@/lib/utilities"
 import { buttonVariants } from "@/components/ui/button"
@@ -45,6 +46,7 @@ const EditFormSchema = RestaurantLocationSchema.pick({
     restaurant_id: true,
     name: true,
     address: true,
+    city: true,
     phone: true,
     email: true,
     latitude: true,
@@ -56,6 +58,8 @@ const EditFormSchema = RestaurantLocationSchema.pick({
     is_main: true,
     whatsapp_available: true,
     show_number: true,
+}).extend({
+    city: z.string().min(1, "City is required"),
 })
 
 type EditFormModel = typeof EditFormSchema._type
@@ -83,7 +87,7 @@ export default function EditRestaurantLocationPage({ params }: { params: Promise
 
     const { data: restaurantsData, isLoading: isLoadingRestaurants } = useQuery({
         queryKey: ["restaurants-for-select"],
-        queryFn: () => queryRestaurants({}),
+        queryFn: () => queryRestaurants({ limit: 200 }),
         refetchOnWindowFocus: false,
     })
 
@@ -128,6 +132,7 @@ function EditLocationForm({ location, restaurants, cuisineCategories }: { locati
             restaurant_id: location.restaurant_id,
             name: location.name,
             address: location.address,
+            city: location.city ?? "",
             phone: location.phone,
             email: location.email ?? "",
             latitude: Number(location.latitude) || 0,
@@ -168,7 +173,7 @@ function EditLocationForm({ location, restaurants, cuisineCategories }: { locati
     }
 
     return (
-        <div className="space-y-10">
+        <div className="space-y-10 px-4 py-6 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
@@ -211,7 +216,7 @@ function EditLocationForm({ location, restaurants, cuisineCategories }: { locati
                                             name="restaurant_id"
                                             render={({ field }) => (
                                                 <FormItem>
-                                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                    <Select onValueChange={field.onChange} value={field.value}>
                                                         <FormControl>
                                                             <SelectTrigger className="w-full">
                                                                 <SelectValue placeholder="Select a restaurant" />
@@ -242,7 +247,7 @@ function EditLocationForm({ location, restaurants, cuisineCategories }: { locati
                                             name="status"
                                             render={({ field }) => (
                                                 <FormItem>
-                                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                    <Select onValueChange={field.onChange} value={field.value}>
                                                         <FormControl>
                                                             <SelectTrigger className="w-full">
                                                                 <SelectValue placeholder="Select status" />
@@ -406,6 +411,9 @@ function EditLocationForm({ location, restaurants, cuisineCategories }: { locati
                                             if (data.address) {
                                                 form.setValue("address", data.address)
                                             }
+                                            if (data.city) {
+                                                form.setValue("city", data.city)
+                                            }
                                             form.setValue("latitude", data.latitude)
                                             form.setValue("longitude", data.longitude)
                                             if (data.place_id) {
@@ -522,6 +530,34 @@ function EditLocationForm({ location, restaurants, cuisineCategories }: { locati
                                                 )}
                                             />
                                         </div>
+                                    </div>
+
+                                    <div className="sm:col-span-3">
+                                        <label htmlFor="city" className="block text-sm/6 font-medium text-gray-900 dark:text-white">
+                                            City
+                                        </label>
+                                        <div className="mt-2">
+                                            <FormField
+                                                control={form.control}
+                                                name="city"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormControl>
+                                                            <Input
+                                                                id="city"
+                                                                placeholder="e.g. Harare, Bulawayo"
+                                                                className={inputClass}
+                                                                {...field}
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        </div>
+                                        <p className="mt-2 text-sm/6 text-gray-500 dark:text-gray-400">
+                                            Auto-filled from Google Places. You can edit it.
+                                        </p>
                                     </div>
                                 </div>
                             </div>

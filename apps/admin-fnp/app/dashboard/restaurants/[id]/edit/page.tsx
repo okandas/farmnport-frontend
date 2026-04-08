@@ -92,7 +92,7 @@ function EditRestaurantForm({ restaurant }: { restaurant: Restaurant }) {
     }
 
     return (
-        <div className="space-y-10">
+        <div className="space-y-10 px-4 py-6 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">

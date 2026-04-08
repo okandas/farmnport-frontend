@@ -42,6 +42,13 @@ export const restaurantLocationColumns: ColumnDef<RestaurantLocation>[] = [
     ),
   },
   {
+    accessorKey: "city",
+    header: "City",
+    cell: ({ row }) => (
+      <span className="capitalize">{row.original.city || "-"}</span>
+    ),
+  },
+  {
     accessorKey: "phone",
     header: "Phone",
   },

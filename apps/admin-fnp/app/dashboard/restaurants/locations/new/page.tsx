@@ -44,7 +44,7 @@ export default function NewRestaurantLocationPage() {
 
     const { data: restaurantsData } = useQuery({
         queryKey: ["restaurants-for-select"],
-        queryFn: () => queryRestaurants({}),
+        queryFn: () => queryRestaurants({ limit: 200 }),
         refetchOnWindowFocus: false,
     })
 
@@ -63,6 +63,7 @@ export default function NewRestaurantLocationPage() {
             restaurant_id: "",
             name: "",
             address: "",
+            city: "",
             phone: "",
             email: "",
             latitude: 0,
@@ -108,7 +109,7 @@ export default function NewRestaurantLocationPage() {
     }
 
     return (
-        <div className="space-y-10">
+        <div className="space-y-10 px-4 py-6 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
@@ -268,6 +269,9 @@ export default function NewRestaurantLocationPage() {
                                             if (data.address) {
                                                 form.setValue("address", data.address)
                                             }
+                                            if (data.city) {
+                                                form.setValue("city", data.city)
+                                            }
                                             form.setValue("latitude", data.latitude)
                                             form.setValue("longitude", data.longitude)
                                             if (data.place_id) {
@@ -320,6 +324,34 @@ export default function NewRestaurantLocationPage() {
                                                             <Input
                                                                 id="address"
                                                                 placeholder="Enter full address"
+                                                                className={inputClass}
+                                                                {...field}
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        </div>
+                                        <p className="mt-2 text-sm/6 text-gray-500 dark:text-gray-400">
+                                            Auto-filled from Google Places. You can edit it.
+                                        </p>
+                                    </div>
+
+                                    <div className="sm:col-span-3">
+                                        <label htmlFor="city" className="block text-sm/6 font-medium text-gray-900 dark:text-white">
+                                            City
+                                        </label>
+                                        <div className="mt-2">
+                                            <FormField
+                                                control={form.control}
+                                                name="city"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormControl>
+                                                            <Input
+                                                                id="city"
+                                                                placeholder="e.g. Harare, Bulawayo"
                                                                 className={inputClass}
                                                                 {...field}
                                                             />

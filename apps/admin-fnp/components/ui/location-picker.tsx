@@ -8,6 +8,7 @@ interface PlaceResult {
     place_id: string
     address: string
     name: string
+    city: string
 }
 
 interface LocationPickerProps {
@@ -100,6 +101,7 @@ export function LocationPicker({ onSelect, latitude, longitude, defaultValue }: 
                 place_id: "",
                 address: "",
                 name: "",
+                city: "",
             })
         })
     }, [loaded])
@@ -111,7 +113,7 @@ export function LocationPicker({ onSelect, latitude, longitude, defaultValue }: 
         const autocomplete = new google.maps.places.Autocomplete(inputRef.current, {
             types: ["establishment", "geocode"],
             componentRestrictions: { country: "zw" },
-            fields: ["geometry", "place_id", "formatted_address", "name"],
+            fields: ["geometry", "place_id", "formatted_address", "name", "address_components"],
         })
 
         autocomplete.addListener("place_changed", () => {
@@ -123,12 +125,17 @@ export function LocationPicker({ onSelect, latitude, longitude, defaultValue }: 
 
             updateMapMarker(lat, lng)
 
+            const cityComponent = place.address_components?.find((c: { types: string[] }) =>
+                c.types.includes("locality")
+            )
+
             onSelectRef.current({
                 latitude: lat,
                 longitude: lng,
                 place_id: place.place_id || "",
                 address: place.formatted_address || "",
                 name: place.name || "",
+                city: cityComponent?.long_name || "",
             })
         })
     }, [loaded, updateMapMarker])
