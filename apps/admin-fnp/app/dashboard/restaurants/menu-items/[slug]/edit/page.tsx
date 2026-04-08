@@ -54,7 +54,7 @@ export default function EditMenuItemPage() {
     const [searchComponent, setSearchComponent] = useState("")
     const [openComponents, setOpenComponents] = useState(false)
     const [selectedTags, setSelectedTags] = useState<string[]>([])
-    const [sizes, setSizes] = useState<{ name: string; price_cents: string }[]>([])
+    const [sizes, setSizes] = useState<{ name: string; description: string; price_cents: string }[]>([])
     const [initialized, setInitialized] = useState(false)
 
     const availableTags = ["Vegetarian", "Vegetarian On Request", "Gluten Free", "Scrambled", "Fried", "Grilled"]
@@ -99,6 +99,7 @@ export default function EditMenuItemPage() {
             setSelectedTags(menuItem.tags || [])
             setSizes((menuItem.sizes || []).map(s => ({
                 name: s.name,
+                description: s.description || "",
                 price_cents: String(centsToDollarsFormInputs(s.price_cents || 0)),
             })))
             setInitialized(true)
@@ -198,6 +199,7 @@ export default function EditMenuItemPage() {
             composition: selectedComponents,
             sizes: sizes.filter(s => s.name.trim()).map(s => ({
                 name: s.name.trim(),
+                description: s.description.trim(),
                 price_cents: dollarsToCents(parseFloat(s.price_cents || "0")),
             })),
             tags: selectedTags,
@@ -386,54 +388,70 @@ export default function EditMenuItemPage() {
 
                             <div className="col-span-full">
                                 <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">
-                                    Size Options
+                                    Options / Variants
                                 </label>
                                 <p className="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">
-                                    Add size variants if this item comes in multiple sizes (e.g. Small, Medium, Large).
+                                    Add options if this item has variants (e.g. On its own, + Single Side, Small, Large).
                                 </p>
-                                <div className="mt-3 space-y-3">
+                                <div className="mt-3 space-y-4">
                                     {sizes.map((size, index) => (
-                                        <div key={index} className="flex items-center gap-3">
-                                            <Input
-                                                placeholder="Size name (e.g. Medium)"
-                                                value={size.name}
-                                                onChange={(e) => {
-                                                    const updated = [...sizes]
-                                                    updated[index] = { ...updated[index], name: e.target.value }
-                                                    setSizes(updated)
-                                                }}
-                                                className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
-                                            />
-                                            <Input
-                                                type="number"
-                                                step="0.01"
-                                                min="0"
-                                                placeholder="Price ($)"
-                                                value={size.price_cents}
-                                                onChange={(e) => {
-                                                    const updated = [...sizes]
-                                                    updated[index] = { ...updated[index], price_cents: e.target.value }
-                                                    setSizes(updated)
-                                                }}
-                                                className="block w-40 rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
-                                            />
-                                            <button
-                                                type="button"
-                                                onClick={() => setSizes(sizes.filter((_, i) => i !== index))}
-                                                className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
-                                            >
-                                                <Icons.close className="w-4 h-4" />
-                                            </button>
+                                        <div key={index} className="rounded-lg border border-gray-200 p-4 dark:border-white/10">
+                                            <div className="flex items-start gap-3">
+                                                <div className="flex-1 space-y-3">
+                                                    <div className="flex items-center gap-3">
+                                                        <Input
+                                                            placeholder="Option name (e.g. On its own, + Single Side)"
+                                                            value={size.name}
+                                                            onChange={(e) => {
+                                                                const updated = [...sizes]
+                                                                updated[index] = { ...updated[index], name: e.target.value }
+                                                                setSizes(updated)
+                                                            }}
+                                                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
+                                                        />
+                                                        <Input
+                                                            type="number"
+                                                            step="0.01"
+                                                            min="0"
+                                                            placeholder="Price ($)"
+                                                            value={size.price_cents}
+                                                            onChange={(e) => {
+                                                                const updated = [...sizes]
+                                                                updated[index] = { ...updated[index], price_cents: e.target.value }
+                                                                setSizes(updated)
+                                                            }}
+                                                            className="block w-36 rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
+                                                        />
+                                                    </div>
+                                                    <Input
+                                                        placeholder="Description (e.g. Single Chips & a Nando's Roll)"
+                                                        value={size.description}
+                                                        onChange={(e) => {
+                                                            const updated = [...sizes]
+                                                            updated[index] = { ...updated[index], description: e.target.value }
+                                                            setSizes(updated)
+                                                        }}
+                                                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
+                                                    />
+                                                </div>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setSizes(sizes.filter((_, i) => i !== index))}
+                                                    className="mt-1.5 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+                                                >
+                                                    <Icons.close className="w-4 h-4" />
+                                                </button>
+                                            </div>
                                         </div>
                                     ))}
                                     <Button
                                         type="button"
                                         variant="outline"
                                         size="sm"
-                                        onClick={() => setSizes([...sizes, { name: "", price_cents: "" }])}
+                                        onClick={() => setSizes([...sizes, { name: "", description: "", price_cents: "" }])}
                                     >
                                         <Icons.add className="w-4 h-4 mr-1" />
-                                        Add Size
+                                        Add Option
                                     </Button>
                                 </div>
                             </div>

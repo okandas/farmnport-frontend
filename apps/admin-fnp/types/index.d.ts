@@ -19,6 +19,7 @@ export type SidebarNavigationItem = {
 export type SidebarNavigationGroup = {
   label: string
   items: SidebarNavigationItem[]
+  alwaysOpen?: boolean
 }
 
 export type NavigationItem = {

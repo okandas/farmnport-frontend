@@ -41,6 +41,8 @@ import {
 } from "@/components/ui/command"
 import { Badge } from "@/components/ui/badge"
 
+const inputClass = "block w-full rounded-md bg-white px-3.5 py-2.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
+
 export default function NewMenuPage() {
     const router = useRouter()
     const [locationsOpen, setLocationsOpen] = useState(false)
@@ -122,111 +124,19 @@ export default function NewMenuPage() {
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)}>
                     <div className="space-y-12">
+
+                        {/* Section 1: Menu Details */}
                         <div className="border-b border-gray-900/10 pb-12 dark:border-white/10">
                             <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">
-                                Menu Information
+                                Menu Details
                             </h2>
                             <p className="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">
-                                e.g. Breakfast Menu, Lunch Menu, Weekend Special
+                                Basic information about this menu.
                             </p>
 
                             <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-                                <div className="sm:col-span-4 px-1">
-                                    <label
-                                        className="block text-sm/6 font-medium text-gray-900 dark:text-white"
-                                    >
-                                        Locations
-                                    </label>
-                                    <div className="mt-2">
-                                        <FormField
-                                            control={form.control}
-                                            name="locations"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <Popover open={locationsOpen} onOpenChange={setLocationsOpen}>
-                                                        <PopoverTrigger asChild>
-                                                            <button
-                                                                type="button"
-                                                                role="combobox"
-                                                                aria-expanded={locationsOpen}
-                                                                className="flex w-full items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 hover:bg-gray-50 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
-                                                            >
-                                                                <span className="text-gray-400 dark:text-gray-500">
-                                                                    {field.value?.length
-                                                                        ? `${field.value.length} location${field.value.length > 1 ? "s" : ""} selected`
-                                                                        : "Select locations"}
-                                                                </span>
-                                                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                                            </button>
-                                                        </PopoverTrigger>
-                                                        <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
-                                                            <Command>
-                                                                <CommandInput placeholder="Search locations..." />
-                                                                <CommandList>
-                                                                    <CommandEmpty>No locations found.</CommandEmpty>
-                                                                    <CommandGroup>
-                                                                        {locations.map((loc) => {
-                                                                            const isSelected = field.value?.some(
-                                                                                (l) => l.location_id === loc.id
-                                                                            )
-                                                                            return (
-                                                                                <CommandItem
-                                                                                    key={loc.id}
-                                                                                    value={loc.name}
-                                                                                    onSelect={() => {
-                                                                                        field.onChange(
-                                                                                            toggleLocation(loc, field.value || [])
-                                                                                        )
-                                                                                    }}
-                                                                                >
-                                                                                    <Check
-                                                                                        className={cn(
-                                                                                            "mr-2 h-4 w-4",
-                                                                                            isSelected ? "opacity-100" : "opacity-0"
-                                                                                        )}
-                                                                                    />
-                                                                                    <span className="capitalize">{loc.name}</span>
-                                                                                </CommandItem>
-                                                                            )
-                                                                        })}
-                                                                    </CommandGroup>
-                                                                </CommandList>
-                                                            </Command>
-                                                        </PopoverContent>
-                                                    </Popover>
-                                                    {field.value && field.value.length > 0 && (
-                                                        <div className="flex flex-wrap gap-1.5 mt-2">
-                                                            {field.value.map((loc) => (
-                                                                <Badge
-                                                                    key={loc.location_id}
-                                                                    variant="secondary"
-                                                                    className="capitalize cursor-pointer"
-                                                                    onClick={() => {
-                                                                        field.onChange(
-                                                                            field.value?.filter(
-                                                                                (l) => l.location_id !== loc.location_id
-                                                                            ) || []
-                                                                        )
-                                                                    }}
-                                                                >
-                                                                    {loc.location_name}
-                                                                    <X className="ml-1 h-3 w-3" />
-                                                                </Badge>
-                                                            ))}
-                                                        </div>
-                                                    )}
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="sm:col-span-4 px-1">
-                                    <label
-                                        htmlFor="name"
-                                        className="block text-sm/6 font-medium text-gray-900 dark:text-white"
-                                    >
+                                <div className="sm:col-span-3">
+                                    <label htmlFor="name" className="block text-sm/6 font-medium text-gray-900 dark:text-white">
                                         Menu Name
                                     </label>
                                     <div className="mt-2">
@@ -238,8 +148,8 @@ export default function NewMenuPage() {
                                                     <FormControl>
                                                         <Input
                                                             id="name"
-                                                            placeholder="Enter menu name"
-                                                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
+                                                            placeholder="e.g. Breakfast Menu, Lunch Menu"
+                                                            className={inputClass}
                                                             {...field}
                                                         />
                                                     </FormControl>
@@ -250,38 +160,8 @@ export default function NewMenuPage() {
                                     </div>
                                 </div>
 
-                                <div className="sm:col-span-4 px-1">
-                                    <label
-                                        htmlFor="note"
-                                        className="block text-sm/6 font-medium text-gray-900 dark:text-white"
-                                    >
-                                        Note
-                                    </label>
-                                    <div className="mt-2">
-                                        <FormField
-                                            control={form.control}
-                                            name="note"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormControl>
-                                                        <Input
-                                                            id="note"
-                                                            placeholder="e.g. Served until 11:00 AM"
-                                                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
-                                                            {...field}
-                                                        />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="sm:col-span-4 px-1">
-                                    <label
-                                        className="block text-sm/6 font-medium text-gray-900 dark:text-white"
-                                    >
+                                <div className="sm:col-span-3">
+                                    <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">
                                         Status
                                     </label>
                                     <div className="mt-2">
@@ -307,29 +187,151 @@ export default function NewMenuPage() {
                                         />
                                     </div>
                                 </div>
+
+                                <div className="col-span-full">
+                                    <label htmlFor="note" className="block text-sm/6 font-medium text-gray-900 dark:text-white">
+                                        Note <span className="text-gray-400 font-normal">(optional)</span>
+                                    </label>
+                                    <div className="mt-2">
+                                        <FormField
+                                            control={form.control}
+                                            name="note"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormControl>
+                                                        <Input
+                                                            id="note"
+                                                            placeholder="e.g. Served until 11:00 AM"
+                                                            className={inputClass}
+                                                            {...field}
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
+                        {/* Section 2: Locations */}
+                        <div className="border-b border-gray-900/10 pb-12 dark:border-white/10">
+                            <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">
+                                Locations
+                            </h2>
+                            <p className="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">
+                                Select which restaurant locations this menu is available at.
+                            </p>
+
+                            <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                                <div className="sm:col-span-4">
+                                    <FormField
+                                        control={form.control}
+                                        name="locations"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <Popover open={locationsOpen} onOpenChange={setLocationsOpen}>
+                                                    <PopoverTrigger asChild>
+                                                        <button
+                                                            type="button"
+                                                            role="combobox"
+                                                            aria-expanded={locationsOpen}
+                                                            className="flex w-full items-center justify-between rounded-md bg-white px-3.5 py-2.5 text-sm text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 hover:bg-gray-50 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:hover:bg-white/10"
+                                                        >
+                                                            <span className="text-gray-400 dark:text-gray-500">
+                                                                {field.value?.length
+                                                                    ? `${field.value.length} location${field.value.length > 1 ? "s" : ""} selected`
+                                                                    : "Select locations"}
+                                                            </span>
+                                                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                                        </button>
+                                                    </PopoverTrigger>
+                                                    <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+                                                        <Command>
+                                                            <CommandInput placeholder="Search locations..." />
+                                                            <CommandList>
+                                                                <CommandEmpty>No locations found.</CommandEmpty>
+                                                                <CommandGroup>
+                                                                    {locations.map((loc) => {
+                                                                        const isSelected = field.value?.some(
+                                                                            (l) => l.location_id === loc.id
+                                                                        )
+                                                                        return (
+                                                                            <CommandItem
+                                                                                key={loc.id}
+                                                                                value={loc.name}
+                                                                                onSelect={() => {
+                                                                                    field.onChange(
+                                                                                        toggleLocation(loc, field.value || [])
+                                                                                    )
+                                                                                }}
+                                                                            >
+                                                                                <Check
+                                                                                    className={cn(
+                                                                                        "mr-2 h-4 w-4",
+                                                                                        isSelected ? "opacity-100" : "opacity-0"
+                                                                                    )}
+                                                                                />
+                                                                                <span className="capitalize">{loc.name}</span>
+                                                                            </CommandItem>
+                                                                        )
+                                                                    })}
+                                                                </CommandGroup>
+                                                            </CommandList>
+                                                        </Command>
+                                                    </PopoverContent>
+                                                </Popover>
+                                                {field.value && field.value.length > 0 && (
+                                                    <div className="flex flex-wrap gap-1.5 mt-3">
+                                                        {field.value.map((loc) => (
+                                                            <Badge
+                                                                key={loc.location_id}
+                                                                variant="secondary"
+                                                                className="capitalize cursor-pointer"
+                                                                onClick={() => {
+                                                                    field.onChange(
+                                                                        field.value?.filter(
+                                                                            (l) => l.location_id !== loc.location_id
+                                                                        ) || []
+                                                                    )
+                                                                }}
+                                                            >
+                                                                {loc.location_name}
+                                                                <X className="ml-1 h-3 w-3" />
+                                                            </Badge>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Section 3: Category Notes */}
                         {categories.length > 0 && (
                             <div className="border-b border-gray-900/10 pb-12 dark:border-white/10">
-                                <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">
-                                    Category Notes
-                                </h2>
-                                <p className="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">
-                                    Add notes for specific categories on this menu. e.g. &quot;All steaks are 14-day aged and served with your choice of sides&quot;
-                                </p>
+                                <div className="sticky top-0 z-10 bg-background pb-4 pt-2">
+                                    <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">
+                                        Category Notes
+                                    </h2>
+                                    <p className="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">
+                                        Add optional notes for specific menu categories, e.g. &quot;All steaks are 14-day aged and served with your choice of sides&quot;
+                                    </p>
+                                </div>
 
-                                <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
+                                <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
                                     {categories.map((cat) => (
-                                        <div key={cat.id} className="sm:col-span-4 px-1">
-                                            <label
-                                                className="block text-sm/6 font-medium text-gray-900 dark:text-white capitalize"
-                                            >
+                                        <div key={cat.id} className="sm:col-span-3">
+                                            <label className="block text-sm/6 font-medium text-gray-900 dark:text-white capitalize">
                                                 {cat.name}
                                             </label>
                                             <div className="mt-2">
                                                 <Input
-                                                    placeholder={`Note for ${cat.name} (optional)`}
+                                                    placeholder={`Note for ${cat.name}`}
                                                     value={form.watch("category_notes")?.[cat.id] || ""}
                                                     onChange={(e) => {
                                                         const current = form.getValues("category_notes") || {}
@@ -340,7 +342,7 @@ export default function NewMenuPage() {
                                                             form.setValue("category_notes", { ...current, [cat.id]: e.target.value }, { shouldDirty: true })
                                                         }
                                                     }}
-                                                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
+                                                    className={inputClass}
                                                 />
                                             </div>
                                         </div>
@@ -361,7 +363,7 @@ export default function NewMenuPage() {
                         <button
                             type="submit"
                             disabled={isPending}
-                            className="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-indigo-500 dark:shadow-none dark:hover:bg-indigo-400 dark:focus-visible:outline-indigo-500"
+                            className="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {isPending && <Icons.spinner className="w-4 h-4 mr-2 animate-spin" />}
                             Save

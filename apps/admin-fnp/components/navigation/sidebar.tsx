@@ -25,7 +25,7 @@ export function SidebarNavigation({ navigationGroups }: SidebarNavigationProps) 
       const hasActiveItem = group.items.some(
         (item) => item.href && isActive(item.href)
       )
-      acc[index] = hasActiveItem || group.items.length <= 1
+      acc[index] = hasActiveItem || group.items.length <= 1 || !!group.alwaysOpen
       return acc
     },
     {}
@@ -40,7 +40,7 @@ export function SidebarNavigation({ navigationGroups }: SidebarNavigationProps) 
       const hasActiveItem = group.items.some(
         (item) => item.href && isActive(item.href)
       )
-      next[index] = hasActiveItem || group.items.length <= 1
+      next[index] = hasActiveItem || group.items.length <= 1 || !!group.alwaysOpen
     })
     setOpenGroups(next)
   }, [path])
