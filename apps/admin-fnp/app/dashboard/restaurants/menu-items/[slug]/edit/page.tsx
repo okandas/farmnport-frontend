@@ -65,7 +65,21 @@ export default function EditMenuItemPage() {
         )
     }
 
+    const [searchCategory, setSearchCategory] = useState("")
+    const [openCategories, setOpenCategories] = useState(false)
+    const [categoryPage, setCategoryPage] = useState(1)
+    const [allCategories, setAllCategories] = useState<MenuItemCategory[]>([])
+    const [hasMoreCategories, setHasMoreCategories] = useState(true)
+
     const [debouncedComponentQuery] = useDebounce(searchComponent, 1000)
+    const [debouncedCategoryQuery] = useDebounce(searchCategory, 500)
+
+    // Reset categories when search changes
+    useEffect(() => {
+        setCategoryPage(1)
+        setAllCategories([])
+        setHasMoreCategories(true)
+    }, [debouncedCategoryQuery])
 
     // Fetch the menu item
     const { data: menuItemData, isLoading, isError } = useQuery({
@@ -106,14 +120,28 @@ export default function EditMenuItemPage() {
         }
     }, [menuItem, initialized])
 
-    // Fetch categories for dropdown
-    const { data: categoryData } = useQuery({
-        queryKey: ["menu-item-categories-all"],
-        queryFn: () => queryMenuItemCategories({ p: 1, limit: 100 }),
+    // Fetch categories with search and pagination
+    const { data: categoryData, isFetching: isFetchingCategories } = useQuery({
+        queryKey: ["menu-item-categories-search", { p: categoryPage, search: debouncedCategoryQuery }],
+        queryFn: () => queryMenuItemCategories({ p: categoryPage, search: debouncedCategoryQuery, limit: 20 }),
         refetchOnWindowFocus: false,
     })
 
-    const categories = (categoryData?.data?.data as MenuItemCategory[]) || []
+    useEffect(() => {
+        const newCategories = categoryData?.data?.data as MenuItemCategory[]
+        const total = categoryData?.data?.total as number
+        if (newCategories) {
+            setAllCategories(prev => {
+                if (categoryPage === 1) return newCategories
+                const existingIds = new Set(prev.map(c => c.id))
+                const unique = newCategories.filter(c => !existingIds.has(c.id))
+                return [...prev, ...unique]
+            })
+            setHasMoreCategories(categoryPage * 20 < total)
+        }
+    }, [categoryData, categoryPage])
+
+    const selectedCategoryName = allCategories.find(c => c.id === categoryId)?.name
 
     // Search components for composition
     const hasShownError = useRef(false)
@@ -371,18 +399,55 @@ export default function EditMenuItemPage() {
                                     Category
                                 </label>
                                 <div className="mt-2">
-                                    <Select onValueChange={setCategoryId} value={categoryId || menuItem?.category_id || ""}>
-                                        <SelectTrigger className="w-full">
-                                            <SelectValue placeholder="Select a category" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {categories.map((cat) => (
-                                                <SelectItem key={cat.id} value={cat.id}>
-                                                    {cat.name}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
+                                    <Popover open={openCategories} onOpenChange={setOpenCategories}>
+                                        <PopoverTrigger asChild>
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                role="combobox"
+                                                aria-expanded={openCategories}
+                                                className="w-full justify-between text-left font-normal"
+                                            >
+                                                {selectedCategoryName || "Select a category"}
+                                                <Icons.chevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="p-0" align="start" style={{ width: 'var(--radix-popover-trigger-width)' }}>
+                                            <Command shouldFilter={false}>
+                                                <CommandInput
+                                                    placeholder="Search categories..."
+                                                    value={searchCategory}
+                                                    onValueChange={setSearchCategory}
+                                                />
+                                                <CommandList onScroll={(e) => {
+                                                    const el = e.currentTarget
+                                                    if (!isFetchingCategories && hasMoreCategories && el.scrollTop + el.clientHeight >= el.scrollHeight - 10) {
+                                                        setCategoryPage(prev => prev + 1)
+                                                    }
+                                                }}>
+                                                    <CommandEmpty>
+                                                        {isFetchingCategories ? "Searching..." : "No categories found"}
+                                                    </CommandEmpty>
+                                                    {allCategories?.map((cat) => (
+                                                        <CommandItem
+                                                            key={cat.id}
+                                                            value={cat.id}
+                                                            onSelect={() => {
+                                                                setCategoryId(cat.id)
+                                                                setOpenCategories(false)
+                                                            }}
+                                                        >
+                                                            <Icons.check className={cn("mr-2 h-4 w-4", categoryId === cat.id ? "opacity-100" : "opacity-0")} />
+                                                            {cat.name}
+                                                        </CommandItem>
+                                                    ))}
+                                                    {isFetchingCategories && allCategories.length > 0 && (
+                                                        <div className="py-2 text-center text-sm text-gray-500">Loading more...</div>
+                                                    )}
+                                                </CommandList>
+                                            </Command>
+                                        </PopoverContent>
+                                    </Popover>
                                 </div>
                             </div>
 
@@ -393,9 +458,9 @@ export default function EditMenuItemPage() {
                                 <p className="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">
                                     Add options if this item has variants (e.g. On its own, + Single Side, Small, Large).
                                 </p>
-                                <div className="mt-3 space-y-4">
+                                <div className="mt-3 divide-y divide-gray-200 dark:divide-white/10">
                                     {sizes.map((size, index) => (
-                                        <div key={index} className="rounded-lg border border-gray-200 p-4 dark:border-white/10">
+                                        <div key={index} className="py-4 first:pt-0">
                                             <div className="flex items-start gap-3">
                                                 <div className="flex-1 space-y-3">
                                                     <div className="flex items-center gap-3">
