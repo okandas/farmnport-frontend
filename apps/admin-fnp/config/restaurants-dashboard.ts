@@ -24,26 +24,12 @@ export const restaurantsDashboardConfig: DashboardConfig = {
       ],
     },
     {
-      label: "Sales",
-      items: [
-        {
-          title: "Overview",
-          href: "/dashboard/restaurants/sales",
-          icon: "barChart",
-        },
-        {
-          title: "Orders",
-          href: "/dashboard/restaurants/sales/orders",
-          icon: "shoppingCart",
-        },
-      ],
-    },
-    {
       label: "Menu Catalog",
+      alwaysOpen: true,
       items: [
         {
           title: "Menu Categories",
-          href: "/dashboard/restaurants/menu-categories",
+          href: "/dashboard/restaurants/menu-item-categories",
           icon: "layers",
         },
         {
@@ -57,11 +43,6 @@ export const restaurantsDashboardConfig: DashboardConfig = {
           icon: "utensilsCrossed",
         },
         {
-          title: "Categories",
-          href: "/dashboard/restaurants/menu-item-categories",
-          icon: "tag",
-        },
-        {
           title: "Add-Ons",
           href: "/dashboard/restaurants/menu-item-add-ons",
           icon: "sparkles",
@@ -70,6 +51,22 @@ export const restaurantsDashboardConfig: DashboardConfig = {
           title: "Components",
           href: "/dashboard/restaurants/menu-item-components",
           icon: "egg",
+        },
+      ],
+    },
+    {
+      label: "Sales",
+      alwaysOpen: true,
+      items: [
+        {
+          title: "Overview",
+          href: "/dashboard/restaurants/sales",
+          icon: "barChart",
+        },
+        {
+          title: "Orders",
+          href: "/dashboard/restaurants/sales/orders",
+          icon: "shoppingCart",
         },
       ],
     },
