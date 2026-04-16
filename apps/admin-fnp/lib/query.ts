@@ -1068,6 +1068,28 @@ export function deleteRestaurant(id: string) {
   return api.delete(url)
 }
 
+// Restaurant Cuisines (junction)
+export function queryRestaurantCuisines(restaurantId: string) {
+  let url = `${baseUrl}/restaurants/cuisines/${restaurantId}`
+  return api.get(url)
+}
+
+export function addRestaurantCuisine(data: {
+  restaurant_id: string
+  restaurant_name: string
+  cuisine_category_id: string
+  cuisine_category_name: string
+  cuisine_category_slug: string
+}) {
+  let url = `${baseUrl}/restaurants/cuisines/add`
+  return api.post(url, data)
+}
+
+export function deleteRestaurantCuisine(id: string) {
+  let url = `${baseUrl}/restaurants/cuisines/delete/${id}`
+  return api.delete(url)
+}
+
 // Restaurant Locations
 export function addRestaurantLocation(data: any) {
   let url = `${baseUrl}/restaurant-locations/add`

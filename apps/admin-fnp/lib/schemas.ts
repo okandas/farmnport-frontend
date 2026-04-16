@@ -1112,10 +1112,6 @@ export const RestaurantLocationSchema = z.object({
   whatsapp_available: z.boolean().default(false),
   show_number: z.boolean().default(false),
   is_main: z.boolean().default(false),
-  cuisine_categories: z.array(z.object({
-    cuisine_category_id: z.string(),
-    cuisine_category_name: z.string(),
-  })).default([]),
   operating_hours: z.array(OperatingHourSchema).default([]),
   status: z.enum(["active", "inactive", "closed"]).default("active"),
   created: z.string().optional(),
@@ -1132,7 +1128,6 @@ export const FormRestaurantLocationSchema = RestaurantLocationSchema.pick({
   latitude: true,
   longitude: true,
   place_id: true,
-  cuisine_categories: true,
   operating_hours: true,
   status: true,
 }).extend({
@@ -1253,6 +1248,19 @@ export type CuisineCategoryResponse = {
   total: number
   data: CuisineCategory[]
 }
+
+// Restaurant Cuisine (junction)
+export const RestaurantCuisineSchema = z.object({
+  id: z.string(),
+  restaurant_id: z.string(),
+  restaurant_name: z.string(),
+  cuisine_category_id: z.string(),
+  cuisine_category_name: z.string(),
+  cuisine_category_slug: z.string(),
+  created: z.string().optional(),
+})
+
+export type RestaurantCuisine = z.infer<typeof RestaurantCuisineSchema>
 
 // Menu Item Component
 export const MenuItemComponentSchema = z.object({
