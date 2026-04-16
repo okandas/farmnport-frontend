@@ -8,9 +8,9 @@ import { useForm, useFieldArray } from "react-hook-form"
 import { useRouter } from "next/navigation"
 import dynamic from "next/dynamic"
 
-import { updateRestaurantLocation, queryRestaurantLocation, queryRestaurants, queryCuisineCategories } from "@/lib/query"
+import { updateRestaurantLocation, queryRestaurantLocation, queryRestaurants } from "@/lib/query"
 import { z } from "zod"
-import { RestaurantLocationSchema, RestaurantLocation, Restaurant, CuisineCategory } from "@/lib/schemas"
+import { RestaurantLocationSchema, RestaurantLocation, Restaurant } from "@/lib/schemas"
 import { cn } from "@/lib/utilities"
 import { buttonVariants } from "@/components/ui/button"
 import { Icons } from "@/components/icons/lucide"
@@ -52,7 +52,6 @@ const EditFormSchema = RestaurantLocationSchema.pick({
     latitude: true,
     longitude: true,
     place_id: true,
-    cuisine_categories: true,
     operating_hours: true,
     status: true,
     is_main: true,
@@ -93,15 +92,7 @@ export default function EditRestaurantLocationPage({ params }: { params: Promise
 
     const restaurants = (restaurantsData?.data?.data as Restaurant[]) || []
 
-    const { data: cuisineCategoriesData, isLoading: isLoadingCuisines } = useQuery({
-        queryKey: ["cuisine-categories-for-select"],
-        queryFn: () => queryCuisineCategories({ limit: 100 }),
-        refetchOnWindowFocus: false,
-    })
-
-    const cuisineCategories = (cuisineCategoriesData?.data?.data as CuisineCategory[]) || []
-
-    if (isLoadingLocation || isLoadingRestaurants || isLoadingCuisines) {
+    if (isLoadingLocation || isLoadingRestaurants) {
         return (
             <div className="flex justify-center py-12">
                 <Icons.spinner className="w-8 h-8 animate-spin text-gray-400" />
@@ -119,11 +110,11 @@ export default function EditRestaurantLocationPage({ params }: { params: Promise
         )
     }
 
-    return <EditLocationForm location={location} restaurants={restaurants} cuisineCategories={cuisineCategories} />
+    return <EditLocationForm location={location} restaurants={restaurants} />
 }
 
 // Form component — only mounts after data is loaded, so defaultValues are correct from the start
-function EditLocationForm({ location, restaurants, cuisineCategories }: { location: RestaurantLocation; restaurants: Restaurant[]; cuisineCategories: CuisineCategory[] }) {
+function EditLocationForm({ location, restaurants }: { location: RestaurantLocation; restaurants: Restaurant[] }) {
     const router = useRouter()
 
     const form = useForm<EditFormModel>({
@@ -138,7 +129,6 @@ function EditLocationForm({ location, restaurants, cuisineCategories }: { locati
             latitude: Number(location.latitude) || 0,
             longitude: Number(location.longitude) || 0,
             place_id: location.place_id ?? "",
-            cuisine_categories: location.cuisine_categories || [],
             status: location.status,
             is_main: location.is_main || false,
             whatsapp_available: location.whatsapp_available || false,
@@ -263,49 +253,6 @@ function EditLocationForm({ location, restaurants, cuisineCategories }: { locati
                                                 </FormItem>
                                             )}
                                         />
-                                    </div>
-                                </div>
-
-                                <div className="sm:col-span-6">
-                                    <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">
-                                        Cuisine Categories
-                                    </label>
-                                    <p className="mt-1 text-sm/6 text-gray-500 dark:text-gray-400">
-                                        Select the cuisine types this location serves.
-                                    </p>
-                                    <div className="mt-2 flex flex-wrap gap-2">
-                                        {cuisineCategories.map((cat) => {
-                                            const selected = form.watch("cuisine_categories") || []
-                                            const isSelected = selected.some((s) => s.cuisine_category_id === cat.id)
-                                            return (
-                                                <button
-                                                    key={cat.id}
-                                                    type="button"
-                                                    onClick={() => {
-                                                        const current = form.getValues("cuisine_categories") || []
-                                                        if (isSelected) {
-                                                            form.setValue(
-                                                                "cuisine_categories",
-                                                                current.filter((s) => s.cuisine_category_id !== cat.id)
-                                                            )
-                                                        } else {
-                                                            form.setValue("cuisine_categories", [
-                                                                ...current,
-                                                                { cuisine_category_id: cat.id, cuisine_category_name: cat.name },
-                                                            ])
-                                                        }
-                                                    }}
-                                                    className={cn(
-                                                        "inline-flex items-center rounded-full px-3 py-1.5 text-sm font-medium capitalize transition-colors",
-                                                        isSelected
-                                                            ? "bg-indigo-600 text-white hover:bg-indigo-500"
-                                                            : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-white/10 dark:text-gray-300 dark:hover:bg-white/20"
-                                                    )}
-                                                >
-                                                    {cat.name}
-                                                </button>
-                                            )
-                                        })}
                                     </div>
                                 </div>
 

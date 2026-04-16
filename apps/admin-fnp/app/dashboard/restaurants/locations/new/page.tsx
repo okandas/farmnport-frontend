@@ -7,8 +7,8 @@ import { useForm, useFieldArray } from "react-hook-form"
 import { useRouter } from "next/navigation"
 import dynamic from "next/dynamic"
 
-import { addRestaurantLocation, queryRestaurants, queryCuisineCategories } from "@/lib/query"
-import { FormRestaurantLocationSchema, FormRestaurantLocationModel, Restaurant, CuisineCategory } from "@/lib/schemas"
+import { addRestaurantLocation, queryRestaurants } from "@/lib/query"
+import { FormRestaurantLocationSchema, FormRestaurantLocationModel, Restaurant } from "@/lib/schemas"
 import { cn } from "@/lib/utilities"
 import { buttonVariants } from "@/components/ui/button"
 import { Icons } from "@/components/icons/lucide"
@@ -50,14 +50,6 @@ export default function NewRestaurantLocationPage() {
 
     const restaurants = (restaurantsData?.data?.data as Restaurant[]) || []
 
-    const { data: cuisineCategoriesData } = useQuery({
-        queryKey: ["cuisine-categories-for-select"],
-        queryFn: () => queryCuisineCategories({ limit: 100 }),
-        refetchOnWindowFocus: false,
-    })
-
-    const cuisineCategories = (cuisineCategoriesData?.data?.data as CuisineCategory[]) || []
-
     const form = useForm<FormRestaurantLocationModel>({
         defaultValues: {
             restaurant_id: "",
@@ -69,7 +61,6 @@ export default function NewRestaurantLocationPage() {
             latitude: 0,
             longitude: 0,
             place_id: "",
-            cuisine_categories: [],
             status: "active",
             operating_hours: [
                 { day: "Monday", open: "07:00", close: "23:00", closed: false },
@@ -199,49 +190,6 @@ export default function NewRestaurantLocationPage() {
                                                 </FormItem>
                                             )}
                                         />
-                                    </div>
-                                </div>
-
-                                <div className="sm:col-span-6">
-                                    <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">
-                                        Cuisine Categories
-                                    </label>
-                                    <p className="mt-1 text-sm/6 text-gray-500 dark:text-gray-400">
-                                        Select the cuisine types this location serves.
-                                    </p>
-                                    <div className="mt-2 flex flex-wrap gap-2">
-                                        {cuisineCategories.map((cat) => {
-                                            const selected = form.watch("cuisine_categories") || []
-                                            const isSelected = selected.some((s) => s.cuisine_category_id === cat.id)
-                                            return (
-                                                <button
-                                                    key={cat.id}
-                                                    type="button"
-                                                    onClick={() => {
-                                                        const current = form.getValues("cuisine_categories") || []
-                                                        if (isSelected) {
-                                                            form.setValue(
-                                                                "cuisine_categories",
-                                                                current.filter((s) => s.cuisine_category_id !== cat.id)
-                                                            )
-                                                        } else {
-                                                            form.setValue("cuisine_categories", [
-                                                                ...current,
-                                                                { cuisine_category_id: cat.id, cuisine_category_name: cat.name },
-                                                            ])
-                                                        }
-                                                    }}
-                                                    className={cn(
-                                                        "inline-flex items-center rounded-full px-3 py-1.5 text-sm font-medium capitalize transition-colors",
-                                                        isSelected
-                                                            ? "bg-indigo-600 text-white hover:bg-indigo-500"
-                                                            : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-white/10 dark:text-gray-300 dark:hover:bg-white/20"
-                                                    )}
-                                                >
-                                                    {cat.name}
-                                                </button>
-                                            )
-                                        })}
                                     </div>
                                 </div>
 

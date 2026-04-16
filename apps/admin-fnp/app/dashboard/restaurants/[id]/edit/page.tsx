@@ -3,12 +3,19 @@
 import { use } from "react"
 import Link from "next/link"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useMutation, useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useForm } from "react-hook-form"
 import { useRouter } from "next/navigation"
 
-import { updateRestaurant, queryRestaurant } from "@/lib/query"
-import { FormRestaurantSchema, FormRestaurantModel, Restaurant } from "@/lib/schemas"
+import {
+    updateRestaurant,
+    queryRestaurant,
+    queryCuisineCategories,
+    queryRestaurantCuisines,
+    addRestaurantCuisine,
+    deleteRestaurantCuisine,
+} from "@/lib/query"
+import { FormRestaurantSchema, FormRestaurantModel, Restaurant, CuisineCategory, RestaurantCuisine } from "@/lib/schemas"
 import { cn } from "@/lib/utilities"
 import { buttonVariants } from "@/components/ui/button"
 import { Icons } from "@/components/icons/lucide"
@@ -40,7 +47,23 @@ export default function EditRestaurantPage({ params }: { params: Promise<{ id: s
 
     const restaurant = restaurantData?.data as Restaurant
 
-    if (isLoading) {
+    const { data: cuisineCategoriesData, isLoading: isLoadingCuisines } = useQuery({
+        queryKey: ["cuisine-categories-for-select"],
+        queryFn: () => queryCuisineCategories({ limit: 100 }),
+        refetchOnWindowFocus: false,
+    })
+
+    const cuisineCategories = (cuisineCategoriesData?.data?.data as CuisineCategory[]) || []
+
+    const { data: restaurantCuisinesData, isLoading: isLoadingRestaurantCuisines } = useQuery({
+        queryKey: ["restaurant-cuisines", id],
+        queryFn: () => queryRestaurantCuisines(id),
+        enabled: !!id,
+    })
+
+    const restaurantCuisines = (restaurantCuisinesData?.data as RestaurantCuisine[]) || []
+
+    if (isLoading || isLoadingCuisines || isLoadingRestaurantCuisines) {
         return (
             <div className="flex justify-center py-12">
                 <Icons.spinner className="w-8 h-8 animate-spin text-gray-400" />
@@ -58,11 +81,26 @@ export default function EditRestaurantPage({ params }: { params: Promise<{ id: s
         )
     }
 
-    return <EditRestaurantForm restaurant={restaurant} />
+    return (
+        <EditRestaurantForm
+            restaurant={restaurant}
+            cuisineCategories={cuisineCategories}
+            restaurantCuisines={restaurantCuisines}
+        />
+    )
 }
 
-function EditRestaurantForm({ restaurant }: { restaurant: Restaurant }) {
+function EditRestaurantForm({
+    restaurant,
+    cuisineCategories,
+    restaurantCuisines,
+}: {
+    restaurant: Restaurant
+    cuisineCategories: CuisineCategory[]
+    restaurantCuisines: RestaurantCuisine[]
+}) {
     const router = useRouter()
+    const queryClient = useQueryClient()
 
     const form = useForm<FormRestaurantModel>({
         defaultValues: {
@@ -87,8 +125,45 @@ function EditRestaurantForm({ restaurant }: { restaurant: Restaurant }) {
         },
     })
 
+    const { mutate: addCuisine } = useMutation({
+        mutationFn: addRestaurantCuisine,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["restaurant-cuisines", restaurant.id] })
+            toast({ description: "Cuisine added" })
+        },
+        onError: (error) => {
+            handleApiError(error, { context: "adding cuisine" })
+        },
+    })
+
+    const { mutate: removeCuisine } = useMutation({
+        mutationFn: deleteRestaurantCuisine,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["restaurant-cuisines", restaurant.id] })
+            toast({ description: "Cuisine removed" })
+        },
+        onError: (error) => {
+            handleApiError(error, { context: "removing cuisine" })
+        },
+    })
+
     async function onSubmit(data: FormRestaurantModel) {
         mutate({ ...data, id: restaurant.id })
+    }
+
+    function handleCuisineToggle(cat: CuisineCategory) {
+        const existing = restaurantCuisines.find((rc) => rc.cuisine_category_id === cat.id)
+        if (existing) {
+            removeCuisine(existing.id)
+        } else {
+            addCuisine({
+                restaurant_id: restaurant.id,
+                restaurant_name: restaurant.name,
+                cuisine_category_id: cat.id,
+                cuisine_category_name: cat.name,
+                cuisine_category_slug: cat.slug || "",
+            })
+        }
     }
 
     return (
@@ -99,7 +174,7 @@ function EditRestaurantForm({ restaurant }: { restaurant: Restaurant }) {
                         Edit Restaurant
                     </h1>
                     <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                        Update restaurant details.
+                        Update restaurant details and cuisine types.
                     </p>
                 </div>
                 <Link
@@ -182,6 +257,37 @@ function EditRestaurantForm({ restaurant }: { restaurant: Restaurant }) {
                                         />
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+
+                        {/* Cuisine Categories */}
+                        <div className="border-b border-gray-900/10 pb-12 dark:border-white/10">
+                            <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">
+                                Cuisine Categories
+                            </h2>
+                            <p className="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">
+                                Select the cuisine types this restaurant serves. Changes are saved immediately.
+                            </p>
+
+                            <div className="mt-6 flex flex-wrap gap-2">
+                                {cuisineCategories.map((cat) => {
+                                    const isSelected = restaurantCuisines.some((rc) => rc.cuisine_category_id === cat.id)
+                                    return (
+                                        <button
+                                            key={cat.id}
+                                            type="button"
+                                            onClick={() => handleCuisineToggle(cat)}
+                                            className={cn(
+                                                "inline-flex items-center rounded-full px-3 py-1.5 text-sm font-medium capitalize transition-colors",
+                                                isSelected
+                                                    ? "bg-indigo-600 text-white hover:bg-indigo-500"
+                                                    : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-white/10 dark:text-gray-300 dark:hover:bg-white/20"
+                                            )}
+                                        >
+                                            {cat.name}
+                                        </button>
+                                    )
+                                })}
                             </div>
                         </div>
                     </div>
