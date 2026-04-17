@@ -119,9 +119,9 @@ export function LoggedOutLanding({ counts }: { counts: MarketplaceCounts }) {
                                         Build a profitable agricultural business with access to verified buyers, market insights, quality inputs and expert guidance all in one platform.
                                     </p>
                                     <Link href="/signup">
-                                        <Button className="bg-orange-600 hover:bg-orange-700 text-white dark:bg-orange-500 dark:hover:bg-orange-600 justify-center" onClick={() => sendGTMEvent({ event: "link", value: "SignupHeroNavigation" })}>
+                                        <Button className="bg-orange-700 hover:bg-orange-800 text-white dark:bg-orange-500 dark:hover:bg-orange-400 justify-center" onClick={() => sendGTMEvent({ event: "link", value: "SignupHeroNavigation" })}>
                                             Get Started
-                                            <ArrowDownIcon className="h-4 w-4 text-black dark:text-white" />
+                                            <ArrowDownIcon className="h-4 w-4 text-white" />
                                         </Button>
                                     </Link>
                                 </div>
