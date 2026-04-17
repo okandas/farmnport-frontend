@@ -29,6 +29,7 @@ import {
     FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
     Select,
     SelectContent,
@@ -105,6 +106,7 @@ function EditRestaurantForm({
     const form = useForm<FormRestaurantModel>({
         defaultValues: {
             name: restaurant.name,
+            featured: restaurant.featured || false,
             status: restaurant.status,
         },
         resolver: zodResolver(FormRestaurantSchema),
@@ -256,6 +258,31 @@ function EditRestaurantForm({
                                             )}
                                         />
                                     </div>
+                                </div>
+
+                                <div className="sm:col-span-4 px-1">
+                                    <FormField
+                                        control={form.control}
+                                        name="featured"
+                                        render={({ field }) => (
+                                            <FormItem className="flex items-center gap-3">
+                                                <FormControl>
+                                                    <Checkbox
+                                                        checked={field.value}
+                                                        onCheckedChange={field.onChange}
+                                                    />
+                                                </FormControl>
+                                                <div>
+                                                    <label className="text-sm font-medium text-gray-900 dark:text-white">
+                                                        Featured on homepage
+                                                    </label>
+                                                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                                                        Show this restaurant in the Popular Restaurants section (max 10)
+                                                    </p>
+                                                </div>
+                                            </FormItem>
+                                        )}
+                                    />
                                 </div>
                             </div>
                         </div>

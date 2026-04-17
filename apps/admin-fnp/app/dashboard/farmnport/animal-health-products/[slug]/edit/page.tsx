@@ -4,13 +4,13 @@ import { use } from "react"
 import Link from "next/link"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation, useQuery } from "@tanstack/react-query"
-import { useForm } from "react-hook-form"
+import { useForm, useFieldArray } from "react-hook-form"
 import { useRouter } from "next/navigation"
 
-import { updateAnimalHealthProduct, queryAnimalHealthProduct } from "@/lib/query"
-import { FormAnimalHealthProductSchema, FormAnimalHealthProductModel, AnimalHealthProduct } from "@/lib/schemas"
-import { cn } from "@/lib/utilities"
-import { buttonVariants } from "@/components/ui/button"
+import { updateAnimalHealthProduct, queryAnimalHealthProduct, queryBrands, queryAnimalHealthCategories } from "@/lib/query"
+import { FormAnimalHealthProductSchema, FormAnimalHealthProductModel, AnimalHealthProduct, Brand, AnimalHealthCategory } from "@/lib/schemas"
+import { cn, centsToDollarsFormInputs, dollarsToCents } from "@/lib/utilities"
+import { buttonVariants, Button } from "@/components/ui/button"
 import { Icons } from "@/components/icons/lucide"
 import { toast } from "@/components/ui/use-toast"
 import { handleApiError } from "@/lib/error-handler"
@@ -23,7 +23,6 @@ import {
     FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 
 export default function EditAnimalHealthProductPage({ params }: { params: Promise<{ slug: string }> }) {
     const router = useRouter()
@@ -35,7 +34,21 @@ export default function EditAnimalHealthProductPage({ params }: { params: Promis
         queryFn: () => queryAnimalHealthProduct(productId),
     })
 
+    const { data: brandsData } = useQuery({
+        queryKey: ["brands-list"],
+        queryFn: () => queryBrands(),
+        refetchOnWindowFocus: false,
+    })
+
+    const { data: categoriesData } = useQuery({
+        queryKey: ["animal-health-categories-list"],
+        queryFn: () => queryAnimalHealthCategories(),
+        refetchOnWindowFocus: false,
+    })
+
     const product = productData?.data as AnimalHealthProduct
+    const brands = brandsData?.data?.data as Brand[] || []
+    const categories = categoriesData?.data?.data as AnimalHealthCategory[] || []
 
     const form = useForm<FormAnimalHealthProductModel>({
         defaultValues: {
@@ -51,6 +64,9 @@ export default function EditAnimalHealthProductPage({ params }: { params: Promis
             show_price: product?.show_price ?? true,
             sale_price: product?.sale_price ?? 0,
             was_price: product?.was_price ?? 0,
+            variants: product?.variants || [],
+            precautions: product?.precautions || [],
+            status: product?.status ?? "active",
         },
         values: product ? {
             id: product.id,
@@ -63,10 +79,27 @@ export default function EditAnimalHealthProductPage({ params }: { params: Promis
             stock_level: product.stock_level ?? 0,
             available_for_sale: product.available_for_sale ?? false,
             show_price: product.show_price ?? true,
-            sale_price: product.sale_price ?? 0,
-            was_price: product.was_price ?? 0,
+            sale_price: centsToDollarsFormInputs(product.sale_price ?? 0),
+            was_price: centsToDollarsFormInputs(product.was_price ?? 0),
+            variants: product.variants?.map(v => ({
+                ...v,
+                sale_price: centsToDollarsFormInputs(v.sale_price ?? 0),
+                was_price: centsToDollarsFormInputs(v.was_price ?? 0),
+            })) || [],
+            precautions: product.precautions || [],
+            status: product.status ?? "active",
         } : undefined,
         resolver: zodResolver(FormAnimalHealthProductSchema),
+    })
+
+    const { fields: variantFields, append: appendVariant, remove: removeVariant } = useFieldArray({
+        control: form.control,
+        name: "variants",
+    })
+
+    const { fields: precautionFields, append: appendPrecaution, remove: removePrecaution } = useFieldArray({
+        control: form.control,
+        name: "precautions" as any,
     })
 
     const { mutate, isPending } = useMutation({
@@ -85,7 +118,16 @@ export default function EditAnimalHealthProductPage({ params }: { params: Promis
     })
 
     async function onSubmit(data: FormAnimalHealthProductModel) {
-        mutate(data)
+        mutate({
+            ...data,
+            sale_price: dollarsToCents(data.sale_price),
+            was_price: dollarsToCents(data.was_price),
+            variants: data.variants.map(v => ({
+                ...v,
+                sale_price: dollarsToCents(v.sale_price),
+                was_price: dollarsToCents(v.was_price),
+            })),
+        })
     }
 
     if (isLoading) {
@@ -137,8 +179,8 @@ export default function EditAnimalHealthProductPage({ params }: { params: Promis
                                 Basic information about the animal health product.
                             </p>
 
-                            <div className="mt-10 space-y-8">
-                                <div className="px-1">
+                            <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                                <div className="sm:col-span-4">
                                     <label
                                         htmlFor="name"
                                         className="block text-sm/6 font-medium text-gray-900 dark:text-white"
@@ -155,7 +197,7 @@ export default function EditAnimalHealthProductPage({ params }: { params: Promis
                                                         <Input
                                                             id="name"
                                                             placeholder="e.g., Terramycin LA, Ivomec, Multimin"
-                                                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
+                                                            className="block w-full rounded-md border-0 bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus-visible:ring-0 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
                                                             {...field}
                                                         />
                                                     </FormControl>
@@ -169,18 +211,116 @@ export default function EditAnimalHealthProductPage({ params }: { params: Promis
                                     </p>
                                 </div>
 
-                                <div className="px-1">
+                                <div className="sm:col-span-4">
                                     <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">
                                         Current Slug
                                     </label>
                                     <div className="mt-2">
-                                        <div className="block w-full rounded-md bg-gray-50 px-3 py-1.5 text-base text-gray-500 outline outline-1 outline-gray-300 sm:text-sm/6 dark:bg-gray-900 dark:text-gray-400 dark:outline-white/10">
+                                        <div className="block w-full rounded-md bg-gray-50 px-3 py-1.5 text-base text-gray-500 outline outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6 dark:bg-gray-900 dark:text-gray-400 dark:outline-white/10">
                                             {product.slug}
                                         </div>
                                     </div>
                                     <p className="mt-3 text-sm/6 text-gray-600 dark:text-gray-400">
                                         This is the URL-friendly version of the product name.
                                     </p>
+                                </div>
+
+                                <div className="sm:col-span-3">
+                                    <label htmlFor="brand_id" className="block text-sm/6 font-medium text-gray-900 dark:text-white">
+                                        Brand
+                                    </label>
+                                    <div className="mt-2">
+                                        <FormField
+                                            control={form.control}
+                                            name="brand_id"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormControl>
+                                                        <div className="grid grid-cols-1">
+                                                            <select
+                                                                id="brand_id"
+                                                                className="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-1.5 pl-3 pr-8 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:focus:outline-indigo-500"
+                                                                {...field}
+                                                            >
+                                                                <option value="">Select a brand</option>
+                                                                {brands.map((brand) => (
+                                                                    <option key={brand.id} value={brand.id}>
+                                                                        {brand.name}
+                                                                    </option>
+                                                                ))}
+                                                            </select>
+                                                            <Icons.chevronDown aria-hidden="true" className="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-gray-500 sm:size-4 dark:text-gray-400" />
+                                                        </div>
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="sm:col-span-3">
+                                    <label htmlFor="animal_health_category_id" className="block text-sm/6 font-medium text-gray-900 dark:text-white">
+                                        Category
+                                    </label>
+                                    <div className="mt-2">
+                                        <FormField
+                                            control={form.control}
+                                            name="animal_health_category_id"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormControl>
+                                                        <div className="grid grid-cols-1">
+                                                            <select
+                                                                id="animal_health_category_id"
+                                                                className="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-1.5 pl-3 pr-8 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:focus:outline-indigo-500"
+                                                                {...field}
+                                                            >
+                                                                <option value="">Select a category</option>
+                                                                {categories.map((cat) => (
+                                                                    <option key={cat.id} value={cat.id}>
+                                                                        {cat.name}
+                                                                    </option>
+                                                                ))}
+                                                            </select>
+                                                            <Icons.chevronDown aria-hidden="true" className="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-gray-500 sm:size-4 dark:text-gray-400" />
+                                                        </div>
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="sm:col-span-2">
+                                    <label htmlFor="status" className="block text-sm/6 font-medium text-gray-900 dark:text-white">
+                                        Status
+                                    </label>
+                                    <div className="mt-2">
+                                        <FormField
+                                            control={form.control}
+                                            name="status"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormControl>
+                                                        <div className="grid grid-cols-1">
+                                                            <select
+                                                                id="status"
+                                                                className="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-1.5 pl-3 pr-8 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:focus:outline-indigo-500"
+                                                                {...field}
+                                                            >
+                                                                <option value="active">Active</option>
+                                                                <option value="inactive">Inactive</option>
+                                                            </select>
+                                                            <Icons.chevronDown aria-hidden="true" className="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-gray-500 sm:size-4 dark:text-gray-400" />
+                                                        </div>
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -237,7 +377,7 @@ export default function EditAnimalHealthProductPage({ params }: { params: Promis
                                             <FormItem>
                                                 <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Sale Price (USD)</label>
                                                 <FormControl>
-                                                    <Input type="number" step="0.01" min="0" placeholder="0.00" {...field} />
+                                                    <Input type="number" step="0.01" min="0" placeholder="0.00" className="border-0 bg-white dark:bg-white/5 dark:text-white focus-visible:ring-0 outline outline-1 -outline-offset-1 outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 dark:outline-white/10 dark:focus:outline-indigo-500" {...field} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -252,7 +392,7 @@ export default function EditAnimalHealthProductPage({ params }: { params: Promis
                                             <FormItem>
                                                 <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Was Price (USD)</label>
                                                 <FormControl>
-                                                    <Input type="number" step="0.01" min="0" placeholder="0.00" {...field} />
+                                                    <Input type="number" step="0.01" min="0" placeholder="0.00" className="border-0 bg-white dark:bg-white/5 dark:text-white focus-visible:ring-0 outline outline-1 -outline-offset-1 outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 dark:outline-white/10 dark:focus:outline-indigo-500" {...field} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -267,7 +407,7 @@ export default function EditAnimalHealthProductPage({ params }: { params: Promis
                                             <FormItem>
                                                 <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Stock Level</label>
                                                 <FormControl>
-                                                    <Input type="number" min="0" placeholder="0" {...field} />
+                                                    <Input type="number" min="0" placeholder="0" className="border-0 bg-white dark:bg-white/5 dark:text-white focus-visible:ring-0 outline outline-1 -outline-offset-1 outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 dark:outline-white/10 dark:focus:outline-indigo-500" {...field} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -275,6 +415,153 @@ export default function EditAnimalHealthProductPage({ params }: { params: Promis
                                     />
                                 </div>
                             </div>
+                        </div>
+
+                        {/* Product Variants / Pack Sizes */}
+                        <div className="border-b border-gray-900/10 dark:border-gray-100/10 pb-12">
+                            <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">Pack Sizes / Variants</h2>
+                            <p className="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">
+                                Add different pack sizes with their own SKU, stock level, and pricing.
+                            </p>
+
+                            <div className="mt-6 divide-y divide-gray-200 dark:divide-white/10">
+                                {variantFields.map((field, index) => (
+                                    <div key={field.id} className="py-4 first:pt-0">
+                                        <div className="flex items-start gap-3">
+                                            <div className="flex-1 grid grid-cols-1 gap-3 sm:grid-cols-5">
+                                                <FormField
+                                                    control={form.control}
+                                                    name={`variants.${index}.name`}
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300">Name</label>
+                                                            <FormControl>
+                                                                <Input placeholder="e.g. 100ml, 500ml, 5L" className="border-0 bg-white dark:bg-white/5 dark:text-white focus-visible:ring-0 outline outline-1 -outline-offset-1 outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 dark:outline-white/10 dark:focus:outline-indigo-500" {...field} />
+                                                            </FormControl>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                                <FormField
+                                                    control={form.control}
+                                                    name={`variants.${index}.sku`}
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300">SKU</label>
+                                                            <FormControl>
+                                                                <Input placeholder="e.g. TRTX-100" className="border-0 bg-white dark:bg-white/5 dark:text-white focus-visible:ring-0 outline outline-1 -outline-offset-1 outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 dark:outline-white/10 dark:focus:outline-indigo-500" {...field} />
+                                                            </FormControl>
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                                <FormField
+                                                    control={form.control}
+                                                    name={`variants.${index}.sale_price`}
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300">Sale Price ($)</label>
+                                                            <FormControl>
+                                                                <Input type="number" step="0.01" min="0" placeholder="0.00" className="border-0 bg-white dark:bg-white/5 dark:text-white focus-visible:ring-0 outline outline-1 -outline-offset-1 outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 dark:outline-white/10 dark:focus:outline-indigo-500" {...field} />
+                                                            </FormControl>
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                                <FormField
+                                                    control={form.control}
+                                                    name={`variants.${index}.was_price`}
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300">Was Price ($)</label>
+                                                            <FormControl>
+                                                                <Input type="number" step="0.01" min="0" placeholder="0.00" className="border-0 bg-white dark:bg-white/5 dark:text-white focus-visible:ring-0 outline outline-1 -outline-offset-1 outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 dark:outline-white/10 dark:focus:outline-indigo-500" {...field} />
+                                                            </FormControl>
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                                <FormField
+                                                    control={form.control}
+                                                    name={`variants.${index}.stock_level`}
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300">Stock</label>
+                                                            <FormControl>
+                                                                <Input type="number" min="0" placeholder="0" className="border-0 bg-white dark:bg-white/5 dark:text-white focus-visible:ring-0 outline outline-1 -outline-offset-1 outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 dark:outline-white/10 dark:focus:outline-indigo-500" {...field} />
+                                                            </FormControl>
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                            </div>
+                                            <button
+                                                type="button"
+                                                onClick={() => removeVariant(index)}
+                                                className="mt-6 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+                                            >
+                                                <Icons.close className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                className="mt-4"
+                                onClick={() => appendVariant({ sku: "", name: "", stock_level: 0, sale_price: 0, was_price: 0 })}
+                            >
+                                <Icons.add className="w-4 h-4 mr-1" />
+                                Add Variant
+                            </Button>
+                        </div>
+
+                        {/* Precautions */}
+                        <div className="border-b border-gray-900/10 dark:border-gray-100/10 pb-12">
+                            <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">Precautions</h2>
+                            <p className="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">
+                                Safety warnings and handling instructions for this product.
+                            </p>
+
+                            <div className="mt-6 space-y-3">
+                                {precautionFields.map((field, index) => (
+                                    <div key={field.id} className="flex items-center gap-3">
+                                        <FormField
+                                            control={form.control}
+                                            name={`precautions.${index}` as any}
+                                            render={({ field }) => (
+                                                <FormItem className="flex-1">
+                                                    <FormControl>
+                                                        <Input
+                                                            placeholder="e.g. Keep out of reach of children"
+                                                            className="border-0 bg-white dark:bg-white/5 dark:text-white focus-visible:ring-0 outline outline-1 -outline-offset-1 outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 dark:outline-white/10 dark:focus:outline-indigo-500"
+                                                            {...field}
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => removePrecaution(index)}
+                                            className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+                                        >
+                                            <Icons.close className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                className="mt-4"
+                                onClick={() => appendPrecaution("" as any)}
+                            >
+                                <Icons.add className="w-4 h-4 mr-1" />
+                                Add Precaution
+                            </Button>
                         </div>
                     </div>
 

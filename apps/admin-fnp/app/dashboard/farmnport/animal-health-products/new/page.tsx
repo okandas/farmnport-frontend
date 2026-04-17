@@ -1,15 +1,16 @@
 "use client"
 
+import { useState } from "react"
 import Link from "next/link"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation } from "@tanstack/react-query"
-import { useForm } from "react-hook-form"
+import { useForm, useFieldArray } from "react-hook-form"
 import { useRouter } from "next/navigation"
 
 import { addAnimalHealthProduct } from "@/lib/query"
 import { FormAnimalHealthProductSchema, FormAnimalHealthProductModel } from "@/lib/schemas"
-import { cn } from "@/lib/utilities"
-import { buttonVariants } from "@/components/ui/button"
+import { cn, dollarsToCents } from "@/lib/utilities"
+import { buttonVariants, Button } from "@/components/ui/button"
 import { Icons } from "@/components/icons/lucide"
 import { toast } from "@/components/ui/use-toast"
 import { handleApiError } from "@/lib/error-handler"
@@ -41,8 +42,14 @@ export default function NewAnimalHealthProductPage() {
             show_price: true,
             sale_price: 0,
             was_price: 0,
+            variants: [],
         },
         resolver: zodResolver(FormAnimalHealthProductSchema),
+    })
+
+    const { fields: variantFields, append: appendVariant, remove: removeVariant } = useFieldArray({
+        control: form.control,
+        name: "variants",
     })
 
     const { mutate, isPending } = useMutation({
@@ -61,7 +68,16 @@ export default function NewAnimalHealthProductPage() {
     })
 
     async function onSubmit(data: FormAnimalHealthProductModel) {
-        mutate(data)
+        mutate({
+            ...data,
+            sale_price: dollarsToCents(data.sale_price),
+            was_price: dollarsToCents(data.was_price),
+            variants: data.variants.map(v => ({
+                ...v,
+                sale_price: dollarsToCents(v.sale_price),
+                was_price: dollarsToCents(v.was_price),
+            })),
+        })
     }
 
     return (
@@ -219,6 +235,104 @@ export default function NewAnimalHealthProductPage() {
                                     />
                                 </div>
                             </div>
+                        </div>
+
+                        {/* Product Variants / Pack Sizes */}
+                        <div className="border-b border-gray-900/10 dark:border-gray-100/10 pb-12">
+                            <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">Pack Sizes / Variants</h2>
+                            <p className="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">
+                                Add different pack sizes with their own SKU, stock level, and pricing.
+                            </p>
+
+                            <div className="mt-6 divide-y divide-gray-200 dark:divide-white/10">
+                                {variantFields.map((field, index) => (
+                                    <div key={field.id} className="py-4 first:pt-0">
+                                        <div className="flex items-start gap-3">
+                                            <div className="flex-1 grid grid-cols-1 gap-3 sm:grid-cols-5">
+                                                <FormField
+                                                    control={form.control}
+                                                    name={`variants.${index}.name`}
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300">Name</label>
+                                                            <FormControl>
+                                                                <Input placeholder="e.g. 100ml, 500ml, 5L" {...field} />
+                                                            </FormControl>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                                <FormField
+                                                    control={form.control}
+                                                    name={`variants.${index}.sku`}
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300">SKU</label>
+                                                            <FormControl>
+                                                                <Input placeholder="e.g. TRTX-100" {...field} />
+                                                            </FormControl>
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                                <FormField
+                                                    control={form.control}
+                                                    name={`variants.${index}.sale_price`}
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300">Sale Price ($)</label>
+                                                            <FormControl>
+                                                                <Input type="number" step="0.01" min="0" placeholder="0.00" {...field} />
+                                                            </FormControl>
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                                <FormField
+                                                    control={form.control}
+                                                    name={`variants.${index}.was_price`}
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300">Was Price ($)</label>
+                                                            <FormControl>
+                                                                <Input type="number" step="0.01" min="0" placeholder="0.00" {...field} />
+                                                            </FormControl>
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                                <FormField
+                                                    control={form.control}
+                                                    name={`variants.${index}.stock_level`}
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300">Stock</label>
+                                                            <FormControl>
+                                                                <Input type="number" min="0" placeholder="0" {...field} />
+                                                            </FormControl>
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                            </div>
+                                            <button
+                                                type="button"
+                                                onClick={() => removeVariant(index)}
+                                                className="mt-6 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+                                            >
+                                                <Icons.close className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                className="mt-4"
+                                onClick={() => appendVariant({ sku: "", name: "", stock_level: 0, sale_price: 0, was_price: 0 })}
+                            >
+                                <Icons.add className="w-4 h-4 mr-1" />
+                                Add Variant
+                            </Button>
                         </div>
                     </div>
 
