@@ -1071,6 +1071,7 @@ export const RestaurantSchema = z.object({
   id: z.string(),
   name: z.string().min(1, "Restaurant name is required").max(120, "Name cannot exceed 120 characters"),
   slug: z.string().optional(),
+  featured: z.boolean().default(false),
   status: z.enum(["active", "inactive", "closed"]).default("active"),
   created: z.string().optional(),
   updated: z.string().optional(),
@@ -1078,6 +1079,7 @@ export const RestaurantSchema = z.object({
 
 export const FormRestaurantSchema = RestaurantSchema.pick({
   name: true,
+  featured: true,
   status: true,
 })
 
