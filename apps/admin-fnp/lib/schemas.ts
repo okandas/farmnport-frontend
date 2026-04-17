@@ -762,6 +762,15 @@ export const AnimalHealthProductSchema = z.object({
   show_price: z.boolean().default(true),
   sale_price: z.coerce.number().nonnegative().default(0),
   was_price: z.coerce.number().nonnegative().default(0),
+  variants: z.array(z.object({
+    sku: z.string().default(""),
+    name: z.string().min(1, "Variant name is required"),
+    stock_level: z.coerce.number().int().nonnegative().default(0),
+    sale_price: z.coerce.number().nonnegative().default(0),
+    was_price: z.coerce.number().nonnegative().default(0),
+  })).default([]),
+  precautions: z.array(z.string()).default([]),
+  status: z.enum(["active", "inactive"]).default("active"),
   created: z.string().optional(),
   updated: z.string().optional(),
 })
