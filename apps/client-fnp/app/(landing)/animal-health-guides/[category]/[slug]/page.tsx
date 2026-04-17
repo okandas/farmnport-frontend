@@ -3,23 +3,7 @@ import { Beaker, AlertTriangle } from "lucide-react"
 import Link from "next/link"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
 import { capitalizeFirstLetter, formatUnit } from "@/lib/utilities"
-import { BaseURL } from "@/lib/schemas"
-import { BuyNowButton } from "./BuyNowButton"
-
-const fetchOptions: RequestInit = process.env.NODE_ENV === "production"
-    ? { next: { revalidate: 3600 } } as RequestInit
-    : { cache: "no-store" }
-
-async function getProduct(slug: string) {
-    try {
-        const res = await fetch(`${BaseURL}/animalhealth/${slug}`, fetchOptions)
-        if (!res.ok) return null
-        const json = await res.json()
-        return json?.data || null
-    } catch {
-        return null
-    }
-}
+import { queryAnimalHealthProduct } from "@/lib/query"
 
 interface GuidePageProps {
     params: Promise<{
@@ -38,7 +22,8 @@ const overviewDesc: Record<string, string> = {
 
 export default async function AnimalHealthGuidePage({ params }: GuidePageProps) {
     const { category, slug } = await params
-    const product = await getProduct(slug)
+    const response = await queryAnimalHealthProduct(slug)
+    const product = response?.data
 
     if (!product) {
         return (
@@ -174,7 +159,7 @@ export default async function AnimalHealthGuidePage({ params }: GuidePageProps) 
                     <div className="text-xs text-muted-foreground">per {entry.dosage.per}</div>
                 </td>
                 <td className="p-3 align-top">
-                    <div className="font-semibold text-orange-700 dark:text-orange-300">{entry.max_applications.max}</div>
+                    <div className="font-semibold text-orange-700 dark:text-orange-300">{entry.max_applications.max > 0 ? entry.max_applications.max : "—"}</div>
                     {entry.max_applications.note && entry.max_applications.note.trim() !== '' && (
                         <div className="text-xs text-muted-foreground mt-1">{entry.max_applications.note}</div>
                     )}
@@ -183,7 +168,18 @@ export default async function AnimalHealthGuidePage({ params }: GuidePageProps) 
                     <div className="font-semibold text-teal-700 dark:text-teal-300 text-sm">{entry.application_interval}</div>
                 </td>
                 <td className="p-3 align-top">
-                    <div className="font-semibold text-rose-700 dark:text-rose-300 text-sm">{entry.withdrawal_period}</div>
+                    {Array.isArray(entry.withdrawal_period) && entry.withdrawal_period.length > 0 ? (
+                        <ul className="space-y-1">
+                            {entry.withdrawal_period.map((wp: string, wpIdx: number) => (
+                                <li key={wpIdx} className="text-sm text-rose-700 dark:text-rose-300 flex items-start gap-1.5">
+                                    <span className="h-1 w-1 mt-1.5 rounded-full bg-rose-500/50 flex-shrink-0" />
+                                    <span className="flex-1">{wp}</span>
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <span className="text-xs text-muted-foreground">&mdash;</span>
+                    )}
                 </td>
                 <td className="p-3 align-top">
                     {entry.remarks && entry.remarks.length > 0 ? (
@@ -270,7 +266,23 @@ export default async function AnimalHealthGuidePage({ params }: GuidePageProps) 
                             </div>
                         )}
 
-                        <BuyNowButton slug={slug} />
+                        {/* Precautions */}
+                        {product.precautions && product.precautions.length > 0 && (
+                            <div className="rounded-lg border border-red-200 dark:border-red-900 bg-red-50/50 dark:bg-red-950/30 px-3 py-2">
+                                <h2 className="text-xs font-semibold uppercase tracking-wide text-red-700 dark:text-red-400 mb-1.5 flex items-center gap-1.5">
+                                    <AlertTriangle className="w-3.5 h-3.5" />
+                                    Precautions
+                                </h2>
+                                <ul className="space-y-0.5">
+                                    {product.precautions.map((precaution: string, idx: number) => (
+                                        <li key={idx} className="flex items-start gap-1.5 text-xs text-red-800 dark:text-red-300">
+                                            <span className="h-1 w-1 rounded-full bg-red-500 dark:bg-red-400 flex-shrink-0 mt-1.5" />
+                                            <span>{precaution}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
                     </div>
 
                     {/* Right - Product Info */}
