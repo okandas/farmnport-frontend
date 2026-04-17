@@ -1032,7 +1032,15 @@ export function markNotificationsRead(data: { ids?: string[]; all?: boolean }) {
 }
 
 // Restaurants
-export function addRestaurant(data: { name: string; status: string }) {
+export function addRestaurant(data: {
+  name: string
+  status: string
+  cuisines: {
+    cuisine_category_id: string
+    cuisine_category_name: string
+    cuisine_category_slug: string
+  }[]
+}) {
   let url = `${baseUrl}/restaurants/add`
   return api.post(url, data)
 }
