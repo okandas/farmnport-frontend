@@ -5,7 +5,6 @@ import Link from "next/link"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
 import { capitalizeFirstLetter, formatUnit } from "@/lib/utilities"
 import { SprayProgramBackLink } from "./SprayProgramBackLink"
-import { BuyNowButton } from "./BuyNowButton"
 
 interface GuidePageProps {
     params: Promise<{
@@ -183,7 +182,23 @@ export default async function AgroChemicalGuidePage({ params }: GuidePageProps) 
                             </div>
                         )}
 
-                        <BuyNowButton slug={slug} />
+                        {/* Precautions */}
+                        {chemical.precautions && chemical.precautions.length > 0 && (
+                            <div className="rounded-lg border border-red-200 dark:border-red-900 bg-red-50/50 dark:bg-red-950/30 px-3 py-2">
+                                <h2 className="text-xs font-semibold uppercase tracking-wide text-red-700 dark:text-red-400 mb-1.5 flex items-center gap-1.5">
+                                    <AlertTriangle className="w-3.5 h-3.5" />
+                                    Precautions
+                                </h2>
+                                <ul className="space-y-0.5">
+                                    {chemical.precautions.map((precaution: string, idx: number) => (
+                                        <li key={idx} className="flex items-start gap-1.5 text-xs text-red-800 dark:text-red-300">
+                                            <span className="h-1 w-1 rounded-full bg-red-500 dark:bg-red-400 flex-shrink-0 mt-1.5" />
+                                            <span>{precaution}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
                     </div>
 
                     {/* Right - Product Info */}
