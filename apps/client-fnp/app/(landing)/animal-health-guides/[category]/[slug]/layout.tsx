@@ -1,5 +1,5 @@
 import { Metadata } from 'next'
-import { queryAnimalHealthProduct } from '@/lib/query'
+import { BaseURL } from '@/lib/schemas'
 
 interface LayoutProps {
   children: React.ReactNode
@@ -13,8 +13,11 @@ export async function generateMetadata({ params }: LayoutProps): Promise<Metadat
   const { category, slug } = await params
 
   try {
-    const response = await queryAnimalHealthProduct(slug)
-    const product = response?.data
+    const fetchOptions: RequestInit = process.env.NODE_ENV === "production"
+      ? { next: { revalidate: 3600 } } as RequestInit
+      : { cache: "no-store" }
+    const res = await fetch(`${BaseURL}/animalhealth/${slug}`, fetchOptions)
+    const product = res.ok ? await res.json() : null
 
     if (!product) {
       return {
