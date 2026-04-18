@@ -33,7 +33,7 @@ export function Navigation({ user }: NavigationProps) {
         >
           Prices
         </Link>
-        <Link href="/agrochemical-guides" onClick={() => sendGTMEvent({ event: 'link', value: 'GuidesTopNavigation' })}
+        <Link href="/guides" onClick={() => sendGTMEvent({ event: 'link', value: 'GuidesTopNavigation' })}
               className={buttonVariants({
                 size: "sm",
                 variant: "link"
