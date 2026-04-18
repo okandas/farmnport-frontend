@@ -208,13 +208,36 @@ export default async function AgroChemicalGuidePage({ params }: GuidePageProps) 
                             </Link> */}
                         </div>
 
-                        {chemical.show_price && chemical.sale_price > 0 && (
+                        {/* Variants / Pack Sizes */}
+                        {chemical.variants && chemical.variants.length > 0 && (
+                            <div>
+                                <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">Pack Sizes & Pricing</h2>
+                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                                    {chemical.variants.map((variant: any, idx: number) => (
+                                        <div key={idx} className="rounded-lg border bg-card p-3 flex flex-col gap-1">
+                                            <span className="text-sm font-medium text-foreground">{variant.name}</span>
+                                            {variant.sale_price > 0 && (
+                                                <div className="flex items-baseline gap-1.5">
+                                                    {variant.was_price > 0 && variant.was_price > variant.sale_price && (
+                                                        <span className="text-xs text-muted-foreground line-through">${(variant.was_price / 100).toFixed(2)}</span>
+                                                    )}
+                                                    <span className="text-base font-bold text-primary">${(variant.sale_price / 100).toFixed(2)}</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Fallback single price */}
+                        {(!chemical.variants || chemical.variants.length === 0) && chemical.show_price && chemical.sale_price > 0 && (
                             <div className="flex items-center gap-3">
                                 <span className="text-sm text-muted-foreground">Guide Price:</span>
                                 {chemical.was_price > 0 && chemical.was_price > chemical.sale_price && (
-                                    <span className="text-lg text-muted-foreground line-through">${chemical.was_price.toFixed(2)}</span>
+                                    <span className="text-lg text-muted-foreground line-through">${(chemical.was_price / 100).toFixed(2)}</span>
                                 )}
-                                <span className="text-2xl font-bold text-primary">${chemical.sale_price.toFixed(2)}</span>
+                                <span className="text-2xl font-bold text-primary">${(chemical.sale_price / 100).toFixed(2)}</span>
                             </div>
                         )}
 
