@@ -3,7 +3,7 @@ import { Beaker, AlertTriangle } from "lucide-react"
 import Link from "next/link"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
 import { capitalizeFirstLetter, formatUnit } from "@/lib/utilities"
-import { queryAnimalHealthProduct } from "@/lib/query"
+import { BaseURL } from "@/lib/schemas"
 
 interface GuidePageProps {
     params: Promise<{
@@ -20,10 +20,14 @@ const overviewDesc: Record<string, string> = {
     "biosecurity-disinfectants": "a biosecurity disinfectant designed for cleaning and sanitizing poultry and livestock housing. It helps eliminate pathogens and maintain a healthy environment.",
 }
 
+const fetchOptions: RequestInit = process.env.NODE_ENV === "production"
+    ? { next: { revalidate: 3600 } } as RequestInit
+    : { cache: "no-store" }
+
 export default async function AnimalHealthGuidePage({ params }: GuidePageProps) {
     const { category, slug } = await params
-    const response = await queryAnimalHealthProduct(slug)
-    const product = response?.data
+    const res = await fetch(`${BaseURL}/animalhealth/${slug}`, fetchOptions)
+    const product = res.ok ? await res.json() : null
 
     if (!product) {
         return (
