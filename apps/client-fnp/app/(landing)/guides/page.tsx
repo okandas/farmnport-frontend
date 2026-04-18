@@ -67,15 +67,15 @@ export default async function GuidesPage() {
     return (
         <main className="bg-gradient-to-b from-background to-muted/20">
             {/* Hero */}
-            <section className="py-16 lg:py-24 relative overflow-hidden">
+            <section className="py-6 lg:py-8 relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-br from-green-50/60 via-transparent to-emerald-50/40 dark:from-green-950/20 dark:to-emerald-950/10" />
                 <div className="mx-auto max-w-7xl px-6 lg:px-8 relative">
                     <div className="text-center max-w-3xl mx-auto">
-                        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 text-sm font-medium mb-6">
+                        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 text-sm font-medium mb-3">
                             <FlaskConical className="h-4 w-4" />
                             Your Farming Knowledge Hub
                         </div>
-                        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl font-heading mb-5">
+                        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl font-heading mb-3">
                             Agrochemical &{" "}
                             <span className="text-primary">Animal Health Guides</span>
                         </h1>
@@ -87,9 +87,9 @@ export default async function GuidesPage() {
             </section>
 
             {/* Agrochemical Categories */}
-            <section className="py-14 lg:py-20 bg-muted/30">
+            <section className="py-6 lg:py-8 bg-muted/30">
                 <div className="mx-auto max-w-7xl px-6 lg:px-8">
-                    <div className="flex items-end justify-between mb-8">
+                    <div className="flex items-end justify-between mb-5">
                         <div>
                             <h2 className="text-3xl font-bold tracking-tight font-heading">
                                 Agrochemical Guides
@@ -138,9 +138,9 @@ export default async function GuidesPage() {
             </section>
 
             {/* Animal Health Categories */}
-            <section className="py-14 lg:py-20">
+            <section className="py-6 lg:py-8">
                 <div className="mx-auto max-w-7xl px-6 lg:px-8">
-                    <div className="flex items-end justify-between mb-8">
+                    <div className="flex items-end justify-between mb-5">
                         <div>
                             <h2 className="text-3xl font-bold tracking-tight font-heading">
                                 Animal Health Guides
