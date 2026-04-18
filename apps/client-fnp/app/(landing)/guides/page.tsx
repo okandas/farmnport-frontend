@@ -99,7 +99,7 @@ export default async function GuidesPage() {
                             </p>
                         </div>
                         <Link
-                            href="/agrochemical-guides/all"
+                            href="/agrochemical-guides"
                             className="hidden sm:flex items-center gap-1 text-sm font-medium text-primary hover:underline"
                         >
                             View All Agrochemical Products
@@ -128,7 +128,7 @@ export default async function GuidesPage() {
                     </div>
 
                     <Link
-                        href="/agrochemical-guides/all"
+                        href="/agrochemical-guides"
                         className="sm:hidden flex items-center justify-center gap-1 text-sm font-medium text-primary hover:underline mt-6"
                     >
                         View All Agrochemical Products
@@ -150,7 +150,7 @@ export default async function GuidesPage() {
                             </p>
                         </div>
                         <Link
-                            href="/animal-health-guides/all"
+                            href="/animal-health-guides"
                             className="hidden sm:flex items-center gap-1 text-sm font-medium text-primary hover:underline"
                         >
                             View All Animal Health Products
@@ -179,7 +179,7 @@ export default async function GuidesPage() {
                     </div>
 
                     <Link
-                        href="/animal-health-guides/all"
+                        href="/animal-health-guides"
                         className="sm:hidden flex items-center justify-center gap-1 text-sm font-medium text-primary hover:underline mt-6"
                     >
                         View All Animal Health Products
