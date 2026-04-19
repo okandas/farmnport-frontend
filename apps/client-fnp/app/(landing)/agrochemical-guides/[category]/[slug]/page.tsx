@@ -267,7 +267,9 @@ export default async function AgroChemicalGuidePage({ params }: GuidePageProps) 
                         <div>
                             <h2 className="text-lg font-semibold mb-3 text-foreground">Overview</h2>
                             <p className="text-muted-foreground leading-relaxed text-sm">
-                                {chemical.agrochemical_category?.slug ? (
+                                {chemical.product_overview ? (
+                                    chemical.product_overview
+                                ) : chemical.agrochemical_category?.slug ? (
                                     <><span className="font-medium text-foreground">{capitalizeFirstLetter(chemical.name)}</span> is {overviewDesc[chemical.agrochemical_category.slug] || `a ${chemical.agrochemical_category.name.toLowerCase().replace(/s$/, '')} for effective crop protection. It provides targeted action while ensuring crop safety when used according to recommended guidelines.`}</>
                                 ) : (
                                     <><span className="font-medium text-foreground">{chemical.name}</span> is a professional agrochemical solution for crop protection and management in agricultural applications.</>

@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/form"
 
 import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 import { toast } from "@/components/ui/use-toast"
 import { Icons } from "@/components/icons/lucide"
 import {
@@ -73,6 +74,7 @@ export function AgroChemicalForm({ agroChemical, mode = "create" }: AgroChemical
                 wholesale_price: v.wholesale_price ? v.wholesale_price / 100 : 0,
             })),
             precautions: agroChemical?.precautions || [],
+            product_overview: agroChemical?.product_overview || "",
             stock_level: agroChemical?.stock_level ?? 0,
             available_for_sale: agroChemical?.available_for_sale ?? false,
             show_price: agroChemical?.show_price ?? true,
@@ -707,6 +709,35 @@ export function AgroChemicalForm({ agroChemical, mode = "create" }: AgroChemical
                         >
                             + Add Pack Size
                         </Button>
+                    </div>
+                </div>
+
+                {/* Product Overview */}
+                <div className="border-b border-gray-900/10 pb-12 dark:border-white/10">
+                    <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">
+                        Product Overview
+                    </h2>
+                    <p className="mt-1 max-w-2xl text-sm/6 text-gray-600 dark:text-gray-400">
+                        Custom overview text. If set, this replaces the auto-generated description on the product page.
+                    </p>
+                    <div className="mt-6">
+                        <FormField
+                            control={form.control}
+                            name="product_overview"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormControl>
+                                        <Textarea
+                                            placeholder="Enter a custom product overview..."
+                                            className="sm:max-w-2xl"
+                                            rows={4}
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
                     </div>
                 </div>
 
