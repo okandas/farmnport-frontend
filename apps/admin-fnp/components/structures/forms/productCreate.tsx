@@ -61,6 +61,7 @@ export function CreateAgroChemicalForm({ product }: EditFormProps) {
             images: product?.images || [],
             active_ingredients: product?.active_ingredients || [],
             dosage_rates: product?.dosage_rates || [],
+            product_overview: product?.product_overview || "",
         },
         resolver: zodResolver(FormAgroChemicalSchema),
     })

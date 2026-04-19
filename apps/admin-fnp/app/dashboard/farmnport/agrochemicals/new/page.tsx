@@ -28,6 +28,7 @@ export default function CreateAgroChemicalPage() {
         dosage_rates: [],
         variants: [],
         precautions: [],
+        product_overview: "",
         stock_level: 0,
         available_for_sale: false,
         show_price: true,
