@@ -278,7 +278,7 @@ export function CreateAgroChemicalForm({ product }: EditFormProps) {
                 <div className="mt-6 flex items-center justify-end gap-x-6">
                     <button
                         type="button"
-                        onClick={() => router.push('/dashboard/agrochemicals')}
+                        onClick={() => router.push('/dashboard/farmnport/agrochemicals')}
                         className="text-sm/6 font-semibold text-gray-900 dark:text-white"
                     >
                         Cancel
