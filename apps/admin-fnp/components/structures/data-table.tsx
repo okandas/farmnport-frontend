@@ -56,6 +56,7 @@ export function DataTable<TData, TValue>({
   filters,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = useState({})
+  const [inputValue, setInputValue] = useState(search ?? "")
 
   const pageCount = Math.ceil(total / pagination.pageSize)
 
@@ -99,17 +100,14 @@ export function DataTable<TData, TValue>({
             <div className="flex items-center flex-1 space-x-2">
               <Input
                 placeholder={searchPlaceholder || `Search for ${tableName.toLowerCase()}...`}
-                value={search ?? ""}
-                onChange={(event) => {
-                  setSearch(event.target.value)
-                }}
+                value={inputValue}
+                onChange={(event) => setInputValue(event.target.value)}
+                onKeyDown={(event) => { if (event.key === "Enter") setSearch(inputValue) }}
                 className="h-8 w-[150px] lg:w-[250px]"
               />
               <Button
                 variant="outline"
-                onClick={() => {
-                  console.log(search)
-                }}
+                onClick={() => setSearch(inputValue)}
                 className="h-8 px-2 lg:px-3"
               >
                 Search

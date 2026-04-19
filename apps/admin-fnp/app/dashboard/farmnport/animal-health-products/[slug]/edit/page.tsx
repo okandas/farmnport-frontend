@@ -23,6 +23,7 @@ import {
     FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { FileInput } from "@/components/structures/controls/file-input"
 
 export default function EditAnimalHealthProductPage({ params }: { params: Promise<{ slug: string }> }) {
     const router = useRouter()
@@ -85,6 +86,7 @@ export default function EditAnimalHealthProductPage({ params }: { params: Promis
                 ...v,
                 sale_price: centsToDollarsFormInputs(v.sale_price ?? 0),
                 was_price: centsToDollarsFormInputs(v.was_price ?? 0),
+                wholesale_price: centsToDollarsFormInputs(v.wholesale_price ?? 0),
             })) || [],
             precautions: product.precautions || [],
             status: product.status ?? "active",
@@ -96,6 +98,8 @@ export default function EditAnimalHealthProductPage({ params }: { params: Promis
         control: form.control,
         name: "variants",
     })
+
+    const watchedVariants = form.watch("variants")
 
     const { fields: precautionFields, append: appendPrecaution, remove: removePrecaution } = useFieldArray({
         control: form.control,
@@ -126,6 +130,7 @@ export default function EditAnimalHealthProductPage({ params }: { params: Promis
                 ...v,
                 sale_price: dollarsToCents(v.sale_price),
                 was_price: dollarsToCents(v.was_price),
+                wholesale_price: dollarsToCents(v.wholesale_price ?? 0),
             })),
         })
     }
@@ -425,10 +430,16 @@ export default function EditAnimalHealthProductPage({ params }: { params: Promis
                             </p>
 
                             <div className="mt-6 divide-y divide-gray-200 dark:divide-white/10">
-                                {variantFields.map((field, index) => (
+                                {variantFields.map((field, index) => {
+                                    const salePrice = Number(watchedVariants?.[index]?.sale_price) || 0
+                                    const wholesalePrice = Number(watchedVariants?.[index]?.wholesale_price) || 0
+                                    const margin = salePrice > 0 && wholesalePrice > 0
+                                        ? ((salePrice - wholesalePrice) / salePrice * 100).toFixed(1)
+                                        : null
+                                    return (
                                     <div key={field.id} className="py-4 first:pt-0">
                                         <div className="flex items-start gap-3">
-                                            <div className="flex-1 grid grid-cols-1 gap-3 sm:grid-cols-5">
+                                            <div className="flex-1 grid grid-cols-1 gap-3 sm:grid-cols-6">
                                                 <FormField
                                                     control={form.control}
                                                     name={`variants.${index}.name`}
@@ -450,6 +461,18 @@ export default function EditAnimalHealthProductPage({ params }: { params: Promis
                                                             <label className="block text-xs font-medium text-gray-700 dark:text-gray-300">SKU</label>
                                                             <FormControl>
                                                                 <Input placeholder="e.g. TRTX-100" className="border-0 bg-white dark:bg-white/5 dark:text-white focus-visible:ring-0 outline outline-1 -outline-offset-1 outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 dark:outline-white/10 dark:focus:outline-indigo-500" {...field} />
+                                                            </FormControl>
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                                <FormField
+                                                    control={form.control}
+                                                    name={`variants.${index}.wholesale_price`}
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300">Wholesale ($)</label>
+                                                            <FormControl>
+                                                                <Input type="number" step="0.01" min="0" placeholder="0.00" className="border-0 bg-white dark:bg-white/5 dark:text-white focus-visible:ring-0 outline outline-1 -outline-offset-1 outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 dark:outline-white/10 dark:focus:outline-indigo-500" {...field} />
                                                             </FormControl>
                                                         </FormItem>
                                                     )}
@@ -491,16 +514,26 @@ export default function EditAnimalHealthProductPage({ params }: { params: Promis
                                                     )}
                                                 />
                                             </div>
-                                            <button
-                                                type="button"
-                                                onClick={() => removeVariant(index)}
-                                                className="mt-6 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
-                                            >
-                                                <Icons.close className="w-4 h-4" />
-                                            </button>
+                                            <div className="flex flex-col items-center gap-1 mt-5">
+                                                {margin !== null ? (
+                                                    <span className={`text-xs font-semibold px-2 py-1 rounded ${Number(margin) >= 20 ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : Number(margin) >= 10 ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'}`}>
+                                                        {margin}%
+                                                    </span>
+                                                ) : (
+                                                    <span className="text-xs text-gray-400">—%</span>
+                                                )}
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeVariant(index)}
+                                                    className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+                                                >
+                                                    <Icons.close className="w-4 h-4" />
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
-                                ))}
+                                    )
+                                })}
                             </div>
 
                             <Button
@@ -508,11 +541,42 @@ export default function EditAnimalHealthProductPage({ params }: { params: Promis
                                 variant="outline"
                                 size="sm"
                                 className="mt-4"
-                                onClick={() => appendVariant({ sku: "", name: "", stock_level: 0, sale_price: 0, was_price: 0 })}
+                                onClick={() => appendVariant({ sku: "", name: "", stock_level: 0, sale_price: 0, was_price: 0, wholesale_price: 0 })}
                             >
                                 <Icons.add className="w-4 h-4 mr-1" />
                                 Add Variant
                             </Button>
+                        </div>
+
+                        {/* Images */}
+                        <div className="border-b border-gray-900/10 dark:border-gray-100/10 pb-12">
+                            <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">Product Images</h2>
+                            <p className="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">Upload images for this product.</p>
+
+                            <div className="mt-6">
+                                <FormField
+                                    control={form.control}
+                                    name="images"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormControl>
+                                                <FileInput
+                                                    id={product?.id}
+                                                    fieldName="images"
+                                                    entityType="animal_health"
+                                                    value={field.value || []}
+                                                    onChange={field.onChange}
+                                                    maxImages={5}
+                                                    showPlaceholders={true}
+                                                    thumbnailClassName="inline-flex flex-col overflow-hidden border border-gray-200 rounded-lg mt-2 me-2 relative bg-white shadow-sm"
+                                                    imageClassName="flex items-center justify-center w-32 h-32 overflow-hidden bg-gray-50"
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
                         </div>
 
                         {/* Precautions */}

@@ -70,6 +70,7 @@ export function AgroChemicalForm({ agroChemical, mode = "create" }: AgroChemical
                 ...v,
                 sale_price: v.sale_price ? v.sale_price / 100 : 0,
                 was_price: v.was_price ? v.was_price / 100 : 0,
+                wholesale_price: v.wholesale_price ? v.wholesale_price / 100 : 0,
             })),
             precautions: agroChemical?.precautions || [],
             stock_level: agroChemical?.stock_level ?? 0,
@@ -838,7 +839,7 @@ export function AgroChemicalForm({ agroChemical, mode = "create" }: AgroChemical
                 <div className="mt-6 mb-12 flex items-center justify-end gap-x-6">
                     <button
                         type="button"
-                        onClick={() => router.push('/dashboard/agrochemicals')}
+                        onClick={() => router.push('/dashboard/farmnport/agrochemicals')}
                         className="text-sm/6 font-semibold text-gray-900 dark:text-white"
                     >
                         Cancel
