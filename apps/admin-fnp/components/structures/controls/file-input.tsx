@@ -16,6 +16,7 @@ interface FileInputProps {
     value: ImageModel[],
     id?: string,
     fieldName?: string, // "images", "front_label", or "back_label"
+    entityType?: string, // "agrochemical", "animal_health", "feed", etc.
     onChange: (value: any) => void
     thumbnailClassName?: string // Custom classes for thumbnail container
     imageClassName?: string // Custom classes for image container
@@ -25,7 +26,7 @@ interface FileInputProps {
 
 
 
-export function FileInput({ id, value, fieldName = "images", onChange, thumbnailClassName, imageClassName, maxImages, showPlaceholders = false }: FileInputProps) {
+export function FileInput({ id, value, fieldName = "images", entityType, onChange, thumbnailClassName, imageClassName, maxImages, showPlaceholders = false }: FileInputProps) {
     const [files, setFiles] = useState<ImageModel[]>(value ?? [])
     const entity_id = id
     const logtail = new Logtail("qBaLFyhMa3oZsq86JuRmfwpo")
@@ -115,6 +116,10 @@ export function FileInput({ id, value, fieldName = "images", onChange, thumbnail
 
             // Add field_name to indicate which field to update
             formData.append("field_name", fieldName)
+
+            if (entityType !== undefined) {
+                formData.append("entity_type", entityType)
+            }
 
             if (acceptedFiles.length) {
 
