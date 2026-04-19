@@ -1,5 +1,6 @@
 import { Metadata } from 'next'
-import { queryAnimalHealthProduct } from '@/lib/query'
+import { BaseURL } from '@/lib/schemas'
+import { capitalizeFirstLetter } from '@/lib/utilities'
 
 interface LayoutProps {
   children: React.ReactNode
@@ -13,8 +14,11 @@ export async function generateMetadata({ params }: LayoutProps): Promise<Metadat
   const { category, slug } = await params
 
   try {
-    const response = await queryAnimalHealthProduct(slug)
-    const product = response?.data
+    const fetchOptions: RequestInit = process.env.NODE_ENV === "production"
+      ? { next: { revalidate: 3600 } } as RequestInit
+      : { cache: "no-store" }
+    const res = await fetch(`${BaseURL}/animalhealth/${slug}`, fetchOptions)
+    const product = res.ok ? await res.json() : null
 
     if (!product) {
       return {
@@ -45,12 +49,12 @@ export async function generateMetadata({ params }: LayoutProps): Promise<Metadat
     ].filter(Boolean).join(', ')
 
     return {
-      title: `${product.name} - Animal Health Guide | farmnport`,
+      title: `${capitalizeFirstLetter(product.name)} - Animal Health Guide | farmnport`,
       description,
       keywords,
       authors: [{ name: 'farmnport' }],
       openGraph: {
-        title: `${product.name} - Animal Health Guide`,
+        title: `${capitalizeFirstLetter(product.name)} - Animal Health Guide`,
         description,
         url,
         siteName: 'farmnport',
@@ -67,7 +71,7 @@ export async function generateMetadata({ params }: LayoutProps): Promise<Metadat
       },
       twitter: {
         card: 'summary_large_image',
-        title: `${product.name} - Animal Health Guide`,
+        title: `${capitalizeFirstLetter(product.name)} - Animal Health Guide`,
         description,
         images: [imageUrl],
       },

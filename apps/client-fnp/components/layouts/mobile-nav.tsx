@@ -79,7 +79,7 @@ export function MobileNav({ user }: MobileNavProps) {
                    </Link>
 
                    <Link
-                     href="/agrochemical-guides"
+                     href="/guides"
                      onClick={() => {
                        sendGTMEvent({ event: 'link', value: 'GuidesTopNavigation' })
                        setIsOpen(false)
