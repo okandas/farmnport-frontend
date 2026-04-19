@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation, useQuery } from "@tanstack/react-query"
-import { useForm, FieldErrors } from "react-hook-form"
+import { useForm, useFieldArray, FieldErrors } from "react-hook-form"
 import { useRouter } from "next/navigation"
 import { useState, useEffect, useRef } from "react"
 import { useDebounce } from "use-debounce"
@@ -66,6 +66,12 @@ export function AgroChemicalForm({ agroChemical, mode = "create" }: AgroChemical
             images: agroChemical?.images || [],
             active_ingredients: agroChemical?.active_ingredients || [],
             dosage_rates: agroChemical?.dosage_rates || [],
+            variants: (agroChemical?.variants || []).map((v: any) => ({
+                ...v,
+                sale_price: v.sale_price ? v.sale_price / 100 : 0,
+                was_price: v.was_price ? v.was_price / 100 : 0,
+            })),
+            precautions: agroChemical?.precautions || [],
             stock_level: agroChemical?.stock_level ?? 0,
             available_for_sale: agroChemical?.available_for_sale ?? false,
             show_price: agroChemical?.show_price ?? true,
@@ -74,6 +80,21 @@ export function AgroChemicalForm({ agroChemical, mode = "create" }: AgroChemical
         },
         resolver: zodResolver(FormAgroChemicalSchema),
     })
+
+    const { fields: variantFields, append: appendVariant, remove: removeVariant } = useFieldArray({
+        control: form.control,
+        name: "variants",
+    })
+
+    const precautions = form.watch("precautions") || []
+
+    const addPrecaution = () => form.setValue("precautions", [...precautions, ""])
+    const removePrecaution = (index: number) => form.setValue("precautions", precautions.filter((_: string, i: number) => i !== index))
+    const updatePrecaution = (index: number, value: string) => {
+        const updated = [...precautions]
+        updated[index] = value
+        form.setValue("precautions", updated)
+    }
 
     const router = useRouter()
 
@@ -203,8 +224,16 @@ export function AgroChemicalForm({ agroChemical, mode = "create" }: AgroChemical
     })
 
     async function onSubmit(payload: FormAgroChemicalModel) {
-        logFormPayload(payload, "agrochemical")
-        mutate(payload)
+        const transformed = {
+            ...payload,
+            variants: (payload.variants || []).map((v: any) => ({
+                ...v,
+                sale_price: Math.round(v.sale_price * 100),
+                was_price: Math.round(v.was_price * 100),
+            })),
+        }
+        logFormPayload(transformed, "agrochemical")
+        mutate(transformed)
     }
 
     const onError = (errors: FieldErrors<FormAgroChemicalModel>) => {
@@ -587,6 +616,130 @@ export function AgroChemicalForm({ agroChemical, mode = "create" }: AgroChemical
                                 </FormItem>
                             )}
                         />
+                    </div>
+                </div>
+
+                {/* Variants / Pack Sizes */}
+                <div className="border-b border-gray-900/10 pb-12 dark:border-white/10">
+                    <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">
+                        Pack Sizes &amp; Variants
+                    </h2>
+                    <p className="mt-1 max-w-2xl text-sm/6 text-gray-600 dark:text-gray-400">
+                        Add pack size variants with individual pricing and stock levels.
+                    </p>
+
+                    <div className="mt-6 space-y-4">
+                        {variantFields.map((field, index) => (
+                            <div key={field.id} className="grid grid-cols-1 gap-3 sm:grid-cols-5 items-end rounded-lg border border-gray-200 dark:border-white/10 p-4">
+                                <div className="sm:col-span-2">
+                                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Name</label>
+                                    <FormField
+                                        control={form.control}
+                                        name={`variants.${index}.name`}
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormControl>
+                                                    <Input placeholder="e.g. 1L, 5kg" {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Sale Price (USD)</label>
+                                    <FormField
+                                        control={form.control}
+                                        name={`variants.${index}.sale_price`}
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormControl>
+                                                    <Input type="number" min="0" step="0.01" placeholder="0.00" {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Was Price (USD)</label>
+                                    <FormField
+                                        control={form.control}
+                                        name={`variants.${index}.was_price`}
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormControl>
+                                                    <Input type="number" min="0" step="0.01" placeholder="0.00" {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                                <div className="flex items-end gap-2">
+                                    <div className="flex-1">
+                                        <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Stock</label>
+                                        <FormField
+                                            control={form.control}
+                                            name={`variants.${index}.stock_level`}
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormControl>
+                                                        <Input type="number" min="0" placeholder="0" {...field} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
+                                    <Button type="button" variant="ghost" size="sm" onClick={() => removeVariant(index)} className="text-red-500 hover:text-red-700 mb-0.5">
+                                        Remove
+                                    </Button>
+                                </div>
+                            </div>
+                        ))}
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => appendVariant({ sku: "", name: "", sale_price: 0, was_price: 0, stock_level: 0 })}
+                        >
+                            + Add Pack Size
+                        </Button>
+                    </div>
+                </div>
+
+                {/* Precautions */}
+                <div className="border-b border-gray-900/10 pb-12 dark:border-white/10">
+                    <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">
+                        Precautions
+                    </h2>
+                    <p className="mt-1 max-w-2xl text-sm/6 text-gray-600 dark:text-gray-400">
+                        Add safety precautions and warnings for this product.
+                    </p>
+
+                    <div className="mt-6 space-y-3">
+                        {precautions.map((precaution: string, index: number) => (
+                            <div key={index} className="flex items-center gap-2">
+                                <Input
+                                    placeholder="Enter precaution..."
+                                    value={precaution}
+                                    onChange={(e) => updatePrecaution(index, e.target.value)}
+                                    className="flex-1"
+                                />
+                                <Button type="button" variant="ghost" size="sm" onClick={() => removePrecaution(index)} className="text-red-500 hover:text-red-700 shrink-0">
+                                    Remove
+                                </Button>
+                            </div>
+                        ))}
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={addPrecaution}
+                        >
+                            + Add Precaution
+                        </Button>
                     </div>
                 </div>
 
