@@ -5,6 +5,8 @@ import Link from "next/link"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
 import { capitalizeFirstLetter, formatUnit } from "@/lib/utilities"
 import { SprayProgramBackLink } from "./SprayProgramBackLink"
+import { FertilizerApplicationRates } from "@/components/agrochemical/FertilizerApplicationRates"
+import { ProductTargets } from "@/components/agrochemical/ProductTargets"
 
 interface GuidePageProps {
     params: Promise<{
@@ -29,6 +31,10 @@ export default async function AgroChemicalGuidePage({ params }: GuidePageProps) 
         rodenticides: "Target Rodents",
         molluscicides: "Target Molluscs",
         bactericides: "Target Bacteria",
+        "foliar-feeds": "Targets",
+        fertilizers: "Targets",
+        "plant-nutrition": "Targets",
+        biostimulants: "Targets",
     }
     const overviewDesc: Record<string, string> = {
         herbicides: "a herbicide used for weed management and control. It helps suppress unwanted weed growth while protecting crops when applied according to recommended guidelines.",
@@ -40,10 +46,8 @@ export default async function AgroChemicalGuidePage({ params }: GuidePageProps) 
         molluscicides: "a molluscicide designed to control snails and slugs. It protects crops from mollusc damage during vulnerable growth stages.",
         bactericides: "a bactericide used to manage bacterial infections in crops. It helps prevent the spread of bacterial diseases and supports plant health.",
     }
-    const sectionTitle = targetLabel[categorySlug] || "Target Pests & Diseases"
-    const noTargetMsg = targetLabel[categorySlug]
-        ? `No ${sectionTitle.toLowerCase().replace("target ", "")} information available.`
-        : "No target pest or disease information available."
+    const sectionTitle = targetLabel[categorySlug] || "Targets"
+    const noTargetMsg = `No ${sectionTitle.toLowerCase()} information available.`
 
     if (!chemical) {
         return (
@@ -315,34 +319,22 @@ export default async function AgroChemicalGuidePage({ params }: GuidePageProps) 
                             )}
 
                             {/* Target Pests & Diseases Section */}
-                            <div className="rounded-xl border bg-card p-4">
-                                <h2 className="text-sm font-semibold uppercase tracking-wide text-green-700 dark:text-green-400 mb-3">
-                                    {sectionTitle}
-                                </h2>
-                                {chemical.targets && chemical.targets.length > 0 ? (
-                                    <ul className="space-y-1.5">
-                                        {chemical.targets.map((target: any, idx: number) => (
-                                            <li key={idx} className="flex items-start gap-2 text-sm text-foreground">
-                                                <span className="h-1.5 w-1.5 rounded-full bg-green-500 dark:bg-green-400 flex-shrink-0 mt-1.5" />
-                                                <span>
-                                                    <span className="capitalize">{target.name}</span>
-                                                    {target.scientific_name && (
-                                                        <span className="text-xs text-muted-foreground italic ml-1">({target.scientific_name})</span>
-                                                    )}
-                                                </span>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                ) : (
-                                    <p className="text-sm text-muted-foreground">{noTargetMsg}</p>
-                                )}
-                            </div>
+                            <ProductTargets
+                                title={sectionTitle}
+                                targets={chemical.targets || []}
+                                emptyMessage={noTargetMsg}
+                            />
                         </div>
                     </div>
                 </div>
 
                 {/* Dosage Rates & Application Guide Section */}
-                {chemical.dosage_rates && chemical.dosage_rates.length > 0 && (
+                {chemical.dosage_rates && chemical.dosage_rates.length > 0 && (() => {
+                    const isFertilizerRates = chemical.dosage_rates.every((r: any) => !r.crop_group_id && r.crop_group)
+                    if (isFertilizerRates) {
+                        return <FertilizerApplicationRates dosageRates={chemical.dosage_rates} />
+                    }
+                    return (
                     <div className="mb-12">
                         <h2 className="sticky top-16 z-10 text-2xl font-bold py-4 text-foreground bg-background">Dosage Rates & Application Guide</h2>
                         <div className="overflow-x-auto">
@@ -410,7 +402,7 @@ export default async function AgroChemicalGuidePage({ params }: GuidePageProps) 
                                                         <div className="text-xs text-muted-foreground">per {entry.dosage.per}</div>
                                                     </td>
                                                     <td className="p-3 align-top">
-                                                        <div className="font-semibold text-orange-700 dark:text-orange-300">{entry.max_applications.max}</div>
+                                                        <div className="font-semibold text-orange-700 dark:text-orange-300">{entry.max_applications.max > 0 ? entry.max_applications.max : "—"}</div>
                                                         {entry.max_applications.note && entry.max_applications.note.trim() !== '' && (
                                                             <div className="text-xs text-muted-foreground mt-1">{entry.max_applications.note}</div>
                                                         )}
@@ -481,8 +473,8 @@ export default async function AgroChemicalGuidePage({ params }: GuidePageProps) 
                                                             const rate = rates[0]
                                                             const cropCell = (
                                                                 <div>
-                                                                    <div className="font-semibold capitalize text-sm text-foreground">{rate.crop}</div>
-                                                                    {rate.category_name && (
+                                                                    <div className="font-semibold capitalize text-sm text-foreground">{rate.crop_group || rate.crop}</div>
+                                                                    {!rate.crop_group && rate.category_name && (
                                                                         <div className="text-xs text-muted-foreground mt-0.5">{rate.category_name}</div>
                                                                     )}
                                                                 </div>
@@ -493,8 +485,8 @@ export default async function AgroChemicalGuidePage({ params }: GuidePageProps) 
                                                         return rates.map((rate: any, rateIdx: number) => {
                                                             const cropCell = (
                                                                 <div>
-                                                                    <div className="font-semibold capitalize text-sm text-foreground">{rate.crop}</div>
-                                                                    {rate.category_name && (
+                                                                    <div className="font-semibold capitalize text-sm text-foreground">{rate.crop_group || rate.crop}</div>
+                                                                    {!rate.crop_group && rate.category_name && (
                                                                         <div className="text-xs text-muted-foreground mt-0.5">{rate.category_name}</div>
                                                                     )}
                                                                 </div>
@@ -511,7 +503,8 @@ export default async function AgroChemicalGuidePage({ params }: GuidePageProps) 
                             </table>
                         </div>
                     </div>
-                )}
+                    )
+                })()}
 
                 {/* Product Labels Section */}
                 {(chemical.front_label?.img?.src || chemical.back_label?.img?.src) && (
