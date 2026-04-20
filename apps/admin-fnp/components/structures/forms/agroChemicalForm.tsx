@@ -499,7 +499,7 @@ export function AgroChemicalForm({ agroChemical, mode = "create" }: AgroChemical
                                     htmlFor="images"
                                     className="block text-sm/6 font-medium text-gray-900 dark:text-white"
                                 >
-                                    Product Images <span className="text-red-600">*</span>
+                                    Product Images
                                 </label>
                                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                                     Upload product images to showcase this agrochemical.
@@ -525,7 +525,7 @@ export function AgroChemicalForm({ agroChemical, mode = "create" }: AgroChemical
                                             </FormControl>
                                             <FormMessage />
                                             <p className="mt-2 text-xs text-gray-500">
-                                                Upload up to 5 product images. At least 1 image is required.
+                                                Upload up to 5 product images.
                                             </p>
                                         </FormItem>
                                     )}
