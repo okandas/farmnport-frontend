@@ -305,7 +305,7 @@ export function AgroChemicalForm({ agroChemical, mode = "create" }: AgroChemical
                                                 <Textarea
                                                     id="product_overview"
                                                     placeholder="Enter a custom product overview..."
-                                                    className="sm:max-w-2xl"
+                                                    className="sm:max-w-2xl px-3 py-2"
                                                     rows={4}
                                                     {...field}
                                                 />
