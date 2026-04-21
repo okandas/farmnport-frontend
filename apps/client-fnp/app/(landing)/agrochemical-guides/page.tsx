@@ -172,6 +172,14 @@ export default async function AgrochemicalGuidesPage() {
                         </Link>
                     </div>
 
+                    <Link
+                        href="/agrochemical-guides/all"
+                        className="sm:hidden flex items-center justify-center gap-1 text-sm font-medium text-primary hover:underline mb-6"
+                    >
+                        View All Agrochemical Products
+                        <ArrowRight className="h-4 w-4" />
+                    </Link>
+
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                         {categories.map((category: any) => {
                             const Icon = categoryIcons[category.slug] || Pill
@@ -192,13 +200,6 @@ export default async function AgrochemicalGuidesPage() {
                         })}
                     </div>
 
-                    <Link
-                        href="/agrochemical-guides/all"
-                        className="sm:hidden flex items-center justify-center gap-1 text-sm font-medium text-primary hover:underline mt-6"
-                    >
-                        View All Agrochemical Products
-                        <ArrowRight className="h-4 w-4" />
-                    </Link>
                 </div>
             </section>
         </main>
