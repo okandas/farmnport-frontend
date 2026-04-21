@@ -445,7 +445,7 @@ export function SprayProgramDetailClient({ program, slug }: SprayProgramDetailCl
                                                 <div className="flex-1 min-w-0">
                                                     <button
                                                         onClick={() => agrochemical && setQuickViewProduct({ ...rec, agrochemical })}
-                                                        className="text-sm font-medium text-foreground hover:text-primary transition-colors text-left truncate block w-full cursor-pointer"
+                                                        className="text-sm font-medium text-foreground hover:text-primary transition-colors text-left block w-full cursor-pointer"
                                                     >
                                                         {capitalizeFirstLetter(rec.agrochemical_name)}
                                                         {brandName && hasBrands && (

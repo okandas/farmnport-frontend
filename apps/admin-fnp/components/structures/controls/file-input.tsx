@@ -28,6 +28,7 @@ interface FileInputProps {
 
 export function FileInput({ id, value, fieldName = "images", entityType, onChange, thumbnailClassName, imageClassName, maxImages, showPlaceholders = false }: FileInputProps) {
     const [files, setFiles] = useState<ImageModel[]>(value ?? [])
+    const [localPreviews, setLocalPreviews] = useState<Record<string, string>>({})
     const entity_id = id
     const logtail = new Logtail("qBaLFyhMa3oZsq86JuRmfwpo")
 
@@ -41,6 +42,7 @@ export function FileInput({ id, value, fieldName = "images", entityType, onChang
 
             if (data.data === null) {
 
+                setLocalPreviews({})
                 toast({
                     description: "There seems to be an issue with your upload, please wait and try again or contact admin if it persists.",
                     action: <ToastAction altText="Try again">Try again</ToastAction>,
@@ -52,6 +54,21 @@ export function FileInput({ id, value, fieldName = "images", entityType, onChang
                 const newImages = isSingleField ? [data.data] : [...files, ...data.data]
                 onChange(newImages)
                 setFiles(newImages)
+
+                // Map server image IDs to any pending local previews
+                const uploaded: ImageModel[] = isSingleField ? [data.data] : data.data
+                setLocalPreviews(prev => {
+                    const next = { ...prev }
+                    // Match by insertion order: newest local previews correspond to the returned images
+                    const pendingKeys = Object.keys(next)
+                    uploaded.forEach((img, i) => {
+                        if (pendingKeys[i]) {
+                            next[img.img.id] = next[pendingKeys[i]]
+                            delete next[pendingKeys[i]]
+                        }
+                    })
+                    return next
+                })
 
             }
         },
@@ -122,6 +139,13 @@ export function FileInput({ id, value, fieldName = "images", entityType, onChang
             }
 
             if (acceptedFiles.length) {
+                // Create local preview URLs so the image displays immediately
+                // without waiting for the CDN to make the uploaded file available
+                const previews: Record<string, string> = {}
+                acceptedFiles.forEach((file) => {
+                    previews[file.name] = URL.createObjectURL(file)
+                })
+                setLocalPreviews(prev => ({ ...prev, ...previews }))
 
                 acceptedFiles.forEach((attachment) => {
                     formData.append('product_image', attachment)
@@ -170,6 +194,15 @@ export function FileInput({ id, value, fieldName = "images", entityType, onChang
     })
 
     const deleteImage = (image: ImageModel) => {
+        const localUrl = localPreviews[image.img.id]
+        if (localUrl) {
+            URL.revokeObjectURL(localUrl)
+            setLocalPreviews(prev => {
+                const next = { ...prev }
+                delete next[image.img.id]
+                return next
+            })
+        }
         mutationRemoveImage.mutate(image)
     }
 
@@ -183,13 +216,24 @@ export function FileInput({ id, value, fieldName = "images", entityType, onChang
                 key={index}
             >
                 <div className={imageClassName || defaultImageClass}>
-                    <Image
-                        src={file.img.src}
-                        width={192}
-                        height={192}
-                        alt="product preview image"
-                        className="object-contain"
-                    />
+                    {localPreviews[file.img.id] ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                            src={localPreviews[file.img.id]}
+                            width={192}
+                            height={192}
+                            alt="product preview image"
+                            className="object-contain"
+                        />
+                    ) : (
+                        <Image
+                            src={file.img.src}
+                            width={192}
+                            height={192}
+                            alt="product preview image"
+                            className="object-contain"
+                        />
+                    )}
                 </div>
                 <button
                     className="w-6 h-6 flex items-center justify-center rounded-full bg-red-600 text-white absolute top-2 end-2 shadow-lg outline-none hover:bg-red-700 transition-colors"
