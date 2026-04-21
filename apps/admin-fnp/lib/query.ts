@@ -1407,3 +1407,25 @@ export function deleteMenuItemAddOn(id: string) {
   let url = `${baseUrl}/menu-item-add-ons/delete/${id}`
   return api.delete(url)
 }
+
+
+// Subscription Plans
+export function querySubscriptionPlans(params?: { status?: string; tier?: string }) {
+  const query = new URLSearchParams()
+  if (params?.status) query.set("status", params.status)
+  if (params?.tier) query.set("tier", params.tier)
+  const qs = query.toString()
+  return api.get(`${baseUrl}/restaurant-subscription-plans/list${qs ? `?${qs}` : ""}`)
+}
+
+export function querySubscriptionPlan(id: string) {
+  return api.get(`${baseUrl}/restaurant-subscription-plans/get/${id}`)
+}
+
+export function addSubscriptionPlan(data: any) {
+  return api.post(`${baseUrl}/restaurant-subscription-plans/add`, data)
+}
+
+export function updateSubscriptionPlan(id: string, data: any) {
+  return api.post(`${baseUrl}/restaurant-subscription-plans/update/${id}`, data)
+}

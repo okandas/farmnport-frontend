@@ -55,6 +55,17 @@ export const restaurantsDashboardConfig: DashboardConfig = {
       ],
     },
     {
+      label: "Subscriptions",
+      alwaysOpen: true,
+      items: [
+        {
+          title: "Plans",
+          href: "/dashboard/restaurants/subscription-plans",
+          icon: "billing",
+        },
+      ],
+    },
+    {
       label: "Sales",
       alwaysOpen: true,
       items: [

@@ -1392,3 +1392,31 @@ export type MenuItemAddOnResponse = {
   total: number
   data: MenuItemAddOn[]
 }
+
+
+// Subscription Plans
+export const RestaurantSubscriptionPlanSchema = z.object({
+  id: z.string(),
+  tier: z.enum(["starter", "pro"]),
+  name: z.string().min(1, "Name is required"),
+  description: z.string().optional().default(""),
+  price_cents: z.number().min(1, "Price is required"),
+  vat_rate: z.number().min(0),
+  currency: z.string().min(1, "Currency is required"),
+  status: z.enum(["active", "inactive"]).default("active"),
+  created: z.string().optional(),
+  updated: z.string().optional(),
+})
+
+export const FormRestaurantSubscriptionPlanSchema = RestaurantSubscriptionPlanSchema.pick({
+  tier: true,
+  name: true,
+  description: true,
+  price_cents: true,
+  vat_rate: true,
+  currency: true,
+  status: true,
+})
+
+export type RestaurantSubscriptionPlan = z.infer<typeof RestaurantSubscriptionPlanSchema>
+export type FormRestaurantSubscriptionPlanModel = z.infer<typeof FormRestaurantSubscriptionPlanSchema>
