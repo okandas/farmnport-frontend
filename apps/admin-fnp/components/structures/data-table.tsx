@@ -31,7 +31,7 @@ import { Pagination } from "./controls/pagination"
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
-  newUrl: string
+  newUrl?: string
   tableName: string
   total: number
   pagination: PaginationState
@@ -84,15 +84,17 @@ export function DataTable<TData, TValue>({
     <div className="pb-8 space-y-8">
       <div className="flex justify-between">
         <div className="flex justify-start">
-          <Link
-            href={newUrl}
-            className={cn(buttonVariants({ variant: "outline" }))}
-          >
-            <>
-              New {tableName}
-              <Icons.add className="w-4 h-4 ml-2" />
-            </>
-          </Link>
+          {newUrl && (
+            <Link
+              href={newUrl}
+              className={cn(buttonVariants({ variant: "outline" }))}
+            >
+              <>
+                New {tableName}
+                <Icons.add className="w-4 h-4 ml-2" />
+              </>
+            </Link>
+          )}
         </div>
         <div className="flex justify-end items-center gap-2">
           {filters && <div className="flex items-center gap-2">{filters}</div>}

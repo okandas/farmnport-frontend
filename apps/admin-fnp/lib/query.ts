@@ -1117,6 +1117,10 @@ export function queryRestaurantLocations(pagination?: pagination) {
   return api.get(url)
 }
 
+export function queryRestaurantLocationsByRestaurant(restaurantId: string) {
+  return api.get(`${baseUrl}/restaurant-locations/list?restaurant_id=${restaurantId}&limit=100`)
+}
+
 export function queryRestaurantLocation(id: string) {
   let url = `${baseUrl}/restaurant-locations/get/${id}`
   return api.get(url)
@@ -1406,4 +1410,115 @@ export function updateMenuItemAddOn(data: any) {
 export function deleteMenuItemAddOn(id: string) {
   let url = `${baseUrl}/menu-item-add-ons/delete/${id}`
   return api.delete(url)
+}
+
+
+// Subscription Plans
+export function querySubscriptionPlans(params?: { status?: string; tier?: string }) {
+  const query = new URLSearchParams()
+  if (params?.status) query.set("status", params.status)
+  if (params?.tier) query.set("tier", params.tier)
+  const qs = query.toString()
+  return api.get(`${baseUrl}/restaurant-subscription-plans/list${qs ? `?${qs}` : ""}`)
+}
+
+export function querySubscriptionPlan(id: string) {
+  return api.get(`${baseUrl}/restaurant-subscription-plans/get/${id}`)
+}
+
+export function addSubscriptionPlan(data: any) {
+  return api.post(`${baseUrl}/restaurant-subscription-plans/add`, data)
+}
+
+export function updateSubscriptionPlan(id: string, data: any) {
+  return api.post(`${baseUrl}/restaurant-subscription-plans/update/${id}`, data)
+}
+
+// Restaurant Subscriptions
+export function queryRestaurantSubscriptions(params?: { restaurant_id?: string; status?: string; p?: number }) {
+  const query = new URLSearchParams()
+  if (params?.restaurant_id) query.set("restaurant_id", params.restaurant_id)
+  if (params?.status) query.set("status", params.status)
+  if (params?.p) query.set("p", String(params.p))
+  const qs = query.toString()
+  return api.get(`${baseUrl}/restaurant-subscriptions/list${qs ? `?${qs}` : ""}`)
+}
+
+export function addRestaurantSubscription(data: any) {
+  return api.post(`${baseUrl}/restaurant-subscriptions/add`, data)
+}
+
+export function queryRestaurantSubscription(id: string) {
+  return api.get(`${baseUrl}/restaurant-subscriptions/get/${id}`)
+}
+
+export function cancelRestaurantSubscription(id: string) {
+  return api.post(`${baseUrl}/restaurant-subscriptions/cancel/${id}`, {})
+}
+
+export function activateRestaurantSubscription(id: string) {
+  return api.post(`${baseUrl}/restaurant-subscriptions/activate/${id}`, {})
+}
+
+// Location Subscriptions
+export function queryLocationSubscriptions(params?: { restaurant_id?: string; location_id?: string; status?: string; p?: number }) {
+  const query = new URLSearchParams()
+  if (params?.restaurant_id) query.set("restaurant_id", params.restaurant_id)
+  if (params?.location_id) query.set("location_id", params.location_id)
+  if (params?.status) query.set("status", params.status)
+  if (params?.p) query.set("p", String(params.p))
+  const qs = query.toString()
+  return api.get(`${baseUrl}/restaurant-location-subscriptions/list${qs ? `?${qs}` : ""}`)
+}
+
+export function addLocationSubscription(data: any) {
+  return api.post(`${baseUrl}/restaurant-location-subscriptions/add`, data)
+}
+
+export function renewLocationSubscription(id: string, data?: any) {
+  return api.post(`${baseUrl}/restaurant-location-subscriptions/renew/${id}`, data ?? {})
+}
+
+export function cancelLocationSubscription(id: string) {
+  return api.post(`${baseUrl}/restaurant-location-subscriptions/cancel/${id}`, {})
+}
+
+export function queryLocationPayments(params?: { restaurant_id?: string; location_id?: string; subscription_id?: string; p?: number }) {
+  const query = new URLSearchParams()
+  if (params?.restaurant_id) query.set("restaurant_id", params.restaurant_id)
+  if (params?.location_id) query.set("location_id", params.location_id)
+  if (params?.subscription_id) query.set("subscription_id", params.subscription_id)
+  if (params?.p) query.set("p", String(params.p))
+  const qs = query.toString()
+  return api.get(`${baseUrl}/restaurant-location-payments/list${qs ? `?${qs}` : ""}`)
+}
+
+// Location Seats
+export function queryLocationSeats(params?: { subscription_id?: string; restaurant_id?: string; status?: string; p?: number }) {
+  const query = new URLSearchParams()
+  if (params?.subscription_id) query.set("subscription_id", params.subscription_id)
+  if (params?.restaurant_id) query.set("restaurant_id", params.restaurant_id)
+  if (params?.status) query.set("status", params.status)
+  if (params?.p) query.set("p", String(params.p))
+  const qs = query.toString()
+  return api.get(`${baseUrl}/restaurant-location-seats/list${qs ? `?${qs}` : ""}`)
+}
+
+export function addLocationSeat(data: { subscription_id: string; location_id: string }) {
+  return api.post(`${baseUrl}/restaurant-location-seats/add`, data)
+}
+
+// Invoices
+export function queryRestaurantInvoices(params?: { subscription_id?: string; restaurant_id?: string; status?: string; p?: number }) {
+  const query = new URLSearchParams()
+  if (params?.subscription_id) query.set("subscription_id", params.subscription_id)
+  if (params?.restaurant_id) query.set("restaurant_id", params.restaurant_id)
+  if (params?.status) query.set("status", params.status)
+  if (params?.p) query.set("p", String(params.p))
+  const qs = query.toString()
+  return api.get(`${baseUrl}/restaurant-invoices/list${qs ? `?${qs}` : ""}`)
+}
+
+export function queryRestaurantInvoice(id: string) {
+  return api.get(`${baseUrl}/restaurant-invoices/get/${id}`)
 }
