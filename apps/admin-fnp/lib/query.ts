@@ -1479,6 +1479,16 @@ export function cancelLocationSubscription(id: string) {
   return api.post(`${baseUrl}/restaurant-location-subscriptions/cancel/${id}`, {})
 }
 
+export function queryLocationPayments(params?: { restaurant_id?: string; location_id?: string; subscription_id?: string; p?: number }) {
+  const query = new URLSearchParams()
+  if (params?.restaurant_id) query.set("restaurant_id", params.restaurant_id)
+  if (params?.location_id) query.set("location_id", params.location_id)
+  if (params?.subscription_id) query.set("subscription_id", params.subscription_id)
+  if (params?.p) query.set("p", String(params.p))
+  const qs = query.toString()
+  return api.get(`${baseUrl}/restaurant-location-payments/list${qs ? `?${qs}` : ""}`)
+}
+
 // Location Seats
 export function queryLocationSeats(params?: { subscription_id?: string; restaurant_id?: string; status?: string; p?: number }) {
   const query = new URLSearchParams()
