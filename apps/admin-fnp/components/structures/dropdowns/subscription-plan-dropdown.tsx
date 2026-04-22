@@ -28,10 +28,10 @@ export function SubscriptionPlanDropDown({ plan }: SubscriptionPlanDropDownProps
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-        <DropdownMenuItem>
+        <DropdownMenuItem asChild disabled={!plan?.id}>
           <Link
             className="w-full"
-            href={`/dashboard/restaurants/subscription-plans/${plan?.id}/edit`}
+            href={plan?.id ? `/dashboard/restaurants/subscription-plans/${plan.id}/edit` : "#"}
           >
             Edit
           </Link>

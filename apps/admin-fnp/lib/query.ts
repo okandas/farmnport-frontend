@@ -1448,6 +1448,10 @@ export function addRestaurantSubscription(data: any) {
   return api.post(`${baseUrl}/restaurant-subscriptions/add`, data)
 }
 
+export function queryRestaurantSubscription(id: string) {
+  return api.get(`${baseUrl}/restaurant-subscriptions/get/${id}`)
+}
+
 export function cancelRestaurantSubscription(id: string) {
   return api.post(`${baseUrl}/restaurant-subscriptions/cancel/${id}`, {})
 }

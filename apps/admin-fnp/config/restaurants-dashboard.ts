@@ -63,6 +63,16 @@ export const restaurantsDashboardConfig: DashboardConfig = {
           href: "/dashboard/restaurants/subscription-plans",
           icon: "billing",
         },
+        {
+          title: "Subscriptions",
+          href: "/dashboard/restaurants/subscriptions",
+          icon: "layers",
+        },
+        {
+          title: "Invoices",
+          href: "/dashboard/restaurants/invoices",
+          icon: "billing",
+        },
       ],
     },
     {

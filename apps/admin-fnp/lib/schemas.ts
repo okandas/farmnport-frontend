@@ -1420,3 +1420,122 @@ export const FormRestaurantSubscriptionPlanSchema = RestaurantSubscriptionPlanSc
 
 export type RestaurantSubscriptionPlan = z.infer<typeof RestaurantSubscriptionPlanSchema>
 export type FormRestaurantSubscriptionPlanModel = z.infer<typeof FormRestaurantSubscriptionPlanSchema>
+
+// Restaurant Subscriptions (restaurant-level account)
+export const RestaurantSubscriptionSchema = z.object({
+  id: z.string(),
+  restaurant_id: z.string(),
+  restaurant_name: z.string(),
+  plan_id: z.string(),
+  member_number: z.string(),
+  billing_email: z.string(),
+  billing_phone: z.string().optional().default(""),
+  status: z.enum(["active", "expired", "cancelled"]),
+  billing_day: z.number(),
+  cycle_start: z.string(),
+  cycle_end: z.string(),
+  created: z.string().optional(),
+  updated: z.string().optional(),
+})
+
+export const FormAddRestaurantSubscriptionSchema = z.object({
+  restaurant_id: z.string().min(1, "Restaurant is required"),
+  plan_id: z.string().min(1, "Plan is required"),
+  billing_email: z.string().email("Valid email required"),
+  billing_phone: z.string().optional().default(""),
+  location_ids: z.array(z.string()).min(1, "At least one location is required"),
+})
+
+export type RestaurantSubscription = z.infer<typeof RestaurantSubscriptionSchema>
+export type FormAddRestaurantSubscriptionModel = z.infer<typeof FormAddRestaurantSubscriptionSchema>
+
+// Location Seats (one per location under a subscription)
+export const RestaurantLocationSeatSchema = z.object({
+  id: z.string(),
+  subscription_id: z.string(),
+  restaurant_id: z.string(),
+  location_id: z.string(),
+  location_name: z.string(),
+  plan_id: z.string(),
+  tier: z.enum(["starter", "pro"]),
+  status: z.enum(["pending", "active", "cancelled"]),
+  expires_at: z.string(),
+  added_at: z.string(),
+  created: z.string().optional(),
+  updated: z.string().optional(),
+})
+
+export type RestaurantLocationSeat = z.infer<typeof RestaurantLocationSeatSchema>
+
+// Restaurant Invoices (one per 30-day cycle, covers all seats)
+export const InvoiceLineItemSchema = z.object({
+  location_id: z.string(),
+  location_name: z.string(),
+  plan_id: z.string(),
+  days_in_cycle: z.number(),
+  days_charged: z.number(),
+  unit_amount_cents: z.number(),
+  prorated_amount_cents: z.number(),
+})
+
+export const RestaurantInvoiceSchema = z.object({
+  id: z.string(),
+  subscription_id: z.string(),
+  restaurant_id: z.string(),
+  restaurant_name: z.string(),
+  invoice_id: z.string(),
+  status: z.enum(["pending", "paid", "cancelled"]),
+  cycle_start: z.string(),
+  cycle_end: z.string(),
+  line_items: z.array(InvoiceLineItemSchema),
+  subtotal_cents: z.number(),
+  vat_cents: z.number(),
+  total_cents: z.number(),
+  provider: z.string().optional().default(""),
+  provider_reference: z.string().optional().default(""),
+  due_date: z.string(),
+  paid_at: z.string().nullable().optional(),
+  created: z.string().optional(),
+})
+
+export type InvoiceLineItem = z.infer<typeof InvoiceLineItemSchema>
+export type RestaurantInvoice = z.infer<typeof RestaurantInvoiceSchema>
+
+// Restaurant Location Subscriptions (one per location)
+export const RestaurantLocationSubscriptionSchema = z.object({
+  id: z.string(),
+  restaurant_id: z.string(),
+  restaurant_name: z.string(),
+  location_id: z.string(),
+  location_name: z.string(),
+  plan_id: z.string(),
+  billing_email: z.string(),
+  billing_phone: z.string().optional().default(""),
+  tier: z.enum(["starter", "pro"]),
+  base_amount_cents: z.number(),
+  vat_cents: z.number(),
+  total_amount_cents: z.number(),
+  status: z.enum(["active", "expired", "cancelled"]),
+  starts_at: z.string(),
+  expires_at: z.string(),
+  created: z.string().optional(),
+  updated: z.string().optional(),
+})
+
+export type RestaurantLocationSubscription = z.infer<typeof RestaurantLocationSubscriptionSchema>
+
+// Restaurant Location Payments (one per Billpay/manual payment)
+export const RestaurantLocationPaymentSchema = z.object({
+  id: z.string(),
+  subscription_id: z.string(),
+  plan_id: z.string(),
+  provider: z.string(),
+  invoice_id: z.string(),
+  provider_reference: z.string().optional().default(""),
+  base_amount_cents: z.number(),
+  vat_cents: z.number(),
+  total_amount_cents: z.number(),
+  created: z.string().optional(),
+})
+
+export type RestaurantLocationPayment = z.infer<typeof RestaurantLocationPaymentSchema>
