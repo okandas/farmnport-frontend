@@ -1,3 +1,4 @@
+import { ActiveIngredientsList } from "@/components/shared/ActiveIngredientUnitsKey"
 import Image from "next/image"
 import { Beaker, AlertTriangle } from "lucide-react"
 import Link from "next/link"
@@ -322,23 +323,8 @@ export default async function AnimalHealthGuidePage({ params }: GuidePageProps) 
 
                         {/* Active Ingredients Section */}
                         <div>
-                            <h2 className="text-lg font-semibold mb-3 text-foreground">
-                                Active Ingredients
-                            </h2>
-                            {product.active_ingredients && product.active_ingredients.length > 0 ? (
-                                <div className="space-y-2">
-                                    {product.active_ingredients.map((ai: any, idx: number) => (
-                                        <div key={idx} className="flex items-center justify-between p-3 bg-gradient-to-r from-purple-50/50 to-transparent dark:from-purple-950/30 rounded-lg border border-purple-100 dark:border-purple-900 hover:border-purple-300 dark:hover:border-purple-700 transition-colors">
-                                            <div className="font-medium capitalize text-sm text-foreground">{ai.name}</div>
-                                            <div className="text-right">
-                                                <div className="font-bold text-purple-600 dark:text-purple-400">{ai.dosage_value} {ai.dosage_unit}</div>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <p className="text-sm text-muted-foreground p-4 bg-muted/30 rounded-lg border">No active ingredient information available.</p>
-                            )}
+                            <h2 className="text-lg font-semibold mb-1 text-foreground">Active Ingredients</h2>
+                            <ActiveIngredientsList activeIngredients={product.active_ingredients || []} />
                         </div>
 
                         {/* AdSense Ad */}

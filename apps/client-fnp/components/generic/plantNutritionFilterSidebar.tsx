@@ -11,7 +11,7 @@ import { Filter, X, Search } from "lucide-react"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { useQuery } from "@tanstack/react-query"
 import { useState, useMemo } from "react"
-import { queryAnimalHealthFilterAggregates } from "@/lib/query"
+import { queryPlantNutritionFilterAggregates } from "@/lib/query"
 import { sendGTMEvent } from "@next/third-parties/google"
 
 interface FilterItem {
@@ -20,11 +20,11 @@ interface FilterItem {
   count: number
 }
 
-interface AnimalHealthFilterAggregates {
-  brands: FilterItem[]
-  targets: FilterItem[]
-  active_ingredients: FilterItem[]
+interface PlantNutritionFilterAggregates {
   used_on: FilterItem[]
+  brands: FilterItem[]
+  categories: FilterItem[]
+  active_ingredients: FilterItem[]
 }
 
 function SearchableCheckboxList({
@@ -82,7 +82,6 @@ function SearchableCheckboxList({
             const displayName = item.name || item._id
             const value = item._id
             const isChecked = selectedItems.includes(value)
-
             return (
               <div className="flex items-start space-x-2" key={item._id}>
                 <Checkbox
@@ -107,65 +106,52 @@ function SearchableCheckboxList({
   )
 }
 
-function FilterContent({
-  onClearAll,
-}: {
-  onClearAll: () => void
-}) {
+function FilterContent({ onClearAll }: { onClearAll: () => void }) {
   const [queryState, setQueryState] = useQueryStates({
     brand: parseAsArrayOf(parseAsString),
-    target: parseAsArrayOf(parseAsString),
+    category: parseAsArrayOf(parseAsString),
     active_ingredient: parseAsArrayOf(parseAsString),
     used_on: parseAsString,
   })
 
   const { data: aggregateData, isLoading: isLoadingAggregates } = useQuery({
-    queryKey: ["animal-health-filter-aggregates"],
+    queryKey: ["plant-nutrition-filter-aggregates"],
     queryFn: async () => {
-      const response = await queryAnimalHealthFilterAggregates()
-      return response.data as AnimalHealthFilterAggregates
+      const response = await queryPlantNutritionFilterAggregates()
+      return response.data as PlantNutritionFilterAggregates
     },
   })
 
-  const brandItems = useMemo(() => aggregateData?.brands || [], [aggregateData])
-  const targetItems = useMemo(() => aggregateData?.targets || [], [aggregateData])
-  const activeIngredientItems = useMemo(() => aggregateData?.active_ingredients || [], [aggregateData])
   const usedOnItems = useMemo(() => aggregateData?.used_on || [], [aggregateData])
+  const brandItems = useMemo(() => aggregateData?.brands || [], [aggregateData])
+  const categoryItems = useMemo(() => aggregateData?.categories || [], [aggregateData])
+  const activeIngredientItems = useMemo(() => aggregateData?.active_ingredients || [], [aggregateData])
 
   const handleToggle = (filterKey: string, value: string) => {
     if (filterKey === 'used_on') {
       const isDeselecting = queryState.used_on === value
-      sendGTMEvent({ event: 'filter', value: `${isDeselecting ? 'Remove' : 'Add'}UsedOnFilter` })
-      setQueryState({ used_on: isDeselecting ? null : value })
+      sendGTMEvent({ event: 'filter', value: `${isDeselecting ? 'Remove' : 'Add'}PlantNutritionUsedOnFilter` })
+      setQueryState({ used_on: isDeselecting ? null : value } as any)
       return
     }
-    const currentValues = queryState[filterKey as keyof typeof queryState] as string[] | null || []
+    const currentValues = (queryState as any)[filterKey] || []
     const isAdding = !currentValues.includes(value)
     const newValues = isAdding
       ? [...currentValues, value]
-      : currentValues.filter(v => v !== value)
+      : currentValues.filter((v: string) => v !== value)
 
-    const filterTypeMap: Record<string, string> = {
-      'target': 'Target',
-      'active_ingredient': 'ActiveIngredient',
-      'brand': 'Brand'
-    }
-    const filterType = filterTypeMap[filterKey] || filterKey
-    const action = isAdding ? 'Add' : 'Remove'
-    sendGTMEvent({ event: 'filter', value: `${action}${filterType}Filter` })
+    sendGTMEvent({ event: 'filter', value: `${isAdding ? 'Add' : 'Remove'}PlantNutrition${filterKey.charAt(0).toUpperCase() + filterKey.slice(1)}Filter` })
 
-    setQueryState({
-      [filterKey]: newValues.length > 0 ? newValues : null
-    })
+    setQueryState({ [filterKey]: newValues.length > 0 ? newValues : null } as any)
   }
 
-  const totalFilters = (queryState.used_on ? 1 : 0) + (queryState.brand?.length || 0) + (queryState.target?.length || 0) + (queryState.active_ingredient?.length || 0)
+  const totalFilters = (queryState.used_on ? 1 : 0) + (queryState.brand?.length || 0) + (queryState.category?.length || 0) + (queryState.active_ingredient?.length || 0)
 
   const filterSections = [
     { name: "Used On", key: "used_on", items: usedOnItems, isLoading: isLoadingAggregates },
-    { name: "Targets", key: "target", items: targetItems, isLoading: isLoadingAggregates },
-    { name: "Active Ingredients", key: "active_ingredient", items: activeIngredientItems, isLoading: isLoadingAggregates },
     { name: "Brands", key: "brand", items: brandItems, isLoading: isLoadingAggregates },
+    { name: "Categories", key: "category", items: categoryItems, isLoading: isLoadingAggregates },
+    { name: "Active Ingredients", key: "active_ingredient", items: activeIngredientItems, isLoading: isLoadingAggregates },
   ]
 
   return (
@@ -182,7 +168,7 @@ function FilterContent({
         </div>
       )}
 
-      <Accordion type="multiple" className="w-full flex-1" defaultValue={["Used On"]}>
+      <Accordion type="multiple" className="w-full flex-1" defaultValue={["Used On", "Brands", "Categories", "Active Ingredients"]}>
         {filterSections.map((section) => {
           const raw = (queryState as any)[section.key]
           const selectedFilters: string[] = Array.isArray(raw) ? raw : (raw ? [raw] : [])
@@ -216,22 +202,17 @@ function FilterContent({
   )
 }
 
-export function AnimalHealthFilterSidebar() {
+export function PlantNutritionFilterSidebar() {
   const isDesktop = useMediaQuery("(min-width: 1024px)")
   const [, setQueryState] = useQueryStates({
+    used_on: parseAsArrayOf(parseAsString),
     brand: parseAsArrayOf(parseAsString),
-    target: parseAsArrayOf(parseAsString),
+    category: parseAsArrayOf(parseAsString),
     active_ingredient: parseAsArrayOf(parseAsString),
-    used_on: parseAsString,
   })
 
   const handleClearAll = () => {
-    setQueryState({
-      brand: null,
-      target: null,
-      active_ingredient: null,
-      used_on: null,
-    })
+    setQueryState({ used_on: null, brand: null, category: null, active_ingredient: null })
   }
 
   if (isDesktop) {
@@ -252,7 +233,7 @@ export function AnimalHealthFilterSidebar() {
       </SheetTrigger>
       <SheetContent side="left" className="w-[300px] sm:w-[400px] overflow-y-auto">
         <SheetHeader className="mb-4">
-          <SheetTitle>Filter Animal Health Products</SheetTitle>
+          <SheetTitle>Filter Plant Nutrition Products</SheetTitle>
         </SheetHeader>
         <FilterContent onClearAll={handleClearAll} />
       </SheetContent>

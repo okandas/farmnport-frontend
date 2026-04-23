@@ -5,7 +5,7 @@ import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
 import { capitalizeFirstLetter } from "@/lib/utilities"
 import { BaseURL } from "@/lib/schemas"
 import { FertilizerApplicationRates } from "@/components/agrochemical/FertilizerApplicationRates"
-import { ActiveIngredientUnitsKey } from "@/components/shared/ActiveIngredientUnitsKey"
+import { ActiveIngredientsList } from "@/components/shared/ActiveIngredientUnitsKey"
 
 interface GuidePageProps {
     params: Promise<{
@@ -225,21 +225,7 @@ export default async function PlantNutritionGuidePage({ params }: GuidePageProps
                         {/* Active Ingredients */}
                         <div>
                             <h2 className="text-lg font-semibold mb-1 text-foreground">Active Ingredients</h2>
-                            {product.active_ingredients && product.active_ingredients.length > 0 ? (
-                                <>
-                                    <ActiveIngredientUnitsKey activeIngredients={product.active_ingredients} />
-                                    <div className="grid grid-cols-2 gap-1.5 mt-3">
-                                        {product.active_ingredients.map((ai: any, idx: number) => (
-                                            <div key={idx} className="flex items-center justify-between px-3 py-2 bg-gradient-to-r from-purple-50/50 to-transparent dark:from-purple-950/30 rounded-lg border border-purple-100 dark:border-purple-900">
-                                                <div className="font-medium capitalize text-sm text-foreground">{ai.name}</div>
-                                                <div className="font-bold text-purple-600 dark:text-purple-400 text-sm ml-2 shrink-0">{ai.dosage_value} {ai.dosage_unit}</div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </>
-                            ) : (
-                                <p className="text-sm text-muted-foreground p-4 bg-muted/30 rounded-lg border">No active ingredient information available.</p>
-                            )}
+                            <ActiveIngredientsList activeIngredients={product.active_ingredients || []} />
                         </div>
 
                         <AdSenseInFeed />

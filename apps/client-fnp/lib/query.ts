@@ -515,13 +515,22 @@ export function queryPlantNutritionCategories() {
   return api.get(`${BaseURL}/plantnutritioncategories/`)
 }
 
-export function queryAllPlantNutritionProducts(pagination?: PaginationModel & { brand?: string[] }) {
+export function queryAllPlantNutritionProducts(pagination?: PaginationModel & { brand?: string[], category?: string[], active_ingredient?: string[], used_on?: string[] }) {
   const params = new URLSearchParams()
   if (pagination?.p !== undefined && pagination.p >= 2) {
     params.set('p', pagination.p.toString())
   }
   if (pagination?.brand && pagination.brand.length > 0) {
     pagination.brand.forEach(b => params.append('brand', b))
+  }
+  if (pagination?.category && pagination.category.length > 0) {
+    pagination.category.forEach(c => params.append('category', c))
+  }
+  if (pagination?.active_ingredient && pagination.active_ingredient.length > 0) {
+    pagination.active_ingredient.forEach(ai => params.append('active_ingredient', ai))
+  }
+  if (pagination?.used_on && pagination.used_on.length > 0) {
+    pagination.used_on.forEach(u => params.append('used_on', u))
   }
   const qs = params.toString()
   return api.get(qs ? `${BaseURL}/plantnutrition/all?${qs}` : `${BaseURL}/plantnutrition/all`)

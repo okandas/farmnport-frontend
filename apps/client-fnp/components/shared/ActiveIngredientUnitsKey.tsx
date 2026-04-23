@@ -16,6 +16,32 @@ interface ActiveIngredientUnitsKeyProps {
     activeIngredients: { dosage_unit: string }[]
 }
 
+interface ActiveIngredient {
+    name: string
+    dosage_value: string | number
+    dosage_unit: string
+}
+
+export function ActiveIngredientsList({ activeIngredients }: { activeIngredients: ActiveIngredient[] }) {
+    if (!activeIngredients || activeIngredients.length === 0) {
+        return <p className="text-sm text-muted-foreground p-4 bg-muted/30 rounded-lg border">No active ingredient information available.</p>
+    }
+
+    return (
+        <>
+            <ActiveIngredientUnitsKey activeIngredients={activeIngredients} />
+            <div className="grid grid-cols-2 gap-1 mt-2">
+                {activeIngredients.map((ai, idx) => (
+                    <div key={idx} className="flex items-center justify-between px-2.5 py-1.5 rounded-md bg-muted/50 border border-border">
+                        <span className="capitalize text-sm text-foreground">{ai.name}</span>
+                        <span className="text-xs font-semibold text-primary ml-2 shrink-0">{ai.dosage_value} {ai.dosage_unit}</span>
+                    </div>
+                ))}
+            </div>
+        </>
+    )
+}
+
 export function ActiveIngredientUnitsKey({ activeIngredients }: ActiveIngredientUnitsKeyProps) {
     const units = Array.from(new Set(activeIngredients.map(ai => ai.dosage_unit))) as string[]
     const knownUnits = units.filter(u => unitLabels[u])
