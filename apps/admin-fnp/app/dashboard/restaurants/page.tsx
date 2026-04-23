@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { useQuery } from "@tanstack/react-query"
 import {
-  Phone, MapPin, Eye, ArrowRight, UtensilsCrossed,
+  Phone, MapPin, ArrowRight, UtensilsCrossed,
   MousePointerClick, Mail, MessageCircle, Navigation,
 } from "lucide-react"
 
@@ -62,22 +62,6 @@ export default function RestaurantsPage() {
       {/* Quick Actions */}
       <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-4 mb-2">
         <Link
-          href="/dashboard/restaurants/all"
-          className="flex items-center gap-3 rounded-lg border bg-card p-3 text-card-foreground shadow-sm hover:bg-accent transition-colors"
-        >
-          <UtensilsCrossed className="h-4 w-4 text-muted-foreground" />
-          <span className="text-sm font-medium flex-1">Restaurants</span>
-          <ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />
-        </Link>
-        <Link
-          href="/dashboard/restaurants/locations"
-          className="flex items-center gap-3 rounded-lg border bg-card p-3 text-card-foreground shadow-sm hover:bg-accent transition-colors"
-        >
-          <MapPin className="h-4 w-4 text-muted-foreground" />
-          <span className="text-sm font-medium flex-1">Locations</span>
-          <ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />
-        </Link>
-        <Link
           href="/dashboard/restaurants/contact-views"
           className="flex items-center gap-3 rounded-lg border bg-card p-3 text-card-foreground shadow-sm hover:bg-accent transition-colors"
         >
@@ -116,17 +100,7 @@ export default function RestaurantsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{contactTotal}</div>
-            <p className="text-xs text-muted-foreground">Across all locations</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Top Locations</CardTitle>
-            <Eye className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <Link href="/dashboard/restaurants/contact-views" className="text-sm text-emerald-600 hover:underline">
+            <Link href="/dashboard/restaurants/contact-views" className="text-xs text-emerald-600 hover:underline">
               View stats →
             </Link>
           </CardContent>

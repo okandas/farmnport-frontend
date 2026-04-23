@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
-import { Phone, Mail, MessageCircle, MapPin, Navigation, MousePointerClick, ArrowLeft, ArrowRight } from "lucide-react"
+import { Phone, Mail, MessageCircle, MapPin, Navigation, MousePointerClick } from "lucide-react"
 
 import { queryMenusContactViewStats, queryMenusContactViewList } from "@/lib/query"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -51,6 +51,43 @@ function formatDate(s: string) {
   return new Date(s).toLocaleString()
 }
 
+function Pagination({ page, pageCount, onPage }: { page: number; pageCount: number; onPage: (p: number) => void }) {
+  if (pageCount <= 1) return null
+
+  const pages: (number | "...")[] = []
+  if (pageCount <= 7) {
+    for (let i = 1; i <= pageCount; i++) pages.push(i)
+  } else {
+    pages.push(1)
+    if (page > 3) pages.push("...")
+    for (let i = Math.max(2, page - 1); i <= Math.min(pageCount - 1, page + 1); i++) pages.push(i)
+    if (page < pageCount - 2) pages.push("...")
+    pages.push(pageCount)
+  }
+
+  return (
+    <div className="flex items-center gap-1 mt-4 justify-center">
+      {pages.map((p, i) =>
+        p === "..." ? (
+          <span key={i} className="px-2 text-sm text-muted-foreground">…</span>
+        ) : (
+          <button
+            key={p}
+            onClick={() => onPage(p as number)}
+            className={`w-8 h-8 rounded text-sm font-medium transition-colors ${
+              p === page
+                ? "bg-primary text-primary-foreground"
+                : "hover:bg-muted text-muted-foreground"
+            }`}
+          >
+            {p}
+          </button>
+        )
+      )}
+    </div>
+  )
+}
+
 export default function ContactViewsPage() {
   const [view, setView] = useState<ViewMode>("stats")
   const [statsPage, setStatsPage] = useState(1)
@@ -71,12 +108,11 @@ export default function ContactViewsPage() {
 
   const statsTotal: number = statsData?.data?.total ?? 0
   const statsRows: StatRow[] = statsData?.data?.data ?? []
-
   const listTotal: number = listData?.data?.total ?? 0
   const listRows: EventRow[] = listData?.data?.data ?? []
 
   const statsPageCount = Math.ceil(statsTotal / 20)
-  const listPageCount = Math.ceil(listTotal / 50)
+  const listPageCount = Math.ceil(listTotal / 10)
 
   return (
     <DashboardShell>
@@ -131,7 +167,7 @@ export default function ContactViewsPage() {
                         <th className="px-4 py-2 font-medium text-right" title="Phone clicks"><MousePointerClick className="h-3.5 w-3.5 inline" /></th>
                         <th className="px-4 py-2 font-medium text-right" title="WhatsApp"><MessageCircle className="h-3.5 w-3.5 inline" /></th>
                         <th className="px-4 py-2 font-medium text-right" title="Email"><Mail className="h-3.5 w-3.5 inline" /></th>
-                        <th className="px-4 py-2 font-medium text-right" title="Address clicks"><MapPin className="h-3.5 w-3.5 inline" /></th>
+                        <th className="px-4 py-2 font-medium text-right" title="Address"><MapPin className="h-3.5 w-3.5 inline" /></th>
                         <th className="px-4 py-2 font-medium text-right" title="Directions"><Navigation className="h-3.5 w-3.5 inline" /></th>
                         <th className="px-4 py-2 font-medium">Last Event</th>
                       </tr>
@@ -159,25 +195,7 @@ export default function ContactViewsPage() {
               )}
             </CardContent>
           </Card>
-          {statsPageCount > 1 && (
-            <div className="flex items-center justify-between mt-4">
-              <button
-                disabled={statsPage <= 1}
-                onClick={() => setStatsPage((p) => p - 1)}
-                className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                <ArrowLeft className="h-4 w-4" /> Prev
-              </button>
-              <span className="text-sm text-muted-foreground">Page {statsPage} of {statsPageCount}</span>
-              <button
-                disabled={statsPage >= statsPageCount}
-                onClick={() => setStatsPage((p) => p + 1)}
-                className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                Next <ArrowRight className="h-4 w-4" />
-              </button>
-            </div>
-          )}
+          <Pagination page={statsPage} pageCount={statsPageCount} onPage={setStatsPage} />
         </>
       )}
 
@@ -228,25 +246,7 @@ export default function ContactViewsPage() {
               )}
             </CardContent>
           </Card>
-          {listPageCount > 1 && (
-            <div className="flex items-center justify-between mt-4">
-              <button
-                disabled={listPage <= 1}
-                onClick={() => setListPage((p) => p - 1)}
-                className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                <ArrowLeft className="h-4 w-4" /> Prev
-              </button>
-              <span className="text-sm text-muted-foreground">Page {listPage} of {listPageCount}</span>
-              <button
-                disabled={listPage >= listPageCount}
-                onClick={() => setListPage((p) => p + 1)}
-                className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                Next <ArrowRight className="h-4 w-4" />
-              </button>
-            </div>
-          )}
+          <Pagination page={listPage} pageCount={listPageCount} onPage={setListPage} />
         </>
       )}
     </DashboardShell>
