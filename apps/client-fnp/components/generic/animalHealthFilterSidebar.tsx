@@ -182,7 +182,7 @@ function FilterContent({
         </div>
       )}
 
-      <Accordion type="multiple" className="w-full flex-1" defaultValue={["Used On", "Targets", "Active Ingredients", "Brands"]}>
+      <Accordion type="multiple" className="w-full flex-1" defaultValue={["Used On"]}>
         {filterSections.map((section) => {
           const raw = (queryState as any)[section.key]
           const selectedFilters: string[] = Array.isArray(raw) ? raw : (raw ? [raw] : [])
