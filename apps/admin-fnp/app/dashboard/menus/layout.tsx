@@ -1,17 +1,16 @@
 import Link from "next/link"
-import { dashboardConfig } from "@/config/dashboard"
+import { menusDashboardConfig } from "@/config/menus-dashboard"
 import { AccountNavigation } from "@/components/navigation/account"
-import { NotificationBell } from "@/components/notifications/notification-bell"
 import { SidebarNavigation } from "@/components/navigation/sidebar"
 import { ScrollArea } from "@/components/ui/scroll-area"
 
-interface DashboardLayoutProps {
+interface MenusDashboardLayoutProps {
   children?: React.ReactNode
 }
 
-export default async function DashboardLayout({
+export default async function MenusDashboardLayout({
   children,
-}: DashboardLayoutProps) {
+}: MenusDashboardLayoutProps) {
   return (
     <div className="flex flex-col min-h-screen">
       <header className="sticky top-0 z-40 border-b shadow-sm bg-background">
@@ -19,17 +18,14 @@ export default async function DashboardLayout({
           <Link href="/dashboard" className="text-sm font-medium hover:text-muted-foreground transition-colors">
             Manage Apps
           </Link>
-          <div className="flex items-center gap-2">
-            <NotificationBell />
-            <AccountNavigation />
-          </div>
+          <AccountNavigation />
         </div>
       </header>
       <div className="max-w-full flex flex-1 px-8">
         <aside className="fixed top-16 hidden h-[calc(100vh-4rem)] w-[220px] flex-col border-r md:flex">
           <ScrollArea className="flex-1 px-4 py-4">
             <SidebarNavigation
-              navigationGroups={dashboardConfig.sidebarNavigation}
+              navigationGroups={menusDashboardConfig.sidebarNavigation}
             />
           </ScrollArea>
         </aside>

@@ -1,19 +1,25 @@
 import { DashboardConfig } from "@/types"
 
-export const restaurantsDashboardConfig: DashboardConfig = {
+export const menusDashboardConfig: DashboardConfig = {
   mainNavigation: [],
   sidebarNavigation: [
     {
       label: "Overview",
       items: [
         {
-          title: "Overview",
-          href: "/dashboard/restaurants",
+          title: "Dashboard",
+          href: "/dashboard/menus",
           icon: "dashboard",
         },
+      ],
+    },
+    {
+      label: "Restaurants",
+      alwaysOpen: true,
+      items: [
         {
           title: "Restaurants",
-          href: "/dashboard/restaurants/all",
+          href: "/dashboard/restaurants",
           icon: "utensilsCrossed",
         },
         {
@@ -60,39 +66,13 @@ export const restaurantsDashboardConfig: DashboardConfig = {
       ],
     },
     {
-      label: "Subscriptions",
+      label: "Analytics",
       alwaysOpen: true,
       items: [
         {
-          title: "Plans",
-          href: "/dashboard/restaurants/subscription-plans",
-          icon: "billing",
-        },
-        {
-          title: "Subscriptions",
-          href: "/dashboard/restaurants/subscriptions",
-          icon: "layers",
-        },
-        {
-          title: "Invoices",
-          href: "/dashboard/restaurants/invoices",
-          icon: "billing",
-        },
-      ],
-    },
-    {
-      label: "Sales",
-      alwaysOpen: true,
-      items: [
-        {
-          title: "Overview",
-          href: "/dashboard/restaurants/sales",
-          icon: "barChart",
-        },
-        {
-          title: "Orders",
-          href: "/dashboard/restaurants/sales/orders",
-          icon: "shoppingCart",
+          title: "Contact Interactions",
+          href: "/dashboard/menus/contact-views",
+          icon: "eye",
         },
       ],
     },
