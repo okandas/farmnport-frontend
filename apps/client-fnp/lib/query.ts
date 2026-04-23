@@ -509,3 +509,36 @@ export function queryCdmPricesByClient(clientId: string, pagination?: Pagination
 
   return api.get(url)
 }
+
+// Plant Nutrition
+export function queryPlantNutritionCategories() {
+  return api.get(`${BaseURL}/plantnutritioncategories/`)
+}
+
+export function queryAllPlantNutritionProducts(pagination?: PaginationModel & { brand?: string[] }) {
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) {
+    params.set('p', pagination.p.toString())
+  }
+  if (pagination?.brand && pagination.brand.length > 0) {
+    pagination.brand.forEach(b => params.append('brand', b))
+  }
+  const qs = params.toString()
+  return api.get(qs ? `${BaseURL}/plantnutrition/all?${qs}` : `${BaseURL}/plantnutrition/all`)
+}
+
+export function queryPlantNutritionProductsByCategory(options: { category: string } & PaginationModel & { brand?: string[] }) {
+  const params = new URLSearchParams()
+  if (options.p !== undefined && options.p >= 2) {
+    params.set('p', options.p.toString())
+  }
+  if (options.brand && options.brand.length > 0) {
+    options.brand.forEach(b => params.append('brand', b))
+  }
+  const qs = params.toString()
+  return api.get(qs ? `${BaseURL}/plantnutrition/category/${options.category}?${qs}` : `${BaseURL}/plantnutrition/category/${options.category}`)
+}
+
+export function queryPlantNutritionFilterAggregates() {
+  return api.get(`${BaseURL}/plantnutrition/aggregates/filters`)
+}
