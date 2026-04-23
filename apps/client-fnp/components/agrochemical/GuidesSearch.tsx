@@ -12,9 +12,9 @@ export function GuidesSearch() {
 
     const handleSearch = () => {
         if (query.trim().length >= 2) {
-            router.push(`/agrochemical-guides/all?search=${encodeURIComponent(query.trim())}`)
+            router.push(`/agrochemical-guides?search=${encodeURIComponent(query.trim())}`)
         } else {
-            router.push("/agrochemical-guides/all")
+            router.push("/agrochemical-guides")
         }
     }
 

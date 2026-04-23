@@ -10,17 +10,6 @@ export function GuidesHeroActions() {
         <div className="flex flex-wrap items-center justify-center gap-3">
             <Button
                 size="lg"
-                asChild
-                onClick={() => sendGTMEvent({ event: "click", value: "ReadGuides" })}
-                className="text-base px-6 py-5 h-auto font-semibold shadow-lg hover:shadow-xl transition-all group"
-            >
-                <Link href="/agrochemical-guides/all" className="flex items-center gap-2">
-                    <Search className="h-5 w-5" />
-                    Browse All Products
-                </Link>
-            </Button>
-            <Button
-                size="lg"
                 variant="outline"
                 asChild
                 className="text-base px-6 py-5 h-auto font-semibold transition-all group"
