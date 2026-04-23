@@ -29,6 +29,17 @@ export const restaurantsDashboardConfig: DashboardConfig = {
       ],
     },
     {
+      label: "Analytics",
+      alwaysOpen: true,
+      items: [
+        {
+          title: "Contact Interactions",
+          href: "/dashboard/restaurants/contact-views",
+          icon: "eye",
+        },
+      ],
+    },
+    {
       label: "Menu Catalog",
       alwaysOpen: true,
       items: [
@@ -93,17 +104,6 @@ export const restaurantsDashboardConfig: DashboardConfig = {
           title: "Orders",
           href: "/dashboard/restaurants/sales/orders",
           icon: "shoppingCart",
-        },
-      ],
-    },
-    {
-      label: "Analytics",
-      alwaysOpen: true,
-      items: [
-        {
-          title: "Contact Interactions",
-          href: "/dashboard/restaurants/contact-views",
-          icon: "eye",
         },
       ],
     },
