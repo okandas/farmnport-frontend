@@ -7,9 +7,14 @@ export const restaurantsDashboardConfig: DashboardConfig = {
       label: "Overview",
       items: [
         {
-          title: "Restaurants",
+          title: "Overview",
           href: "/dashboard/restaurants",
           icon: "dashboard",
+        },
+        {
+          title: "Restaurants",
+          href: "/dashboard/restaurants/all",
+          icon: "utensilsCrossed",
         },
         {
           title: "Locations",
@@ -20,6 +25,17 @@ export const restaurantsDashboardConfig: DashboardConfig = {
           title: "Cuisine Categories",
           href: "/dashboard/restaurants/cuisine-categories",
           icon: "tag",
+        },
+      ],
+    },
+    {
+      label: "Analytics",
+      alwaysOpen: true,
+      items: [
+        {
+          title: "Contact Interactions",
+          href: "/dashboard/restaurants/contact-views",
+          icon: "eye",
         },
       ],
     },

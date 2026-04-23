@@ -37,7 +37,7 @@ export default async function PlantNutritionGuidePage({ params }: GuidePageProps
                         We couldn&apos;t find the plant nutrition guide you&apos;re looking for. It may have been removed or the link might be incorrect.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                        <Link href="/plant-nutrition-guides/all">
+                        <Link href="/plant-nutrition-guides">
                             <button className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
                                 Browse All Guides
                             </button>
@@ -92,7 +92,7 @@ export default async function PlantNutritionGuidePage({ params }: GuidePageProps
                     <nav className="flex text-sm text-muted-foreground">
                         <Link href="/" className="hover:text-foreground">Home</Link>
                         <span className="mx-2">/</span>
-                        <Link href="/plant-nutrition-guides/all" className="hover:text-foreground">Guides</Link>
+                        <Link href="/plant-nutrition-guides" className="hover:text-foreground">Guides</Link>
                         <span className="mx-2">/</span>
                         <Link href={`/plant-nutrition-guides/${categorySlug}`} className="hover:text-foreground capitalize">{product.plant_nutrition_category?.name || category}</Link>
                         <span className="mx-2">/</span>

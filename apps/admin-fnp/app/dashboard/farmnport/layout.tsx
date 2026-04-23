@@ -17,7 +17,7 @@ export default async function DashboardLayout({
       <header className="sticky top-0 z-40 border-b shadow-sm bg-background">
         <div className="container flex items-center justify-between h-16 py-4">
           <Link href="/dashboard" className="text-sm font-medium hover:text-muted-foreground transition-colors">
-            farmnport
+            Manage Apps
           </Link>
           <div className="flex items-center gap-2">
             <NotificationBell />

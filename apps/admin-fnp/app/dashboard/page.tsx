@@ -18,7 +18,7 @@ export default function AppSelectorPage() {
             href="/dashboard/farmnport"
             className="rounded-lg border bg-card p-6 text-card-foreground shadow-sm hover:bg-accent transition-colors"
           >
-            <h2 className="text-lg font-semibold">farmnport</h2>
+            <h2 className="text-lg font-semibold">Farmnport</h2>
             <p className="text-sm text-muted-foreground">
               Manage products, users, prices, and programs
             </p>
@@ -28,9 +28,9 @@ export default function AppSelectorPage() {
             href="/dashboard/restaurants"
             className="rounded-lg border bg-card p-6 text-card-foreground shadow-sm hover:bg-accent transition-colors"
           >
-            <h2 className="text-lg font-semibold">restaurants</h2>
+            <h2 className="text-lg font-semibold">Restaurants</h2>
             <p className="text-sm text-muted-foreground">
-              Manage restaurant listings and locations
+              Manage restaurant listings, locations, subscriptions, and sales
             </p>
           </Link>
         </div>

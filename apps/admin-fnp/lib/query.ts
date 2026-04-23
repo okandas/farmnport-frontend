@@ -1522,3 +1522,20 @@ export function queryRestaurantInvoices(params?: { subscription_id?: string; res
 export function queryRestaurantInvoice(id: string) {
   return api.get(`${baseUrl}/restaurant-invoices/get/${id}`)
 }
+
+// Menus Contact Views
+export function queryMenusContactViewStats(p?: number) {
+  const params = new URLSearchParams()
+  if (p !== undefined && p >= 2) params.set("p", String(p))
+  const qs = params.toString()
+  return api.get(`${baseUrl}/menus-contact-views/stats${qs ? `?${qs}` : ""}`)
+}
+
+export function queryMenusContactViewList(params?: { p?: number; location_id?: string; type?: string }) {
+  const query = new URLSearchParams()
+  if (params?.p !== undefined && params.p >= 2) query.set("p", String(params.p))
+  if (params?.location_id) query.set("location_id", params.location_id)
+  if (params?.type) query.set("type", params.type)
+  const qs = query.toString()
+  return api.get(`${baseUrl}/menus-contact-views/list${qs ? `?${qs}` : ""}`)
+}
