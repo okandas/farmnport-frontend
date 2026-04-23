@@ -78,7 +78,7 @@ export default function RestaurantsPage() {
           <ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />
         </Link>
         <Link
-          href="/dashboard/menus/contact-views"
+          href="/dashboard/restaurants/contact-views"
           className="flex items-center gap-3 rounded-lg border bg-card p-3 text-card-foreground shadow-sm hover:bg-accent transition-colors"
         >
           <Phone className="h-4 w-4 text-muted-foreground" />
@@ -126,7 +126,7 @@ export default function RestaurantsPage() {
             <Eye className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <Link href="/dashboard/menus/contact-views" className="text-sm text-emerald-600 hover:underline">
+            <Link href="/dashboard/restaurants/contact-views" className="text-sm text-emerald-600 hover:underline">
               View stats →
             </Link>
           </CardContent>
@@ -138,7 +138,7 @@ export default function RestaurantsPage() {
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-base">Contact Interactions</CardTitle>
           <Link
-            href="/dashboard/menus/contact-views"
+            href="/dashboard/restaurants/contact-views"
             className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
             View all <ArrowRight className="h-3.5 w-3.5" />

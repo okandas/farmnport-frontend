@@ -96,5 +96,16 @@ export const restaurantsDashboardConfig: DashboardConfig = {
         },
       ],
     },
+    {
+      label: "Analytics",
+      alwaysOpen: true,
+      items: [
+        {
+          title: "Contact Interactions",
+          href: "/dashboard/restaurants/contact-views",
+          icon: "eye",
+        },
+      ],
+    },
   ],
 }
