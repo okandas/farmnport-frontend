@@ -96,7 +96,7 @@ export function AnimalHealthCategoryClient({ category, categoryName, initialProd
                         <div className="text-center py-12">
                             <Beaker className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
                             <p className="text-muted-foreground mb-4">No {typeof categoryName === 'string' ? categoryName.toLowerCase() : ''} products found matching your filters.</p>
-                            <Link href="/animal-health-guides/all">
+                            <Link href="/animal-health-guides">
                                 <Button variant="outline">View All Animal Health Products</Button>
                             </Link>
                         </div>

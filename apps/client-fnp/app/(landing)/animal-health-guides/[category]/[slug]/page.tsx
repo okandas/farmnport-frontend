@@ -44,7 +44,7 @@ export default async function AnimalHealthGuidePage({ params }: GuidePageProps) 
                         We couldn&apos;t find the animal health product guide you&apos;re looking for. It may have been removed or the link might be incorrect.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                        <Link href="/animal-health-guides/all">
+                        <Link href="/animal-health-guides">
                             <button className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
                                 Browse All Guides
                             </button>
@@ -218,7 +218,7 @@ export default async function AnimalHealthGuidePage({ params }: GuidePageProps) 
                     <nav className="flex text-sm text-muted-foreground">
                         <Link href="/" className="hover:text-foreground">Home</Link>
                         <span className="mx-2">/</span>
-                        <Link href="/animal-health-guides/all" className="hover:text-foreground">Guides</Link>
+                        <Link href="/animal-health-guides" className="hover:text-foreground">Guides</Link>
                         <span className="mx-2">/</span>
                         <Link href={`/animal-health-guides/${category}`} className="hover:text-foreground capitalize">{product.animal_health_category?.name || category}</Link>
                         <span className="mx-2">/</span>

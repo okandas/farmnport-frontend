@@ -82,7 +82,7 @@ export function AgroCategoryClient({ category, categoryName, initialChemicals, i
                     <div className="text-center py-12">
                         <Beaker className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
                         <p className="text-muted-foreground mb-4">No {categoryName.toLowerCase()} found matching your filters.</p>
-                        <Link href="/agrochemical-guides/all">
+                        <Link href="/agrochemical-guides">
                             <Button variant="outline">View All Agrochemicals</Button>
                         </Link>
                     </div>
