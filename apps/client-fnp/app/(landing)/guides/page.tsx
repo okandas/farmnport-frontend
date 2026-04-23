@@ -1,69 +1,28 @@
 import Link from "next/link"
-import {
-    Pill, Bug, Droplet, Rat, TrendingUp, Beaker, Shell, Shield,
-    ArrowRight, FlaskConical, Syringe, Heart, Scissors, Cross, Zap, Baby
-} from "lucide-react"
-import { BaseURL } from "@/lib/schemas"
+import { FlaskConical, Heart, Leaf } from "lucide-react"
 
-const fetchOptions: RequestInit = process.env.NODE_ENV === "production"
-    ? { next: { revalidate: 3600 } } as RequestInit
-    : { cache: "no-store" }
+const sections = [
+    {
+        title: "Agrochemical Guides",
+        description: "Pesticides, herbicides, and fungicides — active ingredients, targets, and usage by category.",
+        href: "/agrochemical-guides",
+        Icon: FlaskConical,
+    },
+    {
+        title: "Animal Health Guides",
+        description: "Vaccines, antibiotics, and supplements — dosage rates, withdrawal periods, and active ingredients for poultry and livestock.",
+        href: "/animal-health-guides",
+        Icon: Heart,
+    },
+    {
+        title: "Plant Nutrition Guides",
+        description: "Fertilizers, foliar feeds, biostimulants, and plant growth regulators — active ingredients and application rates.",
+        href: "/plant-nutrition-guides",
+        Icon: Leaf,
+    },
+]
 
-const agroIcons: Record<string, any> = {
-    "insecticides": Bug,
-    "fungicides": Shield,
-    "herbicides": Droplet,
-    "acaricides": Bug,
-    "nematicides": Droplet,
-    "rodenticides": Rat,
-    "plant-growth-regulators": TrendingUp,
-    "adjuvants": Beaker,
-    "molluscicides": Shell,
-    "bactericides": Pill,
-}
-
-const animalHealthIcons: Record<string, any> = {
-    "vaccines": Syringe,
-    "antibiotics": Pill,
-    "nutrition-supplements": Heart,
-    "anti-protozoa": Shield,
-    "biosecurity-disinfectants": Shield,
-    "tick-flea-control": Bug,
-    "worm-fluke-control": Scissors,
-    "wound-remedies": Cross,
-    "fly-control": Zap,
-    "stud-management": Baby,
-    "equipment": Beaker,
-}
-
-async function getAgroCategories() {
-    try {
-        const res = await fetch(`${BaseURL}/agrochemicalcategories/`, fetchOptions)
-        if (!res.ok) return []
-        const data = await res.json()
-        return data?.data || []
-    } catch {
-        return []
-    }
-}
-
-async function getAnimalHealthCategories() {
-    try {
-        const res = await fetch(`${BaseURL}/animalhealthcategories/`, fetchOptions)
-        if (!res.ok) return []
-        const data = await res.json()
-        return data?.data || []
-    } catch {
-        return []
-    }
-}
-
-export default async function GuidesPage() {
-    const [agroCategories, animalHealthCategories] = await Promise.all([
-        getAgroCategories(),
-        getAnimalHealthCategories(),
-    ])
-
+export default function GuidesPage() {
     return (
         <main className="bg-gradient-to-b from-background to-muted/20">
             {/* Hero */}
@@ -76,115 +35,40 @@ export default async function GuidesPage() {
                             Your Farming Knowledge Hub
                         </div>
                         <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl font-heading mb-3">
-                            Agrochemical &{" "}
-                            <span className="text-primary">Animal Health Guides</span>
+                            Farming{" "}
+                            <span className="text-primary">Guides</span>
                         </h1>
                         <p className="text-lg text-muted-foreground leading-7 max-w-2xl mx-auto">
-                            Dosage rates, active ingredients, and application guidelines for crop protection and livestock health — all in one place.
+                            Dosage rates, active ingredients, and application guidelines for crop protection, plant nutrition, and livestock health — all in one place.
                         </p>
                     </div>
                 </div>
             </section>
 
-            {/* Agrochemical Categories */}
-            <section className="py-6 lg:py-8 bg-muted/30">
-                <div className="mx-auto max-w-7xl px-6 lg:px-8">
-                    <div className="flex items-end justify-between mb-5">
-                        <div>
-                            <h2 className="text-3xl font-bold tracking-tight font-heading">
-                                Agrochemical Guides
-                            </h2>
-                            <p className="text-muted-foreground mt-2 max-w-lg">
-                                Pesticides, herbicides, and fungicides — active ingredients, targets, and usage by category.
-                            </p>
-                        </div>
-                        <Link
-                            href="/agrochemical-guides"
-                            className="hidden sm:flex items-center gap-1 text-sm font-medium text-primary hover:underline"
-                        >
-                            View All Agrochemical Products
-                            <ArrowRight className="h-4 w-4" />
-                        </Link>
+            {/* Guide Sections */}
+            <section className="py-10 lg:py-14">
+                <div className="mx-auto max-w-4xl px-6 lg:px-8">
+                    <div className="grid gap-6 sm:grid-cols-3">
+                        {sections.map(({ title, description, href, Icon }) => (
+                            <Link
+                                key={href}
+                                href={href}
+                                className="flex flex-col gap-4 p-6 rounded-xl bg-card border border-border hover:border-primary hover:shadow-md transition-all group"
+                            >
+                                <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                                    <Icon className="w-6 h-6 text-primary" strokeWidth={2} />
+                                </div>
+                                <div>
+                                    <h2 className="text-base font-semibold text-foreground group-hover:text-primary transition-colors mb-1">
+                                        {title}
+                                    </h2>
+                                    <p className="text-sm text-muted-foreground leading-relaxed">
+                                        {description}
+                                    </p>
+                                </div>
+                            </Link>
+                        ))}
                     </div>
-
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                        {agroCategories.map((category: any) => {
-                            const Icon = agroIcons[category.slug] || Pill
-                            return (
-                                <Link
-                                    key={category.slug}
-                                    href={`/agrochemical-guides/${category.slug}`}
-                                    className="flex flex-col items-center gap-3 p-6 rounded-xl bg-card border border-border hover:border-primary hover:shadow-md transition-all group"
-                                >
-                                    <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                                        <Icon className="w-6 h-6 text-primary" strokeWidth={2} />
-                                    </div>
-                                    <span className="text-sm font-medium text-center text-foreground group-hover:text-primary transition-colors">
-                                        {category.name}
-                                    </span>
-                                </Link>
-                            )
-                        })}
-                    </div>
-
-                    <Link
-                        href="/agrochemical-guides"
-                        className="sm:hidden flex items-center justify-center gap-1 text-sm font-medium text-primary hover:underline mt-6"
-                    >
-                        View All Agrochemical Products
-                        <ArrowRight className="h-4 w-4" />
-                    </Link>
-                </div>
-            </section>
-
-            {/* Animal Health Categories */}
-            <section className="py-6 lg:py-8">
-                <div className="mx-auto max-w-7xl px-6 lg:px-8">
-                    <div className="flex items-end justify-between mb-5">
-                        <div>
-                            <h2 className="text-3xl font-bold tracking-tight font-heading">
-                                Animal Health Guides
-                            </h2>
-                            <p className="text-muted-foreground mt-2 max-w-lg">
-                                Vaccines, antibiotics, and supplements — dosage rates, withdrawal periods, and active ingredients for poultry and livestock.
-                            </p>
-                        </div>
-                        <Link
-                            href="/animal-health-guides"
-                            className="hidden sm:flex items-center gap-1 text-sm font-medium text-primary hover:underline"
-                        >
-                            View All Animal Health Products
-                            <ArrowRight className="h-4 w-4" />
-                        </Link>
-                    </div>
-
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                        {animalHealthCategories.map((category: any) => {
-                            const Icon = animalHealthIcons[category.slug] || Pill
-                            return (
-                                <Link
-                                    key={category.slug}
-                                    href={`/animal-health-guides/${category.slug}`}
-                                    className="flex flex-col items-center gap-3 p-5 rounded-xl bg-card border border-border hover:border-primary hover:bg-accent transition-all group"
-                                >
-                                    <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                                        <Icon className="w-5 h-5 text-primary" strokeWidth={2} />
-                                    </div>
-                                    <span className="text-sm font-medium text-center text-foreground group-hover:text-primary transition-colors">
-                                        {category.name}
-                                    </span>
-                                </Link>
-                            )
-                        })}
-                    </div>
-
-                    <Link
-                        href="/animal-health-guides"
-                        className="sm:hidden flex items-center justify-center gap-1 text-sm font-medium text-primary hover:underline mt-6"
-                    >
-                        View All Animal Health Products
-                        <ArrowRight className="h-4 w-4" />
-                    </Link>
                 </div>
             </section>
         </main>
