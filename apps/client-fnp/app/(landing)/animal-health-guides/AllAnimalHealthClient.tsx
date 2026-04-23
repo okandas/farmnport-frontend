@@ -18,7 +18,7 @@ export function AllAnimalHealthClient({ initialProducts, initialTotal }: AllAnim
         brand: parseAsArrayOf(parseAsString),
         target: parseAsArrayOf(parseAsString),
         active_ingredient: parseAsArrayOf(parseAsString),
-        used_on: parseAsArrayOf(parseAsString),
+        used_on: parseAsString,
         p: parseAsInteger.withDefault(1),
     })
 
@@ -26,7 +26,7 @@ export function AllAnimalHealthClient({ initialProducts, initialTotal }: AllAnim
         (queryState.brand && queryState.brand.length > 0) ||
         (queryState.target && queryState.target.length > 0) ||
         (queryState.active_ingredient && queryState.active_ingredient.length > 0) ||
-        (queryState.used_on && queryState.used_on.length > 0) ||
+        !!queryState.used_on ||
         queryState.p > 1
 
     const { data: productsData, isLoading: productsLoading } = useQuery({
@@ -36,7 +36,7 @@ export function AllAnimalHealthClient({ initialProducts, initialTotal }: AllAnim
             brand: queryState.brand || [],
             target: queryState.target || [],
             active_ingredient: queryState.active_ingredient || [],
-            used_on: queryState.used_on || [],
+            used_on: queryState.used_on ? [queryState.used_on] : [],
         }),
         refetchOnWindowFocus: false,
         placeholderData: !hasFilters ? { data: { data: initialProducts, total: initialTotal } } as any : undefined,

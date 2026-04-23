@@ -19,7 +19,7 @@ export function AllAgroChemicalsClient({ initialChemicals, initialTotal }: AllAg
         brand: parseAsArrayOf(parseAsString),
         target: parseAsArrayOf(parseAsString),
         active_ingredient: parseAsArrayOf(parseAsString),
-        used_on: parseAsArrayOf(parseAsString),
+        used_on: parseAsString,
         p: parseAsInteger.withDefault(1),
     })
 
@@ -27,7 +27,7 @@ export function AllAgroChemicalsClient({ initialChemicals, initialTotal }: AllAg
         (queryState.brand && queryState.brand.length > 0) ||
         (queryState.target && queryState.target.length > 0) ||
         (queryState.active_ingredient && queryState.active_ingredient.length > 0) ||
-        (queryState.used_on && queryState.used_on.length > 0) ||
+        !!queryState.used_on ||
         queryState.p > 1
 
     const { data: chemicalsData, isLoading: chemicalsLoading } = useQuery({
@@ -38,7 +38,7 @@ export function AllAgroChemicalsClient({ initialChemicals, initialTotal }: AllAg
             brand: queryState.brand || [],
             target: queryState.target || [],
             active_ingredient: queryState.active_ingredient || [],
-            used_on: queryState.used_on || [],
+            used_on: queryState.used_on ? [queryState.used_on] : [],
         }),
         refetchOnWindowFocus: false,
         placeholderData: !hasFilters ? { data: { data: initialChemicals, total: initialTotal } } as any : undefined,

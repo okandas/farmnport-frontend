@@ -111,7 +111,7 @@ function FilterContent({ onClearAll }: { onClearAll: () => void }) {
     brand: parseAsArrayOf(parseAsString),
     category: parseAsArrayOf(parseAsString),
     active_ingredient: parseAsArrayOf(parseAsString),
-    used_on: parseAsArrayOf(parseAsString),
+    used_on: parseAsString,
   })
 
   const { data: aggregateData, isLoading: isLoadingAggregates } = useQuery({
@@ -128,6 +128,12 @@ function FilterContent({ onClearAll }: { onClearAll: () => void }) {
   const activeIngredientItems = useMemo(() => aggregateData?.active_ingredients || [], [aggregateData])
 
   const handleToggle = (filterKey: string, value: string) => {
+    if (filterKey === 'used_on') {
+      const isDeselecting = queryState.used_on === value
+      sendGTMEvent({ event: 'filter', value: `${isDeselecting ? 'Remove' : 'Add'}PlantNutritionUsedOnFilter` })
+      setQueryState({ used_on: isDeselecting ? null : value } as any)
+      return
+    }
     const currentValues = (queryState as any)[filterKey] || []
     const isAdding = !currentValues.includes(value)
     const newValues = isAdding
@@ -139,7 +145,7 @@ function FilterContent({ onClearAll }: { onClearAll: () => void }) {
     setQueryState({ [filterKey]: newValues.length > 0 ? newValues : null } as any)
   }
 
-  const totalFilters = (queryState.used_on?.length || 0) + (queryState.brand?.length || 0) + (queryState.category?.length || 0) + (queryState.active_ingredient?.length || 0)
+  const totalFilters = (queryState.used_on ? 1 : 0) + (queryState.brand?.length || 0) + (queryState.category?.length || 0) + (queryState.active_ingredient?.length || 0)
 
   const filterSections = [
     { name: "Used On", key: "used_on", items: usedOnItems, isLoading: isLoadingAggregates },
@@ -164,7 +170,8 @@ function FilterContent({ onClearAll }: { onClearAll: () => void }) {
 
       <Accordion type="multiple" className="w-full flex-1" defaultValue={["Used On", "Brands", "Categories", "Active Ingredients"]}>
         {filterSections.map((section) => {
-          const selectedFilters = (queryState as any)[section.key] || []
+          const raw = (queryState as any)[section.key]
+          const selectedFilters: string[] = Array.isArray(raw) ? raw : (raw ? [raw] : [])
           return (
             <AccordionItem value={section.name} key={section.key}>
               <AccordionTrigger>
@@ -210,7 +217,7 @@ export function PlantNutritionFilterSidebar() {
 
   if (isDesktop) {
     return (
-      <div className="sticky top-20 mt-[20px] max-h-[calc(100vh-5rem)] overflow-y-auto">
+      <div className="sticky top-20 mt-[20px] max-h-[calc(100vh-5rem)] overflow-y-auto overflow-x-hidden">
         <FilterContent onClearAll={handleClearAll} />
       </div>
     )

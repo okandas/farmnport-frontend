@@ -116,7 +116,7 @@ function FilterContent({
     brand: parseAsArrayOf(parseAsString),
     target: parseAsArrayOf(parseAsString),
     active_ingredient: parseAsArrayOf(parseAsString),
-    used_on: parseAsArrayOf(parseAsString),
+    used_on: parseAsString,
   })
 
   const { data: aggregateData, isLoading: isLoadingAggregates } = useQuery({
@@ -133,14 +133,19 @@ function FilterContent({
   const usedOnItems = useMemo(() => aggregateData?.used_on || [], [aggregateData])
 
   const handleToggle = (filterKey: string, value: string) => {
-    const currentValues = queryState[filterKey as keyof typeof queryState] || []
+    if (filterKey === 'used_on') {
+      const isDeselecting = queryState.used_on === value
+      sendGTMEvent({ event: 'filter', value: `${isDeselecting ? 'Remove' : 'Add'}UsedOnFilter` })
+      setQueryState({ used_on: isDeselecting ? null : value })
+      return
+    }
+    const currentValues = queryState[filterKey as keyof typeof queryState] as string[] | null || []
     const isAdding = !currentValues.includes(value)
     const newValues = isAdding
       ? [...currentValues, value]
       : currentValues.filter(v => v !== value)
 
     const filterTypeMap: Record<string, string> = {
-      'used_on': 'UsedOn',
       'target': 'Target',
       'active_ingredient': 'ActiveIngredient',
       'brand': 'Brand'
@@ -154,7 +159,7 @@ function FilterContent({
     })
   }
 
-  const totalFilters = Object.values(queryState).reduce((acc, val) => acc + (val?.length || 0), 0)
+  const totalFilters = (queryState.used_on ? 1 : 0) + (queryState.brand?.length || 0) + (queryState.target?.length || 0) + (queryState.active_ingredient?.length || 0)
 
   const filterSections = [
     { name: "Used On", key: "used_on", items: usedOnItems, isLoading: isLoadingAggregates },
@@ -179,7 +184,8 @@ function FilterContent({
 
       <Accordion type="multiple" className="w-full flex-1" defaultValue={["Used On", "Targets", "Active Ingredients"]}>
         {filterSections.map((section) => {
-          const selectedFilters = queryState[section.key as keyof typeof queryState] || []
+          const raw = (queryState as any)[section.key]
+          const selectedFilters: string[] = Array.isArray(raw) ? raw : (raw ? [raw] : [])
           return (
             <AccordionItem value={section.name} key={section.key}>
               <AccordionTrigger>
@@ -216,7 +222,7 @@ export function AnimalHealthFilterSidebar() {
     brand: parseAsArrayOf(parseAsString),
     target: parseAsArrayOf(parseAsString),
     active_ingredient: parseAsArrayOf(parseAsString),
-    used_on: parseAsArrayOf(parseAsString),
+    used_on: parseAsString,
   })
 
   const handleClearAll = () => {
