@@ -182,7 +182,7 @@ function FilterContent({
         </div>
       )}
 
-      <Accordion type="multiple" className="w-full flex-1" defaultValue={["Used On", "Targets", "Active Ingredients"]}>
+      <Accordion type="multiple" className="w-full flex-1" defaultValue={["Used On", "Targets", "Active Ingredients", "Brands"]}>
         {filterSections.map((section) => {
           const raw = (queryState as any)[section.key]
           const selectedFilters: string[] = Array.isArray(raw) ? raw : (raw ? [raw] : [])
@@ -236,7 +236,7 @@ export function AnimalHealthFilterSidebar() {
 
   if (isDesktop) {
     return (
-      <div className="sticky top-20 mt-[20px]">
+      <div className="sticky top-20 mt-[20px] max-h-[calc(100vh-5rem)] overflow-y-auto overflow-x-hidden">
         <FilterContent onClearAll={handleClearAll} />
       </div>
     )

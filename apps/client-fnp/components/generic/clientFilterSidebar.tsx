@@ -398,7 +398,7 @@ export function ClientFilterSidebar({ type, hideProduce, hideCategory, product }
   // Desktop: Sticky sidebar
   if (isDesktop) {
     return (
-      <div className="sticky top-20 mt-[20px]">
+      <div className="sticky top-20 mt-[20px] max-h-[calc(100vh-5rem)] overflow-y-auto overflow-x-hidden">
         <FilterContent onClearAll={handleClearAll} type={type} hideProduce={hideProduce} hideCategory={hideCategory} product={product} />
       </div>
     )
