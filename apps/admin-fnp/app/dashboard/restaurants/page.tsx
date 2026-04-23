@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { useQuery } from "@tanstack/react-query"
 import {
-  Phone, MapPin, ArrowRight, UtensilsCrossed,
+  Phone, MapPin, UtensilsCrossed, ArrowRight,
   MousePointerClick, Mail, MessageCircle, Navigation,
 } from "lucide-react"
 
@@ -59,17 +59,6 @@ export default function RestaurantsPage() {
     <DashboardShell>
       <DashboardHeader heading="Overview" text="Restaurants and menus at a glance." />
 
-      {/* Quick Actions */}
-      <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-4 mb-2">
-        <Link
-          href="/dashboard/restaurants/contact-views"
-          className="flex items-center gap-3 rounded-lg border bg-card p-3 text-card-foreground shadow-sm hover:bg-accent transition-colors"
-        >
-          <Phone className="h-4 w-4 text-muted-foreground" />
-          <span className="text-sm font-medium flex-1">Contact Interactions</span>
-          <ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />
-        </Link>
-      </div>
 
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6">
