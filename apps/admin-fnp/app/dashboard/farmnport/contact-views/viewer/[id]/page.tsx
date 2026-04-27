@@ -4,12 +4,10 @@ import { useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { useQuery } from "@tanstack/react-query"
 import Link from "next/link"
-import { ArrowLeft, Users, ChevronLeft, ChevronRight } from "lucide-react"
+import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react"
 
 import { queryViewerDetail } from "@/lib/query"
 import { formatDate } from "@/lib/utilities"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 
@@ -38,22 +36,12 @@ export default function ViewerDetailPage() {
     return (
       <div className="flex flex-col gap-6">
         <Skeleton className="h-5 w-32" />
-        <div>
-          <Skeleton className="h-9 w-64" />
-          <Skeleton className="h-4 w-48 mt-2" />
+        <Skeleton className="h-9 w-64" />
+        <div className="space-y-2">
+          {Array.from({ length: PAGE_SIZE }).map((_, i) => (
+            <Skeleton key={i} className="h-14 w-full rounded-lg" />
+          ))}
         </div>
-        <Card>
-          <CardHeader>
-            <Skeleton className="h-5 w-48" />
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {Array.from({ length: PAGE_SIZE }).map((_, i) => (
-                <Skeleton key={i} className="h-10 w-full" />
-              ))}
-            </div>
-          </CardContent>
-        </Card>
       </div>
     )
   }
@@ -72,85 +60,57 @@ export default function ViewerDetailPage() {
 
       <div>
         <h2 className="text-3xl font-bold tracking-tight capitalize">{viewer.name}</h2>
-        <div className="flex items-center gap-2 mt-1">
-          <Badge variant="secondary" className="capitalize">{viewer.type}</Badge>
-          {viewer.city && <span className="text-sm text-muted-foreground">{viewer.city}</span>}
-          <span className="text-sm text-muted-foreground">
-            &middot; Viewed {total} contact{total !== 1 ? "s" : ""}
-          </span>
-        </div>
+        <p className="text-muted-foreground capitalize">
+          {viewer.type}{viewer.city ? ` · ${viewer.city}` : ""} &middot; viewed {total} contact{total !== 1 ? "s" : ""}
+        </p>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2">
-            <Users className="h-4 w-4" />
-            Contacts viewed by this person
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {viewed.length === 0 ? (
-            <p className="text-sm text-muted-foreground py-4 text-center">No contacts viewed yet</p>
-          ) : (
-            <div className="space-y-2">
-              <div className="grid grid-cols-[2rem_1fr_5rem_5rem_5rem_9rem] gap-2 text-xs font-medium text-muted-foreground pb-1 border-b">
-                <span>#</span>
-                <span>Name</span>
-                <span>Type</span>
-                <span>City</span>
-                <span>Channel</span>
-                <span className="text-right">Last View</span>
-              </div>
-              {viewed.map((contact: any, i: number) => (
-                <Link
-                  key={`${contact.viewed_id}-${contact.date}-${i}`}
-                  href={`/dashboard/farmnport/contact-views/contact/${contact.viewed_id}`}
-                  className="grid grid-cols-[2rem_1fr_5rem_5rem_5rem_9rem] gap-2 items-center rounded-lg p-2 text-sm hover:bg-muted/50 transition-colors"
-                >
-                  <span className="text-muted-foreground text-xs">{(page - 1) * PAGE_SIZE + i + 1}</span>
-                  <span className="font-medium truncate capitalize">{contact.name}</span>
-                  <Badge variant="secondary" className="text-xs w-fit capitalize">
-                    {contact.type}
-                  </Badge>
-                  <span className="text-muted-foreground text-xs truncate capitalize">{contact.city || "—"}</span>
-                  <Badge variant="outline" className="text-xs w-fit capitalize">
-                    {contact.contact_type || "—"}
-                  </Badge>
-                  <span className="text-right text-muted-foreground text-xs">{formatDate(contact.date) || "—"}</span>
-                </Link>
-              ))}
+      <div>
+        <p className="text-sm font-medium text-muted-foreground mb-2">Contacts this person viewed</p>
 
-              {totalPages > 1 && (
-                <div className="flex items-center justify-between pt-3 border-t">
-                  <span className="text-xs text-muted-foreground">
-                    Page {page} of {totalPages} ({total} total)
-                  </span>
-                  <div className="flex gap-1">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="h-7 px-2"
-                      disabled={page <= 1}
-                      onClick={() => setPage(page - 1)}
-                    >
-                      <ChevronLeft className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="h-7 px-2"
-                      disabled={page >= totalPages}
-                      onClick={() => setPage(page + 1)}
-                    >
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
-                  </div>
+        {viewed.length === 0 ? (
+          <p className="text-sm text-muted-foreground py-8 text-center">No contacts viewed yet</p>
+        ) : (
+          <div className="space-y-1">
+            {viewed.map((contact: any, i: number) => (
+              <Link
+                key={`${contact.viewed_id}-${contact.date}-${i}`}
+                href={`/dashboard/farmnport/contact-views/contact/${contact.viewed_id}`}
+                className="flex items-center gap-4 rounded-lg px-4 py-3 hover:bg-muted/50 transition-colors"
+              >
+                <span className="text-xs text-muted-foreground w-5 shrink-0 text-right">
+                  {(page - 1) * PAGE_SIZE + i + 1}
+                </span>
+
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-sm capitalize truncate">{contact.name}</p>
+                  <p className="text-xs text-muted-foreground capitalize">
+                    {contact.type}{contact.city ? ` · ${contact.city}` : ""}
+                  </p>
                 </div>
-              )}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+
+                <p className="text-xs text-muted-foreground shrink-0">{formatDate(contact.date) || "—"}</p>
+              </Link>
+            ))}
+
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between pt-4 border-t">
+                <span className="text-xs text-muted-foreground">
+                  Page {page} of {totalPages} ({total} total)
+                </span>
+                <div className="flex gap-1">
+                  <Button variant="outline" size="sm" className="h-7 px-2" disabled={page <= 1} onClick={() => setPage(page - 1)}>
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <Button variant="outline" size="sm" className="h-7 px-2" disabled={page >= totalPages} onClick={() => setPage(page + 1)}>
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   )
 }

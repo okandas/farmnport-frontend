@@ -8,8 +8,6 @@ import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react"
 
 import { queryTopViewers } from "@/lib/query"
 import { formatDate } from "@/lib/utilities"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 
@@ -29,20 +27,18 @@ export default function AllViewersPage() {
   const total: number = data?.data?.total || 0
   const totalPages: number = data?.data?.total_pages || 1
 
+  const maxViewed = viewers.reduce((m: number, v: any) => Math.max(m, v.contacts_viewed), 0)
+
   if (isLoading) {
     return (
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-4">
         <Skeleton className="h-5 w-32" />
         <Skeleton className="h-9 w-64" />
-        <Card>
-          <CardContent className="pt-6">
-            <div className="space-y-3">
-              {Array.from({ length: PAGE_SIZE }).map((_, i) => (
-                <Skeleton key={i} className="h-10 w-full" />
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        <div className="space-y-2">
+          {Array.from({ length: PAGE_SIZE }).map((_, i) => (
+            <Skeleton key={i} className="h-14 w-full rounded-lg" />
+          ))}
+        </div>
       </div>
     )
   }
@@ -58,76 +54,61 @@ export default function AllViewersPage() {
       </button>
 
       <div>
-        <h2 className="text-3xl font-bold tracking-tight">Active Viewers</h2>
-        <p className="text-muted-foreground">
-          {total} viewers sorted by contacts viewed
-        </p>
+        <h2 className="text-3xl font-bold tracking-tight">Most Active Viewers</h2>
+        <p className="text-muted-foreground">{total} users sorted by contacts viewed — click any to see their history</p>
       </div>
 
-      <Card>
-        <CardContent className="pt-6">
-          {viewers.length === 0 ? (
-            <p className="text-sm text-muted-foreground py-4 text-center">No data yet</p>
-          ) : (
-            <div className="space-y-2">
-              <div className="grid grid-cols-[2rem_1fr_5rem_5rem_9rem_4rem] gap-2 text-xs font-medium text-muted-foreground pb-1 border-b">
-                <span>#</span>
-                <span>Name</span>
-                <span>Type</span>
-                <span>Channel</span>
-                <span>Last View</span>
-                <span className="text-right">Viewed</span>
-              </div>
-              {viewers.map((viewer: any, i: number) => (
-                <Link
-                  key={viewer.user_id || i}
-                  href={`/dashboard/farmnport/contact-views/viewer/${viewer.user_id}`}
-                  className="grid grid-cols-[2rem_1fr_5rem_5rem_9rem_4rem] gap-2 items-center rounded-lg p-2 text-sm hover:bg-muted/50 transition-colors"
-                >
-                  <span className="text-muted-foreground text-xs">{(page - 1) * PAGE_SIZE + i + 1}</span>
-                  <span className="font-medium truncate capitalize">{viewer.name}</span>
-                  <Badge variant="secondary" className="text-xs w-fit capitalize">
-                    {viewer.type}
-                  </Badge>
-                  <Badge variant="outline" className="text-xs w-fit capitalize">
-                    {viewer.contact_type || "—"}
-                  </Badge>
-                  <span className="text-muted-foreground text-xs">{formatDate(viewer.last_date) || "—"}</span>
-                  <span className="text-right font-semibold">{viewer.contacts_viewed}</span>
-                </Link>
-              ))}
+      {viewers.length === 0 ? (
+        <p className="text-sm text-muted-foreground py-8 text-center">No data yet</p>
+      ) : (
+        <div className="space-y-1">
+          {viewers.map((viewer: any, i: number) => {
+            const pct = maxViewed > 0 ? (viewer.contacts_viewed / maxViewed) * 100 : 0
+            return (
+              <Link
+                key={viewer.user_id || i}
+                href={`/dashboard/farmnport/contact-views/viewer/${viewer.user_id}`}
+                className="flex items-center gap-4 rounded-lg px-4 py-3 hover:bg-muted/50 transition-colors"
+              >
+                <span className="text-xs text-muted-foreground w-5 shrink-0 text-right">
+                  {(page - 1) * PAGE_SIZE + i + 1}
+                </span>
 
-              {totalPages > 1 && (
-                <div className="flex items-center justify-between pt-3 border-t">
-                  <span className="text-xs text-muted-foreground">
-                    Page {page} of {totalPages} ({total} total)
-                  </span>
-                  <div className="flex gap-1">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="h-7 px-2"
-                      disabled={page <= 1}
-                      onClick={() => setPage(page - 1)}
-                    >
-                      <ChevronLeft className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="h-7 px-2"
-                      disabled={page >= totalPages}
-                      onClick={() => setPage(page + 1)}
-                    >
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-sm capitalize truncate">{viewer.name}</p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <div className="h-1 rounded-full bg-muted flex-1 max-w-32">
+                      <div className="h-1 rounded-full bg-orange-400" style={{ width: `${pct}%` }} />
+                    </div>
+                    <span className="text-xs text-muted-foreground capitalize shrink-0">{viewer.type}</span>
                   </div>
                 </div>
-              )}
+
+                <div className="shrink-0 text-right">
+                  <p className="text-sm font-bold">{viewer.contacts_viewed} viewed</p>
+                  <p className="text-xs text-muted-foreground">{formatDate(viewer.last_date) || "—"}</p>
+                </div>
+              </Link>
+            )
+          })}
+
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between pt-4 border-t">
+              <span className="text-xs text-muted-foreground">
+                Page {page} of {totalPages} ({total} total)
+              </span>
+              <div className="flex gap-1">
+                <Button variant="outline" size="sm" className="h-7 px-2" disabled={page <= 1} onClick={() => setPage(page - 1)}>
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button variant="outline" size="sm" className="h-7 px-2" disabled={page >= totalPages} onClick={() => setPage(page + 1)}>
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      )}
     </div>
   )
 }
