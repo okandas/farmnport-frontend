@@ -306,7 +306,7 @@ export default async function AgroChemicalGuidePage({ params }: GuidePageProps) 
                     }
                     return (
                     <div className="mb-12">
-                        <h2 className="sticky top-16 z-10 text-2xl font-bold py-4 text-foreground bg-background">Dosage Rates & Application Guide</h2>
+                        <h2 id="dosage-guide" className="sticky top-16 z-10 text-2xl font-bold py-4 text-foreground bg-background">Dosage Rates & Application Guide</h2>
                         <div className="overflow-x-auto">
                             <table className="w-full border-collapse">
                                 <thead>

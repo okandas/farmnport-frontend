@@ -295,12 +295,12 @@ export function SprayProgramDetailClient({ program, slug }: SprayProgramDetailCl
                             <div className="overflow-x-auto">
                                 <table className="w-full border-collapse min-w-[640px]">
                                     <thead>
-                                        <tr className="bg-muted/60">
-                                            <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide p-3 w-36 border-r border-border sticky left-0 bg-muted/60 z-10">
+                                        <tr className="bg-muted">
+                                            <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide p-3 w-36 border-r border-border sticky left-0 bg-muted z-10">
                                                 Category
                                             </th>
                                             {stages.map((stage: any, idx: number) => (
-                                                <th key={idx} className="text-center p-3 border-r border-border last:border-r-0 min-w-[140px]">
+                                                <th key={idx} className="text-center p-3 border-r border-border last:border-r-0 min-w-[140px] bg-muted">
                                                     <div className="text-xs font-semibold text-foreground">{capitalizeFirstLetter(stage.name)}</div>
                                                     {stage.timing_description && (
                                                         <div className="text-[10px] text-muted-foreground font-normal mt-0.5">{stage.timing_description}</div>
@@ -316,7 +316,7 @@ export function SprayProgramDetailClient({ program, slug }: SprayProgramDetailCl
                                             const Icon = style.icon
                                             return (
                                                 <tr key={purpose} className="hover:bg-muted/20 transition-colors">
-                                                    <td className="p-3 border-r border-border sticky left-0 bg-background z-10">
+                                                    <td className="p-3 border-r border-border sticky left-0 bg-card z-10">
                                                         <div className={`inline-flex items-center gap-1.5 px-2 py-1 rounded text-[11px] font-medium ${style.bg} ${style.text}`}>
                                                             <Icon className="h-3 w-3" />
                                                             {purpose}
@@ -590,27 +590,35 @@ export function SprayProgramDetailClient({ program, slug }: SprayProgramDetailCl
 
                                 {/* Targets - inline */}
                                 {quickViewProduct.agrochemical?.targets?.length > 0 && (
-                                    <div className="flex flex-wrap gap-1">
+                                    <ul className="grid grid-cols-2 lg:grid-cols-5 gap-x-3 gap-y-1">
                                         {quickViewProduct.agrochemical.targets.map((t: any, idx: number) => (
-                                            <span key={idx} className="px-1.5 py-0.5 rounded text-[10px] bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300 capitalize">
+                                            <li key={idx} className="flex items-center gap-1.5 text-[11px] text-green-700 dark:text-green-300 capitalize">
+                                                <span className="h-1.5 w-1.5 rounded-full bg-green-500 flex-shrink-0" />
                                                 {t.name}
-                                            </span>
+                                            </li>
                                         ))}
-                                    </div>
+                                    </ul>
                                 )}
                             </div>
                         </div>
 
                         {/* CTA */}
                         {quickViewProduct.agrochemical?.agrochemical_category?.slug && quickViewProduct.agrochemical_slug && (
-                            <div className="px-5 pb-5">
+                            <div className="px-5 pb-5 flex gap-2">
                                 <Link
                                     href={`/agrochemical-guides/${quickViewProduct.agrochemical.agrochemical_category.slug}/${quickViewProduct.agrochemical_slug}?from=${slug}`}
-                                    className="flex items-center justify-center gap-2 w-full py-2 rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                                    className="flex-1 flex items-center justify-center gap-1 py-2 rounded-full text-sm font-semibold border border-primary text-primary hover:bg-primary/5 transition-colors"
                                     onClick={() => setQuickViewProduct(null)}
                                 >
                                     View Full Guide
-                                    <ChevronRight className="h-4 w-4" />
+                                    <ChevronRight className="h-3.5 w-3.5" />
+                                </Link>
+                                <Link
+                                    href={`/buy-agrochemicals/${quickViewProduct.agrochemical_slug}`}
+                                    className="flex-1 flex items-center justify-center py-2 rounded-full text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                                    onClick={() => setQuickViewProduct(null)}
+                                >
+                                    Buy Now
                                 </Link>
                             </div>
                         )}

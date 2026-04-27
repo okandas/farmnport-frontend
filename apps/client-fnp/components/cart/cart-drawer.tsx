@@ -2,7 +2,7 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { Minus, Plus, ShoppingCart, Trash2, X } from "lucide-react"
+import { Minus, Plus, ShoppingCart, Trash2 } from "lucide-react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useSession } from "next-auth/react"
 import { toast } from "sonner"
@@ -13,7 +13,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet"
-import { Button } from "@/components/ui/button"
+
 import { useCart } from "@/contexts/cart-context"
 import { getCart, removeFromCart, updateCartItem } from "@/lib/query"
 
@@ -64,7 +64,7 @@ export function CartDrawer() {
 
   return (
     <Sheet open={isOpen} onOpenChange={(open) => !open && closeCart()}>
-      <SheetContent side="right" className="flex flex-col w-full sm:max-w-md p-0">
+      <SheetContent side="right" className="flex flex-col w-[calc(100%-3rem)] sm:max-w-md p-0">
         <SheetHeader className="px-6 py-4 border-b">
           <SheetTitle className="flex items-center gap-2">
             <ShoppingCart className="w-5 h-5" />
