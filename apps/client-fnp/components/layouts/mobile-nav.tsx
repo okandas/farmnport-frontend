@@ -16,6 +16,10 @@ import {AppURL, AuthenticatedUser} from "@/lib/schemas";
 import {sendGTMEvent} from "@next/third-parties/google";
 import {ThemeSwitcher} from "@/components/ui/theme-switcher";
 import {signOut} from "next-auth/react";
+import { ShoppingCart } from "lucide-react";
+import { useCart } from "@/contexts/cart-context";
+import { useQuery } from "@tanstack/react-query";
+import { getCart } from "@/lib/query";
 
 interface MobileNavProps {
   user: AuthenticatedUser | null
@@ -24,6 +28,14 @@ interface MobileNavProps {
 export function MobileNav({ user }: MobileNavProps) {
     const segment = useSelectedLayoutSegment()
     const [isOpen, setIsOpen] = React.useState(false)
+    const { openCart } = useCart()
+    const { data: cartData } = useQuery({
+      queryKey: ["cart"],
+      queryFn: () => getCart().then((r) => r.data),
+      enabled: !!user,
+      staleTime: 30000,
+    })
+    const cartCount: number = (cartData as any)?.items?.length ?? 0
 
 
     return (
@@ -36,7 +48,19 @@ export function MobileNav({ user }: MobileNavProps) {
           <span className="sr-only">Home</span>
         </Link>
 
-       <div className="flex flex-1 justify-end">
+       <div className="flex flex-1 justify-end items-center gap-1">
+         <button
+           onClick={openCart}
+           className="relative p-2 rounded-full hover:bg-muted transition-colors"
+           aria-label="Open cart"
+         >
+           <ShoppingCart className="w-5 h-5" />
+           {cartCount > 0 && (
+             <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-primary text-primary-foreground text-[10px] font-bold px-1">
+               {cartCount}
+             </span>
+           )}
+         </button>
          <Sheet open={isOpen} onOpenChange={setIsOpen}>
            <SheetTrigger asChild>
              <Button
@@ -161,6 +185,14 @@ export function MobileNav({ user }: MobileNavProps) {
                        >
                          <Icons.user className="h-5 w-5" />
                          <span>Profile</span>
+                       </Link>
+                       <Link
+                         href="/orders"
+                         onClick={() => setIsOpen(false)}
+                         className="flex items-center gap-3 px-3 py-2 text-base font-medium rounded-md hover:bg-accent transition-colors"
+                       >
+                         <Icons.arrowRight className="h-5 w-5" />
+                         <span>My Orders</span>
                        </Link>
                        <button
                          onClick={() => {

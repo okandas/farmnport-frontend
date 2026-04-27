@@ -551,3 +551,65 @@ export function queryPlantNutritionProductsByCategory(options: { category: strin
 export function queryPlantNutritionFilterAggregates() {
   return api.get(`${BaseURL}/plantnutrition/aggregates/filters`)
 }
+
+// Cart
+export function getCart() {
+  return api.get(`${BaseURL}/cart/get`)
+}
+
+export function addToCart(item: {
+  product_id: string
+  product_type: string
+  product_name: string
+  product_slug: string
+  image_src: string
+  unit_price: number
+  quantity: number
+  seller_id?: string
+}) {
+  return api.post(`${BaseURL}/cart/add`, item)
+}
+
+export function updateCartItem(product_id: string, quantity: number) {
+  return api.post(`${BaseURL}/cart/update`, { product_id, quantity })
+}
+
+export function removeFromCart(product_id: string) {
+  return api.post(`${BaseURL}/cart/remove`, { product_id })
+}
+
+export function clearCart() {
+  return api.delete(`${BaseURL}/cart/clear`)
+}
+
+// Orders
+export function checkout(data: {
+  provider: string
+  method: string
+  phone: string
+  email: string
+  fulfillment: string
+  address?: {
+    name: string
+    phone: string
+    address: string
+    city: string
+    province: string
+  }
+  order_type?: string
+}) {
+  return api.post(`${BaseURL}/order/checkout`, data)
+}
+
+export function pollOrderStatus(reference: string) {
+  return api.post(`${BaseURL}/order/poll`, { reference })
+}
+
+export function myOrders(page?: number) {
+  const url = page && page >= 2 ? `${BaseURL}/order/my-orders?p=${page}` : `${BaseURL}/order/my-orders`
+  return api.get(url)
+}
+
+export function getOrder(id: string) {
+  return api.get(`${BaseURL}/order/${id}`)
+}

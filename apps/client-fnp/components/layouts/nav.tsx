@@ -17,9 +17,39 @@ import {capitalizeFirstLetter, makeAbbveriation} from "@/lib/utilities";
 import {signOut} from "next-auth/react";
 import {AppURL, AuthenticatedUser} from "@/lib/schemas";
 import {ThemeSwitcher} from "@/components/ui/theme-switcher";
+import { ShoppingCart } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { useCart } from "@/contexts/cart-context";
+import { getCart } from "@/lib/query";
 
 interface NavigationProps {
   user: AuthenticatedUser | null
+}
+
+function CartIcon({ user }: { user: AuthenticatedUser | null }) {
+  const { openCart } = useCart()
+  const { data } = useQuery({
+    queryKey: ["cart"],
+    queryFn: () => getCart().then((r) => r.data),
+    enabled: !!user,
+    staleTime: 30000,
+  })
+  const count: number = (data as any)?.items?.length ?? 0
+
+  return (
+    <button
+      onClick={openCart}
+      className="relative p-2 rounded-full hover:bg-muted transition-colors"
+      aria-label="Open cart"
+    >
+      <ShoppingCart className="w-5 h-5" />
+      {count > 0 && (
+        <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-primary text-primary-foreground text-[10px] font-bold px-1">
+          {count}
+        </span>
+      )}
+    </button>
+  )
 }
 
 export function Navigation({ user }: NavigationProps) {
@@ -115,13 +145,10 @@ export function Navigation({ user }: NavigationProps) {
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
                 <DropdownMenuItem asChild>
-                  <Link href="/profile">
-                    {/* <DashboardIcon
-                        className="mr-2 h-4 w-4"
-                        aria-hidden="true"
-                    /> */}
-                    Profile
-                  </Link>
+                  <Link href="/profile">Profile</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/orders">My Orders</Link>
                 </DropdownMenuItem>
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
@@ -159,6 +186,7 @@ export function Navigation({ user }: NavigationProps) {
           </>
 
         )}
+        <CartIcon user={user} />
         < ThemeSwitcher />
       </nav>
   )

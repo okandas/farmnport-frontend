@@ -1,12 +1,19 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { createPortal } from "react-dom"
 import Image from "next/image"
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
-import { Minus, Plus, RotateCcw, Beaker, Check } from "lucide-react"
+import { Minus, Plus, Beaker, Check, ShoppingCart, Loader2 } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ShareButton } from "./ShareButton"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { addToCart } from "@/lib/query"
+import { useCart } from "@/contexts/cart-context"
+import { toast } from "sonner"
+import { useSession } from "next-auth/react"
+import { useRouter } from "next/navigation"
 
 interface ProductInteractiveProps {
   chemical: any
@@ -20,6 +27,42 @@ export function ProductInteractive({ chemical, slug, baseUrl }: ProductInteracti
   const [selectedImage, setSelectedImage] = useState(0)
   const [quantity, setQuantity] = useState(1)
   const [fulfillment, setFulfillment] = useState<"delivery" | "pickup">("delivery")
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => { setMounted(true) }, [])
+
+  const { data: session } = useSession()
+  const router = useRouter()
+  const { openCart } = useCart()
+  const qc = useQueryClient()
+
+  const addMutation = useMutation({
+    mutationFn: addToCart,
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["cart"] })
+      openCart()
+    },
+    onError: () => toast.error("Failed to add to cart"),
+  })
+
+  function handleAddToCart() {
+    if (!session) {
+      router.push(`/login?next=/buy-agrochemicals/${slug}`)
+      return
+    }
+    if (!displayPrice) {
+      toast.info("Please contact us for pricing")
+      return
+    }
+    addMutation.mutate({
+      product_id: chemical.id,
+      product_type: "agrochemical",
+      product_name: selectedVariant ? `${chemical.name} - ${selectedVariant.name}` : chemical.name,
+      product_slug: slug,
+      image_src: chemical.images?.[0]?.img?.src ?? "",
+      unit_price: displayPrice,
+      quantity,
+    })
+  }
 
   const displayPrice = selectedVariant?.sale_price
     ? selectedVariant.sale_price / 100
@@ -40,6 +83,7 @@ export function ProductInteractive({ chemical, slug, baseUrl }: ProductInteracti
   const images = chemical.images || []
 
   return (
+    <div className="pb-20 lg:pb-0">
     <div className="grid lg:grid-cols-[480px_1fr_300px] gap-6 items-start">
 
       {/* ── Column 1: Image ── */}
@@ -189,16 +233,19 @@ export function ProductInteractive({ chemical, slug, baseUrl }: ProductInteracti
 
           <TabsContent value="targets" className="mt-4">
             {chemical.targets?.length > 0 ? (
-              <div className="columns-2 gap-x-6">
+              <ul className="space-y-1.5">
                 {chemical.targets.map((target: any, idx: number) => (
-                  <div key={idx} className="py-1.5 border-b last:border-0 break-inside-avoid">
-                    <p className="text-sm font-medium">{target.name}</p>
-                    {target.scientific_name && (
-                      <p className="text-xs text-muted-foreground italic">{target.scientific_name}</p>
-                    )}
-                  </div>
+                  <li key={idx} className="flex items-start gap-2 text-sm">
+                    <span className="h-1.5 w-1.5 rounded-full bg-green-500 flex-shrink-0 mt-1.5" />
+                    <span>
+                      <span className="font-medium">{target.name}</span>
+                      {target.scientific_name && (
+                        <span className="text-xs text-muted-foreground italic ml-1">({target.scientific_name})</span>
+                      )}
+                    </span>
+                  </li>
                 ))}
-              </div>
+              </ul>
             ) : (
               <p className="text-sm text-muted-foreground mt-4">No information available.</p>
             )}
@@ -244,12 +291,18 @@ export function ProductInteractive({ chemical, slug, baseUrl }: ProductInteracti
                 <span className="text-xs font-medium text-red-700 dark:text-red-400">Out of stock</span>
               </div>
             )}
-            <Link
-              href={`/contact?subject=Enquiry: ${encodeURIComponent(chemical.name)}${selectedVariant ? ` - ${selectedVariant.name}` : ""}&utm_source=farmnport&utm_medium=buy-page&utm_content=${slug}`}
-              className="block w-full text-center bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-sm py-2.5 rounded-full transition-colors mt-3"
+            <button
+              onClick={handleAddToCart}
+              disabled={addMutation.isPending || !chemical.available_for_sale}
+              className="flex items-center justify-center gap-2 w-full bg-primary hover:bg-primary/90 disabled:opacity-60 text-primary-foreground font-semibold text-sm py-2.5 rounded-full transition-colors mt-3"
             >
-              Add to Cart
-            </Link>
+              {addMutation.isPending ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <ShoppingCart className="w-4 h-4" />
+              )}
+              {chemical.available_for_sale ? "Add to Cart" : "Out of Stock"}
+            </button>
           </div>
 
           {/* Fulfillment */}
@@ -327,6 +380,28 @@ export function ProductInteractive({ chemical, slug, baseUrl }: ProductInteracti
           </div>
         </div>
       </div>
+
+    </div>
+
+    {/* Mobile sticky CTA — rendered via portal to guarantee fixed positioning */}
+    {mounted && createPortal(
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-[999] bg-background border-t px-4 py-3 flex items-center gap-3">
+        <div className="flex-1 min-w-0">
+          <p className="text-xs text-muted-foreground truncate">{chemical.name}{selectedVariant ? ` · ${selectedVariant.name}` : ""}</p>
+          {displayPrice !== null
+            ? <p className="text-base font-bold leading-tight">${displayPrice.toFixed(2)}</p>
+            : <p className="text-sm text-muted-foreground">Price on request</p>
+          }
+        </div>
+        <Link
+          href={`/contact?subject=Enquiry: ${encodeURIComponent(chemical.name)}${selectedVariant ? ` - ${selectedVariant.name}` : ""}&utm_source=farmnport&utm_medium=buy-page&utm_content=${slug}`}
+          className="shrink-0 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-sm px-5 py-2.5 rounded-full transition-colors"
+        >
+          Want to buy
+        </Link>
+      </div>,
+      document.body
+    )}
 
     </div>
   )
