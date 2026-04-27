@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query"
 import { queryAllFeedProducts } from "@/lib/query"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
+import Image from "next/image"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
 import { FeedFilterSidebar } from "@/components/generic/feedFilterSidebar"
 
@@ -63,18 +64,20 @@ export function FeedListingClient({ initialData, initialTotal }: FeedListingClie
 
                 {/* Main Content */}
                 {productsLoading ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                        {[...Array(6)].map((_, i) => (
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+                        {[...Array(8)].map((_, i) => (
                             <div key={i} className="animate-pulse">
                                 <div className="bg-card border border-border rounded-lg overflow-hidden">
-                                    <div className="p-4 space-y-3">
+                                    <div className="aspect-square bg-muted" />
+                                    <div className="p-4 space-y-3 border-t">
                                         <div className="h-3 bg-muted rounded w-1/3" />
                                         <div className="h-4 bg-muted rounded w-4/5" />
                                         <div className="h-4 bg-muted rounded w-3/5" />
-                                        <div className="flex gap-2 pt-1">
-                                            <div className="h-5 bg-muted rounded-full w-14" />
-                                            <div className="h-5 bg-muted rounded-full w-14" />
+                                        <div className="flex gap-4 pt-2 border-t">
+                                            <div className="h-3 bg-muted rounded w-16" />
+                                            <div className="h-3 bg-muted rounded w-16" />
                                         </div>
+                                        <div className="h-10 bg-muted rounded mt-4" />
                                     </div>
                                 </div>
                             </div>
@@ -86,55 +89,62 @@ export function FeedListingClient({ initialData, initialTotal }: FeedListingClie
                     </div>
                 ) : (
                     <>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                        {/* Results count */}
+                        <div className="mb-4 text-sm text-muted-foreground">
+                            Showing {products.length} of {productsData?.data?.total || 0} products
+                        </div>
+
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
                             {products.map((product: any) => (
-                                <Link
+                                <div
                                     key={product.id}
-                                    href={`/feeds/${product.slug}`}
                                     className="bg-card border border-border rounded-lg overflow-hidden transition-all duration-200 hover:shadow-lg hover:border-primary/50 group"
                                 >
-                                    <div className="p-4 space-y-2">
+                                    {/* Image */}
+                                    <Link href={`/feeds/${product.slug}`} className="block">
+                                        <div className="relative aspect-square bg-white">
+                                            {product.images?.[0]?.img?.src ? (
+                                                <Image
+                                                    src={product.images[0].img.src}
+                                                    alt={product.name}
+                                                    fill
+                                                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                                                    className="object-contain transition-transform duration-200 group-hover:scale-105"
+                                                />
+                                            ) : (
+                                                <div className="absolute inset-0 bg-muted/30" />
+                                            )}
+                                        </div>
+                                    </Link>
+
+                                    {/* Content */}
+                                    <div className="p-4 space-y-3 border-t">
                                         {product.brand && (
                                             <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">
                                                 {product.brand.name}
                                             </p>
                                         )}
-                                        <h3 className="font-semibold text-sm leading-tight capitalize line-clamp-2 min-h-[2.5rem] group-hover:text-primary transition-colors">
-                                            {product.name}
-                                        </h3>
-                                        <div className="flex flex-wrap gap-1.5">
-                                            {product.animal && (
-                                                <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-600/10 dark:bg-amber-950/30 dark:text-amber-400">
-                                                    {product.animal}
-                                                </span>
-                                            )}
-                                            {product.phase && (
-                                                <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-600/10 dark:bg-blue-950/30 dark:text-blue-400">
-                                                    {product.phase}
-                                                </span>
-                                            )}
-                                            {product.form && (
-                                                <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-green-50 text-green-700 ring-1 ring-inset ring-green-600/10 dark:bg-green-950/30 dark:text-green-400">
-                                                    {product.form}
-                                                </span>
-                                            )}
-                                            {product.sub_type && (
-                                                <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-violet-50 text-violet-700 ring-1 ring-inset ring-violet-600/10 dark:bg-violet-950/30 dark:text-violet-400">
-                                                    {product.sub_type}
-                                                </span>
-                                            )}
+                                        <Link href={`/feeds/${product.slug}`}>
+                                            <h3 className="font-semibold text-sm leading-tight line-clamp-2 min-h-[2.5rem] group-hover:text-primary transition-colors">
+                                                {product.name}
+                                            </h3>
+                                        </Link>
+
+                                        {/* Stats */}
+                                        <div className="flex items-center gap-4 text-xs text-muted-foreground pt-2 border-t min-h-[1.25rem] overflow-hidden">
+                                            {product.animal && <span className="truncate shrink-0 max-w-[40%]">{product.animal}</span>}
+                                            {product.phase && <span className="truncate shrink-0 max-w-[35%]">{product.phase}</span>}
+                                            {product.form && <span className="truncate">{product.form}</span>}
                                         </div>
-                                        {product.show_price && product.sale_price > 0 && (
-                                            <div className="flex items-center gap-2 pt-1">
-                                                <span className="text-xs text-muted-foreground">Price:</span>
-                                                {product.was_price > 0 && product.was_price > product.sale_price && (
-                                                    <span className="text-xs text-muted-foreground line-through">${product.was_price.toFixed(2)}</span>
-                                                )}
-                                                <span className="text-sm font-semibold text-primary">${product.sale_price.toFixed(2)}</span>
-                                            </div>
-                                        )}
+
+                                        {/* CTA */}
+                                        <Link href={`/feeds/${product.slug}`} className="block pt-2">
+                                            <Button variant="outline" className="w-full" size="sm">
+                                                View Guide
+                                            </Button>
+                                        </Link>
                                     </div>
-                                </Link>
+                                </div>
                             ))}
                         </div>
 

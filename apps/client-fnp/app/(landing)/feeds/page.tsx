@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { BaseURL } from "@/lib/schemas"
 import { FeedListingClient } from "./FeedListingClient"
 
@@ -23,6 +24,11 @@ export default async function FeedProductsPage() {
         <main>
             <div className="mx-auto max-w-7xl px-6 lg:px-8 min-h-[70lvh]">
                 <div className="pt-10 pb-6">
+                    <nav className="flex text-sm text-muted-foreground mb-4">
+                        <Link href="/guides" className="hover:text-foreground transition-colors">Guides</Link>
+                        <span className="mx-2">/</span>
+                        <span className="text-foreground">Animal Nutrition</span>
+                    </nav>
                     <h1 className="text-3xl font-bold font-heading tracking-tight">
                         Livestock Feed Products
                     </h1>

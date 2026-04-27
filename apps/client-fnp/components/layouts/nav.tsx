@@ -1,6 +1,5 @@
 "use client"
 
-import * as React from "react"
 import Link from "next/link"
 
 import {sendGTMEvent} from "@next/third-parties/google";
@@ -64,84 +63,24 @@ function CartIcon({ user }: { user: AuthenticatedUser | null }) {
   )
 }
 
-function ProgramsMenu() {
-  const [open, setOpen] = React.useState(false)
-  return (
-    <div className="relative" onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
-      <button className={buttonVariants({ size: "sm", variant: "link" })}>
-        Programs
-      </button>
-      {open && (
-        <div className="absolute left-0 top-full z-50 min-w-[160px] rounded-md border bg-popover p-1 shadow-md">
-          <Link
-            href="/spray-programs"
-            onClick={() => { sendGTMEvent({ event: 'link', value: 'SprayProgramsTopNavigation' }); setOpen(false) }}
-            className="block rounded-sm px-3 py-1.5 text-sm hover:bg-accent transition-colors"
-          >
-            Spray Programs
-          </Link>
-          <Link
-            href="/feeding-programs"
-            onClick={() => { sendGTMEvent({ event: 'link', value: 'FeedProgramsTopNavigation' }); setOpen(false) }}
-            className="block rounded-sm px-3 py-1.5 text-sm hover:bg-accent transition-colors"
-          >
-            Feed Programs
-          </Link>
-        </div>
-      )}
-    </div>
-  )
-}
-
-function MarketMenu() {
-  const [open, setOpen] = React.useState(false)
-  return (
-    <div className="relative" onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
-      <button className={buttonVariants({ size: "sm", variant: "link" })}>
-        Market
-      </button>
-      {open && (
-        <div className="absolute left-0 top-full z-50 min-w-[140px] rounded-md border bg-popover p-1 shadow-md">
-          <Link
-            href="/prices"
-            onClick={() => { sendGTMEvent({ event: 'link', value: 'PricesTopNavigation' }); setOpen(false) }}
-            className="block rounded-sm px-3 py-1.5 text-sm hover:bg-accent transition-colors"
-          >
-            Prices
-          </Link>
-          <Link
-            href="/buyers"
-            onClick={() => { sendGTMEvent({ event: 'link', value: 'BuyerTopNavigation' }); setOpen(false) }}
-            className="block rounded-sm px-3 py-1.5 text-sm hover:bg-accent transition-colors"
-          >
-            Buyers
-          </Link>
-          <Link
-            href="/farmers"
-            onClick={() => { sendGTMEvent({ event: 'link', value: 'FarmerTopNavigation' }); setOpen(false) }}
-            className="block rounded-sm px-3 py-1.5 text-sm hover:bg-accent transition-colors"
-          >
-            Farmers
-          </Link>
-        </div>
-      )}
-    </div>
-  )
-}
-
 export function Navigation({ user }: NavigationProps) {
   return (
       <nav className="lg:flex lg:space-x-2">
         <Link href="/guides" onClick={() => sendGTMEvent({ event: 'link', value: 'GuidesTopNavigation' })}
-              className={buttonVariants({
-                size: "sm",
-                variant: "link"
-              })}
+              className={buttonVariants({ size: "sm", variant: "link" })}
         >
           Guides
         </Link>
-        <ProgramsMenu />
-        <MarketMenu />
+        <Link href="/programs" onClick={() => sendGTMEvent({ event: 'link', value: 'ProgramsTopNavigation' })}
+              className={buttonVariants({ size: "sm", variant: "link" })}
+        >
+          Programs
+        </Link>
+        <Link href="/market" onClick={() => sendGTMEvent({ event: 'link', value: 'MarketTopNavigation' })}
+              className={buttonVariants({ size: "sm", variant: "link" })}
+        >
+          Market
+        </Link>
         {user ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

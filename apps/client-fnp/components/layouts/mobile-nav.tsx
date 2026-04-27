@@ -15,100 +15,11 @@ import {AppURL, AuthenticatedUser} from "@/lib/schemas";
 import {sendGTMEvent} from "@next/third-parties/google";
 import {ThemeSwitcher} from "@/components/ui/theme-switcher";
 import {signOut} from "next-auth/react";
-import { ShoppingCart, ChevronDown } from "lucide-react";
+import { ShoppingCart } from "lucide-react";
 import { useCart } from "@/contexts/cart-context";
 import { useQuery } from "@tanstack/react-query";
 import { getCart } from "@/lib/query";
 
-function MarketSection({ setIsOpen }: { setIsOpen: (v: boolean) => void }) {
-  const [open, setOpen] = React.useState(false)
-  return (
-    <div>
-      <button
-        onClick={() => setOpen(!open)}
-        className="flex items-center gap-3 px-3 py-2 text-base font-medium rounded-md hover:bg-accent transition-colors w-full text-left"
-      >
-        <Icons.dollar className="h-5 w-5" />
-        <span>Market</span>
-        <ChevronDown className={`ml-auto h-4 w-4 transition-transform ${open ? "rotate-180" : ""}`} />
-      </button>
-      {open && (
-        <div className="ml-8 mt-1 space-y-1">
-          <Link
-            href="/prices"
-            onClick={() => {
-              sendGTMEvent({ event: 'link', value: 'PricesTopNavigation' })
-              setIsOpen(false)
-            }}
-            className="flex items-center gap-3 px-3 py-2 text-base font-medium rounded-md hover:bg-accent transition-colors"
-          >
-            <span>Prices</span>
-          </Link>
-          <Link
-            href="/buyers"
-            onClick={() => {
-              sendGTMEvent({ event: 'link', value: 'BuyerTopNavigation' })
-              setIsOpen(false)
-            }}
-            className="flex items-center gap-3 px-3 py-2 text-base font-medium rounded-md hover:bg-accent transition-colors"
-          >
-            <span>Buyers</span>
-          </Link>
-          <Link
-            href="/farmers"
-            onClick={() => {
-              sendGTMEvent({ event: 'link', value: 'FarmerTopNavigation' })
-              setIsOpen(false)
-            }}
-            className="flex items-center gap-3 px-3 py-2 text-base font-medium rounded-md hover:bg-accent transition-colors"
-          >
-            <span>Farmers</span>
-          </Link>
-        </div>
-      )}
-    </div>
-  )
-}
-
-function ProgramsSection({ setIsOpen }: { setIsOpen: (v: boolean) => void }) {
-  const [open, setOpen] = React.useState(false)
-  return (
-    <div>
-      <button
-        onClick={() => setOpen(!open)}
-        className="flex items-center gap-3 px-3 py-2 text-base font-medium rounded-md hover:bg-accent transition-colors w-full text-left"
-      >
-        <Icons.sprout className="h-5 w-5" />
-        <span>Programs</span>
-        <ChevronDown className={`ml-auto h-4 w-4 transition-transform ${open ? "rotate-180" : ""}`} />
-      </button>
-      {open && (
-        <div className="ml-8 mt-1 space-y-1">
-          <Link
-            href="/spray-programs"
-            onClick={() => {
-              sendGTMEvent({ event: 'link', value: 'SprayProgramsTopNavigation' })
-              setIsOpen(false)
-            }}
-            className="flex items-center gap-3 px-3 py-2 text-base font-medium rounded-md hover:bg-accent transition-colors"
-          >
-            <span>Spray Programs</span>
-          </Link>
-          <Link
-            href="/feeding-programs"
-            onClick={() => {
-              sendGTMEvent({ event: 'link', value: 'FeedProgramsTopNavigation' })
-              setIsOpen(false)
-            }}
-            className="flex items-center gap-3 px-3 py-2 text-base font-medium rounded-md hover:bg-accent transition-colors"
-          >
-            <span>Feed Programs</span>
-          </Link>
-        </div>
-      )}
-    </div>
-  )
-}
 
 interface MobileNavProps {
   user: AuthenticatedUser | null
@@ -131,7 +42,6 @@ export function MobileNav({ user }: MobileNavProps) {
     return (
       <div className="flex flex-1 md:hidden">
         <Link href="/" className="items-center space-x-2 flex md:hidden">
-          <Icons.logo className="h-6 w-6" aria-hidden="true" />
           <span className="font-bold lg:inline-block">
                     {siteConfig.name}
                 </span>
@@ -179,7 +89,6 @@ export function MobileNav({ user }: MobileNavProps) {
                  className="flex items-center"
                  onClick={() => setIsOpen(false)}
                >
-                 <Icons.logo className="mr-2 h-4 w-4" aria-hidden="true" />
                  <span className="font-bold">{siteConfig.name}</span>
                  <span className="sr-only">Home</span>
                </Link>
@@ -200,9 +109,29 @@ export function MobileNav({ user }: MobileNavProps) {
                      <span>Guides</span>
                    </Link>
 
-                   <ProgramsSection setIsOpen={setIsOpen} />
+                   <Link
+                     href="/programs"
+                     onClick={() => {
+                       sendGTMEvent({ event: 'link', value: 'ProgramsTopNavigation' })
+                       setIsOpen(false)
+                     }}
+                     className="flex items-center gap-3 px-3 py-2 text-base font-medium rounded-md hover:bg-accent transition-colors"
+                   >
+                     <Icons.sprout className="h-5 w-5" />
+                     <span>Programs</span>
+                   </Link>
 
-                   <MarketSection setIsOpen={setIsOpen} />
+                   <Link
+                     href="/market"
+                     onClick={() => {
+                       sendGTMEvent({ event: 'link', value: 'MarketTopNavigation' })
+                       setIsOpen(false)
+                     }}
+                     className="flex items-center gap-3 px-3 py-2 text-base font-medium rounded-md hover:bg-accent transition-colors"
+                   >
+                     <Icons.dollar className="h-5 w-5" />
+                     <span>Market</span>
+                   </Link>
                  </nav>
 
                  {/* Account Section */}

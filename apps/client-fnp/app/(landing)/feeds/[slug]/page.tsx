@@ -1,9 +1,10 @@
 import Image from "next/image"
-import { AlertTriangle, ShoppingCart } from "lucide-react"
+import { AlertTriangle } from "lucide-react"
 import Link from "next/link"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
 import { BaseURL } from "@/lib/schemas"
 import { FeedBreadcrumb } from "./FeedBreadcrumb"
+import { WantToBuyCTA } from "@/components/shared/WantToBuyCTA"
 import { sendGTMEvent } from "@next/third-parties/google"
 
 interface FeedDetailPageProps {
@@ -120,19 +121,7 @@ export default async function FeedDetailPage({ params }: FeedDetailPageProps) {
                         )}
 
                         {/* Want to Buy CTA */}
-                        {product.available_for_sale && <Link
-                            href="/waiting-list-shop"
-                            className="flex items-center gap-3 rounded-xl border-2 border-primary/20 bg-primary/5 hover:bg-primary/10 hover:border-primary/40 transition-colors px-4 py-3"
-                        >
-                            <div className="flex items-center justify-center w-9 h-9 rounded-full bg-primary/10 shrink-0">
-                                <ShoppingCart className="w-4 h-4 text-primary" />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                                <p className="text-sm font-semibold text-foreground">Want to buy {product.name}?</p>
-                                <p className="text-xs text-muted-foreground">Find sellers &amp; compare prices</p>
-                            </div>
-                            <span className="text-xs font-medium text-primary shrink-0">View →</span>
-                        </Link>}
+                        <WantToBuyCTA available_for_sale={product.available_for_sale} name={product.name} href="/waiting-list-shop" />
 
                         {/* Safety Warnings */}
                         {product.safety_warnings && (

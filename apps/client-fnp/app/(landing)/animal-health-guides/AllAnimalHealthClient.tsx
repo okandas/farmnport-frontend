@@ -57,8 +57,8 @@ export function AllAnimalHealthClient({ initialProducts, initialTotal }: AllAnim
 
             <main className="flex-1">
                 {productsLoading ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                        {[...Array(6)].map((_, i) => (
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+                        {[...Array(8)].map((_, i) => (
                             <div key={i} className="animate-pulse">
                                 <div className="bg-card border border-border rounded-lg overflow-hidden">
                                     <div className="aspect-square bg-muted" />
@@ -82,7 +82,7 @@ export function AllAnimalHealthClient({ initialProducts, initialTotal }: AllAnim
                     </div>
                 ) : (
                     <>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
                             {products.map((product: any) => (
                                 <AnimalHealthCard key={product.id} product={product} />
                             ))}

@@ -3,6 +3,7 @@ import Image from "next/image"
 import { Bug, Beaker } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { sendGTMEvent } from '@next/third-parties/google'
+import { formatProductName } from "@/lib/utilities"
 
 interface AnimalHealthCardProps {
   product: any
@@ -44,8 +45,8 @@ export function AnimalHealthCard({ product }: AnimalHealthCardProps) {
 
         {/* Product Name */}
         <Link href={href}>
-          <h3 className="font-semibold text-sm leading-tight capitalize line-clamp-2 min-h-[2.5rem] group-hover:text-primary transition-colors">
-            {product.name}
+          <h3 className="font-semibold text-sm leading-tight line-clamp-2 min-h-[2.5rem] group-hover:text-primary transition-colors">
+            {formatProductName(product.name)}
           </h3>
         </Link>
 
@@ -60,16 +61,6 @@ export function AnimalHealthCard({ product }: AnimalHealthCardProps) {
             <span>{product.active_ingredients?.length || 0} active</span>
           </div>
         </div>
-
-        {product.show_price && product.sale_price > 0 && (
-            <div className="flex items-center gap-2">
-                <span className="text-xs text-muted-foreground">Guide Price:</span>
-                {product.was_price > 0 && product.was_price > product.sale_price && (
-                    <span className="text-xs text-muted-foreground line-through">${product.was_price.toFixed(2)}</span>
-                )}
-                <span className="text-sm font-semibold text-primary">${product.sale_price.toFixed(2)}</span>
-            </div>
-        )}
 
         {/* CTA */}
         <Link href={href} className="block pt-2">

@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Link from "next/link"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
 import { BaseURL } from "@/lib/schemas"
-import { BuyFeedActions } from "./BuyFeedActions"
+import { AddToCartButton } from "@/components/cart/AddToCartButton"
 import { BackToProgram } from "./BackToProgram"
 
 interface BuyFeedPageProps {
@@ -238,7 +238,16 @@ export default async function BuyFeedPage({ params }: BuyFeedPageProps) {
                         </div>
 
                         {/* Add to Cart Section */}
-                        <BuyFeedActions />
+                        <AddToCartButton
+                            productId={product.id}
+                            productType="feed"
+                            productName={product.name}
+                            productSlug={slug}
+                            imageSrc={product.images?.[0]?.img?.src}
+                            unitPrice={product.show_price && product.sale_price > 0 ? product.sale_price / 100 : null}
+                            available={product.available_for_sale}
+                            loginRedirect={`/buy-feeds/${slug}`}
+                        />
 
                         {/* Delivery & Returns Info */}
                         <div className="bg-muted/50 rounded-lg p-4 space-y-3">

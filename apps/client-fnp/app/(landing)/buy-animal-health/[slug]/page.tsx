@@ -1,10 +1,10 @@
 import { queryAnimalHealthProduct } from "@/lib/query"
 import Image from "next/image"
-import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { ShoppingCart, Heart, Share2, Truck, Shield, RotateCcw, Bug, Beaker } from "lucide-react"
+import { Truck, Shield, RotateCcw, Bug, Beaker } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Link from "next/link"
+import { AddToCartButton } from "@/components/cart/AddToCartButton"
 
 interface BuyAnimalHealthProductPageProps {
     params: Promise<{
@@ -212,27 +212,16 @@ export default async function BuyAnimalHealthProductPage({ params }: BuyAnimalHe
                         </div>
 
                         {/* Add to Cart Section */}
-                        <div className="space-y-3">
-                            <div className="flex gap-3">
-                                <Link href="/waiting-list-shop" className="flex-1">
-                                    <Button size="lg" className="w-full">
-                                        <ShoppingCart className="w-5 h-5 mr-2" />
-                                        Add to Cart
-                                    </Button>
-                                </Link>
-                                <Button size="lg" variant="outline">
-                                    <Heart className="w-5 h-5" />
-                                </Button>
-                                <Button size="lg" variant="outline">
-                                    <Share2 className="w-5 h-5" />
-                                </Button>
-                            </div>
-                            <Link href="/waiting-list-shop">
-                                <Button size="lg" variant="secondary" className="w-full">
-                                    Buy Now
-                                </Button>
-                            </Link>
-                        </div>
+                        <AddToCartButton
+                            productId={product.id}
+                            productType="animal_health"
+                            productName={product.name}
+                            productSlug={product.slug}
+                            imageSrc={product.images?.[0]?.img?.src}
+                            unitPrice={product.show_price && product.sale_price > 0 ? product.sale_price / 100 : null}
+                            available={product.available_for_sale}
+                            loginRedirect={`/buy-animal-health/${slug}`}
+                        />
 
                         {/* Delivery & Returns Info */}
                         <div className="bg-muted/50 rounded-lg p-4 space-y-3">
