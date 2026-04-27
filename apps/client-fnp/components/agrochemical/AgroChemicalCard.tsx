@@ -71,7 +71,7 @@ export function AgroChemicalCard({ chemical, mode }: AgroChemicalCardProps) {
             {chemical.show_price && chemical.sale_price > 0 ? (
               <div className="flex items-baseline gap-2">
                 <span className="text-lg font-bold">${(chemical.sale_price / 100).toFixed(2)}</span>
-                {chemical.was_price > 0 && chemical.was_price > chemical.sale_price && (
+                {chemical.show_was_price && chemical.was_price > 0 && chemical.was_price > chemical.sale_price && (
                   <span className="text-xs text-muted-foreground line-through">${(chemical.was_price / 100).toFixed(2)}</span>
                 )}
               </div>

@@ -25,7 +25,6 @@ export function ProductInteractive({ chemical, slug, baseUrl }: ProductInteracti
   const hasVariants = chemical.variants && chemical.variants.length > 0
   const [selectedVariant, setSelectedVariant] = useState<any>(hasVariants ? chemical.variants[0] : null)
   const [selectedImage, setSelectedImage] = useState(0)
-  const [quantity, setQuantity] = useState(1)
   const [fulfillment, setFulfillment] = useState<"delivery" | "pickup">("delivery")
   const [mounted, setMounted] = useState(false)
   useEffect(() => { setMounted(true) }, [])
@@ -83,7 +82,7 @@ export function ProductInteractive({ chemical, slug, baseUrl }: ProductInteracti
       product_slug: slug,
       image_src: chemical.images?.[0]?.img?.src ?? "",
       unit_price: displayPrice,
-      quantity,
+      quantity: 1,
     })
   }
 
@@ -96,7 +95,7 @@ export function ProductInteractive({ chemical, slug, baseUrl }: ProductInteracti
   const displayWasPrice =
     selectedVariant?.was_price > 0 && selectedVariant.was_price > selectedVariant.sale_price
       ? selectedVariant.was_price / 100
-      : chemical.was_price > 0 && chemical.was_price > chemical.sale_price
+      : chemical.show_was_price && chemical.was_price > 0 && chemical.was_price > chemical.sale_price
       ? chemical.was_price / 100
       : null
 
@@ -383,24 +382,6 @@ export function ProductInteractive({ chemical, slug, baseUrl }: ProductInteracti
             </div>
           </div>
 
-          {/* Qty + Add to Cart */}
-          <div className="p-5 border-b space-y-3">
-            <div className="flex items-center gap-3">
-              <p className="text-sm font-medium">Qty:</p>
-              <div className="flex items-center border rounded-lg overflow-hidden">
-                <button onClick={() => setQuantity(q => Math.max(1, q - 1))} className="w-8 h-8 flex items-center justify-center hover:bg-muted transition-colors border-r">
-                  <Minus className="w-3 h-3" />
-                </button>
-                <span className="w-10 text-center text-sm font-semibold">{quantity}</span>
-                <button onClick={() => setQuantity(q => q + 1)} className="w-8 h-8 flex items-center justify-center hover:bg-muted transition-colors border-l">
-                  <Plus className="w-3 h-3" />
-                </button>
-              </div>
-              {displayPrice && (
-                <span className="text-sm font-bold ml-auto">${(displayPrice * quantity).toFixed(2)}</span>
-              )}
-            </div>
-          </div>
 
           {/* Seller footer */}
           <div className="px-5 pb-5 space-y-2.5 text-xs text-muted-foreground border-t pt-4">
