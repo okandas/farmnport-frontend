@@ -77,7 +77,7 @@ export default function ContactViewsPage() {
       <div>
         <h2 className="text-3xl font-bold tracking-tight">Contact Views</h2>
         <p className="text-muted-foreground">
-          Analytics on who is viewing contact details
+          Track which profiles are being viewed and which users are viewing them
         </p>
       </div>
 
@@ -136,6 +136,7 @@ export default function ContactViewsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Most Viewed Contacts</CardTitle>
+            <p className="text-xs text-muted-foreground">Profiles whose contact info was viewed most often</p>
           </CardHeader>
           <CardContent>
             {topViewed.length === 0 ? (
@@ -147,7 +148,7 @@ export default function ContactViewsPage() {
                   <span>Name</span>
                   <span>Type</span>
                   <span>City</span>
-                  <span>Last View</span>
+                  <span>Last Viewed</span>
                   <span className="text-right">Views</span>
                 </div>
                 {visibleViewed.map((contact: any, i: number) => (
@@ -181,6 +182,7 @@ export default function ContactViewsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Most Active Viewers</CardTitle>
+            <p className="text-xs text-muted-foreground">Users who have viewed the most contact profiles</p>
           </CardHeader>
           <CardContent>
             {topViewers.length === 0 ? (
@@ -191,7 +193,7 @@ export default function ContactViewsPage() {
                   <span>#</span>
                   <span>Name</span>
                   <span>Type</span>
-                  <span>Last View</span>
+                  <span>Last Active</span>
                   <span className="text-right">Viewed</span>
                 </div>
                 {visibleViewers.map((viewer: any, i: number) => (
