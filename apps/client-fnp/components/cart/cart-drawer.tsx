@@ -70,7 +70,7 @@ export function CartDrawer() {
             <ShoppingCart className="w-5 h-5" />
             Cart
             {items.length > 0 && (
-              <span className="ml-auto text-sm font-normal text-muted-foreground">
+              <span className="ml-auto mr-6 text-sm font-normal text-muted-foreground">
                 {items.length} {items.length === 1 ? "item" : "items"}
               </span>
             )}
