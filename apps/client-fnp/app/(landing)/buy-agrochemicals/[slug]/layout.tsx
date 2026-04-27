@@ -75,10 +75,10 @@ export async function generateMetadata({ params }: LayoutProps): Promise<Metadat
         canonical: url,
       },
       robots: {
-        index: false,
+        index: true,
         follow: true,
         googleBot: {
-          index: false,
+          index: true,
           follow: true,
         },
       },
