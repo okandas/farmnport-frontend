@@ -178,9 +178,11 @@ export function updateUserWantToPay(wantToPay: boolean) {
   return api.post(url, { wantToPay })
 }
 
-export function queryClientFilterAggregates(type: 'buyers' | 'farmers') {
-  const url = `${BaseURL}/client/aggregates/filters?type=${type}`
-  return api.get(url)
+export function queryClientFilterAggregates(type: 'buyers' | 'farmers', filters?: { produce?: string[], province?: string[] }) {
+  const params = new URLSearchParams({ type })
+  filters?.produce?.forEach(p => params.append('produce', p))
+  filters?.province?.forEach(p => params.append('province', p))
+  return api.get(`${BaseURL}/client/aggregates/filters?${params.toString()}`)
 }
 
 export function queryClientPricing(clientId: string, pagination?: PaginationModel) {
