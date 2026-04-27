@@ -125,17 +125,10 @@ export function FeedListingClient({ initialData, initialTotal }: FeedListingClie
                                             </p>
                                         )}
                                         <Link href={`/feeds/${product.slug}`}>
-                                            <h3 className="font-semibold text-sm leading-tight line-clamp-2 min-h-[2.5rem] group-hover:text-primary transition-colors">
+                                            <h3 className="font-semibold text-sm leading-tight line-clamp-2 min-h-[2.5rem] group-hover:text-primary transition-colors capitalize">
                                                 {product.name}
                                             </h3>
                                         </Link>
-
-                                        {/* Stats */}
-                                        <div className="flex items-center gap-4 text-xs text-muted-foreground pt-2 border-t min-h-[1.25rem] overflow-hidden">
-                                            {product.animal && <span className="truncate shrink-0 max-w-[40%]">{product.animal}</span>}
-                                            {product.phase && <span className="truncate shrink-0 max-w-[35%]">{product.phase}</span>}
-                                            {product.form && <span className="truncate">{product.form}</span>}
-                                        </div>
 
                                         {/* CTA */}
                                         <Link href={`/feeds/${product.slug}`} className="block pt-2">
