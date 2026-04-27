@@ -116,8 +116,13 @@ function FeedFilterContent({ onClearAll }: { onClearAll: () => void }) {
   })
 
   const { data: filtersData, isLoading: filtersLoading } = useQuery({
-    queryKey: ["feed-filter-aggregates"],
-    queryFn: () => queryFeedFilterAggregates(),
+    queryKey: ["feed-filter-aggregates", queryState.brand, queryState.animal, queryState.phase, queryState.sub_type],
+    queryFn: () => queryFeedFilterAggregates({
+      brand: queryState.brand ?? [],
+      animal: queryState.animal ?? [],
+      phase: queryState.phase ?? [],
+      sub_type: queryState.sub_type ?? [],
+    }),
     refetchOnWindowFocus: false,
   })
 
@@ -241,7 +246,7 @@ function FeedFilterContent({ onClearAll }: { onClearAll: () => void }) {
         </div>
       )}
 
-      <Accordion type="single" collapsible className="w-full flex-1" defaultValue="Feeding Stage">
+      <Accordion type="multiple" className="w-full flex-1" defaultValue={filterSections.filter(s => { const v = queryState[s.key as keyof typeof queryState]; return Array.isArray(v) ? v.length > 0 : false }).map(s => s.name).concat(["Feeding Stage", "Livestock Type"]).filter((v, i, a) => a.indexOf(v) === i)}>
         {filterSections.map((section) => {
           const selectedFilters = queryState[section.key as keyof typeof queryState] as string[] || []
 

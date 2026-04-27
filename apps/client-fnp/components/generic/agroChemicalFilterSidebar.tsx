@@ -119,11 +119,16 @@ function FilterContent({
     used_on: parseAsString,
   })
 
-  // Fetch aggregate data for agrochemicals
+  // Fetch aggregate data for agrochemicals — cascade by active filters
   const { data: aggregateData, isLoading: isLoadingAggregates } = useQuery({
-    queryKey: ["agrochemical-filter-aggregates"],
+    queryKey: ["agrochemical-filter-aggregates", queryState.brand, queryState.target, queryState.active_ingredient, queryState.used_on],
     queryFn: async () => {
-      const response = await queryAgroChemicalFilterAggregates()
+      const response = await queryAgroChemicalFilterAggregates({
+        brand: queryState.brand ?? [],
+        target: queryState.target ?? [],
+        active_ingredient: queryState.active_ingredient ?? [],
+        used_on: queryState.used_on ? [queryState.used_on] : [],
+      })
       return response.data as AgroChemicalFilterAggregates
     },
   })
@@ -219,7 +224,7 @@ function FilterContent({
         </div>
       )}
 
-      <Accordion type="multiple" className="w-full flex-1" defaultValue={["Used On", "Targets", "Active Ingredients"]}>
+      <Accordion type="multiple" className="w-full flex-1" defaultValue={filterSections.filter(s => { const raw = (queryState as any)[s.key]; return Array.isArray(raw) ? raw.length > 0 : !!raw }).map(s => s.name).concat(["Used On", "Targets"]).filter((v, i, a) => a.indexOf(v) === i)}>
         {filterSections.map((section) => {
           const raw = (queryState as any)[section.key]
           const selectedFilters: string[] = Array.isArray(raw) ? raw : (raw ? [raw] : [])

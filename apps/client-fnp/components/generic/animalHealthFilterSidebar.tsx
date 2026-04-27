@@ -119,10 +119,16 @@ function FilterContent({
     used_on: parseAsString,
   })
 
+  // Fetch aggregate data for animal health — cascade by active filters
   const { data: aggregateData, isLoading: isLoadingAggregates } = useQuery({
-    queryKey: ["animal-health-filter-aggregates"],
+    queryKey: ["animal-health-filter-aggregates", queryState.brand, queryState.target, queryState.active_ingredient, queryState.used_on],
     queryFn: async () => {
-      const response = await queryAnimalHealthFilterAggregates()
+      const response = await queryAnimalHealthFilterAggregates({
+        brand: queryState.brand ?? [],
+        target: queryState.target ?? [],
+        active_ingredient: queryState.active_ingredient ?? [],
+        used_on: queryState.used_on ? [queryState.used_on] : [],
+      })
       return response.data as AnimalHealthFilterAggregates
     },
   })
@@ -182,7 +188,7 @@ function FilterContent({
         </div>
       )}
 
-      <Accordion type="multiple" className="w-full flex-1" defaultValue={["Used On"]}>
+      <Accordion type="multiple" className="w-full flex-1" defaultValue={filterSections.filter(s => { const raw = (queryState as any)[s.key]; return Array.isArray(raw) ? raw.length > 0 : !!raw }).map(s => s.name).concat(["Used On"]).filter((v, i, a) => a.indexOf(v) === i)}>
         {filterSections.map((section) => {
           const raw = (queryState as any)[section.key]
           const selectedFilters: string[] = Array.isArray(raw) ? raw : (raw ? [raw] : [])

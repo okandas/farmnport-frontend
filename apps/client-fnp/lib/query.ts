@@ -295,9 +295,14 @@ export function queryAllActiveIngredients() {
   return api.get(url)
 }
 
-export function queryAgroChemicalFilterAggregates() {
-  const url = `${BaseURL}/agrochemical/aggregates/filters`
-  return api.get(url)
+export function queryAgroChemicalFilterAggregates(filters?: { brand?: string[], target?: string[], active_ingredient?: string[], used_on?: string[] }) {
+  const params = new URLSearchParams()
+  filters?.brand?.forEach(v => params.append('brand', v))
+  filters?.target?.forEach(v => params.append('target', v))
+  filters?.active_ingredient?.forEach(v => params.append('active_ingredient', v))
+  filters?.used_on?.forEach(v => params.append('used_on', v))
+  const qs = params.toString()
+  return api.get(`${BaseURL}/agrochemical/aggregates/filters${qs ? `?${qs}` : ''}`)
 }
 
 export function queryAgroChemical(slug: string) {
@@ -405,9 +410,14 @@ export function queryAnimalHealthProductsByCategory(options: { category: string 
   return api.get(url)
 }
 
-export function queryAnimalHealthFilterAggregates() {
-  const url = `${BaseURL}/animalhealth/aggregates/filters`
-  return api.get(url)
+export function queryAnimalHealthFilterAggregates(filters?: { brand?: string[], target?: string[], active_ingredient?: string[], used_on?: string[] }) {
+  const params = new URLSearchParams()
+  filters?.brand?.forEach(v => params.append('brand', v))
+  filters?.target?.forEach(v => params.append('target', v))
+  filters?.active_ingredient?.forEach(v => params.append('active_ingredient', v))
+  filters?.used_on?.forEach(v => params.append('used_on', v))
+  const qs = params.toString()
+  return api.get(`${BaseURL}/animalhealth/aggregates/filters${qs ? `?${qs}` : ''}`)
 }
 
 export function queryAnimalHealthProduct(slug: string) {
@@ -463,9 +473,14 @@ export function queryFeedCategories() {
   return api.get(url)
 }
 
-export function queryFeedFilterAggregates() {
-  const url = `${BaseURL}/feed/aggregates/filters`
-  return api.get(url)
+export function queryFeedFilterAggregates(filters?: { brand?: string[], animal?: string[], phase?: string[], sub_type?: string[] }) {
+  const params = new URLSearchParams()
+  filters?.brand?.forEach(v => params.append('brand', v))
+  filters?.animal?.forEach(v => params.append('animal', v))
+  filters?.phase?.forEach(v => params.append('phase', v))
+  filters?.sub_type?.forEach(v => params.append('sub_type', v))
+  const qs = params.toString()
+  return api.get(`${BaseURL}/feed/aggregates/filters${qs ? `?${qs}` : ''}`)
 }
 
 // Feeding Programs
@@ -550,8 +565,14 @@ export function queryPlantNutritionProductsByCategory(options: { category: strin
   return api.get(qs ? `${BaseURL}/plantnutrition/category/${options.category}?${qs}` : `${BaseURL}/plantnutrition/category/${options.category}`)
 }
 
-export function queryPlantNutritionFilterAggregates() {
-  return api.get(`${BaseURL}/plantnutrition/aggregates/filters`)
+export function queryPlantNutritionFilterAggregates(filters?: { brand?: string[], category?: string[], active_ingredient?: string[], used_on?: string[] }) {
+  const params = new URLSearchParams()
+  filters?.brand?.forEach(v => params.append('brand', v))
+  filters?.category?.forEach(v => params.append('category', v))
+  filters?.active_ingredient?.forEach(v => params.append('active_ingredient', v))
+  filters?.used_on?.forEach(v => params.append('used_on', v))
+  const qs = params.toString()
+  return api.get(`${BaseURL}/plantnutrition/aggregates/filters${qs ? `?${qs}` : ''}`)
 }
 
 // Cart
