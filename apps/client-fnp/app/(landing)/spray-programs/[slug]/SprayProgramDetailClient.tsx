@@ -104,7 +104,7 @@ export function SprayProgramDetailClient({ program, slug }: SprayProgramDetailCl
             <div className="border-b">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
                     <nav className="flex text-sm text-muted-foreground">
-                        <Link href="/" className="hover:text-foreground">Home</Link>
+                        <Link href="/programs" className="hover:text-foreground">Programs</Link>
                         <span className="mx-2">/</span>
                         <Link href="/spray-programs" className="hover:text-foreground">Spray Programs</Link>
                         <span className="mx-2">/</span>

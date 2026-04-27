@@ -5,15 +5,10 @@ import { createPortal } from "react-dom"
 import Image from "next/image"
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
-import { Minus, Plus, Beaker, Check, Loader2 } from "lucide-react"
+import { Beaker, Check } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ShareButton } from "./ShareButton"
-import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query"
-import { addToCart, getCart, updateCartItem, removeFromCart } from "@/lib/query"
-import { useCart } from "@/contexts/cart-context"
-import { toast } from "sonner"
-import { useSession } from "next-auth/react"
-import { useRouter } from "next/navigation"
+import { AddToCartButton } from "@/components/cart/AddToCartButton"
 
 interface ProductInteractiveProps {
   chemical: any
@@ -28,63 +23,6 @@ export function ProductInteractive({ chemical, slug, baseUrl }: ProductInteracti
   const [fulfillment, setFulfillment] = useState<"delivery" | "pickup">("delivery")
   const [mounted, setMounted] = useState(false)
   useEffect(() => { setMounted(true) }, [])
-
-  const { data: session } = useSession()
-  const router = useRouter()
-  const { openCart } = useCart()
-  const qc = useQueryClient()
-
-  const { data: cartData } = useQuery({
-    queryKey: ["cart"],
-    queryFn: () => getCart().then((r) => r.data),
-    enabled: !!session,
-    staleTime: 0,
-  })
-
-  const cartItem = (cartData as any)?.items?.find(
-    (i: any) => i.product_id === chemical.id
-  )
-  const cartQty: number = cartItem?.quantity ?? 0
-
-  const addMutation = useMutation({
-    mutationFn: addToCart,
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["cart"] })
-      openCart()
-    },
-    onError: () => toast.error("Failed to add to cart"),
-  })
-
-  const updateMutation = useMutation({
-    mutationFn: ({ qty }: { qty: number }) =>
-      qty < 1
-        ? removeFromCart(chemical.id)
-        : updateCartItem(chemical.id, qty),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["cart"] }),
-    onError: () => toast.error("Failed to update cart"),
-  })
-
-  const isMutating = addMutation.isPending || updateMutation.isPending
-
-  function handleAddToCart() {
-    if (!session) {
-      router.push(`/login?next=/buy-agrochemicals/${slug}`)
-      return
-    }
-    if (!displayPrice) {
-      toast.info("Please contact us for pricing")
-      return
-    }
-    addMutation.mutate({
-      product_id: chemical.id,
-      product_type: "agrochemical",
-      product_name: selectedVariant ? `${chemical.name} - ${selectedVariant.name}` : chemical.name,
-      product_slug: slug,
-      image_src: chemical.images?.[0]?.img?.src ?? "",
-      unit_price: displayPrice,
-      quantity: 1,
-    })
-  }
 
   const displayPrice = selectedVariant?.sale_price
     ? selectedVariant.sale_price / 100
@@ -313,36 +251,16 @@ export function ProductInteractive({ chemical, slug, baseUrl }: ProductInteracti
                 <span className="text-xs font-medium text-red-700 dark:text-red-400">Out of stock</span>
               </div>
             )}
-            {cartQty > 0 ? (
-              <div className="flex items-center mt-3 rounded-full border-2 border-primary overflow-hidden">
-                <button
-                  onClick={() => updateMutation.mutate({ qty: cartQty - 1 })}
-                  disabled={isMutating}
-                  className="flex-1 flex items-center justify-center h-10 hover:bg-primary/10 transition-colors disabled:opacity-60"
-                >
-                  <Minus className="w-4 h-4 text-primary" />
-                </button>
-                <span className="px-4 text-sm font-bold text-primary tabular-nums">
-                  {isMutating ? <Loader2 className="w-4 h-4 animate-spin" /> : cartQty}
-                </span>
-                <button
-                  onClick={() => updateMutation.mutate({ qty: cartQty + 1 })}
-                  disabled={isMutating}
-                  className="flex-1 flex items-center justify-center h-10 hover:bg-primary/10 transition-colors disabled:opacity-60"
-                >
-                  <Plus className="w-4 h-4 text-primary" />
-                </button>
-              </div>
-            ) : (
-              <button
-                onClick={handleAddToCart}
-                disabled={addMutation.isPending || !chemical.available_for_sale}
-                className="flex items-center justify-center gap-2 w-full bg-primary hover:bg-primary/90 disabled:opacity-60 text-primary-foreground font-semibold text-sm py-2.5 rounded-full transition-colors mt-3"
-              >
-                {addMutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
-                {chemical.available_for_sale ? "Add to Cart" : "Out of Stock"}
-              </button>
-            )}
+            <AddToCartButton
+              productId={chemical.id}
+              productType="agrochemical"
+              productName={selectedVariant ? `${chemical.name} - ${selectedVariant.name}` : chemical.name}
+              productSlug={slug}
+              imageSrc={chemical.images?.[0]?.img?.src}
+              unitPrice={displayPrice}
+              available={chemical.available_for_sale}
+              loginRedirect={`/buy-agrochemicals/${slug}`}
+            />
           </div>
 
           {/* Fulfillment */}
