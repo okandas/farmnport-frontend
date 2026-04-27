@@ -1,7 +1,6 @@
 import Link from "next/link"
 import Image from "next/image"
-import { useRouter } from "next/navigation"
-import { Bug, Beaker, ShoppingCart } from "lucide-react"
+import { Bug, Beaker } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { sendGTMEvent } from '@next/third-parties/google'
 import { formatProductName } from "@/lib/utilities"
@@ -12,7 +11,6 @@ interface AgroChemicalCardProps {
 }
 
 export function AgroChemicalCard({ chemical, mode }: AgroChemicalCardProps) {
-  const router = useRouter()
   const categorySlug = chemical.agrochemical_category?.slug || 'all'
   const href = mode === "shop"
     ? `/buy-agrochemicals/${chemical.slug}`
@@ -70,25 +68,21 @@ export function AgroChemicalCard({ chemical, mode }: AgroChemicalCardProps) {
         {/* CTA - Different based on mode */}
         {mode === "shop" ? (
           <div className="pt-3 space-y-2">
-            {/* Price placeholder - will be populated from backend */}
-            <div className="flex items-baseline gap-2">
-              <span className="text-lg font-bold text-primary">$25.00</span>
-              <span className="text-xs text-muted-foreground line-through">$35.00</span>
-            </div>
-            <Button
-              className="w-full"
-              size="sm"
-              onClick={(e) => {
-                e.preventDefault()
-                // Track GTM event for shop click
-                sendGTMEvent({ event: 'action', value: 'ShopBuyOnline' })
-                // Redirect to waiting list
-                router.push('/waiting-list-shop')
-              }}
-            >
-              <ShoppingCart className="w-4 h-4 mr-2" />
-              Add to Cart
-            </Button>
+            {chemical.show_price && chemical.sale_price > 0 ? (
+              <div className="flex items-baseline gap-2">
+                <span className="text-lg font-bold">${(chemical.sale_price / 100).toFixed(2)}</span>
+                {chemical.was_price > 0 && chemical.was_price > chemical.sale_price && (
+                  <span className="text-xs text-muted-foreground line-through">${(chemical.was_price / 100).toFixed(2)}</span>
+                )}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">Price on request</p>
+            )}
+            <Link href={href} className="block" onClick={() => sendGTMEvent({ event: 'action', value: 'ShopBuyOnline' })}>
+              <Button className="w-full" size="sm">
+                Buy Now
+              </Button>
+            </Link>
           </div>
         ) : (
           <Link href={href} className="block pt-2">
