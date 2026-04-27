@@ -590,7 +590,7 @@ export function SprayProgramDetailClient({ program, slug }: SprayProgramDetailCl
 
                                 {/* Targets - inline */}
                                 {quickViewProduct.agrochemical?.targets?.length > 0 && (
-                                    <ul className="grid grid-cols-2 lg:grid-cols-5 gap-x-3 gap-y-1">
+                                    <ul className="flex flex-wrap gap-x-4 gap-y-1">
                                         {quickViewProduct.agrochemical.targets.map((t: any, idx: number) => (
                                             <li key={idx} className="flex items-center gap-1.5 text-[11px] text-green-700 dark:text-green-300 capitalize">
                                                 <span className="h-1.5 w-1.5 rounded-full bg-green-500 flex-shrink-0" />

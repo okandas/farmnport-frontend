@@ -1,12 +1,10 @@
-import { notFound } from "next/navigation"
 import Image from "next/image"
-import { AlertTriangle } from "lucide-react"
+import { AlertTriangle, ShoppingCart } from "lucide-react"
 import Link from "next/link"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
-import { capitalizeFirstLetter } from "@/lib/utilities"
 import { BaseURL } from "@/lib/schemas"
-import { BuyNowButton } from "./BuyNowButton"
 import { FeedBreadcrumb } from "./FeedBreadcrumb"
+import { sendGTMEvent } from "@next/third-parties/google"
 
 interface FeedDetailPageProps {
     params: Promise<{ slug: string }>
@@ -61,19 +59,11 @@ export default async function FeedDetailPage({ params }: FeedDetailPageProps) {
         "image": imageUrl,
         "category": product.feed_category?.name || "Livestock Feed",
         "url": url,
-        "brand": product.brand?.name ? {
-            "@type": "Brand",
-            "name": product.brand.name,
-        } : undefined,
+        "brand": product.brand?.name ? { "@type": "Brand", "name": product.brand.name } : undefined,
         "additionalProperty": [
             ...(product.animal ? [{ "@type": "PropertyValue", "name": "Animal", "value": product.animal }] : []),
             ...(product.phase ? [{ "@type": "PropertyValue", "name": "Phase", "value": product.phase }] : []),
             ...(product.form ? [{ "@type": "PropertyValue", "name": "Form", "value": product.form }] : []),
-            ...(product.active_ingredients?.map((ai: any) => ({
-                "@type": "PropertyValue",
-                "name": "Active Ingredient",
-                "value": ai.concentration ? `${ai.name} (${ai.concentration})` : ai.name,
-            })) || []),
         ],
     }
 
@@ -92,8 +82,8 @@ export default async function FeedDetailPage({ params }: FeedDetailPageProps) {
             </div>
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                {/* Header Section */}
                 <div className="grid lg:grid-cols-[450px,1fr] gap-12 mb-16">
+
                     {/* Left - Image */}
                     <div className="space-y-4">
                         <div className="relative aspect-square bg-white rounded-xl border overflow-hidden shadow-sm">
@@ -107,17 +97,14 @@ export default async function FeedDetailPage({ params }: FeedDetailPageProps) {
                                     priority
                                 />
                             ) : (
-                                <div className="absolute inset-0 bg-white" />
+                                <div className="absolute inset-0 bg-muted/20" />
                             )}
                         </div>
 
                         {product.images && product.images.length > 1 && (
                             <div className="grid grid-cols-4 gap-3">
                                 {product.images.slice(0, 4).map((img: any, idx: number) => (
-                                    <button
-                                        key={idx}
-                                        className="relative aspect-square bg-white rounded-lg border hover:border-primary transition-colors"
-                                    >
+                                    <div key={idx} className="relative aspect-square bg-white rounded-lg border hover:border-primary transition-colors">
                                         {img.img?.src && (
                                             <Image
                                                 src={img.img.src}
@@ -127,12 +114,36 @@ export default async function FeedDetailPage({ params }: FeedDetailPageProps) {
                                                 className="object-contain p-2"
                                             />
                                         )}
-                                    </button>
+                                    </div>
                                 ))}
                             </div>
                         )}
 
-                        <BuyNowButton slug={slug} />
+                        {/* Want to Buy CTA */}
+                        {product.available_for_sale && <Link
+                            href="/waiting-list-shop"
+                            className="flex items-center gap-3 rounded-xl border-2 border-primary/20 bg-primary/5 hover:bg-primary/10 hover:border-primary/40 transition-colors px-4 py-3"
+                        >
+                            <div className="flex items-center justify-center w-9 h-9 rounded-full bg-primary/10 shrink-0">
+                                <ShoppingCart className="w-4 h-4 text-primary" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <p className="text-sm font-semibold text-foreground">Want to buy {product.name}?</p>
+                                <p className="text-xs text-muted-foreground">Find sellers &amp; compare prices</p>
+                            </div>
+                            <span className="text-xs font-medium text-primary shrink-0">View →</span>
+                        </Link>}
+
+                        {/* Safety Warnings */}
+                        {product.safety_warnings && (
+                            <div className="rounded-lg border border-red-200 dark:border-red-900 bg-red-50/50 dark:bg-red-950/30 px-3 py-2">
+                                <h2 className="text-xs font-semibold uppercase tracking-wide text-red-700 dark:text-red-400 mb-1.5 flex items-center gap-1.5">
+                                    <AlertTriangle className="w-3.5 h-3.5" />
+                                    Safety Warning
+                                </h2>
+                                <p className="text-xs text-red-800 dark:text-red-300 whitespace-pre-line">{product.safety_warnings}</p>
+                            </div>
+                        )}
                     </div>
 
                     {/* Right - Product Info */}
@@ -141,7 +152,6 @@ export default async function FeedDetailPage({ params }: FeedDetailPageProps) {
                             {product.name}
                         </h1>
 
-                        {/* Badges */}
                         <div className="flex items-center gap-3 flex-wrap">
                             {product.feed_category && (
                                 <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
@@ -149,25 +159,13 @@ export default async function FeedDetailPage({ params }: FeedDetailPageProps) {
                                 </span>
                             )}
                             {product.brand && (
-                                <span className="text-sm text-muted-foreground">
-                                    by {capitalizeFirstLetter(product.brand.name)}
-                                </span>
+                                <span className="text-sm text-muted-foreground">by {product.brand.name}</span>
                             )}
                         </div>
 
-                        {product.available_for_sale && product.show_price && product.sale_price > 0 && (
-                            <div className="flex items-center gap-3">
-                                <span className="text-sm text-muted-foreground">Price:</span>
-                                {product.was_price > 0 && product.was_price > product.sale_price && (
-                                    <span className="text-lg text-muted-foreground line-through">${product.was_price.toFixed(2)}</span>
-                                )}
-                                <span className="text-2xl font-bold text-primary">${product.sale_price.toFixed(2)}</span>
-                            </div>
-                        )}
-
                         <div className="h-px bg-border" />
 
-                        {/* Animal / Phase / Form / Sub Type */}
+                        {/* Tags */}
                         <div className="flex flex-wrap gap-2">
                             {product.animal && (
                                 <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-600/10 dark:bg-amber-950/30 dark:text-amber-400">
@@ -194,26 +192,17 @@ export default async function FeedDetailPage({ params }: FeedDetailPageProps) {
                         {/* Description */}
                         {product.description && (
                             <div>
-                                <h2 className="text-lg font-semibold mb-3 text-foreground">Description</h2>
-                                <p className="text-muted-foreground leading-relaxed text-sm">
-                                    {product.description}
-                                </p>
+                                <h2 className="text-lg font-semibold mb-3 text-foreground">Overview</h2>
+                                <p className="text-muted-foreground leading-relaxed text-sm">{product.description}</p>
                             </div>
                         )}
 
-                        {/* Package Size */}
-                        {product.package_size && (
-                            <div>
-                                <h2 className="text-lg font-semibold mb-3 text-foreground">Package Size</h2>
-                                <p className="text-muted-foreground leading-relaxed text-sm">{product.package_size}</p>
-                            </div>
-                        )}
 
                         {/* Breed Recommendations */}
                         {product.breed_recommendations && (
                             <div>
-                                <h2 className="text-lg font-semibold mb-3 text-foreground">Breed Recommendations</h2>
-                                <p className="text-muted-foreground leading-relaxed text-sm whitespace-pre-line">{product.breed_recommendations}</p>
+                                <h2 className="text-lg font-semibold mb-2 text-foreground">Breed Recommendations</h2>
+                                <p className="text-muted-foreground text-sm whitespace-pre-line">{product.breed_recommendations}</p>
                             </div>
                         )}
 
@@ -231,11 +220,11 @@ export default async function FeedDetailPage({ params }: FeedDetailPageProps) {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {product.feeding_instructions.map((instruction: { period: string; amount: string; notes: string }, idx: number) => (
+                                            {product.feeding_instructions.map((row: any, idx: number) => (
                                                 <tr key={idx} className="border-b border-border/50">
-                                                    <td className="py-2 pr-4 text-muted-foreground">{instruction.period}</td>
-                                                    <td className="py-2 pr-4 text-muted-foreground">{instruction.amount}</td>
-                                                    <td className="py-2 text-muted-foreground">{instruction.notes}</td>
+                                                    <td className="py-2 pr-4 text-muted-foreground">{row.period}</td>
+                                                    <td className="py-2 pr-4 text-muted-foreground">{row.amount}</td>
+                                                    <td className="py-2 text-muted-foreground">{row.notes}</td>
                                                 </tr>
                                             ))}
                                         </tbody>
@@ -247,25 +236,21 @@ export default async function FeedDetailPage({ params }: FeedDetailPageProps) {
                         {/* Management Tips */}
                         {product.management_tips && (
                             <div>
-                                <h2 className="text-lg font-semibold mb-3 text-foreground">Management Tips</h2>
-                                <p className="text-muted-foreground leading-relaxed text-sm whitespace-pre-line">{product.management_tips}</p>
+                                <h2 className="text-lg font-semibold mb-2 text-foreground">Management Tips</h2>
+                                <p className="text-muted-foreground text-sm whitespace-pre-line">{product.management_tips}</p>
                             </div>
                         )}
 
-                        {/* Active Ingredients - only show if product has them */}
+                        {/* Active Ingredients */}
                         {product.active_ingredients && product.active_ingredients.length > 0 && (
                             <div>
-                                <h2 className="text-lg font-semibold mb-3 text-foreground">
-                                    Active Ingredients
-                                </h2>
+                                <h2 className="text-lg font-semibold mb-3 text-foreground">Active Ingredients</h2>
                                 <div className="space-y-2">
                                     {product.active_ingredients.map((ai: any, idx: number) => (
-                                        <div key={idx} className="flex items-center justify-between p-3 bg-gradient-to-r from-purple-50/50 to-transparent dark:from-purple-950/30 rounded-lg border border-purple-100 dark:border-purple-900 hover:border-purple-300 dark:hover:border-purple-700 transition-colors">
-                                            <div className="font-medium capitalize text-sm text-foreground">{ai.name}</div>
+                                        <div key={idx} className="flex items-center justify-between p-3 bg-gradient-to-r from-purple-50/50 to-transparent dark:from-purple-950/30 rounded-lg border border-purple-100 dark:border-purple-900">
+                                            <span className="font-medium capitalize text-sm text-foreground">{ai.name}</span>
                                             {ai.concentration && (
-                                                <div className="text-right">
-                                                    <div className="font-bold text-purple-600 dark:text-purple-400">{ai.concentration}</div>
-                                                </div>
+                                                <span className="font-bold text-purple-600 dark:text-purple-400">{ai.concentration}</span>
                                             )}
                                         </div>
                                     ))}
@@ -275,22 +260,6 @@ export default async function FeedDetailPage({ params }: FeedDetailPageProps) {
 
                         <AdSenseInFeed />
 
-                        {/* Targets */}
-                        {product.targets && product.targets.length > 0 && (
-                            <div className="rounded-xl border bg-card p-4">
-                                <h2 className="text-sm font-semibold uppercase tracking-wide text-green-700 dark:text-green-400 mb-3">
-                                    Targets
-                                </h2>
-                                <ul className="space-y-1.5">
-                                    {product.targets.map((target: any, idx: number) => (
-                                        <li key={idx} className="flex items-start gap-2 text-sm text-foreground">
-                                            <span className="h-1.5 w-1.5 rounded-full bg-green-500 dark:bg-green-400 flex-shrink-0 mt-1.5" />
-                                            <span className="capitalize">{target.name}</span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        )}
                         {/* Nutritional Specifications */}
                         {product.nutritional_specs && product.nutritional_specs.length > 0 && (
                             <div>
@@ -405,13 +374,7 @@ export default async function FeedDetailPage({ params }: FeedDetailPageProps) {
                                 <div className="space-y-3">
                                     <h3 className="text-lg font-semibold">Front Label</h3>
                                     <div className="relative aspect-[3/4] bg-white rounded-lg border overflow-hidden">
-                                        <Image
-                                            src={product.front_label.img.src}
-                                            alt={`${product.name} - Front Label`}
-                                            fill
-                                            sizes="(max-width: 768px) 100vw, 50vw"
-                                            className="object-contain p-4"
-                                        />
+                                        <Image src={product.front_label.img.src} alt={`${product.name} - Front Label`} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-contain p-4" />
                                     </div>
                                 </div>
                             )}
@@ -419,31 +382,10 @@ export default async function FeedDetailPage({ params }: FeedDetailPageProps) {
                                 <div className="space-y-3">
                                     <h3 className="text-lg font-semibold">Back Label</h3>
                                     <div className="relative aspect-[3/4] bg-white rounded-lg border overflow-hidden">
-                                        <Image
-                                            src={product.back_label.img.src}
-                                            alt={`${product.name} - Back Label`}
-                                            fill
-                                            sizes="(max-width: 768px) 100vw, 50vw"
-                                            className="object-contain p-4"
-                                        />
+                                        <Image src={product.back_label.img.src} alt={`${product.name} - Back Label`} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-contain p-4" />
                                     </div>
                                 </div>
                             )}
-                        </div>
-                    </div>
-                )}
-
-                {/* Product-Specific Safety Warnings */}
-                {product.safety_warnings && (
-                    <div className="mb-6 bg-red-500/10 border border-red-500/20 rounded-lg p-6">
-                        <div className="flex items-start gap-3">
-                            <AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-500 flex-shrink-0" />
-                            <div>
-                                <h3 className="font-semibold mb-2 text-red-900 dark:text-red-100">Safety Warning</h3>
-                                <p className="text-sm text-red-800 dark:text-red-200 whitespace-pre-line">
-                                    {product.safety_warnings}
-                                </p>
-                            </div>
                         </div>
                     </div>
                 )}
