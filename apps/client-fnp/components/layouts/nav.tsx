@@ -34,20 +34,32 @@ function CartIcon({ user }: { user: AuthenticatedUser | null }) {
     enabled: !!user,
     staleTime: 30000,
   })
-  const count: number = (data as any)?.items?.length ?? 0
+  const items: any[] = (data as any)?.items ?? []
+  const count = items.length
+  const total = items.reduce((s: number, i: any) => s + i.unit_price * i.quantity, 0)
+
+  if (!user || count === 0) {
+    return (
+      <button
+        onClick={openCart}
+        className="relative p-2 rounded-full hover:bg-muted transition-colors"
+        aria-label="Open cart"
+      >
+        <ShoppingCart className="w-5 h-5" />
+      </button>
+    )
+  }
 
   return (
     <button
       onClick={openCart}
-      className="relative p-2 rounded-full hover:bg-muted transition-colors"
+      className="flex items-center gap-1.5 pl-2 pr-3 py-1.5 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors text-sm font-semibold"
       aria-label="Open cart"
     >
-      <ShoppingCart className="w-5 h-5" />
-      {count > 0 && (
-        <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-primary text-primary-foreground text-[10px] font-bold px-1">
-          {count}
-        </span>
-      )}
+      <ShoppingCart className="w-4 h-4" />
+      <span>{count}</span>
+      <span className="opacity-70">·</span>
+      <span>${total.toFixed(2)}</span>
     </button>
   )
 }

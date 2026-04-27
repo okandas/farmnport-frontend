@@ -2,7 +2,6 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { useSelectedLayoutSegment } from "next/navigation"
 
 
 import { siteConfig } from "@/config/site"
@@ -26,7 +25,6 @@ interface MobileNavProps {
 }
 
 export function MobileNav({ user }: MobileNavProps) {
-    const segment = useSelectedLayoutSegment()
     const [isOpen, setIsOpen] = React.useState(false)
     const { openCart } = useCart()
     const { data: cartData } = useQuery({
@@ -35,7 +33,9 @@ export function MobileNav({ user }: MobileNavProps) {
       enabled: !!user,
       staleTime: 30000,
     })
-    const cartCount: number = (cartData as any)?.items?.length ?? 0
+    const cartItems: any[] = (cartData as any)?.items ?? []
+    const cartCount: number = cartItems.length
+    const cartTotal: number = cartItems.reduce((s: number, i: any) => s + i.unit_price * i.quantity, 0)
 
 
     return (
@@ -49,18 +49,26 @@ export function MobileNav({ user }: MobileNavProps) {
         </Link>
 
        <div className="flex flex-1 justify-end items-center gap-1">
-         <button
-           onClick={openCart}
-           className="relative p-2 rounded-full hover:bg-muted transition-colors"
-           aria-label="Open cart"
-         >
-           <ShoppingCart className="w-5 h-5" />
-           {cartCount > 0 && (
-             <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-primary text-primary-foreground text-[10px] font-bold px-1">
-               {cartCount}
-             </span>
-           )}
-         </button>
+         {cartCount > 0 ? (
+           <button
+             onClick={openCart}
+             className="flex items-center gap-1.5 pl-2 pr-3 py-1.5 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors text-sm font-semibold"
+             aria-label="Open cart"
+           >
+             <ShoppingCart className="w-4 h-4" />
+             <span>{cartCount}</span>
+             <span className="opacity-70">·</span>
+             <span>${cartTotal.toFixed(2)}</span>
+           </button>
+         ) : (
+           <button
+             onClick={openCart}
+             className="relative p-2 rounded-full hover:bg-muted transition-colors"
+             aria-label="Open cart"
+           >
+             <ShoppingCart className="w-5 h-5" />
+           </button>
+         )}
          <Sheet open={isOpen} onOpenChange={setIsOpen}>
            <SheetTrigger asChild>
              <Button
