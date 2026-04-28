@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     description: 'Shop professional agrochemical products with fast shipping and secure checkout.',
     url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://farmnport.com'}/buy-agrochemicals`,
     siteName: 'farmnport',
-    locale: 'en_US',
+    locale: 'en_ZW',
     type: 'website',
   },
   twitter: {

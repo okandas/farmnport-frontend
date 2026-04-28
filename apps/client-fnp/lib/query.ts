@@ -565,6 +565,10 @@ export function queryPlantNutritionProductsByCategory(options: { category: strin
   return api.get(qs ? `${BaseURL}/plantnutrition/category/${options.category}?${qs}` : `${BaseURL}/plantnutrition/category/${options.category}`)
 }
 
+export function queryPlantNutritionProduct(slug: string) {
+  return api.get(`${BaseURL}/plantnutrition/${slug}`)
+}
+
 export function queryPlantNutritionFilterAggregates(filters?: { brand?: string[], category?: string[], active_ingredient?: string[], used_on?: string[] }) {
   const params = new URLSearchParams()
   filters?.brand?.forEach(v => params.append('brand', v))

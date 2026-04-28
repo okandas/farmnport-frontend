@@ -1,6 +1,5 @@
 import { Metadata } from 'next'
-import { queryFeedProduct } from '@/lib/query'
-import { capitalizeFirstLetter } from '@/lib/utilities'
+import { queryPlantNutritionProduct } from '@/lib/query'
 
 interface LayoutProps {
   children: React.ReactNode
@@ -13,41 +12,40 @@ export async function generateMetadata({ params }: LayoutProps): Promise<Metadat
   const { slug } = await params
 
   try {
-    const response = await queryFeedProduct(slug)
+    const response = await queryPlantNutritionProduct(slug)
     const product = response?.data
 
     if (!product) {
       return {
         title: 'Product Not Found | farmnport',
-        description: 'The feed product you are looking for could not be found.',
+        description: 'The plant nutrition product you are looking for could not be found.',
       }
     }
 
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://farmnport.com'
-    const url = `${baseUrl}/buy-feeds/${slug}`
-    const imageUrl = product.images?.[0]?.img?.src || `${baseUrl}/default-feed.png`
+    const url = `${baseUrl}/buy-plant-nutrition/${slug}`
+    const imageUrl = product.images?.[0]?.img?.src || `${baseUrl}/default-product.png`
 
-    const description = product.feed_category?.name
-      ? `Buy ${capitalizeFirstLetter(product.name)} - ${product.feed_category.name} for ${product.animal || 'livestock'}. Fast shipping, secure checkout, and quality guarantee.`
-      : `Buy ${capitalizeFirstLetter(product.name)} online. Quality livestock feed products with fast shipping and secure checkout.`
+    const description = product.plant_nutrition_category?.name
+      ? `Buy ${product.name} - ${product.plant_nutrition_category.name} for healthy crop nutrition. Fast shipping, secure checkout, and quality guarantee.`
+      : `Buy ${product.name} online. Professional plant nutrition products with fast shipping and secure checkout.`
 
     const keywords = [
       `buy ${product.name}`,
-      'livestock feed shop',
-      'buy animal feed online',
-      product.feed_category?.name || '',
-      product.animal || '',
-      product.phase || '',
+      'plant nutrition shop',
+      'buy fertilizers online',
+      product.plant_nutrition_category?.name || '',
       product.brand?.name || '',
+      ...(product.active_ingredients?.map((ai: any) => ai.name) || []),
     ].filter(Boolean).join(', ')
 
     return {
-      title: `Buy ${capitalizeFirstLetter(product.name)} - ${product.feed_category?.name || 'Livestock Feed'} | farmnport`,
+      title: `Buy ${product.name} - ${product.plant_nutrition_category?.name || 'Plant Nutrition'} | farmnport`,
       description,
       keywords,
       authors: [{ name: 'farmnport' }],
       openGraph: {
-        title: `Buy ${capitalizeFirstLetter(product.name)}`,
+        title: `Buy ${product.name}`,
         description,
         url,
         siteName: 'farmnport',
@@ -64,7 +62,7 @@ export async function generateMetadata({ params }: LayoutProps): Promise<Metadat
       },
       twitter: {
         card: 'summary_large_image',
-        title: `Buy ${capitalizeFirstLetter(product.name)}`,
+        title: `Buy ${product.name}`,
         description,
         images: [imageUrl],
       },
@@ -83,12 +81,12 @@ export async function generateMetadata({ params }: LayoutProps): Promise<Metadat
   } catch (error) {
     console.error('Error generating metadata:', error)
     return {
-      title: 'Buy Livestock Feed | farmnport',
-      description: 'Shop quality livestock feed products online with fast shipping.',
+      title: 'Buy Plant Nutrition Products | farmnport',
+      description: 'Shop professional plant nutrition products online with fast shipping.',
     }
   }
 }
 
-export default function BuyFeedLayout({ children }: LayoutProps) {
+export default function BuyPlantNutritionProductLayout({ children }: LayoutProps) {
   return <>{children}</>
 }

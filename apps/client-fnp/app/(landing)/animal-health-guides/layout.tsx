@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     description: 'Comprehensive animal health product guides covering vaccines, antibiotics, supplements, and more. Find dosage rates, active ingredients, and withdrawal periods.',
     url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://farmnport.com'}/animal-health-guides`,
     siteName: 'farmnport',
-    locale: 'en_US',
+    locale: 'en_ZW',
     type: 'website',
   },
   twitter: {
