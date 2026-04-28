@@ -8,6 +8,18 @@ import Image from "next/image"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
 import { FeedFilterSidebar } from "@/components/generic/feedFilterSidebar"
 
+function toFeedingProgramAnimal(animal: string): string {
+    const a = animal.toLowerCase()
+    if (a === "poultry" || a.startsWith("chicken")) return "chickens"
+    if (a.startsWith("cattle") || a.startsWith("beef")) return "cattle"
+    if (a.startsWith("pig") || a.startsWith("pork") || a === "swine") return "pigs"
+    if (a.startsWith("sheep") || a.startsWith("lamb")) return "sheep"
+    if (a.startsWith("goat")) return "goats"
+    if (a.startsWith("duck")) return "ducks"
+    if (a.startsWith("turkey")) return "turkeys"
+    return a
+}
+
 interface FeedListingClientProps {
     initialData: any[]
     initialTotal: number
@@ -129,6 +141,16 @@ export function FeedListingClient({ initialData, initialTotal }: FeedListingClie
                                                 {product.name}
                                             </h3>
                                         </Link>
+
+                                        {/* Animal pill */}
+                                        {product.animal && (
+                                            <Link
+                                                href={`/feeding-programs?animal=${toFeedingProgramAnimal(product.animal)}`}
+                                                className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 hover:bg-amber-200 dark:hover:bg-amber-900/60 transition-colors capitalize"
+                                            >
+                                                {product.animal}
+                                            </Link>
+                                        )}
 
                                         {/* CTA */}
                                         <Link href={`/feeds/${product.slug}`} className="block pt-2">

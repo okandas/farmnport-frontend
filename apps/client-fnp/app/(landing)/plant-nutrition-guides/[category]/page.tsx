@@ -28,27 +28,24 @@ export default async function PlantNutritionCategoryPage({ params }: CategoryPag
     const categoryName = products[0]?.plant_nutrition_category?.name || category.replace(/-/g, ' ')
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
-            <div className="border-b">
-                <div className="max-w-7xl mx-auto px-6 lg:px-8 py-3">
-                    <nav className="flex text-sm text-muted-foreground">
-                        <Link href="/" className="hover:text-foreground">Home</Link>
+        <main className="bg-gradient-to-b from-background to-muted/20">
+            <section className="py-14 lg:py-20 bg-muted/30">
+                <div className="mx-auto max-w-7xl px-6 lg:px-8">
+                    <nav className="flex text-sm text-muted-foreground mb-6">
+                        <Link href="/guides" className="hover:text-foreground transition-colors">Guides</Link>
                         <span className="mx-2">/</span>
-                        <Link href="/plant-nutrition-guides" className="hover:text-foreground">Plant Nutrition</Link>
+                        <Link href="/plant-nutrition-guides" className="hover:text-foreground transition-colors">Plant Nutrition Guides</Link>
                         <span className="mx-2">/</span>
                         <span className="text-foreground capitalize">{categoryName}</span>
                     </nav>
+                    <PlantNutritionCategoryClient
+                        category={category}
+                        categoryName={categoryName}
+                        initialProducts={products}
+                        initialTotal={total}
+                    />
                 </div>
-            </div>
-
-            <div className="mx-auto max-w-7xl px-6 lg:px-8 py-12">
-                <PlantNutritionCategoryClient
-                    category={category}
-                    categoryName={categoryName}
-                    initialProducts={products}
-                    initialTotal={total}
-                />
-            </div>
-        </div>
+            </section>
+        </main>
     )
 }

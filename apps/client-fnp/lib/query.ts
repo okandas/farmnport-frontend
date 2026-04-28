@@ -295,9 +295,10 @@ export function queryAllActiveIngredients() {
   return api.get(url)
 }
 
-export function queryAgroChemicalFilterAggregates(filters?: { brand?: string[], target?: string[], active_ingredient?: string[], used_on?: string[] }) {
+export function queryAgroChemicalFilterAggregates(filters?: { brand?: string[], category?: string[], target?: string[], active_ingredient?: string[], used_on?: string[] }) {
   const params = new URLSearchParams()
   filters?.brand?.forEach(v => params.append('brand', v))
+  filters?.category?.forEach(v => params.append('category', v))
   filters?.target?.forEach(v => params.append('target', v))
   filters?.active_ingredient?.forEach(v => params.append('active_ingredient', v))
   filters?.used_on?.forEach(v => params.append('used_on', v))
@@ -410,9 +411,10 @@ export function queryAnimalHealthProductsByCategory(options: { category: string 
   return api.get(url)
 }
 
-export function queryAnimalHealthFilterAggregates(filters?: { brand?: string[], target?: string[], active_ingredient?: string[], used_on?: string[] }) {
+export function queryAnimalHealthFilterAggregates(filters?: { brand?: string[], category?: string[], target?: string[], active_ingredient?: string[], used_on?: string[] }) {
   const params = new URLSearchParams()
   filters?.brand?.forEach(v => params.append('brand', v))
+  filters?.category?.forEach(v => params.append('category', v))
   filters?.target?.forEach(v => params.append('target', v))
   filters?.active_ingredient?.forEach(v => params.append('active_ingredient', v))
   filters?.used_on?.forEach(v => params.append('used_on', v))

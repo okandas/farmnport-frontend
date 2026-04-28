@@ -370,6 +370,7 @@ export default async function BuyFeedPage({ params }: BuyFeedPageProps) {
                 availableForSale={product.available_for_sale}
                 breadcrumb={{ href: "/buy-feeds", label: "Feeds" }}
                 loginRedirect={`/buy-feeds/${slug}`}
+                shareUrl={`${baseUrl}/buy-feeds/${slug}?utm_source=farmnport&utm_medium=share&utm_content=${slug}`}
                 extraStats={extraStats}
                 tabsContent={tabsContent}
                 extraActions={<BackToProgram />}

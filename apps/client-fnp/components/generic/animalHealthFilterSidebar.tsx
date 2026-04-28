@@ -109,8 +109,10 @@ function SearchableCheckboxList({
 
 function FilterContent({
   onClearAll,
+  categorySlug,
 }: {
   onClearAll: () => void
+  categorySlug?: string
 }) {
   const [queryState, setQueryState] = useQueryStates({
     brand: parseAsArrayOf(parseAsString),
@@ -121,10 +123,11 @@ function FilterContent({
 
   // Fetch aggregate data for animal health — cascade by active filters
   const { data: aggregateData, isLoading: isLoadingAggregates } = useQuery({
-    queryKey: ["animal-health-filter-aggregates", queryState.brand, queryState.target, queryState.active_ingredient, queryState.used_on],
+    queryKey: ["animal-health-filter-aggregates", categorySlug, queryState.brand, queryState.target, queryState.active_ingredient, queryState.used_on],
     queryFn: async () => {
       const response = await queryAnimalHealthFilterAggregates({
         brand: queryState.brand ?? [],
+        category: categorySlug ? [categorySlug] : [],
         target: queryState.target ?? [],
         active_ingredient: queryState.active_ingredient ?? [],
         used_on: queryState.used_on ? [queryState.used_on] : [],
@@ -222,7 +225,7 @@ function FilterContent({
   )
 }
 
-export function AnimalHealthFilterSidebar() {
+export function AnimalHealthFilterSidebar({ categorySlug }: { categorySlug?: string } = {}) {
   const isDesktop = useMediaQuery("(min-width: 1024px)")
   const [, setQueryState] = useQueryStates({
     brand: parseAsArrayOf(parseAsString),
@@ -243,7 +246,7 @@ export function AnimalHealthFilterSidebar() {
   if (isDesktop) {
     return (
       <div className="sticky top-20 mt-[20px] max-h-[calc(100vh-5rem)] overflow-y-auto overflow-x-hidden">
-        <FilterContent onClearAll={handleClearAll} />
+        <FilterContent onClearAll={handleClearAll} categorySlug={categorySlug} />
       </div>
     )
   }
@@ -260,7 +263,7 @@ export function AnimalHealthFilterSidebar() {
         <SheetHeader className="mb-4">
           <SheetTitle>Filter Animal Health Products</SheetTitle>
         </SheetHeader>
-        <FilterContent onClearAll={handleClearAll} />
+        <FilterContent onClearAll={handleClearAll} categorySlug={categorySlug} />
       </SheetContent>
     </Sheet>
   )

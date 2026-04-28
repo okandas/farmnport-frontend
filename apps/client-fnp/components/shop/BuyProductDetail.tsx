@@ -3,6 +3,7 @@ import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import { Truck, Shield, RotateCcw } from "lucide-react"
 import { AddToCartButton, type CartProductType } from "@/components/cart/AddToCartButton"
+import { ShareButton } from "@/components/shop/ShareButton"
 
 interface BuyProductDetailProps {
   // Identity
@@ -27,6 +28,7 @@ interface BuyProductDetailProps {
   breadcrumb: { href: string; label: string }
   guideHref?: string
   loginRedirect: string
+  shareUrl?: string
   // Slots
   extraStats?: React.ReactNode
   tabsContent?: React.ReactNode
@@ -49,6 +51,7 @@ export function BuyProductDetail({
   breadcrumb,
   guideHref,
   loginRedirect,
+  shareUrl,
   extraStats,
   tabsContent,
   extraActions,
@@ -214,6 +217,17 @@ export function BuyProductDetail({
             )}
 
             {extraActions}
+
+            {/* Seller footer */}
+            {shareUrl && (
+              <div className="space-y-2 text-xs text-muted-foreground border-t pt-4">
+                <div className="flex items-center gap-1.5">
+                  <span className="font-medium text-foreground">Sold by</span>
+                  <span>farmnport</span>
+                </div>
+                <ShareButton url={shareUrl} title={`Buy ${productName} on farmnport`} />
+              </div>
+            )}
           </div>
         </div>
 
