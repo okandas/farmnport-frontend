@@ -1,11 +1,12 @@
 import Image from "next/image"
+import { Egg, AlertTriangle } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
-import { Egg, Beaker, Shield, AlertTriangle } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
 import { BaseURL } from "@/lib/schemas"
-import { BuyProductDetail } from "@/components/shop/BuyProductDetail"
+import { BuyProductInteractive } from "@/components/shop/BuyProductInteractive"
 import { BackToProgram } from "./BackToProgram"
+import Link from "next/link"
 
 interface BuyFeedPageProps {
     params: Promise<{ slug: string }>
@@ -41,8 +42,6 @@ export default async function BuyFeedPage({ params }: BuyFeedPageProps) {
     }
 
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://farmnport.com'
-    const salePrice = product.show_price && product.sale_price > 0 ? product.sale_price / 100 : null
-    const wasPrice = product.was_price > product.sale_price ? product.was_price / 100 : null
 
     const structuredData = {
         "@context": "https://schema.org",
@@ -57,84 +56,54 @@ export default async function BuyFeedPage({ params }: BuyFeedPageProps) {
             "@type": "Offer",
             "url": `${baseUrl}/buy-feeds/${slug}`,
             "priceCurrency": "USD",
-            "price": salePrice ? salePrice.toFixed(2) : "0.00",
+            "price": product.show_price && product.sale_price > 0 ? (product.sale_price / 100).toFixed(2) : "0.00",
             "availability": product.available_for_sale ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
             "seller": { "@type": "Organization", "name": "farmnport" }
-        },
+        }
     }
-
-    const extraStats = (product.animal || product.phase || product.form) ? (
-        <div className="flex gap-6 py-2 flex-wrap">
-            {product.animal && (
-                <div className="flex items-center gap-2">
-                    <Egg className="w-5 h-5 text-muted-foreground" />
-                    <div>
-                        <div className="text-sm font-medium">{product.animal}</div>
-                        <div className="text-xs text-muted-foreground">Animal</div>
-                    </div>
-                </div>
-            )}
-            {product.phase && (
-                <div className="flex items-center gap-2">
-                    <Beaker className="w-5 h-5 text-muted-foreground" />
-                    <div>
-                        <div className="text-sm font-medium">{product.phase}</div>
-                        <div className="text-xs text-muted-foreground">Phase</div>
-                    </div>
-                </div>
-            )}
-            {product.form && (
-                <div className="flex items-center gap-2">
-                    <Shield className="w-5 h-5 text-muted-foreground" />
-                    <div>
-                        <div className="text-sm font-medium">{product.form}</div>
-                        <div className="text-xs text-muted-foreground">Form</div>
-                    </div>
-                </div>
-            )}
-        </div>
-    ) : null
 
     const tabsContent = (
         <>
-            <Tabs defaultValue="overview" className="w-full">
-                <TabsList className="w-full justify-start border-b rounded-none h-auto p-0 bg-transparent">
-                    <TabsTrigger value="overview" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary">Overview</TabsTrigger>
-                    <TabsTrigger value="active-ingredients" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary">Active Ingredients</TabsTrigger>
+            <Tabs defaultValue="overview">
+                <TabsList className="w-full justify-start border-b rounded-none h-auto p-0 bg-transparent gap-1 flex-wrap">
+                    <TabsTrigger value="overview" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent text-sm px-3 pb-2">Overview</TabsTrigger>
+                    <TabsTrigger value="active-ingredients" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent text-sm px-3 pb-2">Active Ingredients</TabsTrigger>
                     {product.targets?.length > 0 && (
-                        <TabsTrigger value="targets" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary">Targets</TabsTrigger>
+                        <TabsTrigger value="targets" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent text-sm px-3 pb-2">Targets</TabsTrigger>
                     )}
                     {product.nutritional_specs?.length > 0 && (
-                        <TabsTrigger value="nutritional-specs" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary">Nutritional Specs</TabsTrigger>
+                        <TabsTrigger value="nutritional-specs" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent text-sm px-3 pb-2">Nutritional Specs</TabsTrigger>
                     )}
                     {product.mixing_recommendations?.length > 0 && (
-                        <TabsTrigger value="mixing" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary">Mixing</TabsTrigger>
+                        <TabsTrigger value="mixing" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent text-sm px-3 pb-2">Mixing</TabsTrigger>
                     )}
                     {product.adaptation_schedule?.length > 0 && (
-                        <TabsTrigger value="adaptation" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary">Adaptation</TabsTrigger>
+                        <TabsTrigger value="adaptation" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent text-sm px-3 pb-2">Adaptation</TabsTrigger>
                     )}
                     {(product.front_label?.img?.src || product.back_label?.img?.src) && (
-                        <TabsTrigger value="labels" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary">Labels</TabsTrigger>
+                        <TabsTrigger value="labels" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent text-sm px-3 pb-2">Labels</TabsTrigger>
                     )}
                 </TabsList>
 
-                <TabsContent value="overview" className="mt-6">
-                    <div className="space-y-6">
-                        {product.description && (
-                            <div>
-                                <h3 className="font-semibold mb-2">Description</h3>
-                                <p className="text-muted-foreground text-sm leading-relaxed">{product.description}</p>
+                <TabsContent value="overview" className="mt-4">
+                    <div className="space-y-4">
+                        {(product.animal || product.phase || product.form) && (
+                            <div className="flex gap-3 flex-wrap">
+                                {product.animal && <Badge variant="secondary">{product.animal}</Badge>}
+                                {product.phase && <Badge variant="outline">{product.phase}</Badge>}
+                                {product.form && <Badge variant="outline">{product.form}</Badge>}
                             </div>
                         )}
+                        {product.description && <p className="text-sm text-muted-foreground leading-relaxed">{product.description}</p>}
                         {product.package_size && (
                             <div>
-                                <h3 className="font-semibold mb-2">Package Size</h3>
-                                <p className="text-muted-foreground text-sm">{product.package_size}</p>
+                                <p className="text-sm font-semibold mb-1">Package Size</p>
+                                <p className="text-sm text-muted-foreground">{product.package_size}</p>
                             </div>
                         )}
                         {product.feeding_instructions?.length > 0 && (
                             <div>
-                                <h3 className="font-semibold mb-2">Feeding Instructions</h3>
+                                <p className="text-sm font-semibold mb-2">Feeding Instructions</p>
                                 <div className="overflow-x-auto">
                                     <table className="w-full text-sm">
                                         <thead>
@@ -145,7 +114,7 @@ export default async function BuyFeedPage({ params }: BuyFeedPageProps) {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {product.feeding_instructions.map((i: { period: string; amount: string; notes: string }, idx: number) => (
+                                            {product.feeding_instructions.map((i: any, idx: number) => (
                                                 <tr key={idx} className="border-b border-border/50">
                                                     <td className="py-2 pr-4 text-muted-foreground">{i.period}</td>
                                                     <td className="py-2 pr-4 text-muted-foreground">{i.amount}</td>
@@ -159,57 +128,49 @@ export default async function BuyFeedPage({ params }: BuyFeedPageProps) {
                         )}
                         {product.management_tips && (
                             <div>
-                                <h3 className="font-semibold mb-2">Management Tips</h3>
-                                <p className="text-muted-foreground text-sm leading-relaxed whitespace-pre-line">{product.management_tips}</p>
+                                <p className="text-sm font-semibold mb-1">Management Tips</p>
+                                <p className="text-sm text-muted-foreground whitespace-pre-line">{product.management_tips}</p>
                             </div>
                         )}
                         {product.breed_recommendations && (
                             <div>
-                                <h3 className="font-semibold mb-2">Breed Recommendations</h3>
-                                <p className="text-muted-foreground text-sm leading-relaxed whitespace-pre-line">{product.breed_recommendations}</p>
+                                <p className="text-sm font-semibold mb-1">Breed Recommendations</p>
+                                <p className="text-sm text-muted-foreground whitespace-pre-line">{product.breed_recommendations}</p>
                             </div>
                         )}
                     </div>
                 </TabsContent>
 
-                <TabsContent value="active-ingredients" className="mt-6">
+                <TabsContent value="active-ingredients" className="mt-4">
                     {product.active_ingredients?.length > 0 ? (
-                        <div className="space-y-4">
+                        <div className="divide-y">
                             {product.active_ingredients.map((ai: any, idx: number) => (
-                                <div key={idx} className="flex justify-between items-center p-4 bg-muted/50 rounded-lg">
-                                    <div>
-                                        <div className="font-medium capitalize">{ai.name}</div>
-                                        <div className="text-sm text-muted-foreground">Active Ingredient</div>
-                                    </div>
-                                    {ai.concentration && (
-                                        <div className="text-right">
-                                            <div className="font-bold text-purple-600 dark:text-purple-400">{ai.concentration}</div>
-                                            <div className="text-xs text-muted-foreground">Concentration</div>
-                                        </div>
-                                    )}
+                                <div key={idx} className="flex justify-between py-2 text-sm">
+                                    <span className="capitalize">{ai.name}</span>
+                                    {ai.concentration && <span className="font-semibold">{ai.concentration}</span>}
                                 </div>
                             ))}
                         </div>
                     ) : (
-                        <p className="text-muted-foreground">No active ingredient information available.</p>
+                        <p className="text-sm text-muted-foreground mt-4">No information available.</p>
                     )}
                 </TabsContent>
 
                 {product.targets?.length > 0 && (
-                    <TabsContent value="targets" className="mt-6">
-                        <div className="grid md:grid-cols-2 gap-4">
+                    <TabsContent value="targets" className="mt-4">
+                        <ul className="space-y-1.5">
                             {product.targets.map((target: any, idx: number) => (
-                                <div key={idx} className="flex items-center gap-3 p-4 bg-muted/50 rounded-lg">
-                                    <Egg className="w-5 h-5 text-primary" />
-                                    <div className="font-medium capitalize">{target.name}</div>
-                                </div>
+                                <li key={idx} className="flex items-start gap-2 text-sm">
+                                    <span className="h-1.5 w-1.5 rounded-full bg-green-500 flex-shrink-0 mt-1.5" />
+                                    <span className="font-medium capitalize">{target.name}</span>
+                                </li>
                             ))}
-                        </div>
+                        </ul>
                     </TabsContent>
                 )}
 
                 {product.nutritional_specs?.length > 0 && (
-                    <TabsContent value="nutritional-specs" className="mt-6">
+                    <TabsContent value="nutritional-specs" className="mt-4">
                         <div className="rounded-lg border overflow-hidden">
                             <table className="w-full text-sm">
                                 <thead>
@@ -236,7 +197,7 @@ export default async function BuyFeedPage({ params }: BuyFeedPageProps) {
                 )}
 
                 {product.mixing_recommendations?.length > 0 && (
-                    <TabsContent value="mixing" className="mt-6">
+                    <TabsContent value="mixing" className="mt-4">
                         <div className="space-y-6">
                             {product.mixing_recommendations.map((mix: any, idx: number) => (
                                 <div key={idx} className="rounded-lg border p-5">
@@ -273,7 +234,7 @@ export default async function BuyFeedPage({ params }: BuyFeedPageProps) {
                 )}
 
                 {product.adaptation_schedule?.length > 0 && (
-                    <TabsContent value="adaptation" className="mt-6">
+                    <TabsContent value="adaptation" className="mt-4">
                         <div className="rounded-lg border overflow-hidden">
                             <table className="w-full text-sm">
                                 <thead>
@@ -298,7 +259,7 @@ export default async function BuyFeedPage({ params }: BuyFeedPageProps) {
                 )}
 
                 {(product.front_label?.img?.src || product.back_label?.img?.src) && (
-                    <TabsContent value="labels" className="mt-6">
+                    <TabsContent value="labels" className="mt-4">
                         <div className="grid md:grid-cols-2 gap-6">
                             {product.front_label?.img?.src && (
                                 <div className="space-y-3">
@@ -350,31 +311,36 @@ export default async function BuyFeedPage({ params }: BuyFeedPageProps) {
     )
 
     return (
-        <>
-            <script
-                type="application/ld+json"
-                dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-            />
-            <BuyProductDetail
-                productId={product.id}
-                productName={product.name}
-                productSlug={slug}
-                productType="feed"
-                images={product.images}
-                fallbackIcon={<Egg className="w-24 h-24 text-muted-foreground/30" />}
-                brand={product.brand}
-                brandHref={`/feeds?brand=${product.brand?.name}`}
-                categoryName={product.feed_category?.name}
-                salePrice={salePrice}
-                wasPrice={wasPrice}
-                availableForSale={product.available_for_sale}
-                breadcrumb={{ href: "/buy-feeds", label: "Feeds" }}
-                loginRedirect={`/buy-feeds/${slug}`}
-                shareUrl={`${baseUrl}/buy-feeds/${slug}?utm_source=farmnport&utm_medium=share&utm_content=${slug}`}
-                extraStats={extraStats}
-                tabsContent={tabsContent}
-                extraActions={<BackToProgram />}
-            />
-        </>
+        <div className="min-h-screen bg-background">
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
+            <div className="border-b">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+                    <nav className="flex text-sm text-muted-foreground">
+                        <Link href="/" className="hover:text-foreground">Home</Link>
+                        <span className="mx-2">/</span>
+                        <Link href="/buy-feeds" className="hover:text-foreground">Feeds</Link>
+                        <span className="mx-2">/</span>
+                        <span className="text-foreground capitalize">{product.name}</span>
+                    </nav>
+                </div>
+            </div>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <BackToProgram />
+                <BuyProductInteractive
+                    product={product}
+                    slug={slug}
+                    baseUrl={baseUrl}
+                    productType="feed"
+                    categoryName={product.feed_category?.name}
+                    brandHref={product.brand ? `/buy-feeds?brand=${product.brand.name}` : undefined}
+                    shopHref="/buy-feeds"
+                    guideHref={`/feeds/${slug}`}
+                    guideLabel="View Feed Guide →"
+                    loginRedirect={`/buy-feeds/${slug}`}
+                    fallbackIcon={<Egg className="w-28 h-28 text-muted-foreground/20" />}
+                    tabsContent={tabsContent}
+                />
+            </div>
+        </div>
     )
 }

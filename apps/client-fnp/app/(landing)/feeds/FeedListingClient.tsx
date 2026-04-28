@@ -61,6 +61,7 @@ export function FeedListingClient({ initialData, initialTotal }: FeedListingClie
 
     const handlePageChange = (newPage: number) => {
         setQueryState({ p: newPage })
+        window.scrollTo({ top: 0, behavior: "smooth" })
     }
 
     return (

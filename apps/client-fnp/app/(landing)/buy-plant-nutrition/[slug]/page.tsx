@@ -1,7 +1,8 @@
 import { queryPlantNutritionProduct } from "@/lib/query"
+import Link from "next/link"
 import { Leaf } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { BuyProductDetail } from "@/components/shop/BuyProductDetail"
+import { BuyProductInteractive } from "@/components/shop/BuyProductInteractive"
 
 interface BuyPlantNutritionProductPageProps {
     params: Promise<{ slug: string }>
@@ -9,26 +10,13 @@ interface BuyPlantNutritionProductPageProps {
 
 export default async function BuyPlantNutritionProductPage({ params }: BuyPlantNutritionProductPageProps) {
     const { slug } = await params
+
     const response = await queryPlantNutritionProduct(slug)
     const product = response?.data
 
-    if (!product) {
-        return (
-            <div className="min-h-screen bg-background flex items-center justify-center">
-                <div className="text-center">
-                    <h2 className="text-2xl font-bold mb-2">Product Not Found</h2>
-                    <p className="text-muted-foreground">The product you&apos;re looking for doesn&apos;t exist.</p>
-                </div>
-            </div>
-        )
-    }
-
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://farmnport.com'
-    const salePrice = product.show_price && product.sale_price > 0 ? product.sale_price / 100 : null
-    const wasPrice = product.was_price > product.sale_price ? product.was_price / 100 : null
-    const categorySlug = product.plant_nutrition_category?.slug || 'all'
 
-    const structuredData = {
+    const structuredData = product ? {
         "@context": "https://schema.org",
         "@type": "Product",
         "name": product.name,
@@ -43,74 +31,109 @@ export default async function BuyPlantNutritionProductPage({ params }: BuyPlantN
             "@type": "Offer",
             "url": `${baseUrl}/buy-plant-nutrition/${slug}`,
             "priceCurrency": "USD",
-            "price": salePrice ? salePrice.toFixed(2) : "0.00",
+            "price": product.show_price && product.sale_price > 0 ? (product.sale_price / 100).toFixed(2) : "0.00",
             "availability": product.available_for_sale ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
             "seller": { "@type": "Organization", "name": "farmnport" }
         }
+    } : null
+
+    if (!product) {
+        return (
+            <div className="min-h-screen bg-background flex items-center justify-center">
+                <div className="text-center">
+                    <h2 className="text-2xl font-bold mb-2">Product Not Found</h2>
+                    <p className="text-muted-foreground">The product you&apos;re looking for doesn&apos;t exist.</p>
+                </div>
+            </div>
+        )
     }
 
-    const tabsContent = (
-        <Tabs defaultValue="overview" className="w-full">
-            <TabsList className="w-full justify-start border-b rounded-none h-auto p-0 bg-transparent">
-                <TabsTrigger value="overview" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary">Overview</TabsTrigger>
-                <TabsTrigger value="active-ingredients" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary">Active Ingredients</TabsTrigger>
-            </TabsList>
+    const categorySlug = product.plant_nutrition_category?.slug || "all"
+    const tabs = ["overview", "active-ingredients", ...(product.targets?.length > 0 ? ["targets"] : [])]
 
-            <TabsContent value="overview" className="mt-6">
-                <p className="text-muted-foreground">
-                    {product.plant_nutrition_category?.name
-                        ? <>This is a <span className="font-medium capitalize">{product.plant_nutrition_category.name}</span> product designed for healthy crop nutrition and yield improvement.</>
+    const tabsContent = (
+        <Tabs defaultValue="overview">
+            <TabsList className="w-full justify-start border-b rounded-none h-auto p-0 bg-transparent gap-1">
+                {tabs.map((tab) => (
+                    <TabsTrigger key={tab} value={tab} className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent text-sm px-3 pb-2 capitalize">
+                        {tab.replace("-", " ")}
+                    </TabsTrigger>
+                ))}
+            </TabsList>
+            <TabsContent value="overview" className="mt-4">
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                    {product.description
+                        ? product.description
+                        : product.plant_nutrition_category?.name
+                        ? <>This is a <span className="font-medium capitalize">{product.plant_nutrition_category.name}</span> designed to support healthy crop nutrition and yield improvement.</>
                         : `${product.name} is a professional plant nutrition product.`}
                 </p>
             </TabsContent>
-
-            <TabsContent value="active-ingredients" className="mt-6">
+            <TabsContent value="active-ingredients" className="mt-4">
                 {product.active_ingredients?.length > 0 ? (
-                    <div className="space-y-4">
+                    <div className="divide-y">
                         {product.active_ingredients.map((ai: any, idx: number) => (
-                            <div key={idx} className="flex justify-between items-center p-4 bg-muted/50 rounded-lg">
-                                <div>
-                                    <div className="font-medium capitalize">{ai.name}</div>
-                                    <div className="text-sm text-muted-foreground">Active Ingredient</div>
-                                </div>
-                                <div className="text-right">
-                                    <div className="font-bold">{ai.dosage_value} {ai.dosage_unit}</div>
-                                    <div className="text-xs text-muted-foreground">Concentration</div>
-                                </div>
+                            <div key={idx} className="flex justify-between py-2 text-sm">
+                                <span className="capitalize">{ai.name}</span>
+                                <span className="font-semibold">{ai.dosage_value} {ai.dosage_unit}</span>
                             </div>
                         ))}
                     </div>
                 ) : (
-                    <p className="text-muted-foreground">No active ingredient information available.</p>
+                    <p className="text-sm text-muted-foreground mt-4">No information available.</p>
                 )}
             </TabsContent>
+            {product.targets?.length > 0 && (
+                <TabsContent value="targets" className="mt-4">
+                    <ul className="space-y-1.5">
+                        {product.targets.map((target: any, idx: number) => (
+                            <li key={idx} className="flex items-start gap-2 text-sm">
+                                <span className="h-1.5 w-1.5 rounded-full bg-green-500 flex-shrink-0 mt-1.5" />
+                                <span>
+                                    <span className="font-medium">{target.name}</span>
+                                    {target.scientific_name && (
+                                        <span className="text-xs text-muted-foreground italic ml-1">({target.scientific_name})</span>
+                                    )}
+                                </span>
+                            </li>
+                        ))}
+                    </ul>
+                </TabsContent>
+            )}
         </Tabs>
     )
 
     return (
-        <>
-            <script
-                type="application/ld+json"
-                dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-            />
-            <BuyProductDetail
-                productId={product.id}
-                productName={product.name}
-                productSlug={product.slug}
-                productType="plant_nutrition"
-                images={product.images}
-                fallbackIcon={<Leaf className="w-24 h-24 text-muted-foreground/30" />}
-                brand={product.brand}
-                brandHref={`/buy-plant-nutrition?brand=${product.brand?.id}`}
-                categoryName={product.plant_nutrition_category?.name}
-                salePrice={salePrice}
-                wasPrice={wasPrice}
-                availableForSale={product.available_for_sale}
-                breadcrumb={{ href: "/buy-plant-nutrition", label: "Shop" }}
-                guideHref={`/plant-nutrition-guides/${categorySlug}/${product.slug}`}
-                loginRedirect={`/buy-plant-nutrition/${slug}`}
-                tabsContent={tabsContent}
-            />
-        </>
+        <div className="min-h-screen bg-background">
+            {structuredData && (
+                <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
+            )}
+            <div className="border-b">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+                    <nav className="flex text-sm text-muted-foreground">
+                        <Link href="/" className="hover:text-foreground">Home</Link>
+                        <span className="mx-2">/</span>
+                        <Link href="/buy-plant-nutrition" className="hover:text-foreground">Shop</Link>
+                        <span className="mx-2">/</span>
+                        <span className="text-foreground capitalize">{product.name}</span>
+                    </nav>
+                </div>
+            </div>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <BuyProductInteractive
+                    product={product}
+                    slug={slug}
+                    baseUrl={baseUrl}
+                    productType="plant_nutrition"
+                    categoryName={product.plant_nutrition_category?.name}
+                    brandHref={product.brand ? `/buy-plant-nutrition?brand=${product.brand.id}` : undefined}
+                    shopHref="/buy-plant-nutrition"
+                    guideHref={`/plant-nutrition-guides/${categorySlug}/${slug}`}
+                    loginRedirect={`/buy-plant-nutrition/${slug}`}
+                    fallbackIcon={<Leaf className="w-28 h-28 text-muted-foreground/20" />}
+                    tabsContent={tabsContent}
+                />
+            </div>
+        </div>
     )
 }

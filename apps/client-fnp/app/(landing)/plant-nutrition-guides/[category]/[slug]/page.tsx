@@ -5,6 +5,7 @@ import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
 import { capitalizeFirstLetter } from "@/lib/utilities"
 import { BaseURL } from "@/lib/schemas"
 import { FertilizerApplicationRates } from "@/components/agrochemical/FertilizerApplicationRates"
+import { AgrochemicalDosageTable } from "@/components/agrochemical/AgrochemicalDosageTable"
 import { ActiveIngredientsList } from "@/components/shared/ActiveIngredientUnitsKey"
 import { WantToBuyCTA } from "@/components/shared/WantToBuyCTA"
 
@@ -223,7 +224,9 @@ export default async function PlantNutritionGuidePage({ params }: GuidePageProps
 
                 {/* Application Rates */}
                 {product.dosage_rates && product.dosage_rates.length > 0 && (
-                    <FertilizerApplicationRates dosageRates={product.dosage_rates} />
+                    product.dosage_rates.every((r: any) => !r.crop_group_id && r.crop_group)
+                        ? <FertilizerApplicationRates dosageRates={product.dosage_rates} />
+                        : <AgrochemicalDosageTable dosageRates={product.dosage_rates} />
                 )}
 
                 {/* Product Labels */}
