@@ -390,6 +390,7 @@ export default async function FeedDetailPage({ params }: FeedDetailPageProps) {
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
     )
