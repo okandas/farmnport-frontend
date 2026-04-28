@@ -144,7 +144,7 @@ export default async function PlantNutritionGuidePage({ params }: GuidePageProps
                         )}
 
                         {/* Want to Buy CTA */}
-                        <WantToBuyCTA available_for_sale={product.available_for_sale} name={product.name} href="/waiting-list-shop" />
+                        <WantToBuyCTA available_for_sale={product.available_for_sale} name={product.name} href={`/buy-plant-nutrition/${slug}`} />
 
                         {/* Precautions */}
                         {product.precautions && product.precautions.length > 0 && (

@@ -5,7 +5,6 @@ import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
 import { BaseURL } from "@/lib/schemas"
 import { FeedBreadcrumb } from "./FeedBreadcrumb"
 import { WantToBuyCTA } from "@/components/shared/WantToBuyCTA"
-import { sendGTMEvent } from "@next/third-parties/google"
 
 interface FeedDetailPageProps {
     params: Promise<{ slug: string }>
@@ -121,7 +120,7 @@ export default async function FeedDetailPage({ params }: FeedDetailPageProps) {
                         )}
 
                         {/* Want to Buy CTA */}
-                        <WantToBuyCTA available_for_sale={product.available_for_sale} name={product.name} href="/waiting-list-shop" />
+                        <WantToBuyCTA available_for_sale={product.available_for_sale} name={product.name} href={`/buy-feeds/${slug}`} />
 
                         {/* Safety Warnings */}
                         {product.safety_warnings && (
