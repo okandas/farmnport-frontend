@@ -401,47 +401,12 @@ export default function CheckoutPage() {
               {/* Payment */}
               <section className="border rounded-xl p-5 space-y-4">
                 <h2 className="font-semibold">Payment Method</h2>
-                <div className="space-y-3">
-                  {[
-                    { value: "billpay", label: "BillPay Kiosk", desc: "Pay at any BillPay kiosk", icon: "🏧" },
-                    { value: "paynow_ecocash", label: "Paynow — EcoCash", desc: "Pay via EcoCash mobile money", icon: "📱" },
-                    { value: "paynow_onemoney", label: "Paynow — OneMoney", desc: "Pay via OneMoney mobile money", icon: "📱" },
-                    { value: "paynow_web", label: "Paynow — Card / Bank", desc: "Pay online with card or bank transfer", icon: "💳" },
-                  ].map((opt) => (
-                    <button
-                      key={opt.value}
-                      type="button"
-                      onClick={() => {
-                        if (opt.value === "billpay") {
-                          setValue("provider", "billpay")
-                          setValue("method", "")
-                        } else if (opt.value === "paynow_ecocash") {
-                          setValue("provider", "paynow")
-                          setValue("method", "ecocash")
-                        } else if (opt.value === "paynow_onemoney") {
-                          setValue("provider", "paynow")
-                          setValue("method", "onemoney")
-                        } else {
-                          setValue("provider", "paynow")
-                          setValue("method", "")
-                        }
-                      }}
-                      className={`relative w-full rounded-xl border-2 p-4 text-left transition-colors flex items-center gap-3 ${
-                        (opt.value === "billpay" && provider === "billpay") ||
-                        (opt.value === "paynow_ecocash" && provider === "paynow" && watch("method") === "ecocash") ||
-                        (opt.value === "paynow_onemoney" && provider === "paynow" && watch("method") === "onemoney") ||
-                        (opt.value === "paynow_web" && provider === "paynow" && watch("method") === "")
-                          ? "border-primary bg-primary/5"
-                          : "border-border hover:border-primary/40"
-                      }`}
-                    >
-                      <span className="text-2xl shrink-0">{opt.icon}</span>
-                      <div>
-                        <p className="font-semibold text-sm">{opt.label}</p>
-                        <p className="text-xs text-muted-foreground">{opt.desc}</p>
-                      </div>
-                    </button>
-                  ))}
+                <div className="flex items-center gap-3 rounded-xl border-2 border-primary bg-primary/5 p-4">
+                  <span className="text-2xl shrink-0">🏧</span>
+                  <div>
+                    <p className="font-semibold text-sm">BillPay Kiosk</p>
+                    <p className="text-xs text-muted-foreground">Pay at any BillPay kiosk using your reference number</p>
+                  </div>
                 </div>
               </section>
             </div>
