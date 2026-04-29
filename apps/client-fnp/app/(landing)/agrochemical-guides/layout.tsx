@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     description: 'Comprehensive agrochemical guides covering insecticides, fungicides, herbicides, and more. Search active ingredients, dosage rates, target pests, and safe application methods.',
     url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://farmnport.com'}/agrochemical-guides`,
     siteName: 'farmnport',
-    locale: 'en_US',
+    locale: 'en_ZW',
     type: 'website',
   },
   twitter: {

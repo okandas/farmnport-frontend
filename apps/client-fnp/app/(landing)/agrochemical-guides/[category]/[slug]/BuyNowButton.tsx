@@ -7,7 +7,7 @@ import { sendGTMEvent } from "@next/third-parties/google"
 export function BuyNowButton({ slug }: { slug: string }) {
     return (
         <Link
-            href="/waiting-list-shop"
+            href={`/buy-agrochemicals/${slug}`}
             onClick={() => sendGTMEvent({ event: 'buy_now_click', value: slug, category: 'agrochemical' })}
             className="flex items-center justify-center gap-2 w-full py-3 px-4 rounded-lg bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-colors"
         >

@@ -1,3 +1,4 @@
+import { Suspense } from "react"
 import {Farmers} from "@/components/layouts/farmers"
 import { retrieveUser } from "@/lib/actions"
 import { ClientFilterSidebar } from "@/components/generic/clientFilterSidebar"
@@ -42,7 +43,7 @@ export default async function FarmersPage() {
             <div className="lg:hidden mb-4">
               <ClientFilterSidebar type="farmers" />
             </div>
-            <Farmers user={user} />
+            <Suspense><Farmers user={user} /></Suspense>
           </div>
 
           <div className="hidden lg:block lg:w-80 relative">

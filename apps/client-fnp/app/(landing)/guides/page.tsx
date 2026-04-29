@@ -1,24 +1,27 @@
 import Link from "next/link"
-import { FlaskConical, Heart, Leaf } from "lucide-react"
+import { FlaskConical } from "lucide-react"
+// FlaskConical used in hero badge only
 
 const sections = [
     {
         title: "Agrochemical Guides",
         description: "Pesticides, herbicides, and fungicides — active ingredients, targets, and usage by category.",
         href: "/agrochemical-guides",
-        Icon: FlaskConical,
     },
     {
         title: "Animal Health Guides",
         description: "Vaccines, antibiotics, and supplements — dosage rates, withdrawal periods, and active ingredients for poultry and livestock.",
         href: "/animal-health-guides",
-        Icon: Heart,
+    },
+    {
+        title: "Animal Nutrition",
+        description: "Livestock feed products across all categories and animal types — browse feeds by animal, phase, and form.",
+        href: "/feeds",
     },
     {
         title: "Plant Nutrition Guides",
         description: "Fertilizers, foliar feeds, biostimulants, and plant growth regulators — active ingredients and application rates.",
         href: "/plant-nutrition-guides",
-        Icon: Leaf,
     },
 ]
 
@@ -48,24 +51,19 @@ export default function GuidesPage() {
             {/* Guide Sections */}
             <section className="py-10 lg:py-14">
                 <div className="mx-auto max-w-4xl px-6 lg:px-8">
-                    <div className="grid gap-6 sm:grid-cols-3">
-                        {sections.map(({ title, description, href, Icon }) => (
+                    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                        {sections.map(({ title, description, href }) => (
                             <Link
                                 key={href}
                                 href={href}
-                                className="flex flex-col gap-4 p-6 rounded-xl bg-card border border-border hover:border-primary hover:shadow-md transition-all group"
+                                className="flex flex-col gap-3 p-6 rounded-xl bg-card border border-border hover:border-primary hover:shadow-md transition-all group"
                             >
-                                <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                                    <Icon className="w-6 h-6 text-primary" strokeWidth={2} />
-                                </div>
-                                <div>
-                                    <h2 className="text-base font-semibold text-foreground group-hover:text-primary transition-colors mb-1">
-                                        {title}
-                                    </h2>
-                                    <p className="text-sm text-muted-foreground leading-relaxed">
-                                        {description}
-                                    </p>
-                                </div>
+                                <h2 className="text-base font-semibold text-foreground group-hover:text-primary transition-colors">
+                                    {title}
+                                </h2>
+                                <p className="text-sm text-muted-foreground leading-relaxed">
+                                    {description}
+                                </p>
                             </Link>
                         ))}
                     </div>

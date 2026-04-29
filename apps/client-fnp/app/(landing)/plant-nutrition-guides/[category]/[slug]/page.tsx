@@ -5,7 +5,9 @@ import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
 import { capitalizeFirstLetter } from "@/lib/utilities"
 import { BaseURL } from "@/lib/schemas"
 import { FertilizerApplicationRates } from "@/components/agrochemical/FertilizerApplicationRates"
+import { AgrochemicalDosageTable } from "@/components/agrochemical/AgrochemicalDosageTable"
 import { ActiveIngredientsList } from "@/components/shared/ActiveIngredientUnitsKey"
+import { WantToBuyCTA } from "@/components/shared/WantToBuyCTA"
 
 interface GuidePageProps {
     params: Promise<{
@@ -142,6 +144,9 @@ export default async function PlantNutritionGuidePage({ params }: GuidePageProps
                             </div>
                         )}
 
+                        {/* Want to Buy CTA */}
+                        <WantToBuyCTA available_for_sale={product.available_for_sale} name={product.name} href={`/buy-plant-nutrition/${slug}`} />
+
                         {/* Precautions */}
                         {product.precautions && product.precautions.length > 0 && (
                             <div className="rounded-lg border border-red-200 dark:border-red-900 bg-red-50/50 dark:bg-red-950/30 px-3 py-2">
@@ -175,38 +180,6 @@ export default async function PlantNutritionGuidePage({ params }: GuidePageProps
                                 </div>
                             )}
                         </div>
-
-                        {/* Variants / Pack Sizes */}
-                        {product.variants && product.variants.length > 0 && (
-                            <div>
-                                <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">Pack Sizes & Pricing</h2>
-                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                                    {product.variants.map((variant: any, idx: number) => (
-                                        <div key={idx} className="rounded-lg border bg-card p-3 flex flex-col gap-1">
-                                            <span className="text-sm font-medium text-foreground">{variant.name}</span>
-                                            {variant.sale_price > 0 && (
-                                                <div className="flex items-baseline gap-1.5">
-                                                    {variant.was_price > 0 && variant.was_price > variant.sale_price && (
-                                                        <span className="text-xs text-muted-foreground line-through">${(variant.was_price / 100).toFixed(2)}</span>
-                                                    )}
-                                                    <span className="text-base font-bold text-primary">${(variant.sale_price / 100).toFixed(2)}</span>
-                                                </div>
-                                            )}
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {(!product.variants || product.variants.length === 0) && product.show_price && product.sale_price > 0 && (
-                            <div className="flex items-center gap-3">
-                                <span className="text-sm text-muted-foreground">Guide Price:</span>
-                                {product.was_price > 0 && product.was_price > product.sale_price && (
-                                    <span className="text-lg text-muted-foreground line-through">${(product.was_price / 100).toFixed(2)}</span>
-                                )}
-                                <span className="text-2xl font-bold text-primary">${(product.sale_price / 100).toFixed(2)}</span>
-                            </div>
-                        )}
 
                         <div className="h-px bg-border" />
 
@@ -251,7 +224,9 @@ export default async function PlantNutritionGuidePage({ params }: GuidePageProps
 
                 {/* Application Rates */}
                 {product.dosage_rates && product.dosage_rates.length > 0 && (
-                    <FertilizerApplicationRates dosageRates={product.dosage_rates} />
+                    product.dosage_rates.every((r: any) => !r.crop_group_id && r.crop_group)
+                        ? <FertilizerApplicationRates dosageRates={product.dosage_rates} />
+                        : <AgrochemicalDosageTable dosageRates={product.dosage_rates} />
                 )}
 
                 {/* Product Labels */}

@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     title: 'Livestock Feed Products | farmnport',
     description: 'Browse livestock feed products including poultry, cattle, pig, and dairy feeds.',
     siteName: 'farmnport',
-    locale: 'en_US',
+    locale: 'en_ZW',
     type: 'website',
   },
   alternates: {

@@ -1,12 +1,5 @@
-import { DashboardHeader } from "@/components/state/dashboardHeader"
-import { DashboardShell } from "@/components/state/dashboardShell"
-import { OrdersTable } from "@/components/structures/tables/orders"
+import { redirect } from "next/navigation"
 
-export default async function OrdersPage() {
-  return (
-    <DashboardShell>
-      <DashboardHeader heading="Orders" text="Manage customer orders." />
-      <OrdersTable />
-    </DashboardShell>
-  )
+export default function OldOrdersRedirect() {
+  redirect("/dashboard/farmnport/orders/sales")
 }

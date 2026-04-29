@@ -4,10 +4,12 @@ import Image from "next/image"
 import { Beaker, AlertTriangle } from "lucide-react"
 import Link from "next/link"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
-import { capitalizeFirstLetter, formatUnit } from "@/lib/utilities"
+import { capitalizeFirstLetter } from "@/lib/utilities"
 import { SprayProgramBackLink } from "./SprayProgramBackLink"
 import { FertilizerApplicationRates } from "@/components/agrochemical/FertilizerApplicationRates"
+import { AgrochemicalDosageTable } from "@/components/agrochemical/AgrochemicalDosageTable"
 import { ProductTargets } from "@/components/agrochemical/ProductTargets"
+import { WantToBuyCTA } from "@/components/shared/WantToBuyCTA"
 
 interface GuidePageProps {
     params: Promise<{
@@ -187,6 +189,9 @@ export default async function AgroChemicalGuidePage({ params }: GuidePageProps) 
                             </div>
                         )}
 
+                        {/* Want to Buy CTA */}
+                        <WantToBuyCTA available_for_sale={chemical.available_for_sale} name={chemical.name} href={`/buy-agrochemicals/${slug}`} />
+
                         {/* Precautions */}
                         {chemical.precautions && chemical.precautions.length > 0 && (
                             <div className="rounded-lg border border-red-200 dark:border-red-900 bg-red-50/50 dark:bg-red-950/30 px-3 py-2">
@@ -227,39 +232,6 @@ export default async function AgroChemicalGuidePage({ params }: GuidePageProps) 
                                 Ready to Buy
                             </Link> */}
                         </div>
-
-                        {/* Variants / Pack Sizes */}
-                        {chemical.variants && chemical.variants.length > 0 && (
-                            <div>
-                                <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">Pack Sizes & Pricing</h2>
-                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                                    {chemical.variants.map((variant: any, idx: number) => (
-                                        <div key={idx} className="rounded-lg border bg-card p-3 flex flex-col gap-1">
-                                            <span className="text-sm font-medium text-foreground">{variant.name}</span>
-                                            {variant.sale_price > 0 && (
-                                                <div className="flex items-baseline gap-1.5">
-                                                    {variant.was_price > 0 && variant.was_price > variant.sale_price && (
-                                                        <span className="text-xs text-muted-foreground line-through">${(variant.was_price / 100).toFixed(2)}</span>
-                                                    )}
-                                                    <span className="text-base font-bold text-primary">${(variant.sale_price / 100).toFixed(2)}</span>
-                                                </div>
-                                            )}
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Fallback single price */}
-                        {(!chemical.variants || chemical.variants.length === 0) && chemical.show_price && chemical.sale_price > 0 && (
-                            <div className="flex items-center gap-3">
-                                <span className="text-sm text-muted-foreground">Guide Price:</span>
-                                {chemical.was_price > 0 && chemical.was_price > chemical.sale_price && (
-                                    <span className="text-lg text-muted-foreground line-through">${(chemical.was_price / 100).toFixed(2)}</span>
-                                )}
-                                <span className="text-2xl font-bold text-primary">${(chemical.sale_price / 100).toFixed(2)}</span>
-                            </div>
-                        )}
 
                         {/* Divider */}
                         <div className="h-px bg-border" />
@@ -317,182 +289,11 @@ export default async function AgroChemicalGuidePage({ params }: GuidePageProps) 
                 </div>
 
                 {/* Dosage Rates & Application Guide Section */}
-                {chemical.dosage_rates && chemical.dosage_rates.length > 0 && (() => {
-                    const isFertilizerRates = chemical.dosage_rates.every((r: any) => !r.crop_group_id && r.crop_group)
-                    if (isFertilizerRates) {
-                        return <FertilizerApplicationRates dosageRates={chemical.dosage_rates} />
-                    }
-                    return (
-                    <div className="mb-12">
-                        <h2 className="sticky top-16 z-10 text-2xl font-bold py-4 text-foreground bg-background">Dosage Rates & Application Guide</h2>
-                        <div className="overflow-x-auto">
-                            <table className="w-full border-collapse">
-                                <thead>
-                                    <tr className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/50 dark:to-indigo-950/50 border-b-2 border-blue-200 dark:border-blue-800">
-                                        <th className="text-left p-3 text-sm font-semibold text-blue-900 dark:text-blue-100 min-w-[120px]">Crop</th>
-                                        <th className="text-left p-3 text-sm font-semibold text-blue-900 dark:text-blue-100 min-w-[180px]">Target</th>
-                                        <th className="text-left p-3 text-sm font-semibold text-blue-900 dark:text-blue-100 min-w-[140px]">Dosage</th>
-                                        <th className="text-left p-3 text-sm font-semibold text-orange-700 dark:text-orange-300 min-w-[120px] whitespace-nowrap">Max Applications</th>
-                                        <th className="text-left p-3 text-sm font-semibold text-teal-700 dark:text-teal-300 min-w-[130px] whitespace-nowrap">Application Interval</th>
-                                        <th className="text-left p-3 text-sm font-semibold text-rose-700 dark:text-rose-300 min-w-[60px]">PHI</th>
-                                        <th className="text-left p-3 text-sm font-semibold text-blue-900 dark:text-blue-100 min-w-[180px]">Remarks</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {(() => {
-                                        const grouped = new Map<string, any[]>()
-                                        const ungrouped: any[] = []
-
-                                        chemical.dosage_rates.forEach((rate: any) => {
-                                            if (rate.crop_group_id) {
-                                                const existing = grouped.get(rate.crop_group_id) || []
-                                                existing.push(rate)
-                                                grouped.set(rate.crop_group_id, existing)
-                                            } else {
-                                                ungrouped.push(rate)
-                                            }
-                                        })
-
-                                        const renderTargetGrid = (targets: string[]) => (
-                                            <div className="grid grid-cols-2 gap-x-4 gap-y-0.5">
-                                                {targets.map((t: string, i: number) => {
-                                                    const parenIdx = t.indexOf(" (")
-                                                    const mainName = parenIdx > -1 ? t.slice(0, parenIdx) : t
-                                                    const sciName = parenIdx > -1 ? t.slice(parenIdx) : ""
-                                                    return (
-                                                        <div key={i} className="text-sm flex items-start gap-1">
-                                                            <span className="h-1 w-1 mt-1.5 rounded-full bg-muted-foreground/50 flex-shrink-0" />
-                                                            <span>
-                                                                <span className="text-foreground">{mainName}</span>
-                                                                {sciName && <span className="text-muted-foreground text-xs">{sciName}</span>}
-                                                            </span>
-                                                        </div>
-                                                    )
-                                                })}
-                                            </div>
-                                        )
-
-                                        const renderEntryRows = (rate: any, rateKey: string, cropCell: React.ReactNode, targetCell: React.ReactNode) => {
-                                            const entries = rate.entries || []
-                                            const lastIdx = entries.length - 1
-                                            return entries.map((entry: any, entryIdx: number) => (
-                                                <tr key={`${rateKey}-${entryIdx}`} className={`hover:bg-muted/30 transition-colors ${entryIdx === 0 ? "border-t border-border" : ""} ${entryIdx === lastIdx ? "border-b border-border" : ""}`}>
-                                                    <td className="p-3 align-top">
-                                                        {entryIdx === 0 ? cropCell : null}
-                                                    </td>
-                                                    <td className="p-3 align-top">
-                                                        {entryIdx === 0 ? targetCell : null}
-                                                    </td>
-                                                    <td className="p-3 align-top">
-                                                        <div className="font-bold text-blue-600 dark:text-blue-400 text-base">
-                                                            {entry.dosage.value} {formatUnit(entry.dosage.unit)}
-                                                        </div>
-                                                        <div className="text-xs text-muted-foreground">per {entry.dosage.per}</div>
-                                                    </td>
-                                                    <td className="p-3 align-top">
-                                                        <div className="font-semibold text-orange-700 dark:text-orange-300">{entry.max_applications.max > 0 ? entry.max_applications.max : "—"}</div>
-                                                        {entry.max_applications.note && entry.max_applications.note.trim() !== '' && (
-                                                            <div className="text-xs text-muted-foreground mt-1">{entry.max_applications.note}</div>
-                                                        )}
-                                                    </td>
-                                                    <td className="p-3 align-top">
-                                                        <div className="font-semibold text-teal-700 dark:text-teal-300 text-sm">{entry.application_interval}</div>
-                                                    </td>
-                                                    <td className="p-3 align-top">
-                                                        <div className="font-semibold text-rose-700 dark:text-rose-300 text-sm">{entry.phi}</div>
-                                                    </td>
-                                                    <td className="p-3 align-top">
-                                                        {entry.remarks && entry.remarks.length > 0 ? (
-                                                            <ul className="space-y-1">
-                                                                {entry.remarks.map((remark: string, remarkIdx: number) => (
-                                                                    <li key={remarkIdx} className="text-xs text-foreground flex items-start gap-1.5">
-                                                                        <span className="h-1 w-1 mt-1.5 rounded-full bg-foreground/50 flex-shrink-0" />
-                                                                        <span className="flex-1">{remark}</span>
-                                                                    </li>
-                                                                ))}
-                                                            </ul>
-                                                        ) : (
-                                                            <span className="text-xs text-muted-foreground">&mdash;</span>
-                                                        )}
-                                                    </td>
-                                                </tr>
-                                            ))
-                                        }
-
-                                        return (
-                                            <>
-                                                {/* Grouped rates - show group name with crops listed */}
-                                                {Array.from(grouped.entries()).map(([groupId, rates]) => {
-                                                    const firstRate = rates[0]
-                                                    const cropCell = (
-                                                        <div>
-                                                            <div className="font-semibold text-sm text-blue-700 dark:text-blue-300">
-                                                                {firstRate.crop_group}
-                                                            </div>
-                                                            <div className="mt-1 space-y-0.5">
-                                                                {rates.map((r: any, idx: number) => (
-                                                                    <div key={idx} className="text-xs text-muted-foreground capitalize flex items-start gap-1">
-                                                                        <span className="h-1 w-1 mt-1.5 rounded-full bg-blue-400 flex-shrink-0" />
-                                                                        <span className="flex-1">{r.crop}</span>
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-                                                        </div>
-                                                    )
-                                                    const targetCell = renderTargetGrid(firstRate.targets || [])
-                                                    return renderEntryRows(firstRate, `group-${groupId}`, cropCell, targetCell)
-                                                })}
-
-                                                {/* Ungrouped rates - group by matching targets */}
-                                                {(() => {
-                                                    const targetGrouped = new Map<string, any[]>()
-                                                    const targetOrder: string[] = []
-                                                    ungrouped.forEach((rate: any) => {
-                                                        const key = Array.isArray(rate.targets) ? rate.targets.slice().sort().join("|") : ""
-                                                        if (!targetGrouped.has(key)) {
-                                                            targetGrouped.set(key, [])
-                                                            targetOrder.push(key)
-                                                        }
-                                                        targetGrouped.get(key)!.push(rate)
-                                                    })
-                                                    return targetOrder.map((targetKey, tgIdx) => {
-                                                        const rates = targetGrouped.get(targetKey)!
-                                                        if (rates.length === 1) {
-                                                            const rate = rates[0]
-                                                            const cropCell = (
-                                                                <div>
-                                                                    <div className="font-semibold capitalize text-sm text-foreground">{rate.crop_group || rate.crop}</div>
-                                                                    {!rate.crop_group && rate.category_name && (
-                                                                        <div className="text-xs text-muted-foreground mt-0.5">{rate.category_name}</div>
-                                                                    )}
-                                                                </div>
-                                                            )
-                                                            const targetCell = renderTargetGrid(rate.targets || [])
-                                                            return renderEntryRows(rate, `tg-${tgIdx}`, cropCell, targetCell)
-                                                        }
-                                                        return rates.map((rate: any, rateIdx: number) => {
-                                                            const cropCell = (
-                                                                <div>
-                                                                    <div className="font-semibold capitalize text-sm text-foreground">{rate.crop_group || rate.crop}</div>
-                                                                    {!rate.crop_group && rate.category_name && (
-                                                                        <div className="text-xs text-muted-foreground mt-0.5">{rate.category_name}</div>
-                                                                    )}
-                                                                </div>
-                                                            )
-                                                            const targetCell = rateIdx === 0 ? renderTargetGrid(rate.targets || []) : null
-                                                            return renderEntryRows(rate, `tg-${tgIdx}-${rateIdx}`, cropCell, targetCell)
-                                                        })
-                                                    })
-                                                })()}
-                                            </>
-                                        )
-                                    })()}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    )
-                })()}
+                {chemical.dosage_rates && chemical.dosage_rates.length > 0 && (
+                    chemical.dosage_rates.every((r: any) => !r.crop_group_id && r.crop_group)
+                        ? <FertilizerApplicationRates dosageRates={chemical.dosage_rates} />
+                        : <AgrochemicalDosageTable dosageRates={chemical.dosage_rates} />
+                )}
 
                 {/* Product Labels Section */}
                 {(chemical.front_label?.img?.src || chemical.back_label?.img?.src) && (
