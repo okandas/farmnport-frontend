@@ -7,6 +7,7 @@ import { Leaf } from "lucide-react"
 import { PlantNutritionCard } from "@/components/plantnutrition/PlantNutritionCard"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
 import Link from "next/link"
+import { PlantNutritionFilterSidebar } from "@/components/generic/plantNutritionFilterSidebar"
 
 interface PlantNutritionCategoryClientProps {
     category: string
@@ -48,49 +49,76 @@ export function PlantNutritionCategoryClient({ category, categoryName, initialPr
                 </p>
             </div>
 
-            {isLoading ? (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                    {[...Array(8)].map((_, i) => (
-                        <div key={i} className="bg-card border border-border rounded-lg overflow-hidden animate-pulse">
-                            <div className="aspect-square bg-muted" />
-                            <div className="p-4 space-y-2">
-                                <div className="h-3 bg-muted rounded w-1/2" />
-                                <div className="h-4 bg-muted rounded" />
-                                <div className="h-4 bg-muted rounded w-3/4" />
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            ) : products.length === 0 ? (
-                <div className="text-center py-16">
-                    <Leaf className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
-                    <p className="text-muted-foreground">No products found in this category.</p>
-                    <Link href="/plant-nutrition-guides" className="mt-4 inline-block">
-                        <Button variant="outline" size="sm">Browse Categories</Button>
-                    </Link>
-                </div>
-            ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                    {products.map((product: any) => (
-                        <PlantNutritionCard key={product.id} product={product} />
-                    ))}
-                </div>
-            )}
+            <div className="flex flex-col lg:flex-row gap-8">
+                <aside className="w-full lg:w-64 flex-shrink-0">
+                    <PlantNutritionFilterSidebar hideCategory={true} categorySlug={category} />
+                </aside>
 
-            {totalPages > 1 && (
-                <div className="flex justify-center gap-2 mt-8">
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                        <Button
-                            key={page}
-                            variant={queryState.p === page ? "default" : "outline"}
-                            size="sm"
-                            onClick={() => setQueryState({ p: page })}
-                        >
-                            {page}
-                        </Button>
-                    ))}
-                </div>
-            )}
+                <main className="flex-1">
+                    {isLoading ? (
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+                            {[...Array(8)].map((_, i) => (
+                                <div key={i} className="animate-pulse">
+                                    <div className="bg-card border border-border rounded-lg overflow-hidden">
+                                        <div className="aspect-square bg-muted" />
+                                        <div className="p-4 space-y-3 border-t">
+                                            <div className="h-3 bg-muted rounded w-1/3" />
+                                            <div className="h-4 bg-muted rounded w-4/5" />
+                                            <div className="h-4 bg-muted rounded w-3/5" />
+                                            <div className="flex gap-4 pt-2 border-t">
+                                                <div className="h-3 bg-muted rounded w-16" />
+                                                <div className="h-3 bg-muted rounded w-16" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : products.length === 0 ? (
+                        <div className="text-center py-12">
+                            <Leaf className="w-16 h-16 text-muted-foreground/30 mx-auto mb-4" />
+                            <p className="text-muted-foreground">No products found in this category.</p>
+                            <Link href="/plant-nutrition-guides" className="mt-4 inline-block">
+                                <Button variant="outline" size="sm">Browse Categories</Button>
+                            </Link>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+                            {products.map((product: any) => (
+                                <PlantNutritionCard key={product.id} product={product} />
+                            ))}
+                        </div>
+                    )}
+
+                    {totalPages > 1 && (
+                        <div className="mt-8 flex justify-center gap-1">
+                            {Array.from({ length: totalPages }, (_, i) => i + 1)
+                                .filter(pageNum =>
+                                    pageNum === 1 ||
+                                    pageNum === totalPages ||
+                                    (pageNum >= queryState.p - 2 && pageNum <= queryState.p + 2)
+                                )
+                                .map((pageNum, idx, arr) => {
+                                    const prevPageNum = arr[idx - 1]
+                                    const showEllipsis = prevPageNum && pageNum - prevPageNum > 1
+                                    return (
+                                        <div key={pageNum} className="flex items-center gap-1">
+                                            {showEllipsis && <span className="px-2 text-muted-foreground">...</span>}
+                                            <Button
+                                                variant={queryState.p === pageNum ? "default" : "outline"}
+                                                size="sm"
+                                                onClick={() => setQueryState({ p: pageNum })}
+                                                className="min-w-[40px]"
+                                            >
+                                                {pageNum}
+                                            </Button>
+                                        </div>
+                                    )
+                                })}
+                        </div>
+                    )}
+                </main>
+            </div>
         </>
     )
 }

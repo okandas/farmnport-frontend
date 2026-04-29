@@ -60,7 +60,7 @@ export async function generateMetadata({ params }: LayoutProps): Promise<Metadat
             alt: product.name,
           },
         ],
-        locale: 'en_US',
+        locale: 'en_ZW',
         type: 'website',
       },
       twitter: {

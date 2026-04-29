@@ -518,6 +518,7 @@ export const AgroChemicalSchema = z.object({
   available_for_sale: z.boolean().default(false),
   show_price: z.boolean().default(true),
   sale_price: z.coerce.number().nonnegative().default(0),
+  show_was_price: z.boolean().default(false),
   was_price: z.coerce.number().nonnegative().default(0),
   created: z.string().optional(),
   updated: z.string().optional(),

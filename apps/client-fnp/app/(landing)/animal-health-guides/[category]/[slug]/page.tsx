@@ -5,6 +5,7 @@ import Link from "next/link"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
 import { capitalizeFirstLetter, formatUnit } from "@/lib/utilities"
 import { BaseURL } from "@/lib/schemas"
+import { WantToBuyCTA } from "@/components/shared/WantToBuyCTA"
 
 interface GuidePageProps {
     params: Promise<{
@@ -270,6 +271,9 @@ export default async function AnimalHealthGuidePage({ params }: GuidePageProps) 
                                 ))}
                             </div>
                         )}
+
+                        {/* Want to Buy CTA */}
+                        <WantToBuyCTA available_for_sale={product.available_for_sale} name={product.name} href={`/buy-animal-health/${slug}`} />
 
                         {/* Precautions */}
                         {product.precautions && product.precautions.length > 0 && (

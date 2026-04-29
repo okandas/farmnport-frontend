@@ -68,14 +68,14 @@ export function AnimalHealthCategoryClient({ category, categoryName, initialProd
             <div className="flex flex-col lg:flex-row gap-8">
                 {/* Sidebar Filters */}
                 <aside className="w-full lg:w-64 flex-shrink-0">
-                    <AnimalHealthFilterSidebar />
+                    <AnimalHealthFilterSidebar categorySlug={category} />
                 </aside>
 
                 {/* Main Content */}
                 <main className="flex-1">
                     {productsLoading ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                            {[...Array(6)].map((_, i) => (
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+                            {[...Array(8)].map((_, i) => (
                                 <div key={i} className="animate-pulse">
                                     <div className="bg-card border border-border rounded-lg overflow-hidden">
                                         <div className="aspect-square bg-muted" />
@@ -102,7 +102,7 @@ export function AnimalHealthCategoryClient({ category, categoryName, initialProd
                         </div>
                     ) : (
                         <>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
                                 {products.map((product: any) => (
                                     <AnimalHealthCard
                                         key={product.id}
@@ -114,26 +114,15 @@ export function AnimalHealthCategoryClient({ category, categoryName, initialProd
                             {/* Pagination */}
                             {totalPages > 1 && (
                                 <div className="mt-8 flex justify-center gap-1">
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => handlePageChange(Math.max(1, queryState.p - 1))}
-                                        disabled={queryState.p === 1}
-                                    >
-                                        Previous
-                                    </Button>
                                     {Array.from({ length: totalPages }, (_, i) => i + 1)
-                                        .filter(pageNum => {
-                                            return (
-                                                pageNum === 1 ||
-                                                pageNum === totalPages ||
-                                                (pageNum >= queryState.p - 2 && pageNum <= queryState.p + 2)
-                                            )
-                                        })
+                                        .filter(pageNum =>
+                                            pageNum === 1 ||
+                                            pageNum === totalPages ||
+                                            (pageNum >= queryState.p - 2 && pageNum <= queryState.p + 2)
+                                        )
                                         .map((pageNum, idx, arr) => {
                                             const prevPageNum = arr[idx - 1]
                                             const showEllipsis = prevPageNum && pageNum - prevPageNum > 1
-
                                             return (
                                                 <div key={pageNum} className="flex items-center gap-1">
                                                     {showEllipsis && (
@@ -150,14 +139,6 @@ export function AnimalHealthCategoryClient({ category, categoryName, initialProd
                                                 </div>
                                             )
                                         })}
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => handlePageChange(queryState.p + 1)}
-                                        disabled={queryState.p >= totalPages}
-                                    >
-                                        Next
-                                    </Button>
                                 </div>
                             )}
                         </>

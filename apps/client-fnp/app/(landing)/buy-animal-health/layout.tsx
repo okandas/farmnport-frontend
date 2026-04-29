@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     description: 'Shop professional animal health products with fast shipping and secure checkout.',
     url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://farmnport.com'}/buy-animal-health`,
     siteName: 'farmnport',
-    locale: 'en_US',
+    locale: 'en_ZW',
     type: 'website',
   },
   twitter: {
@@ -22,10 +22,10 @@ export const metadata: Metadata = {
     canonical: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://farmnport.com'}/buy-animal-health`,
   },
   robots: {
-    index: false,
+    index: true,
     follow: true,
     googleBot: {
-      index: false,
+      index: true,
       follow: true,
     },
   },

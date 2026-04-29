@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { queryPublishedSprayPrograms } from "@/lib/query"
 import { SprayProgramsClient } from "./SprayProgramsClient"
 
@@ -16,6 +17,11 @@ export default async function SprayProgramsPage() {
             {/* Header */}
             <section className="border-b">
                 <div className="mx-auto max-w-7xl px-6 lg:px-8 pt-10 pb-8">
+                    <nav className="flex text-sm text-muted-foreground mb-4">
+                        <Link href="/programs" className="hover:text-foreground transition-colors">Programs</Link>
+                        <span className="mx-2">/</span>
+                        <span className="text-foreground">Spray Programs</span>
+                    </nav>
                     <p className="text-xs font-semibold text-primary tracking-wide uppercase">Crop Protection</p>
                     <h1 className="mt-1 text-3xl font-bold font-heading tracking-tight">
                         Spray Programs

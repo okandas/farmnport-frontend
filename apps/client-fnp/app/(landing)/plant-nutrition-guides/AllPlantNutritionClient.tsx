@@ -56,26 +56,32 @@ export function AllPlantNutritionClient({ initialProducts, initialTotal }: AllPl
 
             <main className="flex-1">
             {isLoading ? (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
                     {[...Array(8)].map((_, i) => (
-                        <div key={i} className="bg-card border border-border rounded-lg overflow-hidden animate-pulse">
-                            <div className="aspect-square bg-muted" />
-                            <div className="p-4 space-y-2">
-                                <div className="h-3 bg-muted rounded w-1/2" />
-                                <div className="h-4 bg-muted rounded" />
-                                <div className="h-4 bg-muted rounded w-3/4" />
+                        <div key={i} className="animate-pulse">
+                            <div className="bg-card border border-border rounded-lg overflow-hidden">
+                                <div className="aspect-square bg-muted" />
+                                <div className="p-4 space-y-3 border-t">
+                                    <div className="h-3 bg-muted rounded w-1/3" />
+                                    <div className="h-4 bg-muted rounded w-4/5" />
+                                    <div className="h-4 bg-muted rounded w-3/5" />
+                                    <div className="flex gap-4 pt-2 border-t">
+                                        <div className="h-3 bg-muted rounded w-16" />
+                                        <div className="h-3 bg-muted rounded w-16" />
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     ))}
                 </div>
             ) : products.length === 0 ? (
-                <div className="text-center py-16">
-                    <Leaf className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
-                    <p className="text-muted-foreground">No products found.</p>
+                <div className="text-center py-12">
+                    <Leaf className="w-16 h-16 text-muted-foreground/30 mx-auto mb-4" />
+                    <p className="text-muted-foreground">No products found matching your filters.</p>
                 </div>
             ) : (
                 <>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
                         {products.map((product: any) => (
                             <PlantNutritionCard key={product.id} product={product} />
                         ))}
