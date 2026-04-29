@@ -37,9 +37,19 @@ export const dashboardConfig: DashboardConfig = {
           icon: "shoppingCart",
         },
         {
-          title: "Pre-Orders & Bookings",
-          href: "/dashboard/farmnport/orders/pre-orders",
+          title: "Bookings",
+          href: "/dashboard/farmnport/orders/bookings",
           icon: "calender",
+        },
+        {
+          title: "Booking Events",
+          href: "/dashboard/farmnport/orders/booking-events",
+          icon: "calender",
+        },
+        {
+          title: "Delivery Locations",
+          href: "/dashboard/farmnport/orders/delivery-locations",
+          icon: "mapPin",
         },
       ],
     },

@@ -642,3 +642,49 @@ export function myOrders(page?: number) {
 export function getOrder(id: string) {
   return api.get(`${BaseURL}/order/${id}`)
 }
+
+// Bookings
+export function listBookingEvents(options?: { product_id?: string; status?: string }) {
+  const params = new URLSearchParams()
+  if (options?.product_id) params.set("product_id", options.product_id)
+  if (options?.status) params.set("status", options.status)
+  const qs = params.toString()
+  return api.get(`${BaseURL}/booking/events${qs ? `?${qs}` : ""}`)
+}
+
+export function getBookingEvent(id: string) {
+  return api.get(`${BaseURL}/booking/events/${id}`)
+}
+
+export function listDeliveryLocations() {
+  return api.get(`${BaseURL}/booking/delivery-locations`)
+}
+
+export function createBooking(data: {
+  type: "livestock" | "delivery"
+  booking_date: string // RFC3339
+  time_slot?: string
+  notes?: string
+  phone: string
+  // livestock
+  event_id?: string
+  quantity?: number
+  // delivery
+  delivery_location_id?: string
+  goods?: string
+}) {
+  return api.post(`${BaseURL}/booking/`, data)
+}
+
+export function myBookings(page?: number) {
+  const url = page && page >= 2 ? `${BaseURL}/booking/my-bookings?p=${page}` : `${BaseURL}/booking/my-bookings`
+  return api.get(url)
+}
+
+export function getBooking(id: string) {
+  return api.get(`${BaseURL}/booking/${id}`)
+}
+
+export function cancelBooking(id: string) {
+  return api.put(`${BaseURL}/booking/${id}/cancel`, {})
+}
