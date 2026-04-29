@@ -81,6 +81,11 @@ export function Navigation({ user }: NavigationProps) {
         >
           Market
         </Link>
+        <Link href="/buy" onClick={() => sendGTMEvent({ event: 'link', value: 'BuyTopNavigation' })}
+              className={buttonVariants({ size: "sm", variant: "link" })}
+        >
+          Buy
+        </Link>
         {user ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

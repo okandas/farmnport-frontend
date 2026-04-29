@@ -132,6 +132,18 @@ export function MobileNav({ user }: MobileNavProps) {
                      <Icons.dollar className="h-5 w-5" />
                      <span>Market</span>
                    </Link>
+
+                   <Link
+                     href="/buy"
+                     onClick={() => {
+                       sendGTMEvent({ event: 'link', value: 'BuyTopNavigation' })
+                       setIsOpen(false)
+                     }}
+                     className="flex items-center gap-3 px-3 py-2 text-base font-medium rounded-md hover:bg-accent transition-colors"
+                   >
+                     <Icons.shoppingBag className="h-5 w-5" />
+                     <span>Buy</span>
+                   </Link>
                  </nav>
 
                  {/* Account Section */}
