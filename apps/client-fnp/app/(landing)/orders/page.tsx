@@ -2,11 +2,10 @@
 
 import { useSession } from "next-auth/react"
 import { useQuery } from "@tanstack/react-query"
-import { Loader2, Package, ChevronRight } from "lucide-react"
+import { Loader2, Package } from "lucide-react"
 import Link from "next/link"
 
 import { myOrders } from "@/lib/query"
-import { AuthenticatedUser } from "@/lib/schemas"
 
 const STATUS_STYLES: Record<string, string> = {
   pending:    "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400",
@@ -39,7 +38,6 @@ interface Order {
 
 export default function OrdersPage() {
   const { data: session, status } = useSession()
-  const user = session?.user as AuthenticatedUser | undefined
 
   const { data, isLoading } = useQuery({
     queryKey: ["my-orders"],
@@ -104,7 +102,7 @@ export default function OrdersPage() {
         ) : (
           <div className="space-y-3">
             {orders.map((order) => (
-              <div key={order.id} className="border rounded-xl p-4 hover:bg-muted/30 transition-colors">
+              <Link key={order.id} href={`/orders/${order.id}`} className="block border rounded-xl p-4 hover:bg-muted/30 transition-colors">
                 <div className="flex items-start justify-between gap-3">
                   <div className="space-y-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
@@ -129,7 +127,7 @@ export default function OrdersPage() {
                     <p className="text-xs text-muted-foreground">{order.currency}</p>
                   </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         )}
