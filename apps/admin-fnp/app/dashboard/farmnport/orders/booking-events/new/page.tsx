@@ -4,11 +4,12 @@ import { useState } from "react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
 import { Loader2 } from "lucide-react"
-import { toast } from "sonner"
+import { toast } from "@/components/ui/use-toast"
 
 import { createBookingEvent } from "@/lib/query"
 import { DashboardHeader } from "@/components/state/dashboardHeader"
 import { DashboardShell } from "@/components/state/dashboardShell"
+import { ProductCombobox, ProductType } from "@/components/structures/product-combobox"
 
 export default function NewBookingEventPage() {
   const router = useRouter()
@@ -52,11 +53,11 @@ export default function NewBookingEventPage() {
         image_src: form.image_src || undefined,
       }),
     onSuccess: () => {
-      toast.success("Booking event created")
+      toast({ description: "Booking event created" })
       queryClient.invalidateQueries({ queryKey: ["admin-booking-events"] })
       router.push("/dashboard/farmnport/orders/booking-events")
     },
-    onError: () => toast.error("Failed to create event"),
+    onError: () => toast({ description: "Failed to create event", variant: "destructive" }),
   })
 
   function set(field: string, value: string) {
@@ -122,47 +123,42 @@ export default function NewBookingEventPage() {
         {/* Product link */}
         <div className="border rounded-xl p-5 space-y-4">
           <h2 className="font-semibold text-sm">Product</h2>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-muted-foreground">Product ID *</label>
-              <input
-                value={form.product_id}
-                onChange={(e) => set("product_id", e.target.value)}
-                placeholder="MongoDB ObjectId"
-                className="w-full text-sm border rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-ring font-mono"
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-muted-foreground">Product Type *</label>
-              <select
-                value={form.product_type}
-                onChange={(e) => set("product_type", e.target.value)}
-                className="w-full text-sm border rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-ring bg-background"
-              >
-                <option value="animal_health">Animal Health</option>
-                <option value="feed">Feed</option>
-                <option value="agrochemical">Agrochemical</option>
-                <option value="plant_nutrition">Plant Nutrition</option>
-              </select>
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-muted-foreground">Product Name *</label>
-              <input
-                value={form.product_name}
-                onChange={(e) => set("product_name", e.target.value)}
-                placeholder="Supa Chics"
-                className="w-full text-sm border rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-ring"
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-muted-foreground">Product Slug *</label>
-              <input
-                value={form.product_slug}
-                onChange={(e) => set("product_slug", e.target.value)}
-                placeholder="supa-chics"
-                className="w-full text-sm border rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-ring"
-              />
-            </div>
+
+          <div className="space-y-1">
+            <label className="text-xs font-medium text-muted-foreground">Product Type *</label>
+            <select
+              value={form.product_type}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, product_type: e.target.value, product_id: "", product_name: "", product_slug: "" }))
+              }
+              className="w-full text-sm border rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-ring bg-background"
+            >
+              <option value="animal_health">Animal Health</option>
+              <option value="feed">Feed</option>
+              <option value="agrochemical">Agrochemical</option>
+            </select>
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-xs font-medium text-muted-foreground">Product *</label>
+            <ProductCombobox
+              productType={form.product_type as ProductType}
+              value={form.product_id}
+              onChange={(selection) =>
+                setForm((f) => ({
+                  ...f,
+                  product_id: selection.id,
+                  product_name: selection.name,
+                  product_slug: selection.slug,
+                  product_type: selection.type,
+                }))
+              }
+            />
+            {form.product_name && (
+              <p className="text-xs text-muted-foreground mt-1">
+                Selected: <span className="font-medium text-foreground">{form.product_name}</span> · slug: {form.product_slug}
+              </p>
+            )}
           </div>
         </div>
 
