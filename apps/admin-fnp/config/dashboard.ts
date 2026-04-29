@@ -26,10 +26,20 @@ export const dashboardConfig: DashboardConfig = {
           href: "/dashboard/farmnport/sales",
           icon: "barChart",
         },
+      ],
+    },
+    {
+      label: "Orders",
+      items: [
         {
-          title: "Orders",
-          href: "/dashboard/farmnport/sales/orders",
+          title: "Sales Orders",
+          href: "/dashboard/farmnport/orders/sales",
           icon: "shoppingCart",
+        },
+        {
+          title: "Pre-Orders & Bookings",
+          href: "/dashboard/farmnport/orders/pre-orders",
+          icon: "calender",
         },
       ],
     },
