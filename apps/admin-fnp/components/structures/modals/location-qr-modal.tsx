@@ -54,11 +54,13 @@ export function LocationQRModal({ location, open, onOpenChange }: LocationQRModa
   const svgRef = useRef<SVGSVGElement>(null)
 
   const city = toSlug(location.city || "")
-  const restaurantSlug = toSlug(location.restaurant_name || "")
-  const locationSlug = location.name ? toSlug(location.name) : location.id
-  const qrValue = `https://menus.co.zw/restaurants/${city}/${restaurantSlug}/${locationSlug}`
+  const restaurantSlug = location.restaurant_slug || toSlug(location.restaurant_name || "")
+  const locationSlug = location.slug || toSlug(location.name || location.id)
   const restaurantName = location.restaurant_name || ""
   const locationLabel = `${location.name}, ${location.address}, ${location.city}`
+  const utmContent = encodeURIComponent(`${restaurantName} ${location.name}`)
+  const baseUrl = `https://menus.co.zw/restaurants/${city}/${restaurantSlug}/${locationSlug}`
+  const qrValue = `${baseUrl}?utm_source=qr&utm_medium=print_qr_code&utm_campaign=digital_QR&utm_content=${utmContent}`
   const fileName = `${restaurantSlug}-${locationSlug}-qr`
 
   function getSVGString(): string | null {

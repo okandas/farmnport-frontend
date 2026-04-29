@@ -1122,7 +1122,9 @@ export const OperatingHourSchema = z.object({
 
 export const RestaurantLocationSchema = z.object({
   id: z.string(),
+  slug: z.string().optional(),
   restaurant_id: z.string().min(1, "Restaurant is required"),
+  restaurant_slug: z.string().optional(),
   restaurant_name: z.string().optional(),
   name: z.string().min(1, "Location name is required").max(120, "Name cannot exceed 120 characters"),
   address: z.string().min(1, "Address is required"),
