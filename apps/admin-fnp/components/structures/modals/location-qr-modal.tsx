@@ -53,9 +53,9 @@ function buildSVGString(qrSvgEl: SVGSVGElement, restaurantName: string, location
 export function LocationQRModal({ location, open, onOpenChange }: LocationQRModalProps) {
   const svgRef = useRef<SVGSVGElement>(null)
 
-  const city = toSlug(location.city || "")
-  const restaurantSlug = location.restaurant_slug || toSlug(location.restaurant_name || "")
-  const locationSlug = location.slug || toSlug(location.name || location.id)
+  const city = toSlug(location.city)
+  const restaurantSlug = location.restaurant_slug
+  const locationSlug = location.slug
   const restaurantName = location.restaurant_name || ""
   const locationLabel = `${location.name}, ${location.address}, ${location.city}`
   const utmContent = encodeURIComponent(`${restaurantName} ${location.name}`)
