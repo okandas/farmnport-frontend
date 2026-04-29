@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef } from "react"
-import { QRCodeCanvas } from "qrcode.react"
+import { QRCodeSVG } from "qrcode.react"
 import { Download } from "lucide-react"
 
 import { RestaurantLocation } from "@/lib/schemas"
@@ -23,65 +23,112 @@ function toSlug(str: string) {
   return str.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "")
 }
 
+function buildSVGString(qrSvgEl: SVGSVGElement, restaurantName: string, locationLabel: string): string {
+  const qrSize = 220
+  const padX = 32
+  const padY = 16
+  const topLabelH = 32
+  const bottomLabelH = 36
+  const totalW = qrSize + padX * 2
+  const totalH = qrSize + topLabelH + bottomLabelH + padY * 2
+
+  const qrInner = qrSvgEl.innerHTML
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${totalW}" height="${totalH}" viewBox="0 0 ${totalW} ${totalH}">
+  <rect width="${totalW}" height="${totalH}" fill="white"/>
+  <!-- top label -->
+  <text x="${totalW / 2}" y="${padY + 20}" font-family="sans-serif" font-size="16" font-weight="bold" fill="#111827" text-anchor="middle">menus.co.zw</text>
+  <!-- qr code -->
+  <svg x="${padX}" y="${padY + topLabelH}" width="${qrSize}" height="${qrSize}" viewBox="0 0 ${qrSize} ${qrSize}">
+    ${qrInner}
+  </svg>
+  <!-- restaurant name overlay -->
+  <rect x="${totalW / 2 - 64}" y="${padY + topLabelH + qrSize / 2 - 14}" width="128" height="28" rx="4" fill="rgba(255,255,255,0.9)"/>
+  <text x="${totalW / 2}" y="${padY + topLabelH + qrSize / 2 + 6}" font-family="sans-serif" font-size="12" font-weight="bold" fill="#111827" text-anchor="middle">${restaurantName}</text>
+  <!-- bottom label -->
+  <text x="${totalW / 2}" y="${padY + topLabelH + qrSize + 20}" font-family="sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">${locationLabel}</text>
+</svg>`
+}
+
 export function LocationQRModal({ location, open, onOpenChange }: LocationQRModalProps) {
-  const canvasRef = useRef<HTMLDivElement>(null)
+  const svgRef = useRef<SVGSVGElement>(null)
 
   const city = toSlug(location.city || "")
   const restaurantSlug = toSlug(location.restaurant_name || "")
   const locationSlug = location.name ? toSlug(location.name) : location.id
   const qrValue = `https://menus.co.zw/restaurants/${city}/${restaurantSlug}/${locationSlug}`
+  const restaurantName = location.restaurant_name || ""
+  const locationLabel = `${location.name}, ${location.address}, ${location.city}`
+  const fileName = `${restaurantSlug}-${locationSlug}-qr`
 
-  function handleDownload() {
-    const canvas = canvasRef.current?.querySelector("canvas")
-    if (!canvas) return
+  function getSVGString(): string | null {
+    if (!svgRef.current) return null
+    return buildSVGString(svgRef.current, restaurantName, locationLabel)
+  }
 
-    const padding = 48
-    const labelHeight = 36
-    const nameHeight = 28
-    const totalHeight = canvas.height + labelHeight * 2 + padding * 2
-    const totalWidth = canvas.width + padding * 2
+  function downloadSVG() {
+    const svg = getSVGString()
+    if (!svg) return
+    const blob = new Blob([svg], { type: "image/svg+xml" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `${fileName}.svg`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
 
-    const out = document.createElement("canvas")
-    out.width = totalWidth
-    out.height = totalHeight
-    const ctx = out.getContext("2d")!
+  async function downloadPDF() {
+    const svg = getSVGString()
+    if (!svg) return
+    const { jsPDF } = await import("jspdf")
 
-    // Background
+    const qrSize = 220
+    const padX = 32
+    const padY = 16
+    const topLabelH = 32
+    const bottomLabelH = 36
+    const totalW = qrSize + padX * 2
+    const totalH = qrSize + topLabelH + bottomLabelH + padY * 2
+
+    // Convert px to mm (96dpi → 1px = 0.2646mm)
+    const px2mm = 0.2646
+    const wMM = totalW * px2mm
+    const hMM = totalH * px2mm
+
+    const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: [wMM, hMM] })
+
+    // White background
+    doc.setFillColor(255, 255, 255)
+    doc.rect(0, 0, wMM, hMM, "F")
+
+    // Top label
+    doc.setFont("helvetica", "bold")
+    doc.setFontSize(11)
+    doc.setTextColor(17, 24, 39)
+    doc.text("menus.co.zw", wMM / 2, (padY + 20) * px2mm, { align: "center" })
+
+    // QR code as SVG image
+    const svgBlob = new Blob([svg], { type: "image/svg+xml" })
+    const svgUrl = URL.createObjectURL(svgBlob)
+    const img = new Image()
+    img.src = svgUrl
+    await new Promise<void>((res) => { img.onload = () => res() })
+
+    const canvas = document.createElement("canvas")
+    canvas.width = totalW * 2
+    canvas.height = totalH * 2
+    const ctx = canvas.getContext("2d")!
+    ctx.scale(2, 2)
     ctx.fillStyle = "#ffffff"
-    ctx.fillRect(0, 0, out.width, out.height)
+    ctx.fillRect(0, 0, totalW, totalH)
+    ctx.drawImage(img, 0, 0, totalW, totalH)
+    URL.revokeObjectURL(svgUrl)
 
-    // Top label — menus.co.zw
-    ctx.fillStyle = "#111827"
-    ctx.font = "bold 22px sans-serif"
-    ctx.textAlign = "center"
-    ctx.fillText("menus.co.zw", out.width / 2, padding)
+    const imgData = canvas.toDataURL("image/png")
+    doc.addImage(imgData, "PNG", 0, 0, wMM, hMM)
 
-    // QR code
-    ctx.drawImage(canvas, padding, padding + labelHeight)
-
-    // Restaurant name overlay (centered on QR)
-    const qrCenterY = padding + labelHeight + canvas.height / 2
-    ctx.fillStyle = "rgba(255,255,255,0.85)"
-    const nameW = 140
-    const nameH = nameHeight + 8
-    ctx.fillRect(out.width / 2 - nameW / 2, qrCenterY - nameH / 2, nameW, nameH)
-    ctx.fillStyle = "#111827"
-    ctx.font = "bold 13px sans-serif"
-    ctx.textAlign = "center"
-    const name = location.restaurant_name || ""
-    ctx.fillText(name, out.width / 2, qrCenterY + 5)
-
-    // Bottom label — address
-    ctx.fillStyle = "#6b7280"
-    ctx.font = "14px sans-serif"
-    ctx.textAlign = "center"
-    const address = `${location.name}, ${location.address}, ${location.city}`
-    ctx.fillText(address, out.width / 2, padding + labelHeight + canvas.height + 24)
-
-    const link = document.createElement("a")
-    link.download = `${restaurantSlug}-${locationSlug}-qr.png`
-    link.href = out.toDataURL("image/png")
-    link.click()
+    doc.save(`${fileName}.pdf`)
   }
 
   return (
@@ -95,29 +142,33 @@ export function LocationQRModal({ location, open, onOpenChange }: LocationQRModa
           {/* Preview */}
           <div className="flex flex-col items-center gap-2 border rounded-xl p-4 bg-white w-full">
             <span className="text-sm font-bold text-gray-800 tracking-wide">menus.co.zw</span>
-            <div className="relative" ref={canvasRef}>
-              <QRCodeCanvas
+            <div className="relative">
+              <QRCodeSVG
+                ref={svgRef}
                 value={qrValue}
                 size={220}
                 level="H"
                 marginSize={1}
               />
-              {/* Restaurant name overlay */}
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <span className="bg-white/90 text-gray-900 text-xs font-bold px-2 py-1 rounded text-center max-w-[120px] leading-tight">
-                  {location.restaurant_name}
+                  {restaurantName}
                 </span>
               </div>
             </div>
-            <span className="text-xs text-gray-500 text-center">
-              {location.name}, {location.address}, {location.city}
-            </span>
+            <span className="text-xs text-gray-500 text-center">{locationLabel}</span>
           </div>
 
-          <Button onClick={handleDownload} className="w-full gap-2">
-            <Download className="h-4 w-4" />
-            Download PNG
-          </Button>
+          <div className="flex gap-2 w-full">
+            <Button onClick={downloadSVG} variant="outline" className="flex-1 gap-2">
+              <Download className="h-4 w-4" />
+              SVG
+            </Button>
+            <Button onClick={downloadPDF} className="flex-1 gap-2">
+              <Download className="h-4 w-4" />
+              PDF
+            </Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
