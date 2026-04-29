@@ -20,14 +20,14 @@ interface OrderItem {
 }
 
 interface OrderConfirmationEmailProps {
-  name: string
-  orderNumber: string
-  orderId: string
-  items: OrderItem[]
-  subtotal: number
-  deliveryFee: number
-  total: number
-  fulfillment: string
+  name?: string
+  orderNumber?: string
+  orderId?: string
+  items?: OrderItem[]
+  subtotal?: number
+  deliveryFee?: number
+  total?: number
+  fulfillment?: string
   deliveryAddress?: {
     name: string
     phone: string
@@ -35,28 +35,32 @@ interface OrderConfirmationEmailProps {
     city: string
     province: string
   }
-  paymentProvider: string
-  paymentRef: string
-  orderUrl: string
+  paymentProvider?: string
+  paymentRef?: string
+  orderUrl?: string
 }
 
-function formatPrice(cents: number) {
+function fmt(cents: number) {
   return `$${(cents / 100).toFixed(2)}`
 }
 
+const PREVIEW_ITEMS: OrderItem[] = [
+  { product_name: "Plesiva Star 60WG", quantity: 2, unit_price: 2500, line_total: 5000 },
+]
+
 export default function OrderConfirmationEmail({
-  name,
-  orderNumber,
-  orderId,
-  items,
-  subtotal,
-  deliveryFee,
-  total,
-  fulfillment,
+  name = "Okandas",
+  orderNumber = "FNP-0001",
+  orderId: _orderId = "preview",
+  items = PREVIEW_ITEMS,
+  subtotal = 5000,
+  deliveryFee = 500,
+  total = 5500,
+  fulfillment = "delivery",
   deliveryAddress,
-  paymentProvider,
-  paymentRef,
-  orderUrl,
+  paymentProvider = "BillPay",
+  paymentRef = "FNP-ORD-PREVIEW",
+  orderUrl = "https://farmnport.com/account/orders/preview",
 }: OrderConfirmationEmailProps) {
   return (
     <Html lang="en">
@@ -64,62 +68,75 @@ export default function OrderConfirmationEmail({
       <Preview>Order {orderNumber} confirmed — thank you for your purchase.</Preview>
       <Body style={body}>
         <Container style={container}>
-          <Text style={logo}>farm &amp; port — <strong>getting you to market</strong></Text>
-          <Hr style={divider} />
 
+          {/* Header */}
+          <Section style={header}>
+            <Text style={brandName}>farm<span style={amp}>&amp;</span>port</Text>
+            <Text style={brandTagline}>getting you to market</Text>
+          </Section>
+
+          <Hr style={headerDivider} />
+
+          {/* Body */}
           <Section style={content}>
-            <Text style={heading}>Order Confirmed</Text>
-            <Text style={paragraph}>Dear {name},</Text>
+
+            {/* Status pill */}
+            <Section style={pillWrapper}>
+              <Text style={pill}>✓ &nbsp;Order Confirmed</Text>
+            </Section>
+
+            <Text style={greeting}>Thanks for your order, {name}.</Text>
             <Text style={paragraph}>
-              Thank you for your order. We have received your payment and your order is now being
-              processed.
+              We've received your payment and your order is now being processed.
             </Text>
 
-            <Section style={orderBox}>
-              <Text style={orderBoxLabel}>Order Number</Text>
-              <Text style={orderBoxValue}>{orderNumber}</Text>
+            {/* Order number card */}
+            <Section style={orderCard}>
+              <Text style={orderCardLabel}>Order number</Text>
+              <Text style={orderCardNumber}>{orderNumber}</Text>
             </Section>
 
             {/* Items */}
             <Text style={sectionLabel}>Items</Text>
             {items.map((item, i) => (
               <Row key={i} style={itemRow}>
-                <Column style={itemNameCol}>
-                  <Text style={itemText}>{item.product_name}</Text>
-                  <Text style={itemMeta}>Qty: {item.quantity} × {formatPrice(item.unit_price)}</Text>
+                <Column>
+                  <Text style={itemName}>{item.product_name}</Text>
+                  <Text style={itemMeta}>Qty {item.quantity} × {fmt(item.unit_price)}</Text>
                 </Column>
                 <Column style={itemPriceCol}>
-                  <Text style={itemPrice}>{formatPrice(item.line_total)}</Text>
+                  <Text style={itemPrice}>{fmt(item.line_total)}</Text>
                 </Column>
               </Row>
             ))}
 
             <Hr style={thinDivider} />
 
+            {/* Totals */}
             <Row style={totalRow}>
               <Column><Text style={totalLabel}>Subtotal</Text></Column>
-              <Column style={totalValueCol}><Text style={totalValue}>{formatPrice(subtotal)}</Text></Column>
+              <Column style={amountCol}><Text style={totalAmount}>{fmt(subtotal)}</Text></Column>
             </Row>
             {fulfillment === "delivery" && (
               <Row style={totalRow}>
                 <Column><Text style={totalLabel}>Delivery</Text></Column>
-                <Column style={totalValueCol}><Text style={totalValue}>{formatPrice(deliveryFee)}</Text></Column>
+                <Column style={amountCol}><Text style={totalAmount}>{fmt(deliveryFee)}</Text></Column>
               </Row>
             )}
             <Row style={totalRow}>
-              <Column><Text style={grandTotalLabel}>Total</Text></Column>
-              <Column style={totalValueCol}><Text style={grandTotalValue}>{formatPrice(total)}</Text></Column>
+              <Column><Text style={grandLabel}>Total paid</Text></Column>
+              <Column style={amountCol}><Text style={grandAmount}>{fmt(total)}</Text></Column>
             </Row>
 
             <Hr style={thinDivider} />
 
             {/* Fulfillment */}
             <Text style={sectionLabel}>Fulfillment</Text>
-            <Text style={paragraph}>
-              {fulfillment === "delivery" ? "Delivery to your address" : "Collection from store"}
+            <Text style={metaValue}>
+              {fulfillment === "delivery" ? "Delivery to address" : "Click & Collect"}
             </Text>
             {fulfillment === "delivery" && deliveryAddress && (
-              <Text style={addressText}>
+              <Text style={addressBlock}>
                 {deliveryAddress.name}<br />
                 {deliveryAddress.phone}<br />
                 {deliveryAddress.address}<br />
@@ -129,24 +146,27 @@ export default function OrderConfirmationEmail({
 
             {/* Payment */}
             <Text style={sectionLabel}>Payment</Text>
-            <Text style={paragraph}>
-              Provider: {paymentProvider}<br />
-              Reference: {paymentRef}
-            </Text>
+            <Text style={metaValue}>{paymentProvider}</Text>
+            <Text style={refText}>Ref: {paymentRef}</Text>
 
-            <Button href={orderUrl} style={button}>View Order</Button>
+            <Section style={buttonWrapper}>
+              <Button href={orderUrl} style={button}>View your order</Button>
+            </Section>
 
-            <Text style={paragraph}>
-              If you have any questions about your order, please contact us and quote your order
-              number.
-            </Text>
-            <Text style={paragraph}>the farmnport team</Text>
+            <Hr style={divider} />
+            <Text style={signoff}>the farm&amp;port team</Text>
           </Section>
 
-          <Hr style={divider} />
-          <Text style={footer}>
-            farmnport &nbsp;•&nbsp; 13 Grace Rd &nbsp;•&nbsp; Winston Park, Marondera, Zimbabwe
-          </Text>
+          {/* Footer */}
+          <Section style={footer}>
+            <Text style={footerText}>
+              farm&amp;port &nbsp;·&nbsp; 13 Grace Rd, Winston Park, Marondera, Zimbabwe
+            </Text>
+            <Text style={footerText}>
+              © {new Date().getFullYear()} farm&amp;port. All rights reserved.
+            </Text>
+          </Section>
+
         </Container>
       </Body>
     </Html>
@@ -154,181 +174,243 @@ export default function OrderConfirmationEmail({
 }
 
 const body: React.CSSProperties = {
-  backgroundColor: "#f2f5f7",
-  fontFamily: "'Avenir', sans-serif",
-  color: "#5d7079",
-  paddingTop: "40px",
-  paddingBottom: "40px",
+  backgroundColor: "#f8fafc",
+  fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+  margin: 0,
+  padding: "40px 0",
 }
 
 const container: React.CSSProperties = {
   backgroundColor: "#ffffff",
   margin: "0 auto",
-  maxWidth: "600px",
-  borderRadius: "4px",
+  maxWidth: "580px",
+  borderRadius: "8px",
   overflow: "hidden",
+  boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
 }
 
-const logo: React.CSSProperties = {
-  fontSize: "18px",
-  padding: "25px 40px 10px",
+const header: React.CSSProperties = {
+  backgroundColor: "#ffffff",
+  padding: "28px 40px 20px",
+}
+
+const brandName: React.CSSProperties = {
+  fontSize: "22px",
+  fontWeight: "700",
+  color: "#0f172a",
+  margin: "0 0 2px",
+  letterSpacing: "-0.3px",
+}
+
+const amp: React.CSSProperties = {
+  color: "#ea580c",
+}
+
+const brandTagline: React.CSSProperties = {
+  fontSize: "12px",
+  color: "#94a3b8",
   margin: 0,
+  letterSpacing: "0.05em",
+  textTransform: "uppercase",
 }
 
-const divider: React.CSSProperties = {
-  borderColor: "#e8ecef",
-  margin: "0 40px",
-}
-
-const thinDivider: React.CSSProperties = {
-  borderColor: "#e8ecef",
-  margin: "12px 0",
+const headerDivider: React.CSSProperties = {
+  borderColor: "#f1f5f9",
+  margin: 0,
 }
 
 const content: React.CSSProperties = {
-  padding: "20px 40px",
+  padding: "32px 40px 24px",
 }
 
-const heading: React.CSSProperties = {
-  fontSize: "22px",
-  fontWeight: "700",
-  color: "#2ea664",
-  marginBottom: "8px",
+const pillWrapper: React.CSSProperties = {
+  marginBottom: "24px",
 }
 
-const paragraph: React.CSSProperties = {
-  fontSize: "16px",
-  lineHeight: "1.6",
-  marginBottom: "1em",
-  color: "#5d7079",
-}
-
-const sectionLabel: React.CSSProperties = {
+const pill: React.CSSProperties = {
+  display: "inline-block",
   fontSize: "12px",
-  fontWeight: "700",
-  textTransform: "uppercase",
-  letterSpacing: "0.08em",
-  color: "#999999",
-  marginTop: "20px",
-  marginBottom: "8px",
-}
-
-const orderBox: React.CSSProperties = {
-  backgroundColor: "#f2f5f7",
-  borderRadius: "4px",
-  padding: "12px 16px",
-  marginBottom: "20px",
-}
-
-const orderBoxLabel: React.CSSProperties = {
-  fontSize: "11px",
-  color: "#999999",
-  textTransform: "uppercase",
-  letterSpacing: "0.06em",
+  fontWeight: "600",
+  letterSpacing: "0.04em",
+  color: "#16a34a",
+  border: "1px solid #16a34a",
+  borderRadius: "999px",
+  padding: "4px 12px",
   margin: 0,
 }
 
-const orderBoxValue: React.CSSProperties = {
-  fontSize: "18px",
+const greeting: React.CSSProperties = {
+  fontSize: "22px",
   fontWeight: "700",
-  color: "#2ea664",
-  margin: "4px 0 0",
+  color: "#0f172a",
+  margin: "0 0 12px",
+}
+
+const paragraph: React.CSSProperties = {
+  fontSize: "15px",
+  lineHeight: "1.7",
+  color: "#475569",
+  margin: "0 0 24px",
+}
+
+const orderCard: React.CSSProperties = {
+  backgroundColor: "#f8fafc",
+  borderRadius: "6px",
+  padding: "14px 18px",
+  marginBottom: "28px",
+}
+
+const orderCardLabel: React.CSSProperties = {
+  fontSize: "11px",
+  color: "#94a3b8",
+  textTransform: "uppercase",
+  letterSpacing: "0.06em",
+  margin: "0 0 4px",
+}
+
+const orderCardNumber: React.CSSProperties = {
+  fontSize: "20px",
+  fontWeight: "700",
+  color: "#0f172a",
+  margin: 0,
+}
+
+const sectionLabel: React.CSSProperties = {
+  fontSize: "11px",
+  fontWeight: "700",
+  textTransform: "uppercase",
+  letterSpacing: "0.08em",
+  color: "#94a3b8",
+  margin: "20px 0 10px",
 }
 
 const itemRow: React.CSSProperties = {
-  marginBottom: "8px",
+  marginBottom: "10px",
 }
 
-const itemNameCol: React.CSSProperties = {
-  verticalAlign: "top",
-}
-
-const itemPriceCol: React.CSSProperties = {
-  verticalAlign: "top",
-  textAlign: "right",
-  width: "100px",
-}
-
-const itemText: React.CSSProperties = {
-  fontSize: "15px",
-  color: "#374151",
+const itemName: React.CSSProperties = {
+  fontSize: "14px",
+  fontWeight: "600",
+  color: "#0f172a",
   margin: 0,
 }
 
 const itemMeta: React.CSSProperties = {
   fontSize: "13px",
-  color: "#9ca3af",
+  color: "#94a3b8",
   margin: "2px 0 0",
 }
 
+const itemPriceCol: React.CSSProperties = {
+  textAlign: "right",
+  width: "80px",
+  verticalAlign: "top",
+}
+
 const itemPrice: React.CSSProperties = {
-  fontSize: "15px",
-  color: "#374151",
+  fontSize: "14px",
+  color: "#0f172a",
   margin: 0,
   textAlign: "right",
 }
 
-const totalRow: React.CSSProperties = {
-  marginBottom: "4px",
+const thinDivider: React.CSSProperties = {
+  borderColor: "#f1f5f9",
+  margin: "14px 0",
 }
 
-const totalValueCol: React.CSSProperties = {
+const totalRow: React.CSSProperties = {
+  marginBottom: "6px",
+}
+
+const amountCol: React.CSSProperties = {
   textAlign: "right",
-  width: "100px",
+  width: "80px",
 }
 
 const totalLabel: React.CSSProperties = {
-  fontSize: "15px",
-  color: "#5d7079",
-  margin: "4px 0",
+  fontSize: "14px",
+  color: "#64748b",
+  margin: 0,
 }
 
-const totalValue: React.CSSProperties = {
-  fontSize: "15px",
-  color: "#374151",
-  margin: "4px 0",
+const totalAmount: React.CSSProperties = {
+  fontSize: "14px",
+  color: "#0f172a",
+  margin: 0,
   textAlign: "right",
 }
 
-const grandTotalLabel: React.CSSProperties = {
-  fontSize: "16px",
+const grandLabel: React.CSSProperties = {
+  fontSize: "15px",
   fontWeight: "700",
-  color: "#374151",
-  margin: "4px 0",
+  color: "#0f172a",
+  margin: 0,
 }
 
-const grandTotalValue: React.CSSProperties = {
-  fontSize: "16px",
+const grandAmount: React.CSSProperties = {
+  fontSize: "15px",
   fontWeight: "700",
-  color: "#2ea664",
-  margin: "4px 0",
+  color: "#ea580c",
+  margin: 0,
   textAlign: "right",
 }
 
-const addressText: React.CSSProperties = {
-  fontSize: "15px",
+const metaValue: React.CSSProperties = {
+  fontSize: "14px",
+  color: "#0f172a",
+  margin: "0 0 4px",
+}
+
+const refText: React.CSSProperties = {
+  fontSize: "13px",
+  color: "#94a3b8",
+  margin: 0,
+}
+
+const addressBlock: React.CSSProperties = {
+  fontSize: "14px",
+  color: "#475569",
   lineHeight: "1.8",
-  color: "#374151",
-  marginBottom: "1em",
+  margin: "4px 0 0",
+}
+
+const buttonWrapper: React.CSSProperties = {
+  margin: "28px 0 8px",
 }
 
 const button: React.CSSProperties = {
-  backgroundColor: "#2ea664",
-  borderRadius: "4px",
+  backgroundColor: "#ea580c",
+  borderRadius: "6px",
   color: "#ffffff",
-  fontSize: "16px",
-  fontWeight: "700",
+  fontSize: "14px",
+  fontWeight: "600",
   textDecoration: "none",
   textAlign: "center",
   display: "inline-block",
   padding: "13px 24px",
-  marginBottom: "20px",
-  marginTop: "8px",
+}
+
+const divider: React.CSSProperties = {
+  borderColor: "#e2e8f0",
+  margin: "24px 0",
+}
+
+const signoff: React.CSSProperties = {
+  fontSize: "14px",
+  color: "#64748b",
+  margin: 0,
 }
 
 const footer: React.CSSProperties = {
-  fontSize: "12.5px",
-  color: "#999999",
+  backgroundColor: "#f8fafc",
+  borderTop: "1px solid #e2e8f0",
+  padding: "20px 40px",
+}
+
+const footerText: React.CSSProperties = {
+  fontSize: "12px",
+  color: "#94a3b8",
+  margin: "0 0 4px",
   textAlign: "center",
-  padding: "16px 40px",
 }

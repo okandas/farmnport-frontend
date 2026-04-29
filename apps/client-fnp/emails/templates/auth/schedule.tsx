@@ -11,39 +11,61 @@ import {
 } from "@react-email/components"
 
 interface ScheduleEmailProps {
-  name: string
-  confirmUrl: string
+  name?: string
+  confirmUrl?: string
 }
 
-export default function ScheduleEmail({ name, confirmUrl }: ScheduleEmailProps) {
+export default function ScheduleEmail({
+  name = "Okandas",
+  confirmUrl = "https://farmnport.com/verify/schedule/preview",
+}: ScheduleEmailProps) {
   return (
     <Html lang="en">
       <Head />
-      <Preview>Your recent schedule needs confirmation...</Preview>
+      <Preview>Confirm your farm&port schedule — link valid for 24 hours.</Preview>
       <Body style={body}>
         <Container style={container}>
-          <Text style={logo}>farm &amp; port — <strong>getting you to market</strong></Text>
-          <Hr style={divider} />
+
+          {/* Header */}
+          <Section style={header}>
+            <Text style={brandName}>farm<span style={amp}>&amp;</span>port</Text>
+            <Text style={brandTagline}>getting you to market</Text>
+          </Section>
+
+          {/* Body */}
           <Section style={content}>
+            <Text style={greeting}>Confirm your schedule</Text>
             <Text style={paragraph}>Dear {name},</Text>
             <Text style={paragraph}>
-              Thank you for creating your schedule. We require one more step — please confirm that
-              you are the one who created this schedule via the link below.
+              Thank you for creating your schedule on farm&amp;port. We need one final step —
+              please confirm that you created this schedule by clicking the button below.
             </Text>
-            <Button href={confirmUrl} style={button}>Confirm Schedule</Button>
+            <Section style={buttonWrapper}>
+              <Button href={confirmUrl} style={button}>Confirm Schedule</Button>
+            </Section>
+            <Section style={noticeBox}>
+              <Text style={noticeText}>
+                ⏱ This link is valid for <strong>24 hours</strong>. If not confirmed, the schedule
+                will be automatically removed.
+              </Text>
+            </Section>
+            <Hr style={divider} />
             <Text style={paragraph}>
-              The link will be valid for 24 hours. If the schedule is not verified it will be
-              automatically removed.
+              If you didn't create this schedule you can safely ignore this email.
             </Text>
-            <Text style={paragraph}>
-              Please do not hesitate to make any further enquiries, we&apos;re happy to help.
-            </Text>
-            <Text style={paragraph}>the farmnport team</Text>
+            <Text style={signoff}>the farm&amp;port team</Text>
           </Section>
-          <Hr style={divider} />
-          <Text style={footer}>
-            farmnport &nbsp;•&nbsp; 13 Grace Rd &nbsp;•&nbsp; Winston Park, Marondera, Zimbabwe
-          </Text>
+
+          {/* Footer */}
+          <Section style={footer}>
+            <Text style={footerText}>
+              farm&amp;port &nbsp;·&nbsp; 13 Grace Rd, Winston Park, Marondera, Zimbabwe
+            </Text>
+            <Text style={footerText}>
+              © {new Date().getFullYear()} farm&amp;port. All rights reserved.
+            </Text>
+          </Section>
+
         </Container>
       </Body>
     </Html>
@@ -51,59 +73,115 @@ export default function ScheduleEmail({ name, confirmUrl }: ScheduleEmailProps) 
 }
 
 const body: React.CSSProperties = {
-  backgroundColor: "#f2f5f7",
-  fontFamily: "'Avenir', sans-serif",
-  color: "#5d7079",
-  paddingTop: "40px",
-  paddingBottom: "40px",
+  backgroundColor: "#f8fafc",
+  fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+  margin: 0,
+  padding: "40px 0",
 }
 
 const container: React.CSSProperties = {
   backgroundColor: "#ffffff",
   margin: "0 auto",
-  maxWidth: "600px",
-  borderRadius: "4px",
+  maxWidth: "580px",
+  borderRadius: "8px",
   overflow: "hidden",
+  boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
 }
 
-const logo: React.CSSProperties = {
-  fontSize: "18px",
-  padding: "25px 40px 10px",
+const header: React.CSSProperties = {
+  backgroundColor: "#ffffff",
+  padding: "28px 40px 20px",
+}
+
+const brandName: React.CSSProperties = {
+  fontSize: "22px",
+  fontWeight: "700",
+  color: "#0f172a",
+  margin: "0 0 2px",
+  letterSpacing: "-0.3px",
+}
+
+const amp: React.CSSProperties = {
+  color: "#ea580c",
+}
+
+const brandTagline: React.CSSProperties = {
+  fontSize: "12px",
+  color: "#94a3b8",
   margin: 0,
-}
-
-const divider: React.CSSProperties = {
-  borderColor: "#e8ecef",
-  margin: "0 40px",
+  letterSpacing: "0.05em",
+  textTransform: "uppercase",
 }
 
 const content: React.CSSProperties = {
-  padding: "20px 40px",
+  padding: "36px 40px 24px",
+}
+
+const greeting: React.CSSProperties = {
+  fontSize: "24px",
+  fontWeight: "700",
+  color: "#0f172a",
+  margin: "0 0 20px",
 }
 
 const paragraph: React.CSSProperties = {
-  fontSize: "16px",
-  lineHeight: "1.6",
-  marginBottom: "1em",
-  color: "#5d7079",
+  fontSize: "15px",
+  lineHeight: "1.7",
+  color: "#475569",
+  margin: "0 0 16px",
+}
+
+const buttonWrapper: React.CSSProperties = {
+  margin: "28px 0 20px",
 }
 
 const button: React.CSSProperties = {
-  backgroundColor: "#2ea664",
-  borderRadius: "4px",
+  backgroundColor: "#ea580c",
+  borderRadius: "6px",
   color: "#ffffff",
-  fontSize: "18px",
-  fontWeight: "900",
+  fontSize: "15px",
+  fontWeight: "600",
   textDecoration: "none",
   textAlign: "center",
   display: "inline-block",
-  padding: "13px 24px",
-  marginBottom: "1em",
+  padding: "14px 28px",
+}
+
+const noticeBox: React.CSSProperties = {
+  backgroundColor: "#fefce8",
+  borderLeft: "3px solid #fbbf24",
+  borderRadius: "4px",
+  padding: "12px 16px",
+  marginBottom: "20px",
+}
+
+const noticeText: React.CSSProperties = {
+  fontSize: "13px",
+  color: "#92400e",
+  margin: 0,
+  lineHeight: "1.6",
+}
+
+const divider: React.CSSProperties = {
+  borderColor: "#e2e8f0",
+  margin: "24px 0",
+}
+
+const signoff: React.CSSProperties = {
+  fontSize: "14px",
+  color: "#64748b",
+  margin: 0,
 }
 
 const footer: React.CSSProperties = {
-  fontSize: "12.5px",
-  color: "#999999",
+  backgroundColor: "#f8fafc",
+  borderTop: "1px solid #e2e8f0",
+  padding: "20px 40px",
+}
+
+const footerText: React.CSSProperties = {
+  fontSize: "12px",
+  color: "#94a3b8",
+  margin: "0 0 4px",
   textAlign: "center",
-  padding: "16px 40px",
 }
