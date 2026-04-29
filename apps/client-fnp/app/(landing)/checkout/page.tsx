@@ -208,7 +208,7 @@ export default function CheckoutPage() {
           </p>
           <div className="flex flex-col gap-3">
             <Link
-              href="/orders"
+              href="/account/orders"
               className="block w-full text-center bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-sm py-3 rounded-full transition-colors"
             >
               View My Orders
