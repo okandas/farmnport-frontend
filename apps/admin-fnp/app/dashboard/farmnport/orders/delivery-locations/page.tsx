@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { PlusCircle, Loader2, MapPin, Pencil, X } from "lucide-react"
-import { toast } from "sonner"
+import { toast } from "@/components/ui/use-toast"
 
 import { queryDeliveryLocations, createDeliveryLocation, updateDeliveryLocation } from "@/lib/query"
 import { DashboardHeader } from "@/components/state/dashboardHeader"
@@ -42,12 +42,12 @@ export default function DeliveryLocationsPage() {
         active: form.active,
       }),
     onSuccess: () => {
-      toast.success("Delivery location created")
+      toast({ description: "Delivery location created" })
       queryClient.invalidateQueries({ queryKey: ["admin-delivery-locations"] })
       setShowForm(false)
       setForm(EMPTY_FORM)
     },
-    onError: () => toast.error("Failed to create location"),
+    onError: () => toast({ description: "Failed to create location", variant: "destructive" }),
   })
 
   const updateMutation = useMutation({
@@ -60,13 +60,13 @@ export default function DeliveryLocationsPage() {
         active: form.active,
       }),
     onSuccess: () => {
-      toast.success("Location updated")
+      toast({ description: "Location updated" })
       queryClient.invalidateQueries({ queryKey: ["admin-delivery-locations"] })
       setEditing(null)
       setShowForm(false)
       setForm(EMPTY_FORM)
     },
-    onError: () => toast.error("Failed to update location"),
+    onError: () => toast({ description: "Failed to update location", variant: "destructive" }),
   })
 
   function startEdit(loc: Location) {

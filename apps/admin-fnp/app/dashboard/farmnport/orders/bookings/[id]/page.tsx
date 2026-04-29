@@ -2,14 +2,13 @@
 
 import { useState, use } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { Loader2, CalendarDays, Truck, CheckCircle, XCircle, Clock, Package } from "lucide-react"
+import { Loader2, CalendarDays, Truck, Clock } from "lucide-react"
 import Link from "next/link"
-import { toast } from "sonner"
 
-import { updateBookingStatus } from "@/lib/query"
+import { queryAdminBooking, updateBookingStatus } from "@/lib/query"
+import { toast } from "@/components/ui/use-toast"
 import { DashboardHeader } from "@/components/state/dashboardHeader"
 import { DashboardShell } from "@/components/state/dashboardShell"
-import api from "@/lib/api"
 
 const STATUS_STYLES: Record<string, string> = {
   pending:   "bg-yellow-100 text-yellow-800",
@@ -63,8 +62,6 @@ function getTransitions(booking: any): string[] {
   return STATUS_TRANSITIONS[booking.status] ?? []
 }
 
-let baseUrl = (process.env.NEXT_PUBLIC_BASE_URL ?? "") + "/v1"
-
 export default function AdminBookingDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const queryClient = useQueryClient()
@@ -72,19 +69,19 @@ export default function AdminBookingDetailPage({ params }: { params: Promise<{ i
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin-booking", id],
-    queryFn: () => api.get(`${baseUrl}/booking/${id}`).then((r) => r.data),
+    queryFn: () => queryAdminBooking(id),
     refetchOnWindowFocus: false,
   })
 
   const statusMutation = useMutation({
     mutationFn: (status: string) => updateBookingStatus(id, status, note || undefined),
     onSuccess: (_, status) => {
-      toast.success(`Booking marked as ${status}`)
+      toast({ description: `Booking marked as ${status}` })
       setNote("")
       queryClient.invalidateQueries({ queryKey: ["admin-booking", id] })
       queryClient.invalidateQueries({ queryKey: ["admin-bookings"] })
     },
-    onError: () => toast.error("Failed to update status"),
+    onError: () => toast({ description: "Failed to update status", variant: "destructive" }),
   })
 
   if (isLoading) {
@@ -96,7 +93,7 @@ export default function AdminBookingDetailPage({ params }: { params: Promise<{ i
     )
   }
 
-  const booking = data?.booking
+  const booking = data?.data?.booking
   if (!booking) {
     return (
       <DashboardShell>

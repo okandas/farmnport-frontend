@@ -1551,6 +1551,10 @@ export function queryAdminBookings(params?: { type?: string; status?: string; lo
   return api.get(`${baseUrl}/booking/admin/list${qs ? `?${qs}` : ""}`)
 }
 
+export function queryAdminBooking(id: string) {
+  return api.get(`${baseUrl}/booking/admin/${id}`)
+}
+
 export function updateBookingStatus(id: string, status: string, note?: string) {
   return api.put(`${baseUrl}/booking/admin/${id}/status`, { status, note })
 }

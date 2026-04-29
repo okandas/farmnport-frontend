@@ -10,9 +10,10 @@ import { Placeholder } from "@/components/state/placeholder"
 import { DataTable } from "@/components/structures/data-table"
 import { orderColumns, OrderRow } from "@/components/structures/columns/orders"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 const ORDER_TYPES = [
-  { value: "", label: "All" },
+  { value: "all", label: "All channels" },
   { value: "retail", label: "Retail" },
   { value: "bundle", label: "Bundle" },
   { value: "marketplace", label: "Marketplace" },
@@ -33,12 +34,14 @@ const STATUS_FILTERS = [
 
 export function OrdersTable() {
   const [search, setSearch] = useState("")
-  const [orderType, setOrderType] = useState("")
+  const [orderType, setOrderType] = useState("all")
   const [statusFilter, setStatusFilter] = useState("")
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 20,
   })
+
+  const channelFilter = orderType === "all" ? undefined : orderType
 
   const { isError, isLoading, isFetching, refetch, data, error } = useQuery({
     queryKey: [
@@ -46,7 +49,7 @@ export function OrdersTable() {
       {
         p: pagination.pageIndex + 1,
         search,
-        order_type: orderType,
+        order_type: channelFilter,
         status: statusFilter,
       },
     ],
@@ -55,7 +58,7 @@ export function OrdersTable() {
         p: pagination.pageIndex + 1,
         search,
         limit: pagination.pageSize,
-        order_type: orderType || undefined,
+        order_type: channelFilter,
         status: statusFilter || undefined,
       }),
     refetchOnWindowFocus: false,
@@ -104,27 +107,32 @@ export function OrdersTable() {
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Channel filter */}
-      <Tabs value={orderType} onValueChange={(v) => { setOrderType(v); setPagination(p => ({ ...p, pageIndex: 0 })) }}>
-        <TabsList>
-          {ORDER_TYPES.map((type) => (
-            <TabsTrigger key={type.value} value={type.value}>
-              {type.label}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-      </Tabs>
+      <div className="flex items-center justify-between gap-4">
+        {/* Status tabs — primary filter */}
+        <Tabs value={statusFilter} onValueChange={(v) => { setStatusFilter(v); setPagination(p => ({ ...p, pageIndex: 0 })) }}>
+          <TabsList>
+            {STATUS_FILTERS.map((status) => (
+              <TabsTrigger key={status.value} value={status.value}>
+                {status.label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
 
-      {/* Status filter */}
-      <Tabs value={statusFilter} onValueChange={(v) => { setStatusFilter(v); setPagination(p => ({ ...p, pageIndex: 0 })) }}>
-        <TabsList>
-          {STATUS_FILTERS.map((status) => (
-            <TabsTrigger key={status.value} value={status.value}>
-              {status.label}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-      </Tabs>
+        {/* Channel select — secondary filter */}
+        <Select value={orderType} onValueChange={(v) => { setOrderType(v); setPagination(p => ({ ...p, pageIndex: 0 })) }}>
+          <SelectTrigger className="w-44">
+            <SelectValue placeholder="All channels" />
+          </SelectTrigger>
+          <SelectContent>
+            {ORDER_TYPES.map((type) => (
+              <SelectItem key={type.value} value={type.value}>
+                {type.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
 
       <DataTable
         columns={orderColumns}
