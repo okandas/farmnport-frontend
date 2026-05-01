@@ -81,54 +81,66 @@ export function LocationQRModal({ location, open, onOpenChange }: LocationQRModa
   }
 
   async function downloadPDF() {
-    const svg = getSVGString()
-    if (!svg) return
+    if (!svgRef.current) return
     const { jsPDF } = await import("jspdf")
+    const QRCodeLib = await import("qrcode")
 
-    const qrSize = 220
-    const padX = 32
-    const padY = 16
-    const topLabelH = 32
-    const bottomLabelH = 36
-    const totalW = qrSize + padX * 2
-    const totalH = qrSize + topLabelH + bottomLabelH + padY * 2
+    // A4 in mm
+    const A4_W = 210
+    const A4_H = 297
 
-    // Convert px to mm (96dpi → 1px = 0.2646mm)
-    const px2mm = 0.2646
-    const wMM = totalW * px2mm
-    const hMM = totalH * px2mm
+    // QR: 180mm centered on page
+    const qrMM = 180
+    const qrX = (A4_W - qrMM) / 2
+    const qrY = (A4_H - qrMM) / 2
 
-    const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: [wMM, hMM] })
+    // Render QR to high-res canvas (600dpi equivalent)
+    const scale = 10 // 1mm = 10px → 180mm = 1800px
+    const qrPx = qrMM * scale
+    const qrCanvas = document.createElement("canvas")
+    qrCanvas.width = qrPx
+    qrCanvas.height = qrPx
+    await QRCodeLib.toCanvas(qrCanvas, qrValue, {
+      width: qrPx,
+      margin: 1,
+      errorCorrectionLevel: "H",
+      color: { dark: "#000000", light: "#ffffff" },
+    })
+
+    const qrDataUrl = qrCanvas.toDataURL("image/png")
+
+    const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" })
 
     // White background
     doc.setFillColor(255, 255, 255)
-    doc.rect(0, 0, wMM, hMM, "F")
+    doc.rect(0, 0, A4_W, A4_H, "F")
 
-    // Top label
+    // QR image — centered
+    doc.addImage(qrDataUrl, "PNG", qrX, qrY, qrMM, qrMM)
+
+    // Top title: restaurant name, 14mm above QR
     doc.setFont("helvetica", "bold")
-    doc.setFontSize(11)
+    doc.setFontSize(22)
     doc.setTextColor(17, 24, 39)
-    doc.text("menus.co.zw", wMM / 2, (padY + 20) * px2mm, { align: "center" })
+    doc.text(restaurantName, A4_W / 2, qrY - 10, { align: "center" })
 
-    // QR code as SVG image
-    const svgBlob = new Blob([svg], { type: "image/svg+xml" })
-    const svgUrl = URL.createObjectURL(svgBlob)
-    const img = new Image()
-    img.src = svgUrl
-    await new Promise<void>((res) => { img.onload = () => res() })
+    // Middle overlay on QR: white rect + location name
+    const ovW = 60
+    const ovH = 9
+    const ovX = A4_W / 2 - ovW / 2
+    const ovY = qrY + qrMM / 2 - ovH / 2
+    doc.setFillColor(255, 255, 255)
+    doc.roundedRect(ovX, ovY, ovW, ovH, 2, 2, "F")
+    doc.setFont("helvetica", "bold")
+    doc.setFontSize(10)
+    doc.setTextColor(17, 24, 39)
+    doc.text(location.name, A4_W / 2, ovY + 6, { align: "center" })
 
-    const canvas = document.createElement("canvas")
-    canvas.width = totalW * 2
-    canvas.height = totalH * 2
-    const ctx = canvas.getContext("2d")!
-    ctx.scale(2, 2)
-    ctx.fillStyle = "#ffffff"
-    ctx.fillRect(0, 0, totalW, totalH)
-    ctx.drawImage(img, 0, 0, totalW, totalH)
-    URL.revokeObjectURL(svgUrl)
-
-    const imgData = canvas.toDataURL("image/png")
-    doc.addImage(imgData, "PNG", 0, 0, wMM, hMM)
+    // Bottom label: "By menus.co.zw" 14mm below QR
+    doc.setFont("helvetica", "normal")
+    doc.setFontSize(14)
+    doc.setTextColor(107, 114, 128)
+    doc.text("By menus.co.zw", A4_W / 2, qrY + qrMM + 12, { align: "center" })
 
     doc.save(`${fileName}.pdf`)
   }
@@ -143,7 +155,7 @@ export function LocationQRModal({ location, open, onOpenChange }: LocationQRModa
         <div className="flex flex-col items-center gap-4 py-2">
           {/* Preview */}
           <div className="flex flex-col items-center gap-2 border rounded-xl p-4 bg-white w-full">
-            <span className="text-sm font-bold text-gray-800 tracking-wide">menus.co.zw</span>
+            <span className="text-sm font-bold text-gray-800 tracking-wide capitalize">{location.name}</span>
             <div className="relative">
               <QRCodeSVG
                 ref={svgRef}
@@ -153,12 +165,12 @@ export function LocationQRModal({ location, open, onOpenChange }: LocationQRModa
                 marginSize={1}
               />
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <span className="bg-white/90 text-gray-900 text-xs font-bold px-2 py-1 rounded text-center max-w-[120px] leading-tight">
-                  {restaurantName}
+                <span className="bg-white/90 text-gray-900 text-xs font-bold px-2 py-1 rounded text-center max-w-[120px] leading-tight capitalize">
+                  {location.name}
                 </span>
               </div>
             </div>
-            <span className="text-xs text-gray-500 text-center">{locationLabel}</span>
+            <span className="text-xs text-gray-500 text-center">By menus.co.zw</span>
           </div>
 
           <div className="flex gap-2 w-full">
