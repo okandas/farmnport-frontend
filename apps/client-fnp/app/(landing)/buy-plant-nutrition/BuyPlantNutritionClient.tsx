@@ -4,10 +4,12 @@ import { useQuery } from "@tanstack/react-query"
 import { queryAllPlantNutritionProducts } from "@/lib/query"
 import { Button } from "@/components/ui/button"
 import { PlantNutritionFilterSidebar } from "@/components/generic/plantNutritionFilterSidebar"
+import { BuyCategoriesNav } from "@/components/generic/BuyCategoriesNav"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
 import { Leaf } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
+import { AddToCartButton } from "@/components/cart/AddToCartButton"
 
 interface BuyPlantNutritionClientProps {
     initialProducts: any[]
@@ -56,20 +58,25 @@ function PlantNutritionShopCard({ product }: { product: any }) {
                     </div>
                 </div>
 
-                {product.show_price && product.sale_price > 0 && (
-                    <div className="flex items-center gap-2">
+                {product.show_price && product.sale_price > 0 ? (
+                    <div className="flex items-baseline gap-2">
+                        <span className="text-lg font-bold">${(product.sale_price / 100).toFixed(2)}</span>
                         {product.was_price > 0 && product.was_price > product.sale_price && (
                             <span className="text-xs text-muted-foreground line-through">${(product.was_price / 100).toFixed(2)}</span>
                         )}
-                        <span className="text-sm font-semibold text-primary">${(product.sale_price / 100).toFixed(2)}</span>
                     </div>
+                ) : (
+                    <p className="text-sm text-muted-foreground">Price on request</p>
                 )}
-
-                <Link href={href} className="block pt-2">
-                    <Button variant="outline" className="w-full" size="sm">
-                        View Product
-                    </Button>
-                </Link>
+                <AddToCartButton
+                    productId={product.id}
+                    productType="plant_nutrition"
+                    productName={product.name}
+                    productSlug={product.slug}
+                    imageSrc={product.images?.[0]?.img?.src}
+                    unitPrice={product.show_price && product.sale_price > 0 ? product.sale_price : null}
+                    loginRedirect={href}
+                />
             </div>
         </div>
     )
@@ -114,12 +121,13 @@ export function BuyPlantNutritionClient({ initialProducts, initialTotal }: BuyPl
     return (
         <div className="flex flex-col lg:flex-row gap-8">
             <aside className="w-full lg:w-64 flex-shrink-0">
+                <BuyCategoriesNav />
                 <PlantNutritionFilterSidebar />
             </aside>
 
             <main className="flex-1">
                 {productsLoading ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
                         {[...Array(6)].map((_, i) => (
                             <div key={i} className="animate-pulse">
                                 <div className="bg-card border border-border rounded-lg overflow-hidden">
@@ -149,7 +157,7 @@ export function BuyPlantNutritionClient({ initialProducts, initialTotal }: BuyPl
                             Showing {products.length} of {productsData?.data?.total || 0} products
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
                             {products.map((product: any) => (
                                 <PlantNutritionShopCard key={product.id} product={product} />
                             ))}

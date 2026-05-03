@@ -86,23 +86,23 @@ export function AddToCartButton({
 
   if (cartQty > 0) {
     return (
-      <div className="flex items-center mt-3 rounded-full border-2 border-primary overflow-hidden">
+      <div className="flex items-center mt-3 rounded-md border border-primary overflow-hidden">
         <button
           onClick={() => updateMutation.mutate({ qty: cartQty - 1 })}
           disabled={isMutating}
-          className="flex-1 flex items-center justify-center h-10 hover:bg-primary/10 transition-colors disabled:opacity-60"
+          className="flex-1 flex items-center justify-center h-9 hover:bg-primary/10 transition-colors disabled:opacity-60"
         >
-          <Minus className="w-4 h-4 text-primary" />
+          <Minus className="w-3.5 h-3.5 text-primary" />
         </button>
-        <span className="px-4 text-sm font-bold text-primary tabular-nums">
-          {isMutating ? <Loader2 className="w-4 h-4 animate-spin" /> : cartQty}
+        <span className="px-3 text-sm font-bold text-primary tabular-nums">
+          {isMutating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : cartQty}
         </span>
         <button
           onClick={() => updateMutation.mutate({ qty: cartQty + 1 })}
           disabled={isMutating}
-          className="flex-1 flex items-center justify-center h-10 hover:bg-primary/10 transition-colors disabled:opacity-60"
+          className="flex-1 flex items-center justify-center h-9 hover:bg-primary/10 transition-colors disabled:opacity-60"
         >
-          <Plus className="w-4 h-4 text-primary" />
+          <Plus className="w-3.5 h-3.5 text-primary" />
         </button>
       </div>
     )
@@ -112,9 +112,9 @@ export function AddToCartButton({
     <button
       onClick={handleAdd}
       disabled={addMutation.isPending || !available}
-      className="flex items-center justify-center gap-2 w-full bg-primary hover:bg-primary/90 disabled:opacity-60 text-primary-foreground font-semibold text-sm py-2.5 rounded-full transition-colors mt-3"
+      className="flex items-center justify-center gap-2 w-full bg-primary hover:bg-primary/90 disabled:opacity-60 text-primary-foreground font-medium text-sm h-9 px-3 rounded-md transition-colors mt-3"
     >
-      {addMutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
+      {addMutation.isPending && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
       {available ? "Add to Cart" : "Out of Stock"}
     </button>
   )

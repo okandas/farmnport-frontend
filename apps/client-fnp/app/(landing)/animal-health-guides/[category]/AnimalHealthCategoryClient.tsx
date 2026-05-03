@@ -107,6 +107,7 @@ export function AnimalHealthCategoryClient({ category, categoryName, initialProd
                                     <AnimalHealthCard
                                         key={product.id}
                                         product={product}
+                                        mode="guide"
                                     />
                                 ))}
                             </div>

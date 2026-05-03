@@ -1,4 +1,3 @@
-import { ShoppingCart } from "lucide-react"
 import {
   queryAllAgroChemicals,
   queryAllAnimalHealthProducts,
@@ -31,16 +30,13 @@ export default async function BuyPage() {
       {/* Hero */}
       <section className="py-6 lg:py-8 border-b border-border">
         <div className="mx-auto max-w-7xl px-4 lg:px-8">
-          <div className="flex items-center gap-3">
-            <ShoppingCart className="h-5 w-5 text-primary" />
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight font-heading">
-                Buy Farm Inputs
-              </h1>
-              <p className="text-sm text-muted-foreground">
-                Agrochemicals, animal health, feed, plant nutrition & more.
-              </p>
-            </div>
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight font-heading">
+              Buy Farm Inputs
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Agrochemicals, animal health, feed, plant nutrition & more.
+            </p>
           </div>
         </div>
       </section>

@@ -4,14 +4,18 @@ import { Bug, Beaker } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { sendGTMEvent } from '@next/third-parties/google'
 import { formatProductName } from "@/lib/utilities"
+import { AddToCartButton } from "@/components/cart/AddToCartButton"
 
 interface AnimalHealthCardProps {
   product: any
+  mode: "guide" | "shop"
 }
 
-export function AnimalHealthCard({ product }: AnimalHealthCardProps) {
+export function AnimalHealthCard({ product, mode }: AnimalHealthCardProps) {
   const categorySlug = product.animal_health_category?.slug || 'all'
-  const href = `/animal-health-guides/${categorySlug}/${product.slug}`
+  const href = mode === "shop"
+    ? `/buy-animal-health/${product.slug}`
+    : `/animal-health-guides/${categorySlug}/${product.slug}`
 
   return (
     <div className="bg-card border border-border rounded-lg overflow-hidden transition-all duration-200 hover:shadow-lg hover:border-primary/50 group">
@@ -63,16 +67,40 @@ export function AnimalHealthCard({ product }: AnimalHealthCardProps) {
         </div>
 
         {/* CTA */}
-        <Link href={href} className="block pt-2">
-          <Button
-            variant="outline"
-            className="w-full"
-            size="sm"
-            onClick={() => sendGTMEvent({ event: 'link', value: 'ViewAnimalHealthGuide' })}
-          >
-            View Guide
-          </Button>
-        </Link>
+        {mode === "shop" ? (
+          <div className="pt-3 space-y-2">
+            {product.show_price && product.sale_price > 0 ? (
+              <div className="flex items-baseline gap-2">
+                <span className="text-lg font-bold">${(product.sale_price / 100).toFixed(2)}</span>
+                {product.show_was_price && product.was_price > 0 && product.was_price > product.sale_price && (
+                  <span className="text-xs text-muted-foreground line-through">${(product.was_price / 100).toFixed(2)}</span>
+                )}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">Price on request</p>
+            )}
+            <AddToCartButton
+              productId={product.id}
+              productType="animal_health"
+              productName={product.name}
+              productSlug={product.slug}
+              imageSrc={product.images?.[0]?.img?.src}
+              unitPrice={product.show_price && product.sale_price > 0 ? product.sale_price : null}
+              loginRedirect={href}
+            />
+          </div>
+        ) : (
+          <Link href={href} className="block pt-2">
+            <Button
+              variant="outline"
+              className="w-full"
+              size="sm"
+              onClick={() => sendGTMEvent({ event: 'link', value: 'ViewAnimalHealthGuide' })}
+            >
+              View Guide
+            </Button>
+          </Link>
+        )}
       </div>
     </div>
   )

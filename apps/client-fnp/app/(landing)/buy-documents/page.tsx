@@ -26,7 +26,7 @@ export default async function BuyDocumentsPage() {
                         Plans & Documents
                     </h1>
                     <p className="text-lg text-muted-foreground">
-                        Downloadable plans, templates, and guides for farmers and rural entrepreneurs.
+                        Downloadable plans, templates, and guides for farmers and rural entrepreneurs
                     </p>
                 </div>
                 <BuyDocumentsClient

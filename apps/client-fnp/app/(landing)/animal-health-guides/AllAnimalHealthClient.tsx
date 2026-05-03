@@ -84,7 +84,7 @@ export function AllAnimalHealthClient({ initialProducts, initialTotal }: AllAnim
                     <>
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
                             {products.map((product: any) => (
-                                <AnimalHealthCard key={product.id} product={product} />
+                                <AnimalHealthCard key={product.id} product={product} mode="guide" />
                             ))}
                         </div>
 

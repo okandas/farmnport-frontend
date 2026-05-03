@@ -4,10 +4,12 @@ import { useQuery } from "@tanstack/react-query"
 import { queryAllFeedProducts } from "@/lib/query"
 import { Button } from "@/components/ui/button"
 import { FeedFilterSidebar } from "@/components/generic/feedFilterSidebar"
+import { BuyCategoriesNav } from "@/components/generic/BuyCategoriesNav"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
 import { Egg } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
+import { AddToCartButton } from "@/components/cart/AddToCartButton"
 
 interface BuyFeedsClientProps {
     initialProducts: any[]
@@ -58,20 +60,25 @@ function FeedCard({ product }: { product: any }) {
                     )}
                 </div>
 
-                {product.show_price && product.sale_price > 0 && (
-                    <div className="flex items-center gap-2">
+                {product.show_price && product.sale_price > 0 ? (
+                    <div className="flex items-baseline gap-2">
+                        <span className="text-lg font-bold">${(product.sale_price / 100).toFixed(2)}</span>
                         {product.was_price > 0 && product.was_price > product.sale_price && (
                             <span className="text-xs text-muted-foreground line-through">${(product.was_price / 100).toFixed(2)}</span>
                         )}
-                        <span className="text-sm font-semibold text-primary">${(product.sale_price / 100).toFixed(2)}</span>
                     </div>
+                ) : (
+                    <p className="text-sm text-muted-foreground">Price on request</p>
                 )}
-
-                <Link href={href} className="block pt-2">
-                    <Button variant="outline" className="w-full" size="sm">
-                        View Product
-                    </Button>
-                </Link>
+                <AddToCartButton
+                    productId={product.id}
+                    productType="feed"
+                    productName={product.name}
+                    productSlug={product.slug}
+                    imageSrc={product.images?.[0]?.img?.src}
+                    unitPrice={product.show_price && product.sale_price > 0 ? product.sale_price : null}
+                    loginRedirect={href}
+                />
             </div>
         </div>
     )
@@ -116,12 +123,13 @@ export function BuyFeedsClient({ initialProducts, initialTotal }: BuyFeedsClient
     return (
         <div className="flex flex-col lg:flex-row gap-8">
             <aside className="w-full lg:w-64 flex-shrink-0">
+                <BuyCategoriesNav />
                 <FeedFilterSidebar />
             </aside>
 
             <main className="flex-1">
                 {productsLoading ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
                         {[...Array(6)].map((_, i) => (
                             <div key={i} className="animate-pulse">
                                 <div className="bg-card border border-border rounded-lg overflow-hidden">
@@ -151,7 +159,7 @@ export function BuyFeedsClient({ initialProducts, initialTotal }: BuyFeedsClient
                             Showing {products.length} of {productsData?.data?.total || 0} products
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
                             {products.map((product: any) => (
                                 <FeedCard key={product.id} product={product} />
                             ))}
