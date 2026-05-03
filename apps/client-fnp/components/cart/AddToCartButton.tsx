@@ -8,7 +8,7 @@ import { toast } from "sonner"
 import { addToCart, getCart, updateCartItem, removeFromCart } from "@/lib/query"
 import { useCart } from "@/contexts/cart-context"
 
-export type CartProductType = "agrochemical" | "feed" | "animal_health" | "plant_nutrition"
+export type CartProductType = "agrochemical" | "feed" | "animal_health" | "plant_nutrition" | "document"
 
 interface AddToCartButtonProps {
   productId: string

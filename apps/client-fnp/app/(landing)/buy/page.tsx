@@ -22,6 +22,11 @@ const sections = [
         description: "Fertilizers, foliar feeds, biostimulants, and plant growth regulators.",
         href: "/buy-plant-nutrition",
     },
+    {
+        title: "Plans & Documents",
+        description: "Downloadable infrastructure plans, financial templates, and agronomy guides.",
+        href: "/buy-documents",
+    },
 ]
 
 export default function BuyPage() {

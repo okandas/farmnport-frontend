@@ -688,3 +688,17 @@ export function getBooking(id: string) {
 export function cancelBooking(id: string) {
   return api.put(`${BaseURL}/booking/${id}/cancel`, {})
 }
+
+// ── Documents ─────────────────────────────────────────────────────────────────
+
+export function queryAllDocuments(pagination?: { p?: number; category?: string }) {
+  const params = new URLSearchParams()
+  if (pagination?.p && pagination.p >= 2) params.set('p', pagination.p.toString())
+  if (pagination?.category) params.set('category', pagination.category)
+  const qs = params.toString()
+  return api.get(qs ? `${BaseURL}/documents?${qs}` : `${BaseURL}/documents`)
+}
+
+export function queryDocument(slug: string) {
+  return api.get(`${BaseURL}/documents/${slug}`)
+}
