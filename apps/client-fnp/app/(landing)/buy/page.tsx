@@ -1,3 +1,4 @@
+import Link from "next/link"
 import {
   queryAllAgroChemicals,
   queryAllAnimalHealthProducts,
@@ -30,6 +31,11 @@ export default async function BuyPage() {
       {/* Hero */}
       <section className="py-6 lg:py-8 border-b border-border">
         <div className="mx-auto max-w-7xl px-4 lg:px-8">
+          <nav className="flex items-center gap-1.5 text-xs text-muted-foreground mb-3">
+            <Link href="/" className="hover:text-foreground transition-colors">Home</Link>
+            <span>/</span>
+            <span className="text-foreground font-medium">Buy</span>
+          </nav>
           <div>
             <h1 className="text-2xl font-bold tracking-tight font-heading">
               Buy Farm Inputs
