@@ -48,7 +48,7 @@ const TYPE_ICON: Record<string, React.ReactNode> = {
 
 function formatDate(s: string) {
   if (!s) return "—"
-  return new Date(s).toLocaleString()
+  return new Date(s).toLocaleString("en-GB")
 }
 
 function Pagination({ page, pageCount, onPage }: { page: number; pageCount: number; onPage: (p: number) => void }) {
