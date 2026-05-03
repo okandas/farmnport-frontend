@@ -45,6 +45,7 @@ export function BuyAgroChemicalsClient({ initialChemicals, initialTotal }: BuyAg
 
     const handlePageChange = (newPage: number) => {
         setQueryState({ p: newPage })
+        window.scrollTo({ top: 0, behavior: 'smooth' })
     }
 
     return (

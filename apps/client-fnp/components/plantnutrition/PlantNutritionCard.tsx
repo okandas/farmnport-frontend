@@ -28,9 +28,7 @@ export function PlantNutritionCard({ product }: PlantNutritionCardProps) {
               className="object-contain transition-transform duration-200 group-hover:scale-105"
             />
           ) : (
-            <div className="absolute inset-0 flex items-center justify-center bg-muted/30">
-              <Leaf className="w-16 h-16 text-muted-foreground/30" />
-            </div>
+            <div className="absolute inset-0 bg-muted/30" />
           )}
         </div>
       </Link>

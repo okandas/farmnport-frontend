@@ -2,16 +2,16 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { Beaker, Heart, Egg, Leaf, FileText, ArrowRight, ShoppingBag } from "lucide-react"
+import { ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { formatProductName } from "@/lib/utilities"
 
 const CATEGORIES = [
-  { id: "agrochemicals", label: "Agrochemicals", icon: Beaker, href: "/buy-agrochemicals" },
-  { id: "animal-health", label: "Animal Health", icon: Heart, href: "/buy-animal-health" },
-  { id: "animal-feed", label: "Animal Feed", icon: Egg, href: "/buy-feeds" },
-  { id: "plant-nutrition", label: "Plant Nutrition", icon: Leaf, href: "/buy-plant-nutrition" },
-  { id: "documents", label: "Plans & Documents", icon: FileText, href: "/buy-documents" },
+  { id: "agrochemicals", label: "Agrochemicals", href: "/buy-agrochemicals" },
+  { id: "animal-health", label: "Animal Health", href: "/buy-animal-health" },
+  { id: "animal-feed", label: "Animal Feed", href: "/buy-feeds" },
+  { id: "plant-nutrition", label: "Plant Nutrition", href: "/buy-plant-nutrition" },
+  { id: "documents", label: "Plans & Documents", href: "/buy-documents" },
 ]
 
 // ── Shared product card — matches AgroChemicalCard guide size exactly ─────────
@@ -36,9 +36,7 @@ function ProductCard({ href, imageSrc, name, brand, meta }: {
               className="object-contain transition-transform duration-200 group-hover:scale-105"
             />
           ) : (
-            <div className="absolute inset-0 flex items-center justify-center bg-muted/30">
-              <ShoppingBag className="w-16 h-16 text-muted-foreground/30" />
-            </div>
+            <div className="absolute inset-0 bg-muted/30" />
           )}
         </div>
       </Link>
@@ -77,9 +75,7 @@ function DocumentCard({ doc }: { doc: any }) {
           {preview ? (
             <Image src={preview} alt={doc.title} fill className="object-cover" sizes="25vw" />
           ) : (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <FileText className="w-16 h-16 text-muted-foreground/30" />
-            </div>
+            <div className="absolute inset-0 bg-muted/30" />
           )}
         </div>
       </Link>
@@ -157,13 +153,12 @@ export function BuyPageClient({
           <div className="sticky top-6">
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-2">Categories</p>
             <nav className="flex flex-col gap-0.5">
-              {CATEGORIES.map(({ label, icon: Icon, href }) => (
+              {CATEGORIES.map(({ label, href }) => (
                 <Link
                   key={href}
                   href={href}
-                  className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                  className="px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
                 >
-                  <Icon className="h-4 w-4 flex-shrink-0" />
                   {label}
                 </Link>
               ))}

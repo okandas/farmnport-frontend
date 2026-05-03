@@ -34,9 +34,7 @@ function DocumentCard({ doc }: { doc: any }) {
                             className="object-cover transition-transform duration-200 group-hover:scale-105"
                         />
                     ) : (
-                        <div className="absolute inset-0 flex items-center justify-center bg-muted/30">
-                            <FileText className="w-16 h-16 text-muted-foreground/30" />
-                        </div>
+                        <div className="absolute inset-0 bg-muted/30" />
                     )}
                 </div>
             </Link>
@@ -169,7 +167,7 @@ export function BuyDocumentsClient({ initialDocuments, initialTotal }: BuyDocume
                                                 <Button
                                                     variant={queryState.p === pageNum ? "default" : "outline"}
                                                     size="sm"
-                                                    onClick={() => setQueryState({ p: pageNum })}
+                                                    onClick={() => { setQueryState({ p: pageNum }); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
                                                     className="min-w-[40px]"
                                                 >
                                                     {pageNum}

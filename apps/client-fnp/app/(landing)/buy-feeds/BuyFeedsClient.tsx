@@ -31,9 +31,7 @@ function FeedCard({ product }: { product: any }) {
                             className="object-contain transition-transform duration-200 group-hover:scale-105"
                         />
                     ) : (
-                        <div className="absolute inset-0 flex items-center justify-center bg-muted/30">
-                            <Egg className="w-16 h-16 text-muted-foreground/30" />
-                        </div>
+                        <div className="absolute inset-0 bg-muted/30" />
                     )}
                 </div>
             </Link>
@@ -111,6 +109,7 @@ export function BuyFeedsClient({ initialProducts, initialTotal }: BuyFeedsClient
 
     const handlePageChange = (newPage: number) => {
         setQueryState({ p: newPage })
+        window.scrollTo({ top: 0, behavior: 'smooth' })
     }
 
     return (
