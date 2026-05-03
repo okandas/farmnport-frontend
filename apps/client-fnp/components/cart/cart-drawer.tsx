@@ -59,8 +59,6 @@ export function CartDrawer() {
 
   const items: CartItem[] = cartData?.items ?? []
   const subtotal = items.reduce((sum, i) => sum + i.unit_price * i.quantity, 0)
-  const deliveryFee = subtotal >= 50 ? 0 : items.length > 0 ? 5 : 0
-  const total = subtotal + deliveryFee
 
   return (
     <Sheet open={isOpen} onOpenChange={(open) => !open && closeCart()}>
@@ -198,37 +196,16 @@ export function CartDrawer() {
         {/* Footer totals + checkout */}
         {session && items.length > 0 && (
           <div className="border-t px-6 py-4 space-y-3">
-            <div className="space-y-1.5 text-sm">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Subtotal</span>
-                <span>${subtotal.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Delivery</span>
-                <span>
-                  {deliveryFee === 0 ? (
-                    <span className="text-green-700 dark:text-green-400">Free</span>
-                  ) : (
-                    `$${deliveryFee.toFixed(2)}`
-                  )}
-                </span>
-              </div>
-              <div className="flex justify-between font-bold text-base pt-1 border-t">
-                <span>Total</span>
-                <span>${total.toFixed(2)}</span>
-              </div>
+            <div className="flex justify-between font-bold text-base text-sm">
+              <span>Total</span>
+              <span>${subtotal.toFixed(2)}</span>
             </div>
-            {subtotal < 50 && (
-              <p className="text-xs text-muted-foreground">
-                Add ${(50 - subtotal).toFixed(2)} more for free delivery
-              </p>
-            )}
             <Link
               href="/checkout"
               onClick={closeCart}
               className="block w-full text-center bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-sm py-3 rounded-full transition-colors"
             >
-              Checkout · ${total.toFixed(2)}
+              Checkout · ${subtotal.toFixed(2)}
             </Link>
           </div>
         )}
