@@ -51,25 +51,18 @@ function FeedCard({ product }: { product: any }) {
                     </h3>
                 </Link>
 
-                <div className="flex items-center gap-4 text-xs text-muted-foreground pt-2 border-t">
-                    {product.animal && (
-                        <span className="capitalize">{product.animal}</span>
-                    )}
-                    {product.phase && (
-                        <span className="capitalize">{product.phase}</span>
+                <div className="flex items-baseline gap-2 h-7">
+                    {product.show_price && product.sale_price > 0 ? (
+                        <>
+                            <span className="text-lg font-bold">${(product.sale_price / 100).toFixed(2)}</span>
+                            {product.was_price > 0 && product.was_price > product.sale_price && (
+                                <span className="text-xs text-muted-foreground line-through">${(product.was_price / 100).toFixed(2)}</span>
+                            )}
+                        </>
+                    ) : (
+                        <span className="text-sm text-muted-foreground">Price on request</span>
                     )}
                 </div>
-
-                {product.show_price && product.sale_price > 0 ? (
-                    <div className="flex items-baseline gap-2">
-                        <span className="text-lg font-bold">${(product.sale_price / 100).toFixed(2)}</span>
-                        {product.was_price > 0 && product.was_price > product.sale_price && (
-                            <span className="text-xs text-muted-foreground line-through">${(product.was_price / 100).toFixed(2)}</span>
-                        )}
-                    </div>
-                ) : (
-                    <p className="text-sm text-muted-foreground">Price on request</p>
-                )}
                 <AddToCartButton
                     productId={product.id}
                     productType="feed"

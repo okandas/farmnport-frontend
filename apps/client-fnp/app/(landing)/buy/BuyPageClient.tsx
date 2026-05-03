@@ -100,9 +100,8 @@ function DocumentCard({ doc }: { doc: any }) {
 
 // ── Section wrapper ───────────────────────────────────────────────────────────
 
-function Section({ label, icon: Icon, href, children, count }: {
+function Section({ label, href, children, count }: {
   label: string
-  icon: React.ElementType
   href: string
   children: React.ReactNode
   count?: number
@@ -111,7 +110,6 @@ function Section({ label, icon: Icon, href, children, count }: {
     <section>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <Icon className="h-5 w-5 text-primary" />
           <h2 className="text-xl font-bold">{label}</h2>
           {count !== undefined && (
             <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">{count.toLocaleString()} products</span>
@@ -176,31 +174,31 @@ export function BuyPageClient({
         {/* ── Main content ── */}
         <main className="flex-1 min-w-0 flex flex-col gap-12">
 
-          <Section label="Agrochemicals" icon={Beaker} href="/buy-agrochemicals" count={agrochemicalTotal}>
+          <Section label="Agrochemicals" href="/buy-agrochemicals" count={agrochemicalTotal}>
             {agrochemicals.slice(0, 4).map((p) => (
               <ProductCard key={p.id} href={`/buy-agrochemicals/${p.slug}`} imageSrc={p.images?.[0]?.img?.src} name={p.name} brand={p.brand?.name} meta={p.agrochemical_category?.name} />
             ))}
           </Section>
 
-          <Section label="Animal Health" icon={Heart} href="/buy-animal-health" count={animalHealthTotal}>
+          <Section label="Animal Health" href="/buy-animal-health" count={animalHealthTotal}>
             {animalHealth.slice(0, 4).map((p) => (
               <ProductCard key={p.id} href={`/buy-animal-health/${p.slug}`} imageSrc={p.images?.[0]?.img?.src} name={p.name} brand={p.brand?.name} meta={p.animal_health_category?.name} />
             ))}
           </Section>
 
-          <Section label="Animal Feed" icon={Egg} href="/buy-feeds" count={feedsTotal}>
+          <Section label="Animal Feed" href="/buy-feeds" count={feedsTotal}>
             {feeds.slice(0, 4).map((p) => (
               <ProductCard key={p.id} href={`/buy-feeds/${p.slug}`} imageSrc={p.images?.[0]?.img?.src} name={p.name} brand={p.brand?.name} meta={p.animal ? `${p.animal}${p.phase ? ` · ${p.phase}` : ""}` : undefined} />
             ))}
           </Section>
 
-          <Section label="Plant Nutrition" icon={Leaf} href="/buy-plant-nutrition" count={plantNutritionTotal}>
+          <Section label="Plant Nutrition" href="/buy-plant-nutrition" count={plantNutritionTotal}>
             {plantNutrition.slice(0, 4).map((p) => (
               <ProductCard key={p.id} href={`/buy-plant-nutrition/${p.slug}`} imageSrc={p.images?.[0]?.img?.src} name={p.name} brand={p.brand?.name} meta={p.plant_nutrition_category?.name} />
             ))}
           </Section>
 
-          <Section label="Plans & Documents" icon={FileText} href="/buy-documents" count={documentsTotal}>
+          <Section label="Plans & Documents" href="/buy-documents" count={documentsTotal}>
             {documents.slice(0, 4).map((doc) => (
               <DocumentCard key={doc.id} doc={doc} />
             ))}

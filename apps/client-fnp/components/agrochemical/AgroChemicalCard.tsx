@@ -69,16 +69,18 @@ export function AgroChemicalCard({ chemical, mode }: AgroChemicalCardProps) {
         {/* CTA - Different based on mode */}
         {mode === "shop" ? (
           <div className="pt-3 space-y-2">
-            {chemical.show_price && chemical.sale_price > 0 ? (
-              <div className="flex items-baseline gap-2">
-                <span className="text-lg font-bold">${(chemical.sale_price / 100).toFixed(2)}</span>
-                {chemical.show_was_price && chemical.was_price > 0 && chemical.was_price > chemical.sale_price && (
-                  <span className="text-xs text-muted-foreground line-through">${(chemical.was_price / 100).toFixed(2)}</span>
-                )}
-              </div>
-            ) : (
-              <p className="text-sm text-muted-foreground">Price on request</p>
-            )}
+            <div className="flex items-baseline gap-2 h-7">
+              {chemical.show_price && chemical.sale_price > 0 ? (
+                <>
+                  <span className="text-lg font-bold">${(chemical.sale_price / 100).toFixed(2)}</span>
+                  {chemical.show_was_price && chemical.was_price > 0 && chemical.was_price > chemical.sale_price && (
+                    <span className="text-xs text-muted-foreground line-through">${(chemical.was_price / 100).toFixed(2)}</span>
+                  )}
+                </>
+              ) : (
+                <span className="text-sm text-muted-foreground">Price on request</span>
+              )}
+            </div>
             <AddToCartButton
               productId={chemical.id}
               productType="agrochemical"
