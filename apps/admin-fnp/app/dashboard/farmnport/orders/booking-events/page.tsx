@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query"
 import Link from "next/link"
-import { PlusCircle, Loader2, CalendarDays } from "lucide-react"
+import { PlusCircle, CalendarDays } from "lucide-react"
 
 import { queryAdminBookingEvents } from "@/lib/query"
 import { DashboardHeader } from "@/components/state/dashboardHeader"
@@ -22,7 +22,7 @@ function capitalize(s: string) {
 }
 
 function formatDate(d: string) {
-  return new Date(d).toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" })
+  return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
 }
 
 export default function BookingEventsPage() {

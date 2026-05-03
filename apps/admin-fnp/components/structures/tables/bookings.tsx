@@ -18,7 +18,7 @@ function capitalize(s: string) {
 }
 
 function formatDate(d: string) {
-  return new Date(d).toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" })
+  return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
 }
 
 interface BookingsTableProps {

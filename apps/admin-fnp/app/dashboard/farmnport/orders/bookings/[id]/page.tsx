@@ -48,11 +48,11 @@ function capitalize(s: string) {
 }
 
 function formatDate(d: string) {
-  return new Date(d).toLocaleDateString("en-US", { day: "numeric", month: "long", year: "numeric" })
+  return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })
 }
 
 function formatDateTime(d: string) {
-  return new Date(d).toLocaleString("en-US", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })
+  return new Date(d).toLocaleString("en-GB", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })
 }
 
 function getTransitions(booking: any): string[] {
