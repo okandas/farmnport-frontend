@@ -4,6 +4,7 @@ import { Bug, Beaker } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { sendGTMEvent } from '@next/third-parties/google'
 import { formatProductName } from "@/lib/utilities"
+import { AddToCartButton } from "@/components/cart/AddToCartButton"
 
 interface AgroChemicalCardProps {
   chemical: any
@@ -78,11 +79,15 @@ export function AgroChemicalCard({ chemical, mode }: AgroChemicalCardProps) {
             ) : (
               <p className="text-sm text-muted-foreground">Price on request</p>
             )}
-            <Link href={href} className="block" onClick={() => sendGTMEvent({ event: 'action', value: 'ShopBuyOnline' })}>
-              <Button className="w-full" size="sm">
-                Buy Now
-              </Button>
-            </Link>
+            <AddToCartButton
+              productId={chemical.id}
+              productType="agrochemical"
+              productName={chemical.name}
+              productSlug={chemical.slug}
+              imageSrc={chemical.images?.[0]?.img?.src}
+              unitPrice={chemical.show_price && chemical.sale_price > 0 ? chemical.sale_price : null}
+              loginRedirect={href}
+            />
           </div>
         ) : (
           <Link href={href} className="block pt-2">
