@@ -21,7 +21,7 @@ export default async function BuyPlantNutritionPage() {
                         Buy Plant Nutrition Products Online
                     </h1>
                     <p className="text-lg text-muted-foreground">
-                        Shop our complete range of fertilizers and crop nutrition products with fast delivery
+                        Shop our complete range of fertilizers and crop nutrition products
                     </p>
                 </div>
 

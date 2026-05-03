@@ -27,7 +27,7 @@ export default async function BuyAnimalHealthPage() {
                         Buy Animal Health Products Online
                     </h1>
                     <p className="text-lg text-muted-foreground">
-                        Shop our complete range of quality animal health products with fast delivery
+                        Shop our complete range of quality animal health products
                     </p>
                 </div>
 

@@ -21,7 +21,7 @@ export default async function BuyFeedsPage() {
                         Buy Livestock Feed Online
                     </h1>
                     <p className="text-lg text-muted-foreground">
-                        Shop our complete range of quality feed products for all livestock with fast delivery
+                        Shop our complete range of quality feed products for all livestock
                     </p>
                 </div>
 

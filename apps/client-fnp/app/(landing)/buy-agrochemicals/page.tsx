@@ -27,7 +27,7 @@ export default async function BuyAgroChemicalsPage() {
                         Buy Agrochemicals Online
                     </h1>
                     <p className="text-lg text-muted-foreground">
-                        Shop our complete range of quality agrochemical products with fast delivery
+                        Shop our complete range of quality agrochemical products
                     </p>
                 </div>
 
