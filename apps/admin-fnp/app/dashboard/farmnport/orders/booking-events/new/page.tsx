@@ -9,8 +9,8 @@ import { toast } from "@/components/ui/use-toast"
 import { createBookingEvent } from "@/lib/query"
 import { DashboardHeader } from "@/components/state/dashboardHeader"
 import { DashboardShell } from "@/components/state/dashboardShell"
-import { ProductCombobox, ProductType } from "@/components/structures/product-combobox"
 import { ClientCombobox } from "@/components/structures/client-combobox"
+import { FarmProduceCategoryCombobox, FarmProduceCombobox } from "@/components/structures/farm-produce-combobox"
 
 export default function NewBookingEventPage() {
   const router = useRouter()
@@ -22,7 +22,7 @@ export default function NewBookingEventPage() {
     product_id: "",
     product_name: "",
     product_slug: "",
-    product_type: "animal_health",
+    product_type: "",
     unit_price: "",        // display as dollars, send as cents
     deposit_per_unit: "",  // display as dollars, send as cents
     min_quantity: "",
@@ -142,40 +142,24 @@ export default function NewBookingEventPage() {
           <h2 className="font-semibold text-sm">Product</h2>
 
           <div className="space-y-1">
-            <label className="text-xs font-medium text-muted-foreground">Product Type *</label>
-            <select
+            <label className="text-xs font-medium text-muted-foreground">Category *</label>
+            <FarmProduceCategoryCombobox
               value={form.product_type}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, product_type: e.target.value, product_id: "", product_name: "", product_slug: "" }))
+              onChange={(slug, name) =>
+                setForm((f) => ({ ...f, product_type: slug, product_id: "", product_name: "", product_slug: "" }))
               }
-              className="w-full text-sm border rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-ring bg-background"
-            >
-              <option value="animal_health">Animal Health</option>
-              <option value="feed">Feed</option>
-              <option value="agrochemical">Agrochemical</option>
-            </select>
+            />
           </div>
 
           <div className="space-y-1">
             <label className="text-xs font-medium text-muted-foreground">Product *</label>
-            <ProductCombobox
-              productType={form.product_type as ProductType}
+            <FarmProduceCombobox
+              categorySlug={form.product_type}
               value={form.product_id}
-              onChange={(selection) =>
-                setForm((f) => ({
-                  ...f,
-                  product_id: selection.id,
-                  product_name: selection.name,
-                  product_slug: selection.slug,
-                  product_type: selection.type,
-                }))
+              onChange={(s) =>
+                setForm((f) => ({ ...f, product_id: s.id, product_name: s.name, product_slug: s.slug }))
               }
             />
-            {form.product_name && (
-              <p className="text-xs text-muted-foreground mt-1">
-                Selected: <span className="font-medium text-foreground">{form.product_name}</span> · slug: {form.product_slug}
-              </p>
-            )}
           </div>
         </div>
 
