@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query"
 import { ArrowRight } from "lucide-react"
 
 import { querySalesStats, queryOrders } from "@/lib/query"
+import { centsToDollars } from "@/lib/utilities"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 const STATUS_COLORS: Record<string, string> = {
@@ -102,7 +103,7 @@ export default function SalesOverviewPage() {
                 <CardTitle className="text-sm font-medium text-muted-foreground">Today</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">${stats.revenue.today.toFixed(2)}</div>
+                <div className="text-2xl font-bold">{centsToDollars(stats.revenue.today)}</div>
               </CardContent>
             </Card>
 
@@ -111,7 +112,7 @@ export default function SalesOverviewPage() {
                 <CardTitle className="text-sm font-medium text-muted-foreground">This Week</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">${stats.revenue.week.toFixed(2)}</div>
+                <div className="text-2xl font-bold">{centsToDollars(stats.revenue.week)}</div>
               </CardContent>
             </Card>
 
@@ -120,7 +121,7 @@ export default function SalesOverviewPage() {
                 <CardTitle className="text-sm font-medium text-muted-foreground">This Month</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">${stats.revenue.month.toFixed(2)}</div>
+                <div className="text-2xl font-bold">{centsToDollars(stats.revenue.month)}</div>
               </CardContent>
             </Card>
 
@@ -129,7 +130,7 @@ export default function SalesOverviewPage() {
                 <CardTitle className="text-sm font-medium text-muted-foreground">All Time</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">${stats.revenue.all_time.toFixed(2)}</div>
+                <div className="text-2xl font-bold">{centsToDollars(stats.revenue.all_time)}</div>
               </CardContent>
             </Card>
           </div>
@@ -211,7 +212,7 @@ export default function SalesOverviewPage() {
                   </div>
                   <div className="flex items-center gap-3">
                     <span className="text-sm font-medium">
-                      ${order.total.toFixed(2)}
+                      {centsToDollars(order.total)}
                     </span>
                     <span className={`text-xs font-semibold px-2.5 py-1 rounded-full capitalize ${STATUS_COLORS[order.status] ?? ""}`}>
                       {order.status}
