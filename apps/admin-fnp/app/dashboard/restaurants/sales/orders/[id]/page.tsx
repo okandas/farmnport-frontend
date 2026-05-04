@@ -13,6 +13,7 @@ import {
   XCircle,
   Clock,
   CreditCard,
+  Copy,
 } from "lucide-react"
 
 import { queryOrder, updateOrderStatus } from "@/lib/query"
@@ -347,9 +348,19 @@ export default function RestaurantOrderDetailPage() {
             <CardTitle className="text-base">QR Verification</CardTitle>
           </CardHeader>
           <CardContent className="text-sm">
-            <code className="block rounded bg-muted p-2 text-xs break-all">
-              {CLIENT_URL}/order/verify/{order.id}/{order.verify_token}
-            </code>
+            <div className="flex items-center gap-2">
+              <code className="flex-1 block rounded bg-muted p-2 text-xs break-all">
+                {CLIENT_URL}/order/verify/{order.id}/{order.verify_token}
+              </code>
+              <Button
+                variant="outline"
+                size="icon"
+                className="shrink-0"
+                onClick={() => navigator.clipboard.writeText(`${CLIENT_URL}/order/verify/${order.id}/${order.verify_token}`)}
+              >
+                <Copy className="h-4 w-4" />
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
