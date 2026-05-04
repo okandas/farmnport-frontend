@@ -179,7 +179,7 @@ export default function OrderDetailPage() {
               href={`https://www.topup.co.zw/pay-bill/farmnport?account=FNP-${(session?.user as any)?.id}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-sm px-8 py-3 rounded-full transition-colors"
+              className="inline-flex items-center justify-center bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-sm px-8 py-3 rounded-md transition-colors"
             >
               Pay Now
             </a>

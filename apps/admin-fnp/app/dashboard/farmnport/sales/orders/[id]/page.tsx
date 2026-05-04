@@ -360,18 +360,24 @@ export default function OrderDetailPage() {
           <CardHeader>
             <CardTitle className="text-base">QR Verification</CardTitle>
           </CardHeader>
-          <CardContent className="text-sm">
-            <div className="flex items-center gap-2">
-              <code className="flex-1 block rounded bg-muted p-2 text-xs break-all">
-                {CLIENT_URL}/order/verify/{order.id}/{order.verify_token}
-              </code>
+          <CardContent className="text-sm space-y-2">
+            <code className="block rounded bg-muted p-2 text-xs break-all">
+              {CLIENT_URL}/order/verify/{order.id}/{order.verify_token}
+            </code>
+            <div className="flex gap-2">
               <Button
                 variant="outline"
-                size="icon"
-                className="shrink-0"
+                size="sm"
                 onClick={() => navigator.clipboard.writeText(`${CLIENT_URL}/order/verify/${order.id}/${order.verify_token}`)}
               >
-                <Copy className="h-4 w-4" />
+                <Copy className="h-3.5 w-3.5 mr-1" /> Copy
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => window.open(`${CLIENT_URL}/order/verify/${order.id}/${order.verify_token}`, "_blank")}
+              >
+                View
               </Button>
             </div>
           </CardContent>
