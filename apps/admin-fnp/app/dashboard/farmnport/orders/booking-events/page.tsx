@@ -100,8 +100,7 @@ export default function BookingEventsPage() {
                   <td className="px-4 py-3 font-medium">{event.title}</td>
                   <td className="px-4 py-3 text-muted-foreground">{event.product_name}</td>
                   <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap">
-                    {formatDate(event.open_date)}
-                    <br />→ {formatDate(event.close_date)}
+                    {formatDate(event.open_date)} → {formatDate(event.close_date)}
                   </td>
                   <td className="px-4 py-3">
                     {event.total_booked} / {event.total_available}

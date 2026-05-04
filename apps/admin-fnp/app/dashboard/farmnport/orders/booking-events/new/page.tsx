@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation"
 import { Loader2 } from "lucide-react"
 import { toast } from "@/components/ui/use-toast"
 
+import Link from "next/link"
 import { createBookingEvent } from "@/lib/query"
 import { DashboardHeader } from "@/components/state/dashboardHeader"
 import { DashboardShell } from "@/components/state/dashboardShell"
@@ -145,7 +146,7 @@ export default function NewBookingEventPage() {
             <label className="text-xs font-medium text-muted-foreground">Category *</label>
             <FarmProduceCategoryCombobox
               value={form.product_type}
-              onChange={(slug, name) =>
+              onChange={(slug) =>
                 setForm((f) => ({ ...f, product_type: slug, product_id: "", product_name: "", product_slug: "" }))
               }
             />
@@ -251,14 +252,22 @@ export default function NewBookingEventPage() {
           </div>
         </div>
 
-        <button
-          onClick={() => mutation.mutate()}
-          disabled={mutation.isPending || !form.client_id || !form.title || !form.product_id || !form.unit_price || !form.total_available || !form.open_date || !form.close_date}
-          className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground font-medium py-2.5 rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-50"
-        >
-          {mutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-          Create Booking Event
-        </button>
+        <div className="flex gap-3">
+          <button
+            onClick={() => mutation.mutate()}
+            disabled={mutation.isPending || !form.client_id || !form.title || !form.product_id || !form.unit_price || !form.total_available || !form.open_date || !form.close_date}
+            className="flex items-center gap-2 bg-primary text-primary-foreground font-medium px-5 py-2.5 rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-50 text-sm"
+          >
+            {mutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+            Create Booking Event
+          </button>
+          <Link
+            href="/dashboard/farmnport/orders/booking-events"
+            className="px-5 py-2.5 rounded-xl border text-sm font-medium hover:bg-muted transition-colors"
+          >
+            Cancel
+          </Link>
+        </div>
       </div>
     </DashboardShell>
   )

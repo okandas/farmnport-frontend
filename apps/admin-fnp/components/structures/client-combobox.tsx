@@ -38,7 +38,6 @@ export function ClientCombobox({ value, onChange }: ClientComboboxProps) {
   const { data, isLoading } = useQuery({
     queryKey: ["clients-search", search],
     queryFn: () => queryUsers({ search: search, p: 1 }),
-    enabled: open,
   })
 
   const clients = data?.data?.data || []
