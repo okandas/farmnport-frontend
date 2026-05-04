@@ -15,6 +15,7 @@ import {
 import Link from "next/link"
 
 import { queryOrder, updateOrderStatus } from "@/lib/query"
+import { CLIENT_URL } from "@/lib/config"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -364,7 +365,7 @@ export default function OrderDetailPage() {
               Verify URL for pickup confirmation:
             </p>
             <code className="block rounded bg-muted p-2 text-xs break-all">
-              {typeof window !== "undefined" ? window.location.origin : ""}/order/verify/{order.id}/{order.verify_token}
+              {CLIENT_URL}/order/verify/{order.id}/{order.verify_token}
             </code>
           </CardContent>
         </Card>
