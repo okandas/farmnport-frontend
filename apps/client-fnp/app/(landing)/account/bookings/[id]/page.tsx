@@ -85,20 +85,16 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
   const canCancel = !["completed", "cancelled"].includes(booking.status)
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="border-b">
-        <div className="max-w-2xl mx-auto px-4 py-3">
-          <nav className="flex text-sm text-muted-foreground">
-            <Link href="/" className="hover:text-foreground">Home</Link>
-            <span className="mx-2">/</span>
-            <Link href="/account/bookings" className="hover:text-foreground">My Bookings</Link>
-            <span className="mx-2">/</span>
-            <span className="text-foreground">{booking.booking_ref}</span>
-          </nav>
-        </div>
-      </div>
+    <div>
+      <nav className="flex items-center gap-1.5 text-sm text-muted-foreground mb-4">
+        <Link href="/account" className="hover:text-foreground transition-colors">Account</Link>
+        <span>/</span>
+        <Link href="/account/bookings" className="hover:text-foreground transition-colors">My Bookings</Link>
+        <span>/</span>
+        <span className="text-foreground font-medium">{booking.booking_ref}</span>
+      </nav>
 
-      <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
+      <div className="space-y-6">
 
         {/* Header */}
         <div className="flex items-start justify-between gap-4">

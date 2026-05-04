@@ -64,6 +64,7 @@ export default function CheckoutPage() {
   const [polling, setPolling] = useState(false)
   const [pollRef, setPollRef] = useState("")
   const [orderNumber, setOrderNumber] = useState("")
+  const [memberNumber, setMemberNumber] = useState("")
   const [billPayInstructions, setBillPayInstructions] = useState("")
   const [step, setStep] = useState<"form" | "waiting" | "success">("form")
 
@@ -86,8 +87,6 @@ export default function CheckoutPage() {
 
   const items: CartItem[] = cartData?.items ?? []
   const subtotal = items.reduce((s, i) => s + i.unit_price * i.quantity, 0)
-  const deliveryFee = fulfillment === "click_collect" ? 0 : subtotal >= 50 ? 0 : items.length > 0 ? 5 : 0
-  const total = subtotal + deliveryFee
 
   const checkoutMutation = useMutation({
     mutationFn: checkout,
@@ -95,6 +94,7 @@ export default function CheckoutPage() {
       const data = res.data as CheckoutResponse
       setOrderNumber(data.order_number)
       setPollRef(data.reference)
+      setMemberNumber((data as any).member_number || "")
       qc.invalidateQueries({ queryKey: ["cart"] })
 
       if (data.redirect_url && data.redirect_url.startsWith("http")) {
@@ -236,19 +236,21 @@ export default function CheckoutPage() {
             <h1 className="text-xl font-bold">Complete Your Payment</h1>
             <p className="text-muted-foreground mt-1 text-sm">Order <span className="font-semibold text-foreground">{orderNumber}</span></p>
           </div>
-          {billPayInstructions && (
-            <div className="bg-muted rounded-xl p-4 text-left text-sm space-y-2">
-              <p className="font-semibold">BillPay Instructions</p>
-              <p className="text-muted-foreground">{billPayInstructions}</p>
-              <div className="pt-2 border-t">
-                <p className="text-xs text-muted-foreground">Reference</p>
-                <p className="font-mono font-bold text-base">{pollRef}</p>
-              </div>
-              <div className="border-t pt-2">
-                <p className="font-semibold text-lg">${total.toFixed(2)}</p>
-              </div>
+          <div className="bg-muted rounded-xl p-5 text-left text-sm space-y-4 w-full">
+            <div>
+              <p className="text-xs text-muted-foreground mb-1">Your Member Number</p>
+              <p className="font-mono font-bold text-lg tracking-wider">{memberNumber}</p>
             </div>
-          )}
+            <div className="border-t pt-4 space-y-1">
+              <p className="font-semibold text-sm">How to pay</p>
+              <ol className="list-decimal list-inside text-muted-foreground space-y-1 text-sm">
+                <li>Open BillPay or PayNow</li>
+                <li>Select <span className="font-medium text-foreground">farm&amp;port</span></li>
+                <li>Enter your member number above</li>
+                <li>Confirm the amount and complete payment</li>
+              </ol>
+            </div>
+          </div>
           <p className="text-xs text-muted-foreground">Waiting for payment confirmation{polling ? "..." : ""}</p>
           <button
             onClick={() => router.push("/orders")}
@@ -398,17 +400,6 @@ export default function CheckoutPage() {
                 </div>
               </section>
 
-              {/* Payment */}
-              <section className="border rounded-xl p-5 space-y-4">
-                <h2 className="font-semibold">Payment Method</h2>
-                <div className="flex items-center gap-3 rounded-xl border-2 border-primary bg-primary/5 p-4">
-                  <span className="text-2xl shrink-0">🏧</span>
-                  <div>
-                    <p className="font-semibold text-sm">BillPay Kiosk</p>
-                    <p className="text-xs text-muted-foreground">Pay at any BillPay kiosk using your reference number</p>
-                  </div>
-                </div>
-              </section>
             </div>
 
             {/* ── Right: Order summary ── */}
@@ -439,26 +430,10 @@ export default function CheckoutPage() {
                 </div>
 
                 {/* Totals */}
-                <div className="px-5 py-4 border-t space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Subtotal</span>
-                    <span>${subtotal.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Delivery</span>
-                    <span>
-                      {deliveryFee === 0 ? (
-                        <span className="text-green-700 dark:text-green-400">
-                          {fulfillment === "click_collect" ? "Pickup" : "Free"}
-                        </span>
-                      ) : (
-                        `$${deliveryFee.toFixed(2)}`
-                      )}
-                    </span>
-                  </div>
-                  <div className="flex justify-between font-bold text-base border-t pt-2">
+                <div className="px-5 py-4 border-t">
+                  <div className="flex justify-between font-bold text-base">
                     <span>Total</span>
-                    <span>${total.toFixed(2)}</span>
+                    <span>${subtotal.toFixed(2)}</span>
                   </div>
                 </div>
 
@@ -474,7 +449,7 @@ export default function CheckoutPage() {
                     ) : (
                       <CreditCard className="w-4 h-4" />
                     )}
-                    Place Order · ${total.toFixed(2)}
+                    Place Order · ${subtotal.toFixed(2)}
                   </button>
                 </div>
               </div>

@@ -140,21 +140,16 @@ export default function OrderDetailPage() {
   const currentStepIndex = steps.indexOf(order.status)
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Breadcrumb */}
-      <div className="border-b">
-        <div className="max-w-3xl mx-auto px-4 py-3">
-          <nav className="flex text-sm text-muted-foreground items-center gap-1">
-            <Link href="/" className="hover:text-foreground">Home</Link>
-            <span>/</span>
-            <Link href="/account/orders" className="hover:text-foreground">My Orders</Link>
-            <span>/</span>
-            <span className="text-foreground font-medium">{order.order_number}</span>
-          </nav>
-        </div>
-      </div>
+    <div>
+      <nav className="flex items-center gap-1.5 text-sm text-muted-foreground mb-4">
+        <Link href="/account" className="hover:text-foreground transition-colors">Account</Link>
+        <span>/</span>
+        <Link href="/account/orders" className="hover:text-foreground transition-colors">My Orders</Link>
+        <span>/</span>
+        <span className="text-foreground font-medium">{order.order_number}</span>
+      </nav>
 
-      <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
+      <div className="space-y-6">
 
         {/* Header */}
         <div className="flex items-start justify-between gap-4">

@@ -73,19 +73,13 @@ export default function OrdersPage() {
   const orders: Order[] = (data as any)?.orders ?? []
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="border-b">
-        <div className="max-w-3xl mx-auto px-4 py-3">
-          <nav className="flex text-sm text-muted-foreground">
-            <Link href="/" className="hover:text-foreground">Home</Link>
-            <span className="mx-2">/</span>
-            <span className="text-foreground">My Orders</span>
-          </nav>
-        </div>
-      </div>
-
-      <div className="max-w-3xl mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold mb-6">My Orders</h1>
+    <div>
+      <nav className="flex items-center gap-1.5 text-sm text-muted-foreground mb-4">
+        <Link href="/account" className="hover:text-foreground transition-colors">Account</Link>
+        <span>/</span>
+        <span className="text-foreground font-medium">My Orders</span>
+      </nav>
+      <h1 className="text-xl font-bold mb-6">My Orders</h1>
 
         {orders.length === 0 ? (
           <div className="text-center py-16 space-y-4">
@@ -131,7 +125,6 @@ export default function OrdersPage() {
             ))}
           </div>
         )}
-      </div>
     </div>
   )
 }
