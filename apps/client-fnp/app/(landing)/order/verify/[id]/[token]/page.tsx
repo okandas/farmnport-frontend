@@ -1,15 +1,19 @@
 import { CheckCircle, Package, XCircle } from "lucide-react"
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL
+const BASE_URL = process.env.BASE_URL || process.env.NEXT_PUBLIC_BASE_URL
 
 async function fetchVerifiedOrder(id: string, token: string) {
     try {
-        const res = await fetch(`${BASE_URL}/v1/order/verify/${id}/${token}`, {
-            cache: "no-store",
-        })
-        if (!res.ok) return null
-        return res.json()
-    } catch {
+        const url = `${BASE_URL}/v1/order/verify/${id}/${token}`
+        const res = await fetch(url, { cache: "no-store" })
+        if (!res.ok) {
+            console.error(`[verify] fetch failed: ${res.status} ${url}`)
+            return null
+        }
+        const data = await res.json()
+        return data
+    } catch (e) {
+        console.error("[verify] fetch error:", e)
         return null
     }
 }
@@ -26,8 +30,9 @@ function statusColor(status: string) {
     }
 }
 
-export default async function OrderVerifyPage({ params }: { params: { id: string; token: string } }) {
-    const order = await fetchVerifiedOrder(params.id, params.token)
+export default async function OrderVerifyPage({ params }: { params: Promise<{ id: string; token: string }> }) {
+    const { id, token: verifyToken } = await params
+    const order = await fetchVerifiedOrder(id, verifyToken)
 
     if (!order) {
         return (
