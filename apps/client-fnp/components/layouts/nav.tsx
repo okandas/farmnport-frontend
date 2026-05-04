@@ -35,7 +35,7 @@ function CartIcon({ user }: { user: AuthenticatedUser | null }) {
   })
   const items: any[] = (data as any)?.items ?? []
   const count = items.length
-  const total = items.reduce((s: number, i: any) => s + i.unit_price * i.quantity, 0)
+  const total = items.reduce((s: number, i: any) => s + (i.unit_price * i.quantity) / 100, 0)
 
   if (!user || count === 0) {
     return (

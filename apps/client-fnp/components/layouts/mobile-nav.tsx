@@ -36,7 +36,7 @@ export function MobileNav({ user }: MobileNavProps) {
     })
     const cartItems: any[] = (cartData as any)?.items ?? []
     const cartCount: number = cartItems.length
-    const cartTotal: number = cartItems.reduce((s: number, i: any) => s + i.unit_price * i.quantity, 0)
+    const cartTotal: number = cartItems.reduce((s: number, i: any) => s + (i.unit_price * i.quantity) / 100, 0)
 
 
     return (
