@@ -4,7 +4,7 @@ import { ColumnDef } from "@tanstack/react-table"
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
-import { formatDate } from "@/lib/utilities"
+import { formatDate, centsToDollars } from "@/lib/utilities"
 
 const STATUS_COLORS: Record<string, string> = {
   pending: "bg-yellow-100 text-yellow-800",
@@ -96,7 +96,7 @@ export const orderColumns: ColumnDef<OrderRow>[] = [
     header: "Total",
     cell: ({ row }) => {
       const total = row.getValue("total") as number
-      return <span className="font-medium">${(total / 100).toFixed(2)}</span>
+      return <span className="font-medium">{centsToDollars(total)}</span>
     },
   },
   {

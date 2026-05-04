@@ -6,6 +6,7 @@ import { Loader2, CalendarDays, Truck, Clock } from "lucide-react"
 import Link from "next/link"
 
 import { queryAdminBooking, updateBookingStatus } from "@/lib/query"
+import { centsToDollars } from "@/lib/utilities"
 import { toast } from "@/components/ui/use-toast"
 import { DashboardHeader } from "@/components/state/dashboardHeader"
 import { DashboardShell } from "@/components/state/dashboardShell"
@@ -164,16 +165,16 @@ export default function AdminBookingDetailPage({ params }: { params: Promise<{ i
                   </div>
                   <div>
                     <p className="text-muted-foreground text-xs mb-0.5">Unit Price</p>
-                    <p className="font-medium">${(booking.livestock.unit_price / 100).toFixed(2)}</p>
+                    <p className="font-medium">{centsToDollars(booking.livestock.unit_price)}</p>
                   </div>
                   <div>
                     <p className="text-muted-foreground text-xs mb-0.5">Deposit</p>
-                    <p className="font-bold text-orange-700">${(booking.livestock.deposit_amount / 100).toFixed(2)}</p>
+                    <p className="font-bold text-orange-700">{centsToDollars(booking.livestock.deposit_amount)}</p>
                     <p className="text-xs text-muted-foreground">{booking.livestock.deposit_paid ? "Paid" : "Not paid"}</p>
                   </div>
                   <div>
                     <p className="text-muted-foreground text-xs mb-0.5">Balance Due</p>
-                    <p className="font-bold">${(booking.livestock.balance_due / 100).toFixed(2)}</p>
+                    <p className="font-bold">{centsToDollars(booking.livestock.balance_due)}</p>
                   </div>
                 </div>
               </div>

@@ -15,6 +15,7 @@ import {
 } from "lucide-react"
 
 import { queryOrder, updateOrderStatus } from "@/lib/query"
+import { centsToDollars } from "@/lib/utilities"
 import { CLIENT_URL } from "@/lib/config"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -399,11 +400,11 @@ export default function OrderDetailPage() {
                 <div>
                   <p className="text-sm font-medium">{item.product_name}</p>
                   <p className="text-xs text-muted-foreground">
-                    {item.quantity} x ${(item.unit_price / 100).toFixed(2)}
+                    {item.quantity} x {centsToDollars(item.unit_price)}
                   </p>
                 </div>
                 <span className="text-sm font-medium">
-                  ${(item.line_total / 100).toFixed(2)}
+                  {centsToDollars(item.line_total)}
                 </span>
               </div>
             ))}
@@ -414,7 +415,7 @@ export default function OrderDetailPage() {
           <div className="space-y-1 text-sm">
             <div className="flex justify-between font-medium text-base">
               <span>Total</span>
-              <span>${(order.total / 100).toFixed(2)}</span>
+              <span>{centsToDollars(order.total)}</span>
             </div>
           </div>
         </CardContent>
