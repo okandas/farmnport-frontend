@@ -15,18 +15,6 @@ import { querySalesStats, queryOrders } from "@/lib/query"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { useState } from "react"
-
-const ORDER_TYPES = [
-  { value: "", label: "All" },
-  { value: "retail", label: "Retail" },
-  { value: "bundle", label: "Bundle" },
-  { value: "marketplace", label: "Marketplace" },
-  { value: "wholesale", label: "Wholesale" },
-  { value: "pre_order", label: "Pre-orders" },
-]
-
 const STATUS_COLORS: Record<string, string> = {
   pending: "bg-yellow-100 text-yellow-800",
   paid: "bg-blue-100 text-blue-800",
@@ -59,21 +47,15 @@ interface Order {
 }
 
 export default function SalesOverviewPage() {
-  const [orderType, setOrderType] = useState("")
-
   const { data: statsData, isLoading: statsLoading } = useQuery({
-    queryKey: ["sales-stats", orderType],
-    queryFn: () => querySalesStats(orderType || undefined),
+    queryKey: ["sales-stats"],
+    queryFn: () => querySalesStats(undefined),
     refetchOnWindowFocus: false,
   })
 
   const { data: recentData, isLoading: recentLoading } = useQuery({
-    queryKey: ["recent-orders", orderType],
-    queryFn: () =>
-      queryOrders({
-        limit: 10,
-        order_type: orderType || undefined,
-      }),
+    queryKey: ["recent-orders"],
+    queryFn: () => queryOrders({ limit: 10 }),
     refetchOnWindowFocus: false,
   })
 
@@ -118,17 +100,6 @@ export default function SalesOverviewPage() {
           <ArrowRight className="h-4 w-4" />
         </Link>
       </div>
-
-      {/* Channel Tabs */}
-      <Tabs value={orderType} onValueChange={setOrderType}>
-        <TabsList>
-          {ORDER_TYPES.map((type) => (
-            <TabsTrigger key={type.value} value={type.value}>
-              {type.label}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-      </Tabs>
 
       {/* Revenue Cards */}
       {stats && (
