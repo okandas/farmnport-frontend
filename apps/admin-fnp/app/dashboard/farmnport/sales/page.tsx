@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query"
 import { ArrowRight } from "lucide-react"
 
 import { querySalesStats, queryOrders } from "@/lib/query"
+import { centsToDollars } from "@/lib/utilities"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 const STATUS_COLORS: Record<string, string> = {

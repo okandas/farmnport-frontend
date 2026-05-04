@@ -9,22 +9,9 @@ import { handleFetchError } from "@/lib/error-handler"
 import { Placeholder } from "@/components/state/placeholder"
 import { DataTable } from "@/components/structures/data-table"
 import { orderColumns, OrderRow } from "@/components/structures/columns/orders"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-
-const STATUS_FILTERS = [
-  { value: "", label: "All" },
-  { value: "pending", label: "Pending" },
-  { value: "paid", label: "Paid" },
-  { value: "processing", label: "Processing" },
-  { value: "dispatched", label: "Dispatched" },
-  { value: "ready", label: "Ready" },
-  { value: "delivered", label: "Delivered" },
-  { value: "cancelled", label: "Cancelled" },
-]
 
 export function OrdersTable() {
   const [search, setSearch] = useState("")
-  const [statusFilter, setStatusFilter] = useState("")
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 20,
@@ -36,7 +23,6 @@ export function OrdersTable() {
       {
         p: pagination.pageIndex + 1,
         search,
-        status: statusFilter,
       },
     ],
     queryFn: () =>
@@ -44,7 +30,6 @@ export function OrdersTable() {
         p: pagination.pageIndex + 1,
         search,
         limit: pagination.pageSize,
-        status: statusFilter || undefined,
       }),
     refetchOnWindowFocus: false,
   })
@@ -92,16 +77,6 @@ export function OrdersTable() {
 
   return (
     <div className="flex flex-col gap-4">
-      <Tabs value={statusFilter} onValueChange={(v) => { setStatusFilter(v); setPagination(p => ({ ...p, pageIndex: 0 })) }}>
-        <TabsList>
-          {STATUS_FILTERS.map((status) => (
-            <TabsTrigger key={status.value} value={status.value}>
-              {status.label}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-      </Tabs>
-
       <DataTable
         columns={orderColumns}
         data={orders}

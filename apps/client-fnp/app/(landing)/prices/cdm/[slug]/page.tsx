@@ -1,6 +1,6 @@
 import { CdmPriceCard } from "@/components/structures/cdm-price-card"
 import { RelatedCdmPricesSidebar } from "@/components/structures/related-cdm-prices-sidebar"
-import { formatDate, capitalizeFirstLetter, slug as slugify } from "@/lib/utilities"
+import { formatDate, capitalizeFirstLetter } from "@/lib/utilities"
 import { AppURL } from "@/lib/schemas"
 import axios from "axios"
 import { notFound } from "next/navigation"
@@ -69,6 +69,15 @@ export default async function CdmPriceDetailPage({ params }: CdmDetailPageProps)
 
   const formattedDate = formatDate(price.effectiveDate)
 
+  // NOTE: This is a pricing table, not a product for sale.
+  // Google's schema.org requires `availability` whenever @type "Offer" is used —
+  // "InStock" here means the price is currently published/active, not that stock is available.
+  // Removing availability causes a Search Console warning on all 21+ CDM price pages.
+  // `hasMerchantReturnPolicy` is also required by Google for Merchant Listings — using
+  // MerchantReturnNotPermitted which is accurate for livestock commodity pricing.
+  // `shippingDetails`: each grade has two entries — collected (shippingRate $0, buyer collects)
+  // and delivered (shippingRate = delivered_usd - collected_usd, supplier delivers).
+  // `aggregateRating` and `review` are non-critical warnings — do NOT add fake values.
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "ItemList",
@@ -79,10 +88,16 @@ export default async function CdmPriceDetailPage({ params }: CdmDetailPageProps)
       "@type": "Organization",
       "name": price.client_name
     },
+    // 6 items: each grade has two offers — collected (buyer arranges own transport, shippingRate $0)
+    // and delivered (supplier delivers, shippingRate is the cost difference built into the price).
+    // Both are accurate and give Google full pricing context for Merchant Listings.
     "itemListElement": [
-      { "@type": "ListItem", "position": 1, "item": { "@type": "Product", "name": "Commercial Grade CDM", "offers": { "@type": "Offer", "price": price.carcass_grades.commercial.delivered_usd, "priceCurrency": "USD" } } },
-      { "@type": "ListItem", "position": 2, "item": { "@type": "Product", "name": "Economy Grade CDM", "offers": { "@type": "Offer", "price": price.carcass_grades.economy.delivered_usd, "priceCurrency": "USD" } } },
-      { "@type": "ListItem", "position": 3, "item": { "@type": "Product", "name": "Manufacturing Grade CDM", "offers": { "@type": "Offer", "price": price.carcass_grades.manufacturing.delivered_usd, "priceCurrency": "USD" } } },
+      { "@type": "ListItem", "position": 1, "item": { "@type": "Product", "name": "Commercial Grade CDM (Collected)", "brand": { "@type": "Brand", "name": price.client_name }, "offers": { "@type": "Offer", "price": price.carcass_grades.commercial.collected_usd, "priceCurrency": "USD", "availability": "https://schema.org/InStock", "hasMerchantReturnPolicy": { "@type": "MerchantReturnPolicy", "applicableCountry": "ZW", "returnPolicyCategory": "https://schema.org/MerchantReturnNotPermitted" }, "shippingDetails": { "@type": "OfferShippingDetails", "shippingRate": { "@type": "MonetaryAmount", "value": 0, "currency": "USD" }, "shippingDestination": { "@type": "DefinedRegion", "addressCountry": "ZW" } } } } },
+      { "@type": "ListItem", "position": 2, "item": { "@type": "Product", "name": "Commercial Grade CDM (Delivered)", "brand": { "@type": "Brand", "name": price.client_name }, "offers": { "@type": "Offer", "price": price.carcass_grades.commercial.delivered_usd, "priceCurrency": "USD", "availability": "https://schema.org/InStock", "hasMerchantReturnPolicy": { "@type": "MerchantReturnPolicy", "applicableCountry": "ZW", "returnPolicyCategory": "https://schema.org/MerchantReturnNotPermitted" }, "shippingDetails": { "@type": "OfferShippingDetails", "shippingRate": { "@type": "MonetaryAmount", "value": price.carcass_grades.commercial.delivered_usd - price.carcass_grades.commercial.collected_usd, "currency": "USD" }, "shippingDestination": { "@type": "DefinedRegion", "addressCountry": "ZW" } } } } },
+      { "@type": "ListItem", "position": 3, "item": { "@type": "Product", "name": "Economy Grade CDM (Collected)", "brand": { "@type": "Brand", "name": price.client_name }, "offers": { "@type": "Offer", "price": price.carcass_grades.economy.collected_usd, "priceCurrency": "USD", "availability": "https://schema.org/InStock", "hasMerchantReturnPolicy": { "@type": "MerchantReturnPolicy", "applicableCountry": "ZW", "returnPolicyCategory": "https://schema.org/MerchantReturnNotPermitted" }, "shippingDetails": { "@type": "OfferShippingDetails", "shippingRate": { "@type": "MonetaryAmount", "value": 0, "currency": "USD" }, "shippingDestination": { "@type": "DefinedRegion", "addressCountry": "ZW" } } } } },
+      { "@type": "ListItem", "position": 4, "item": { "@type": "Product", "name": "Economy Grade CDM (Delivered)", "brand": { "@type": "Brand", "name": price.client_name }, "offers": { "@type": "Offer", "price": price.carcass_grades.economy.delivered_usd, "priceCurrency": "USD", "availability": "https://schema.org/InStock", "hasMerchantReturnPolicy": { "@type": "MerchantReturnPolicy", "applicableCountry": "ZW", "returnPolicyCategory": "https://schema.org/MerchantReturnNotPermitted" }, "shippingDetails": { "@type": "OfferShippingDetails", "shippingRate": { "@type": "MonetaryAmount", "value": price.carcass_grades.economy.delivered_usd - price.carcass_grades.economy.collected_usd, "currency": "USD" }, "shippingDestination": { "@type": "DefinedRegion", "addressCountry": "ZW" } } } } },
+      { "@type": "ListItem", "position": 5, "item": { "@type": "Product", "name": "Manufacturing Grade CDM (Collected)", "brand": { "@type": "Brand", "name": price.client_name }, "offers": { "@type": "Offer", "price": price.carcass_grades.manufacturing.collected_usd, "priceCurrency": "USD", "availability": "https://schema.org/InStock", "hasMerchantReturnPolicy": { "@type": "MerchantReturnPolicy", "applicableCountry": "ZW", "returnPolicyCategory": "https://schema.org/MerchantReturnNotPermitted" }, "shippingDetails": { "@type": "OfferShippingDetails", "shippingRate": { "@type": "MonetaryAmount", "value": 0, "currency": "USD" }, "shippingDestination": { "@type": "DefinedRegion", "addressCountry": "ZW" } } } } },
+      { "@type": "ListItem", "position": 6, "item": { "@type": "Product", "name": "Manufacturing Grade CDM (Delivered)", "brand": { "@type": "Brand", "name": price.client_name }, "offers": { "@type": "Offer", "price": price.carcass_grades.manufacturing.delivered_usd, "priceCurrency": "USD", "availability": "https://schema.org/InStock", "hasMerchantReturnPolicy": { "@type": "MerchantReturnPolicy", "applicableCountry": "ZW", "returnPolicyCategory": "https://schema.org/MerchantReturnNotPermitted" }, "shippingDetails": { "@type": "OfferShippingDetails", "shippingRate": { "@type": "MonetaryAmount", "value": price.carcass_grades.manufacturing.delivered_usd - price.carcass_grades.manufacturing.collected_usd, "currency": "USD" }, "shippingDestination": { "@type": "DefinedRegion", "addressCountry": "ZW" } } } } },
     ]
   }
 

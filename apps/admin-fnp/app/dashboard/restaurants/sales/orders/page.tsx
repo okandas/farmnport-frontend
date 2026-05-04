@@ -11,22 +11,9 @@ import { DashboardHeader } from "@/components/state/dashboardHeader"
 import { DashboardShell } from "@/components/state/dashboardShell"
 import { DataTable } from "@/components/structures/data-table"
 import { orderColumns, OrderRow } from "@/components/structures/columns/orders"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-
-const STATUS_FILTERS = [
-  { value: "", label: "All" },
-  { value: "pending", label: "Pending" },
-  { value: "paid", label: "Paid" },
-  { value: "processing", label: "Processing" },
-  { value: "dispatched", label: "Dispatched" },
-  { value: "ready", label: "Ready" },
-  { value: "delivered", label: "Delivered" },
-  { value: "cancelled", label: "Cancelled" },
-]
 
 export default function RestaurantOrdersPage() {
   const [search, setSearch] = useState("")
-  const [statusFilter, setStatusFilter] = useState("")
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 20,
@@ -36,7 +23,7 @@ export default function RestaurantOrdersPage() {
     queryKey: [
       "admin-orders",
       "restaurant",
-      { p: pagination.pageIndex + 1, search, status: statusFilter },
+      { p: pagination.pageIndex + 1, search },
     ],
     queryFn: () =>
       queryOrders({
@@ -44,7 +31,6 @@ export default function RestaurantOrdersPage() {
         search,
         limit: pagination.pageSize,
         order_type: "restaurant",
-        status: statusFilter || undefined,
       }),
     refetchOnWindowFocus: false,
   })
@@ -99,22 +85,6 @@ export default function RestaurantOrdersPage() {
   return (
     <DashboardShell>
       <DashboardHeader heading="Restaurant Orders" text="Manage restaurant orders." />
-
-      <Tabs
-        value={statusFilter}
-        onValueChange={(v) => {
-          setStatusFilter(v)
-          setPagination((p) => ({ ...p, pageIndex: 0 }))
-        }}
-      >
-        <TabsList>
-          {STATUS_FILTERS.map((status) => (
-            <TabsTrigger key={status.value} value={status.value}>
-              {status.label}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-      </Tabs>
 
       <DataTable
         columns={orderColumns}
