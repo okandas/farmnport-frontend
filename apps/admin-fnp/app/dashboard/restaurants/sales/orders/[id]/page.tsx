@@ -3,7 +3,8 @@
 import { useParams, useRouter } from "next/navigation"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { format } from "date-fns"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import Cookies from "js-cookie"
 import {
   ArrowLeft,
   Package,
@@ -29,7 +30,6 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 
 const STATUS_STEPS = ["pending", "paid", "processing", "dispatched", "delivered"]
@@ -145,8 +145,18 @@ export default function RestaurantOrderDetailPage() {
   const orderId = params.id as string
 
   const [markPaidOpen, setMarkPaidOpen] = useState(false)
-  const [approvedBy, setApprovedBy] = useState("")
+  const [adminEmail, setAdminEmail] = useState("")
   const [paidNote, setPaidNote] = useState("")
+
+  useEffect(() => {
+    try {
+      const token = Cookies.get("cl_jtkn")
+      if (token) {
+        const payload = JSON.parse(atob(token.split(".")[1]))
+        setAdminEmail(payload.email || payload.sub || "admin")
+      }
+    } catch {}
+  }, [])
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin-order", orderId],
@@ -159,13 +169,12 @@ export default function RestaurantOrderDetailPage() {
       updateOrderStatus({
         order_id: orderId,
         status: "paid",
-        note: `Manual payment approval. Approved by: ${approvedBy}${paidNote ? `. ${paidNote}` : ""}`,
+        note: `Manual payment approval. Approved by: ${adminEmail}${paidNote ? `. ${paidNote}` : ""}`,
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-order", orderId] })
       queryClient.invalidateQueries({ queryKey: ["admin-orders"] })
       setMarkPaidOpen(false)
-      setApprovedBy("")
       setPaidNote("")
       toast({ title: "Order marked as paid" })
     },
@@ -433,14 +442,9 @@ export default function RestaurantOrderDetailPage() {
             <DialogTitle>Mark Order as Paid</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
-            <div className="space-y-1.5">
-              <Label>Approved by</Label>
-              <Input
-                placeholder="Your name or initials"
-                value={approvedBy}
-                onChange={(e) => setApprovedBy(e.target.value)}
-              />
-            </div>
+            <p className="text-sm text-muted-foreground">
+              Approving as <span className="font-medium text-foreground">{adminEmail}</span>
+            </p>
             <div className="space-y-1.5">
               <Label>Note <span className="text-muted-foreground text-xs">(optional)</span></Label>
               <Textarea
@@ -454,7 +458,7 @@ export default function RestaurantOrderDetailPage() {
           <DialogFooter>
             <Button variant="outline" onClick={() => setMarkPaidOpen(false)}>Cancel</Button>
             <Button
-              disabled={!approvedBy.trim() || markPaidMutation.isPending}
+              disabled={markPaidMutation.isPending}
               onClick={() => markPaidMutation.mutate()}
             >
               Confirm

@@ -233,20 +233,9 @@ export default function CheckoutPage() {
             <h1 className="text-xl font-bold">Complete Your Payment</h1>
             <p className="text-muted-foreground mt-1 text-sm">Order <span className="font-semibold text-foreground">{orderNumber}</span></p>
           </div>
-          <div className="bg-muted rounded-xl p-5 text-left text-sm space-y-4 w-full">
-            <div>
-              <p className="text-xs text-muted-foreground mb-1">Your Member Number</p>
-              <p className="font-mono font-bold text-lg tracking-wider select-all cursor-text">{memberNumber}</p>
-            </div>
-            <div className="border-t pt-4 space-y-1">
-              <p className="font-semibold text-sm">How to pay</p>
-              <ol className="list-decimal list-inside text-muted-foreground space-y-1 text-sm">
-                <li>Open BillPay or PayNow</li>
-                <li>Select <span className="font-medium text-foreground">farm&amp;port</span></li>
-                <li>Enter your member number above</li>
-                <li>Confirm the amount and complete payment</li>
-              </ol>
-            </div>
+          <div className="bg-muted rounded-xl p-5 text-left text-sm w-full">
+            <p className="text-xs text-muted-foreground mb-1">Your Member Number</p>
+            <p className="font-mono font-bold text-lg tracking-wider select-all cursor-text">{memberNumber}</p>
           </div>
           <p className="text-xs text-muted-foreground">Waiting for payment confirmation{polling ? "..." : ""}</p>
           <a
