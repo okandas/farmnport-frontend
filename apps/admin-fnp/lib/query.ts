@@ -1591,6 +1591,10 @@ export function updateBookingEvent(id: string, data: Partial<{
   description: string
   client_id: string
   client_name: string
+  product_id: string
+  product_name: string
+  product_slug: string
+  product_type: string
   status: string
   total_available: number
   unit_price: number

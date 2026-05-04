@@ -12,6 +12,7 @@ import { DashboardHeader } from "@/components/state/dashboardHeader"
 import { DashboardShell } from "@/components/state/dashboardShell"
 import { Placeholder } from "@/components/state/placeholder"
 import { ClientCombobox } from "@/components/structures/client-combobox"
+import { FarmProduceCategoryCombobox, FarmProduceCombobox } from "@/components/structures/farm-produce-combobox"
 
 function toInputDate(iso: string) {
   if (!iso) return ""
@@ -44,6 +45,10 @@ export default function EditBookingEventPage({ params }: { params: Promise<{ id:
     image_src: string
     client_id: string
     client_name: string
+    product_type: string
+    product_id: string
+    product_name: string
+    product_slug: string
   } | null>(null)
 
   // Initialise form once event is loaded
@@ -60,6 +65,10 @@ export default function EditBookingEventPage({ params }: { params: Promise<{ id:
       image_src: event.image_src ?? "",
       client_id: event.client_id ?? "",
       client_name: event.client_name ?? "",
+      product_type: event.product_type ?? "",
+      product_id: event.product_id ?? "",
+      product_name: event.product_name ?? "",
+      product_slug: event.product_slug ?? "",
     })
   }
 
@@ -77,6 +86,10 @@ export default function EditBookingEventPage({ params }: { params: Promise<{ id:
         image_src: form!.image_src || undefined,
         client_id: form!.client_id || undefined,
         client_name: form!.client_name || undefined,
+        product_id: form!.product_id || undefined,
+        product_name: form!.product_name || undefined,
+        product_slug: form!.product_slug || undefined,
+        product_type: form!.product_type || undefined,
       }),
     onSuccess: () => {
       toast({ description: "Event updated" })
@@ -173,6 +186,31 @@ export default function EditBookingEventPage({ params }: { params: Promise<{ id:
             <ClientCombobox
               value={form.client_id}
               onChange={(s) => setForm((f) => f ? { ...f, client_id: s.id, client_name: s.name } : f)}
+            />
+          </div>
+        </div>
+
+        <div className="border rounded-xl p-5 space-y-4">
+          <h2 className="font-semibold text-sm">Product</h2>
+
+          <div className="space-y-1">
+            <label className="text-xs font-medium text-muted-foreground">Category *</label>
+            <FarmProduceCategoryCombobox
+              value={form.product_type}
+              onChange={(slug) =>
+                setForm((f) => f ? { ...f, product_type: slug, product_id: "", product_name: "", product_slug: "" } : f)
+              }
+            />
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-xs font-medium text-muted-foreground">Product *</label>
+            <FarmProduceCombobox
+              categorySlug={form.product_type}
+              value={form.product_id}
+              onChange={(s) =>
+                setForm((f) => f ? { ...f, product_id: s.id, product_name: s.name, product_slug: s.slug } : f)
+              }
             />
           </div>
         </div>
