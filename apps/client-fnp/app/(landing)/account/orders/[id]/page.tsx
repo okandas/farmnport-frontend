@@ -168,6 +168,24 @@ export default function OrderDetailPage() {
           </Link>
         </div>
 
+        {/* Pending payment banner */}
+        {order.status === "pending" && (
+          <div className="border border-yellow-200 bg-yellow-50 dark:bg-yellow-900/20 dark:border-yellow-800 rounded-xl p-5 space-y-3">
+            <p className="font-semibold text-sm">Payment pending</p>
+            <p className="text-sm text-muted-foreground">
+              Complete your payment to confirm this order.
+            </p>
+            <a
+              href={`https://www.topup.co.zw/pay-bill/farmnport?account=FNP-${(session?.user as any)?.id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-sm px-8 py-3 rounded-full transition-colors"
+            >
+              Pay Now
+            </a>
+          </div>
+        )}
+
         {/* Status Stepper */}
         {order.status !== "cancelled" && (
           <div className="border rounded-xl p-5">
@@ -225,15 +243,7 @@ export default function OrderDetailPage() {
           </div>
           {/* Totals */}
           <div className="px-5 py-4 border-t space-y-2 bg-muted/10">
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Subtotal</span>
-              <span>${order.subtotal.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Delivery</span>
-              <span>{order.delivery_fee > 0 ? `$${order.delivery_fee.toFixed(2)}` : <span className="text-green-700 dark:text-green-400">{order.fulfillment === "click_collect" ? "Pickup" : "Free"}</span>}</span>
-            </div>
-            <div className="flex justify-between font-bold text-base border-t pt-2">
+            <div className="flex justify-between font-bold text-base">
               <span>Total</span>
               <span>${order.total.toFixed(2)}</span>
             </div>
@@ -275,8 +285,8 @@ export default function OrderDetailPage() {
               <h2 className="font-semibold text-sm">Payment</h2>
             </div>
             <div className="text-sm space-y-1 text-muted-foreground">
-              <p><span className="text-foreground capitalize">{order.payment_provider}</span>{order.payment_method ? ` — ${order.payment_method}` : ""}</p>
-              <p>Ref: <span className="font-mono text-foreground">{order.payment_ref}</span></p>
+              <p className="text-foreground capitalize">{order.payment_provider}</p>
+              <p>Ref: <span className="font-mono text-foreground select-all cursor-text">{order.payment_ref}</span></p>
               {order.paid_at && <p>Paid {formatDate(order.paid_at)}</p>}
             </div>
           </div>

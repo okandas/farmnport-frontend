@@ -65,19 +65,17 @@ export default function CheckoutPage() {
   const [pollRef, setPollRef] = useState("")
   const [orderNumber, setOrderNumber] = useState("")
   const [memberNumber, setMemberNumber] = useState("")
-  const [billPayInstructions, setBillPayInstructions] = useState("")
   const [step, setStep] = useState<"form" | "waiting" | "success">("form")
 
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<CheckoutForm>({
     defaultValues: {
       fulfillment: "delivery",
       provider: "billpay",
-      method: "ecocash",
+      method: "",
     },
   })
 
   const fulfillment = watch("fulfillment")
-  const provider = watch("provider")
 
   const { data: cartData, isLoading: cartLoading } = useQuery({
     queryKey: ["cart"],
@@ -104,7 +102,6 @@ export default function CheckoutPage() {
         setPolling(true)
       } else {
         // BillPay — show instructions
-        setBillPayInstructions(data.instructions || "Visit a BillPay kiosk and use the reference number below.")
         setStep("waiting")
         setPolling(true)
       }
@@ -239,7 +236,7 @@ export default function CheckoutPage() {
           <div className="bg-muted rounded-xl p-5 text-left text-sm space-y-4 w-full">
             <div>
               <p className="text-xs text-muted-foreground mb-1">Your Member Number</p>
-              <p className="font-mono font-bold text-lg tracking-wider">{memberNumber}</p>
+              <p className="font-mono font-bold text-lg tracking-wider select-all cursor-text">{memberNumber}</p>
             </div>
             <div className="border-t pt-4 space-y-1">
               <p className="font-semibold text-sm">How to pay</p>
@@ -252,8 +249,16 @@ export default function CheckoutPage() {
             </div>
           </div>
           <p className="text-xs text-muted-foreground">Waiting for payment confirmation{polling ? "..." : ""}</p>
+          <a
+            href={`https://www.topup.co.zw/pay-bill/farmnport?account=${memberNumber}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-sm px-8 py-3 rounded-full transition-colors"
+          >
+            Pay Now
+          </a>
           <button
-            onClick={() => router.push("/orders")}
+            onClick={() => router.push("/account/orders")}
             className="block w-full text-center border hover:bg-muted text-sm font-medium py-3 rounded-full transition-colors"
           >
             Go to My Orders
