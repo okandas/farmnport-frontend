@@ -2,18 +2,10 @@
 
 import Link from "next/link"
 import { useQuery } from "@tanstack/react-query"
-import {
-  DollarSign,
-  ShoppingCart,
-  Clock,
-  CheckCircle2,
-  ArrowRight,
-  Package,
-} from "lucide-react"
+import { ArrowRight } from "lucide-react"
 
 import { querySalesStats, queryOrders } from "@/lib/query"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 const STATUS_COLORS: Record<string, string> = {
   pending: "bg-yellow-100 text-yellow-800",
@@ -106,52 +98,38 @@ export default function SalesOverviewPage() {
         <>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Today</CardTitle>
-                <DollarSign className="h-4 w-4 text-muted-foreground" />
+              <CardHeader className="space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">Today</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">
-                  ${stats.revenue.today.toFixed(2)}
-                </div>
+                <div className="text-2xl font-bold">${stats.revenue.today.toFixed(2)}</div>
               </CardContent>
             </Card>
 
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">This Week</CardTitle>
-                <DollarSign className="h-4 w-4 text-muted-foreground" />
+              <CardHeader className="space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">This Week</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">
-                  ${stats.revenue.week.toFixed(2)}
-                </div>
+                <div className="text-2xl font-bold">${stats.revenue.week.toFixed(2)}</div>
               </CardContent>
             </Card>
 
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  This Month
-                </CardTitle>
-                <DollarSign className="h-4 w-4 text-muted-foreground" />
+              <CardHeader className="space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">This Month</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">
-                  ${stats.revenue.month.toFixed(2)}
-                </div>
+                <div className="text-2xl font-bold">${stats.revenue.month.toFixed(2)}</div>
               </CardContent>
             </Card>
 
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">All Time</CardTitle>
-                <DollarSign className="h-4 w-4 text-muted-foreground" />
+              <CardHeader className="space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">All Time</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">
-                  ${stats.revenue.all_time.toFixed(2)}
-                </div>
+                <div className="text-2xl font-bold">${stats.revenue.all_time.toFixed(2)}</div>
               </CardContent>
             </Card>
           </div>
@@ -159,21 +137,17 @@ export default function SalesOverviewPage() {
           {/* Order Status Cards */}
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Pending</CardTitle>
-                <Clock className="h-4 w-4 text-yellow-500" />
+              <CardHeader className="space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">Pending</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">
-                  {stats.orders.pending}
-                </div>
+                <div className="text-2xl font-bold">{stats.orders.pending}</div>
               </CardContent>
             </Card>
 
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Paid</CardTitle>
-                <ShoppingCart className="h-4 w-4 text-blue-500" />
+              <CardHeader className="space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">Paid</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{stats.orders.paid}</div>
@@ -181,28 +155,20 @@ export default function SalesOverviewPage() {
             </Card>
 
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Processing
-                </CardTitle>
-                <Package className="h-4 w-4 text-purple-500" />
+              <CardHeader className="space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">Processing</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">
-                  {stats.orders.processing}
-                </div>
+                <div className="text-2xl font-bold">{stats.orders.processing}</div>
               </CardContent>
             </Card>
 
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Delivered</CardTitle>
-                <CheckCircle2 className="h-4 w-4 text-green-500" />
+              <CardHeader className="space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">Delivered</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">
-                  {stats.orders.delivered}
-                </div>
+                <div className="text-2xl font-bold">{stats.orders.delivered}</div>
               </CardContent>
             </Card>
           </div>
@@ -245,14 +211,11 @@ export default function SalesOverviewPage() {
                   </div>
                   <div className="flex items-center gap-3">
                     <span className="text-sm font-medium">
-                      ${(order.total / 100).toFixed(2)}
+                      ${order.total.toFixed(2)}
                     </span>
-                    <Badge
-                      variant="secondary"
-                      className={STATUS_COLORS[order.status] ?? ""}
-                    >
+                    <span className={`text-xs font-semibold px-2.5 py-1 rounded-full capitalize ${STATUS_COLORS[order.status] ?? ""}`}>
                       {order.status}
-                    </Badge>
+                    </span>
                   </div>
                 </Link>
               ))}
