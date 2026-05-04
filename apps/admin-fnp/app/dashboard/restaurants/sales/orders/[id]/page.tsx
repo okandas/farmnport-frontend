@@ -3,6 +3,7 @@
 import { useParams, useRouter } from "next/navigation"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { format } from "date-fns"
+import { useState } from "react"
 import {
   ArrowLeft,
   Package,
@@ -20,6 +21,16 @@ import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/components/ui/use-toast"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 
 const STATUS_STEPS = ["pending", "paid", "processing", "dispatched", "delivered"]
 const STATUS_STEPS_COLLECT = ["pending", "paid", "processing", "ready", "delivered"]
@@ -133,10 +144,34 @@ export default function RestaurantOrderDetailPage() {
 
   const orderId = params.id as string
 
+  const [markPaidOpen, setMarkPaidOpen] = useState(false)
+  const [approvedBy, setApprovedBy] = useState("")
+  const [paidNote, setPaidNote] = useState("")
+
   const { data, isLoading } = useQuery({
     queryKey: ["admin-order", orderId],
     queryFn: () => queryOrder(orderId),
     refetchOnWindowFocus: false,
+  })
+
+  const markPaidMutation = useMutation({
+    mutationFn: () =>
+      updateOrderStatus({
+        order_id: orderId,
+        status: "paid",
+        note: `Manual payment approval. Approved by: ${approvedBy}${paidNote ? `. ${paidNote}` : ""}`,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-order", orderId] })
+      queryClient.invalidateQueries({ queryKey: ["admin-orders"] })
+      setMarkPaidOpen(false)
+      setApprovedBy("")
+      setPaidNote("")
+      toast({ title: "Order marked as paid" })
+    },
+    onError: () => {
+      toast({ title: "Failed to mark as paid", variant: "destructive" })
+    },
   })
 
   const statusMutation = useMutation({
@@ -328,15 +363,7 @@ export default function RestaurantOrderDetailPage() {
           </div>
           <Separator className="my-4" />
           <div className="space-y-1 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Subtotal</span>
-              <span>${order.subtotal.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Delivery</span>
-              <span>{order.delivery_fee > 0 ? `$${order.delivery_fee.toFixed(2)}` : "Free"}</span>
-            </div>
-            <div className="flex justify-between font-medium text-base pt-1">
+            <div className="flex justify-between font-medium text-base">
               <span>Total</span>
               <span>${order.total.toFixed(2)}</span>
             </div>
@@ -372,8 +399,22 @@ export default function RestaurantOrderDetailPage() {
         </Card>
       )}
 
-      {/* Cancel Order */}
-      {order.status !== "delivered" && order.status !== "cancelled" && (
+      {/* Manual payment approval */}
+      {order.status === "pending" && (
+        <div className="flex gap-2 pt-4 border-t">
+          <Button onClick={() => setMarkPaidOpen(true)}>Mark as Paid</Button>
+          <Button
+            variant="destructive"
+            onClick={() => statusMutation.mutate("cancelled")}
+            disabled={statusMutation.isPending}
+          >
+            Cancel Order
+          </Button>
+        </div>
+      )}
+
+      {/* Cancel for non-pending, non-terminal */}
+      {order.status !== "pending" && order.status !== "delivered" && order.status !== "cancelled" && (
         <div className="flex gap-2 pt-4 border-t">
           <Button
             variant="destructive"
@@ -384,6 +425,43 @@ export default function RestaurantOrderDetailPage() {
           </Button>
         </div>
       )}
+
+      {/* Mark as Paid dialog */}
+      <Dialog open={markPaidOpen} onOpenChange={setMarkPaidOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Mark Order as Paid</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-1.5">
+              <Label>Approved by</Label>
+              <Input
+                placeholder="Your name or initials"
+                value={approvedBy}
+                onChange={(e) => setApprovedBy(e.target.value)}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Note <span className="text-muted-foreground text-xs">(optional)</span></Label>
+              <Textarea
+                placeholder="Payment reference, channel, or any relevant detail"
+                value={paidNote}
+                onChange={(e) => setPaidNote(e.target.value)}
+                rows={3}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setMarkPaidOpen(false)}>Cancel</Button>
+            <Button
+              disabled={!approvedBy.trim() || markPaidMutation.isPending}
+              onClick={() => markPaidMutation.mutate()}
+            >
+              Confirm
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
