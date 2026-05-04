@@ -274,7 +274,7 @@ export default function SalesOverviewPage() {
                   </div>
                   <div className="flex items-center gap-3">
                     <span className="text-sm font-medium">
-                      ${order.total.toFixed(2)}
+                      ${(order.total / 100).toFixed(2)}
                     </span>
                     <Badge
                       variant="secondary"

@@ -79,7 +79,7 @@ export function AddToCartButton({
       product_name: productName,
       product_slug: productSlug,
       image_src: imageSrc ?? "",
-      unit_price: unitPrice,
+      unit_price: Math.round((unitPrice ?? 0) * 100),
       quantity: 1,
     })
   }

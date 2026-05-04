@@ -235,9 +235,9 @@ export default function OrderDetailPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium capitalize">{item.product_name}</p>
-                  <p className="text-xs text-muted-foreground">Qty {item.quantity} × ${item.unit_price.toFixed(2)}</p>
+                  <p className="text-xs text-muted-foreground">Qty {item.quantity} × ${(item.unit_price / 100).toFixed(2)}</p>
                 </div>
-                <p className="text-sm font-semibold shrink-0">${item.line_total.toFixed(2)}</p>
+                <p className="text-sm font-semibold shrink-0">${(item.line_total / 100).toFixed(2)}</p>
               </div>
             ))}
           </div>
@@ -245,7 +245,7 @@ export default function OrderDetailPage() {
           <div className="px-5 py-4 border-t space-y-2 bg-muted/10">
             <div className="flex justify-between font-bold text-base">
               <span>Total</span>
-              <span>${order.total.toFixed(2)}</span>
+              <span>${(order.total / 100).toFixed(2)}</span>
             </div>
           </div>
         </div>

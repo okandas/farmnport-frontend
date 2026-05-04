@@ -58,7 +58,7 @@ export function CartDrawer() {
   })
 
   const items: CartItem[] = cartData?.items ?? []
-  const subtotal = items.reduce((sum, i) => sum + i.unit_price * i.quantity, 0)
+  const subtotal = items.reduce((sum, i) => sum + (i.unit_price * i.quantity) / 100, 0)
 
   return (
     <Sheet open={isOpen} onOpenChange={(open) => !open && closeCart()}>
@@ -146,7 +146,7 @@ export function CartDrawer() {
                       {item.product_type.replace("_", " ")}
                     </p>
                     <p className="text-sm font-bold mt-1">
-                      ${(item.unit_price * item.quantity).toFixed(2)}
+                      ${((item.unit_price * item.quantity) / 100).toFixed(2)}
                     </p>
 
                     {/* Qty controls */}

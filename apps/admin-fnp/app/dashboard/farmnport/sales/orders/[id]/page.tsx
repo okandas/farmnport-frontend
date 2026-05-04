@@ -385,11 +385,11 @@ export default function OrderDetailPage() {
                 <div>
                   <p className="text-sm font-medium">{item.product_name}</p>
                   <p className="text-xs text-muted-foreground">
-                    {item.quantity} x ${item.unit_price.toFixed(2)}
+                    {item.quantity} x ${(item.unit_price / 100).toFixed(2)}
                   </p>
                 </div>
                 <span className="text-sm font-medium">
-                  ${item.line_total.toFixed(2)}
+                  ${(item.line_total / 100).toFixed(2)}
                 </span>
               </div>
             ))}
@@ -398,21 +398,9 @@ export default function OrderDetailPage() {
           <Separator className="my-4" />
 
           <div className="space-y-1 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Subtotal</span>
-              <span>${order.subtotal.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Delivery</span>
-              <span>
-                {order.delivery_fee > 0
-                  ? `$${order.delivery_fee.toFixed(2)}`
-                  : "Free"}
-              </span>
-            </div>
-            <div className="flex justify-between font-medium text-base pt-1">
+            <div className="flex justify-between font-medium text-base">
               <span>Total</span>
-              <span>${order.total.toFixed(2)}</span>
+              <span>${(order.total / 100).toFixed(2)}</span>
             </div>
           </div>
         </CardContent>

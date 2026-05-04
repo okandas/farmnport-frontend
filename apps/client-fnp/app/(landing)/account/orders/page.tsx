@@ -117,7 +117,7 @@ export default function OrdersPage() {
                     </p>
                   </div>
                   <div className="text-right shrink-0">
-                    <p className="font-bold">${order.total.toFixed(2)}</p>
+                    <p className="font-bold">${(order.total / 100).toFixed(2)}</p>
                     <p className="text-xs text-muted-foreground">{order.currency}</p>
                   </div>
                 </div>

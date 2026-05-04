@@ -84,7 +84,7 @@ export default function CheckoutPage() {
   })
 
   const items: CartItem[] = cartData?.items ?? []
-  const subtotal = items.reduce((s, i) => s + i.unit_price * i.quantity, 0)
+  const subtotal = items.reduce((s, i) => s + (i.unit_price * i.quantity) / 100, 0)
 
   const checkoutMutation = useMutation({
     mutationFn: checkout,

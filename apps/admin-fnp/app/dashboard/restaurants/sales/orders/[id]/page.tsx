@@ -355,9 +355,9 @@ export default function RestaurantOrderDetailPage() {
               <div key={i} className="flex items-center justify-between rounded-lg border p-3">
                 <div>
                   <p className="text-sm font-medium">{item.product_name}</p>
-                  <p className="text-xs text-muted-foreground">{item.quantity} x ${item.unit_price.toFixed(2)}</p>
+                  <p className="text-xs text-muted-foreground">{item.quantity} x ${(item.unit_price / 100).toFixed(2)}</p>
                 </div>
-                <span className="text-sm font-medium">${item.line_total.toFixed(2)}</span>
+                <span className="text-sm font-medium">${(item.line_total / 100).toFixed(2)}</span>
               </div>
             ))}
           </div>
@@ -365,7 +365,7 @@ export default function RestaurantOrderDetailPage() {
           <div className="space-y-1 text-sm">
             <div className="flex justify-between font-medium text-base">
               <span>Total</span>
-              <span>${order.total.toFixed(2)}</span>
+              <span>${(order.total / 100).toFixed(2)}</span>
             </div>
           </div>
         </CardContent>
