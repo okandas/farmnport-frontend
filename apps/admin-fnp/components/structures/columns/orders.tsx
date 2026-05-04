@@ -96,7 +96,7 @@ export const orderColumns: ColumnDef<OrderRow>[] = [
     header: "Total",
     cell: ({ row }) => {
       const total = row.getValue("total") as number
-      return <span className="font-medium">${total.toFixed(2)}</span>
+      return <span className="font-medium">${(total / 100).toFixed(2)}</span>
     },
   },
   {
