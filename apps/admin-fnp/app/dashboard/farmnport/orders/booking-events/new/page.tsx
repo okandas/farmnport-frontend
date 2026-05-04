@@ -10,6 +10,7 @@ import { createBookingEvent } from "@/lib/query"
 import { DashboardHeader } from "@/components/state/dashboardHeader"
 import { DashboardShell } from "@/components/state/dashboardShell"
 import { ProductCombobox, ProductType } from "@/components/structures/product-combobox"
+import { ClientCombobox } from "@/components/structures/client-combobox"
 
 export default function NewBookingEventPage() {
   const router = useRouter()
@@ -31,6 +32,8 @@ export default function NewBookingEventPage() {
     close_date: "",
     status: "draft",
     image_src: "",
+    client_id: "",
+    client_name: "",
   })
 
   const mutation = useMutation({
@@ -51,6 +54,8 @@ export default function NewBookingEventPage() {
         close_date: new Date(form.close_date).toISOString(),
         status: form.status,
         image_src: form.image_src || undefined,
+        client_id: form.client_id,
+        client_name: form.client_name,
       }),
     onSuccess: () => {
       toast({ description: "Booking event created" })
@@ -117,6 +122,18 @@ export default function NewBookingEventPage() {
                 className="w-full text-sm border rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-ring"
               />
             </div>
+          </div>
+        </div>
+
+        {/* Supplier */}
+        <div className="border rounded-xl p-5 space-y-4">
+          <h2 className="font-semibold text-sm">Supplier</h2>
+          <div className="space-y-1">
+            <label className="text-xs font-medium text-muted-foreground">Client (Supplier) *</label>
+            <ClientCombobox
+              value={form.client_id}
+              onChange={(s) => setForm((f) => ({ ...f, client_id: s.id, client_name: s.name }))}
+            />
           </div>
         </div>
 
@@ -252,7 +269,7 @@ export default function NewBookingEventPage() {
 
         <button
           onClick={() => mutation.mutate()}
-          disabled={mutation.isPending || !form.title || !form.product_id || !form.unit_price || !form.total_available || !form.open_date || !form.close_date}
+          disabled={mutation.isPending || !form.client_id || !form.title || !form.product_id || !form.unit_price || !form.total_available || !form.open_date || !form.close_date}
           className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground font-medium py-2.5 rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-50"
         >
           {mutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : null}

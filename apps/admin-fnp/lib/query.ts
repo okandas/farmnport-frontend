@@ -1567,6 +1567,8 @@ export function queryAdminBookingEvents(status?: string) {
 export function createBookingEvent(data: {
   title: string
   description?: string
+  client_id: string
+  client_name: string
   product_id: string
   product_name: string
   product_slug: string
@@ -1587,6 +1589,8 @@ export function createBookingEvent(data: {
 export function updateBookingEvent(id: string, data: Partial<{
   title: string
   description: string
+  client_id: string
+  client_name: string
   status: string
   total_available: number
   unit_price: number
