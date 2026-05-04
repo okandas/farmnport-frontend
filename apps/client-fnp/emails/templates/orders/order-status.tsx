@@ -38,7 +38,7 @@ const STATUS_MESSAGES: Record<string, string> = {
   processing: "We've received your payment and your order is now being prepared.",
   dispatched:  "Your order has left our warehouse and is on its way to you.",
   ready:       "Your order is packed and ready for collection at our store.",
-  delivered:   "Your order has been delivered. Thank you for shopping with farm&port.",
+  delivered:   "Your order has been delivered. Thank you for sourcing with farm&port.",
   cancelled:   "Your order has been cancelled. Contact us if you have any questions.",
 }
 

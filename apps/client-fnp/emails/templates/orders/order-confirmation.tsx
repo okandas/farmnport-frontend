@@ -65,7 +65,7 @@ export default function OrderConfirmationEmail({
   return (
     <Html lang="en">
       <Head />
-      <Preview>Order {orderNumber} confirmed — thank you for your purchase.</Preview>
+      <Preview>Order {orderNumber} confirmed — thank you for your order.</Preview>
       <Body style={body}>
         <Container style={container}>
 
