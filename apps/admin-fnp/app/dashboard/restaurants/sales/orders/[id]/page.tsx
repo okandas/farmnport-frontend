@@ -155,7 +155,7 @@ export default function RestaurantOrderDetailPage() {
       const token = Cookies.get("cl_jtkn")
       if (token) {
         const payload = JSON.parse(atob(token.split(".")[1]))
-        setAdminEmail(payload.email || payload.sub || "admin")
+        setAdminEmail(payload.username || payload.email || payload.sub || "admin")
       }
     } catch {}
   }, [])
