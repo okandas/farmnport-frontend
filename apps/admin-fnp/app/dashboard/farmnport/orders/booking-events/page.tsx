@@ -35,7 +35,7 @@ export default function BookingEventsPage() {
   if (isLoading) {
     return (
       <DashboardShell>
-        <DashboardHeader heading="Booking Events" text="Manage pre-order livestock batches." />
+        <DashboardHeader heading="Booking Events" text="Create and manage pre-orders and delivery bookings." />
         <Placeholder><Placeholder.Title>Loading Events</Placeholder.Title></Placeholder>
       </DashboardShell>
     )
@@ -44,7 +44,7 @@ export default function BookingEventsPage() {
   if (isError) {
     return (
       <DashboardShell>
-        <DashboardHeader heading="Booking Events" text="Manage pre-order livestock batches." />
+        <DashboardHeader heading="Booking Events" text="Create and manage pre-orders and delivery bookings." />
         <Placeholder>
           <Placeholder.Icon name="close" />
           <Placeholder.Title>Error loading events</Placeholder.Title>
@@ -57,7 +57,7 @@ export default function BookingEventsPage() {
 
   return (
     <DashboardShell>
-      <DashboardHeader heading="Booking Events" text="Manage pre-order livestock batches.">
+      <DashboardHeader heading="Booking Events" text="Create and manage pre-orders and delivery bookings.">
         <Link
           href="/dashboard/farmnport/orders/booking-events/new"
           className="inline-flex items-center gap-2 bg-primary text-primary-foreground text-sm font-medium px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors"
@@ -86,6 +86,7 @@ export default function BookingEventsPage() {
             <thead className="bg-muted/50 border-b">
               <tr>
                 <th className="text-left px-4 py-3 font-medium">Title</th>
+                <th className="text-left px-4 py-3 font-medium">Supplier</th>
                 <th className="text-left px-4 py-3 font-medium">Product</th>
                 <th className="text-left px-4 py-3 font-medium">Open / Close</th>
                 <th className="text-left px-4 py-3 font-medium">Booked</th>
@@ -98,6 +99,7 @@ export default function BookingEventsPage() {
               {events.map((event) => (
                 <tr key={event.id} className="hover:bg-muted/20 transition-colors">
                   <td className="px-4 py-3 font-medium">{event.title}</td>
+                  <td className="px-4 py-3 text-muted-foreground">{event.client_name ?? "—"}</td>
                   <td className="px-4 py-3 text-muted-foreground">{event.product_name}</td>
                   <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap">
                     {formatDate(event.open_date)} → {formatDate(event.close_date)}

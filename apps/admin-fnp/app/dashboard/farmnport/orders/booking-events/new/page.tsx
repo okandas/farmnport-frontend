@@ -72,7 +72,7 @@ export default function NewBookingEventPage() {
 
   return (
     <DashboardShell>
-      <DashboardHeader heading="New Booking Event" text="Create a pre-order livestock batch for clients to reserve." />
+      <DashboardHeader heading="New Booking Event" text="Create and manage pre-orders and delivery bookings." />
 
       <div className="max-w-2xl space-y-6">
 
