@@ -1620,6 +1620,9 @@ export function createDeliveryLocation(data: {
   address: string
   city: string
   time_slots: string[]
+  phones: string[]
+  latitude?: number
+  longitude?: number
   active?: boolean
 }) {
   return api.post(`${baseUrl}/booking/admin/delivery-locations`, data)
@@ -1630,6 +1633,9 @@ export function updateDeliveryLocation(id: string, data: Partial<{
   address: string
   city: string
   time_slots: string[]
+  phones: string[]
+  latitude: number
+  longitude: number
   active: boolean
 }>) {
   return api.put(`${baseUrl}/booking/admin/delivery-locations/${id}`, data)
