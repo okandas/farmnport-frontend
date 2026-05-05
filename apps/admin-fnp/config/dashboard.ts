@@ -54,6 +54,21 @@ export const dashboardConfig: DashboardConfig = {
       ],
     },
     {
+      label: "Analytics",
+      items: [
+        {
+          title: "Most Viewed Contacts",
+          href: "/dashboard/farmnport/contact-views/all-contacts",
+          icon: "eye",
+        },
+        {
+          title: "Recent Views",
+          href: "/dashboard/farmnport/analytics/recent-views",
+          icon: "calender",
+        },
+      ],
+    },
+    {
       label: "Management",
       items: [
         {
@@ -70,11 +85,6 @@ export const dashboardConfig: DashboardConfig = {
           title: "Buyer Contacts",
           href: "/dashboard/farmnport/buyer-contacts",
           icon: "badgeCheck",
-        },
-        {
-          title: "Contact Views",
-          href: "/dashboard/farmnport/contact-views",
-          icon: "eye",
         },
       ],
     },

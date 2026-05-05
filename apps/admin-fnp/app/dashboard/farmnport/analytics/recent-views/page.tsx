@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query"
 import { PaginationState, ColumnDef, createColumnHelper } from "@tanstack/react-table"
 import Link from "next/link"
 
-import { queryTopViewedContacts } from "@/lib/query"
+import { queryRecentViewedContacts } from "@/lib/query"
 import { formatDate } from "@/lib/utilities"
 import { DataTable } from "@/components/structures/data-table"
 import { DashboardHeader } from "@/components/state/dashboardHeader"
@@ -18,7 +18,6 @@ type ViewedContact = {
   city: string
   primary_category: string
   main_produce: string
-  view_count: number
   last_date: string
 }
 
@@ -63,10 +62,6 @@ const columns = [
     header: "Main Produce",
     cell: ({ row }) => <span className="capitalize">{row.getValue("main_produce") || "—"}</span>,
   }),
-  columnHelper.accessor("view_count", {
-    header: () => <div className="text-right">Views</div>,
-    cell: ({ row }) => <div className="text-right font-semibold">{row.getValue("view_count")}</div>,
-  }),
   columnHelper.accessor("last_date", {
     header: () => <div className="text-right">Last Viewed</div>,
     cell: ({ row }) => (
@@ -77,7 +72,7 @@ const columns = [
 
 const PAGE_SIZE = 20
 
-export default function AllContactsPage() {
+export default function RecentViewsPage() {
   const [search, setSearch] = useState("")
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -85,8 +80,8 @@ export default function AllContactsPage() {
   })
 
   const { data } = useQuery({
-    queryKey: ["top-viewed-contacts", pagination.pageIndex + 1],
-    queryFn: () => queryTopViewedContacts(pagination.pageIndex + 1, PAGE_SIZE),
+    queryKey: ["recent-viewed-contacts", pagination.pageIndex + 1],
+    queryFn: () => queryRecentViewedContacts(pagination.pageIndex + 1, PAGE_SIZE),
     refetchOnWindowFocus: false,
   })
 
@@ -95,7 +90,7 @@ export default function AllContactsPage() {
 
   return (
     <DashboardShell>
-      <DashboardHeader heading="Most Viewed Contacts" text="Contacts sorted by highest view count." />
+      <DashboardHeader heading="Recently Viewed Contacts" text="Contacts sorted by most recently viewed." />
       <DataTable
         columns={columns}
         data={contacts}

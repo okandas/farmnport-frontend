@@ -954,6 +954,11 @@ export function queryTopViewers(page: number, limit: number) {
   return api.get(url)
 }
 
+export function queryRecentViewedContacts(page: number, limit: number) {
+  const url = `${baseUrl}/views/admin/recent-viewed?page=${page}&limit=${limit}`
+  return api.get(url)
+}
+
 export function queryContactViewDetail(contactId: string, page: number, limit: number) {
   const url = `${baseUrl}/views/admin/contact/${contactId}?page=${page}&limit=${limit}`
   return api.get(url)
