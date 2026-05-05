@@ -1,10 +1,8 @@
 import { NextResponse } from "next/server"
-import { NextAuthRequest } from "next-auth/lib"
 import { auth as middleware } from "@/auth"
-import { AppURL } from "@/lib/schemas"
 
 
-export default middleware((request: NextAuthRequest) => {
+export default middleware((request) => {
   const pathname = request.nextUrl.pathname
 
 

@@ -4,12 +4,13 @@ import { AddToCartButton } from "@/components/cart/AddToCartButton"
 import { FileText, Download, Tag } from "lucide-react"
 
 interface Props {
-    params: { slug: string }
+    params: Promise<{ slug: string }>
 }
 
 export async function generateMetadata({ params }: Props) {
+    const { slug } = await params
     try {
-        const res = await queryDocument(params.slug)
+        const res = await queryDocument(slug)
         const doc = res?.data?.document
         return {
             title: `${doc?.title} | farm&port`,
@@ -21,10 +22,11 @@ export async function generateMetadata({ params }: Props) {
 }
 
 export default async function DocumentDetailPage({ params }: Props) {
+    const { slug } = await params
     let doc: any = null
 
     try {
-        const res = await queryDocument(params.slug)
+        const res = await queryDocument(slug)
         doc = res?.data?.document
     } catch {
         notFound()
