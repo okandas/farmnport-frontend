@@ -58,7 +58,7 @@ export const dashboardConfig: DashboardConfig = {
       items: [
         {
           title: "Most Viewed Contacts",
-          href: "/dashboard/farmnport/contact-views/all-contacts",
+          href: "/dashboard/farmnport/contact-views/most-viewed",
           icon: "eye",
         },
         {
