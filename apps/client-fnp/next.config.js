@@ -27,7 +27,7 @@ const nextConfig = {
     ],
   },
   turbopack: {
-
+    root: __dirname,
   },
   experimental: {
   },
