@@ -2,11 +2,14 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { ArrowRight } from "lucide-react"
+import { ArrowRight, CalendarDays } from "lucide-react"
+import { useQuery } from "@tanstack/react-query"
 import { Button } from "@/components/ui/button"
 import { formatProductName } from "@/lib/utilities"
+import { listBookingEvents } from "@/lib/query"
 
 const CATEGORIES = [
+  { id: "pre-orders", label: "Pre-Orders", href: "/bookings" },
   { id: "agrochemicals", label: "Agrochemicals", href: "/buy-agrochemicals" },
   { id: "animal-health", label: "Animal Health", href: "/buy-animal-health" },
   { id: "animal-feed", label: "Animal Feed", href: "/buy-feeds" },
@@ -94,6 +97,52 @@ function DocumentCard({ doc }: { doc: any }) {
   )
 }
 
+// ── Pre-orders section ────────────────────────────────────────────────────────
+
+function PreOrdersSection() {
+  const { data, isLoading } = useQuery({
+    queryKey: ["booking-events-buy-page"],
+    queryFn: () => listBookingEvents({ status: "open" }),
+  })
+  const events: any[] = data?.data?.events ?? []
+
+  if (isLoading || events.length === 0) return null
+
+  return (
+    <section>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <h2 className="text-xl font-bold">Pre-Orders</h2>
+          <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">{events.length} open</span>
+        </div>
+        <Link href="/bookings" className="flex items-center gap-1 text-sm font-medium text-primary hover:underline">
+          View all <ArrowRight className="h-3.5 w-3.5" />
+        </Link>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {events.slice(0, 3).map((event: any) => (
+          <Link
+            key={event.id}
+            href={`/bookings/${event.slug}`}
+            className="border rounded-xl p-4 hover:border-primary/40 hover:shadow-sm transition-all space-y-2"
+          >
+            <div className="flex items-center justify-between">
+              <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-800 font-medium">Open</span>
+              <CalendarDays className="w-4 h-4 text-muted-foreground" />
+            </div>
+            <h3 className="font-semibold text-sm leading-tight">{event.title}</h3>
+            <p className="text-xs text-muted-foreground">{event.client_name} · {event.product_name}</p>
+            <div className="pt-1 border-t flex items-center justify-between text-xs">
+              <span className="text-muted-foreground">${(event.unit_price / 100).toFixed(2)}/unit</span>
+              <span className="text-muted-foreground">${(event.deposit_per_unit / 100).toFixed(2)} deposit</span>
+            </div>
+          </Link>
+        ))}
+      </div>
+    </section>
+  )
+}
+
 // ── Section wrapper ───────────────────────────────────────────────────────────
 
 function Section({ label, href, children, count }: {
@@ -168,6 +217,8 @@ export function BuyPageClient({
 
         {/* ── Main content ── */}
         <main className="flex-1 min-w-0 flex flex-col gap-12">
+
+          <PreOrdersSection />
 
           <Section label="Agrochemicals" href="/buy-agrochemicals" count={agrochemicalTotal}>
             {agrochemicals.slice(0, 4).map((p) => (

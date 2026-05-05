@@ -1,6 +1,5 @@
 "use client"
 
-import { useState } from "react"
 import { useSession } from "next-auth/react"
 import { useQuery } from "@tanstack/react-query"
 import { Loader2, CalendarDays, Truck } from "lucide-react"
@@ -46,15 +45,8 @@ interface Booking {
   }
 }
 
-const TYPE_TABS = [
-  { value: "", label: "All" },
-  { value: "livestock", label: "Livestock" },
-  { value: "delivery", label: "Delivery" },
-]
-
 export default function BookingsPage() {
   const { data: session, status } = useSession()
-  const [typeFilter, setTypeFilter] = useState("")
 
   const { data, isLoading } = useQuery({
     queryKey: ["my-bookings"],
@@ -87,8 +79,7 @@ export default function BookingsPage() {
     )
   }
 
-  const allBookings: Booking[] = (data as any)?.bookings ?? []
-  const bookings = typeFilter ? allBookings.filter((b) => b.type === typeFilter) : allBookings
+  const bookings: Booking[] = (data as any)?.bookings ?? []
 
   return (
     <div>
@@ -98,23 +89,6 @@ export default function BookingsPage() {
         <span className="text-foreground font-medium">My Bookings</span>
       </nav>
       <h1 className="text-xl font-bold mb-6">My Bookings</h1>
-
-        {/* Type filter tabs */}
-        <div className="flex gap-2 mb-6 flex-wrap">
-          {TYPE_TABS.map((tab) => (
-            <button
-              key={tab.value}
-              onClick={() => setTypeFilter(tab.value)}
-              className={`px-4 py-1.5 rounded-full text-sm font-medium border transition-colors ${
-                typeFilter === tab.value
-                  ? "bg-primary text-primary-foreground border-primary"
-                  : "border-border text-muted-foreground hover:text-foreground hover:border-foreground"
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
 
         {bookings.length === 0 ? (
           <div className="text-center py-16 space-y-4">

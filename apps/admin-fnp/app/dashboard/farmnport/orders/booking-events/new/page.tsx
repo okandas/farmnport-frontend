@@ -63,7 +63,7 @@ export default function NewBookingEventPage() {
       queryClient.invalidateQueries({ queryKey: ["admin-booking-events"] })
       router.push("/dashboard/farmnport/orders/booking-events")
     },
-    onError: () => toast({ description: "Failed to create event", variant: "destructive" }),
+    onError: (err: any) => toast({ description: err?.response?.data?.message || "Failed to create event", variant: "destructive" }),
   })
 
   function set(field: string, value: string) {
