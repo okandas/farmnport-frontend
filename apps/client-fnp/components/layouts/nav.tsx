@@ -120,7 +120,7 @@ export function Navigation({ user }: NavigationProps) {
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
                 <DropdownMenuItem asChild>
-                  <Link href="/profile">Profile</Link>
+                  <Link href="/account">Account</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/orders">My Orders</Link>

@@ -151,12 +151,12 @@ export function MobileNav({ user }: MobileNavProps) {
                    { user ? (
                      <>
                        <Link
-                         href="/profile"
+                         href="/account"
                          onClick={() => setIsOpen(false)}
                          className="flex items-center gap-3 px-3 py-2 text-base font-medium rounded-md hover:bg-accent transition-colors"
                        >
                          <Icons.user className="h-5 w-5" />
-                         <span>Profile</span>
+                         <span>Account</span>
                        </Link>
                        <Link
                          href="/orders"
