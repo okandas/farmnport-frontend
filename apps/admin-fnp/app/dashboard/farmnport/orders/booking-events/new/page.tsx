@@ -17,8 +17,6 @@ type SelectedLocation = { id: string; name: string }
 
 const inputCls = "block w-full rounded-md bg-background px-3 py-1.5 text-sm text-foreground outline outline-1 -outline-offset-1 outline-border placeholder:text-muted-foreground focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-ring"
 const labelCls = "block text-sm/6 font-medium text-foreground"
-const hintCls = "mt-1 text-sm/6 text-muted-foreground"
-const sectionCls = "border-b border-border pb-10"
 
 function LocationMultiSelect({
   allLocations,
@@ -51,7 +49,6 @@ function LocationMultiSelect({
 
   return (
     <div className="space-y-2">
-      {/* Selected chips */}
       {selected.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {selected.map((loc) => (
@@ -69,7 +66,6 @@ function LocationMultiSelect({
         </div>
       )}
 
-      {/* Search input */}
       <div className="relative">
         <div className="flex items-center rounded-md bg-background outline outline-1 -outline-offset-1 outline-border focus-within:outline focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-ring px-3 py-1.5 gap-2">
           <Search className="w-4 h-4 text-muted-foreground shrink-0" />
@@ -102,11 +98,7 @@ function LocationMultiSelect({
         {open && filtered.length === 0 && search.length > 0 && (
           <div className="absolute z-10 mt-1 w-full rounded-md border border-border bg-popover shadow-md px-3 py-2 text-sm text-muted-foreground">
             No locations found.{" "}
-            <Link
-              href="/dashboard/farmnport/orders/delivery-locations/new"
-              target="_blank"
-              className="text-primary hover:underline"
-            >
+            <Link href="/dashboard/farmnport/orders/delivery-locations/new" target="_blank" className="text-primary hover:underline">
               Add one
             </Link>
           </div>
@@ -115,11 +107,7 @@ function LocationMultiSelect({
 
       <p className="text-xs text-muted-foreground">
         Can&apos;t find a location?{" "}
-        <Link
-          href="/dashboard/farmnport/orders/delivery-locations/new"
-          target="_blank"
-          className="text-primary hover:underline"
-        >
+        <Link href="/dashboard/farmnport/orders/delivery-locations/new" target="_blank" className="text-primary hover:underline">
           Add new location
         </Link>
       </p>
@@ -198,13 +186,15 @@ export default function NewBookingEventPage() {
     <DashboardShell>
       <DashboardHeader heading="New Booking Event" text="Create a pre-order batch for customers to book." />
 
-      <div className="max-w-2xl space-y-10 mt-2">
+      <div className="mt-4 space-y-0 divide-y divide-border">
 
         {/* Event Details */}
-        <div className={sectionCls}>
-          <h2 className="text-base/7 font-semibold text-foreground">Event Details</h2>
-          <p className={hintCls}>Basic information about this booking batch.</p>
-          <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-6">
+        <div className="grid grid-cols-1 gap-x-8 gap-y-10 py-10 md:grid-cols-3">
+          <div>
+            <h2 className="text-base/7 font-semibold text-foreground">Event Details</h2>
+            <p className="mt-1 text-sm/6 text-muted-foreground">Basic information about this booking batch.</p>
+          </div>
+          <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6 md:col-span-2">
             <div className="col-span-full">
               <label className={labelCls}>Title *</label>
               <div className="mt-2">
@@ -237,10 +227,12 @@ export default function NewBookingEventPage() {
         </div>
 
         {/* Supplier */}
-        <div className={sectionCls}>
-          <h2 className="text-base/7 font-semibold text-foreground">Supplier</h2>
-          <p className={hintCls}>The client supplying this batch.</p>
-          <div className="mt-6">
+        <div className="grid grid-cols-1 gap-x-8 gap-y-10 py-10 md:grid-cols-3">
+          <div>
+            <h2 className="text-base/7 font-semibold text-foreground">Supplier</h2>
+            <p className="mt-1 text-sm/6 text-muted-foreground">The client supplying this batch.</p>
+          </div>
+          <div className="max-w-2xl md:col-span-2">
             <label className={labelCls}>Client *</label>
             <div className="mt-2">
               <ClientCombobox value={form.client_id} onChange={(s) => setForm((f) => ({ ...f, client_id: s.id, client_name: s.name }))} />
@@ -249,10 +241,12 @@ export default function NewBookingEventPage() {
         </div>
 
         {/* Product */}
-        <div className={sectionCls}>
-          <h2 className="text-base/7 font-semibold text-foreground">Product</h2>
-          <p className={hintCls}>What is being sold in this event.</p>
-          <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-6">
+        <div className="grid grid-cols-1 gap-x-8 gap-y-10 py-10 md:grid-cols-3">
+          <div>
+            <h2 className="text-base/7 font-semibold text-foreground">Product</h2>
+            <p className="mt-1 text-sm/6 text-muted-foreground">What is being sold in this event.</p>
+          </div>
+          <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6 md:col-span-2">
             <div className="sm:col-span-3">
               <label className={labelCls}>Category *</label>
               <div className="mt-2">
@@ -269,10 +263,12 @@ export default function NewBookingEventPage() {
         </div>
 
         {/* Pricing & Capacity */}
-        <div className={sectionCls}>
-          <h2 className="text-base/7 font-semibold text-foreground">Pricing & Capacity</h2>
-          <p className={hintCls}>Set the price, deposit, and quantity limits.</p>
-          <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-6">
+        <div className="grid grid-cols-1 gap-x-8 gap-y-10 py-10 md:grid-cols-3">
+          <div>
+            <h2 className="text-base/7 font-semibold text-foreground">Pricing & Capacity</h2>
+            <p className="mt-1 text-sm/6 text-muted-foreground">Set the price, deposit, and quantity limits.</p>
+          </div>
+          <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6 md:col-span-2">
             <div className="sm:col-span-3">
               <label className={labelCls}>Unit Price ($) *</label>
               <div className="mt-2">
@@ -307,10 +303,12 @@ export default function NewBookingEventPage() {
         </div>
 
         {/* Booking Window */}
-        <div className={sectionCls}>
-          <h2 className="text-base/7 font-semibold text-foreground">Booking Window</h2>
-          <p className={hintCls}>When customers can place their bookings.</p>
-          <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-6">
+        <div className="grid grid-cols-1 gap-x-8 gap-y-10 py-10 md:grid-cols-3">
+          <div>
+            <h2 className="text-base/7 font-semibold text-foreground">Booking Window</h2>
+            <p className="mt-1 text-sm/6 text-muted-foreground">When customers can place their bookings.</p>
+          </div>
+          <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6 md:col-span-2">
             <div className="sm:col-span-3">
               <label className={labelCls}>Opens *</label>
               <div className="mt-2">
@@ -327,10 +325,12 @@ export default function NewBookingEventPage() {
         </div>
 
         {/* Collection Points */}
-        <div className={sectionCls}>
-          <h2 className="text-base/7 font-semibold text-foreground">Collection Points</h2>
-          <p className={hintCls}>Where customers can collect their order. Select one or more locations.</p>
-          <div className="mt-6">
+        <div className="grid grid-cols-1 gap-x-8 gap-y-10 py-10 md:grid-cols-3">
+          <div>
+            <h2 className="text-base/7 font-semibold text-foreground">Collection Points</h2>
+            <p className="mt-1 text-sm/6 text-muted-foreground">Where customers can collect their order.</p>
+          </div>
+          <div className="max-w-2xl md:col-span-2">
             <LocationMultiSelect
               allLocations={allLocations}
               selected={selectedLocations}
@@ -339,20 +339,21 @@ export default function NewBookingEventPage() {
           </div>
         </div>
 
-        {/* Actions */}
-        <div className="flex items-center justify-end gap-x-4 pt-2">
-          <Link href="/dashboard/farmnport/orders/booking-events" className="text-sm/6 font-semibold text-foreground">
-            Cancel
-          </Link>
-          <button
-            onClick={() => mutation.mutate()}
-            disabled={mutation.isPending || !form.client_id || !form.title || !form.product_id || !form.unit_price || !form.total_available || !form.open_date || !form.close_date}
-            className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 disabled:opacity-50 transition-colors"
-          >
-            {mutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
-            Create Booking Event
-          </button>
-        </div>
+      </div>
+
+      {/* Actions */}
+      <div className="flex items-center justify-end gap-x-4 border-t border-border pt-6">
+        <Link href="/dashboard/farmnport/orders/booking-events" className="text-sm/6 font-semibold text-foreground">
+          Cancel
+        </Link>
+        <button
+          onClick={() => mutation.mutate()}
+          disabled={mutation.isPending || !form.client_id || !form.title || !form.product_id || !form.unit_price || !form.total_available || !form.open_date || !form.close_date}
+          className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 disabled:opacity-50 transition-colors"
+        >
+          {mutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
+          Create Booking Event
+        </button>
       </div>
     </DashboardShell>
   )
