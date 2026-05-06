@@ -1587,6 +1587,7 @@ export function createBookingEvent(data: {
   close_date: string
   status?: string
   image_src?: string
+  delivery_locations?: { id: string; name: string }[]
 }) {
   return api.post(`${baseUrl}/booking/admin/events`, data)
 }
@@ -1604,9 +1605,12 @@ export function updateBookingEvent(id: string, data: Partial<{
   total_available: number
   unit_price: number
   deposit_per_unit: number
+  min_quantity: number
+  max_quantity: number
   open_date: string
   close_date: string
   image_src: string
+  delivery_locations: { id: string; name: string }[]
 }>) {
   return api.put(`${baseUrl}/booking/admin/events/${id}`, data)
 }
