@@ -3,6 +3,8 @@
 import { useParams, useRouter } from "next/navigation"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { format } from "date-fns"
+import { useState, useEffect } from "react"
+import Cookies from "js-cookie"
 import {
   ArrowLeft,
   Package,
@@ -11,15 +13,26 @@ import {
   XCircle,
   Clock,
   CreditCard,
+  Copy,
 } from "lucide-react"
 
 import { queryOrder, updateOrderStatus } from "@/lib/query"
+import { CLIENT_URL } from "@/lib/config"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/components/ui/use-toast"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
 
 const STATUS_STEPS = ["pending", "paid", "processing", "dispatched", "delivered"]
 const STATUS_STEPS_COLLECT = ["pending", "paid", "processing", "ready", "delivered"]
@@ -133,10 +146,43 @@ export default function RestaurantOrderDetailPage() {
 
   const orderId = params.id as string
 
+  const [markPaidOpen, setMarkPaidOpen] = useState(false)
+  const [adminEmail, setAdminEmail] = useState("")
+  const [paidNote, setPaidNote] = useState("")
+
+  useEffect(() => {
+    try {
+      const token = Cookies.get("cl_jtkn")
+      if (token) {
+        const payload = JSON.parse(atob(token.split(".")[1]))
+        setAdminEmail(payload.username || payload.email || payload.sub || "admin")
+      }
+    } catch {}
+  }, [])
+
   const { data, isLoading } = useQuery({
     queryKey: ["admin-order", orderId],
     queryFn: () => queryOrder(orderId),
     refetchOnWindowFocus: false,
+  })
+
+  const markPaidMutation = useMutation({
+    mutationFn: () =>
+      updateOrderStatus({
+        order_id: orderId,
+        status: "paid",
+        note: `Manual payment approval. Approved by: ${adminEmail}${paidNote ? `. ${paidNote}` : ""}`,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-order", orderId] })
+      queryClient.invalidateQueries({ queryKey: ["admin-orders"] })
+      setMarkPaidOpen(false)
+      setPaidNote("")
+      toast({ title: "Order marked as paid" })
+    },
+    onError: () => {
+      toast({ title: "Failed to mark as paid", variant: "destructive" })
+    },
   })
 
   const statusMutation = useMutation({
@@ -301,10 +347,26 @@ export default function RestaurantOrderDetailPage() {
           <CardHeader>
             <CardTitle className="text-base">QR Verification</CardTitle>
           </CardHeader>
-          <CardContent className="text-sm">
+          <CardContent className="text-sm space-y-2">
             <code className="block rounded bg-muted p-2 text-xs break-all">
-              {typeof window !== "undefined" ? window.location.origin : ""}/order/verify/{order.id}/{order.verify_token}
+              {CLIENT_URL}/order/verify/{order.id}/{order.verify_token}
             </code>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigator.clipboard.writeText(`${CLIENT_URL}/order/verify/${order.id}/${order.verify_token}`)}
+              >
+                <Copy className="h-3.5 w-3.5 mr-1" /> Copy
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => window.open(`${CLIENT_URL}/order/verify/${order.id}/${order.verify_token}`, "_blank")}
+              >
+                View
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -320,25 +382,17 @@ export default function RestaurantOrderDetailPage() {
               <div key={i} className="flex items-center justify-between rounded-lg border p-3">
                 <div>
                   <p className="text-sm font-medium">{item.product_name}</p>
-                  <p className="text-xs text-muted-foreground">{item.quantity} x ${item.unit_price.toFixed(2)}</p>
+                  <p className="text-xs text-muted-foreground">{item.quantity} x ${(item.unit_price / 100).toFixed(2)}</p>
                 </div>
-                <span className="text-sm font-medium">${item.line_total.toFixed(2)}</span>
+                <span className="text-sm font-medium">${(item.line_total / 100).toFixed(2)}</span>
               </div>
             ))}
           </div>
           <Separator className="my-4" />
           <div className="space-y-1 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Subtotal</span>
-              <span>${order.subtotal.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Delivery</span>
-              <span>{order.delivery_fee > 0 ? `$${order.delivery_fee.toFixed(2)}` : "Free"}</span>
-            </div>
-            <div className="flex justify-between font-medium text-base pt-1">
+            <div className="flex justify-between font-medium text-base">
               <span>Total</span>
-              <span>${order.total.toFixed(2)}</span>
+              <span>${(order.total / 100).toFixed(2)}</span>
             </div>
           </div>
         </CardContent>
@@ -372,8 +426,22 @@ export default function RestaurantOrderDetailPage() {
         </Card>
       )}
 
-      {/* Cancel Order */}
-      {order.status !== "delivered" && order.status !== "cancelled" && (
+      {/* Manual payment approval */}
+      {order.status === "pending" && (
+        <div className="flex gap-2 pt-4 border-t">
+          <Button onClick={() => setMarkPaidOpen(true)}>Mark as Paid</Button>
+          <Button
+            variant="destructive"
+            onClick={() => statusMutation.mutate("cancelled")}
+            disabled={statusMutation.isPending}
+          >
+            Cancel Order
+          </Button>
+        </div>
+      )}
+
+      {/* Cancel for non-pending, non-terminal */}
+      {order.status !== "pending" && order.status !== "delivered" && order.status !== "cancelled" && (
         <div className="flex gap-2 pt-4 border-t">
           <Button
             variant="destructive"
@@ -384,6 +452,38 @@ export default function RestaurantOrderDetailPage() {
           </Button>
         </div>
       )}
+
+      {/* Mark as Paid dialog */}
+      <Dialog open={markPaidOpen} onOpenChange={setMarkPaidOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Mark Order as Paid</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <p className="text-sm text-muted-foreground">
+              Approving as <span className="font-medium text-foreground">{adminEmail}</span>
+            </p>
+            <div className="space-y-1.5">
+              <Label>Note <span className="text-muted-foreground text-xs">(optional)</span></Label>
+              <Textarea
+                placeholder="Payment reference, channel, or any relevant detail"
+                value={paidNote}
+                onChange={(e) => setPaidNote(e.target.value)}
+                rows={3}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setMarkPaidOpen(false)}>Cancel</Button>
+            <Button
+              disabled={markPaidMutation.isPending}
+              onClick={() => markPaidMutation.mutate()}
+            >
+              Confirm
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

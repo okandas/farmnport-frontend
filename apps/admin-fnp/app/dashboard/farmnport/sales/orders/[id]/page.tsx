@@ -11,10 +11,12 @@ import {
   XCircle,
   Clock,
   CreditCard,
+  Copy,
 } from "lucide-react"
-import Link from "next/link"
 
 import { queryOrder, updateOrderStatus } from "@/lib/query"
+import { centsToDollars } from "@/lib/utilities"
+import { CLIENT_URL } from "@/lib/config"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -359,13 +361,26 @@ export default function OrderDetailPage() {
           <CardHeader>
             <CardTitle className="text-base">QR Verification</CardTitle>
           </CardHeader>
-          <CardContent className="text-sm">
-            <p className="text-muted-foreground mb-2">
-              Verify URL for pickup confirmation:
-            </p>
+          <CardContent className="text-sm space-y-2">
             <code className="block rounded bg-muted p-2 text-xs break-all">
-              {typeof window !== "undefined" ? window.location.origin : ""}/order/verify/{order.id}/{order.verify_token}
+              {CLIENT_URL}/order/verify/{order.id}/{order.verify_token}
             </code>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigator.clipboard.writeText(`${CLIENT_URL}/order/verify/${order.id}/${order.verify_token}`)}
+              >
+                <Copy className="h-3.5 w-3.5 mr-1" /> Copy
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => window.open(`${CLIENT_URL}/order/verify/${order.id}/${order.verify_token}`, "_blank")}
+              >
+                View
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -385,11 +400,11 @@ export default function OrderDetailPage() {
                 <div>
                   <p className="text-sm font-medium">{item.product_name}</p>
                   <p className="text-xs text-muted-foreground">
-                    {item.quantity} x ${item.unit_price.toFixed(2)}
+                    {item.quantity} x {centsToDollars(item.unit_price)}
                   </p>
                 </div>
                 <span className="text-sm font-medium">
-                  ${item.line_total.toFixed(2)}
+                  {centsToDollars(item.line_total)}
                 </span>
               </div>
             ))}
@@ -398,21 +413,9 @@ export default function OrderDetailPage() {
           <Separator className="my-4" />
 
           <div className="space-y-1 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Subtotal</span>
-              <span>${order.subtotal.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Delivery</span>
-              <span>
-                {order.delivery_fee > 0
-                  ? `$${order.delivery_fee.toFixed(2)}`
-                  : "Free"}
-              </span>
-            </div>
-            <div className="flex justify-between font-medium text-base pt-1">
+            <div className="flex justify-between font-medium text-base">
               <span>Total</span>
-              <span>${order.total.toFixed(2)}</span>
+              <span>{centsToDollars(order.total)}</span>
             </div>
           </div>
         </CardContent>

@@ -1,10 +1,10 @@
 import Link from "next/link"
 import Image from "next/image"
-import { useRouter } from "next/navigation"
-import { Bug, Beaker, ShoppingCart } from "lucide-react"
+import { Bug, Beaker } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { sendGTMEvent } from '@next/third-parties/google'
 import { formatProductName } from "@/lib/utilities"
+import { AddToCartButton } from "@/components/cart/AddToCartButton"
 
 interface AgroChemicalCardProps {
   chemical: any
@@ -12,7 +12,6 @@ interface AgroChemicalCardProps {
 }
 
 export function AgroChemicalCard({ chemical, mode }: AgroChemicalCardProps) {
-  const router = useRouter()
   const categorySlug = chemical.agrochemical_category?.slug || 'all'
   const href = mode === "shop"
     ? `/buy-agrochemicals/${chemical.slug}`
@@ -32,9 +31,7 @@ export function AgroChemicalCard({ chemical, mode }: AgroChemicalCardProps) {
               className="object-contain transition-transform duration-200 group-hover:scale-105"
             />
           ) : (
-            <div className="absolute inset-0 flex items-center justify-center bg-muted/30">
-              <Beaker className="w-16 h-16 text-muted-foreground/30" />
-            </div>
+            <div className="absolute inset-0 bg-muted/30" />
           )}
         </div>
       </Link>
@@ -70,25 +67,27 @@ export function AgroChemicalCard({ chemical, mode }: AgroChemicalCardProps) {
         {/* CTA - Different based on mode */}
         {mode === "shop" ? (
           <div className="pt-3 space-y-2">
-            {/* Price placeholder - will be populated from backend */}
-            <div className="flex items-baseline gap-2">
-              <span className="text-lg font-bold text-primary">$25.00</span>
-              <span className="text-xs text-muted-foreground line-through">$35.00</span>
+            <div className="flex items-baseline gap-2 h-7">
+              {chemical.show_price && chemical.sale_price > 0 ? (
+                <>
+                  <span className="text-lg font-bold">${(chemical.sale_price / 100).toFixed(2)}</span>
+                  {chemical.show_was_price && chemical.was_price > 0 && chemical.was_price > chemical.sale_price && (
+                    <span className="text-xs text-muted-foreground line-through">${(chemical.was_price / 100).toFixed(2)}</span>
+                  )}
+                </>
+              ) : (
+                <span className="text-sm text-muted-foreground">Price on request</span>
+              )}
             </div>
-            <Button
-              className="w-full"
-              size="sm"
-              onClick={(e) => {
-                e.preventDefault()
-                // Track GTM event for shop click
-                sendGTMEvent({ event: 'action', value: 'ShopBuyOnline' })
-                // Redirect to waiting list
-                router.push('/waiting-list-shop')
-              }}
-            >
-              <ShoppingCart className="w-4 h-4 mr-2" />
-              Add to Cart
-            </Button>
+            <AddToCartButton
+              productId={chemical.id}
+              productType="agrochemical"
+              productName={chemical.name}
+              productSlug={chemical.slug}
+              imageSrc={chemical.images?.[0]?.img?.src}
+              unitPrice={chemical.show_price && chemical.sale_price > 0 ? chemical.sale_price : null}
+              loginRedirect={href}
+            />
           </div>
         ) : (
           <Link href={href} className="block pt-2">

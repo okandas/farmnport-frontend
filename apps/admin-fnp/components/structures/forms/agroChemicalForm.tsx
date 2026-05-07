@@ -79,6 +79,7 @@ export function AgroChemicalForm({ agroChemical, mode = "create" }: AgroChemical
             available_for_sale: agroChemical?.available_for_sale ?? false,
             show_price: agroChemical?.show_price ?? true,
             sale_price: agroChemical?.sale_price ?? 0,
+            show_was_price: agroChemical?.show_was_price ?? false,
             was_price: agroChemical?.was_price ?? 0,
         },
         resolver: zodResolver(FormAgroChemicalSchema),
@@ -835,6 +836,23 @@ export function AgroChemicalForm({ agroChemical, mode = "create" }: AgroChemical
                             />
                         </div>
                         <div className="sm:col-span-2">
+                            <FormField
+                                control={form.control}
+                                name="show_was_price"
+                                render={({ field }) => (
+                                    <FormItem className="flex items-center gap-2 mb-2">
+                                        <FormControl>
+                                            <Checkbox
+                                                checked={field.value}
+                                                onCheckedChange={field.onChange}
+                                            />
+                                        </FormControl>
+                                        <label className="text-sm font-medium text-gray-900 dark:text-white cursor-pointer" onClick={() => field.onChange(!field.value)}>
+                                            Show Was Price
+                                        </label>
+                                    </FormItem>
+                                )}
+                            />
                             <FormField
                                 control={form.control}
                                 name="was_price"

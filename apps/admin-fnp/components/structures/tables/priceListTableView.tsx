@@ -81,7 +81,7 @@ export function PriceListTableView({
   showBookButton = true,
 }: PriceListTableViewProps) {
   const formattedDate = producerPriceList.effectiveDate
-    ? new Date(producerPriceList.effectiveDate).toLocaleDateString('en-US', {
+    ? new Date(producerPriceList.effectiveDate).toLocaleDateString('en-GB', {
         year: 'numeric',
         month: 'long',
         day: 'numeric'

@@ -5,6 +5,10 @@ import { NotificationBell } from "@/components/notifications/notification-bell"
 import { SidebarNavigation } from "@/components/navigation/sidebar"
 import { ScrollArea } from "@/components/ui/scroll-area"
 
+export const metadata = {
+  title: "OI - Farmnport Management",
+}
+
 interface DashboardLayoutProps {
   children?: React.ReactNode
 }

@@ -1,5 +1,9 @@
 import Link from "next/link"
 
+export const metadata = {
+  title: "OI - Manage Apps",
+}
+
 export default function AppSelectorPage() {
   return (
     <div className="flex min-h-screen items-center justify-center">

@@ -26,9 +26,7 @@ const nextConfig = {
       },
     ],
   },
-  turbopack: {
-
-  },
+  turbopack: {},
   experimental: {
   },
 }

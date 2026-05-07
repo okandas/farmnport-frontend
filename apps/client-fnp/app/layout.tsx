@@ -13,6 +13,8 @@ import { NuqsAdapter } from "nuqs/adapters/next/app"
 
 import { cn } from "@/lib/utilities"
 import { AuthSessionProvider } from "@/components/providers/AuthSessionProvider"
+import { CartProvider } from "@/contexts/cart-context"
+import { CartDrawer } from "@/components/cart/cart-drawer"
 
 
 import "@/styles/globals.css"
@@ -76,8 +78,10 @@ export default function RootLayout({ children }: RootLayoutProps) {
             disableTransitionOnChange
           >
             <QueryProvider>
+              <CartProvider>
               <NuqsAdapter>
                 {children}
+                <CartDrawer />
                 <Script
                   id="facebook-sdk-init"
                   strategy="lazyOnload"
@@ -108,6 +112,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
                 {NEXT_ENV !== 'production' && <SpeedInsights />}
                 {NEXT_ENV !== 'production' && <Analytics />}
               </NuqsAdapter>
+              </CartProvider>
             </QueryProvider>
           </ThemeProvider>
           </AuthSessionProvider>

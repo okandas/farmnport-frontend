@@ -106,7 +106,7 @@ function SearchableCheckboxList({
   )
 }
 
-function FilterContent({ onClearAll }: { onClearAll: () => void }) {
+function FilterContent({ onClearAll, hideCategory, categorySlug }: { onClearAll: () => void; hideCategory?: boolean; categorySlug?: string }) {
   const [queryState, setQueryState] = useQueryStates({
     brand: parseAsArrayOf(parseAsString),
     category: parseAsArrayOf(parseAsString),
@@ -114,10 +114,16 @@ function FilterContent({ onClearAll }: { onClearAll: () => void }) {
     used_on: parseAsString,
   })
 
+  // Fetch aggregate data for plant nutrition — cascade by active filters
   const { data: aggregateData, isLoading: isLoadingAggregates } = useQuery({
-    queryKey: ["plant-nutrition-filter-aggregates"],
+    queryKey: ["plant-nutrition-filter-aggregates", categorySlug, queryState.brand, queryState.category, queryState.active_ingredient, queryState.used_on],
     queryFn: async () => {
-      const response = await queryPlantNutritionFilterAggregates()
+      const response = await queryPlantNutritionFilterAggregates({
+        brand: queryState.brand ?? [],
+        category: categorySlug ? [categorySlug, ...(queryState.category ?? [])] : (queryState.category ?? []),
+        active_ingredient: queryState.active_ingredient ?? [],
+        used_on: queryState.used_on ? [queryState.used_on] : [],
+      })
       return response.data as PlantNutritionFilterAggregates
     },
   })
@@ -150,7 +156,7 @@ function FilterContent({ onClearAll }: { onClearAll: () => void }) {
   const filterSections = [
     { name: "Used On", key: "used_on", items: usedOnItems, isLoading: isLoadingAggregates },
     { name: "Brands", key: "brand", items: brandItems, isLoading: isLoadingAggregates },
-    { name: "Categories", key: "category", items: categoryItems, isLoading: isLoadingAggregates },
+    ...(!hideCategory ? [{ name: "Categories", key: "category", items: categoryItems, isLoading: isLoadingAggregates }] : []),
     { name: "Active Ingredients", key: "active_ingredient", items: activeIngredientItems, isLoading: isLoadingAggregates },
   ]
 
@@ -168,7 +174,7 @@ function FilterContent({ onClearAll }: { onClearAll: () => void }) {
         </div>
       )}
 
-      <Accordion type="multiple" className="w-full flex-1" defaultValue={["Used On", "Brands", "Categories", "Active Ingredients"]}>
+      <Accordion type="multiple" className="w-full flex-1" defaultValue={filterSections.filter(s => { const raw = (queryState as any)[s.key]; return Array.isArray(raw) ? raw.length > 0 : !!raw }).map(s => s.name).concat(["Used On", "Categories"]).filter((v, i, a) => a.indexOf(v) === i)}>
         {filterSections.map((section) => {
           const raw = (queryState as any)[section.key]
           const selectedFilters: string[] = Array.isArray(raw) ? raw : (raw ? [raw] : [])
@@ -202,7 +208,7 @@ function FilterContent({ onClearAll }: { onClearAll: () => void }) {
   )
 }
 
-export function PlantNutritionFilterSidebar() {
+export function PlantNutritionFilterSidebar({ hideCategory, categorySlug }: { hideCategory?: boolean; categorySlug?: string }) {
   const isDesktop = useMediaQuery("(min-width: 1024px)")
   const [, setQueryState] = useQueryStates({
     used_on: parseAsArrayOf(parseAsString),
@@ -218,7 +224,7 @@ export function PlantNutritionFilterSidebar() {
   if (isDesktop) {
     return (
       <div className="sticky top-20 mt-[20px] max-h-[calc(100vh-5rem)] overflow-y-auto overflow-x-hidden">
-        <FilterContent onClearAll={handleClearAll} />
+        <FilterContent onClearAll={handleClearAll} hideCategory={hideCategory} categorySlug={categorySlug} />
       </div>
     )
   }
@@ -235,7 +241,7 @@ export function PlantNutritionFilterSidebar() {
         <SheetHeader className="mb-4">
           <SheetTitle>Filter Plant Nutrition Products</SheetTitle>
         </SheetHeader>
-        <FilterContent onClearAll={handleClearAll} />
+        <FilterContent onClearAll={handleClearAll} hideCategory={hideCategory} categorySlug={categorySlug} />
       </SheetContent>
     </Sheet>
   )

@@ -518,6 +518,7 @@ export const AgroChemicalSchema = z.object({
   available_for_sale: z.boolean().default(false),
   show_price: z.boolean().default(true),
   sale_price: z.coerce.number().nonnegative().default(0),
+  show_was_price: z.boolean().default(false),
   was_price: z.coerce.number().nonnegative().default(0),
   created: z.string().optional(),
   updated: z.string().optional(),
@@ -1121,7 +1122,10 @@ export const OperatingHourSchema = z.object({
 
 export const RestaurantLocationSchema = z.object({
   id: z.string(),
+  slug: z.string().optional(),
+  qr_slug: z.string().optional(),
   restaurant_id: z.string().min(1, "Restaurant is required"),
+  restaurant_slug: z.string().optional(),
   restaurant_name: z.string().optional(),
   name: z.string().min(1, "Location name is required").max(120, "Name cannot exceed 120 characters"),
   address: z.string().min(1, "Address is required"),
@@ -1136,6 +1140,7 @@ export const RestaurantLocationSchema = z.object({
   is_main: z.boolean().default(false),
   operating_hours: z.array(OperatingHourSchema).default([]),
   status: z.enum(["active", "inactive", "closed"]).default("active"),
+  accessible: z.boolean().optional(),
   created: z.string().optional(),
   updated: z.string().optional(),
 })

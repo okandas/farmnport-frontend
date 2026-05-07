@@ -26,10 +26,55 @@ export const dashboardConfig: DashboardConfig = {
           href: "/dashboard/farmnport/sales",
           icon: "barChart",
         },
+      ],
+    },
+    {
+      label: "Orders",
+      items: [
         {
-          title: "Orders",
-          href: "/dashboard/farmnport/sales/orders",
+          title: "Sales Orders",
+          href: "/dashboard/farmnport/orders/sales",
           icon: "shoppingCart",
+        },
+        {
+          title: "Bookings",
+          href: "/dashboard/farmnport/orders/bookings",
+          icon: "calender",
+        },
+        {
+          title: "Booking Events",
+          href: "/dashboard/farmnport/orders/booking-events",
+          icon: "calender",
+        },
+        {
+          title: "Delivery Locations",
+          href: "/dashboard/farmnport/orders/delivery-locations",
+          icon: "mapPin",
+        },
+      ],
+    },
+    {
+      label: "Analytics",
+      items: [
+        {
+          title: "Most Viewed Contacts",
+          href: "/dashboard/farmnport/contact-views/most-viewed",
+          icon: "eye",
+        },
+        {
+          title: "Recent Views",
+          href: "/dashboard/farmnport/analytics/recent-views",
+          icon: "calender",
+        },
+        {
+          title: "User Views",
+          href: "/dashboard/farmnport/analytics/user-views",
+          icon: "user",
+        },
+        {
+          title: "Recent User Views",
+          href: "/dashboard/farmnport/analytics/recent-user-views",
+          icon: "calender",
         },
       ],
     },
@@ -50,11 +95,6 @@ export const dashboardConfig: DashboardConfig = {
           title: "Buyer Contacts",
           href: "/dashboard/farmnport/buyer-contacts",
           icon: "badgeCheck",
-        },
-        {
-          title: "Contact Views",
-          href: "/dashboard/farmnport/contact-views",
-          icon: "eye",
         },
       ],
     },

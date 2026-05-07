@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: LayoutProps): Promise<Metadat
       description,
       url,
       siteName: 'farmnport',
-      locale: 'en_US',
+      locale: 'en_ZW',
       type: 'website',
     },
     twitter: {

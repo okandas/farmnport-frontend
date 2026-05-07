@@ -7,11 +7,6 @@ export const restaurantsDashboardConfig: DashboardConfig = {
       label: "Overview",
       items: [
         {
-          title: "Overview",
-          href: "/dashboard/restaurants",
-          icon: "dashboard",
-        },
-        {
           title: "Restaurants",
           href: "/dashboard/restaurants/all",
           icon: "utensilsCrossed",
@@ -88,22 +83,6 @@ export const restaurantsDashboardConfig: DashboardConfig = {
           title: "Invoices",
           href: "/dashboard/restaurants/invoices",
           icon: "billing",
-        },
-      ],
-    },
-    {
-      label: "Sales",
-      alwaysOpen: true,
-      items: [
-        {
-          title: "Overview",
-          href: "/dashboard/restaurants/sales",
-          icon: "barChart",
-        },
-        {
-          title: "Orders",
-          href: "/dashboard/restaurants/sales/orders",
-          icon: "shoppingCart",
         },
       ],
     },

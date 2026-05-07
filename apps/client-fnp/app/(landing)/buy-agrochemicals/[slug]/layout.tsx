@@ -26,10 +26,6 @@ export async function generateMetadata({ params }: LayoutProps): Promise<Metadat
     const url = `${baseUrl}/buy-agrochemicals/${slug}`
     const imageUrl = chemical.images?.[0]?.img?.src || `${baseUrl}/default-chemical.png`
 
-    // TODO: Get actual pricing from backend when implemented
-    const price = '25.00' // Placeholder
-    const currency = 'USD'
-
     const description = chemical.agrochemical_category?.name
       ? `Buy ${chemical.name} - ${chemical.agrochemical_category.name} for effective pest and disease control. Fast shipping, secure checkout, and quality guarantee.`
       : `Buy ${chemical.name} online. Professional agrochemical products with fast shipping and secure checkout.`
@@ -75,10 +71,10 @@ export async function generateMetadata({ params }: LayoutProps): Promise<Metadat
         canonical: url,
       },
       robots: {
-        index: false,
+        index: true,
         follow: true,
         googleBot: {
-          index: false,
+          index: true,
           follow: true,
         },
       },

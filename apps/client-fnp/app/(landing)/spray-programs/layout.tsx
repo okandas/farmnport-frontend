@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     description: 'Discover crop-specific spray programs with detailed stage-by-stage agrochemical application schedules. Find the right products for each growth stage of your crops.',
     url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://farmnport.com'}/spray-programs`,
     siteName: 'farmnport',
-    locale: 'en_US',
+    locale: 'en_ZW',
     type: 'website',
   },
   twitter: {

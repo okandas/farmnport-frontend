@@ -21,9 +21,14 @@ import {
 import { queryUsers } from "@/lib/query"
 import { capitalizeFirstLetter } from "@/lib/utilities"
 
+export interface ClientSelection {
+  id: string
+  name: string
+}
+
 interface ClientComboboxProps {
   value: string
-  onChange: (value: string) => void
+  onChange: (selection: ClientSelection) => void
 }
 
 export function ClientCombobox({ value, onChange }: ClientComboboxProps) {
@@ -33,7 +38,6 @@ export function ClientCombobox({ value, onChange }: ClientComboboxProps) {
   const { data, isLoading } = useQuery({
     queryKey: ["clients-search", search],
     queryFn: () => queryUsers({ search: search, p: 1 }),
-    enabled: open,
   })
 
   const clients = data?.data?.data || []
@@ -70,7 +74,9 @@ export function ClientCombobox({ value, onChange }: ClientComboboxProps) {
                 key={client.id}
                 value={client.id}
                 onSelect={(currentValue) => {
-                  onChange(currentValue === value ? "" : currentValue)
+                  if (currentValue !== value) {
+                    onChange({ id: currentValue, name: client.name })
+                  }
                   setOpen(false)
                 }}
               >

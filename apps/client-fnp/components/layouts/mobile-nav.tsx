@@ -2,7 +2,6 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { useSelectedLayoutSegment } from "next/navigation"
 
 
 import { siteConfig } from "@/config/site"
@@ -16,27 +15,60 @@ import {AppURL, AuthenticatedUser} from "@/lib/schemas";
 import {sendGTMEvent} from "@next/third-parties/google";
 import {ThemeSwitcher} from "@/components/ui/theme-switcher";
 import {signOut} from "next-auth/react";
+import { ShoppingCart } from "lucide-react";
+import { useCart } from "@/contexts/cart-context";
+import { useQuery } from "@tanstack/react-query";
+import { getCart } from "@/lib/query";
+
 
 interface MobileNavProps {
   user: AuthenticatedUser | null
 }
 
 export function MobileNav({ user }: MobileNavProps) {
-    const segment = useSelectedLayoutSegment()
     const [isOpen, setIsOpen] = React.useState(false)
+    const { openCart } = useCart()
+    const { data: cartData } = useQuery({
+      queryKey: ["cart"],
+      queryFn: () => getCart().then((r) => r.data),
+      enabled: !!user,
+      staleTime: 30000,
+    })
+    const cartItems: any[] = (cartData as any)?.items ?? []
+    const cartCount: number = cartItems.length
+    const cartTotal: number = cartItems.reduce((s: number, i: any) => s + (i.unit_price * i.quantity) / 100, 0)
 
 
     return (
       <div className="flex flex-1 md:hidden">
         <Link href="/" className="items-center space-x-2 flex md:hidden">
-          <Icons.logo className="h-6 w-6" aria-hidden="true" />
           <span className="font-bold lg:inline-block">
                     {siteConfig.name}
                 </span>
           <span className="sr-only">Home</span>
         </Link>
 
-       <div className="flex flex-1 justify-end">
+       <div className="flex flex-1 justify-end items-center gap-1">
+         {cartCount > 0 ? (
+           <button
+             onClick={openCart}
+             className="flex items-center gap-1.5 pl-2 pr-3 py-1.5 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors text-sm font-semibold"
+             aria-label="Open cart"
+           >
+             <ShoppingCart className="w-4 h-4" />
+             <span>{cartCount}</span>
+             <span className="opacity-70">·</span>
+             <span>${cartTotal.toFixed(2)}</span>
+           </button>
+         ) : (
+           <button
+             onClick={openCart}
+             className="relative p-2 rounded-full hover:bg-muted transition-colors"
+             aria-label="Open cart"
+           >
+             <ShoppingCart className="w-5 h-5" />
+           </button>
+         )}
          <Sheet open={isOpen} onOpenChange={setIsOpen}>
            <SheetTrigger asChild>
              <Button
@@ -57,7 +89,6 @@ export function MobileNav({ user }: MobileNavProps) {
                  className="flex items-center"
                  onClick={() => setIsOpen(false)}
                >
-                 <Icons.logo className="mr-2 h-4 w-4" aria-hidden="true" />
                  <span className="font-bold">{siteConfig.name}</span>
                  <span className="sr-only">Home</span>
                </Link>
@@ -66,18 +97,6 @@ export function MobileNav({ user }: MobileNavProps) {
                <div className="pl-1 pr-7">
                  {/* Main Navigation */}
                  <nav className="space-y-3 mb-6">
-                   <Link
-                     href="/prices"
-                     onClick={() => {
-                       sendGTMEvent({ event: 'link', value: 'PricesTopNavigation' })
-                       setIsOpen(false)
-                     }}
-                     className="flex items-center gap-3 px-3 py-2 text-base font-medium rounded-md hover:bg-accent transition-colors"
-                   >
-                     <Icons.lineChart className="h-5 w-5" />
-                     <span>Prices</span>
-                   </Link>
-
                    <Link
                      href="/guides"
                      onClick={() => {
@@ -91,62 +110,39 @@ export function MobileNav({ user }: MobileNavProps) {
                    </Link>
 
                    <Link
-                     href="/spray-programs"
+                     href="/programs"
                      onClick={() => {
-                       sendGTMEvent({ event: 'link', value: 'SprayProgramsTopNavigation' })
+                       sendGTMEvent({ event: 'link', value: 'ProgramsTopNavigation' })
                        setIsOpen(false)
                      }}
                      className="flex items-center gap-3 px-3 py-2 text-base font-medium rounded-md hover:bg-accent transition-colors"
                    >
                      <Icons.sprout className="h-5 w-5" />
-                     <span>Spray Programs</span>
+                     <span>Programs</span>
                    </Link>
 
                    <Link
-                     href="/feeding-programs"
+                     href="/market"
                      onClick={() => {
-                       sendGTMEvent({ event: 'link', value: 'FeedProgramsTopNavigation' })
-                       setIsOpen(false)
-                     }}
-                     className="flex items-center gap-3 px-3 py-2 text-base font-medium rounded-md hover:bg-accent transition-colors"
-                   >
-                     <Icons.sprout className="h-5 w-5" />
-                     <span>Feed Programs</span>
-                   </Link>
-
-                   <Link
-                     href="/feeds"
-                     onClick={() => {
-                       sendGTMEvent({ event: 'link', value: 'FeedsTopNavigation' })
-                       setIsOpen(false)
-                     }}
-                     className="flex items-center gap-3 px-3 py-2 text-base font-medium rounded-md hover:bg-accent transition-colors"
-                   >
-                     <span>Feeds</span>
-                   </Link>
-
-                   <Link
-                     href="/buyers"
-                     onClick={() => {
-                       sendGTMEvent({ event: 'link', value: 'BuyerTopNavigation' })
+                       sendGTMEvent({ event: 'link', value: 'MarketTopNavigation' })
                        setIsOpen(false)
                      }}
                      className="flex items-center gap-3 px-3 py-2 text-base font-medium rounded-md hover:bg-accent transition-colors"
                    >
                      <Icons.dollar className="h-5 w-5" />
-                     <span>Buyers</span>
+                     <span>Market</span>
                    </Link>
 
                    <Link
-                     href="/farmers"
+                     href="/buy"
                      onClick={() => {
-                       sendGTMEvent({ event: 'link', value: 'FarmerTopNavigation' })
+                       sendGTMEvent({ event: 'link', value: 'BuyTopNavigation' })
                        setIsOpen(false)
                      }}
                      className="flex items-center gap-3 px-3 py-2 text-base font-medium rounded-md hover:bg-accent transition-colors"
                    >
-                     <Icons.tractor className="h-5 w-5" />
-                     <span>Farmers</span>
+                     <Icons.shoppingBag className="h-5 w-5" />
+                     <span>Buy</span>
                    </Link>
                  </nav>
 
@@ -155,12 +151,20 @@ export function MobileNav({ user }: MobileNavProps) {
                    { user ? (
                      <>
                        <Link
-                         href="/profile"
+                         href="/account"
                          onClick={() => setIsOpen(false)}
                          className="flex items-center gap-3 px-3 py-2 text-base font-medium rounded-md hover:bg-accent transition-colors"
                        >
                          <Icons.user className="h-5 w-5" />
-                         <span>Profile</span>
+                         <span>Account</span>
+                       </Link>
+                       <Link
+                         href="/orders"
+                         onClick={() => setIsOpen(false)}
+                         className="flex items-center gap-3 px-3 py-2 text-base font-medium rounded-md hover:bg-accent transition-colors"
+                       >
+                         <Icons.arrowRight className="h-5 w-5" />
+                         <span>My Orders</span>
                        </Link>
                        <button
                          onClick={() => {

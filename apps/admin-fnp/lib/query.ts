@@ -954,6 +954,21 @@ export function queryTopViewers(page: number, limit: number) {
   return api.get(url)
 }
 
+export function queryRecentViewedContacts(page: number, limit: number) {
+  const url = `${baseUrl}/views/admin/recent-viewed?page=${page}&limit=${limit}`
+  return api.get(url)
+}
+
+export function queryUserViews(page: number, limit: number) {
+  const url = `${baseUrl}/views/admin/user-views?page=${page}&limit=${limit}`
+  return api.get(url)
+}
+
+export function queryRecentUserViews(page: number, limit: number) {
+  const url = `${baseUrl}/views/admin/recent-user-views?page=${page}&limit=${limit}`
+  return api.get(url)
+}
+
 export function queryContactViewDetail(contactId: string, page: number, limit: number) {
   const url = `${baseUrl}/views/admin/contact/${contactId}?page=${page}&limit=${limit}`
   return api.get(url)
@@ -1110,7 +1125,7 @@ export function queryRestaurantLocations(pagination?: pagination) {
     params.set("p", String(pagination.p))
   }
   if (pagination?.search !== undefined && pagination.search.length >= 2) {
-    params.set("search", pagination.search)
+    params.set("search", pagination.search.replace(/[^a-zA-Z0-9\s]/g, ""))
   }
   const qs = params.toString()
   const url = `${baseUrl}/restaurant-locations/list${qs ? `?${qs}` : ""}`
@@ -1538,4 +1553,104 @@ export function queryMenusContactViewList(params?: { p?: number; location_id?: s
   if (params?.type) query.set("type", params.type)
   const qs = query.toString()
   return api.get(`${baseUrl}/menus-contact-views/list${qs ? `?${qs}` : ""}`)
+}
+
+// Bookings (admin)
+export function queryAdminBookings(params?: { type?: string; status?: string; location_id?: string; p?: number }) {
+  const query = new URLSearchParams()
+  if (params?.type) query.set("type", params.type)
+  if (params?.status) query.set("status", params.status)
+  if (params?.location_id) query.set("location_id", params.location_id)
+  if (params?.p !== undefined && params.p >= 2) query.set("p", String(params.p))
+  const qs = query.toString()
+  return api.get(`${baseUrl}/booking/admin/list${qs ? `?${qs}` : ""}`)
+}
+
+export function queryAdminBooking(id: string) {
+  return api.get(`${baseUrl}/booking/admin/${id}`)
+}
+
+export function updateBookingStatus(id: string, status: string, note?: string) {
+  return api.put(`${baseUrl}/booking/admin/${id}/status`, { status, note })
+}
+
+export function queryAdminBookingEvents(status?: string) {
+  const qs = status ? `?status=${status}` : ""
+  return api.get(`${baseUrl}/booking/admin/events${qs}`)
+}
+
+export function createBookingEvent(data: {
+  title: string
+  description?: string
+  client_id: string
+  client_name: string
+  product_id: string
+  product_name: string
+  product_slug: string
+  product_type: string
+  unit_price: number
+  deposit_per_unit: number
+  min_quantity?: number
+  max_quantity?: number
+  total_available: number
+  open_date: string
+  close_date: string
+  status?: string
+  image_src?: string
+  delivery_locations?: { id: string; name: string }[]
+}) {
+  return api.post(`${baseUrl}/booking/admin/events`, data)
+}
+
+export function updateBookingEvent(id: string, data: Partial<{
+  title: string
+  description: string
+  client_id: string
+  client_name: string
+  product_id: string
+  product_name: string
+  product_slug: string
+  product_type: string
+  status: string
+  total_available: number
+  unit_price: number
+  deposit_per_unit: number
+  min_quantity: number
+  max_quantity: number
+  open_date: string
+  close_date: string
+  image_src: string
+  delivery_locations: { id: string; name: string }[]
+}>) {
+  return api.put(`${baseUrl}/booking/admin/events/${id}`, data)
+}
+
+export function queryDeliveryLocations() {
+  return api.get(`${baseUrl}/booking/delivery-locations`)
+}
+
+export function createDeliveryLocation(data: {
+  name: string
+  address: string
+  city: string
+  time_slots: string[]
+  phones: string[]
+  latitude?: number
+  longitude?: number
+  active?: boolean
+}) {
+  return api.post(`${baseUrl}/booking/admin/delivery-locations`, data)
+}
+
+export function updateDeliveryLocation(id: string, data: Partial<{
+  name: string
+  address: string
+  city: string
+  time_slots: string[]
+  phones: string[]
+  latitude: number
+  longitude: number
+  active: boolean
+}>) {
+  return api.put(`${baseUrl}/booking/admin/delivery-locations/${id}`, data)
 }
