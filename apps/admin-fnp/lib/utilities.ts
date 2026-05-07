@@ -50,8 +50,9 @@ export function makeAbbreviation(str?: string) {
 }
 
 export function formatDate(d?: string) {
-  if (d === undefined) return ""
+  if (!d) return ""
   const date = new Date(d)
+  if (isNaN(date.getTime())) return ""
   return format(date, "dd MMMM yyyy")
 }
 

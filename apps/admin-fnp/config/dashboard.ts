@@ -66,6 +66,16 @@ export const dashboardConfig: DashboardConfig = {
           href: "/dashboard/farmnport/analytics/recent-views",
           icon: "calender",
         },
+        {
+          title: "User Views",
+          href: "/dashboard/farmnport/analytics/user-views",
+          icon: "user",
+        },
+        {
+          title: "Recent User Views",
+          href: "/dashboard/farmnport/analytics/recent-user-views",
+          icon: "calender",
+        },
       ],
     },
     {
