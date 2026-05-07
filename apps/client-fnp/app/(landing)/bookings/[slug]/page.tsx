@@ -9,7 +9,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { toast } from "sonner"
 
-import { getBookingEvent, createBooking } from "@/lib/query"
+import { getBookingEvent, createBooking, queryClient as queryClientProfile } from "@/lib/query"
 
 function formatDate(d: string) {
   return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
@@ -19,18 +19,25 @@ export default function BookingEventDetailPage() {
   const params = useParams()
   const slug = params.slug as string
   const { data: session } = useSession()
+  const user = session?.user as any
   const router = useRouter()
   const queryClient = useQueryClient()
 
   const [quantity, setQuantity] = useState("")
-  const [bookingDate, setBookingDate] = useState("")
-  const [phone, setPhone] = useState("")
   const [notes, setNotes] = useState("")
 
   const { data, isLoading } = useQuery({
     queryKey: ["booking-event", slug],
     queryFn: () => getBookingEvent(slug).then((r) => r.data),
   })
+
+  const { data: profileData } = useQuery({
+    queryKey: ["my-profile", user?.username],
+    queryFn: () => queryClientProfile(user.username.replace(/ /g, "-")).then((r) => r.data),
+    enabled: !!user?.username,
+  })
+
+  const phone: string = profileData?.phone ?? ""
 
   const event = data?.event
 
@@ -40,7 +47,6 @@ export default function BookingEventDetailPage() {
         type: "livestock",
         event_id: event?.id,
         quantity: parseInt(quantity),
-        booking_date: new Date(bookingDate).toISOString(),
         phone,
         notes: notes || undefined,
       }),
@@ -85,7 +91,6 @@ export default function BookingEventDetailPage() {
     qty >= minQty &&
     qty <= available &&
     (event.max_quantity === 0 || qty <= event.max_quantity) &&
-    !!bookingDate &&
     !!phone
 
   return (
@@ -151,39 +156,38 @@ export default function BookingEventDetailPage() {
             )}
 
             {/* Pricing & capacity */}
-            <div className="border rounded-xl divide-y">
-              <div className="grid grid-cols-2 divide-x">
-                <div className="p-4">
-                  <p className="text-xs text-muted-foreground mb-1">Unit Price</p>
-                  <p className="text-xl font-bold">${(event.unit_price / 100).toFixed(2)}</p>
-                  <p className="text-xs text-muted-foreground">per unit (full price)</p>
-                </div>
-                <div className="p-4">
-                  <p className="text-xs text-muted-foreground mb-1">Deposit per Unit</p>
-                  <p className="text-xl font-bold text-orange-700">${(event.deposit_per_unit / 100).toFixed(2)}</p>
-                  <p className="text-xs text-muted-foreground">required to secure booking</p>
-                </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="rounded-xl border bg-muted/30 p-4">
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Unit Price</p>
+                <p className="text-2xl font-bold">${(event.unit_price / 100).toFixed(2)}</p>
+                <p className="text-xs text-muted-foreground mt-1">per unit · full price</p>
               </div>
-              <div className="grid grid-cols-3 divide-x">
-                <div className="p-4">
-                  <p className="text-xs text-muted-foreground mb-1">Available</p>
-                  <p className="font-semibold">{available.toLocaleString()}</p>
-                  <p className="text-xs text-muted-foreground">of {event.total_available.toLocaleString()} total</p>
-                </div>
-                <div className="p-4">
-                  <p className="text-xs text-muted-foreground mb-1">Min Order</p>
-                  <p className="font-semibold">{minQty.toLocaleString()} units</p>
-                  {event.max_quantity > 0 && (
-                    <p className="text-xs text-muted-foreground">max {event.max_quantity.toLocaleString()}</p>
-                  )}
-                </div>
-                <div className="p-4">
-                  <p className="text-xs text-muted-foreground mb-1 flex items-center gap-1">
-                    <Clock className="w-3 h-3" /> Closes
-                  </p>
-                  <p className="font-semibold">{formatDate(event.close_date)}</p>
-                  <p className="text-xs text-muted-foreground">booking deadline</p>
-                </div>
+              <div className="rounded-xl border border-orange-200 bg-orange-50 p-4">
+                <p className="text-xs font-medium text-orange-700 uppercase tracking-wide mb-2">Deposit per Unit</p>
+                <p className="text-2xl font-bold text-orange-700">${(event.deposit_per_unit / 100).toFixed(2)}</p>
+                <p className="text-xs text-orange-600 mt-1">to secure your booking</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-3">
+              <div className="rounded-xl border bg-muted/30 p-4">
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Available</p>
+                <p className="text-lg font-bold">{available.toLocaleString()}</p>
+                <p className="text-xs text-muted-foreground mt-1">of {event.total_available.toLocaleString()} total</p>
+              </div>
+              <div className="rounded-xl border bg-muted/30 p-4">
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Min Order</p>
+                <p className="text-lg font-bold">{minQty.toLocaleString()}</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {event.max_quantity > 0 ? `max ${event.max_quantity.toLocaleString()} units` : "units minimum"}
+                </p>
+              </div>
+              <div className="rounded-xl border bg-muted/30 p-4">
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2 flex items-center gap-1">
+                  <Clock className="w-3 h-3" /> Closes
+                </p>
+                <p className="text-lg font-bold">{formatDate(event.close_date)}</p>
+                <p className="text-xs text-muted-foreground mt-1">booking deadline</p>
               </div>
             </div>
 
@@ -222,7 +226,7 @@ export default function BookingEventDetailPage() {
               <div className="border rounded-xl p-5 space-y-4">
                 <h2 className="font-semibold">Place Your Booking</h2>
 
-                <div className="space-y-1">
+                <div className="space-y-1.5">
                   <label className="text-xs font-medium text-muted-foreground">
                     Quantity *{event.max_quantity > 0 ? ` (${minQty}–${event.max_quantity})` : ` (min ${minQty})`}
                   </label>
@@ -233,39 +237,28 @@ export default function BookingEventDetailPage() {
                     value={quantity}
                     onChange={(e) => setQuantity(e.target.value)}
                     placeholder={`e.g. ${minQty}`}
-                    className="w-full text-sm border rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-ring"
+                    className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                   />
                 </div>
 
-                <div className="space-y-1">
-                  <label className="text-xs font-medium text-muted-foreground">Collection / Delivery Date *</label>
-                  <input
-                    type="date"
-                    value={bookingDate}
-                    onChange={(e) => setBookingDate(e.target.value)}
-                    className="w-full text-sm border rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-ring"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-xs font-medium text-muted-foreground">Phone Number *</label>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-muted-foreground">Phone Number</label>
                   <input
                     type="tel"
                     value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    placeholder="+263 ..."
-                    className="w-full text-sm border rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-ring"
+                    readOnly
+                    className="flex h-9 w-full rounded-md border border-input bg-muted px-3 py-1 text-sm shadow-sm text-muted-foreground cursor-not-allowed"
                   />
                 </div>
 
-                <div className="space-y-1">
+                <div className="space-y-1.5">
                   <label className="text-xs font-medium text-muted-foreground">Notes</label>
                   <textarea
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     rows={2}
                     placeholder="Any special requirements..."
-                    className="w-full text-sm border rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-1 focus:ring-ring"
+                    className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
                   />
                 </div>
 
