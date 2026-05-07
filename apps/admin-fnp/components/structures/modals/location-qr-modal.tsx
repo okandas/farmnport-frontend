@@ -1,10 +1,12 @@
 "use client"
 
 import { useRef } from "react"
+import { useQuery } from "@tanstack/react-query"
 import { QRCodeSVG } from "qrcode.react"
 import { Download } from "lucide-react"
 
 import { RestaurantLocation } from "@/lib/schemas"
+import { queryLocationSubscriptions } from "@/lib/query"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -53,15 +55,19 @@ function buildSVGString(qrSvgEl: SVGSVGElement, restaurantName: string, location
 export function LocationQRModal({ location, open, onOpenChange }: LocationQRModalProps) {
   const svgRef = useRef<SVGSVGElement>(null)
 
-  const city = toSlug(location.city)
-  const restaurantSlug = location.restaurant_slug
-  const locationSlug = location.slug
+  const { data: subData } = useQuery({
+    queryKey: ["location-subscription", location.id],
+    queryFn: () => queryLocationSubscriptions({ location_id: location.id, status: "active" }),
+    enabled: open,
+  })
+
+  const hasActiveSubscription = (subData?.data?.total ?? 0) > 0
+
   const restaurantName = location.restaurant_name || ""
   const locationLabel = `${location.name}, ${location.address}, ${location.city}`
   const utmContent = encodeURIComponent(`${restaurantName} ${location.name}`)
-  const baseUrl = `https://menus.co.zw/restaurants/${city}/${restaurantSlug}/${locationSlug}`
-  const qrValue = `${baseUrl}?utm_source=qr&utm_medium=print_qr_code&utm_campaign=digital_QR&utm_content=${utmContent}`
-  const fileName = `${restaurantSlug}-${locationSlug}-qr`
+  const qrValue = `https://menus.co.zw/qr/${location.qr_slug}?utm_source=qr&utm_medium=print_qr_code&utm_campaign=digital_QR&utm_content=${utmContent}`
+  const fileName = `${location.qr_slug}-qr`
 
   function getSVGString(): string | null {
     if (!svgRef.current) return null
@@ -165,13 +171,19 @@ export function LocationQRModal({ location, open, onOpenChange }: LocationQRModa
                 marginSize={1}
               />
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <span className="bg-white/90 text-gray-900 text-xs font-bold px-2 py-1 rounded text-center max-w-[120px] leading-tight capitalize">
-                  {location.name}
+                <span className="bg-white/90 text-gray-900 text-xs font-bold px-2 py-1 rounded text-center max-w-[120px] leading-tight">
+                  {location.qr_slug}
                 </span>
               </div>
             </div>
             <span className="text-xs text-gray-500 text-center">By menus.co.zw</span>
           </div>
+
+          {!hasActiveSubscription && subData && (
+            <p className="text-xs text-red-600 text-center">
+              No active subscription — QR will not resolve for visitors.
+            </p>
+          )}
 
           <div className="flex gap-2 w-full">
             <Button onClick={downloadSVG} variant="outline" className="flex-1 gap-2">

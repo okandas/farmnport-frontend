@@ -1123,6 +1123,7 @@ export const OperatingHourSchema = z.object({
 export const RestaurantLocationSchema = z.object({
   id: z.string(),
   slug: z.string().optional(),
+  qr_slug: z.string().optional(),
   restaurant_id: z.string().min(1, "Restaurant is required"),
   restaurant_slug: z.string().optional(),
   restaurant_name: z.string().optional(),
@@ -1139,6 +1140,7 @@ export const RestaurantLocationSchema = z.object({
   is_main: z.boolean().default(false),
   operating_hours: z.array(OperatingHourSchema).default([]),
   status: z.enum(["active", "inactive", "closed"]).default("active"),
+  accessible: z.boolean().optional(),
   created: z.string().optional(),
   updated: z.string().optional(),
 })

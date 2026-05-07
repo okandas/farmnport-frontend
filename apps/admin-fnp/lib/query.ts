@@ -959,6 +959,11 @@ export function queryRecentViewedContacts(page: number, limit: number) {
   return api.get(url)
 }
 
+export function queryUserViews(page: number, limit: number) {
+  const url = `${baseUrl}/views/admin/user-views?page=${page}&limit=${limit}`
+  return api.get(url)
+}
+
 export function queryContactViewDetail(contactId: string, page: number, limit: number) {
   const url = `${baseUrl}/views/admin/contact/${contactId}?page=${page}&limit=${limit}`
   return api.get(url)
@@ -1115,7 +1120,7 @@ export function queryRestaurantLocations(pagination?: pagination) {
     params.set("p", String(pagination.p))
   }
   if (pagination?.search !== undefined && pagination.search.length >= 2) {
-    params.set("search", pagination.search)
+    params.set("search", pagination.search.replace(/[^a-zA-Z0-9\s]/g, ""))
   }
   const qs = params.toString()
   const url = `${baseUrl}/restaurant-locations/list${qs ? `?${qs}` : ""}`

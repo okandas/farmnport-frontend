@@ -60,27 +60,25 @@ export const restaurantLocationColumns: ColumnDef<RestaurantLocation>[] = [
     ),
   },
   {
-    accessorKey: "status",
+    accessorKey: "accessible",
     header: "Status",
-    cell: ({ row }) => (
-      <span className="capitalize">{row.original.status || "-"}</span>
-    ),
-  },
-  {
-    accessorKey: "created",
-    header: "Date Added",
     cell: ({ row }) => {
-      const date = row.original.created
-      if (!date) return "-"
-      return new Date(date).toLocaleDateString("en-GB", {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-      })
+      const { status, is_main, accessible } = row.original
+      if (status !== "active") {
+        return <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-600 capitalize">{status}</span>
+      }
+      if (is_main) {
+        return <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-green-100 text-green-700">Free</span>
+      }
+      if (accessible) {
+        return <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-700">Paid</span>
+      }
+      return <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-orange-100 text-orange-700">Not Subscribed</span>
     },
   },
   {
     id: "actions",
+    header: "Actions",
     cell: ({ row }) => {
       const location = row?.original
       return <RestaurantLocationDropDown location={location} />
