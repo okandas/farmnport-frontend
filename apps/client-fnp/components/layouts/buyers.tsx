@@ -51,10 +51,11 @@ export function Buyers({user, queryBy}: BuyersPageProps) {
   const paymentTermsFilters = searchParams?.getAll("payment_terms") ?? []
   const pricingFilters = searchParams?.getAll("pricing") ?? []
   const verifiedFilters = searchParams?.getAll("verified") ?? []
+  const hasBookingFilter = searchParams?.get("has_booking") ?? ""
 
   const {data, isError, isFetching} = useQuery({
-    queryKey: ["results-buyers", {p: page, province: provinceFilters, produce: produceFilters, category: categoryFilters, payment_terms: paymentTermsFilters, pricing: pricingFilters, verified: verifiedFilters, queryBy}],
-    queryFn: () => queryBy != undefined ? queryClientsByProduct('buyer', queryBy, {p: page, province: provinceFilters, verified: verifiedFilters}) : queryClients('buyer', {p: page, province: provinceFilters, produce: produceFilters, category: categoryFilters, payment_terms: paymentTermsFilters, pricing: pricingFilters, verified: verifiedFilters}),
+    queryKey: ["results-buyers", {p: page, province: provinceFilters, produce: produceFilters, category: categoryFilters, payment_terms: paymentTermsFilters, pricing: pricingFilters, verified: verifiedFilters, has_booking: hasBookingFilter, queryBy}],
+    queryFn: () => queryBy != undefined ? queryClientsByProduct('buyer', queryBy, {p: page, province: provinceFilters, verified: verifiedFilters}) : queryClients('buyer', {p: page, province: provinceFilters, produce: produceFilters, category: categoryFilters, payment_terms: paymentTermsFilters, pricing: pricingFilters, verified: verifiedFilters, has_booking: hasBookingFilter || undefined}),
     refetchOnWindowFocus: false
   })
 
@@ -68,6 +69,7 @@ export function Buyers({user, queryBy}: BuyersPageProps) {
 
   const buyers = data?.data?.data as ApplicationUser[]
   const total = data?.data?.total as number
+  const bookingCount = data?.data?.booking_count as number
 
   const pageCount = Math.ceil(total / 10)
 
@@ -109,6 +111,31 @@ export function Buyers({user, queryBy}: BuyersPageProps) {
           </div>
       }
 
+      {/* Online bookings filter toggle */}
+      <div className="flex items-center gap-2 flex-wrap">
+        <button
+          onClick={() => {
+            router.push(pathname + "?" + createQueryString({ has_booking: hasBookingFilter === "true" ? null : "true", page: null }))
+          }}
+          className={`group inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full border font-medium transition-colors ${
+            hasBookingFilter === "true"
+              ? "bg-blue-600 text-white border-blue-600"
+              : "bg-background text-foreground border-border hover:border-blue-400 hover:text-blue-600"
+          }`}
+        >
+          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          Takes Online Bookings
+          {bookingCount > 0 && (
+            <span className={`text-xs px-1.5 py-0.5 rounded-full font-semibold ${hasBookingFilter === "true" ? "bg-white/20 text-white" : "bg-blue-50 text-blue-700"}`}>
+              <span className="group-hover:hidden">{bookingCount}</span>
+              <span className="hidden group-hover:inline">×</span>
+            </span>
+          )}
+        </button>
+      </div>
+
       {/* Search Bar - Commented out until we have enough users, using sidebar filter for now */}
       {/* <div className="relative">
         <form className="relative flex items-center">
@@ -143,6 +170,11 @@ export function Buyers({user, queryBy}: BuyersPageProps) {
                   {buyer.has_prices && (
                     <Badge variant="secondary" className="bg-green-50 text-green-700 border-green-200 hover:bg-green-50 text-xs">
                       Pricing Available
+                    </Badge>
+                  )}
+                  {buyer.has_booking && (
+                    <Badge variant="secondary" className="bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-50 text-xs">
+                      Online Bookings
                     </Badge>
                   )}
                 </div>

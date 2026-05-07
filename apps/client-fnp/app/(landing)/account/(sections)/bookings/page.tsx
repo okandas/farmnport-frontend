@@ -27,12 +27,12 @@ function formatDate(d: string) {
 interface Booking {
   id: string
   booking_ref: string
-  type: "livestock" | "delivery"
+  type: "pre-order" | "delivery" | "pickup"
   status: string
   booking_date: string
   time_slot?: string
   created: string
-  livestock?: {
+  pre_order?: {
     event_title: string
     product_name: string
     quantity: number
@@ -114,14 +114,14 @@ export default function BookingsPage() {
                         {capitalize(booking.status)}
                       </span>
                       <span className="text-xs text-muted-foreground capitalize flex items-center gap-1">
-                        {booking.type === "delivery" ? <Truck className="w-3 h-3" /> : <CalendarDays className="w-3 h-3" />}
-                        {booking.type}
+                        {booking.type === "delivery" ? <Truck className="w-3 h-3" /> : booking.type === "pickup" ? <Truck className="w-3 h-3" /> : <CalendarDays className="w-3 h-3" />}
+                        {booking.type === "pre-order" ? "Pre-Order" : booking.type}
                       </span>
                     </div>
 
-                    {booking.type === "livestock" && booking.livestock && (
+                    {booking.type === "pre-order" && booking.pre_order && (
                       <p className="text-xs text-muted-foreground">
-                        {booking.livestock.event_title} · {booking.livestock.quantity} units
+                        {booking.pre_order.event_title} · {booking.pre_order.quantity} units
                       </p>
                     )}
 
@@ -137,13 +137,13 @@ export default function BookingsPage() {
                     </p>
                   </div>
 
-                  {booking.type === "livestock" && booking.livestock && (
+                  {booking.type === "pre-order" && booking.pre_order && (
                     <div className="text-right shrink-0">
                       <p className="font-bold text-sm">
-                        ${(booking.livestock.deposit_amount / 100).toFixed(2)}
+                        ${(booking.pre_order.deposit_amount / 100).toFixed(2)}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        {booking.livestock.deposit_paid ? "Deposit paid" : "Deposit due"}
+                        {booking.pre_order.deposit_paid ? "Deposit paid" : "Deposit due"}
                       </p>
                     </div>
                   )}

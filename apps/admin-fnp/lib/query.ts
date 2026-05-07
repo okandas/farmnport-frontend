@@ -141,6 +141,11 @@ export function archiveClient(data: ApplicationUserID) {
   return api.post<ApplicationUser>(url, data)
 }
 
+export function toggleBookingClient(data: ApplicationUserID) {
+  let url = `${baseUrl}/user/toggle_booking`
+  return api.post<ApplicationUser>(url, data)
+}
+
 export function impersonateClient(clientId: string) {
   let url = `${baseUrl}/user/impersonate/${clientId}`
   return api.post<LoginResponse>(url)

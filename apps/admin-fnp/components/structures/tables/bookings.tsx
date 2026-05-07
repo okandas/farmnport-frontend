@@ -62,9 +62,9 @@ export function BookingsTable({ bookings, total, pagination, setPagination }: Bo
                   </Link>
                 </td>
                 <td className="px-4 py-3">
-                  <span className="flex items-center gap-1.5 capitalize text-muted-foreground">
-                    {b.type === "delivery" ? <Truck className="w-3.5 h-3.5" /> : <CalendarDays className="w-3.5 h-3.5" />}
-                    {b.type}
+                  <span className="flex items-center gap-1.5 text-muted-foreground text-xs">
+                    {b.type === "delivery" || b.type === "pickup" ? <Truck className="w-3.5 h-3.5" /> : <CalendarDays className="w-3.5 h-3.5" />}
+                    {b.type === "pre-order" ? "Pre-Order" : capitalize(b.type)}
                   </span>
                 </td>
                 <td className="px-4 py-3">
@@ -72,11 +72,14 @@ export function BookingsTable({ bookings, total, pagination, setPagination }: Bo
                   <p className="text-xs text-muted-foreground">{b.client_phone}</p>
                 </td>
                 <td className="px-4 py-3 max-w-[200px]">
-                  {b.type === "livestock" && b.livestock && (
-                    <p className="truncate text-xs">{b.livestock.event_title} · {b.livestock.quantity} units</p>
+                  {b.type === "pre-order" && b.pre_order && (
+                    <p className="truncate text-xs">{b.pre_order.event_title} · {b.pre_order.quantity} units</p>
                   )}
                   {b.type === "delivery" && b.delivery && (
                     <p className="truncate text-xs">{b.delivery.delivery_location_name} · {b.delivery.goods}</p>
+                  )}
+                  {b.type === "pickup" && b.pickup && (
+                    <p className="truncate text-xs">{b.pickup.farm_address} · {b.pickup.goods}</p>
                   )}
                 </td>
                 <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap">

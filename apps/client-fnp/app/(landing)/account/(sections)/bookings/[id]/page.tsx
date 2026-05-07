@@ -111,40 +111,40 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
         {/* Booking type card */}
         <div className="border rounded-xl p-5 space-y-4">
           <div className="flex items-center gap-2 text-sm font-semibold capitalize">
-            {booking.type === "delivery" ? <Truck className="w-4 h-4" /> : <CalendarDays className="w-4 h-4" />}
-            {booking.type} Booking
+            {booking.type === "delivery" || booking.type === "pickup" ? <Truck className="w-4 h-4" /> : <CalendarDays className="w-4 h-4" />}
+            {booking.type === "pre-order" ? "Pre-Order" : capitalize(booking.type)} Booking
           </div>
 
-          {booking.type === "livestock" && booking.livestock && (
+          {booking.type === "pre-order" && booking.pre_order && (
             <div className="space-y-3">
               <div className="grid grid-cols-2 gap-3 text-sm">
                 <div>
                   <p className="text-muted-foreground text-xs mb-0.5">Event</p>
-                  <p className="font-medium">{booking.livestock.event_title}</p>
+                  <p className="font-medium">{booking.pre_order.event_title}</p>
                 </div>
                 <div>
                   <p className="text-muted-foreground text-xs mb-0.5">Product</p>
-                  <p className="font-medium">{booking.livestock.product_name}</p>
+                  <p className="font-medium">{booking.pre_order.product_name}</p>
                 </div>
                 <div>
                   <p className="text-muted-foreground text-xs mb-0.5">Quantity</p>
-                  <p className="font-medium">{booking.livestock.quantity} units</p>
+                  <p className="font-medium">{booking.pre_order.quantity} units</p>
                 </div>
                 <div>
                   <p className="text-muted-foreground text-xs mb-0.5">Unit Price</p>
-                  <p className="font-medium">${(booking.livestock.unit_price / 100).toFixed(2)}</p>
+                  <p className="font-medium">${(booking.pre_order.unit_price / 100).toFixed(2)}</p>
                 </div>
               </div>
 
               <div className="border-t pt-3 grid grid-cols-2 gap-3 text-sm">
                 <div>
                   <p className="text-muted-foreground text-xs mb-0.5">Deposit</p>
-                  <p className="font-bold text-orange-700">${(booking.livestock.deposit_amount / 100).toFixed(2)}</p>
-                  <p className="text-xs text-muted-foreground">{booking.livestock.deposit_paid ? "Paid" : "Not yet paid"}</p>
+                  <p className="font-bold text-orange-700">${(booking.pre_order.deposit_amount / 100).toFixed(2)}</p>
+                  <p className="text-xs text-muted-foreground">{booking.pre_order.deposit_paid ? "Paid" : "Not yet paid"}</p>
                 </div>
                 <div>
                   <p className="text-muted-foreground text-xs mb-0.5">Balance Due</p>
-                  <p className="font-bold">${(booking.livestock.balance_due / 100).toFixed(2)}</p>
+                  <p className="font-bold">${(booking.pre_order.balance_due / 100).toFixed(2)}</p>
                 </div>
               </div>
             </div>

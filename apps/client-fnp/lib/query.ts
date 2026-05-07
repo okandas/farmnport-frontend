@@ -51,7 +51,7 @@ export function queryClient(slug: string) {
   return api.get(url)
 }
 
-export function queryClients(slug: string, pagination?: PaginationModel & { province?: string[], produce?: string[], category?: string[], payment_terms?: string[], pricing?: string[], verified?: string[] }) {
+export function queryClients(slug: string, pagination?: PaginationModel & { province?: string[], produce?: string[], category?: string[], payment_terms?: string[], pricing?: string[], verified?: string[], has_booking?: string }) {
     const params = new URLSearchParams()
 
     // Add pagination
@@ -77,6 +77,9 @@ export function queryClients(slug: string, pagination?: PaginationModel & { prov
     }
     if (pagination?.verified && pagination.verified.length > 0) {
         params.set('verified', pagination.verified[0])
+    }
+    if (pagination?.has_booking) {
+        params.set('has_booking', pagination.has_booking)
     }
 
     const queryString = params.toString()
@@ -661,17 +664,20 @@ export function listDeliveryLocations() {
 }
 
 export function createBooking(data: {
-  type: "livestock" | "delivery"
-  booking_date: string // RFC3339
+  type: "pre-order" | "delivery" | "pickup"
+  booking_date?: string // RFC3339
   time_slot?: string
   notes?: string
   phone: string
-  // livestock
+  // pre-order
   event_id?: string
   quantity?: number
   // delivery
   delivery_location_id?: string
   goods?: string
+  // pickup
+  buyer_id?: string
+  farm_address?: string
 }) {
   return api.post(`${BaseURL}/booking/`, data)
 }

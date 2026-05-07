@@ -44,7 +44,7 @@ export default function BookingEventDetailPage() {
   const mutation = useMutation({
     mutationFn: () =>
       createBooking({
-        type: "livestock",
+        type: "pre-order",
         event_id: event?.id,
         quantity: parseInt(quantity),
         phone,

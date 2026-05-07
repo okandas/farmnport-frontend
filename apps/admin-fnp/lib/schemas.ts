@@ -78,6 +78,7 @@ export const ApplicationUserSchema = z.object({
   bad_participant: z.boolean(),
   archived: z.boolean().optional(),
   has_prices: z.boolean(),
+  has_booking: z.boolean().optional(),
 })
 
 const pricingSchema = z.object({

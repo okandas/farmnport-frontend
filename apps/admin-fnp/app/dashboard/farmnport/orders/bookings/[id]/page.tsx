@@ -9,6 +9,7 @@ import { queryAdminBooking, updateBookingStatus } from "@/lib/query"
 import { centsToDollars } from "@/lib/utilities"
 import { toast } from "@/components/ui/use-toast"
 import { DashboardShell } from "@/components/state/dashboardShell"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 
 const STATUS_STYLES: Record<string, string> = {
   pending:   "bg-yellow-100 text-yellow-800",
@@ -19,10 +20,10 @@ const STATUS_STYLES: Record<string, string> = {
   cancelled: "bg-red-100 text-red-800",
 }
 
-const LIVESTOCK_STEPS = ["pending", "confirmed", "ready", "completed"]
+const PRE_ORDER_STEPS = ["pending", "confirmed", "ready", "completed"]
 const DELIVERY_STEPS  = ["pending", "approved", "completed"]
 
-const LIVESTOCK_TRANSITIONS: Record<string, string[]> = {
+const PRE_ORDER_TRANSITIONS: Record<string, string[]> = {
   pending:   ["confirmed", "cancelled"],
   confirmed: ["ready", "cancelled"],
   ready:     ["completed", "cancelled"],
@@ -51,13 +52,14 @@ function formatDateTime(d: string) {
 
 function getTransitions(booking: any): string[] {
   if (!booking) return []
-  if (booking.type === "livestock") return LIVESTOCK_TRANSITIONS[booking.status] ?? []
+  if (booking.type === "pre-order") return PRE_ORDER_TRANSITIONS[booking.status] ?? []
   if (booking.type === "delivery")  return DELIVERY_TRANSITIONS[booking.status] ?? []
+  if (booking.type === "pickup")    return DELIVERY_TRANSITIONS[booking.status] ?? []
   return []
 }
 
 function StatusSteps({ status, type }: { status: string; type: string }) {
-  const steps = type === "delivery" ? DELIVERY_STEPS : LIVESTOCK_STEPS
+  const steps = type === "delivery" || type === "pickup" ? DELIVERY_STEPS : PRE_ORDER_STEPS
   if (status === "cancelled") return (
     <span className="text-sm font-medium text-red-600">This booking was cancelled.</span>
   )
@@ -101,6 +103,8 @@ export default function AdminBookingDetailPage({ params }: { params: Promise<{ i
   const { id } = use(params)
   const queryClient = useQueryClient()
   const [note, setNote] = useState("")
+  const [cancelOpen, setCancelOpen] = useState(false)
+  const [cancelReason, setCancelReason] = useState("")
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin-booking", id],
@@ -109,7 +113,7 @@ export default function AdminBookingDetailPage({ params }: { params: Promise<{ i
   })
 
   const statusMutation = useMutation({
-    mutationFn: (status: string) => updateBookingStatus(id, status, note || undefined),
+    mutationFn: (status: string) => updateBookingStatus(id, status, status === "cancelled" ? cancelReason || undefined : note || undefined),
     onSuccess: (_, status) => {
       toast({ description: `Booking marked as ${status}` })
       setNote("")
@@ -189,14 +193,14 @@ export default function AdminBookingDetailPage({ params }: { params: Promise<{ i
           </div>
 
           {/* Booking details */}
-          {booking.type === "livestock" && booking.livestock && (
+          {booking.type === "pre-order" && booking.pre_order && (
             <div className="border rounded-xl p-5">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-4">Pre-Order Details</p>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                <Field label="Event" value={booking.livestock.event_title} />
-                <Field label="Product" value={booking.livestock.product_name} />
-                <Field label="Quantity" value={`${booking.livestock.quantity?.toLocaleString()} units`} />
-                <Field label="Unit Price" value={String(centsToDollars(booking.livestock.unit_price))} />
+                <Field label="Event" value={booking.pre_order.event_title} />
+                <Field label="Product" value={booking.pre_order.product_name} />
+                <Field label="Quantity" value={`${booking.pre_order.quantity?.toLocaleString()} units`} />
+                <Field label="Unit Price" value={String(centsToDollars(booking.pre_order.unit_price))} />
               </div>
               {booking.notes && (
                 <div className="mt-4 pt-4 border-t">
@@ -228,28 +232,50 @@ export default function AdminBookingDetailPage({ params }: { params: Promise<{ i
             </div>
           )}
 
-          {/* Payment summary — livestock only */}
-          {booking.type === "livestock" && booking.livestock && (
+          {booking.type === "pickup" && booking.pickup && (
+            <div className="border rounded-xl p-5">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-4">Pickup Details</p>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                <Field label="Buyer" value={booking.pickup.buyer_name} />
+                <Field label="Farm Address" value={booking.pickup.farm_address} />
+                <Field label="Date" value={formatDate(booking.booking_date)} />
+                {booking.time_slot && <Field label="Time Slot" value={booking.time_slot} />}
+                {booking.pickup.approved_by_name && <Field label="Approved By" value={booking.pickup.approved_by_name} />}
+              </div>
+              <div className="mt-4">
+                <Field label="Goods" value={booking.pickup.goods} />
+              </div>
+              {booking.notes && (
+                <div className="mt-4 pt-4 border-t">
+                  <p className="text-xs text-muted-foreground">Client Notes</p>
+                  <p className="text-sm mt-0.5">{booking.notes}</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Payment summary — pre-order only */}
+          {booking.type === "pre-order" && booking.pre_order && (
             <div className="border rounded-xl p-5">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-4">Payment</p>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Order Total ({booking.livestock.quantity?.toLocaleString()} units)</span>
-                  <span className="font-medium">{centsToDollars((booking.livestock.unit_price ?? 0) * (booking.livestock.quantity ?? 0))}</span>
+                  <span className="text-muted-foreground">Order Total ({booking.pre_order.quantity?.toLocaleString()} units)</span>
+                  <span className="font-medium">{centsToDollars((booking.pre_order.unit_price ?? 0) * (booking.pre_order.quantity ?? 0))}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Deposit</span>
-                  <span className="font-semibold text-orange-700">{centsToDollars(booking.livestock.deposit_amount)}</span>
+                  <span className="font-semibold text-orange-700">{centsToDollars(booking.pre_order.deposit_amount)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Deposit Status</span>
-                  <span className={`font-medium ${booking.livestock.deposit_paid ? "text-green-700" : "text-red-600"}`}>
-                    {booking.livestock.deposit_paid ? "Paid" : "Not yet paid"}
+                  <span className={`font-medium ${booking.pre_order.deposit_paid ? "text-green-700" : "text-red-600"}`}>
+                    {booking.pre_order.deposit_paid ? "Paid" : "Not yet paid"}
                   </span>
                 </div>
                 <div className="flex justify-between border-t pt-2 mt-1">
                   <span className="font-semibold">Balance Due</span>
-                  <span className="font-bold">{centsToDollars(booking.livestock.balance_due)}</span>
+                  <span className="font-bold">{centsToDollars(booking.pre_order.balance_due)}</span>
                 </div>
               </div>
             </div>
@@ -258,7 +284,7 @@ export default function AdminBookingDetailPage({ params }: { params: Promise<{ i
 
         {/* ── Right: actions + history ── */}
         <div className="space-y-5">
-          {nextStatuses.length > 0 && (
+          {nextStatuses.filter(s => s !== "cancelled").length > 0 && (
             <div className="border rounded-xl p-5 space-y-3">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Update Status</p>
               <textarea
@@ -269,16 +295,12 @@ export default function AdminBookingDetailPage({ params }: { params: Promise<{ i
                 className="w-full text-sm border rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-1 focus:ring-ring bg-transparent"
               />
               <div className="flex flex-col gap-2">
-                {nextStatuses.map((s) => (
+                {nextStatuses.filter(s => s !== "cancelled").map((s) => (
                   <button
                     key={s}
                     onClick={() => statusMutation.mutate(s)}
                     disabled={statusMutation.isPending}
-                    className={`w-full py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 ${
-                      s === "cancelled"
-                        ? "border border-red-200 text-red-600 hover:bg-red-50"
-                        : "bg-primary text-primary-foreground hover:bg-primary/90"
-                    }`}
+                    className="w-full py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90"
                   >
                     {statusMutation.isPending
                       ? <Loader2 className="w-4 h-4 animate-spin mx-auto" />
@@ -308,7 +330,55 @@ export default function AdminBookingDetailPage({ params }: { params: Promise<{ i
               </div>
             </div>
           )}
+
+          {nextStatuses.includes("cancelled") && booking.status !== "cancelled" && (
+            <button
+              onClick={() => setCancelOpen(true)}
+              className="w-full py-2 rounded-lg text-sm font-medium border border-red-200 text-red-600 hover:bg-red-50 transition-colors"
+            >
+              Cancel Booking
+            </button>
+          )}
         </div>
+
+        {/* Cancel dialog */}
+        <Dialog open={cancelOpen} onOpenChange={setCancelOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Cancel Booking</DialogTitle>
+            </DialogHeader>
+            <p className="text-sm text-muted-foreground">Please provide a reason for cancelling this booking.</p>
+            <textarea
+              value={cancelReason}
+              onChange={(e) => setCancelReason(e.target.value)}
+              placeholder="Reason for cancellation..."
+              rows={3}
+              className="w-full text-sm border rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-1 focus:ring-ring bg-transparent"
+            />
+            <DialogFooter>
+              <button
+                onClick={() => setCancelOpen(false)}
+                className="px-4 py-2 text-sm rounded-lg border hover:bg-muted transition-colors"
+              >
+                Go back
+              </button>
+              <button
+                onClick={() => {
+                  statusMutation.mutate("cancelled", {
+                    onSuccess: () => {
+                      setCancelOpen(false)
+                      setCancelReason("")
+                    }
+                  })
+                }}
+                disabled={!cancelReason.trim() || statusMutation.isPending}
+                className="px-4 py-2 text-sm rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors disabled:opacity-50"
+              >
+                {statusMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Confirm Cancel"}
+              </button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </DashboardShell>
   )
