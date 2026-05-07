@@ -2,13 +2,12 @@
 
 import { useState, use } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { Loader2, CalendarDays, Truck, Clock } from "lucide-react"
+import { Loader2, CalendarDays, Truck, ArrowLeft, CheckCircle2, Circle } from "lucide-react"
 import Link from "next/link"
 
 import { queryAdminBooking, updateBookingStatus } from "@/lib/query"
 import { centsToDollars } from "@/lib/utilities"
 import { toast } from "@/components/ui/use-toast"
-import { DashboardHeader } from "@/components/state/dashboardHeader"
 import { DashboardShell } from "@/components/state/dashboardShell"
 
 const STATUS_STYLES: Record<string, string> = {
@@ -20,14 +19,8 @@ const STATUS_STYLES: Record<string, string> = {
   cancelled: "bg-red-100 text-red-800",
 }
 
-const STATUS_TRANSITIONS: Record<string, string[]> = {
-  pending:   ["confirmed", "cancelled"],
-  confirmed: ["ready", "cancelled"],
-  approved:  ["ready", "cancelled"],
-  ready:     ["completed", "cancelled"],
-  completed: [],
-  cancelled: [],
-}
+const LIVESTOCK_STEPS = ["pending", "confirmed", "ready", "completed"]
+const DELIVERY_STEPS  = ["pending", "approved", "completed"]
 
 const LIVESTOCK_TRANSITIONS: Record<string, string[]> = {
   pending:   ["confirmed", "cancelled"],
@@ -59,8 +52,49 @@ function formatDateTime(d: string) {
 function getTransitions(booking: any): string[] {
   if (!booking) return []
   if (booking.type === "livestock") return LIVESTOCK_TRANSITIONS[booking.status] ?? []
-  if (booking.type === "delivery") return DELIVERY_TRANSITIONS[booking.status] ?? []
-  return STATUS_TRANSITIONS[booking.status] ?? []
+  if (booking.type === "delivery")  return DELIVERY_TRANSITIONS[booking.status] ?? []
+  return []
+}
+
+function StatusSteps({ status, type }: { status: string; type: string }) {
+  const steps = type === "delivery" ? DELIVERY_STEPS : LIVESTOCK_STEPS
+  if (status === "cancelled") return (
+    <span className="text-sm font-medium text-red-600">This booking was cancelled.</span>
+  )
+  const current = steps.indexOf(status)
+  return (
+    <div className="flex items-start gap-0">
+      {steps.map((step, i) => {
+        const done   = i <= current
+        const isLast = i === steps.length - 1
+        return (
+          <div key={step} className="flex items-start flex-1 last:flex-none">
+            <div className="flex flex-col items-center gap-1.5">
+              {done
+                ? <CheckCircle2 className="w-4 h-4 text-primary" />
+                : <Circle className="w-4 h-4 text-muted-foreground/30" />
+              }
+              <span className={`text-[11px] font-medium ${done ? "text-foreground" : "text-muted-foreground"}`}>
+                {capitalize(step)}
+              </span>
+            </div>
+            {!isLast && (
+              <div className={`h-px flex-1 mt-2 mx-1.5 ${i < current ? "bg-primary" : "bg-border"}`} />
+            )}
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+function Field({ label, value }: { label: string; value?: string | null }) {
+  return (
+    <div>
+      <p className="text-xs text-muted-foreground">{label}</p>
+      <p className="text-sm font-medium mt-0.5">{value || "—"}</p>
+    </div>
+  )
 }
 
 export default function AdminBookingDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -88,8 +122,9 @@ export default function AdminBookingDetailPage({ params }: { params: Promise<{ i
   if (isLoading) {
     return (
       <DashboardShell>
-        <DashboardHeader heading="Booking" text="" />
-        <div className="flex justify-center py-16"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>
+        <div className="flex justify-center py-16">
+          <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+        </div>
       </DashboardShell>
     )
   }
@@ -98,7 +133,7 @@ export default function AdminBookingDetailPage({ params }: { params: Promise<{ i
   if (!booking) {
     return (
       <DashboardShell>
-        <DashboardHeader heading="Booking not found" text="" />
+        <p className="text-muted-foreground">Booking not found.</p>
       </DashboardShell>
     )
   }
@@ -107,149 +142,131 @@ export default function AdminBookingDetailPage({ params }: { params: Promise<{ i
 
   return (
     <DashboardShell>
-      <DashboardHeader
-        heading={booking.booking_ref}
-        text={`Created ${formatDateTime(booking.created)}`}
-      />
+
+      {/* Back + header */}
+      <div className="mb-8">
+        <Link
+          href="/dashboard/farmnport/orders/bookings"
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-4"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" /> All Bookings
+        </Link>
+
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
+            <h1 className="text-lg font-bold font-mono tracking-tight">{booking.booking_ref}</h1>
+            <span className={`text-xs px-2.5 py-0.5 rounded-full font-medium ${STATUS_STYLES[booking.status] ?? "bg-muted text-muted-foreground"}`}>
+              {capitalize(booking.status)}
+            </span>
+            <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+              {booking.type === "delivery" ? <Truck className="w-3.5 h-3.5" /> : <CalendarDays className="w-3.5 h-3.5" />}
+              {capitalize(booking.type)}
+            </span>
+          </div>
+          <p className="text-xs text-muted-foreground">{formatDateTime(booking.created)}</p>
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-        {/* Left — details */}
+        {/* ── Left: main detail ── */}
         <div className="lg:col-span-2 space-y-5">
 
-          {/* Status badge */}
-          <div className="flex items-center gap-3">
-            <span className={`inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full font-medium ${STATUS_STYLES[booking.status] ?? "bg-muted text-muted-foreground"}`}>
-              {booking.type === "delivery" ? <Truck className="w-4 h-4" /> : <CalendarDays className="w-4 h-4" />}
-              {capitalize(booking.type)} · {capitalize(booking.status)}
-            </span>
+          {/* Progress */}
+          <div className="border rounded-xl p-5">
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-4">Status</p>
+            <StatusSteps status={booking.status} type={booking.type} />
           </div>
 
           {/* Client */}
-          <div className="border rounded-xl p-5 space-y-3">
-            <h2 className="font-semibold text-sm">Client</h2>
-            <div className="grid grid-cols-2 gap-3 text-sm">
-              <div>
-                <p className="text-muted-foreground text-xs mb-0.5">Name</p>
-                <p className="font-medium">{booking.client_name}</p>
-              </div>
-              <div>
-                <p className="text-muted-foreground text-xs mb-0.5">Email</p>
-                <p className="font-medium">{booking.client_email}</p>
-              </div>
-              <div>
-                <p className="text-muted-foreground text-xs mb-0.5">Phone</p>
-                <p className="font-medium">{booking.client_phone || "—"}</p>
-              </div>
+          <div className="border rounded-xl p-5">
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-4">Client</p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+              <Field label="Name" value={booking.client_name} />
+              <Field label="Phone" value={booking.client_phone} />
+              <Field label="Email" value={booking.client_email} />
             </div>
           </div>
 
           {/* Booking details */}
-          <div className="border rounded-xl p-5 space-y-4">
-            <h2 className="font-semibold text-sm">Booking Details</h2>
-
-            {booking.type === "livestock" && booking.livestock && (
-              <div className="space-y-3 text-sm">
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <p className="text-muted-foreground text-xs mb-0.5">Event</p>
-                    <p className="font-medium">{booking.livestock.event_title}</p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground text-xs mb-0.5">Product</p>
-                    <p className="font-medium">{booking.livestock.product_name}</p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground text-xs mb-0.5">Quantity</p>
-                    <p className="font-medium">{booking.livestock.quantity} units</p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground text-xs mb-0.5">Unit Price</p>
-                    <p className="font-medium">{centsToDollars(booking.livestock.unit_price)}</p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground text-xs mb-0.5">Deposit</p>
-                    <p className="font-bold text-orange-700">{centsToDollars(booking.livestock.deposit_amount)}</p>
-                    <p className="text-xs text-muted-foreground">{booking.livestock.deposit_paid ? "Paid" : "Not paid"}</p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground text-xs mb-0.5">Balance Due</p>
-                    <p className="font-bold">{centsToDollars(booking.livestock.balance_due)}</p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {booking.type === "delivery" && booking.delivery && (
-              <div className="space-y-3 text-sm">
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <p className="text-muted-foreground text-xs mb-0.5">Drop-off Location</p>
-                    <p className="font-medium">{booking.delivery.delivery_location_name}</p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground text-xs mb-0.5">Date</p>
-                    <p className="font-medium">{formatDate(booking.booking_date)}</p>
-                  </div>
-                  {booking.time_slot && (
-                    <div>
-                      <p className="text-muted-foreground text-xs mb-0.5">Time Slot</p>
-                      <p className="font-medium">{booking.time_slot}</p>
-                    </div>
-                  )}
-                  {booking.delivery.approved_by_name && (
-                    <div>
-                      <p className="text-muted-foreground text-xs mb-0.5">Approved By</p>
-                      <p className="font-medium">{booking.delivery.approved_by_name}</p>
-                    </div>
-                  )}
-                </div>
-                <div>
-                  <p className="text-muted-foreground text-xs mb-0.5">Goods</p>
-                  <p className="font-medium">{booking.delivery.goods}</p>
-                </div>
-              </div>
-            )}
-
-            {booking.notes && (
-              <div className="border-t pt-3 text-sm">
-                <p className="text-muted-foreground text-xs mb-0.5">Client Notes</p>
-                <p>{booking.notes}</p>
-              </div>
-            )}
-          </div>
-
-          {/* Status history */}
-          {booking.status_history?.length > 0 && (
+          {booking.type === "livestock" && booking.livestock && (
             <div className="border rounded-xl p-5">
-              <h2 className="font-semibold text-sm mb-4">Status History</h2>
-              <div className="space-y-3">
-                {[...booking.status_history].reverse().map((h: any, i: number) => (
-                  <div key={i} className="flex items-start gap-3 text-sm">
-                    <Clock className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
-                    <div>
-                      <p className="font-medium">{capitalize(h.to)}</p>
-                      {h.note && <p className="text-xs text-muted-foreground">{h.note}</p>}
-                      <p className="text-xs text-muted-foreground">{formatDateTime(h.timestamp)} · {h.changed_by}</p>
-                    </div>
-                  </div>
-                ))}
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-4">Pre-Order Details</p>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                <Field label="Event" value={booking.livestock.event_title} />
+                <Field label="Product" value={booking.livestock.product_name} />
+                <Field label="Quantity" value={`${booking.livestock.quantity?.toLocaleString()} units`} />
+                <Field label="Unit Price" value={String(centsToDollars(booking.livestock.unit_price))} />
+              </div>
+              {booking.notes && (
+                <div className="mt-4 pt-4 border-t">
+                  <p className="text-xs text-muted-foreground">Client Notes</p>
+                  <p className="text-sm mt-0.5">{booking.notes}</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {booking.type === "delivery" && booking.delivery && (
+            <div className="border rounded-xl p-5">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-4">Delivery Details</p>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                <Field label="Drop-off Location" value={booking.delivery.delivery_location_name} />
+                <Field label="Date" value={formatDate(booking.booking_date)} />
+                {booking.time_slot && <Field label="Time Slot" value={booking.time_slot} />}
+                {booking.delivery.approved_by_name && <Field label="Approved By" value={booking.delivery.approved_by_name} />}
+              </div>
+              <div className="mt-4">
+                <Field label="Goods" value={booking.delivery.goods} />
+              </div>
+              {booking.notes && (
+                <div className="mt-4 pt-4 border-t">
+                  <p className="text-xs text-muted-foreground">Client Notes</p>
+                  <p className="text-sm mt-0.5">{booking.notes}</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Payment summary — livestock only */}
+          {booking.type === "livestock" && booking.livestock && (
+            <div className="border rounded-xl p-5">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-4">Payment</p>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Order Total ({booking.livestock.quantity?.toLocaleString()} units)</span>
+                  <span className="font-medium">{centsToDollars((booking.livestock.unit_price ?? 0) * (booking.livestock.quantity ?? 0))}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Deposit</span>
+                  <span className="font-semibold text-orange-700">{centsToDollars(booking.livestock.deposit_amount)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Deposit Status</span>
+                  <span className={`font-medium ${booking.livestock.deposit_paid ? "text-green-700" : "text-red-600"}`}>
+                    {booking.livestock.deposit_paid ? "Paid" : "Not yet paid"}
+                  </span>
+                </div>
+                <div className="flex justify-between border-t pt-2 mt-1">
+                  <span className="font-semibold">Balance Due</span>
+                  <span className="font-bold">{centsToDollars(booking.livestock.balance_due)}</span>
+                </div>
               </div>
             </div>
           )}
         </div>
 
-        {/* Right — actions */}
-        <div className="space-y-4">
+        {/* ── Right: actions + history ── */}
+        <div className="space-y-5">
           {nextStatuses.length > 0 && (
-            <div className="border rounded-xl p-5 space-y-4">
-              <h2 className="font-semibold text-sm">Update Status</h2>
+            <div className="border rounded-xl p-5 space-y-3">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Update Status</p>
               <textarea
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
                 placeholder="Add a note (optional)"
-                rows={3}
-                className="w-full text-sm border rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-1 focus:ring-ring"
+                rows={2}
+                className="w-full text-sm border rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-1 focus:ring-ring bg-transparent"
               />
               <div className="flex flex-col gap-2">
                 {nextStatuses.map((s) => (
@@ -263,19 +280,34 @@ export default function AdminBookingDetailPage({ params }: { params: Promise<{ i
                         : "bg-primary text-primary-foreground hover:bg-primary/90"
                     }`}
                   >
-                    {statusMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : `Mark as ${capitalize(s)}`}
+                    {statusMutation.isPending
+                      ? <Loader2 className="w-4 h-4 animate-spin mx-auto" />
+                      : `Mark as ${capitalize(s)}`}
                   </button>
                 ))}
               </div>
             </div>
           )}
 
-          <Link
-            href="/dashboard/farmnport/orders/bookings"
-            className="block text-center text-sm text-muted-foreground hover:text-foreground border rounded-xl py-2.5"
-          >
-            Back to Bookings
-          </Link>
+          {booking.status_history?.length > 0 && (
+            <div className="border rounded-xl p-5">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-4">History</p>
+              <div className="space-y-4">
+                {[...booking.status_history].reverse().map((h: any, i: number) => (
+                  <div key={i} className="flex gap-3 text-sm">
+                    <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40 mt-1.5 shrink-0" />
+                    <div>
+                      <p className="font-medium text-sm">{capitalize(h.to)}</p>
+                      {h.note && <p className="text-xs text-muted-foreground mt-0.5">{h.note}</p>}
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {formatDateTime(h.timestamp)}{h.changed_by ? ` · ${h.changed_by}` : ""}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </DashboardShell>

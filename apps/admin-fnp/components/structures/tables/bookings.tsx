@@ -57,7 +57,7 @@ export function BookingsTable({ bookings, total, pagination, setPagination }: Bo
             {bookings.map((b) => (
               <tr key={b.id} className="hover:bg-muted/20 transition-colors">
                 <td className="px-4 py-3">
-                  <Link href={`/dashboard/farmnport/orders/bookings/${b.id}`} className="font-medium text-primary hover:underline">
+                  <Link href={`/dashboard/farmnport/orders/bookings/${b.id}`} className="font-mono text-xs font-medium hover:underline text-foreground">
                     {b.booking_ref}
                   </Link>
                 </td>
