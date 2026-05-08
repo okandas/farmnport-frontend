@@ -47,8 +47,8 @@ export const dashboardConfig: DashboardConfig = {
           icon: "calender",
         },
         {
-          title: "Delivery Locations",
-          href: "/dashboard/farmnport/orders/delivery-locations",
+          title: "Client Locations",
+          href: "/dashboard/farmnport/orders/client-locations",
           icon: "mapPin",
         },
       ],

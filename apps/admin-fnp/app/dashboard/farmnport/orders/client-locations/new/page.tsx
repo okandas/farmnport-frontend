@@ -1,19 +1,31 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { useParams, useRouter } from "next/navigation"
-import { useQuery, useMutation } from "@tanstack/react-query"
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import { Plus, X, Loader2 } from "lucide-react"
 import Link from "next/link"
 import { toast } from "@/components/ui/use-toast"
 
-import { queryDeliveryLocations, updateDeliveryLocation } from "@/lib/query"
+import { createDeliveryLocation, queryUsers } from "@/lib/query"
 import { LocationPicker } from "@/components/ui/location-picker"
 import { DashboardHeader } from "@/components/state/dashboardHeader"
 import { DashboardShell } from "@/components/state/dashboardShell"
 
 const inputCls = "block w-full rounded-md bg-background px-3 py-1.5 text-sm text-foreground outline outline-1 -outline-offset-1 outline-border placeholder:text-muted-foreground focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-ring"
 const labelCls = "block text-sm/6 font-medium text-foreground"
+
+const EMPTY_FORM = {
+  client_id: "",
+  name: "",
+  address: "",
+  city: "",
+  time_slots: [""],
+  phones: [""],
+  latitude: 0,
+  longitude: 0,
+  active: true,
+}
 
 function DynamicList({
   values,
@@ -61,53 +73,25 @@ function DynamicList({
   )
 }
 
-export default function EditDeliveryLocationPage() {
-  const { id } = useParams<{ id: string }>()
+export default function NewDeliveryLocationPage() {
   const router = useRouter()
-  const [form, setForm] = useState({
-    name: "",
-    address: "",
-    city: "",
-    time_slots: [""],
-    phones: [""],
-    latitude: 0,
-    longitude: 0,
-    active: true,
-  })
-  const [loaded, setLoaded] = useState(false)
-
-  const { data } = useQuery({
-    queryKey: ["admin-delivery-locations"],
-    queryFn: () => queryDeliveryLocations(),
-    refetchOnWindowFocus: false,
-  })
-
-  useEffect(() => {
-    if (data && !loaded) {
-      const loc = data?.data?.locations?.find((l: any) => l.id === id)
-      if (loc) {
-        setForm({
-          name: loc.name,
-          address: loc.address,
-          city: loc.city,
-          time_slots: loc.time_slots?.length ? loc.time_slots : [""],
-          phones: loc.phones?.length ? loc.phones : [""],
-          latitude: loc.latitude || 0,
-          longitude: loc.longitude || 0,
-          active: loc.active,
-        })
-        setLoaded(true)
-      }
-    }
-  }, [data, id, loaded])
+  const [form, setForm] = useState(EMPTY_FORM)
 
   function set(field: string, value: any) {
     setForm((f) => ({ ...f, [field]: value }))
   }
 
+  const { data: buyersData } = useQuery({
+    queryKey: ["admin-buyers-list"],
+    queryFn: () => queryUsers({ type: ["buyer"], limit: 200 }).then((r) => r.data),
+    refetchOnWindowFocus: false,
+  })
+  const buyers: any[] = buyersData?.data ?? []
+
   const mutation = useMutation({
     mutationFn: () =>
-      updateDeliveryLocation(id, {
+      createDeliveryLocation({
+        client_id: form.client_id,
         name: form.name,
         address: form.address,
         city: form.city,
@@ -118,17 +102,40 @@ export default function EditDeliveryLocationPage() {
         active: form.active,
       }),
     onSuccess: () => {
-      toast({ description: "Location updated" })
-      router.push("/dashboard/farmnport/orders/delivery-locations")
+      toast({ description: "Location created" })
+      router.push("/dashboard/farmnport/orders/client-locations")
     },
-    onError: () => toast({ description: "Failed to update location", variant: "destructive" }),
+    onError: () => toast({ description: "Failed to create location", variant: "destructive" }),
   })
 
   return (
     <DashboardShell>
-      <DashboardHeader heading="Edit Delivery Location" text="Update drop-off hub details." />
+      <DashboardHeader heading="New Delivery Location" text="Add a collection hub for customer orders." />
 
       <div className="mt-4 space-y-0 divide-y divide-border">
+
+        {/* Buyer */}
+        <div className="grid grid-cols-1 gap-x-8 gap-y-10 py-10 md:grid-cols-3">
+          <div>
+            <h2 className="text-base/7 font-semibold text-foreground">Buyer</h2>
+            <p className="mt-1 text-sm/6 text-muted-foreground">Which buyer does this receiving location belong to?</p>
+          </div>
+          <div className="max-w-2xl md:col-span-2">
+            <label className={labelCls}>Buyer *</label>
+            <div className="mt-2">
+              <select
+                value={form.client_id}
+                onChange={(e) => set("client_id", e.target.value)}
+                className={inputCls}
+              >
+                <option value="">Select a buyer...</option>
+                {buyers.map((b: any) => (
+                  <option key={b.id} value={b.id}>{b.name}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </div>
 
         {/* Location Details */}
         <div className="grid grid-cols-1 gap-x-8 gap-y-10 py-10 md:grid-cols-3">
@@ -143,6 +150,7 @@ export default function EditDeliveryLocationPage() {
                 <input
                   value={form.name}
                   onChange={(e) => set("name", e.target.value)}
+                  placeholder="Fivet Poultry & Livestock Centre Marondera"
                   className={inputCls}
                 />
               </div>
@@ -153,6 +161,7 @@ export default function EditDeliveryLocationPage() {
                 <input
                   value={form.address}
                   onChange={(e) => set("address", e.target.value)}
+                  placeholder="Stand No 5202, Marondera Township"
                   className={inputCls}
                 />
               </div>
@@ -163,6 +172,7 @@ export default function EditDeliveryLocationPage() {
                 <input
                   value={form.city}
                   onChange={(e) => set("city", e.target.value)}
+                  placeholder="Marondera"
                   className={inputCls}
                 />
               </div>
@@ -210,10 +220,11 @@ export default function EditDeliveryLocationPage() {
             <LocationPicker
               latitude={form.latitude || undefined}
               longitude={form.longitude || undefined}
-              defaultValue={form.address}
               onSelect={(place) => {
                 set("latitude", place.latitude)
                 set("longitude", place.longitude)
+                if (place.address && !form.address) set("address", place.address)
+                if (place.city && !form.city) set("city", place.city)
               }}
             />
             {form.latitude !== 0 && (
@@ -253,16 +264,16 @@ export default function EditDeliveryLocationPage() {
 
       {/* Actions */}
       <div className="flex items-center justify-end gap-x-4 border-t border-border pt-6">
-        <Link href="/dashboard/farmnport/orders/delivery-locations" className="text-sm/6 font-semibold text-foreground">
+        <Link href="/dashboard/farmnport/orders/client-locations" className="text-sm/6 font-semibold text-foreground">
           Cancel
         </Link>
         <button
           onClick={() => mutation.mutate()}
-          disabled={mutation.isPending || !form.name || !form.address || !form.city}
+          disabled={mutation.isPending || !form.client_id || !form.name || !form.address || !form.city}
           className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 disabled:opacity-50 transition-colors"
         >
           {mutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
-          Save Changes
+          Create Location
         </button>
       </div>
     </DashboardShell>

@@ -6,12 +6,12 @@ import { PaginationState, ColumnDef, createColumnHelper } from "@tanstack/react-
 import Link from "next/link"
 import { Phone, Clock, Navigation } from "lucide-react"
 
-import { queryDeliveryLocations } from "@/lib/query"
+import { queryClientLocations } from "@/lib/query"
 import { DataTable } from "@/components/structures/data-table"
 import { DashboardHeader } from "@/components/state/dashboardHeader"
 import { DashboardShell } from "@/components/state/dashboardShell"
 
-type DeliveryLocation = {
+type ClientLocation = {
   id: string
   name: string
   address: string
@@ -23,14 +23,14 @@ type DeliveryLocation = {
   active: boolean
 }
 
-const columnHelper = createColumnHelper<DeliveryLocation>()
+const columnHelper = createColumnHelper<ClientLocation>()
 
 const columns = [
   columnHelper.accessor("name", {
     header: "Name",
     cell: ({ row }) => (
       <Link
-        href={`/dashboard/farmnport/orders/delivery-locations/${row.original.id}/edit`}
+        href={`/dashboard/farmnport/orders/client-locations/${row.original.id}/edit`}
         className="font-medium hover:text-primary transition-colors"
       >
         {row.getValue("name")}
@@ -102,7 +102,7 @@ const columns = [
       )
     },
   }),
-] as ColumnDef<DeliveryLocation>[]
+] as ColumnDef<ClientLocation>[]
 
 const PAGE_SIZE = 20
 
@@ -114,12 +114,12 @@ export default function DeliveryLocationsPage() {
   })
 
   const { data } = useQuery({
-    queryKey: ["admin-delivery-locations"],
-    queryFn: () => queryDeliveryLocations(),
+    queryKey: ["admin-client-locations"],
+    queryFn: () => queryClientLocations(),
     refetchOnWindowFocus: false,
   })
 
-  const locations: DeliveryLocation[] = data?.data?.locations ?? []
+  const locations: ClientLocation[] = data?.data?.locations ?? []
   const total: number = locations.length
 
   return (
@@ -129,7 +129,7 @@ export default function DeliveryLocationsPage() {
         columns={columns}
         data={locations}
         tableName="Location"
-        newUrl="/dashboard/farmnport/orders/delivery-locations/new"
+        newUrl="/dashboard/farmnport/orders/client-locations/new"
         total={total}
         pagination={pagination}
         setPagination={setPagination}

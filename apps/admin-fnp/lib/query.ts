@@ -1630,11 +1630,13 @@ export function updateBookingEvent(id: string, data: Partial<{
   return api.put(`${baseUrl}/booking/admin/events/${id}`, data)
 }
 
-export function queryDeliveryLocations() {
-  return api.get(`${baseUrl}/booking/delivery-locations`)
+export function queryClientLocations() {
+  return api.get(`${baseUrl}/booking/client-locations`)
 }
 
 export function createDeliveryLocation(data: {
+  client_id: string
+  types?: string[]
   name: string
   address: string
   city: string
@@ -1644,10 +1646,12 @@ export function createDeliveryLocation(data: {
   longitude?: number
   active?: boolean
 }) {
-  return api.post(`${baseUrl}/booking/admin/delivery-locations`, data)
+  return api.post(`${baseUrl}/booking/admin/client-locations`, data)
 }
 
 export function updateDeliveryLocation(id: string, data: Partial<{
+  client_id: string
+  types: string[]
   name: string
   address: string
   city: string
@@ -1657,5 +1661,5 @@ export function updateDeliveryLocation(id: string, data: Partial<{
   longitude: number
   active: boolean
 }>) {
-  return api.put(`${baseUrl}/booking/admin/delivery-locations/${id}`, data)
+  return api.put(`${baseUrl}/booking/admin/client-locations/${id}`, data)
 }

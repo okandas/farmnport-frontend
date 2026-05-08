@@ -8,12 +8,8 @@ import { Loader2, MapPin, Clock, CalendarDays } from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner"
 
-import { queryClient as queryClientProfile, listDeliveryLocations, createBooking } from "@/lib/query"
+import { queryClient as fetchClient, listDeliveryLocations, createBooking } from "@/lib/query"
 import { capitalizeFirstLetter } from "@/lib/utilities"
-
-function formatDate(d: string) {
-  return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
-}
 
 export default function BookDeliveryPage() {
   const params = useParams()
@@ -31,18 +27,32 @@ export default function BookDeliveryPage() {
   const [goods, setGoods] = useState("")
   const [notes, setNotes] = useState("")
 
-  // Fetch user profile for phone
+  // Fetch logged-in user profile for phone
   const { data: profileData } = useQuery({
     queryKey: ["my-profile", user?.username],
-    queryFn: () => queryClientProfile(user.username.replace(/ /g, "-")).then((r) => r.data),
+    queryFn: () => fetchClient(user.username.replace(/ /g, "-")).then((r) => r.data),
     enabled: !!user?.username,
   })
   const phone: string = profileData?.phone ?? ""
 
-  // Fetch delivery locations for this buyer
+  // Fetch buyer profile to get their ID
+  const { data: buyerData } = useQuery({
+    queryKey: ["buyer-profile", slug],
+    queryFn: () => fetchClient(slug).then((r) => r.data),
+  })
+  const buyerId: string = buyerData?.id ?? ""
+
+  // Fetch delivery locations belonging to this buyer
   const { data: locationsData, isLoading: locationsLoading } = useQuery({
-    queryKey: ["delivery-locations"],
-    queryFn: () => listDeliveryLocations().then((r) => r.data),
+    queryKey: ["delivery-locations", buyerId],
+    queryFn: () => listDeliveryLocations(buyerId).then((r) => {
+      const locs = r.data?.locations ?? []
+      if (locs.length > 0 && !locationId) {
+        setLocationId(locs[0].id)
+      }
+      return r.data
+    }),
+    enabled: !!buyerId,
   })
 
   const locations: any[] = locationsData?.locations ?? []

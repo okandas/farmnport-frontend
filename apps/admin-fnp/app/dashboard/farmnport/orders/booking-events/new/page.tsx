@@ -7,7 +7,7 @@ import { Loader2, X, MapPin, Search } from "lucide-react"
 import { toast } from "@/components/ui/use-toast"
 import Link from "next/link"
 
-import { createBookingEvent, queryDeliveryLocations } from "@/lib/query"
+import { createBookingEvent, queryClientLocations } from "@/lib/query"
 import { DashboardHeader } from "@/components/state/dashboardHeader"
 import { DashboardShell } from "@/components/state/dashboardShell"
 import { ClientCombobox } from "@/components/structures/client-combobox"
@@ -98,7 +98,7 @@ function LocationMultiSelect({
         {open && filtered.length === 0 && search.length > 0 && (
           <div className="absolute z-10 mt-1 w-full rounded-md border border-border bg-popover shadow-md px-3 py-2 text-sm text-muted-foreground">
             No locations found.{" "}
-            <Link href="/dashboard/farmnport/orders/delivery-locations/new" target="_blank" className="text-primary hover:underline">
+            <Link href="/dashboard/farmnport/orders/client-locations/new" target="_blank" className="text-primary hover:underline">
               Add one
             </Link>
           </div>
@@ -107,7 +107,7 @@ function LocationMultiSelect({
 
       <p className="text-xs text-muted-foreground">
         Can&apos;t find a location?{" "}
-        <Link href="/dashboard/farmnport/orders/delivery-locations/new" target="_blank" className="text-primary hover:underline">
+        <Link href="/dashboard/farmnport/orders/client-locations/new" target="_blank" className="text-primary hover:underline">
           Add new location
         </Link>
       </p>
@@ -121,8 +121,8 @@ export default function NewBookingEventPage() {
   const [selectedLocations, setSelectedLocations] = useState<SelectedLocation[]>([])
 
   const { data: locationsData } = useQuery({
-    queryKey: ["admin-delivery-locations"],
-    queryFn: () => queryDeliveryLocations(),
+    queryKey: ["admin-client-locations"],
+    queryFn: () => queryClientLocations(),
     refetchOnWindowFocus: false,
   })
 

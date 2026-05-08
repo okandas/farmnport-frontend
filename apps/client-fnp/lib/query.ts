@@ -659,8 +659,11 @@ export function getBookingEvent(id: string) {
   return api.get(`${BaseURL}/booking/events/${id}`)
 }
 
-export function listDeliveryLocations() {
-  return api.get(`${BaseURL}/booking/delivery-locations`)
+export function listDeliveryLocations(clientId?: string) {
+  const url = clientId
+    ? `${BaseURL}/booking/client-locations?client_id=${clientId}`
+    : `${BaseURL}/booking/client-locations`
+  return api.get(url)
 }
 
 export function createBooking(data: {
