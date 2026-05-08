@@ -28,8 +28,13 @@ export const restaurantsDashboardConfig: DashboardConfig = {
       alwaysOpen: true,
       items: [
         {
-          title: "Contact Interactions",
-          href: "/dashboard/restaurants/contact-views",
+          title: "By Location",
+          href: "/dashboard/restaurants/contact-views/by-location",
+          icon: "mapPin",
+        },
+        {
+          title: "Event Log",
+          href: "/dashboard/restaurants/contact-views/event-log",
           icon: "eye",
         },
       ],

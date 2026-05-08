@@ -1,18 +1,13 @@
 import { CdmPriceCardsView } from "@/components/structures/cdm-price-cards-view"
-import { FilterSidebar } from "@/components/generic/filterSidebar"
-import { ActionsSidebar } from "@/components/generic/actions-sidebar"
 import Link from "next/link"
-import { ChevronLeft } from "lucide-react"
 
 export const metadata = {
   title: 'Cold Dress Mass Cattle Prices (CDM) – Carcass & Liveweight Rates | farmnport.com',
   description: 'Browse current cold dress mass cattle prices from abattoirs across Zimbabwe. Commercial, economy and manufacturing carcass grades, ex leakage, in USD and ZiG.',
-  alternates: {
-    canonical: '/prices/cdm',
-  },
+  alternates: { canonical: '/prices/cdm' },
   openGraph: {
     title: 'Cold Dress Mass Cattle Prices (CDM) – Carcass & Liveweight Rates',
-    description: 'Browse current cold dress mass cattle prices from abattoirs across Zimbabwe. Carcass grades and liveweight rates.',
+    description: 'Browse current cold dress mass cattle prices from abattoirs across Zimbabwe.',
     siteName: 'farmnport',
     type: 'website',
   },
@@ -21,40 +16,21 @@ export const metadata = {
 export default async function CdmPricesPage() {
   return (
     <main>
-      <div className="mx-auto max-w-7xl px-6 lg:px-8 min-h-[70lvh]">
-        <div className="pt-6 pb-4">
-          <Link
-            href="/prices"
-            className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <ChevronLeft className="h-3.5 w-3.5" />
-            All prices
-          </Link>
+      <div className="border-b bg-muted/30">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-3 flex items-center gap-1.5 text-xs text-muted-foreground">
+          <Link href="/prices" className="hover:text-foreground transition-colors">Prices</Link>
+          <span>/</span>
+          <span className="text-foreground font-medium">Cold Dress Mass</span>
         </div>
+      </div>
 
-        <h1 className="text-3xl font-bold font-heading pb-2">
-          Cold Dress Mass Cattle Prices
-        </h1>
-        <p className="text-muted-foreground mb-6">
-          Carcass grade pricing and liveweight rates from abattoirs, ex leakage, in USD and ZiG.
-        </p>
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-8 pb-6">
+        <h1 className="text-2xl font-bold tracking-tight">Cold Dress Mass <span className="text-muted-foreground font-normal">Cattle Prices</span></h1>
+        <p className="mt-1 text-sm text-muted-foreground">Carcass grade pricing · ex leakage · USD and ZiG</p>
+      </div>
 
-        <div className="lg:flex lg:space-x-10">
-          <div className="hidden lg:block lg:w-64 relative">
-            <FilterSidebar hideProduce />
-          </div>
-
-          <div className="lg:flex-1">
-            <div className="lg:hidden mb-6">
-              <FilterSidebar hideProduce />
-            </div>
-            <CdmPriceCardsView />
-          </div>
-
-          <div className="hidden lg:block lg:w-56 shrink-0 relative">
-            <ActionsSidebar type="buyers" />
-          </div>
-        </div>
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-16 min-h-[50lvh]">
+        <CdmPriceCardsView />
       </div>
     </main>
   )

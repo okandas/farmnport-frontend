@@ -11,6 +11,7 @@ import { toast } from "sonner"
 
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Calendar } from "@/components/ui/calendar"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { GoodsPicker, EMPTY_GOODS_ITEM, type GoodsItem } from "@/components/booking/goods-picker"
 import { queryClient as fetchClient, listDeliveryLocations, createBooking } from "@/lib/query"
 import { capitalizeFirstLetter } from "@/lib/utilities"
@@ -207,16 +208,16 @@ export default function BookDeliveryPage() {
                 {timeSlots.length > 0 && (
                   <div className="space-y-1.5">
                     <label className="text-xs font-medium text-muted-foreground">Time Slot</label>
-                    <select
-                      value={timeSlot}
-                      onChange={(e) => setTimeSlot(e.target.value)}
-                      className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                    >
-                      <option value="">Select a slot</option>
-                      {timeSlots.map((s: string) => (
-                        <option key={s} value={s}>{s}</option>
-                      ))}
-                    </select>
+                    <Select value={timeSlot} onValueChange={setTimeSlot}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a slot" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {timeSlots.map((s: string) => (
+                          <SelectItem key={s} value={s}>{s}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 )}
               </div>

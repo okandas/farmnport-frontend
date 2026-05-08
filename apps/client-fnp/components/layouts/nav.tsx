@@ -15,11 +15,11 @@ import {Avatar, AvatarFallback} from "@/components/ui/avatar";
 import {capitalizeFirstLetter, makeAbbveriation} from "@/lib/utilities";
 import {signOut} from "next-auth/react";
 import {AppURL, AuthenticatedUser} from "@/lib/schemas";
-import {ThemeSwitcher} from "@/components/ui/theme-switcher";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, Sun, Moon, Monitor } from "lucide-react";
+import { useTheme } from "next-themes";
 import { useQuery } from "@tanstack/react-query";
 import { useCart } from "@/contexts/cart-context";
-import { getCart } from "@/lib/query";
+import { getCart, countBookingNotifications } from "@/lib/query";
 
 interface NavigationProps {
   user: AuthenticatedUser | null
@@ -63,7 +63,32 @@ function CartIcon({ user }: { user: AuthenticatedUser | null }) {
   )
 }
 
+const POLLING_ENABLED = process.env.NEXT_PUBLIC_ENABLE_NOTIFICATION_POLLING === "true"
+
+function BellIcon({ user }: { user: AuthenticatedUser | null }) {
+  const { data } = useQuery({
+    queryKey: ["booking-notifications-count"],
+    queryFn: () => countBookingNotifications().then((r) => r.data),
+    enabled: !!user,
+    staleTime: 30000,
+    refetchInterval: POLLING_ENABLED ? 60000 : false,
+    refetchIntervalInBackground: false,
+  })
+  const count: number = (data as any)?.count ?? 0
+
+  if (!user || count === 0) return null
+
+  return (
+    <Button variant="outline" size="sm" asChild>
+      <Link href="/account/notifications" aria-label={`${count} unread notifications`}>
+        <span className="text-orange-500 font-bold">{count > 99 ? "99+" : count}</span>
+      </Link>
+    </Button>
+  )
+}
+
 export function Navigation({ user }: NavigationProps) {
+  const { setTheme } = useTheme()
   return (
       <nav className="lg:flex lg:space-x-2">
         <Link href="/guides" onClick={() => sendGTMEvent({ event: 'link', value: 'GuidesTopNavigation' })}
@@ -125,12 +150,20 @@ export function Navigation({ user }: NavigationProps) {
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
+                <DropdownMenuItem onClick={() => setTheme("light")}>
+                  <Sun className="mr-2 h-4 w-4" /> Light
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setTheme("dark")}>
+                  <Moon className="mr-2 h-4 w-4" /> Dark
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setTheme("system")}>
+                  <Monitor className="mr-2 h-4 w-4" /> System
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+              <DropdownMenuSeparator />
+              <DropdownMenuGroup>
                 <DropdownMenuItem asChild>
                   <Link href="#" onClick={() => signOut({ redirectTo: AppURL })}>
-                    {/* <DashboardIcon
-                        className="mr-2 h-4 w-4"
-                        aria-hidden="true"
-                    /> */}
                     Logout
                   </Link>
                 </DropdownMenuItem>
@@ -158,8 +191,8 @@ export function Navigation({ user }: NavigationProps) {
           </>
 
         )}
+        <span className="ml-4"><BellIcon user={user} /></span>
         <CartIcon user={user} />
-        < ThemeSwitcher />
       </nav>
   )
 }

@@ -704,6 +704,34 @@ export function cancelBooking(id: string) {
   return api.put(`${BaseURL}/booking/${id}/cancel`, {})
 }
 
+export function buyerUpdateBookingStatus(id: string, status: string, note?: string) {
+  return api.put(`${BaseURL}/booking/${id}/buyer-status`, { status, note })
+}
+
+export function getIncomingBooking(id: string) {
+  return api.get(`${BaseURL}/booking/incoming/${id}`)
+}
+
+export function incomingBookings(page?: number, status?: string) {
+  const params = new URLSearchParams()
+  if (page && page >= 2) params.set('p', page.toString())
+  if (status) params.set('status', status)
+  const qs = params.toString()
+  return api.get(qs ? `${BaseURL}/booking/incoming?${qs}` : `${BaseURL}/booking/incoming`)
+}
+
+export function listBookingNotifications() {
+  return api.get(`${BaseURL}/booking/notifications`)
+}
+
+export function countBookingNotifications() {
+  return api.get(`${BaseURL}/booking/notifications/count`)
+}
+
+export function markBookingNotificationsRead(ids: string[]) {
+  return api.put(`${BaseURL}/booking/notifications/read`, { ids })
+}
+
 // ── Documents ─────────────────────────────────────────────────────────────────
 
 export function queryAllDocuments(pagination?: { p?: number; category?: string }) {

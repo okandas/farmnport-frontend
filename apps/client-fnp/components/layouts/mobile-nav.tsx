@@ -18,7 +18,7 @@ import {signOut} from "next-auth/react";
 import { ShoppingCart } from "lucide-react";
 import { useCart } from "@/contexts/cart-context";
 import { useQuery } from "@tanstack/react-query";
-import { getCart } from "@/lib/query";
+import { getCart, countBookingNotifications } from "@/lib/query";
 
 
 interface MobileNavProps {
@@ -38,6 +38,14 @@ export function MobileNav({ user }: MobileNavProps) {
     const cartCount: number = cartItems.length
     const cartTotal: number = cartItems.reduce((s: number, i: any) => s + (i.unit_price * i.quantity) / 100, 0)
 
+    const { data: notifData } = useQuery({
+      queryKey: ["booking-notifications-count"],
+      queryFn: () => countBookingNotifications().then((r) => r.data),
+      enabled: !!user,
+      staleTime: 30000,
+    })
+    const notifCount: number = (notifData as any)?.count ?? 0
+
 
     return (
       <div className="flex flex-1 md:hidden">
@@ -49,6 +57,16 @@ export function MobileNav({ user }: MobileNavProps) {
         </Link>
 
        <div className="flex flex-1 justify-end items-center gap-1">
+         {user && notifCount > 0 && (
+           <Link
+             href="/account/notifications"
+             className="min-w-[22px] h-[22px] px-1.5 inline-flex items-center justify-center rounded-full bg-orange-500 text-white text-[11px] font-bold tabular-nums hover:bg-orange-600 transition-colors"
+             style={{ lineHeight: 1, paddingTop: 1 }}
+             aria-label={`${notifCount} unread notifications`}
+           >
+             {notifCount > 99 ? "99+" : notifCount}
+           </Link>
+         )}
          {cartCount > 0 ? (
            <button
              onClick={openCart}
@@ -158,14 +176,7 @@ export function MobileNav({ user }: MobileNavProps) {
                          <Icons.user className="h-5 w-5" />
                          <span>Account</span>
                        </Link>
-                       <Link
-                         href="/orders"
-                         onClick={() => setIsOpen(false)}
-                         className="flex items-center gap-3 px-3 py-2 text-base font-medium rounded-md hover:bg-accent transition-colors"
-                       >
-                         <Icons.arrowRight className="h-5 w-5" />
-                         <span>My Orders</span>
-                       </Link>
+
                        <button
                          onClick={() => {
                            signOut({ redirectTo: AppURL })

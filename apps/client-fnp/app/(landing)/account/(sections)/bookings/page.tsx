@@ -64,7 +64,7 @@ export default function BookingsPage() {
 
   if (!session) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="py-16 flex items-center justify-center">
         <div className="text-center space-y-4">
           <CalendarDays className="w-12 h-12 mx-auto text-muted-foreground/40" />
           <p className="font-semibold">Sign in to view your bookings</p>

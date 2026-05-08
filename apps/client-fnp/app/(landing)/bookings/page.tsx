@@ -7,6 +7,7 @@ import { CalendarDays, Loader2 } from "lucide-react"
 import { listBookingEvents, queryClients, listDeliveryLocations } from "@/lib/query"
 import { slug } from "@/lib/utilities"
 import { BuyCategoriesNav } from "@/components/generic/BuyCategoriesNav"
+import { Icons } from "@/components/icons/lucide"
 
 function formatDate(d: string) {
   return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
@@ -28,7 +29,15 @@ function EventCard({ event }: { event: any }) {
           <h3 className="font-semibold text-sm leading-tight group-hover:text-primary transition-colors line-clamp-2">
             {event.title}
           </h3>
-          <p className="text-xs text-muted-foreground mt-1">{event.client_name}</p>
+          <div className="flex items-center gap-1.5 mt-1">
+            <p className="text-xs text-muted-foreground">{event.client_name}</p>
+            {event.client_verified && (
+              <span className="flex items-center gap-0.5 text-[11px] font-medium text-green-700">
+                <Icons.verified className="h-3.5 w-3.5 shrink-0" aria-hidden="true" color="#228B22" />
+                verified
+              </span>
+            )}
+          </div>
         </div>
         {event.description && (
           <p className="text-xs text-muted-foreground line-clamp-2">{event.description}</p>
@@ -144,7 +153,15 @@ export default function BookingEventsPage() {
                         className="flex flex-col gap-3 border rounded-xl overflow-hidden hover:shadow-md hover:border-primary/50 transition-all group"
                       >
                         <div className="p-4 space-y-1">
-                          <p className="text-sm font-semibold capitalize">{buyer.name}</p>
+                          <div className="flex items-center gap-1.5">
+                            <p className="text-sm font-semibold capitalize">{buyer.name}</p>
+                            {buyer.verified && (
+                              <span className="flex items-center gap-0.5 text-[11px] font-medium text-green-700">
+                                <Icons.verified className="h-3.5 w-3.5 shrink-0" aria-hidden="true" color="#228B22" />
+                                verified
+                              </span>
+                            )}
+                          </div>
                           {buyer.city && <p className="text-xs text-muted-foreground capitalize">{buyer.city}</p>}
                           {buyer.primary_category?.name && (
                             <p className="text-xs text-muted-foreground">Booking slots for {buyer.primary_category.name}</p>
