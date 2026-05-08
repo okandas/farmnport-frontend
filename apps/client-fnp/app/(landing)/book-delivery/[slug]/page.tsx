@@ -11,6 +11,7 @@ import { toast } from "sonner"
 
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Calendar } from "@/components/ui/calendar"
+import { GoodsPicker, EMPTY_GOODS_ITEM, type GoodsItem } from "@/components/booking/goods-picker"
 import { queryClient as fetchClient, listDeliveryLocations, createBooking } from "@/lib/query"
 import { capitalizeFirstLetter } from "@/lib/utilities"
 
@@ -28,7 +29,7 @@ export default function BookDeliveryPage() {
   const [date, setDate] = useState<Date | undefined>(undefined)
   const [calOpen, setCalOpen] = useState(false)
   const [timeSlot, setTimeSlot] = useState("")
-  const [goods, setGoods] = useState("")
+  const [goodsItems, setGoodsItems] = useState<GoodsItem[]>([EMPTY_GOODS_ITEM()])
   const [notes, setNotes] = useState("")
 
   // Fetch logged-in user profile for phone
@@ -65,6 +66,8 @@ export default function BookDeliveryPage() {
   const selectedLocation = locations.find((l: any) => l.id === locationId)
   const timeSlots: string[] = selectedLocation?.time_slots ?? []
 
+  const validItems = goodsItems.filter((g) => g.produce_name && g.quantity > 0)
+
   const mutation = useMutation({
     mutationFn: () =>
       createBooking({
@@ -72,7 +75,7 @@ export default function BookDeliveryPage() {
         delivery_location_id: locationId,
         booking_date: date!.toISOString(),
         time_slot: timeSlot || undefined,
-        goods,
+        goods_items: validItems,
         phone,
         notes: notes || undefined,
       }),
@@ -86,7 +89,7 @@ export default function BookDeliveryPage() {
     },
   })
 
-  const canSubmit = !!session && !!locationId && !!date && !!goods && !!phone
+  const canSubmit = !!session && !!locationId && !!date && validItems.length > 0 && !!phone
 
   if (locationsLoading) {
     return (
@@ -220,15 +223,9 @@ export default function BookDeliveryPage() {
 
               {/* Goods + notes */}
               <div className="p-5 space-y-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-muted-foreground">Goods Description *</label>
-                  <textarea
-                    value={goods}
-                    onChange={(e) => setGoods(e.target.value)}
-                    rows={2}
-                    placeholder="e.g. 80 broilers, 30kg tomatoes"
-                    className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
-                  />
+                <div className="space-y-2">
+                  <label className="text-xs font-medium text-muted-foreground">Goods *</label>
+                  <GoodsPicker items={goodsItems} onChange={setGoodsItems} />
                 </div>
 
                 <div className="space-y-1.5">

@@ -88,7 +88,10 @@ export default function BookingsPage() {
         <span>/</span>
         <span className="text-foreground font-medium">My Bookings</span>
       </nav>
-      <h1 className="text-xl font-bold mb-6">My Bookings</h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-xl font-bold">My Bookings</h1>
+        <Link href="/bookings" className="text-sm text-primary hover:underline">View available bookings</Link>
+      </div>
 
         {bookings.length === 0 ? (
           <div className="text-center py-16 space-y-4">

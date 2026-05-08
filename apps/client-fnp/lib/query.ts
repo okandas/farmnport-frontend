@@ -663,6 +663,15 @@ export function listDeliveryLocations(clientId?: string) {
   return api.get(url)
 }
 
+type GoodsItemPayload = {
+  produce_id?: string
+  produce_name: string
+  produce_slug?: string
+  quantity: number
+  unit: string
+  other?: boolean
+}
+
 export function createBooking(data: {
   type: "pre-order" | "delivery" | "pickup"
   booking_date?: string // RFC3339
@@ -674,7 +683,7 @@ export function createBooking(data: {
   quantity?: number
   // delivery
   delivery_location_id?: string
-  goods?: string
+  goods_items?: GoodsItemPayload[]
   // pickup
   buyer_id?: string
   farm_address?: string

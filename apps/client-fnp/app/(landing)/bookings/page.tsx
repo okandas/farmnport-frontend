@@ -4,7 +4,8 @@ import { useQuery } from "@tanstack/react-query"
 import Link from "next/link"
 import { CalendarDays, Loader2 } from "lucide-react"
 
-import { listBookingEvents } from "@/lib/query"
+import { listBookingEvents, queryClients, listDeliveryLocations } from "@/lib/query"
+import { slug } from "@/lib/utilities"
 import { BuyCategoriesNav } from "@/components/generic/BuyCategoriesNav"
 
 function formatDate(d: string) {
@@ -66,7 +67,19 @@ export default function BookingEventsPage() {
     queryFn: () => listBookingEvents({ status: "open" }),
   })
 
+  const { data: buyersData } = useQuery({
+    queryKey: ["buyers-with-booking"],
+    queryFn: () => queryClients("buyer", { has_booking: "true" }).then((r) => r.data),
+  })
+
+  const { data: locationsData } = useQuery({
+    queryKey: ["all-client-locations"],
+    queryFn: () => listDeliveryLocations().then((r) => r.data),
+  })
+
   const events: any[] = data?.data?.events ?? []
+  const buyers: any[] = buyersData?.data ?? []
+  const allLocations: any[] = locationsData?.locations ?? []
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
@@ -103,16 +116,50 @@ export default function BookingEventsPage() {
                 <p className="text-sm text-muted-foreground">Check back soon for upcoming pre-order batches.</p>
               </div>
             ) : (
-              <>
-                <div className="mb-4 text-sm text-muted-foreground">
-                  {events.length} open {events.length === 1 ? "batch" : "batches"}
+              <div className="mb-4 text-sm text-muted-foreground">
+                {events.length} open {events.length === 1 ? "batch" : "batches"}
+              </div>
+            )}
+
+            {events.length > 0 && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                {events.map((event: any) => (
+                  <EventCard key={event.id} event={event} />
+                ))}
+              </div>
+            )}
+
+            {buyers.length > 0 && (
+              <div className="mt-10">
+                <h2 className="text-xl font-bold mb-1">Book a Delivery Slot</h2>
+                <p className="text-sm text-muted-foreground mb-4">These buyers are accepting deliveries — book a drop-off slot directly.</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {buyers.map((buyer: any) => {
+                    const buyerLocs = allLocations.filter((l: any) => l.client_id === buyer.id)
+                    const slots = [...new Set(buyerLocs.flatMap((l: any) => l.time_slots ?? []))]
+                    return (
+                      <Link
+                        key={buyer.id}
+                        href={`/book-delivery/${slug(buyer.name)}`}
+                        className="flex flex-col gap-3 border rounded-xl overflow-hidden hover:shadow-md hover:border-primary/50 transition-all group"
+                      >
+                        <div className="p-4 space-y-0.5">
+                          <p className="text-sm font-semibold capitalize">{buyer.name}</p>
+                          {buyer.city && <p className="text-xs text-muted-foreground capitalize">{buyer.city}</p>}
+                          {slots.length > 0 && (
+                            <p className="text-xs text-muted-foreground">{slots.join(" · ")}</p>
+                          )}
+                        </div>
+                        <div className="px-4 pb-4">
+                          <div className="w-full text-center text-xs font-medium py-2 rounded-lg border group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-colors">
+                            Book Slot
+                          </div>
+                        </div>
+                      </Link>
+                    )
+                  })}
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                  {events.map((event: any) => (
-                    <EventCard key={event.id} event={event} />
-                  ))}
-                </div>
-              </>
+              </div>
             )}
           </main>
         </div>
