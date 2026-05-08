@@ -20,20 +20,17 @@ api.interceptors.request.use(async(config: InternalAxiosRequestConfig) => {
 api.interceptors.response.use(
     (response) => response,
     async (error) => {
-        if (error.response?.status === 400 || error.response?.status === 401) {
+        if (error.response?.status === 401) {
             const errorMessage = error.response?.data?.message || ""
 
-            // Check if it's a token expiration error
+            // Only sign out if the backend explicitly says the token is expired
             if (errorMessage.includes("expired") || errorMessage.includes("not active yet")) {
-                // Logout the user
                 await logoutUser()
 
-                // Show session expired toast
                 toast("Session Expired", {
                     description: "Your session has expired. Please login again."
                 })
 
-                // Redirect to login page
                 if (typeof window !== "undefined") {
                     window.location.href = "/login"
                 }

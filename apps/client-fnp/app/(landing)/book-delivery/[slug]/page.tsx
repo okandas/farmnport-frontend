@@ -4,10 +4,13 @@ import { useState } from "react"
 import { useSession } from "next-auth/react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useRouter, useParams } from "next/navigation"
-import { Loader2, MapPin, Clock, CalendarDays } from "lucide-react"
+import { Loader2, MapPin, Clock, CalendarDays, ChevronDown } from "lucide-react"
+import { format } from "date-fns"
 import Link from "next/link"
 import { toast } from "sonner"
 
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Calendar } from "@/components/ui/calendar"
 import { queryClient as fetchClient, listDeliveryLocations, createBooking } from "@/lib/query"
 import { capitalizeFirstLetter } from "@/lib/utilities"
 
@@ -22,7 +25,8 @@ export default function BookDeliveryPage() {
   const qc = useQueryClient()
 
   const [locationId, setLocationId] = useState("")
-  const [date, setDate] = useState("")
+  const [date, setDate] = useState<Date | undefined>(undefined)
+  const [calOpen, setCalOpen] = useState(false)
   const [timeSlot, setTimeSlot] = useState("")
   const [goods, setGoods] = useState("")
   const [notes, setNotes] = useState("")
@@ -66,7 +70,7 @@ export default function BookDeliveryPage() {
       createBooking({
         type: "delivery",
         delivery_location_id: locationId,
-        booking_date: new Date(date).toISOString(),
+        booking_date: date!.toISOString(),
         time_slot: timeSlot || undefined,
         goods,
         phone,
@@ -176,13 +180,25 @@ export default function BookDeliveryPage() {
               <div className="p-5 grid sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="text-xs font-medium text-muted-foreground">Delivery Date *</label>
-                  <input
-                    type="date"
-                    value={date}
-                    onChange={(e) => setDate(e.target.value)}
-                    min={new Date().toISOString().split("T")[0]}
-                    className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                  />
+                  <Popover open={calOpen} onOpenChange={setCalOpen}>
+                    <PopoverTrigger asChild>
+                      <button
+                        type="button"
+                        className={`flex h-9 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring ${!date ? "text-muted-foreground" : ""}`}
+                      >
+                        <span>{date ? format(date, "d/M/yyyy") : "Pick a date"}</span>
+                        <ChevronDown className="w-4 h-4 opacity-50" />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={date}
+                        onSelect={(d) => { setDate(d); setCalOpen(false) }}
+                        disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))}
+                      />
+                    </PopoverContent>
+                  </Popover>
                 </div>
 
                 {timeSlots.length > 0 && (
