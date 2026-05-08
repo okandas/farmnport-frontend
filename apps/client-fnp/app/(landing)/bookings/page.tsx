@@ -143,9 +143,12 @@ export default function BookingEventsPage() {
                         href={`/book-delivery/${slug(buyer.name)}`}
                         className="flex flex-col gap-3 border rounded-xl overflow-hidden hover:shadow-md hover:border-primary/50 transition-all group"
                       >
-                        <div className="p-4 space-y-0.5">
+                        <div className="p-4 space-y-1">
                           <p className="text-sm font-semibold capitalize">{buyer.name}</p>
                           {buyer.city && <p className="text-xs text-muted-foreground capitalize">{buyer.city}</p>}
+                          {buyer.primary_category?.name && (
+                            <p className="text-xs text-muted-foreground">Booking slots for {buyer.primary_category.name}</p>
+                          )}
                           {slots.length > 0 && (
                             <p className="text-xs text-muted-foreground">{slots.join(" · ")}</p>
                           )}
