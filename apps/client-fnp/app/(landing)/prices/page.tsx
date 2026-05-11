@@ -14,5 +14,10 @@ export const metadata = {
 }
 
 export default function PricesPage() {
-  return <PricesBoard />
+  return (
+    <>
+      <h1 className="sr-only">Agricultural Market Prices Zimbabwe – Livestock, Produce &amp; More</h1>
+      <PricesBoard />
+    </>
+  )
 }

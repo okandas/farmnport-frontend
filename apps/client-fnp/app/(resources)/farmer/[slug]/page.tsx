@@ -41,8 +41,11 @@ export default async function BuyerPage({ params }:  BuyerPageProps) {
   const user = await retrieveUser()
   const { slug } = await params
 
+  const name = unSlug(slug)
+
   return(
     <main className="min-h-[70lvh]">
+      <h1 className="sr-only">{name} - Farmer in Zimbabwe</h1>
       <div className="mx-auto max-w-7xl min-h-[70lvh]">
         <div className="lg:flex lg:space-x-10">
           <Client slug={slug} user={user}/>
