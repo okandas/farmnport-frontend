@@ -73,7 +73,7 @@ function StatusSteps({ status, type }: { status: string; type: string }) {
           <div key={step} className="flex items-start flex-1 last:flex-none">
             <div className="flex flex-col items-center gap-1.5">
               {done
-                ? <CheckCircle2 className="w-4 h-4 text-primary" />
+                ? <CheckCircle2 className={`w-4 h-4 ${status === "completed" ? "text-black dark:text-white" : "text-primary"}`} />
                 : <Circle className="w-4 h-4 text-muted-foreground/30" />
               }
               <span className={`text-[11px] font-medium ${done ? "text-foreground" : "text-muted-foreground"}`}>

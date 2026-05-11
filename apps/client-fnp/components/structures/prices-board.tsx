@@ -67,19 +67,62 @@ export function PricesBoard() {
   const current = stats[0]
   const prev = stats[1]
 
-  const gradeColors = [
-    "text-green-700 bg-green-50 ring-green-600/20 dark:text-green-400 dark:bg-green-950/30 dark:ring-green-500/20",
-    "text-lime-700 bg-lime-50 ring-lime-600/20 dark:text-lime-400 dark:bg-lime-950/30 dark:ring-lime-500/20",
-    "text-yellow-700 bg-yellow-50 ring-yellow-600/20 dark:text-yellow-400 dark:bg-yellow-950/30 dark:ring-yellow-500/20",
+  type GradeItem = {
+    key: string
+    label: string
+    gradeDesc: string
+    gradeCode: string
+    gradeColor: string
+    delivered: number | undefined
+    prevDelivered: number | undefined
+  }
+
+  const gradeColor = (species: string) => {
+    const map: Record<string, string> = {
+      beef:    "text-yellow-700 bg-yellow-50 ring-yellow-600/20 dark:text-yellow-400 dark:bg-yellow-950/30 dark:ring-yellow-500/20",
+      lamb:    "text-green-700 bg-green-50 ring-green-600/20 dark:text-green-400 dark:bg-green-950/30 dark:ring-green-500/20",
+      mutton:  "text-lime-700 bg-lime-50 ring-lime-600/20 dark:text-lime-400 dark:bg-lime-950/30 dark:ring-lime-500/20",
+      goat:    "text-teal-700 bg-teal-50 ring-teal-600/20 dark:text-teal-400 dark:bg-teal-950/30 dark:ring-teal-500/20",
+      chicken: "text-orange-700 bg-orange-50 ring-orange-600/20 dark:text-orange-400 dark:bg-orange-950/30 dark:ring-orange-500/20",
+      pork:    "text-pink-700 bg-pink-50 ring-pink-600/20 dark:text-pink-400 dark:bg-pink-950/30 dark:ring-pink-500/20",
+    }
+    return map[species] ?? "text-muted-foreground bg-muted ring-border"
+  }
+
+  const allGrades: GradeItem[] = [
+    { key: "beef_super",             label: "Beef",    gradeDesc: "Super",            gradeCode: "S",   gradeColor: gradeColor("beef"),    delivered: current?.beef_super_delivered,             prevDelivered: prev?.beef_super_delivered },
+    { key: "beef_choice",            label: "Beef",    gradeDesc: "Choice",           gradeCode: "CH",  gradeColor: gradeColor("beef"),    delivered: current?.beef_choice_delivered,            prevDelivered: prev?.beef_choice_delivered },
+    { key: "beef_commercial",        label: "Beef",    gradeDesc: "Commercial",       gradeCode: "CM",  gradeColor: gradeColor("beef"),    delivered: current?.beef_commercial_delivered,        prevDelivered: prev?.beef_commercial_delivered },
+    { key: "beef_economy",           label: "Beef",    gradeDesc: "Economy",          gradeCode: "EC",  gradeColor: gradeColor("beef"),    delivered: current?.beef_economy_delivered,           prevDelivered: prev?.beef_economy_delivered },
+    { key: "beef_manufacturing",     label: "Beef",    gradeDesc: "Manufacturing",    gradeCode: "MF",  gradeColor: gradeColor("beef"),    delivered: current?.beef_manufacturing_delivered,     prevDelivered: prev?.beef_manufacturing_delivered },
+    { key: "lamb_super_premium",     label: "Lamb",    gradeDesc: "Super Premium",    gradeCode: "SP",  gradeColor: gradeColor("lamb"),    delivered: current?.lamb_super_premium_delivered,     prevDelivered: prev?.lamb_super_premium_delivered },
+    { key: "lamb_choice",            label: "Lamb",    gradeDesc: "Choice",           gradeCode: "CH",  gradeColor: gradeColor("lamb"),    delivered: current?.lamb_choice_delivered,            prevDelivered: prev?.lamb_choice_delivered },
+    { key: "lamb_standard",          label: "Lamb",    gradeDesc: "Standard",         gradeCode: "ST",  gradeColor: gradeColor("lamb"),    delivered: current?.lamb_standard_delivered,          prevDelivered: prev?.lamb_standard_delivered },
+    { key: "lamb_inferior",          label: "Lamb",    gradeDesc: "Inferior",         gradeCode: "IN",  gradeColor: gradeColor("lamb"),    delivered: current?.lamb_inferior_delivered,          prevDelivered: prev?.lamb_inferior_delivered },
+    { key: "mutton_super",           label: "Mutton",  gradeDesc: "Super",            gradeCode: "S",   gradeColor: gradeColor("mutton"),  delivered: current?.mutton_super_delivered,           prevDelivered: prev?.mutton_super_delivered },
+    { key: "mutton_choice",          label: "Mutton",  gradeDesc: "Choice",           gradeCode: "CH",  gradeColor: gradeColor("mutton"),  delivered: current?.mutton_choice_delivered,          prevDelivered: prev?.mutton_choice_delivered },
+    { key: "mutton_standard",        label: "Mutton",  gradeDesc: "Standard",         gradeCode: "ST",  gradeColor: gradeColor("mutton"),  delivered: current?.mutton_standard_delivered,        prevDelivered: prev?.mutton_standard_delivered },
+    { key: "mutton_ordinary",        label: "Mutton",  gradeDesc: "Ordinary",         gradeCode: "OR",  gradeColor: gradeColor("mutton"),  delivered: current?.mutton_ordinary_delivered,        prevDelivered: prev?.mutton_ordinary_delivered },
+    { key: "mutton_inferior",        label: "Mutton",  gradeDesc: "Inferior",         gradeCode: "IN",  gradeColor: gradeColor("mutton"),  delivered: current?.mutton_inferior_delivered,        prevDelivered: prev?.mutton_inferior_delivered },
+    { key: "goat_super",             label: "Goat",    gradeDesc: "Super",            gradeCode: "S",   gradeColor: gradeColor("goat"),    delivered: current?.goat_super_delivered,             prevDelivered: prev?.goat_super_delivered },
+    { key: "goat_choice",            label: "Goat",    gradeDesc: "Choice",           gradeCode: "CH",  gradeColor: gradeColor("goat"),    delivered: current?.goat_choice_delivered,            prevDelivered: prev?.goat_choice_delivered },
+    { key: "goat_standard",          label: "Goat",    gradeDesc: "Standard",         gradeCode: "ST",  gradeColor: gradeColor("goat"),    delivered: current?.goat_standard_delivered,          prevDelivered: prev?.goat_standard_delivered },
+    { key: "goat_inferior",          label: "Goat",    gradeDesc: "Inferior",         gradeCode: "IN",  gradeColor: gradeColor("goat"),    delivered: current?.goat_inferior_delivered,          prevDelivered: prev?.goat_inferior_delivered },
+    { key: "chicken_a1",             label: "Chicken", gradeDesc: "A1 · over 1.75kg", gradeCode: "A1",  gradeColor: gradeColor("chicken"), delivered: current?.chicken_a1_delivered,             prevDelivered: prev?.chicken_a1_delivered },
+    { key: "chicken_a2",             label: "Chicken", gradeDesc: "A2",               gradeCode: "A2",  gradeColor: gradeColor("chicken"), delivered: current?.chicken_a2_delivered,             prevDelivered: prev?.chicken_a2_delivered },
+    { key: "chicken_a3",             label: "Chicken", gradeDesc: "A3",               gradeCode: "A3",  gradeColor: gradeColor("chicken"), delivered: current?.chicken_a3_delivered,             prevDelivered: prev?.chicken_a3_delivered },
+    { key: "chicken_off_layers",     label: "Chicken", gradeDesc: "Off Layers",       gradeCode: "OL",  gradeColor: gradeColor("chicken"), delivered: current?.chicken_off_layers_delivered,     prevDelivered: prev?.chicken_off_layers_delivered },
+    { key: "pork_super",             label: "Pork",    gradeDesc: "Super",            gradeCode: "SP",  gradeColor: gradeColor("pork"),    delivered: current?.pork_super_delivered,             prevDelivered: prev?.pork_super_delivered },
+    { key: "pork_manufacturing",     label: "Pork",    gradeDesc: "Manufacturing",    gradeCode: "MF",  gradeColor: gradeColor("pork"),    delivered: current?.pork_manufacturing_delivered,     prevDelivered: prev?.pork_manufacturing_delivered },
   ]
 
-  const produceItems = [
-    { key: "chicken", label: "Chicken", gradeDesc: "A Grade · over 1.75kg", gradeCode: "A",  gradeColor: gradeColors[0], delivered: current?.chicken_a1_delivered, prevDelivered: prev?.chicken_a1_delivered },
-    { key: "pork",    label: "Pork",    gradeDesc: "Super",                  gradeCode: "SP", gradeColor: gradeColors[1], delivered: current?.pork_super_delivered,   prevDelivered: prev?.pork_super_delivered },
-    { key: "beef",    label: "Beef",    gradeDesc: "Super Grade",            gradeCode: "S",  gradeColor: gradeColors[2], delivered: current?.beef_super_delivered,   prevDelivered: prev?.beef_super_delivered },
+  const produceItems: GradeItem[] = [
+    { key: "chicken", label: "Chicken", gradeDesc: "A Grade · over 1.75kg", gradeCode: "A",  gradeColor: gradeColor("chicken"), delivered: current?.chicken_a1_delivered, prevDelivered: prev?.chicken_a1_delivered },
+    { key: "pork",    label: "Pork",    gradeDesc: "Super",                  gradeCode: "SP", gradeColor: gradeColor("pork"),    delivered: current?.pork_super_delivered,   prevDelivered: prev?.pork_super_delivered },
+    { key: "beef",    label: "Beef",    gradeDesc: "Super Grade",            gradeCode: "S",  gradeColor: gradeColor("beef"),    delivered: current?.beef_super_delivered,   prevDelivered: prev?.beef_super_delivered },
   ]
 
-  const topGainers = [...produceItems]
+  const topGainers = [...allGrades]
     .filter(item => item.delivered && item.prevDelivered)
     .map(item => ({
       ...item,
@@ -175,6 +218,7 @@ export function PricesBoard() {
               <div className="px-5 py-5">
                 <div className="flex items-center justify-between mb-4">
                   <p className="text-sm font-semibold text-foreground">Top Gainers</p>
+                  <Link href="/prices/lwt" className="text-xs text-muted-foreground hover:text-foreground transition-colors">View more</Link>
                 </div>
                 <ul className="space-y-5">
                   {topGainers.map(item => (

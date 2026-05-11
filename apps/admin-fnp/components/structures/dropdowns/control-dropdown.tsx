@@ -6,7 +6,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { isAxiosError } from "axios"
 import { MoreHorizontal } from "lucide-react"
 
-import { verifyClient, badClient, archiveClient, impersonateClient, toggleBookingClient } from "@/lib/query"
+import { verifyClient, badClient, archiveClient, impersonateClient, toggleBookingClient, togglePickupClient } from "@/lib/query"
 import { ApplicationUserID, ApplicationUser } from "@/lib/schemas"
 import { slug } from "@/lib/utilities"
 import { Button } from "@/components/ui/button"
@@ -177,7 +177,26 @@ export function ControlDropDown({ client }: ControlDropDownProps) {
     },
   })
 
-  const animate = isPending || isPendingBadClient || isPendingArchive || isPendingImpersonate || isPendingBooking ? "animate-bounce" : ""
+  const { mutate: mutateTogglePickup, isPending: isPendingPickup } = useMutation({
+    mutationFn: togglePickupClient,
+    onSuccess: (data) => {
+      const message = data?.data?.has_pickup
+        ? "Pickup Enabled"
+        : "Pickup Disabled"
+      toast({ description: message })
+      queryClient.invalidateQueries({ queryKey: ["dashboard-clients"] })
+      router.refresh()
+    },
+    onError: () => {
+      toast({
+        title: "Update failed",
+        description: "There was a problem updating the pickup setting.",
+        action: <ToastAction altText="Try again">Try again</ToastAction>,
+      })
+    },
+  })
+
+  const animate = isPending || isPendingBadClient || isPendingArchive || isPendingImpersonate || isPendingBooking || isPendingPickup ? "animate-bounce" : ""
 
   const stroke = client?.verified ? "stroke-green-500" : "stroke-red-500"
 
@@ -252,6 +271,15 @@ export function ControlDropDown({ client }: ControlDropDownProps) {
           }}
         >
           {client?.has_booking ? "Disable Online Booking" : "Enable Online Booking"}
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => {
+            if (client?.id !== undefined) {
+              mutateTogglePickup({ id: client.id })
+            }
+          }}
+        >
+          {client?.has_pickup ? "Disable Pickup" : "Enable Pickup"}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem

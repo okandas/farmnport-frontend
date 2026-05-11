@@ -163,6 +163,22 @@ export function Client({ slug, user }: ClientPageProps) {
                 </Link>
               </div>
             )}
+            {client.has_pickup && client.type === 'buyer' && (
+              <div className="bg-green-50 border border-green-200 rounded-xl p-6 space-y-3">
+                <div>
+                  <p className="font-semibold text-sm text-green-900">Request Pickup from {capitalizeFirstLetter(client.name)}</p>
+                  <p className="text-xs text-green-700 mt-1 leading-relaxed">
+                    This buyer offers on-farm pickups. Request them to collect goods directly from your farm.
+                  </p>
+                </div>
+                <Link
+                  href={`/request-pickup/${client.name.toLowerCase().replace(/\s+/g, '-')}`}
+                  className="block w-full text-center bg-green-700 text-white text-sm font-semibold px-4 py-2.5 rounded-lg hover:bg-green-800 transition-colors"
+                >
+                  Request Pickup →
+                </Link>
+              </div>
+            )}
 
             <div className="bg-card border rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
               <h2 className="text-lg font-semibold mb-4">
