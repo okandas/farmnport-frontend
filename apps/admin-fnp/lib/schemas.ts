@@ -79,6 +79,7 @@ export const ApplicationUserSchema = z.object({
   archived: z.boolean().optional(),
   has_prices: z.boolean(),
   has_booking: z.boolean().optional(),
+  has_pickup: z.boolean().optional(),
 })
 
 const pricingSchema = z.object({
@@ -173,6 +174,10 @@ export const ProducerPriceListSchema = z
     pork: z.object({
       farm_produce_id: z.string(),
       super: z.object({
+        code: z.string(),
+        pricing: pricingSchema,
+      }),
+      under: z.object({
         code: z.string(),
         pricing: pricingSchema,
       }),
@@ -1052,9 +1057,23 @@ const CarcassGradePriceSchema = z.object({
 })
 
 const CarcassGradesSchema = z.object({
+  super: CarcassGradePriceSchema,
   commercial: CarcassGradePriceSchema,
   economy: CarcassGradePriceSchema,
   manufacturing: CarcassGradePriceSchema,
+})
+
+const PigsCarcassGradesSchema = z.object({
+  p1: CarcassGradePriceSchema,
+  p2: CarcassGradePriceSchema,
+  manufacturing: CarcassGradePriceSchema,
+})
+
+const GoatsCarcassGradesSchema = z.object({
+  g1: CarcassGradePriceSchema,
+  g2: CarcassGradePriceSchema,
+  g3: CarcassGradePriceSchema,
+  g4: CarcassGradePriceSchema,
 })
 
 const LiveweightEntrySchema = z.object({
@@ -1075,12 +1094,16 @@ export const CdmPriceSchema = z.object({
   effectiveDate: z.coerce.date(),
   exchange_rate: z.coerce.number().positive("Exchange rate must be positive"),
   carcass_grades: CarcassGradesSchema,
+  pigs_carcass_grades: PigsCarcassGradesSchema.optional(),
+  goats_carcass_grades: GoatsCarcassGradesSchema.optional(),
   liveweight: z.array(LiveweightEntrySchema),
   notes: z.array(z.string()).default([]),
 })
 
 export type CdmPrice = z.infer<typeof CdmPriceSchema>
 export type CarcassGradePrice = z.infer<typeof CarcassGradePriceSchema>
+export type PigsCarcassGrades = z.infer<typeof PigsCarcassGradesSchema>
+export type GoatsCarcassGrades = z.infer<typeof GoatsCarcassGradesSchema>
 export type LiveweightEntry = z.infer<typeof LiveweightEntrySchema>
 
 export type CdmPriceResponse = {

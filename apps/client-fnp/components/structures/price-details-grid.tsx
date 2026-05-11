@@ -148,14 +148,14 @@ export function PriceDetailsGrid({ priceList, produce }: PriceDetailsGridProps) 
                           </span>
                         </td>
                         <td className="px-5 py-2.5 text-right">
-                          <span className="text-sm font-semibold text-foreground">
-                            {centsToDollars(deliveredPrice)}
-                          </span>
+                          <span className="text-sm font-semibold text-foreground">{centsToDollars(deliveredPrice)}</span>
+                          {gradeItem?.unit && <span className="block text-[11px] text-muted-foreground">per {gradeItem.unit}</span>}
                         </td>
                         <td className="px-5 py-2.5 text-right">
                           <span className="text-sm text-muted-foreground">
                             {collectedPrice > 0 ? centsToDollars(collectedPrice) : "—"}
                           </span>
+                          {collectedPrice > 0 && gradeItem?.unit && <span className="block text-[11px] text-muted-foreground">per {gradeItem.unit}</span>}
                         </td>
                       </tr>
                     )

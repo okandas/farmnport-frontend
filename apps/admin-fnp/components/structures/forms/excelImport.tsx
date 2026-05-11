@@ -508,6 +508,12 @@ export function ExcelImport({ setValue, setSelectedFarmProduce, setSelectedClien
             }
           }
 
+          // Set unit
+          const unit = category === "slaughter"
+            ? (grade === "chicken" ? "kg" : "head")
+            : "kg"
+          setValue(`${category}.${grade}.unit` as any, unit)
+
           // Set delivered price
           if (delivered !== null && delivered !== undefined) {
             setValue(`${category}.${grade}.pricing.delivered` as any, delivered)

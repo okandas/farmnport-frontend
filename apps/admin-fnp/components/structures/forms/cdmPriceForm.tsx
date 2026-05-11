@@ -99,6 +99,7 @@ export function CdmPriceForm({ price, mode }: CdmPriceFormProps) {
           effectiveDate: new Date(),
           exchange_rate: 0,
           carcass_grades: {
+            super: { ...defaultCarcassGrade },
             commercial: { ...defaultCarcassGrade },
             economy: { ...defaultCarcassGrade },
             manufacturing: { ...defaultCarcassGrade },
@@ -333,7 +334,7 @@ export function CdmPriceForm({ price, mode }: CdmPriceFormProps) {
           {/* Carcass Grades Section */}
           <Card>
             <CardHeader>
-              <CardTitle>Carcass Grades (per kg)</CardTitle>
+              <CardTitle>Cattle Carcass Grades (per kg)</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="overflow-x-auto">
@@ -348,23 +349,120 @@ export function CdmPriceForm({ price, mode }: CdmPriceFormProps) {
                     </tr>
                   </thead>
                   <tbody>
-                    {(["commercial", "economy", "manufacturing"] as const).map((grade) => (
-                      <tr key={grade} className="border-b">
-                        <td className="py-3 font-medium capitalize">{grade} ({grade === "commercial" ? "C" : grade === "economy" ? "X" : "J"})</td>
+                    {([
+                      { key: "super", label: "Super (S)" },
+                      { key: "commercial", label: "Commercial (C)" },
+                      { key: "economy", label: "Economy (X)" },
+                      { key: "manufacturing", label: "Manufacturing (J)" },
+                    ] as const).map(({ key, label }) => (
+                      <tr key={key} className="border-b">
+                        <td className="py-3 font-medium">{label}</td>
                         {(["collected_usd", "delivered_usd", "collected_zig", "delivered_zig"] as const).map((priceField) => (
                           <td key={priceField} className="py-3 pr-2">
                             <FormField
                               control={form.control}
-                              name={`carcass_grades.${grade}.${priceField}`}
+                              name={`carcass_grades.${key}.${priceField}`}
                               render={({ field }) => (
                                 <FormItem>
                                   <FormControl>
-                                    <Input
-                                      type="number"
-                                      step="0.01"
-                                      className="w-28"
-                                      {...field}
-                                    />
+                                    <Input type="number" step="0.01" className="w-28" {...field} />
+                                  </FormControl>
+                                </FormItem>
+                              )}
+                            />
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Pigs Carcass Grades */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Pigs Carcass Grades (per kg)</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="py-2 text-left font-medium">Grade</th>
+                      <th className="py-2 text-left font-medium">Collected USD</th>
+                      <th className="py-2 text-left font-medium">Delivered USD</th>
+                      <th className="py-2 text-left font-medium">Collected ZIG</th>
+                      <th className="py-2 text-left font-medium">Delivered ZIG</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {([
+                      { key: "p1", label: "P1 Grade" },
+                      { key: "p2", label: "P2 Grade" },
+                      { key: "manufacturing", label: "Manufacturing (PM)" },
+                    ] as const).map(({ key, label }) => (
+                      <tr key={key} className="border-b">
+                        <td className="py-3 font-medium">{label}</td>
+                        {(["collected_usd", "delivered_usd", "collected_zig", "delivered_zig"] as const).map((priceField) => (
+                          <td key={priceField} className="py-3 pr-2">
+                            <FormField
+                              control={form.control}
+                              name={`pigs_carcass_grades.${key}.${priceField}` as any}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormControl>
+                                    <Input type="number" step="0.01" className="w-28" {...field} />
+                                  </FormControl>
+                                </FormItem>
+                              )}
+                            />
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Goats Carcass Grades */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Goats Carcass Grades (per kg)</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="py-2 text-left font-medium">Grade</th>
+                      <th className="py-2 text-left font-medium">Collected USD</th>
+                      <th className="py-2 text-left font-medium">Delivered USD</th>
+                      <th className="py-2 text-left font-medium">Collected ZIG</th>
+                      <th className="py-2 text-left font-medium">Delivered ZIG</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {([
+                      { key: "g1", label: "G1 Grade" },
+                      { key: "g2", label: "G2 Grade" },
+                      { key: "g3", label: "G3 Grade" },
+                      { key: "g4", label: "G4 Grade" },
+                    ] as const).map(({ key, label }) => (
+                      <tr key={key} className="border-b">
+                        <td className="py-3 font-medium">{label}</td>
+                        {(["collected_usd", "delivered_usd", "collected_zig", "delivered_zig"] as const).map((priceField) => (
+                          <td key={priceField} className="py-3 pr-2">
+                            <FormField
+                              control={form.control}
+                              name={`goats_carcass_grades.${key}.${priceField}` as any}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormControl>
+                                    <Input type="number" step="0.01" className="w-28" {...field} />
                                   </FormControl>
                                 </FormItem>
                               )}
