@@ -16,7 +16,7 @@ import {
   CdmPrice,
   CdmPriceSchema,
 } from "@/lib/schemas"
-import { cn } from "@/lib/utilities"
+import { cn, centsToDollarsFormInputs, dollarsToCents } from "@/lib/utilities"
 import { handleApiError, handleFormErrors } from "@/lib/error-handler"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -86,11 +86,42 @@ export function CdmPriceForm({ price, mode }: CdmPriceFormProps) {
   const [openCalendar, setOpenCalendar] = useState(false)
   const [noteInput, setNoteInput] = useState("")
 
+  function gradeFromCents(g: { collected_usd: number; delivered_usd: number; collected_zig: number; delivered_zig: number }) {
+    return {
+      collected_usd: centsToDollarsFormInputs(g.collected_usd),
+      delivered_usd: centsToDollarsFormInputs(g.delivered_usd),
+      collected_zig: centsToDollarsFormInputs(g.collected_zig),
+      delivered_zig: centsToDollarsFormInputs(g.delivered_zig),
+    }
+  }
+
   const form = useForm<CdmPrice>({
     defaultValues: price
       ? {
           ...price,
           effectiveDate: new Date(price.effectiveDate),
+          carcass_grades: {
+            super: gradeFromCents(price.carcass_grades.super),
+            commercial: gradeFromCents(price.carcass_grades.commercial),
+            economy: gradeFromCents(price.carcass_grades.economy),
+            manufacturing: gradeFromCents(price.carcass_grades.manufacturing),
+          },
+          pigs_carcass_grades: price.pigs_carcass_grades ? {
+            p1: gradeFromCents(price.pigs_carcass_grades.p1),
+            p2: gradeFromCents(price.pigs_carcass_grades.p2),
+            manufacturing: gradeFromCents(price.pigs_carcass_grades.manufacturing),
+          } : undefined,
+          goats_carcass_grades: price.goats_carcass_grades ? {
+            g1: gradeFromCents(price.goats_carcass_grades.g1),
+            g2: gradeFromCents(price.goats_carcass_grades.g2),
+            g3: gradeFromCents(price.goats_carcass_grades.g3),
+            g4: gradeFromCents(price.goats_carcass_grades.g4),
+          } : undefined,
+          liveweight: price.liveweight.map(e => ({
+            ...e,
+            delivered_usd: centsToDollarsFormInputs(e.delivered_usd),
+            delivered_zig: centsToDollarsFormInputs(e.delivered_zig),
+          })),
         }
       : {
           id: "",
@@ -154,9 +185,43 @@ export function CdmPriceForm({ price, mode }: CdmPriceFormProps) {
 
   const isPending = isCreating || isUpdating
 
+  function gradeToCents(g: { collected_usd: number; delivered_usd: number; collected_zig: number; delivered_zig: number }) {
+    return {
+      collected_usd: dollarsToCents(g.collected_usd),
+      delivered_usd: dollarsToCents(g.delivered_usd),
+      collected_zig: dollarsToCents(g.collected_zig),
+      delivered_zig: dollarsToCents(g.delivered_zig),
+    }
+  }
+
   function onSubmit(data: CdmPrice) {
-    // Set client_name from selected
     data.client_name = selectedClient
+    data.carcass_grades = {
+      super: gradeToCents(data.carcass_grades.super),
+      commercial: gradeToCents(data.carcass_grades.commercial),
+      economy: gradeToCents(data.carcass_grades.economy),
+      manufacturing: gradeToCents(data.carcass_grades.manufacturing),
+    }
+    if (data.pigs_carcass_grades) {
+      data.pigs_carcass_grades = {
+        p1: gradeToCents(data.pigs_carcass_grades.p1),
+        p2: gradeToCents(data.pigs_carcass_grades.p2),
+        manufacturing: gradeToCents(data.pigs_carcass_grades.manufacturing),
+      }
+    }
+    if (data.goats_carcass_grades) {
+      data.goats_carcass_grades = {
+        g1: gradeToCents(data.goats_carcass_grades.g1),
+        g2: gradeToCents(data.goats_carcass_grades.g2),
+        g3: gradeToCents(data.goats_carcass_grades.g3),
+        g4: gradeToCents(data.goats_carcass_grades.g4),
+      }
+    }
+    data.liveweight = data.liveweight.map(e => ({
+      ...e,
+      delivered_usd: dollarsToCents(e.delivered_usd),
+      delivered_zig: dollarsToCents(e.delivered_zig),
+    }))
     if (mode === "create") {
       createMutate(data)
     } else {
