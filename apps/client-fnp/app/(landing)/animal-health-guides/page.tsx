@@ -3,6 +3,18 @@ import { BaseURL } from "@/lib/schemas"
 import { AllAnimalHealthClient } from "./AllAnimalHealthClient"
 import { OtherGuidesLinks } from "@/components/shared/OtherGuidesLinks"
 
+export const metadata = {
+  title: 'Animal Health Product Guides Zimbabwe – Vaccines, Antibiotics & Supplements | farmnport.com',
+  description: 'Browse animal health product guides for poultry and livestock in Zimbabwe. Vaccines, antibiotics, nutrition supplements, anti-protozoals, and biosecurity disinfectants — dosage rates and usage guidelines.',
+  alternates: { canonical: '/animal-health-guides' },
+  openGraph: {
+    title: 'Animal Health Product Guides Zimbabwe',
+    description: 'Browse animal health product guides for poultry and livestock in Zimbabwe. Vaccines, antibiotics, supplements — dosage rates and usage guidelines.',
+    siteName: 'farmnport',
+    type: 'website',
+  },
+}
+
 const fetchOptions: RequestInit = process.env.NODE_ENV === "production"
     ? { next: { revalidate: 3600 } } as RequestInit
     : { cache: "no-store" }

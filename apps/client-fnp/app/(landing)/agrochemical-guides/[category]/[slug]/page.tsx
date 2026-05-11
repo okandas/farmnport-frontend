@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { queryAgroChemical } from "@/lib/query"
 import { ActiveIngredientsList } from "@/components/shared/ActiveIngredientUnitsKey"
 import Image from "next/image"
@@ -10,6 +11,45 @@ import { FertilizerApplicationRates } from "@/components/agrochemical/Fertilizer
 import { AgrochemicalDosageTable } from "@/components/agrochemical/AgrochemicalDosageTable"
 import { ProductTargets } from "@/components/agrochemical/ProductTargets"
 import { WantToBuyCTA } from "@/components/shared/WantToBuyCTA"
+
+type Props = { params: Promise<{ category: string; slug: string }> }
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { category, slug } = await params
+  const response = await queryAgroChemical(slug).catch(() => null)
+  const chemical = response?.data
+
+  if (!chemical) {
+    return { title: 'Agrochemical Guide | farmnport.com' }
+  }
+
+  const categoryName = chemical.agrochemical_category?.name || category.replace(/-/g, ' ')
+  const categorySingular = categoryName.toLowerCase().replace(/icides$/, 'icide').replace(/izers$/, 'izer').replace(/s$/, '')
+  const categorySingularTitle = categorySingular.charAt(0).toUpperCase() + categorySingular.slice(1)
+  const article = /^[aeiou]/i.test(categorySingular) ? 'an' : 'a'
+  const crops = Array.from(new Set<string>((chemical.dosage_rates ?? []).slice(0, 3).map((r: any) => r.crop))).join(', ')
+  const ingredients = (chemical.active_ingredients ?? []).slice(0, 2).map((ai: any) => ai.name).join(', ')
+  const brand = chemical.brand?.name ? ` by ${chemical.brand.name}` : ''
+
+  const description = [
+    `${chemical.name}${brand} is ${article} ${categorySingular} for Zimbabwe farmers`,
+    ingredients ? `containing ${ingredients}` : null,
+    crops ? `used on ${crops}` : null,
+    'View dosage rates, label information, and application guidelines on farmnport.com.',
+  ].filter(Boolean).join('. ')
+
+  return {
+    title: `${chemical.name} – ${categorySingularTitle} Dosage, Label & Guide | farmnport.com`,
+    description,
+    alternates: { canonical: `/agrochemical-guides/${category}/${slug}` },
+    openGraph: {
+      title: `${chemical.name} – ${categorySingularTitle} Guide`,
+      description,
+      siteName: 'farmnport',
+      type: 'website',
+    },
+  }
+}
 
 interface GuidePageProps {
     params: Promise<{

@@ -3,6 +3,18 @@ import { AllPlantNutritionClient } from "./AllPlantNutritionClient"
 import { queryAllPlantNutritionProducts } from "@/lib/query"
 import { OtherGuidesLinks } from "@/components/shared/OtherGuidesLinks"
 
+export const metadata = {
+  title: 'Plant Nutrition Guides Zimbabwe – Fertilizers, Foliar Feeds & Biostimulants | farmnport.com',
+  description: 'Browse plant nutrition product guides for Zimbabwe farmers. Fertilizers, foliar feeds, biostimulants — application rates, active ingredients, and usage guidelines for better crop nutrition.',
+  alternates: { canonical: '/plant-nutrition-guides' },
+  openGraph: {
+    title: 'Plant Nutrition Guides Zimbabwe',
+    description: 'Browse plant nutrition product guides for Zimbabwe farmers. Fertilizers, foliar feeds, biostimulants — application rates and usage guidelines.',
+    siteName: 'farmnport',
+    type: 'website',
+  },
+}
+
 export default async function PlantNutritionGuidesPage() {
     const productsRes = await queryAllPlantNutritionProducts({ p: 1, brand: [] }).catch(() => null)
 

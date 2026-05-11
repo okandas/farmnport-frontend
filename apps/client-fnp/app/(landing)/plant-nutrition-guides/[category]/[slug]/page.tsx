@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import Image from "next/image"
 import { Beaker, AlertTriangle } from "lucide-react"
 import Link from "next/link"
@@ -8,6 +9,45 @@ import { FertilizerApplicationRates } from "@/components/agrochemical/Fertilizer
 import { AgrochemicalDosageTable } from "@/components/agrochemical/AgrochemicalDosageTable"
 import { ActiveIngredientsList } from "@/components/shared/ActiveIngredientUnitsKey"
 import { WantToBuyCTA } from "@/components/shared/WantToBuyCTA"
+
+type Props = { params: Promise<{ category: string; slug: string }> }
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { category, slug } = await params
+  const res = await fetch(`${BaseURL}/plantnutrition/${slug}`, { next: { revalidate: 3600 } }).catch(() => null)
+  const product = res?.ok ? await res.json() : null
+
+  if (!product) {
+    return { title: 'Plant Nutrition Guide | farmnport.com' }
+  }
+
+  const categoryName = product.plant_nutrition_category?.name || category.replace(/-/g, ' ')
+  const categorySingular = categoryName.toLowerCase().replace(/izers$/, 'izer').replace(/ients$/, 'ient').replace(/s$/, '')
+  const categorySingularTitle = categorySingular.charAt(0).toUpperCase() + categorySingular.slice(1)
+  const article = /^[aeiou]/i.test(categorySingular) ? 'an' : 'a'
+  const crops = Array.from(new Set<string>((product.dosage_rates ?? []).slice(0, 3).map((r: any) => r.crop))).join(', ')
+  const ingredients = (product.active_ingredients ?? []).slice(0, 2).map((ai: any) => ai.name).join(', ')
+  const brand = product.brand?.name ? ` by ${product.brand.name}` : ''
+
+  const description = [
+    `${product.name}${brand} is ${article} ${categorySingular} for Zimbabwe crops`,
+    ingredients ? `containing ${ingredients}` : null,
+    crops ? `for use on ${crops}` : null,
+    'View application rates and usage guidelines on farmnport.com.',
+  ].filter(Boolean).join('. ')
+
+  return {
+    title: `${product.name} – ${categorySingularTitle} Application Rates & Guide | farmnport.com`,
+    description,
+    alternates: { canonical: `/plant-nutrition-guides/${category}/${slug}` },
+    openGraph: {
+      title: `${product.name} – ${categorySingularTitle} Guide`,
+      description,
+      siteName: 'farmnport',
+      type: 'website',
+    },
+  }
+}
 
 interface GuidePageProps {
     params: Promise<{

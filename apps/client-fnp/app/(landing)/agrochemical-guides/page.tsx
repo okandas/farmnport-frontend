@@ -3,6 +3,18 @@ import { AllAgroChemicalsClient } from "./AllAgroChemicalsClient"
 import { queryAllAgroChemicals } from "@/lib/query"
 import { OtherGuidesLinks } from "@/components/shared/OtherGuidesLinks"
 
+export const metadata = {
+  title: 'Agrochemical Guides Zimbabwe – Herbicides, Fungicides, Insecticides & More | farmnport.com',
+  description: 'Browse agrochemical product guides for Zimbabwe farmers. Herbicides, fungicides, insecticides, acaricides, and fertilizers — active ingredients, dosage rates, and application guidelines.',
+  alternates: { canonical: '/agrochemical-guides' },
+  openGraph: {
+    title: 'Agrochemical Guides Zimbabwe',
+    description: 'Browse agrochemical product guides for Zimbabwe farmers. Herbicides, fungicides, insecticides, acaricides — dosage rates and application guidelines.',
+    siteName: 'farmnport',
+    type: 'website',
+  },
+}
+
 export default async function AgrochemicalGuidesPage() {
     const chemicalsRes = await queryAllAgroChemicals({ p: 1, search: "", brand: [], target: [], active_ingredient: [], used_on: [] }).catch(() => null)
 
