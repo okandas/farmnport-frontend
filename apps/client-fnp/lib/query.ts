@@ -126,6 +126,10 @@ export function queryMarketStats() {
   return api.get(`${BaseURL}/prices/market-stats`)
 }
 
+export function queryGradeSummary() {
+  return api.get(`${BaseURL}/prices/grade-summary`)
+}
+
 export function queryProducerPriceLists(pagination?: PaginationModel) {
   const params = new URLSearchParams()
   if (pagination?.p !== undefined && pagination.p >= 2) {

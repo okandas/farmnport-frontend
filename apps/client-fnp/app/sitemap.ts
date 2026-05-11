@@ -31,9 +31,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/animal-health-guides`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.8 },
     { url: `${BASE_URL}/animal-health-guides/all`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.8 },
     { url: `${BASE_URL}/pricing`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
-    { url: `${BASE_URL}/prices/lwt`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.7 },
-    { url: `${BASE_URL}/prices/cdm`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.7 },
-    { url: `${BASE_URL}/prices/produce`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.7 },
+    { url: `${BASE_URL}/prices`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.7 },
     { url: `${BASE_URL}/waiting-list-paying`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.4 },
     { url: `${BASE_URL}/waiting-list-shop`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.4 },
     { url: `${BASE_URL}/about`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.5 },
@@ -44,7 +42,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Fetch all dynamic data in parallel
   const [
-    priceLists,
     farmProduce,
     agroChemicalCategories,
     agroChemicals,
@@ -53,10 +50,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     feedProducts,
     feedingPrograms,
     sprayPrograms,
-    cdmPrices,
     clients,
   ] = await Promise.all([
-    fetchPriceLists(),
     fetchFarmProduce(),
     fetchAgroChemicalCategories(),
     fetchAgroChemicals(),
@@ -65,17 +60,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     fetchFeedProducts(),
     fetchFeedingPrograms(),
     fetchSprayPrograms(),
-    fetchCdmPrices(),
     fetchClients(),
   ])
-
-  // Price list routes
-  const priceRoutes: MetadataRoute.Sitemap = priceLists.map((pl) => ({
-    url: `${BASE_URL}/prices/${pl.slug}`,
-    lastModified: safeDate(pl.effectiveDate),
-    changeFrequency: 'weekly' as const,
-    priority: 0.7,
-  }))
 
   // Farm produce → /buyers/{slug} and /farmers/{slug}
   const farmProduceRoutes: MetadataRoute.Sitemap = farmProduce.flatMap((fp: any) => [
@@ -110,18 +96,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }))
 
-  // CDM price routes
-  const cdmPriceRoutes: MetadataRoute.Sitemap = cdmPrices.map((cp: any) => ({
-    url: `${BASE_URL}/prices/cdm/${cp.slug}`,
-    lastModified: safeDate(cp.effectiveDate),
-    changeFrequency: 'weekly' as const,
-    priority: 0.6,
-  }))
-
   // Produce price category routes
   const producePriceCategories = ['beef', 'lamb', 'mutton', 'goat', 'chicken', 'pork']
   const producePriceRoutes: MetadataRoute.Sitemap = producePriceCategories.map((slug) => ({
-    url: `${BASE_URL}/prices/produce/${slug}`,
+    url: `${BASE_URL}/prices/${slug}`,
     lastModified: new Date(),
     changeFrequency: 'weekly' as const,
     priority: 0.7,
@@ -178,8 +156,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [
     ...staticRoutes,
-    ...priceRoutes,
-    ...cdmPriceRoutes,
     ...producePriceRoutes,
     ...farmProduceRoutes,
     ...agroChemicalCategoryRoutes,
@@ -301,27 +277,6 @@ async function fetchSprayPrograms() {
   }))
 }
 
-async function fetchCdmPrices() {
-  const apiUrl = getApiUrl()
-  if (!apiUrl) return []
-
-  try {
-    const response = await fetch(`${apiUrl}/cdmprices/all?p=1&limit=100`, { next: { revalidate: 86400 } })
-    if (!response.ok) return []
-    const data = await response.json()
-    const prices = data.data || []
-    return prices.map((p: any) => {
-      const pDate = new Date(p.effectiveDate).toISOString().split('T')[0]
-      return {
-        slug: `${p.client_name.toLowerCase().replace(/\s+/g, '-')}-${pDate}`,
-        effectiveDate: p.effectiveDate,
-      }
-    })
-  } catch (error) {
-    console.error('Error fetching CDM prices for sitemap:', error)
-    return []
-  }
-}
 
 async function fetchClients() {
   const apiUrl = getApiUrl()
@@ -353,38 +308,3 @@ async function fetchClients() {
   }
 }
 
-async function fetchPriceLists() {
-  const apiUrl = getApiUrl()
-  if (!apiUrl) return []
-
-  try {
-    let all: any[] = []
-    let page = 1
-
-    while (page <= 20 && all.length < 500) {
-      const response = await fetch(`${apiUrl}/prices/all?p=${page}&limit=100`, {
-        next: { revalidate: 3600 },
-      })
-      if (!response.ok) break
-
-      const data = await response.json()
-      const priceLists = data.data || []
-      if (priceLists.length === 0) break
-
-      const mapped = priceLists.map((pl: any) => {
-        const plDate = safeDate(pl.effectiveDate).toISOString().split('T')[0]
-        return {
-          slug: `${pl.client_name.toLowerCase().replace(/\s+/g, '-')}-${plDate}`,
-          effectiveDate: pl.effectiveDate,
-        }
-      })
-      all = [...all, ...mapped]
-      page++
-    }
-
-    return all
-  } catch (error) {
-    console.error('Error fetching price lists for sitemap:', error)
-    return []
-  }
-}

@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { useQuery } from "@tanstack/react-query"
-import { queryProducerPriceLists, queryCdmPrices, queryMarketStats } from "@/lib/query"
+import { queryProducerPriceLists, queryCdmPrices, queryMarketStats, queryGradeSummary } from "@/lib/query"
 
 type MarketStat = {
   effective_date: string
@@ -39,7 +39,30 @@ type MarketStat = {
   pork_manufacturing_delivered: number
 }
 
+
 const toDollars = (v: number) => (v / 100).toFixed(2)
+
+function MiniSparkline({ values }: { values: number[] }) {
+  const filtered = values.filter(v => v > 0)
+  if (filtered.length < 2) return <span className="text-muted-foreground text-sm">—</span>
+  const w = 80, h = 28
+  const min = Math.min(...filtered)
+  const max = Math.max(...filtered)
+  const range = max - min || 1
+  const pts = filtered.map((v, i) => {
+    const x = (i / (filtered.length - 1)) * w
+    const y = h - ((v - min) / range) * (h - 4) - 2
+    return `${x.toFixed(1)},${y.toFixed(1)}`
+  }).join(" ")
+  const up = filtered[filtered.length - 1] >= filtered[0]
+  const stroke = up ? "#16a34a" : "#ef4444"
+  return (
+    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} className="inline-block">
+      <polyline points={pts} fill="none" stroke={stroke} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
 
 // ── Main board ────────────────────────────────────────────────────────────────
 
@@ -59,6 +82,11 @@ export function PricesBoard() {
     queryFn: () => queryProducerPriceLists({ p: 1, limit: 1 } as any),
     refetchOnWindowFocus: false,
   })
+  const { data: gradeSummaryData } = useQuery({
+    queryKey: ["grade-summary"],
+    queryFn: queryGradeSummary,
+    refetchOnWindowFocus: false,
+  })
 
   const stats: MarketStat[] = statsData?.data ?? []
   const lwtTotal: number = lwtMeta?.data?.total ?? 0
@@ -66,6 +94,19 @@ export function PricesBoard() {
 
   const current = stats[0]
   const prev = stats[1]
+
+  type GradeEntry = {
+    key: string
+    produce: string
+    grade: string
+    code: string
+    price_type: string
+    avg: number
+    high: number
+    low: number
+    trend: number[]
+  }
+  const gradeEntries: GradeEntry[] = gradeSummaryData?.data ?? []
 
   type GradeItem = {
     key: string
@@ -182,7 +223,7 @@ export function PricesBoard() {
               <div className="px-5 py-5">
                 <div className="flex items-center justify-between mb-4">
                   <p className="text-sm font-semibold text-foreground">Most Requested Buyer Prices</p>
-                  <Link href="/prices/lwt" className="text-xs text-muted-foreground hover:text-foreground transition-colors">View more</Link>
+                  <Link href="/prices" className="text-xs text-muted-foreground hover:text-foreground transition-colors">View more</Link>
                 </div>
                 <ul className="space-y-5">
                   {produceItems.map(item => (
@@ -218,7 +259,7 @@ export function PricesBoard() {
               <div className="px-5 py-5">
                 <div className="flex items-center justify-between mb-4">
                   <p className="text-sm font-semibold text-foreground">Top Gainers</p>
-                  <Link href="/prices/lwt" className="text-xs text-muted-foreground hover:text-foreground transition-colors">View more</Link>
+                  <Link href="/prices" className="text-xs text-muted-foreground hover:text-foreground transition-colors">View more</Link>
                 </div>
                 <ul className="space-y-5">
                   {topGainers.map(item => (
@@ -242,6 +283,71 @@ export function PricesBoard() {
             </li>
 
           </ul>
+
+          {/* ── Grade price table ── */}
+          {gradeEntries.length > 0 && (
+            <div className="mt-2">
+              <div className="overflow-x-auto border-t border-b border-border">
+                <table className="w-full text-base">
+                  <thead>
+                    <tr className="border-b border-border text-sm text-muted-foreground">
+                      <th className="text-left px-6 py-4 font-medium w-12">#</th>
+                      <th className="text-left px-6 py-4 font-medium min-w-[220px]">Produce · Grade</th>
+                      <th className="text-right px-6 py-4 font-medium">Average</th>
+                      <th className="text-right px-6 py-4 font-medium hidden sm:table-cell">Change</th>
+                      <th className="text-right px-6 py-4 font-medium hidden sm:table-cell">High</th>
+                      <th className="text-right px-6 py-4 font-medium hidden sm:table-cell">Low</th>
+                      <th className="text-right px-6 py-4 font-medium hidden lg:table-cell w-24">Trend</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[...gradeEntries]
+                      .sort((a, b) => b.avg - a.avg)
+                      .map((entry, idx) => {
+                        const color = gradeColor((entry.produce ?? "").toLowerCase())
+                        return (
+                          <tr key={entry.key} className="border-b border-border/50 last:border-0 hover:bg-muted/40 transition-colors">
+                            <td className="px-6 py-4 text-sm text-muted-foreground tabular-nums w-12">{idx + 1}</td>
+                            <td className="px-6 py-4 min-w-[220px]">
+                              <div className="flex items-center gap-3">
+                                <span className={`inline-flex items-center justify-center rounded-md px-2 py-0.5 text-[10px] font-bold ring-1 ring-inset w-8 shrink-0 ${color}`}>{entry.code}</span>
+                                <div>
+                                  <Link href={`/prices/${entry.produce.toLowerCase()}?code=${entry.code.toLowerCase()}`} className="font-medium text-foreground leading-tight hover:text-foreground/70">{entry.produce} <span className="text-muted-foreground font-normal text-sm">· {entry.grade}</span></Link>
+                                  <p className="text-xs text-muted-foreground leading-tight mt-0.5 italic">{entry.price_type}</p>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 text-right tabular-nums font-semibold">
+                              ${toDollars(entry.avg)}
+                            </td>
+                            <td className="px-6 py-4 text-right tabular-nums text-sm font-medium hidden sm:table-cell">
+                              {(() => {
+                                const t = entry.trend ?? []
+                                if (t.length < 2) return <span className="text-muted-foreground">—</span>
+                                const prev = t[t.length - 2], curr = t[t.length - 1]
+                                if (!prev) return <span className="text-muted-foreground">—</span>
+                                const pct = ((curr - prev) / prev) * 100
+                                const up = pct >= 0
+                                return <span className={up ? "text-green-600 dark:text-green-400" : "text-red-500 dark:text-red-400"}>{up ? "▲" : "▼"} {up ? "+" : ""}{pct.toFixed(2)}%</span>
+                              })()}
+                            </td>
+                            <td className="px-6 py-4 text-right tabular-nums text-sm font-medium text-green-600 dark:text-green-400 hidden sm:table-cell">
+                              {entry.high ? `$${toDollars(entry.high)}` : <span className="text-muted-foreground font-normal">—</span>}
+                            </td>
+                            <td className="px-6 py-4 text-right tabular-nums text-sm font-medium text-red-500 dark:text-red-400 hidden sm:table-cell">
+                              {entry.low ? `$${toDollars(entry.low)}` : <span className="text-muted-foreground font-normal">—</span>}
+                            </td>
+                            <td className="px-6 py-4 text-right hidden lg:table-cell">
+                              <MiniSparkline values={entry.trend ?? []} />
+                            </td>
+                          </tr>
+                        )
+                      })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
 
         </div>
       </div>

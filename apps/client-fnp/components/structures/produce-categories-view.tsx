@@ -27,7 +27,7 @@ export function ProduceCategoriesView() {
               <h3 className="text-sm font-bold tracking-tight">{produce.name} Prices</h3>
             </div>
             <Link
-              href={`/prices/produce/${produce.slug}`}
+              href={`/prices/${produce.slug}`}
               className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-primary transition-colors"
             >
               View all
