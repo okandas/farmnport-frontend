@@ -6,7 +6,7 @@ import { useMutation, useQuery } from "@tanstack/react-query"
 import { useRouter, useParams } from "next/navigation"
 import { useDebounce } from "use-debounce"
 
-import { queryMenuItem, updateMenuItem, queryMenuItemCategories, queryMenuItemComponents, queryMenus } from "@/lib/query"
+import { queryMenuItem, updateMenuItem, queryMenuItemCategories, queryMenuItemCategory, queryMenuItemComponents, queryMenus } from "@/lib/query"
 import { MenuItem, MenuItemCategory, MenuItemComponent, CompositionEntry, Menu } from "@/lib/schemas"
 import { cn, dollarsToCents, centsToDollarsFormInputs, centsToDollars } from "@/lib/utilities"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -119,6 +119,20 @@ export default function EditMenuItemPage() {
             setInitialized(true)
         }
     }, [menuItem, initialized])
+
+    // Fetch the current category so it always appears in the list
+    const { data: currentCategoryData } = useQuery({
+        queryKey: ["menu-item-category", categoryId],
+        queryFn: () => queryMenuItemCategory(categoryId),
+        enabled: !!categoryId,
+        refetchOnWindowFocus: false,
+    })
+
+    useEffect(() => {
+        const current = currentCategoryData?.data as MenuItemCategory
+        if (!current) return
+        setAllCategories(prev => prev.find(c => c.id === current.id) ? prev : [current, ...prev])
+    }, [currentCategoryData])
 
     // Fetch categories with search and pagination
     const { data: categoryData, isFetching: isFetchingCategories } = useQuery({
@@ -254,7 +268,8 @@ export default function EditMenuItemPage() {
 
     return (
         <div className="space-y-10 px-4 py-6 sm:px-6 lg:px-8">
-<div className="flex items-center justify-between">
+
+            <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
                         Edit Menu Item
@@ -295,6 +310,11 @@ export default function EditMenuItemPage() {
                                             <SelectValue placeholder="Select a menu" />
                                         </SelectTrigger>
                                         <SelectContent>
+                                            {menuItem?.menu_id && !menus.find(m => m.id === menuItem.menu_id) && (
+                                                <SelectItem key={menuItem.menu_id} value={menuItem.menu_id}>
+                                                    <span className="capitalize">{menuItem.menu_name || menuItem.menu_id}</span>
+                                                </SelectItem>
+                                            )}
                                             {menus.map((menu) => (
                                                 <SelectItem key={menu.id} value={menu.id}>
                                                     <span className="capitalize">{menu.name}</span>

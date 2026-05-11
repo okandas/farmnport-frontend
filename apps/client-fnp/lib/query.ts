@@ -122,6 +122,10 @@ export async function clientSignup(data: SignUpFormData) {
     return api.post(url, data)
 }
 
+export function queryMarketStats() {
+  return api.get(`${BaseURL}/prices/market-stats`)
+}
+
 export function queryProducerPriceLists(pagination?: PaginationModel) {
   const params = new URLSearchParams()
   if (pagination?.p !== undefined && pagination.p >= 2) {
