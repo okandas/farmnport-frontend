@@ -382,6 +382,17 @@ export function createPriceListDefaultValues(priceList: ProducerPriceList) {
             ),
           },
         },
+        under: {
+          code: priceList.pork.under?.code ?? "UP",
+          pricing: {
+            collected: centsToDollarsFormInputs(
+              priceList.pork.under?.pricing.collected ?? 0,
+            ),
+            delivered: centsToDollarsFormInputs(
+              priceList.pork.under?.pricing.delivered ?? 0,
+            ),
+          },
+        },
         manufacturing: {
           code: priceList.pork.manufacturing.code,
           pricing: {
@@ -598,6 +609,9 @@ export function createPriceListPayload(payload: ProducerPriceList) {
   payload.pork.super.pricing.collected = dollarsToCents(
     payload.pork.super.pricing.collected,
   )
+  payload.pork.under.pricing.collected = dollarsToCents(
+    payload.pork.under.pricing.collected,
+  )
   payload.pork.manufacturing.pricing.collected = dollarsToCents(
     payload.pork.manufacturing.pricing.collected,
   )
@@ -607,6 +621,9 @@ export function createPriceListPayload(payload: ProducerPriceList) {
 
   payload.pork.super.pricing.delivered = dollarsToCents(
     payload.pork.super.pricing.delivered,
+  )
+  payload.pork.under.pricing.delivered = dollarsToCents(
+    payload.pork.under.pricing.delivered,
   )
   payload.pork.manufacturing.pricing.delivered = dollarsToCents(
     payload.pork.manufacturing.pricing.delivered,

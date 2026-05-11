@@ -375,6 +375,17 @@ export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
             ),
           },
         },
+        under: {
+          code: priceList.pork.under?.code ?? "UP",
+          pricing: {
+            collected: centsToDollarsFormInputs(
+              priceList.pork.under?.pricing.collected ?? 0,
+            ),
+            delivered: centsToDollarsFormInputs(
+              priceList.pork.under?.pricing.delivered ?? 0,
+            ),
+          },
+        },
         manufacturing: {
           code: priceList.pork.manufacturing.code,
           pricing: {
@@ -2086,6 +2097,26 @@ export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
 
                 <FormField
                   control={form.control}
+                  name="pork.under.pricing.delivered"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Under</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Price Under"
+                          {...field}
+                          type="number"
+                          min="0"
+                          step="any"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
                   name="pork.manufacturing.pricing.delivered"
                   render={({ field }) => (
                     <FormItem>
@@ -2138,6 +2169,26 @@ export function EditProductPriceForm({ priceList }: EditProductPriceFormProps) {
                           <FormControl>
                             <Input
                               placeholder="Price Super"
+                              {...field}
+                              type="number"
+                              min="0"
+                              step="any"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="pork.under.pricing.collected"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Under</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Price Under"
                               {...field}
                               type="number"
                               min="0"

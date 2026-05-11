@@ -30,6 +30,7 @@ export const dashboardConfig: DashboardConfig = {
     },
     {
       label: "Orders",
+      alwaysOpen: true,
       items: [
         {
           title: "Sales Orders",
