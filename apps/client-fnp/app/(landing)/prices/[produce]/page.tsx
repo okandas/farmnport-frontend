@@ -4,7 +4,7 @@ import { capitalizeFirstLetter } from "@/lib/utilities"
 
 interface ProducePageProps {
   params: Promise<{ produce: string }>
-  searchParams: Promise<{ code?: string }>
+  searchParams: Promise<{ code?: string; type?: string }>
 }
 
 export async function generateMetadata({ params }: ProducePageProps): Promise<Metadata> {
@@ -26,12 +26,12 @@ export async function generateMetadata({ params }: ProducePageProps): Promise<Me
 
 export default async function ProducePricePage({ params, searchParams }: ProducePageProps) {
   const { produce } = await params
-  const { code } = await searchParams
+  const { code, type } = await searchParams
 
   return (
     <>
       <h1 className="sr-only">{capitalizeFirstLetter(produce)} Prices Zimbabwe</h1>
-      <ProduceGradeBoard produce={produce} code={code ?? ""} />
+      <ProduceGradeBoard produce={produce} code={code ?? ""} priceType={type ?? ""} />
     </>
   )
 }

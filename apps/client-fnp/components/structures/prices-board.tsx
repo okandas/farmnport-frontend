@@ -106,7 +106,7 @@ export function PricesBoard() {
     low: number
     trend: number[]
   }
-  const gradeEntries: GradeEntry[] = gradeSummaryData?.data ?? []
+  const gradeEntries: GradeEntry[] = gradeSummaryData?.data?.data ?? []
 
   type GradeItem = {
     key: string
@@ -312,7 +312,7 @@ export function PricesBoard() {
                               <div className="flex items-center gap-3">
                                 <span className={`inline-flex items-center justify-center rounded-md px-2 py-0.5 text-[10px] font-bold ring-1 ring-inset w-8 shrink-0 ${color}`}>{entry.code}</span>
                                 <div>
-                                  <Link href={`/prices/${entry.produce.toLowerCase()}?code=${entry.code.toLowerCase()}`} className="font-medium text-foreground leading-tight hover:text-foreground/70">{entry.produce} <span className="text-muted-foreground font-normal text-sm">· {entry.grade}</span></Link>
+                                  <Link href={`/prices/${entry.produce.toLowerCase()}?code=${entry.code.toLowerCase()}&type=${entry.price_type === "Cold Dress Mass" ? "cdm" : "lwt"}`} className="font-medium text-foreground leading-tight hover:text-foreground/70">{entry.produce} <span className="text-muted-foreground font-normal text-sm">· {entry.grade}</span></Link>
                                   <p className="text-xs text-muted-foreground leading-tight mt-0.5 italic">{entry.price_type}</p>
                                 </div>
                               </div>

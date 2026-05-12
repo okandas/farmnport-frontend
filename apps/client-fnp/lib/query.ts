@@ -130,6 +130,10 @@ export function queryGradeSummary() {
   return api.get(`${BaseURL}/prices/grade-summary`)
 }
 
+export function queryGradeChart(produce: string, code: string) {
+  return api.get(`${BaseURL}/prices/grade-chart/${produce.toLowerCase()}/${code.toLowerCase()}`)
+}
+
 export function queryProducerPriceLists(pagination?: PaginationModel) {
   const params = new URLSearchParams()
   if (pagination?.p !== undefined && pagination.p >= 2) {
@@ -166,6 +170,14 @@ export function queryAllFarmProduceUnpaginated() {
 export function queryPriceFilterAggregates() {
   const url = `${BaseURL}/prices/aggregates/filters`
   return api.get(url)
+}
+
+export function queryProduceBuyers(produceSlug: string, pagination?: PaginationModel) {
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) params.set("p", String(pagination.p))
+  if (pagination?.limit) params.set("limit", String(pagination.limit))
+  const qs = params.toString()
+  return api.get(`${BaseURL}/prices/produce/${produceSlug}/buyers${qs ? `?${qs}` : ""}`)
 }
 
 export function queryPricesByProduce(produceSlug: string, pagination?: PaginationModel) {

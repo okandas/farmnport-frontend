@@ -1,11 +1,12 @@
 "use client"
 
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { useQuery } from "@tanstack/react-query"
-import { queryGradeSummary } from "@/lib/query"
+import { queryGradeSummary, queryGradeChart, queryClients } from "@/lib/query"
+import { PriceChart } from "@/components/structures/price-chart"
 
 const toDollars = (v: number) => (v / 100).toFixed(2)
-
 type GradeEntry = {
   key: string
   produce: string
@@ -16,190 +17,311 @@ type GradeEntry = {
   high: number
   low: number
   trend: number[]
+  buyer_count: number
 }
 
-function AreaChart({ values }: { values: number[] }) {
-  const filtered = values.filter(v => v > 0)
-  if (filtered.length < 2) return (
-    <div className="flex items-center justify-center h-48 text-muted-foreground text-sm">Not enough data</div>
-  )
-  const w = 800, h = 200
-  const min = Math.min(...filtered)
-  const max = Math.max(...filtered)
-  const range = max - min || 1
-  const pad = 8
+type TimeRange = "1M" | "3M" | "6M" | "1Y" | "All"
+const TIME_RANGES: TimeRange[] = ["1M", "3M", "6M", "1Y", "All"]
 
-  const coords = filtered.map((v, i) => ({
-    x: (i / (filtered.length - 1)) * w,
-    y: h - pad - ((v - min) / range) * (h - pad * 2),
-  }))
-
-  const linePts = coords.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(" ")
-  const areaPts = [
-    `0,${h}`,
-    ...coords.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`),
-    `${w},${h}`,
-  ].join(" ")
-
-  const up = filtered[filtered.length - 1] >= filtered[0]
-  const stroke = up ? "#16a34a" : "#ef4444"
-  const fill = up ? "rgba(22,163,74,0.08)" : "rgba(239,68,68,0.08)"
-
+function ProduceStats({ totalBuyers, gradeCount }: { totalBuyers: number; gradeCount: number }) {
   return (
-    <svg width="100%" viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" className="w-full">
-      <polygon points={areaPts} fill={fill} />
-      <polyline points={linePts} fill="none" stroke={stroke} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
+    <>
+      <div className="mb-4 pb-4 border-b flex items-center justify-between">
+        <p className="text-sm text-muted-foreground">Available Buyers</p>
+        <p className="text-sm font-semibold text-foreground">{totalBuyers}</p>
+      </div>
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-muted-foreground">Available Grade Prices</p>
+        <p className="text-sm font-semibold text-foreground">{gradeCount}</p>
+      </div>
+    </>
   )
 }
 
-export function ProduceGradeBoard({ produce, code }: { produce: string, code: string }) {
+function filterByRange(history: { value: number; date: string }[], range: TimeRange) {
+  if (range === "All") return history
+  const now = Date.now()
+  const days = range === "1M" ? 30 : range === "3M" ? 90 : range === "6M" ? 180 : 365
+  const cutoff = now - days * 86400000
+  return history.filter(p => new Date(p.date).getTime() >= cutoff)
+}
+
+export function ProduceGradeBoard({
+  produce,
+  code,
+  priceType,
+}: {
+  produce: string
+  code: string
+  priceType: string
+}) {
+  const [timeRange, setTimeRange] = useState<TimeRange>("All")
+  const [selectedKey, setSelectedKey] = useState<string | null>(null)
+  const [chartKey, setChartKey] = useState(0)
+  const [buyersPage, setBuyersPage] = useState(1)
+
+  const overviewRef = useRef<HTMLDivElement>(null)
+  const buyersRef = useRef<HTMLDivElement>(null)
+
   const { data: gradeSummaryData } = useQuery({
     queryKey: ["grade-summary"],
     queryFn: queryGradeSummary,
     refetchOnWindowFocus: false,
   })
 
-  const allEntries: GradeEntry[] = gradeSummaryData?.data ?? []
+  const { data: buyersData } = useQuery({
+    queryKey: ["produce-buyers", produce, buyersPage],
+    queryFn: () => queryClients("buyers", { produce: [produceName], p: buyersPage }),
+    refetchOnWindowFocus: false,
+  })
 
-  const entry = allEntries.find(
-    e => e.produce.toLowerCase() === produce.toLowerCase() &&
-         e.code.toLowerCase() === code.toLowerCase()
-  ) ?? allEntries.find(
-    e => e.produce.toLowerCase() === produce.toLowerCase()
-  )
+  const allEntries: GradeEntry[] = gradeSummaryData?.data?.data ?? []
+  const produceBuyers: Record<string, number> = gradeSummaryData?.data?.produce_buyers ?? {}
 
   const gradeEntries = allEntries
     .filter(e => e.produce.toLowerCase() === produce.toLowerCase())
     .sort((a, b) => b.avg - a.avg)
 
   const produceName = produce.charAt(0).toUpperCase() + produce.slice(1)
+  const totalBuyers = produceBuyers[produceName] ?? 0
+  const priceTypes = Array.from(new Set(gradeEntries.map(e => e.price_type)))
+
+
+  useEffect(() => {
+    if (gradeEntries.length === 0) return
+    if (selectedKey) return
+
+    let match: GradeEntry | undefined
+
+    if (code && priceType) {
+      const typeLabel = priceType === "cdm" ? "Cold Dress Mass" : "Liveweight"
+      match = gradeEntries.find(
+        e => e.code.toLowerCase() === code.toLowerCase() && e.price_type === typeLabel
+      )
+    } else if (code) {
+      match = gradeEntries.find(e => e.code.toLowerCase() === code.toLowerCase())
+    }
+
+    setSelectedKey((match ?? gradeEntries[0]).key)
+
+    if (code || priceType) {
+      window.history.replaceState(null, "", `/prices/${produce}`)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gradeEntries.length])
+
+  const best = (selectedKey ? gradeEntries.find(e => e.key === selectedKey) : null) ?? gradeEntries[0]
+  const activeType = best?.price_type ?? priceTypes[0] ?? ""
+  const activeKey = best?.key ?? ""
+  const peerGrades = gradeEntries.filter(e => e.price_type === activeType)
+
+  const { data: chartData } = useQuery({
+    queryKey: ["grade-chart", produce, activeKey],
+    queryFn: () => queryGradeChart(produce, best?.code ?? ""),
+    enabled: !!activeKey && !!best,
+    refetchOnWindowFocus: false,
+  })
+
+  const rawHistory: { value: number; date: string }[] = chartData?.data?.history ?? []
+  const filtered = filterByRange(rawHistory, timeRange)
+  const chartValues = filtered.map(p => p.value)
+  const chartDates = filtered.map(p => p.date)
+
+  const bestChange = (() => {
+    const t = best?.trend ?? []
+    if (t.length < 2) return null
+    const prev = t[t.length - 2], curr = t[t.length - 1]
+    if (!prev) return null
+    return ((curr - prev) / prev) * 100
+  })()
+
+  type BuyerEntry = {
+    _id: string
+    name: string
+    slug: string
+    province: string
+  }
+  const buyerRelations: BuyerEntry[] = buyersData?.data?.data ?? []
+  const buyersTotal: number = buyersData?.data?.total ?? 0
+  const buyersPageCount = Math.ceil(buyersTotal / 20)
+
+  function handleTypeSwitch(type: string) {
+    const first = gradeEntries.find(e => e.price_type === type)
+    if (first) { setSelectedKey(first.key); setChartKey(k => k + 1) }
+  }
+  function handleGradeSelect(k: string) { setSelectedKey(k); setChartKey(k => k + 1) }
+  function handleTimeRange(r: TimeRange) { setTimeRange(r); setChartKey(k => k + 1) }
 
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen scroll-smooth">
 
-      {/* breadcrumb strip */}
-      <div className="border-b bg-muted/30 text-[11px]">
-        <div className="px-4 sm:px-6 lg:px-8 py-2 flex items-center gap-1.5 text-muted-foreground">
-          <Link href="/prices" className="hover:text-foreground">Prices</Link>
-          <span>/</span>
-          <Link href={`/prices/${produce.toLowerCase()}`} className="hover:text-foreground capitalize">{produceName}</Link>
-          {entry && <><span>/</span><span className="text-foreground">{entry.grade}</span></>}
-        </div>
-      </div>
+      {/* ── overview: two-column + sidebar ── */}
+      <div id="section-overview" ref={overviewRef} className="flex flex-col lg:flex-row border-b">
 
-      {/* main layout */}
-      <div className="flex min-h-[calc(100vh-33px)]">
+        {/* info panel */}
+        <div className="md:w-80 lg:w-96 xl:w-[420px] md:shrink-0 md:border-r border-b md:border-b-0 pt-6 px-4 md:pt-8 md:px-6 pb-6 md:pb-10">
+          <p className="text-sm text-muted-foreground mb-5 flex items-center gap-1.5">
+            <Link href="/prices" className="hover:text-foreground">Prices</Link>
+            <span>/</span>
+            <span className="text-foreground font-semibold">{produceName} Price</span>
+          </p>
+          <h2 className="text-sm mb-4 font-bold text-foreground">{produceName}</h2>
 
-        {/* ── left price panel (CoinGecko style) ── */}
-        <div className="w-72 xl:w-80 shrink-0 border-r px-6 py-8">
-          {entry ? (
-            <div className="space-y-5">
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">{entry.code}</span>
-                  <span className="text-xs text-muted-foreground italic">{entry.price_type}</span>
-                </div>
-                <h1 className="text-2xl font-black tracking-tight">{entry.produce}</h1>
-                <p className="text-sm text-muted-foreground mt-0.5">{entry.grade}</p>
+          {best && (
+            <div className="mb-6">
+              <div className="flex items-center gap-2 flex-wrap">
+                <p className="text-4xl md:text-5xl font-bold text-foreground">${toDollars(best.avg)}</p>
+                <span className="text-sm text-muted-foreground">{best.grade}</span>
+                {bestChange !== null && (
+                  <span className={`text-xs font-medium ${bestChange >= 0 ? "text-green-600" : "text-red-500"}`}>
+                    {bestChange >= 0 ? "▲" : "▼"} {bestChange >= 0 ? "+" : ""}{bestChange.toFixed(2)}%
+                  </span>
+                )}
               </div>
-
-              <div>
-                <p className="text-[11px] text-muted-foreground uppercase tracking-widest mb-1">Avg Price</p>
-                <p className="text-4xl font-black tabular-nums">${toDollars(entry.avg)}</p>
-                <p className="text-xs text-muted-foreground mt-1">per kg delivered</p>
-              </div>
-
-              <div className="border-t pt-4 space-y-3">
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-muted-foreground">High</span>
-                  <span className="font-semibold tabular-nums text-green-600">{entry.high ? `$${toDollars(entry.high)}` : "—"}</span>
-                </div>
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-muted-foreground">Low</span>
-                  <span className="font-semibold tabular-nums text-red-500">{entry.low ? `$${toDollars(entry.low)}` : "—"}</span>
-                </div>
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-muted-foreground">Price Type</span>
-                  <span className="font-medium">{entry.price_type}</span>
-                </div>
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-muted-foreground">Market</span>
-                  <span className="font-medium">Zimbabwe</span>
-                </div>
-              </div>
-
-              {/* grade switcher */}
-              {gradeEntries.length > 1 && (
-                <div className="border-t pt-4">
-                  <p className="text-[11px] text-muted-foreground uppercase tracking-widest mb-3">All {produceName} Grades</p>
-                  <div className="space-y-1">
-                    {gradeEntries.map(e => (
-                      <Link
-                        key={e.key}
-                        href={`/prices/${produce.toLowerCase()}?code=${e.code.toLowerCase()}`}
-                        className={`flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors ${
-                          e.code.toLowerCase() === (entry?.code ?? "").toLowerCase()
-                            ? "bg-foreground text-background"
-                            : "hover:bg-muted/60 text-foreground"
-                        }`}
-                      >
-                        <span className="font-medium">{e.grade}</span>
-                        <span className="tabular-nums font-semibold">${toDollars(e.avg)}</span>
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
-          ) : (
-            <div className="space-y-3">
-              <div className="h-6 w-24 bg-muted rounded animate-pulse" />
-              <div className="h-10 w-32 bg-muted rounded animate-pulse" />
+          )}
+
+          {best && (
+            <div className="hidden md:block">
+              <ProduceStats totalBuyers={totalBuyers} gradeCount={peerGrades.length} />
             </div>
           )}
         </div>
 
-        {/* ── center: chart + table ── */}
-        <div className="flex-1 min-w-0 flex flex-col">
-          <div className="flex-1 px-6 lg:px-10 py-8">
+        {/* chart area */}
+        <div className="flex-1 min-w-0 pt-4 md:pt-6 px-4 flex flex-col pb-6">
 
-            {entry && (
-              <div className="mb-2">
-                <p className="text-xs text-muted-foreground uppercase tracking-widest mb-1">Price History</p>
-                <p className="text-2xl font-black tabular-nums">${toDollars(entry.avg)}<span className="text-sm font-normal text-muted-foreground ml-1">/kg avg</span></p>
-              </div>
-            )}
-
-            {/* area chart */}
-            <div className="mt-4 mb-2">
-              {entry?.trend?.length >= 2 ? (
-                <>
-                  <AreaChart values={entry.trend} />
-                  <div className="flex justify-between text-[11px] text-muted-foreground mt-1 tabular-nums px-1">
-                    <span>${toDollars(entry.trend[0])}</span>
-                    <span>${toDollars(entry.trend[entry.trend.length - 1])}</span>
-                  </div>
-                </>
-              ) : (
-                <div className="h-48 border border-dashed border-border rounded flex items-center justify-center text-sm text-muted-foreground">
-                  Not enough history to draw chart
-                </div>
-              )}
+          {/* price type tabs */}
+          {priceTypes.length > 0 && (
+            <div className="flex items-center gap-0 border-b mb-4 -mx-4 px-4">
+              {priceTypes.map(type => (
+                <button
+                  key={type}
+                  onClick={() => handleTypeSwitch(type)}
+                  className={`px-4 py-2.5 text-xs font-semibold border-b-2 -mb-px transition-colors ${
+                    activeType === type
+                      ? "border-foreground text-foreground"
+                      : "border-transparent text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {type}
+                </button>
+              ))}
             </div>
+          )}
 
+          {/* grade pills + time range */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2 sm:gap-4">
+            <div className="flex items-center gap-1 flex-wrap">
+              {peerGrades.map(e => (
+                <button
+                  key={e.key}
+                  onClick={() => handleGradeSelect(e.key)}
+                  className={`px-3 py-1 rounded-lg text-xs font-medium border transition-all duration-200 ${
+                    activeKey === e.key
+                      ? "bg-foreground text-background border-foreground shadow-sm"
+                      : "bg-background text-muted-foreground border-border hover:text-foreground"
+                  }`}
+                >
+                  {e.grade}
+                </button>
+              ))}
+            </div>
+            <div className="flex items-center gap-0.5 bg-muted rounded-xl p-1 self-start sm:shrink-0">
+              {TIME_RANGES.map(r => (
+                <button
+                  key={r}
+                  onClick={() => handleTimeRange(r)}
+                  className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all duration-150 ${
+                    timeRange === r
+                      ? "bg-background text-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {r}
+                </button>
+              ))}
+            </div>
           </div>
+
+          {/* chart */}
+          <div>
+            {chartValues.length > 0 && (
+              <PriceChart
+                values={chartValues.length === 1 ? [chartValues[0], chartValues[0]] : chartValues}
+                dates={chartDates.length === 1 ? [chartDates[0], chartDates[0]] : chartDates}
+                animKey={chartKey}
+              />
+            )}
+          </div>
+
+          {/* stats — mobile only */}
+          {best && (
+            <div className="md:hidden mt-6 pt-4 border-t">
+              <ProduceStats totalBuyers={totalBuyers} gradeCount={peerGrades.length} />
+            </div>
+          )}
         </div>
 
-        {/* ── right sidebar ── */}
-        <aside className="hidden xl:block w-72 shrink-0 border-l">
-          <div className="sticky top-6 px-5 pt-6">
-            <p className="text-sm mb-3"><span className="font-bold text-foreground">Market</span> <span className="font-normal text-muted-foreground">Insights</span></p>
+        {/* right sidebar */}
+        <aside className="hidden lg:block w-72 xl:w-80 shrink-0 border-l">
+          <div className="sticky top-10 pl-5 pt-6">
+            <p className="text-sm mb-3">
+              <span className="font-bold text-foreground">Market</span>{" "}
+              <span className="font-normal text-muted-foreground">Insights</span>
+            </p>
             <p className="text-sm text-muted-foreground">Headlines coming soon</p>
           </div>
         </aside>
-
       </div>
+
+      {/* ── buyers section — full width below both columns ── */}
+      <div id="section-buyers" ref={buyersRef} className="px-4 lg:px-8 py-8">
+        <p className="text-sm font-semibold text-foreground mb-4">{produceName} Buyers</p>
+        {buyerRelations.length === 0 ? (
+          <p className="text-sm text-muted-foreground">No buyers listed for this produce yet.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b text-xs text-muted-foreground">
+                  <th className="text-left py-2 pr-8 font-medium w-8 tabular-nums">#</th>
+                  <th className="text-left py-2 pr-8 font-medium">Buyer</th>
+                  <th className="text-left py-2 font-medium hidden sm:table-cell">Province</th>
+                </tr>
+              </thead>
+              <tbody>
+                {buyerRelations.map((b, i) => (
+                  <tr key={i} className="border-b border-border/50 last:border-0 hover:bg-muted/40 transition-colors">
+                    <td className="py-3 pr-8 text-muted-foreground tabular-nums text-xs">{(buyersPage - 1) * 20 + i + 1}</td>
+                    <td className="py-3 pr-8 font-medium text-foreground">{b.name}</td>
+                    <td className="py-3 text-muted-foreground hidden sm:table-cell">{b.province || "—"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {buyersPageCount > 1 && (
+          <div className="flex items-center justify-center gap-1 mt-6">
+            {Array.from({ length: buyersPageCount }, (_, i) => i + 1).map(n => (
+              <button
+                key={n}
+                onClick={() => setBuyersPage(n)}
+                className={`w-8 h-8 rounded text-xs font-medium transition-colors ${
+                  buyersPage === n
+                    ? "bg-foreground text-background"
+                    : "text-muted-foreground hover:bg-muted"
+                }`}
+              >
+                {n}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
     </main>
   )
 }
