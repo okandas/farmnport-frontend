@@ -73,6 +73,7 @@ export function ProduceGradeBoard({
   const { data: buyersData } = useQuery({
     queryKey: ["produce-buyers", produce, buyersPage],
     queryFn: () => queryClients("buyer", { produce: [produceName], p: buyersPage }),
+    enabled: !!produce,
     refetchOnWindowFocus: false,
   })
 
@@ -90,7 +91,7 @@ export function ProduceGradeBoard({
 
   useEffect(() => {
     if (gradeEntries.length === 0) return
-    if (selectedKey) return
+    setSelectedKey(null)
 
     let match: GradeEntry | undefined
 
@@ -109,7 +110,7 @@ export function ProduceGradeBoard({
       window.history.replaceState(null, "", `/prices/${produce}`)
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [gradeEntries.length])
+  }, [produce, gradeEntries.length])
 
   const best = (selectedKey ? gradeEntries.find(e => e.key === selectedKey) : null) ?? gradeEntries[0]
   const activeType = best?.price_type ?? priceTypes[0] ?? ""
@@ -293,7 +294,7 @@ export function ProduceGradeBoard({
                     <td className="py-3 pr-8 font-medium text-foreground capitalize">
                       <span className="inline-flex items-center gap-2">
                         <span className="border border-border text-xs font-mono text-muted-foreground px-1.5 py-0.5 rounded shrink-0">
-                          {makeAbbveriation(b.name).toUpperCase()}
+                          {makeAbbveriation(b.name).toUpperCase().slice(0, 2)}
                         </span>
                         {b.name}
                       </span>
