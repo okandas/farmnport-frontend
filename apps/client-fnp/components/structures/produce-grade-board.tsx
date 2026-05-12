@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { useQuery } from "@tanstack/react-query"
 import { queryGradeSummary, queryGradeChart, queryClients } from "@/lib/query"
+import { makeAbbveriation } from "@/lib/utilities"
 import { PriceChart } from "@/components/structures/price-chart"
 
 const toDollars = (v: number) => (v / 100).toFixed(2)
@@ -71,7 +72,7 @@ export function ProduceGradeBoard({
 
   const { data: buyersData } = useQuery({
     queryKey: ["produce-buyers", produce, buyersPage],
-    queryFn: () => queryClients("buyers", { produce: [produceName], p: buyersPage }),
+    queryFn: () => queryClients("buyer", { produce: [produceName], p: buyersPage }),
     refetchOnWindowFocus: false,
   })
 
@@ -155,8 +156,14 @@ export function ProduceGradeBoard({
   return (
     <main className="min-h-screen scroll-smooth">
 
-      {/* ── overview: two-column + sidebar ── */}
-      <div id="section-overview" ref={overviewRef} className="flex flex-col lg:flex-row border-b">
+      {/* ── outer row: left+chart | sidebar ── */}
+      <div className="flex flex-col lg:flex-row">
+
+        {/* left column: overview + buyers */}
+        <div className="flex-1 min-w-0">
+
+        {/* ── overview ── */}
+        <div id="section-overview" ref={overviewRef} className="flex flex-col md:flex-row border-b">
 
         {/* info panel */}
         <div className="md:w-80 lg:w-96 xl:w-[420px] md:shrink-0 md:border-r border-b md:border-b-0 pt-6 px-4 md:pt-8 md:px-6 pb-6 md:pb-10">
@@ -263,21 +270,11 @@ export function ProduceGradeBoard({
           )}
         </div>
 
-        {/* right sidebar */}
-        <aside className="hidden lg:block w-72 xl:w-80 shrink-0 border-l">
-          <div className="sticky top-10 pl-5 pt-6">
-            <p className="text-sm mb-3">
-              <span className="font-bold text-foreground">Market</span>{" "}
-              <span className="font-normal text-muted-foreground">Insights</span>
-            </p>
-            <p className="text-sm text-muted-foreground">Headlines coming soon</p>
-          </div>
-        </aside>
-      </div>
+        </div>{/* end overview */}
 
-      {/* ── buyers section — full width below both columns ── */}
-      <div id="section-buyers" ref={buyersRef} className="px-4 lg:px-8 py-8">
-        <p className="text-sm font-semibold text-foreground mb-4">{produceName} Buyers</p>
+        {/* ── buyers section ── */}
+        <div id="section-buyers" ref={buyersRef} className="px-4 md:px-8 py-8">
+        <p className="text-lg font-semibold text-foreground mb-4">{produceName} Buyers</p>
         {buyerRelations.length === 0 ? (
           <p className="text-sm text-muted-foreground">No buyers listed for this produce yet.</p>
         ) : (
@@ -286,16 +283,21 @@ export function ProduceGradeBoard({
               <thead>
                 <tr className="border-b text-xs text-muted-foreground">
                   <th className="text-left py-2 pr-8 font-medium w-8 tabular-nums">#</th>
-                  <th className="text-left py-2 pr-8 font-medium">Buyer</th>
-                  <th className="text-left py-2 font-medium hidden sm:table-cell">Province</th>
+                  <th className="text-left py-2 font-medium">Buyer</th>
                 </tr>
               </thead>
               <tbody>
                 {buyerRelations.map((b, i) => (
                   <tr key={i} className="border-b border-border/50 last:border-0 hover:bg-muted/40 transition-colors">
                     <td className="py-3 pr-8 text-muted-foreground tabular-nums text-xs">{(buyersPage - 1) * 20 + i + 1}</td>
-                    <td className="py-3 pr-8 font-medium text-foreground">{b.name}</td>
-                    <td className="py-3 text-muted-foreground hidden sm:table-cell">{b.province || "—"}</td>
+                    <td className="py-3 pr-8 font-medium text-foreground capitalize">
+                      <span className="inline-flex items-center gap-2">
+                        <span className="border border-border text-xs font-mono text-muted-foreground px-1.5 py-0.5 rounded shrink-0">
+                          {makeAbbveriation(b.name).toUpperCase()}
+                        </span>
+                        {b.name}
+                      </span>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -320,7 +322,20 @@ export function ProduceGradeBoard({
             ))}
           </div>
         )}
-      </div>
+        </div>{/* end buyers */}
+        </div>{/* end left column */}
+
+        {/* right sidebar */}
+        <aside className="hidden lg:block w-72 xl:w-80 shrink-0 border-l">
+          <div className="sticky top-10 pl-5 pt-6">
+            <p className="text-sm mb-3">
+              <span className="font-bold text-foreground">Market</span>{" "}
+              <span className="font-normal text-muted-foreground">Insights</span>
+            </p>
+            <p className="text-sm text-muted-foreground">Headlines coming soon</p>
+          </div>
+        </aside>
+      </div>{/* end outer row */}
 
     </main>
   )
