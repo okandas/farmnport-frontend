@@ -469,11 +469,7 @@ export function FeedingProgramDetailClient({ program, slug }: FeedingProgramDeta
                                         sizes="160px"
                                         className="object-contain p-3"
                                     />
-                                ) : (
-                                    <div className="absolute inset-0 flex items-center justify-center">
-                                        <Egg className="w-12 h-12 text-muted-foreground/30" />
-                                    </div>
-                                )}
+                                ) : null}
                             </div>
 
                             {/* Details */}
