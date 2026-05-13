@@ -6,7 +6,7 @@ import { useSession } from "next-auth/react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
-import { Check, Loader2, ShoppingCart, Truck, Store, CreditCard } from "lucide-react"
+import { Check, Loader2, ShoppingCart, Truck, Store, CreditCard, Smartphone, Globe } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 
@@ -17,6 +17,12 @@ const PROVINCES = [
   "Harare", "Bulawayo", "Manicaland", "Mashonaland Central",
   "Mashonaland East", "Mashonaland West", "Masvingo",
   "Matabeleland North", "Matabeleland South", "Midlands",
+]
+
+const PAYMENT_METHODS = [
+  { value: "ecocash", label: "EcoCash",          description: "Mobile money prompt to your phone",   icon: Smartphone },
+  { value: "vmc",     label: "Visa / Mastercard", description: "Pay securely online with your card",  icon: CreditCard },
+  { value: "",        label: "PayNow Web",         description: "Choose your method on PayNow",        icon: Globe },
 ]
 
 interface CheckoutForm {
@@ -64,18 +70,20 @@ export default function CheckoutPage() {
   const [polling, setPolling] = useState(false)
   const [pollRef, setPollRef] = useState("")
   const [orderNumber, setOrderNumber] = useState("")
-  const [memberNumber, setMemberNumber] = useState("")
+  const [redirectUrl, setRedirectUrl] = useState("")
+  const [selectedMethod, setSelectedMethod] = useState("")
   const [step, setStep] = useState<"form" | "waiting" | "success">("form")
 
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<CheckoutForm>({
     defaultValues: {
       fulfillment: "delivery",
-      provider: "billpay",
-      method: "",
+      provider: "paynow",
+      method: "ecocash",
     },
   })
 
   const fulfillment = watch("fulfillment")
+  const method = watch("method")
 
   const { data: cartData, isLoading: cartLoading } = useQuery({
     queryKey: ["cart"],
@@ -92,26 +100,22 @@ export default function CheckoutPage() {
       const data = res.data as CheckoutResponse
       setOrderNumber(data.order_number)
       setPollRef(data.reference)
-      setMemberNumber((data as any).member_number || "")
+      setSelectedMethod(method)
       qc.invalidateQueries({ queryKey: ["cart"] })
 
       if (data.redirect_url && data.redirect_url.startsWith("http")) {
-        // Paynow web — open in new tab and poll
+        setRedirectUrl(data.redirect_url)
         window.open(data.redirect_url, "_blank")
-        setStep("waiting")
-        setPolling(true)
-      } else {
-        // BillPay — show instructions
-        setStep("waiting")
-        setPolling(true)
       }
+
+      setStep("waiting")
+      setPolling(true)
     },
     onError: (err: any) => {
       toast.error(err?.response?.data?.message || "Checkout failed. Please try again.")
     },
   })
 
-  // Poll for payment status
   useEffect(() => {
     if (!polling || !pollRef) return
     const interval = setInterval(async () => {
@@ -223,29 +227,47 @@ export default function CheckoutPage() {
   }
 
   if (step === "waiting") {
+    const isExpress = selectedMethod === "ecocash"
+    const methodLabel = PAYMENT_METHODS.find(m => m.value === selectedMethod)?.label || "PayNow"
+
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
         <div className="max-w-md w-full text-center space-y-6">
-          {polling && (
-            <Loader2 className="w-10 h-10 animate-spin text-primary mx-auto" />
-          )}
+          <Loader2 className="w-10 h-10 animate-spin text-primary mx-auto" />
           <div>
             <h1 className="text-xl font-bold">Complete Your Payment</h1>
             <p className="text-muted-foreground mt-1 text-sm">Order <span className="font-semibold text-foreground">{orderNumber}</span></p>
           </div>
-          <div className="bg-muted rounded-xl p-5 text-left text-sm w-full">
-            <p className="text-xs text-muted-foreground mb-1">Your Member Number</p>
-            <p className="font-mono font-bold text-lg tracking-wider select-all cursor-text">{memberNumber}</p>
-          </div>
-          <p className="text-xs text-muted-foreground">Waiting for payment confirmation{polling ? "..." : ""}</p>
-          <a
-            href={`https://www.topup.co.zw/pay-bill/farmnport?account=${memberNumber}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center justify-center bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-sm px-8 py-3 rounded-full transition-colors"
-          >
-            Pay Now
-          </a>
+
+          {isExpress ? (
+            <div className="bg-muted rounded-xl p-5 text-sm space-y-2">
+              <p className="font-medium">Check your phone</p>
+              <p className="text-muted-foreground text-xs">
+                An {methodLabel} payment prompt has been sent to your phone. Approve it to confirm your order.
+              </p>
+            </div>
+          ) : (
+            <div className="bg-muted rounded-xl p-5 text-sm space-y-2">
+              <p className="font-medium">Payment window opened</p>
+              <p className="text-muted-foreground text-xs">
+                Complete your payment in the PayNow window, then return here — this page updates automatically.
+              </p>
+            </div>
+          )}
+
+          <p className="text-xs text-muted-foreground">Waiting for payment confirmation...</p>
+
+          {!isExpress && redirectUrl && (
+            <a
+              href={redirectUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-sm px-8 py-3 rounded-full transition-colors"
+            >
+              Re-open Payment Window
+            </a>
+          )}
+
           <button
             onClick={() => router.push("/account/orders")}
             className="block w-full text-center border hover:bg-muted text-sm font-medium py-3 rounded-full transition-colors"
@@ -394,6 +416,41 @@ export default function CheckoutPage() {
                 </div>
               </section>
 
+              {/* Payment method */}
+              <section className="border rounded-xl p-5 space-y-4">
+                <h2 className="font-semibold">Payment Method</h2>
+                <div className="grid grid-cols-3 gap-3">
+                  {PAYMENT_METHODS.map((pm) => {
+                    const Icon = pm.icon
+                    const active = method === pm.value
+                    return (
+                      <button
+                        key={pm.value || "web"}
+                        type="button"
+                        onClick={() => setValue("method", pm.value)}
+                        className={`relative rounded-xl border-2 p-4 text-left transition-colors ${
+                          active ? "border-primary bg-primary/5" : "border-border hover:border-primary/40"
+                        }`}
+                      >
+                        {active && (
+                          <span className="absolute top-2 right-2 w-4 h-4 bg-primary rounded-full flex items-center justify-center">
+                            <Check className="w-2.5 h-2.5 text-white" />
+                          </span>
+                        )}
+                        <Icon className="w-5 h-5 mb-2 text-muted-foreground" />
+                        <p className="font-semibold text-sm">{pm.label}</p>
+                        <p className="text-xs text-muted-foreground">{pm.description}</p>
+                      </button>
+                    )
+                  })}
+                </div>
+                {method === "ecocash" && (
+                  <p className="text-xs text-muted-foreground">
+                    A payment prompt will be sent to the phone number you entered above.
+                  </p>
+                )}
+              </section>
+
             </div>
 
             {/* ── Right: Order summary ── */}
@@ -418,7 +475,7 @@ export default function CheckoutPage() {
                         <p className="text-sm font-medium capitalize truncate">{item.product_name}</p>
                         <p className="text-xs text-muted-foreground">Qty {item.quantity}</p>
                       </div>
-                      <p className="text-sm font-semibold shrink-0">${(item.unit_price * item.quantity).toFixed(2)}</p>
+                      <p className="text-sm font-semibold shrink-0">${((item.unit_price * item.quantity) / 100).toFixed(2)}</p>
                     </div>
                   ))}
                 </div>

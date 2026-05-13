@@ -173,16 +173,8 @@ export default function OrderDetailPage() {
           <div className="border border-yellow-200 bg-yellow-50 dark:bg-yellow-900/20 dark:border-yellow-800 rounded-xl p-5 space-y-3">
             <p className="font-semibold text-sm">Payment pending</p>
             <p className="text-sm text-muted-foreground">
-              Complete your payment to confirm this order.
+              Your order is awaiting payment. If the payment window closed before you could complete it, please contact us to assist.
             </p>
-            <a
-              href={`https://www.topup.co.zw/pay-bill/farmnport?account=FNP-${(session?.user as any)?.id}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-sm px-8 py-3 rounded-md transition-colors"
-            >
-              Pay Now
-            </a>
           </div>
         )}
 
