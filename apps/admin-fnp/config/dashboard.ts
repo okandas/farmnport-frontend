@@ -19,6 +19,21 @@ export const dashboardConfig: DashboardConfig = {
       ],
     },
     {
+      label: "Pricing",
+      items: [
+        {
+          title: "LWT Prices",
+          href: "/dashboard/farmnport/prices",
+          icon: "billing",
+        },
+        {
+          title: "CDM Prices",
+          href: "/dashboard/farmnport/cdm-prices",
+          icon: "billing",
+        },
+      ],
+    },
+    {
       label: "Sales",
       items: [
         {
@@ -210,7 +225,7 @@ export const dashboardConfig: DashboardConfig = {
       ],
     },
     {
-      label: "Programs & Pricing",
+      label: "Programs",
       items: [
         {
           title: "Spray Programs",
@@ -221,16 +236,6 @@ export const dashboardConfig: DashboardConfig = {
           title: "Feeding Programs",
           href: "/dashboard/farmnport/feeding-programs",
           icon: "egg",
-        },
-        {
-          title: "Producer Prices",
-          href: "/dashboard/farmnport/prices",
-          icon: "billing",
-        },
-        {
-          title: "CDM Prices",
-          href: "/dashboard/farmnport/cdm-prices",
-          icon: "billing",
         },
       ],
     },

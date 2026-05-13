@@ -55,7 +55,7 @@ function Pagination({ page, pageCount, onPage }: { page: number; pageCount: numb
     <div className="flex items-center gap-1 mt-4 justify-center">
       {pages.map((p, i) =>
         p === "..." ? (
-          <span key={i} className="px-2 text-sm text-muted-foreground">…</span>
+          <span key={`ellipsis-${i}`} className="px-2 text-sm text-muted-foreground">…</span>
         ) : (
           <button
             key={p}

@@ -6,7 +6,7 @@ import Link from "next/link"
 
 import { queryClient } from "@/lib/query"
 import { ApplicationUser, AuthenticatedUser } from "@/lib/schemas"
-import { capitalizeFirstLetter, makeAbbveriation, titleCase } from "@/lib/utilities"
+import { capitalizeFirstLetter, makeAbbveriation, titleCase, plural } from "@/lib/utilities"
 import { Icons } from "@/components/icons/lucide"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"

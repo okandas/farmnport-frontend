@@ -196,27 +196,49 @@ export function CdmPriceForm({ price, mode }: CdmPriceFormProps) {
 
   function onSubmit(data: CdmPrice) {
     data.client_name = selectedClient
-    data.carcass_grades = {
+
+    const carcassGradesCents = {
       super: gradeToCents(data.carcass_grades.super),
       commercial: gradeToCents(data.carcass_grades.commercial),
       economy: gradeToCents(data.carcass_grades.economy),
       manufacturing: gradeToCents(data.carcass_grades.manufacturing),
     }
+    ;(data as any).carcass_grades = {
+      ...carcassGradesCents,
+      farm_produce_id: "6913935f4523ed6619d861ea",
+      produce_category: "beef",
+      hasPrice: Object.values(carcassGradesCents).some(g => g.delivered_usd > 0),
+    }
+
     if (data.pigs_carcass_grades) {
-      data.pigs_carcass_grades = {
+      const pigsCents = {
         p1: gradeToCents(data.pigs_carcass_grades.p1),
         p2: gradeToCents(data.pigs_carcass_grades.p2),
         manufacturing: gradeToCents(data.pigs_carcass_grades.manufacturing),
       }
+      ;(data as any).pigs_carcass_grades = {
+        ...pigsCents,
+        farm_produce_id: "6913935f4523ed6619d861eb",
+        produce_category: "pork",
+        hasPrice: Object.values(pigsCents).some(g => g.delivered_usd > 0),
+      }
     }
+
     if (data.goats_carcass_grades) {
-      data.goats_carcass_grades = {
+      const goatsCents = {
         g1: gradeToCents(data.goats_carcass_grades.g1),
         g2: gradeToCents(data.goats_carcass_grades.g2),
         g3: gradeToCents(data.goats_carcass_grades.g3),
         g4: gradeToCents(data.goats_carcass_grades.g4),
       }
+      ;(data as any).goats_carcass_grades = {
+        ...goatsCents,
+        farm_produce_id: "6913935f4523ed6619d861ed",
+        produce_category: "goat",
+        hasPrice: Object.values(goatsCents).some(g => g.delivered_usd > 0),
+      }
     }
+
     data.liveweight = data.liveweight.map(e => ({
       ...e,
       delivered_usd: dollarsToCents(e.delivered_usd),
