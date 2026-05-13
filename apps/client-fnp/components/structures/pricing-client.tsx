@@ -17,7 +17,7 @@ interface PricingClientProps {
 
 export function PricingClient({ user }: PricingClientProps) {
   const router = useRouter()
-  const [method, setMethod] = useState<"ecocash" | "onemoney" | "web">("ecocash")
+  const [method, setMethod] = useState<"ecocash" | "web">("ecocash")
   const [phone, setPhone] = useState("")
   const [error, setError] = useState("")
 
@@ -130,14 +130,7 @@ export function PricingClient({ user }: PricingClientProps) {
                   >
                     EcoCash
                   </Button>
-                  <Button
-                    variant={method === "onemoney" ? "default" : "outline"}
-                    className="flex-1"
-                    onClick={() => setMethod("onemoney")}
-                    type="button"
-                  >
-                    OneMoney
-                  </Button>
+
                   <Button
                     variant={method === "web" ? "default" : "outline"}
                     className="flex-1"

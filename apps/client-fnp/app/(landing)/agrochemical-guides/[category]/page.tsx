@@ -1,6 +1,25 @@
+import type { Metadata } from 'next'
 import { queryAgroChemicalsByCategory } from "@/lib/query"
 import Link from "next/link"
 import { AgroCategoryClient } from "./AgroCategoryClient"
+
+type Props = { params: Promise<{ category: string }> }
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { category } = await params
+  const name = category.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+  return {
+    title: `${name} Zimbabwe – Products, Dosage Rates & Labels | farmnport.com`,
+    description: `Browse ${name.toLowerCase()} products for Zimbabwe farmers. Compare active ingredients, dosage rates, target pests, and application guidelines.`,
+    alternates: { canonical: `/agrochemical-guides/${category}` },
+    openGraph: {
+      title: `${name} Zimbabwe – Agrochemical Guides`,
+      description: `Browse ${name.toLowerCase()} products for Zimbabwe farmers. Compare active ingredients, dosage rates, and application guidelines.`,
+      siteName: 'farmnport',
+      type: 'website',
+    },
+  }
+}
 
 interface CategoryPageProps {
     params: Promise<{

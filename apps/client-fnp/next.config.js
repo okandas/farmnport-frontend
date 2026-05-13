@@ -2,6 +2,15 @@
 const nextConfig = {
   /* config options here */
   output: "standalone",
+  async redirects() {
+    return [
+      { source: '/prices/lwt', destination: '/prices', permanent: true },
+      { source: '/prices/lwt/:path*', destination: '/prices', permanent: true },
+      { source: '/prices/cdm', destination: '/prices', permanent: true },
+      { source: '/prices/cdm/:path*', destination: '/prices', permanent: true },
+      { source: '/prices/produce/:slug', destination: '/prices/:slug', permanent: true },
+    ]
+  },
   images: {
     minimumCacheTTL: 86400,
     dangerouslyAllowLocalIP: true,
@@ -26,9 +35,7 @@ const nextConfig = {
       },
     ],
   },
-  turbopack: {
-
-  },
+  turbopack: {},
   experimental: {
   },
 }

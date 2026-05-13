@@ -92,7 +92,7 @@ export function BuyerContactForm() {
               <FormControl>
                 <ClientCombobox
                   value={field.value}
-                  onChange={field.onChange}
+                  onChange={(s) => field.onChange(s.id)}
                 />
               </FormControl>
               <FormDescription>

@@ -1,3 +1,4 @@
+import { Suspense } from "react"
 import {capitalizeFirstLetter, plural} from "@/lib/utilities"
 import { Buyers } from "@/components/layouts/buyers"
 import { retrieveUser } from "@/lib/actions"
@@ -86,7 +87,7 @@ export default async function BuyersProductPage({ params }: BuyerProductPageProp
             <div className="lg:hidden mb-4">
               <ClientFilterSidebar type="buyers" hideProduce hideCategory product={product} />
             </div>
-            <Buyers user={user} queryBy={product} />
+            <Suspense><Buyers user={user} queryBy={product} /></Suspense>
           </div>
 
           <div className="hidden lg:block lg:w-80 relative">

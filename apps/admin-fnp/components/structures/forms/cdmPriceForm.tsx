@@ -16,7 +16,7 @@ import {
   CdmPrice,
   CdmPriceSchema,
 } from "@/lib/schemas"
-import { cn } from "@/lib/utilities"
+import { cn, centsToDollarsFormInputs, dollarsToCents } from "@/lib/utilities"
 import { handleApiError, handleFormErrors } from "@/lib/error-handler"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -86,11 +86,42 @@ export function CdmPriceForm({ price, mode }: CdmPriceFormProps) {
   const [openCalendar, setOpenCalendar] = useState(false)
   const [noteInput, setNoteInput] = useState("")
 
+  function gradeFromCents(g: { collected_usd: number; delivered_usd: number; collected_zig: number; delivered_zig: number }) {
+    return {
+      collected_usd: centsToDollarsFormInputs(g.collected_usd),
+      delivered_usd: centsToDollarsFormInputs(g.delivered_usd),
+      collected_zig: centsToDollarsFormInputs(g.collected_zig),
+      delivered_zig: centsToDollarsFormInputs(g.delivered_zig),
+    }
+  }
+
   const form = useForm<CdmPrice>({
     defaultValues: price
       ? {
           ...price,
           effectiveDate: new Date(price.effectiveDate),
+          carcass_grades: {
+            super: gradeFromCents(price.carcass_grades.super),
+            commercial: gradeFromCents(price.carcass_grades.commercial),
+            economy: gradeFromCents(price.carcass_grades.economy),
+            manufacturing: gradeFromCents(price.carcass_grades.manufacturing),
+          },
+          pigs_carcass_grades: price.pigs_carcass_grades ? {
+            p1: gradeFromCents(price.pigs_carcass_grades.p1),
+            p2: gradeFromCents(price.pigs_carcass_grades.p2),
+            manufacturing: gradeFromCents(price.pigs_carcass_grades.manufacturing),
+          } : undefined,
+          goats_carcass_grades: price.goats_carcass_grades ? {
+            g1: gradeFromCents(price.goats_carcass_grades.g1),
+            g2: gradeFromCents(price.goats_carcass_grades.g2),
+            g3: gradeFromCents(price.goats_carcass_grades.g3),
+            g4: gradeFromCents(price.goats_carcass_grades.g4),
+          } : undefined,
+          liveweight: price.liveweight.map(e => ({
+            ...e,
+            delivered_usd: centsToDollarsFormInputs(e.delivered_usd),
+            delivered_zig: centsToDollarsFormInputs(e.delivered_zig),
+          })),
         }
       : {
           id: "",
@@ -99,6 +130,7 @@ export function CdmPriceForm({ price, mode }: CdmPriceFormProps) {
           effectiveDate: new Date(),
           exchange_rate: 0,
           carcass_grades: {
+            super: { ...defaultCarcassGrade },
             commercial: { ...defaultCarcassGrade },
             economy: { ...defaultCarcassGrade },
             manufacturing: { ...defaultCarcassGrade },
@@ -153,9 +185,65 @@ export function CdmPriceForm({ price, mode }: CdmPriceFormProps) {
 
   const isPending = isCreating || isUpdating
 
+  function gradeToCents(g: { collected_usd: number; delivered_usd: number; collected_zig: number; delivered_zig: number }) {
+    return {
+      collected_usd: dollarsToCents(g.collected_usd),
+      delivered_usd: dollarsToCents(g.delivered_usd),
+      collected_zig: dollarsToCents(g.collected_zig),
+      delivered_zig: dollarsToCents(g.delivered_zig),
+    }
+  }
+
   function onSubmit(data: CdmPrice) {
-    // Set client_name from selected
     data.client_name = selectedClient
+
+    const carcassGradesCents = {
+      super: gradeToCents(data.carcass_grades.super),
+      commercial: gradeToCents(data.carcass_grades.commercial),
+      economy: gradeToCents(data.carcass_grades.economy),
+      manufacturing: gradeToCents(data.carcass_grades.manufacturing),
+    }
+    ;(data as any).carcass_grades = {
+      ...carcassGradesCents,
+      farm_produce_id: "6913935f4523ed6619d861ea",
+      produce_category: "beef",
+      hasPrice: Object.values(carcassGradesCents).some(g => g.delivered_usd > 0),
+    }
+
+    if (data.pigs_carcass_grades) {
+      const pigsCents = {
+        p1: gradeToCents(data.pigs_carcass_grades.p1),
+        p2: gradeToCents(data.pigs_carcass_grades.p2),
+        manufacturing: gradeToCents(data.pigs_carcass_grades.manufacturing),
+      }
+      ;(data as any).pigs_carcass_grades = {
+        ...pigsCents,
+        farm_produce_id: "6913935f4523ed6619d861eb",
+        produce_category: "pork",
+        hasPrice: Object.values(pigsCents).some(g => g.delivered_usd > 0),
+      }
+    }
+
+    if (data.goats_carcass_grades) {
+      const goatsCents = {
+        g1: gradeToCents(data.goats_carcass_grades.g1),
+        g2: gradeToCents(data.goats_carcass_grades.g2),
+        g3: gradeToCents(data.goats_carcass_grades.g3),
+        g4: gradeToCents(data.goats_carcass_grades.g4),
+      }
+      ;(data as any).goats_carcass_grades = {
+        ...goatsCents,
+        farm_produce_id: "6913935f4523ed6619d861ed",
+        produce_category: "goat",
+        hasPrice: Object.values(goatsCents).some(g => g.delivered_usd > 0),
+      }
+    }
+
+    data.liveweight = data.liveweight.map(e => ({
+      ...e,
+      delivered_usd: dollarsToCents(e.delivered_usd),
+      delivered_zig: dollarsToCents(e.delivered_zig),
+    }))
     if (mode === "create") {
       createMutate(data)
     } else {
@@ -333,7 +421,7 @@ export function CdmPriceForm({ price, mode }: CdmPriceFormProps) {
           {/* Carcass Grades Section */}
           <Card>
             <CardHeader>
-              <CardTitle>Carcass Grades (per kg)</CardTitle>
+              <CardTitle>Cattle Carcass Grades (per kg)</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="overflow-x-auto">
@@ -348,23 +436,120 @@ export function CdmPriceForm({ price, mode }: CdmPriceFormProps) {
                     </tr>
                   </thead>
                   <tbody>
-                    {(["commercial", "economy", "manufacturing"] as const).map((grade) => (
-                      <tr key={grade} className="border-b">
-                        <td className="py-3 font-medium capitalize">{grade} ({grade === "commercial" ? "C" : grade === "economy" ? "X" : "J"})</td>
+                    {([
+                      { key: "super", label: "Super (S)" },
+                      { key: "commercial", label: "Commercial (C)" },
+                      { key: "economy", label: "Economy (X)" },
+                      { key: "manufacturing", label: "Manufacturing (J)" },
+                    ] as const).map(({ key, label }) => (
+                      <tr key={key} className="border-b">
+                        <td className="py-3 font-medium">{label}</td>
                         {(["collected_usd", "delivered_usd", "collected_zig", "delivered_zig"] as const).map((priceField) => (
                           <td key={priceField} className="py-3 pr-2">
                             <FormField
                               control={form.control}
-                              name={`carcass_grades.${grade}.${priceField}`}
+                              name={`carcass_grades.${key}.${priceField}`}
                               render={({ field }) => (
                                 <FormItem>
                                   <FormControl>
-                                    <Input
-                                      type="number"
-                                      step="0.01"
-                                      className="w-28"
-                                      {...field}
-                                    />
+                                    <Input type="number" step="0.01" className="w-28" {...field} />
+                                  </FormControl>
+                                </FormItem>
+                              )}
+                            />
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Pigs Carcass Grades */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Pigs Carcass Grades (per kg)</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="py-2 text-left font-medium">Grade</th>
+                      <th className="py-2 text-left font-medium">Collected USD</th>
+                      <th className="py-2 text-left font-medium">Delivered USD</th>
+                      <th className="py-2 text-left font-medium">Collected ZIG</th>
+                      <th className="py-2 text-left font-medium">Delivered ZIG</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {([
+                      { key: "p1", label: "P1 Grade" },
+                      { key: "p2", label: "P2 Grade" },
+                      { key: "manufacturing", label: "Manufacturing (PM)" },
+                    ] as const).map(({ key, label }) => (
+                      <tr key={key} className="border-b">
+                        <td className="py-3 font-medium">{label}</td>
+                        {(["collected_usd", "delivered_usd", "collected_zig", "delivered_zig"] as const).map((priceField) => (
+                          <td key={priceField} className="py-3 pr-2">
+                            <FormField
+                              control={form.control}
+                              name={`pigs_carcass_grades.${key}.${priceField}` as any}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormControl>
+                                    <Input type="number" step="0.01" className="w-28" {...field} />
+                                  </FormControl>
+                                </FormItem>
+                              )}
+                            />
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Goats Carcass Grades */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Goats Carcass Grades (per kg)</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="py-2 text-left font-medium">Grade</th>
+                      <th className="py-2 text-left font-medium">Collected USD</th>
+                      <th className="py-2 text-left font-medium">Delivered USD</th>
+                      <th className="py-2 text-left font-medium">Collected ZIG</th>
+                      <th className="py-2 text-left font-medium">Delivered ZIG</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {([
+                      { key: "g1", label: "G1 Grade" },
+                      { key: "g2", label: "G2 Grade" },
+                      { key: "g3", label: "G3 Grade" },
+                      { key: "g4", label: "G4 Grade" },
+                    ] as const).map(({ key, label }) => (
+                      <tr key={key} className="border-b">
+                        <td className="py-3 font-medium">{label}</td>
+                        {(["collected_usd", "delivered_usd", "collected_zig", "delivered_zig"] as const).map((priceField) => (
+                          <td key={priceField} className="py-3 pr-2">
+                            <FormField
+                              control={form.control}
+                              name={`goats_carcass_grades.${key}.${priceField}` as any}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormControl>
+                                    <Input type="number" step="0.01" className="w-28" {...field} />
                                   </FormControl>
                                 </FormItem>
                               )}

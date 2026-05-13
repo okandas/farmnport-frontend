@@ -4,7 +4,7 @@ import { ColumnDef } from "@tanstack/react-table"
 import Link from "next/link"
 import { RestaurantInvoice } from "@/lib/schemas"
 import { Checkbox } from "@/components/ui/checkbox"
-import { formatDate } from "@/lib/utilities"
+import { formatDate, centsToDollars } from "@/lib/utilities"
 
 export const restaurantInvoiceColumns: ColumnDef<RestaurantInvoice>[] = [
   {
@@ -68,18 +68,18 @@ export const restaurantInvoiceColumns: ColumnDef<RestaurantInvoice>[] = [
   {
     accessorKey: "subtotal_cents",
     header: "Subtotal",
-    cell: ({ row }) => `$${(row.original.subtotal_cents / 100).toFixed(2)}`,
+    cell: ({ row }) => centsToDollars(row.original.subtotal_cents),
   },
   {
     accessorKey: "vat_cents",
     header: "VAT",
-    cell: ({ row }) => `$${(row.original.vat_cents / 100).toFixed(2)}`,
+    cell: ({ row }) => centsToDollars(row.original.vat_cents),
   },
   {
     accessorKey: "total_cents",
     header: "Total",
     cell: ({ row }) => (
-      <span className="font-semibold">${(row.original.total_cents / 100).toFixed(2)}</span>
+      <span className="font-semibold">{centsToDollars(row.original.total_cents)}</span>
     ),
   },
   {

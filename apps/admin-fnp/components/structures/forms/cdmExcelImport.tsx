@@ -25,6 +25,9 @@ type CdmExcelImportProps = {
   setSelectedClient: (client: string) => void
 }
 
+type CdmGradePrice = { collected_usd: number; delivered_usd: number; collected_zig: number; delivered_zig: number }
+const zeroCdmGrade = (): CdmGradePrice => ({ collected_usd: 0, delivered_usd: 0, collected_zig: 0, delivered_zig: 0 })
+
 type ParsedCdmData = {
   metadata: {
     effectiveDate: string
@@ -33,10 +36,22 @@ type ParsedCdmData = {
     username: string
   }
   carcassGrades: {
-    commercial: { collected_usd: number; delivered_usd: number; collected_zig: number; delivered_zig: number }
-    economy: { collected_usd: number; delivered_usd: number; collected_zig: number; delivered_zig: number }
-    manufacturing: { collected_usd: number; delivered_usd: number; collected_zig: number; delivered_zig: number }
+    super: CdmGradePrice
+    commercial: CdmGradePrice
+    economy: CdmGradePrice
+    manufacturing: CdmGradePrice
   }
+  pigsCarcassGrades: {
+    p1: CdmGradePrice
+    p2: CdmGradePrice
+    manufacturing: CdmGradePrice
+  } | null
+  goatsCarcassGrades: {
+    g1: CdmGradePrice
+    g2: CdmGradePrice
+    g3: CdmGradePrice
+    g4: CdmGradePrice
+  } | null
   liveweight: {
     weight_range: string
     teeth: string
@@ -88,10 +103,13 @@ export function CdmExcelImport({ setValue, setSelectedClient }: CdmExcelImportPr
           const result: ParsedCdmData = {
             metadata,
             carcassGrades: {
-              commercial: { collected_usd: 0, delivered_usd: 0, collected_zig: 0, delivered_zig: 0 },
-              economy: { collected_usd: 0, delivered_usd: 0, collected_zig: 0, delivered_zig: 0 },
-              manufacturing: { collected_usd: 0, delivered_usd: 0, collected_zig: 0, delivered_zig: 0 },
+              super: zeroCdmGrade(),
+              commercial: zeroCdmGrade(),
+              economy: zeroCdmGrade(),
+              manufacturing: zeroCdmGrade(),
             },
+            pigsCarcassGrades: null,
+            goatsCarcassGrades: null,
             liveweight: [],
             notes: [],
             errors: [],
@@ -122,15 +140,32 @@ export function CdmExcelImport({ setValue, setSelectedClient }: CdmExcelImportPr
             if (!category || !grade) continue
 
             if (category === "CATTLE") {
-              // Carcass grades
               const gradeLower = grade.toLowerCase()
-              if (gradeLower.includes("commercial")) {
-                result.carcassGrades.commercial = { collected_usd: collectedUsd, delivered_usd: deliveredUsd, collected_zig: collectedZig, delivered_zig: deliveredZig }
+              const gradeData = { collected_usd: collectedUsd, delivered_usd: deliveredUsd, collected_zig: collectedZig, delivered_zig: deliveredZig }
+              if (gradeLower.includes("super")) {
+                result.carcassGrades.super = gradeData
+              } else if (gradeLower.includes("commercial")) {
+                result.carcassGrades.commercial = gradeData
               } else if (gradeLower.includes("economy")) {
-                result.carcassGrades.economy = { collected_usd: collectedUsd, delivered_usd: deliveredUsd, collected_zig: collectedZig, delivered_zig: deliveredZig }
+                result.carcassGrades.economy = gradeData
               } else if (gradeLower.includes("manufacturing")) {
-                result.carcassGrades.manufacturing = { collected_usd: collectedUsd, delivered_usd: deliveredUsd, collected_zig: collectedZig, delivered_zig: deliveredZig }
+                result.carcassGrades.manufacturing = gradeData
               }
+            } else if (category === "PIGS") {
+              if (!result.pigsCarcassGrades) result.pigsCarcassGrades = { p1: zeroCdmGrade(), p2: zeroCdmGrade(), manufacturing: zeroCdmGrade() }
+              const gradeLower = grade.toLowerCase()
+              const gradeData = { collected_usd: collectedUsd, delivered_usd: deliveredUsd, collected_zig: collectedZig, delivered_zig: deliveredZig }
+              if (gradeLower.includes("p1")) result.pigsCarcassGrades.p1 = gradeData
+              else if (gradeLower.includes("p2")) result.pigsCarcassGrades.p2 = gradeData
+              else if (gradeLower.includes("manufacturing")) result.pigsCarcassGrades.manufacturing = gradeData
+            } else if (category === "GOATS") {
+              if (!result.goatsCarcassGrades) result.goatsCarcassGrades = { g1: zeroCdmGrade(), g2: zeroCdmGrade(), g3: zeroCdmGrade(), g4: zeroCdmGrade() }
+              const gradeLower = grade.toLowerCase()
+              const gradeData = { collected_usd: collectedUsd, delivered_usd: deliveredUsd, collected_zig: collectedZig, delivered_zig: deliveredZig }
+              if (gradeLower.includes("g1")) result.goatsCarcassGrades.g1 = gradeData
+              else if (gradeLower.includes("g2")) result.goatsCarcassGrades.g2 = gradeData
+              else if (gradeLower.includes("g3")) result.goatsCarcassGrades.g3 = gradeData
+              else if (gradeLower.includes("g4")) result.goatsCarcassGrades.g4 = gradeData
             } else if (category === "CATTLE LWT") {
               // Liveweight entries - extract weight range from grade name
               let weightRange = ""
@@ -199,11 +234,9 @@ export function CdmExcelImport({ setValue, setSelectedClient }: CdmExcelImportPr
     } catch (error) {
       setParsedData({
         metadata: { effectiveDate: "", exchangeRate: 35, userId: "", username: "" },
-        carcassGrades: {
-          commercial: { collected_usd: 0, delivered_usd: 0, collected_zig: 0, delivered_zig: 0 },
-          economy: { collected_usd: 0, delivered_usd: 0, collected_zig: 0, delivered_zig: 0 },
-          manufacturing: { collected_usd: 0, delivered_usd: 0, collected_zig: 0, delivered_zig: 0 },
-        },
+        carcassGrades: { super: zeroCdmGrade(), commercial: zeroCdmGrade(), economy: zeroCdmGrade(), manufacturing: zeroCdmGrade() },
+        pigsCarcassGrades: null,
+        goatsCarcassGrades: null,
         liveweight: [],
         errors: [error instanceof Error ? error.message : "Unknown error occurred"],
         warnings: [],
@@ -263,9 +296,18 @@ export function CdmExcelImport({ setValue, setSelectedClient }: CdmExcelImportPr
       }
 
       // Set carcass grades
+      setValue("carcass_grades.super", parsedData.carcassGrades.super)
       setValue("carcass_grades.commercial", parsedData.carcassGrades.commercial)
       setValue("carcass_grades.economy", parsedData.carcassGrades.economy)
       setValue("carcass_grades.manufacturing", parsedData.carcassGrades.manufacturing)
+
+      // Set pigs/goats if present
+      if (parsedData.pigsCarcassGrades) {
+        setValue("pigs_carcass_grades" as any, parsedData.pigsCarcassGrades)
+      }
+      if (parsedData.goatsCarcassGrades) {
+        setValue("goats_carcass_grades" as any, parsedData.goatsCarcassGrades)
+      }
 
       // Build full 16-entry liveweight array (4 weight ranges × 4 teeth categories)
       const liveweightArray = WEIGHT_RANGES.flatMap((range) =>

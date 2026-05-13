@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
-import { Phone, Mail, MessageCircle, MapPin, Navigation, MousePointerClick } from "lucide-react"
+import { Phone, Mail, MessageCircle, MapPin, Navigation, MousePointerClick, QrCode } from "lucide-react"
 
 import { queryMenusContactViewStats, queryMenusContactViewList } from "@/lib/query"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -23,7 +23,9 @@ interface StatRow {
   email: number
   whatsapp: number
   address: number
+  address_copy: number
   directions: number
+  qr_scan: number
   last_event: string
 }
 
@@ -44,11 +46,12 @@ const TYPE_ICON: Record<string, React.ReactNode> = {
   whatsapp: <MessageCircle className="h-3.5 w-3.5" />,
   address: <MapPin className="h-3.5 w-3.5" />,
   directions: <Navigation className="h-3.5 w-3.5" />,
+  qr_scan: <QrCode className="h-3.5 w-3.5" />,
 }
 
 function formatDate(s: string) {
   if (!s) return "—"
-  return new Date(s).toLocaleString()
+  return new Date(s).toLocaleString("en-GB")
 }
 
 function Pagination({ page, pageCount, onPage }: { page: number; pageCount: number; onPage: (p: number) => void }) {
@@ -169,6 +172,7 @@ export default function ContactViewsPage() {
                         <th className="px-4 py-2 font-medium text-right" title="Email"><Mail className="h-3.5 w-3.5 inline" /></th>
                         <th className="px-4 py-2 font-medium text-right" title="Address"><MapPin className="h-3.5 w-3.5 inline" /></th>
                         <th className="px-4 py-2 font-medium text-right" title="Directions"><Navigation className="h-3.5 w-3.5 inline" /></th>
+                        <th className="px-4 py-2 font-medium text-right" title="QR Scan"><QrCode className="h-3.5 w-3.5 inline" /></th>
                         <th className="px-4 py-2 font-medium">Last Event</th>
                       </tr>
                     </thead>
@@ -186,6 +190,7 @@ export default function ContactViewsPage() {
                           <td className="px-4 py-2 text-right">{row.email}</td>
                           <td className="px-4 py-2 text-right">{row.address}</td>
                           <td className="px-4 py-2 text-right">{row.directions}</td>
+                          <td className="px-4 py-2 text-right">{row.qr_scan}</td>
                           <td className="px-4 py-2 text-xs text-muted-foreground whitespace-nowrap">{formatDate(row.last_event)}</td>
                         </tr>
                       ))}

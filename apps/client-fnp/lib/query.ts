@@ -20,20 +20,17 @@ api.interceptors.request.use(async(config: InternalAxiosRequestConfig) => {
 api.interceptors.response.use(
     (response) => response,
     async (error) => {
-        if (error.response?.status === 400 || error.response?.status === 401) {
+        if (error.response?.status === 401) {
             const errorMessage = error.response?.data?.message || ""
 
-            // Check if it's a token expiration error
+            // Only sign out if the backend explicitly says the token is expired
             if (errorMessage.includes("expired") || errorMessage.includes("not active yet")) {
-                // Logout the user
                 await logoutUser()
 
-                // Show session expired toast
                 toast("Session Expired", {
                     description: "Your session has expired. Please login again."
                 })
 
-                // Redirect to login page
                 if (typeof window !== "undefined") {
                     window.location.href = "/login"
                 }
@@ -51,7 +48,7 @@ export function queryClient(slug: string) {
   return api.get(url)
 }
 
-export function queryClients(slug: string, pagination?: PaginationModel & { province?: string[], produce?: string[], category?: string[], payment_terms?: string[], pricing?: string[], verified?: string[] }) {
+export function queryClients(slug: string, pagination?: PaginationModel & { province?: string[], produce?: string[], category?: string[], payment_terms?: string[], pricing?: string[], verified?: string[], has_booking?: string }) {
     const params = new URLSearchParams()
 
     // Add pagination
@@ -77,6 +74,9 @@ export function queryClients(slug: string, pagination?: PaginationModel & { prov
     }
     if (pagination?.verified && pagination.verified.length > 0) {
         params.set('verified', pagination.verified[0])
+    }
+    if (pagination?.has_booking) {
+        params.set('has_booking', pagination.has_booking)
     }
 
     const queryString = params.toString()
@@ -122,6 +122,18 @@ export async function clientSignup(data: SignUpFormData) {
     return api.post(url, data)
 }
 
+export function queryMarketStats() {
+  return api.get(`${BaseURL}/prices/market-stats`)
+}
+
+export function queryGradeSummary() {
+  return api.get(`${BaseURL}/prices/grade-summary`)
+}
+
+export function queryGradeChart(produce: string, code: string) {
+  return api.get(`${BaseURL}/prices/grade-chart/${produce.toLowerCase()}/${code.toLowerCase()}`)
+}
+
 export function queryProducerPriceLists(pagination?: PaginationModel) {
   const params = new URLSearchParams()
   if (pagination?.p !== undefined && pagination.p >= 2) {
@@ -160,6 +172,14 @@ export function queryPriceFilterAggregates() {
   return api.get(url)
 }
 
+export function queryProduceBuyers(produceSlug: string, pagination?: PaginationModel) {
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) params.set("p", String(pagination.p))
+  if (pagination?.limit) params.set("limit", String(pagination.limit))
+  const qs = params.toString()
+  return api.get(`${BaseURL}/prices/produce/${produceSlug}/buyers${qs ? `?${qs}` : ""}`)
+}
+
 export function queryPricesByProduce(produceSlug: string, pagination?: PaginationModel) {
   const params = new URLSearchParams()
   if (pagination?.p !== undefined && pagination.p >= 2) {
@@ -178,9 +198,11 @@ export function updateUserWantToPay(wantToPay: boolean) {
   return api.post(url, { wantToPay })
 }
 
-export function queryClientFilterAggregates(type: 'buyers' | 'farmers') {
-  const url = `${BaseURL}/client/aggregates/filters?type=${type}`
-  return api.get(url)
+export function queryClientFilterAggregates(type: 'buyers' | 'farmers', filters?: { produce?: string[], province?: string[] }) {
+  const params = new URLSearchParams({ type })
+  filters?.produce?.forEach(p => params.append('produce', p))
+  filters?.province?.forEach(p => params.append('province', p))
+  return api.get(`${BaseURL}/client/aggregates/filters?${params.toString()}`)
 }
 
 export function queryClientPricing(clientId: string, pagination?: PaginationModel) {
@@ -293,9 +315,15 @@ export function queryAllActiveIngredients() {
   return api.get(url)
 }
 
-export function queryAgroChemicalFilterAggregates() {
-  const url = `${BaseURL}/agrochemical/aggregates/filters`
-  return api.get(url)
+export function queryAgroChemicalFilterAggregates(filters?: { brand?: string[], category?: string[], target?: string[], active_ingredient?: string[], used_on?: string[] }) {
+  const params = new URLSearchParams()
+  filters?.brand?.forEach(v => params.append('brand', v))
+  filters?.category?.forEach(v => params.append('category', v))
+  filters?.target?.forEach(v => params.append('target', v))
+  filters?.active_ingredient?.forEach(v => params.append('active_ingredient', v))
+  filters?.used_on?.forEach(v => params.append('used_on', v))
+  const qs = params.toString()
+  return api.get(`${BaseURL}/agrochemical/aggregates/filters${qs ? `?${qs}` : ''}`)
 }
 
 export function queryAgroChemical(slug: string) {
@@ -403,9 +431,15 @@ export function queryAnimalHealthProductsByCategory(options: { category: string 
   return api.get(url)
 }
 
-export function queryAnimalHealthFilterAggregates() {
-  const url = `${BaseURL}/animalhealth/aggregates/filters`
-  return api.get(url)
+export function queryAnimalHealthFilterAggregates(filters?: { brand?: string[], category?: string[], target?: string[], active_ingredient?: string[], used_on?: string[] }) {
+  const params = new URLSearchParams()
+  filters?.brand?.forEach(v => params.append('brand', v))
+  filters?.category?.forEach(v => params.append('category', v))
+  filters?.target?.forEach(v => params.append('target', v))
+  filters?.active_ingredient?.forEach(v => params.append('active_ingredient', v))
+  filters?.used_on?.forEach(v => params.append('used_on', v))
+  const qs = params.toString()
+  return api.get(`${BaseURL}/animalhealth/aggregates/filters${qs ? `?${qs}` : ''}`)
 }
 
 export function queryAnimalHealthProduct(slug: string) {
@@ -461,9 +495,14 @@ export function queryFeedCategories() {
   return api.get(url)
 }
 
-export function queryFeedFilterAggregates() {
-  const url = `${BaseURL}/feed/aggregates/filters`
-  return api.get(url)
+export function queryFeedFilterAggregates(filters?: { brand?: string[], animal?: string[], phase?: string[], sub_type?: string[] }) {
+  const params = new URLSearchParams()
+  filters?.brand?.forEach(v => params.append('brand', v))
+  filters?.animal?.forEach(v => params.append('animal', v))
+  filters?.phase?.forEach(v => params.append('phase', v))
+  filters?.sub_type?.forEach(v => params.append('sub_type', v))
+  const qs = params.toString()
+  return api.get(`${BaseURL}/feed/aggregates/filters${qs ? `?${qs}` : ''}`)
 }
 
 // Feeding Programs
@@ -548,6 +587,181 @@ export function queryPlantNutritionProductsByCategory(options: { category: strin
   return api.get(qs ? `${BaseURL}/plantnutrition/category/${options.category}?${qs}` : `${BaseURL}/plantnutrition/category/${options.category}`)
 }
 
-export function queryPlantNutritionFilterAggregates() {
-  return api.get(`${BaseURL}/plantnutrition/aggregates/filters`)
+export function queryPlantNutritionProduct(slug: string) {
+  return api.get(`${BaseURL}/plantnutrition/${slug}`)
+}
+
+export function queryPlantNutritionFilterAggregates(filters?: { brand?: string[], category?: string[], active_ingredient?: string[], used_on?: string[] }) {
+  const params = new URLSearchParams()
+  filters?.brand?.forEach(v => params.append('brand', v))
+  filters?.category?.forEach(v => params.append('category', v))
+  filters?.active_ingredient?.forEach(v => params.append('active_ingredient', v))
+  filters?.used_on?.forEach(v => params.append('used_on', v))
+  const qs = params.toString()
+  return api.get(`${BaseURL}/plantnutrition/aggregates/filters${qs ? `?${qs}` : ''}`)
+}
+
+// Cart
+export function getCart() {
+  return api.get(`${BaseURL}/cart/get`)
+}
+
+export function addToCart(item: {
+  product_id: string
+  product_type: string
+  product_name: string
+  product_slug: string
+  image_src: string
+  unit_price: number
+  quantity: number
+  seller_id?: string
+}) {
+  return api.post(`${BaseURL}/cart/add`, item)
+}
+
+export function updateCartItem(product_id: string, quantity: number) {
+  return api.post(`${BaseURL}/cart/update`, { product_id, quantity })
+}
+
+export function removeFromCart(product_id: string) {
+  return api.post(`${BaseURL}/cart/remove`, { product_id })
+}
+
+export function clearCart() {
+  return api.delete(`${BaseURL}/cart/clear`)
+}
+
+// Orders
+export function checkout(data: {
+  provider: string
+  method: string
+  phone: string
+  email: string
+  fulfillment: string
+  address?: {
+    name: string
+    phone: string
+    address: string
+    city: string
+    province: string
+  }
+  order_type?: string
+}) {
+  return api.post(`${BaseURL}/order/checkout`, data)
+}
+
+export function pollOrderStatus(reference: string) {
+  return api.post(`${BaseURL}/order/poll`, { reference })
+}
+
+export function myOrders(page?: number) {
+  const url = page && page >= 2 ? `${BaseURL}/order/my-orders?p=${page}` : `${BaseURL}/order/my-orders`
+  return api.get(url)
+}
+
+export function getOrder(id: string) {
+  return api.get(`${BaseURL}/order/${id}`)
+}
+
+// Bookings
+export function listBookingEvents(options?: { product_id?: string; status?: string }) {
+  const params = new URLSearchParams()
+  if (options?.product_id) params.set("product_id", options.product_id)
+  if (options?.status) params.set("status", options.status)
+  const qs = params.toString()
+  return api.get(`${BaseURL}/booking/events${qs ? `?${qs}` : ""}`)
+}
+
+export function getBookingEvent(id: string) {
+  return api.get(`${BaseURL}/booking/events/${id}`)
+}
+
+export function listDeliveryLocations(clientId?: string) {
+  const url = clientId
+    ? `${BaseURL}/booking/client-locations?client_id=${clientId}`
+    : `${BaseURL}/booking/client-locations`
+  return api.get(url)
+}
+
+type GoodsItemPayload = {
+  produce_id?: string
+  produce_name: string
+  produce_slug?: string
+  quantity: number
+  unit: string
+  other?: boolean
+}
+
+export function createBooking(data: {
+  type: "pre-order" | "delivery" | "pickup"
+  booking_date?: string // RFC3339
+  time_slot?: string
+  notes?: string
+  phone: string
+  // pre-order
+  event_id?: string
+  quantity?: number
+  // delivery
+  delivery_location_id?: string
+  goods_items?: GoodsItemPayload[]
+  // pickup
+  buyer_id?: string
+  farm_address?: string
+}) {
+  return api.post(`${BaseURL}/booking/`, data)
+}
+
+export function myBookings(page?: number) {
+  const url = page && page >= 2 ? `${BaseURL}/booking/my-bookings?p=${page}` : `${BaseURL}/booking/my-bookings`
+  return api.get(url)
+}
+
+export function getBooking(id: string) {
+  return api.get(`${BaseURL}/booking/${id}`)
+}
+
+export function cancelBooking(id: string) {
+  return api.put(`${BaseURL}/booking/${id}/cancel`, {})
+}
+
+export function buyerUpdateBookingStatus(id: string, status: string, note?: string) {
+  return api.put(`${BaseURL}/booking/${id}/buyer-status`, { status, note })
+}
+
+export function getIncomingBooking(id: string) {
+  return api.get(`${BaseURL}/booking/incoming/${id}`)
+}
+
+export function incomingBookings(page?: number, status?: string) {
+  const params = new URLSearchParams()
+  if (page && page >= 2) params.set('p', page.toString())
+  if (status) params.set('status', status)
+  const qs = params.toString()
+  return api.get(qs ? `${BaseURL}/booking/incoming?${qs}` : `${BaseURL}/booking/incoming`)
+}
+
+export function listBookingNotifications() {
+  return api.get(`${BaseURL}/booking/notifications`)
+}
+
+export function countBookingNotifications() {
+  return api.get(`${BaseURL}/booking/notifications/count`)
+}
+
+export function markBookingNotificationsRead(ids: string[]) {
+  return api.put(`${BaseURL}/booking/notifications/read`, { ids })
+}
+
+// ── Documents ─────────────────────────────────────────────────────────────────
+
+export function queryAllDocuments(pagination?: { p?: number; category?: string }) {
+  const params = new URLSearchParams()
+  if (pagination?.p && pagination.p >= 2) params.set('p', pagination.p.toString())
+  if (pagination?.category) params.set('category', pagination.category)
+  const qs = params.toString()
+  return api.get(qs ? `${BaseURL}/documents?${qs}` : `${BaseURL}/documents`)
+}
+
+export function queryDocument(slug: string) {
+  return api.get(`${BaseURL}/documents/${slug}`)
 }

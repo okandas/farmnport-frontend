@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     title: 'Feeding Programs | farmnport',
     description: 'Browse livestock feeding programs with stage-by-stage nutritional guidelines.',
     siteName: 'farmnport',
-    locale: 'en_US',
+    locale: 'en_ZW',
     type: 'website',
   },
   alternates: {

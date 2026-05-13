@@ -54,7 +54,7 @@ export function AgroCategoryClient({ category, categoryName, initialChemicals, i
         <div className="flex flex-col lg:flex-row gap-8">
             {/* Sidebar Filters */}
             <aside className="w-full lg:w-64 flex-shrink-0">
-                <AgroChemicalFilterSidebar hideCategory={true} />
+                <AgroChemicalFilterSidebar hideCategory={true} categorySlug={category} />
             </aside>
 
             {/* Main Content */}
@@ -88,7 +88,7 @@ export function AgroCategoryClient({ category, categoryName, initialChemicals, i
                     </div>
                 ) : (
                     <>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
                             {chemicals.map((chemical: any) => (
                                 <AgroChemicalCard
                                     key={chemical.id}
@@ -101,27 +101,15 @@ export function AgroCategoryClient({ category, categoryName, initialChemicals, i
                         {/* Pagination */}
                         {totalPages > 1 && (
                             <div className="mt-8 flex justify-center gap-1">
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => handlePageChange(Math.max(1, queryState.p - 1))}
-                                    disabled={queryState.p === 1}
-                                >
-                                    Previous
-                                </Button>
                                 {Array.from({ length: totalPages }, (_, i) => i + 1)
-                                    .filter(pageNum => {
-                                        // Show first page, last page, current page, and pages around current
-                                        return (
-                                            pageNum === 1 ||
-                                            pageNum === totalPages ||
-                                            (pageNum >= queryState.p - 2 && pageNum <= queryState.p + 2)
-                                        )
-                                    })
+                                    .filter(pageNum =>
+                                        pageNum === 1 ||
+                                        pageNum === totalPages ||
+                                        (pageNum >= queryState.p - 2 && pageNum <= queryState.p + 2)
+                                    )
                                     .map((pageNum, idx, arr) => {
                                         const prevPageNum = arr[idx - 1]
                                         const showEllipsis = prevPageNum && pageNum - prevPageNum > 1
-
                                         return (
                                             <div key={pageNum} className="flex items-center gap-1">
                                                 {showEllipsis && (
@@ -138,14 +126,6 @@ export function AgroCategoryClient({ category, categoryName, initialChemicals, i
                                             </div>
                                         )
                                     })}
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => handlePageChange(queryState.p + 1)}
-                                    disabled={queryState.p >= totalPages}
-                                >
-                                    Next
-                                </Button>
                             </div>
                         )}
                     </>

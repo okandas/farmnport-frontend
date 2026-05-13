@@ -7,6 +7,7 @@ import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
 
 import { queryRestaurantInvoice, queryRestaurantSubscription } from "@/lib/query"
+import { centsToDollars } from "@/lib/utilities"
 import { RestaurantInvoice, RestaurantSubscription } from "@/lib/schemas"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -133,9 +134,9 @@ export default function RestaurantInvoiceDetailPage() {
                 </div>
                 <div className="text-right">
                   {item.days_charged < item.days_in_cycle && (
-                    <p className="text-xs text-muted-foreground line-through">${(item.unit_amount_cents / 100).toFixed(2)}</p>
+                    <p className="text-xs text-muted-foreground line-through">{centsToDollars(item.unit_amount_cents)}</p>
                   )}
-                  <p className="text-sm font-medium">${(item.prorated_amount_cents / 100).toFixed(2)}</p>
+                  <p className="text-sm font-medium">{centsToDollars(item.prorated_amount_cents)}</p>
                 </div>
               </div>
             ))}
@@ -146,15 +147,15 @@ export default function RestaurantInvoiceDetailPage() {
           <div className="space-y-1 text-sm">
             <div className="flex justify-between">
               <span className="text-muted-foreground">Subtotal</span>
-              <span>${(inv.subtotal_cents / 100).toFixed(2)}</span>
+              <span>{centsToDollars(inv.subtotal_cents)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">VAT</span>
-              <span>${(inv.vat_cents / 100).toFixed(2)}</span>
+              <span>{centsToDollars(inv.vat_cents)}</span>
             </div>
             <div className="flex justify-between font-semibold text-base pt-1">
               <span>Total</span>
-              <span>${(inv.total_cents / 100).toFixed(2)}</span>
+              <span>{centsToDollars(inv.total_cents)}</span>
             </div>
           </div>
         </CardContent>

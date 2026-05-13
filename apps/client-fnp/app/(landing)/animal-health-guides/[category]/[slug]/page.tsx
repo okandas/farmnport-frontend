@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { ActiveIngredientsList } from "@/components/shared/ActiveIngredientUnitsKey"
 import Image from "next/image"
 import { Beaker, AlertTriangle } from "lucide-react"
@@ -5,6 +6,46 @@ import Link from "next/link"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
 import { capitalizeFirstLetter, formatUnit } from "@/lib/utilities"
 import { BaseURL } from "@/lib/schemas"
+import { WantToBuyCTA } from "@/components/shared/WantToBuyCTA"
+
+type Props = { params: Promise<{ category: string; slug: string }> }
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { category, slug } = await params
+  const res = await fetch(`${BaseURL}/animalhealth/${slug}`, { next: { revalidate: 3600 } }).catch(() => null)
+  const product = res?.ok ? await res.json() : null
+
+  if (!product) {
+    return { title: 'Animal Health Product Guide | farmnport.com' }
+  }
+
+  const categoryName = product.animal_health_category?.name || category.replace(/-/g, ' ')
+  const categorySingular = categoryName.toLowerCase().replace(/icides$/, 'icide').replace(/izers$/, 'izer').replace(/s$/, '')
+  const categorySingularTitle = categorySingular.charAt(0).toUpperCase() + categorySingular.slice(1)
+  const article = /^[aeiou]/i.test(categorySingular) ? 'an' : 'a'
+  const usedOn = (product.used_on ?? []).slice(0, 3).join(', ')
+  const ingredients = (product.active_ingredients ?? []).slice(0, 2).map((ai: any) => ai.name).join(', ')
+  const brand = product.brand?.name ? ` by ${product.brand.name}` : ''
+
+  const description = [
+    `${product.name}${brand} is ${article} ${categorySingular}`,
+    usedOn ? `for ${usedOn}` : 'for poultry and livestock in Zimbabwe',
+    ingredients ? `containing ${ingredients}` : null,
+    'View dosage rates and usage guidelines on farmnport.com.',
+  ].filter(Boolean).join('. ')
+
+  return {
+    title: `${product.name} – ${categorySingularTitle} Dosage & Guide | farmnport.com`,
+    description,
+    alternates: { canonical: `/animal-health-guides/${category}/${slug}` },
+    openGraph: {
+      title: `${product.name} – ${categorySingularTitle} Guide`,
+      description,
+      siteName: 'farmnport',
+      type: 'website',
+    },
+  }
+}
 
 interface GuidePageProps {
     params: Promise<{
@@ -270,6 +311,9 @@ export default async function AnimalHealthGuidePage({ params }: GuidePageProps) 
                                 ))}
                             </div>
                         )}
+
+                        {/* Want to Buy CTA */}
+                        <WantToBuyCTA available_for_sale={product.available_for_sale} name={product.name} href={`/buy-animal-health/${slug}`} />
 
                         {/* Precautions */}
                         {product.precautions && product.precautions.length > 0 && (

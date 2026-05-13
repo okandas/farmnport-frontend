@@ -20,7 +20,7 @@ export function ProduceFilter({ categories, activeFilter }: ProduceFilterProps) 
       params.set("filter", slug)
     }
     const qs = params.toString()
-    router.push(`/prices/produce${qs ? `?${qs}` : ""}`)
+    router.push(`/prices${qs ? `?${qs}` : ""}`)
   }
 
   return (
@@ -29,7 +29,7 @@ export function ProduceFilter({ categories, activeFilter }: ProduceFilterProps) 
         variant={!activeFilter ? "default" : "outline"}
         size="sm"
         onClick={() => {
-          router.push("/prices/produce")
+          router.push("/prices")
         }}
       >
         All

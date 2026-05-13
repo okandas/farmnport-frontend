@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     description: 'Comprehensive plant nutrition product guides. Find application rates and active ingredients for fertilizers, foliar feeds, and more.',
     url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://farmnport.com'}/plant-nutrition-guides`,
     siteName: 'farmnport',
-    locale: 'en_US',
+    locale: 'en_ZW',
     type: 'website',
   },
   twitter: {

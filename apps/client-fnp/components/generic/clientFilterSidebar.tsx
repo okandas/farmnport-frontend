@@ -14,7 +14,7 @@ import { useState, useMemo } from "react"
 import { queryClientFilterAggregates, queryPricesByProduce } from "@/lib/query"
 import { centsToDollars } from "@/lib/utilities"
 import { sendGTMEvent } from "@next/third-parties/google"
-import { paymentTermsLabel } from "@/components/structures/repository/data"
+
 import Link from "next/link"
 
 interface FilterItem {
@@ -135,11 +135,14 @@ function FilterContent({
     verified: parseAsArrayOf(parseAsString),
   })
 
-  // Fetch aggregate data for clients
+  // Fetch aggregate data for clients — cascade by active filters
   const { data: aggregateData, isLoading: isLoadingAggregates } = useQuery({
-    queryKey: ["client-filter-aggregates", type],
+    queryKey: ["client-filter-aggregates", type, queryState.produce, queryState.province],
     queryFn: async () => {
-      const response = await queryClientFilterAggregates(type)
+      const response = await queryClientFilterAggregates(type, {
+        produce: queryState.produce ?? [],
+        province: queryState.province ?? [],
+      })
       return response.data as ClientFilterAggregates
     },
   })
@@ -156,16 +159,6 @@ function FilterContent({
     return aggregateData?.categories || []
   }, [aggregateData])
 
-  const paymentTermsItems = useMemo(() => {
-    return (aggregateData?.payment_terms || []).map((item) => ({
-      ...item,
-      name: paymentTermsLabel(item._id),
-    }))
-  }, [aggregateData])
-
-  const pricingItems = useMemo(() => {
-    return aggregateData?.pricing || []
-  }, [aggregateData])
 
   // Fetch prices for the product if specified
   const { data: priceData, isLoading: isLoadingPrices } = useQuery({
@@ -261,18 +254,6 @@ function FilterContent({
       items: verifiedItems,
       isLoading: false
     }] : []),
-    {
-      name: "Payment Terms",
-      key: "payment_terms",
-      items: paymentTermsItems,
-      isLoading: isLoadingAggregates
-    },
-    {
-      name: "Pricing",
-      key: "pricing",
-      items: pricingItems,
-      isLoading: isLoadingAggregates
-    },
     ...(!hideProduce ? [{
       name: "Produce",
       key: "produce",
@@ -312,7 +293,7 @@ function FilterContent({
         </div>
       )}
 
-      <Accordion type="multiple" className="w-full flex-1" defaultValue={["Payment Terms"]}>
+      <Accordion type="multiple" className="w-full flex-1" defaultValue={filterSections.filter(s => (queryState[s.key as keyof typeof queryState] ?? []).length > 0).map(s => s.name)}>
         {filterSections.map((section) => {
           const selectedFilters = queryState[section.key as keyof typeof queryState] || []
 

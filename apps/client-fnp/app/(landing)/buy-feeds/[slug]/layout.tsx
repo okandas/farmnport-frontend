@@ -59,7 +59,7 @@ export async function generateMetadata({ params }: LayoutProps): Promise<Metadat
             alt: product.name,
           },
         ],
-        locale: 'en_US',
+        locale: 'en_ZW',
         type: 'website',
       },
       twitter: {
@@ -72,10 +72,10 @@ export async function generateMetadata({ params }: LayoutProps): Promise<Metadat
         canonical: url,
       },
       robots: {
-        index: false,
+        index: true,
         follow: true,
         googleBot: {
-          index: false,
+          index: true,
           follow: true,
         },
       },

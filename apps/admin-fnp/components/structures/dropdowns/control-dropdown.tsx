@@ -6,7 +6,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { isAxiosError } from "axios"
 import { MoreHorizontal } from "lucide-react"
 
-import { verifyClient, badClient, archiveClient, impersonateClient } from "@/lib/query"
+import { verifyClient, badClient, archiveClient, impersonateClient, toggleBookingClient, togglePickupClient } from "@/lib/query"
 import { ApplicationUserID, ApplicationUser } from "@/lib/schemas"
 import { slug } from "@/lib/utilities"
 import { Button } from "@/components/ui/button"
@@ -158,7 +158,45 @@ export function ControlDropDown({ client }: ControlDropDownProps) {
     mutateArchiveClient(payload)
   }
 
-  const animate = isPending || isPendingBadClient || isPendingArchive || isPendingImpersonate ? "animate-bounce" : ""
+  const { mutate: mutateToggleBooking, isPending: isPendingBooking } = useMutation({
+    mutationFn: toggleBookingClient,
+    onSuccess: (data) => {
+      const message = data?.data?.has_booking
+        ? "Online Booking Enabled"
+        : "Online Booking Disabled"
+      toast({ description: message })
+      queryClient.invalidateQueries({ queryKey: ["dashboard-clients"] })
+      router.refresh()
+    },
+    onError: () => {
+      toast({
+        title: "Update failed",
+        description: "There was a problem updating the booking setting.",
+        action: <ToastAction altText="Try again">Try again</ToastAction>,
+      })
+    },
+  })
+
+  const { mutate: mutateTogglePickup, isPending: isPendingPickup } = useMutation({
+    mutationFn: togglePickupClient,
+    onSuccess: (data) => {
+      const message = data?.data?.has_pickup
+        ? "Pickup Enabled"
+        : "Pickup Disabled"
+      toast({ description: message })
+      queryClient.invalidateQueries({ queryKey: ["dashboard-clients"] })
+      router.refresh()
+    },
+    onError: () => {
+      toast({
+        title: "Update failed",
+        description: "There was a problem updating the pickup setting.",
+        action: <ToastAction altText="Try again">Try again</ToastAction>,
+      })
+    },
+  })
+
+  const animate = isPending || isPendingBadClient || isPendingArchive || isPendingImpersonate || isPendingBooking || isPendingPickup ? "animate-bounce" : ""
 
   const stroke = client?.verified ? "stroke-green-500" : "stroke-red-500"
 
@@ -224,6 +262,24 @@ export function ControlDropDown({ client }: ControlDropDownProps) {
           }}
         >
           {client?.archived === false || !client?.archived ? "Archive Client" : "Unarchive Client"}
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => {
+            if (client?.id !== undefined) {
+              mutateToggleBooking({ id: client.id })
+            }
+          }}
+        >
+          {client?.has_booking ? "Disable Online Booking" : "Enable Online Booking"}
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => {
+            if (client?.id !== undefined) {
+              mutateTogglePickup({ id: client.id })
+            }
+          }}
+        >
+          {client?.has_pickup ? "Disable Pickup" : "Enable Pickup"}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem

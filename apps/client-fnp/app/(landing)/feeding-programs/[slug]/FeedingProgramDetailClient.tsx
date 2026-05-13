@@ -106,7 +106,7 @@ export function FeedingProgramDetailClient({ program, slug }: FeedingProgramDeta
             <div className="border-b">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
                     <nav className="flex text-sm text-muted-foreground">
-                        <Link href="/" className="hover:text-foreground transition-colors">Home</Link>
+                        <Link href="/programs" className="hover:text-foreground transition-colors">Programs</Link>
                         <span className="mx-2">/</span>
                         <Link href="/feeding-programs" className="hover:text-foreground transition-colors">Feeding Programs</Link>
                         <span className="mx-2">/</span>
@@ -450,55 +450,66 @@ export function FeedingProgramDetailClient({ program, slug }: FeedingProgramDeta
                         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
                         onClick={() => setQuickViewRec(null)}
                     />
-                    <div className="relative bg-card rounded-xl border shadow-lg max-w-md w-full">
+                    <div className="relative bg-background rounded-xl border shadow-2xl max-w-2xl w-full">
                         <button
                             onClick={() => setQuickViewRec(null)}
-                            className="absolute right-3 top-3 z-10 p-1.5 rounded-md hover:bg-muted transition-colors"
+                            className="absolute right-3 top-3 z-10 p-1.5 rounded-full bg-muted hover:bg-muted/80 transition-colors"
                         >
-                            <X className="h-4 w-4 text-muted-foreground" />
+                            <X className="h-4 w-4" />
                         </button>
 
-                        <div className="p-5 space-y-4">
-                            <div>
-                                <h3 className="text-base font-bold leading-tight pr-8">
-                                    {capitalizeFirstLetter(quickViewRec.feed_product_name)}
-                                </h3>
-                                {quickViewRec.feed_product?.show_price && quickViewRec.feed_product?.sale_price > 0 && (
-                                    <div className="mt-2">
-                                        <span className="text-lg font-bold text-foreground">${quickViewRec.feed_product.sale_price.toFixed(2)}</span>
-                                        {quickViewRec.feed_product.was_price > quickViewRec.feed_product.sale_price && (
-                                            <span className="text-sm text-muted-foreground line-through ml-2">${quickViewRec.feed_product.was_price.toFixed(2)}</span>
-                                        )}
+                        <div className="flex gap-5 p-5">
+                            {/* Image */}
+                            <div className="relative w-32 h-32 sm:w-40 sm:h-40 bg-white dark:bg-gray-900 rounded-lg border overflow-hidden flex-shrink-0">
+                                {quickViewRec.feed_product?.images?.[0]?.img?.src ? (
+                                    <Image
+                                        src={quickViewRec.feed_product.images[0].img.src}
+                                        alt={quickViewRec.feed_product_name}
+                                        fill
+                                        sizes="160px"
+                                        className="object-contain p-3"
+                                    />
+                                ) : (
+                                    <div className="absolute inset-0 flex items-center justify-center">
+                                        <Egg className="w-12 h-12 text-muted-foreground/30" />
                                     </div>
                                 )}
-                                {quickViewRec.purpose && (() => {
-                                    const style = getPurposeStyle(quickViewRec.purpose)
-                                    const Icon = style.icon
-                                    return (
-                                        <div className={`inline-flex items-center gap-1 mt-2 px-2 py-0.5 rounded-md text-[11px] font-medium ${style.bg} ${style.text}`}>
-                                            <Icon className="h-3 w-3" />
-                                            {quickViewRec.purpose}
-                                        </div>
-                                    )
-                                })()}
                             </div>
 
-                            {quickViewRec.notes && (
-                                <div className="rounded-lg bg-muted/50 p-3">
-                                    <p className="text-sm text-muted-foreground">{quickViewRec.notes}</p>
+                            {/* Details */}
+                            <div className="flex-1 min-w-0 space-y-2.5">
+                                <h3 className="text-lg font-bold leading-tight pr-8">
+                                    {capitalizeFirstLetter(quickViewRec.feed_product_name)}
+                                </h3>
+
+                                <div className="flex items-center gap-2 flex-wrap">
+                                    {quickViewRec.feed_product?.brand?.name && (
+                                        <span className="text-xs text-muted-foreground">
+                                            {capitalizeFirstLetter(quickViewRec.feed_product.brand.name)}
+                                        </span>
+                                    )}
+                                    {quickViewRec.purpose && (
+                                        <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-muted text-muted-foreground">
+                                            {quickViewRec.purpose}
+                                        </span>
+                                    )}
                                 </div>
-                            )}
+
+                                {quickViewRec.notes && (
+                                    <p className="text-sm text-muted-foreground">{quickViewRec.notes}</p>
+                                )}
+                            </div>
                         </div>
 
                         {quickViewRec.feed_product_slug && (
                             <div className="px-5 pb-5">
                                 <Link
                                     href={`/feeds/${quickViewRec.feed_product_slug}?ref=${slug}`}
-                                    className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                                    className="flex items-center justify-center gap-1 w-full py-2 rounded-full text-sm font-semibold border border-primary text-primary hover:bg-primary/5 transition-colors"
                                     onClick={() => setQuickViewRec(null)}
                                 >
-                                    View Full Product
-                                    <ChevronRight className="h-4 w-4" />
+                                    View Full Guide
+                                    <ChevronRight className="h-3.5 w-3.5" />
                                 </Link>
                             </div>
                         )}

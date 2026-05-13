@@ -215,6 +215,13 @@ export default function CreateClientPage() {
           delivered: 0,
         },
       },
+      under: {
+        code: "UP",
+        pricing: {
+          collected: 0,
+          delivered: 0,
+        },
+      },
       manufacturing: {
         code: "J",
         pricing: {

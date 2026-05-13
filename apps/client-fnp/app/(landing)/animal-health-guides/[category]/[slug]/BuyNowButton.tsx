@@ -11,7 +11,7 @@ interface BuyNowButtonProps {
 export function BuyNowButton({ slug }: BuyNowButtonProps) {
     return (
         <Link
-            href="/waiting-list-shop"
+            href={`/buy-animal-health/${slug}`}
             onClick={() => sendGTMEvent({ event: 'buy_now_click', value: slug, category: 'animal_health' })}
             className="flex items-center justify-center gap-2 w-full py-3 px-4 rounded-lg bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-colors"
         >

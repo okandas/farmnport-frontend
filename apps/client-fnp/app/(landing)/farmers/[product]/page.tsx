@@ -1,3 +1,4 @@
+import { Suspense } from "react"
 import { capitalizeFirstLetter, plural } from "@/lib/utilities"
 import { Farmers } from "@/components/layouts/farmers"
 import { retrieveUser } from "@/lib/actions"
@@ -86,7 +87,7 @@ export default async function FarmersProductPage({ params }: FarmerProductPagePr
             <div className="lg:hidden mb-4">
               <ClientFilterSidebar type="farmers" hideProduce hideCategory product={product} />
             </div>
-            <Farmers user={user} queryBy={product} />
+            <Suspense><Farmers user={user} queryBy={product} /></Suspense>
           </div>
 
           <div className="hidden lg:block lg:w-80 relative">

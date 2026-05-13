@@ -13,6 +13,7 @@ import {
   activateRestaurantSubscription,
   cancelRestaurantSubscription,
 } from "@/lib/query"
+import { centsToDollars } from "@/lib/utilities"
 import { RestaurantSubscription, RestaurantInvoice, RestaurantLocationSeat } from "@/lib/schemas"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -216,7 +217,7 @@ export default function RestaurantSubscriptionDetailPage() {
                     </p>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="text-sm font-semibold">${(inv.total_cents / 100).toFixed(2)}</span>
+                    <span className="text-sm font-semibold">{centsToDollars(inv.total_cents)}</span>
                     <Badge className={INVOICE_COLORS[inv.status] ?? ""}>{inv.status}</Badge>
                   </div>
                 </Link>

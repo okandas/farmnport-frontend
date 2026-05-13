@@ -16,12 +16,10 @@ export function ProductTargets({ title, targets, emptyMessage }: ProductTargetsP
                 {title}
             </h2>
             {targets && targets.length > 0 ? (
-                <ol className="space-y-1.5 list-none">
+                <ul className="space-y-1.5">
                     {targets.map((target, idx) => (
                         <li key={idx} className="flex items-start gap-2 text-sm text-foreground">
-                            <span className="text-xs font-semibold text-green-600 dark:text-green-400 tabular-nums mt-0.5 min-w-[1.25rem]">
-                                {idx + 1}.
-                            </span>
+                            <span className="h-1.5 w-1.5 rounded-full bg-green-500 dark:bg-green-400 flex-shrink-0 mt-1.5" />
                             <span>
                                 <span className="capitalize">{target.name}</span>
                                 {target.scientific_name && (
@@ -30,7 +28,7 @@ export function ProductTargets({ title, targets, emptyMessage }: ProductTargetsP
                             </span>
                         </li>
                     ))}
-                </ol>
+                </ul>
             ) : (
                 <p className="text-sm text-muted-foreground">{emptyMessage}</p>
             )}

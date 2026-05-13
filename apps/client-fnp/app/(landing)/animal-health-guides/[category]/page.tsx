@@ -1,6 +1,25 @@
+import type { Metadata } from 'next'
 import Link from "next/link"
 import { BaseURL } from "@/lib/schemas"
 import { AnimalHealthCategoryClient } from "./AnimalHealthCategoryClient"
+
+type Props = { params: Promise<{ category: string }> }
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { category } = await params
+  const name = category.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+  return {
+    title: `${name} Zimbabwe – Animal Health Products & Guides | farmnport.com`,
+    description: `Browse ${name.toLowerCase()} products for poultry and livestock in Zimbabwe. Compare dosage rates, active ingredients, and usage guidelines.`,
+    alternates: { canonical: `/animal-health-guides/${category}` },
+    openGraph: {
+      title: `${name} Zimbabwe – Animal Health Guides`,
+      description: `Browse ${name.toLowerCase()} products for poultry and livestock in Zimbabwe. Compare dosage rates and usage guidelines.`,
+      siteName: 'farmnport',
+      type: 'website',
+    },
+  }
+}
 
 const fetchOptions: RequestInit = process.env.NODE_ENV === "production"
     ? { next: { revalidate: 3600 } } as RequestInit

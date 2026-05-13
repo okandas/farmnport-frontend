@@ -17,8 +17,8 @@ const fontSans = FontSans({
 })
 
 export const metadata = {
-  title: "farmnport - Welcome Administrator",
-  description: "Manage Farmnport",
+  title: "OI - Administration",
+  description: "OI Administration",
   other: {
     "facebook-domain-verification": "3stp1ph9qmao37d0k25dqq002nmfd8",
   },

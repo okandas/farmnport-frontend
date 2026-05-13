@@ -90,18 +90,22 @@ export function PriceCardsView({ limit, viewAllHref }: PriceCardsViewProps = {})
 
   // Full paginated mode
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">
-          Showing {producePriceLists.length} of {total} price lists
-        </p>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between text-xs text-muted-foreground">
+        <span><span className="font-semibold text-foreground tabular-nums">{total}</span> price lists</span>
+        <span className="font-medium uppercase tracking-widest text-[10px]">Liveweight · USD</span>
       </div>
 
-      <div className="space-y-3">
+      <div className="rounded-2xl border bg-card overflow-hidden shadow-sm">
+        <div className="grid grid-cols-[2.5rem_1fr_auto] sm:grid-cols-[2.5rem_1fr_auto_auto] items-center gap-3 px-5 py-3 border-b bg-muted/50">
+          <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-right">#</span>
+          <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Buyer</span>
+          <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-right">Date</span>
+        </div>
         {producePriceLists.map((priceList: any, index: number) => (
           <Fragment key={priceList.id}>
-            <PriceSummaryCard priceList={priceList} />
-            {(index + 1) % 3 === 0 && index < producePriceLists.length - 1 && (
+            <PriceSummaryCard priceList={priceList} rank={(currentPage - 1) * 20 + index + 1} />
+            {(index + 1) % 9 === 0 && index < producePriceLists.length - 1 && (
               <AdSenseInFeed />
             )}
           </Fragment>
@@ -109,53 +113,28 @@ export function PriceCardsView({ limit, viewAllHref }: PriceCardsViewProps = {})
       </div>
 
       {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2 pt-6 border-t">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-            disabled={currentPage === 1}
-          >
-            <ChevronLeft className="h-4 w-4 mr-1" />
-            Previous
-          </Button>
-
+        <div className="flex items-center justify-between">
+          <p className="text-xs text-muted-foreground">Page {currentPage} of {totalPages}</p>
           <div className="flex items-center gap-1">
+            <Button variant="outline" size="sm" onClick={() => { setCurrentPage(p => Math.max(1, p - 1)); window.scrollTo({ top: 0, behavior: "smooth" }) }} disabled={currentPage === 1} className="h-8 w-8 p-0">
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
             {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
               let pageNumber: number
-              if (totalPages <= 5) {
-                pageNumber = i + 1
-              } else if (currentPage <= 3) {
-                pageNumber = i + 1
-              } else if (currentPage >= totalPages - 2) {
-                pageNumber = totalPages - 4 + i
-              } else {
-                pageNumber = currentPage - 2 + i
-              }
-
+              if (totalPages <= 5) pageNumber = i + 1
+              else if (currentPage <= 3) pageNumber = i + 1
+              else if (currentPage >= totalPages - 2) pageNumber = totalPages - 4 + i
+              else pageNumber = currentPage - 2 + i
               return (
-                <Button
-                  key={pageNumber}
-                  variant={currentPage === pageNumber ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => setCurrentPage(pageNumber)}
-                  className="w-9"
-                >
+                <Button key={pageNumber} variant={currentPage === pageNumber ? "default" : "ghost"} size="sm" onClick={() => { setCurrentPage(pageNumber); window.scrollTo({ top: 0, behavior: "smooth" }) }} className="h-8 w-8 p-0 text-xs">
                   {pageNumber}
                 </Button>
               )
             })}
+            <Button variant="outline" size="sm" onClick={() => { setCurrentPage(p => Math.min(totalPages, p + 1)); window.scrollTo({ top: 0, behavior: "smooth" }) }} disabled={currentPage === totalPages} className="h-8 w-8 p-0">
+              <ChevronRight className="h-4 w-4" />
+            </Button>
           </div>
-
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-            disabled={currentPage === totalPages}
-          >
-            Next
-            <ChevronRight className="h-4 w-4 ml-1" />
-          </Button>
         </div>
       )}
     </div>

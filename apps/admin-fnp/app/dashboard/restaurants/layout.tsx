@@ -4,6 +4,10 @@ import { AccountNavigation } from "@/components/navigation/account"
 import { SidebarNavigation } from "@/components/navigation/sidebar"
 import { ScrollArea } from "@/components/ui/scroll-area"
 
+export const metadata = {
+  title: "OI - Restaurants Management",
+}
+
 interface RestaurantsDashboardLayoutProps {
   children?: React.ReactNode
 }

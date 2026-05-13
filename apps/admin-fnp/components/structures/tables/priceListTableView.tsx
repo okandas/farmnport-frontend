@@ -81,7 +81,7 @@ export function PriceListTableView({
   showBookButton = true,
 }: PriceListTableViewProps) {
   const formattedDate = producerPriceList.effectiveDate
-    ? new Date(producerPriceList.effectiveDate).toLocaleDateString('en-US', {
+    ? new Date(producerPriceList.effectiveDate).toLocaleDateString('en-GB', {
         year: 'numeric',
         month: 'long',
         day: 'numeric'
@@ -233,7 +233,7 @@ export function PriceListTableView({
                                   <span className="text-sm font-bold text-gray-900 dark:text-white">
                                     {centsToDollars(deliveredPrice)}
                                   </span>
-                                  <span className="text-xs text-gray-500 dark:text-gray-400">per kg</span>
+                                  {gradeItem?.unit && <span className="text-xs text-gray-500 dark:text-gray-400">per {gradeItem.unit}</span>}
                                 </div>
                               </td>
                               <td className="whitespace-nowrap px-6 py-4 text-right">
@@ -241,8 +241,8 @@ export function PriceListTableView({
                                   <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
                                     {collectedPrice > 0 ? centsToDollars(collectedPrice) : "-"}
                                   </span>
-                                  {collectedPrice > 0 && (
-                                    <span className="text-xs text-gray-500 dark:text-gray-400">per kg</span>
+                                  {collectedPrice > 0 && gradeItem?.unit && (
+                                    <span className="text-xs text-gray-500 dark:text-gray-400">per {gradeItem.unit}</span>
                                   )}
                                 </div>
                               </td>

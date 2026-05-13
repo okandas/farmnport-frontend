@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { Egg } from "lucide-react"
 import { queryPublishedFeedingPrograms } from "@/lib/query"
 import { FeedingProgramsGrid } from "@/components/structures/feeding-programs-grid"
@@ -16,6 +17,11 @@ export default async function FeedingProgramsPage() {
         <main>
             <section className="border-b">
                 <div className="mx-auto max-w-7xl px-6 lg:px-8 pt-10 pb-8">
+                    <nav className="flex text-sm text-muted-foreground mb-4">
+                        <Link href="/programs" className="hover:text-foreground transition-colors">Programs</Link>
+                        <span className="mx-2">/</span>
+                        <span className="text-foreground">Feeding Programs</span>
+                    </nav>
                     <p className="text-xs font-semibold text-primary tracking-wide uppercase">Animal Nutrition</p>
                     <h1 className="mt-1 text-3xl font-bold font-heading tracking-tight">Feeding Programs</h1>
                     <p className="mt-2 text-sm text-muted-foreground">Structured feeding schedules for optimal livestock growth and nutrition at every stage.</p>

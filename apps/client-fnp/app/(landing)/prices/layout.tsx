@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     description: 'Compare current agricultural prices from verified buyers across Zimbabwe.',
     url: `${baseUrl}/prices`,
     siteName: 'farmnport',
-    locale: 'en_US',
+    locale: 'en_ZW',
     type: 'website',
   },
   twitter: {

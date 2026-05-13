@@ -1,6 +1,19 @@
+import Link from "next/link"
 import { BaseURL } from "@/lib/schemas"
 import { AllAnimalHealthClient } from "./AllAnimalHealthClient"
 import { OtherGuidesLinks } from "@/components/shared/OtherGuidesLinks"
+
+export const metadata = {
+  title: 'Animal Health Product Guides Zimbabwe – Vaccines, Antibiotics & Supplements | farmnport.com',
+  description: 'Browse animal health product guides for poultry and livestock in Zimbabwe. Vaccines, antibiotics, nutrition supplements, anti-protozoals, and biosecurity disinfectants — dosage rates and usage guidelines.',
+  alternates: { canonical: '/animal-health-guides' },
+  openGraph: {
+    title: 'Animal Health Product Guides Zimbabwe',
+    description: 'Browse animal health product guides for poultry and livestock in Zimbabwe. Vaccines, antibiotics, supplements — dosage rates and usage guidelines.',
+    siteName: 'farmnport',
+    type: 'website',
+  },
+}
 
 const fetchOptions: RequestInit = process.env.NODE_ENV === "production"
     ? { next: { revalidate: 3600 } } as RequestInit
@@ -24,6 +37,11 @@ export default async function AnimalHealthGuidesPage() {
         <main className="bg-gradient-to-b from-background to-muted/20">
             <section className="py-14 lg:py-20 bg-muted/30">
                 <div className="mx-auto max-w-7xl px-6 lg:px-8">
+                    <nav className="flex text-sm text-muted-foreground mb-6">
+                        <Link href="/guides" className="hover:text-foreground transition-colors">Guides</Link>
+                        <span className="mx-2">/</span>
+                        <span className="text-foreground">Animal Health Guides</span>
+                    </nav>
                     <div className="mb-8 flex items-start justify-between gap-4">
                         <div>
                             <h2 className="text-3xl font-bold tracking-tight font-heading">

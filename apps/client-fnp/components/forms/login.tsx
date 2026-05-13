@@ -46,9 +46,9 @@ export function AuthForm({ className, ...props }: AuthFormProps) {
             const wantToSee = searchParams.get("wantToSee");
 
             if (wantToSee && entity) {
-                router.push(`/${entity}/${wantToSee}`)
+                window.location.href = `/${entity}/${wantToSee}`
             } else {
-                router.push("/")
+                window.location.href = "/"
             }
         },
         onError: async (error) => {
