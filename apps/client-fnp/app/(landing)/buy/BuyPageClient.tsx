@@ -6,15 +6,20 @@ import { ArrowRight, CalendarDays } from "lucide-react"
 import { useQuery } from "@tanstack/react-query"
 import { Button } from "@/components/ui/button"
 import { formatProductName } from "@/lib/utilities"
-import { listBookingEvents } from "@/lib/query"
+import {
+  listBookingEvents,
+  queryAllAgroChemicals,
+  queryAllAnimalHealthProducts,
+  queryAllFeedProducts,
+  queryAllPlantNutritionProducts,
+} from "@/lib/query"
 
 const CATEGORIES = [
-  { id: "pre-orders", label: "Pre-Orders", href: "/bookings" },
+  { id: "forward-bookings", label: "Forward Bookings", href: "/bookings" },
   { id: "agrochemicals", label: "Agrochemicals", href: "/buy-agrochemicals" },
   { id: "animal-health", label: "Animal Health", href: "/buy-animal-health" },
   { id: "animal-feed", label: "Animal Feed", href: "/buy-feeds" },
   { id: "plant-nutrition", label: "Plant Nutrition", href: "/buy-plant-nutrition" },
-  { id: "documents", label: "Plans & Documents", href: "/buy-documents" },
 ]
 
 // ── Shared product card — matches AgroChemicalCard guide size exactly ─────────
@@ -97,9 +102,9 @@ function DocumentCard({ doc }: { doc: any }) {
   )
 }
 
-// ── Pre-orders section ────────────────────────────────────────────────────────
+// ── Forward Bookings section ──────────────────────────────────────────────────
 
-function PreOrdersSection() {
+function ForwardBookingsSection() {
   const { data, isLoading } = useQuery({
     queryKey: ["booking-events-buy-page"],
     queryFn: () => listBookingEvents({ status: "open" }),
@@ -112,7 +117,7 @@ function PreOrdersSection() {
     <section>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <h2 className="text-xl font-bold">Pre-Orders</h2>
+          <h2 className="text-xl font-bold">Forward Bookings</h2>
           <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">{events.length} open</span>
         </div>
         <Link href="/bookings" className="flex items-center gap-1 text-sm font-medium text-primary hover:underline">
@@ -173,26 +178,19 @@ function Section({ label, href, children, count }: {
 
 // ── Main client component ─────────────────────────────────────────────────────
 
-interface BuyPageClientProps {
-  agrochemicals: any[]
-  agrochemicalTotal: number
-  animalHealth: any[]
-  animalHealthTotal: number
-  feeds: any[]
-  feedsTotal: number
-  plantNutrition: any[]
-  plantNutritionTotal: number
-  documents: any[]
-  documentsTotal: number
-}
-
-export function BuyPageClient({
-  agrochemicals, agrochemicalTotal,
-  animalHealth, animalHealthTotal,
-  feeds, feedsTotal,
-  plantNutrition, plantNutritionTotal,
-  documents, documentsTotal,
-}: BuyPageClientProps) {
+export function BuyPageClient() {
+  const { data: agroData } = useQuery({ queryKey: ["buy-agro"], queryFn: () => queryAllAgroChemicals({ p: 1, brand: [], target: [], active_ingredient: [] }), refetchOnWindowFocus: false })
+  const { data: animalHealthData } = useQuery({ queryKey: ["buy-animal-health"], queryFn: () => queryAllAnimalHealthProducts({ p: 1, brand: [], target: [], active_ingredient: [], used_on: [] }), refetchOnWindowFocus: false })
+  const { data: feedsData } = useQuery({ queryKey: ["buy-feeds"], queryFn: () => queryAllFeedProducts({ p: 1 }), refetchOnWindowFocus: false })
+  const { data: plantNutritionData } = useQuery({ queryKey: ["buy-plant-nutrition"], queryFn: () => queryAllPlantNutritionProducts({ p: 1, brand: [], category: [], active_ingredient: [], used_on: [] }), refetchOnWindowFocus: false })
+  const agrochemicals: any[] = agroData?.data?.data ?? []
+  const agrochemicalTotal: number = agroData?.data?.total ?? 0
+  const animalHealth: any[] = animalHealthData?.data?.data ?? []
+  const animalHealthTotal: number = animalHealthData?.data?.total ?? 0
+  const feeds: any[] = feedsData?.data?.data ?? []
+  const feedsTotal: number = feedsData?.data?.total ?? 0
+  const plantNutrition: any[] = plantNutritionData?.data?.data ?? []
+  const plantNutritionTotal: number = plantNutritionData?.data?.total ?? 0
   return (
     <div className="mx-auto max-w-7xl px-4 lg:px-8 py-8">
       <div className="flex gap-8">
@@ -218,7 +216,7 @@ export function BuyPageClient({
         {/* ── Main content ── */}
         <main className="flex-1 min-w-0 flex flex-col gap-12">
 
-          <PreOrdersSection />
+          <ForwardBookingsSection />
 
           <Section label="Agrochemicals" href="/buy-agrochemicals" count={agrochemicalTotal}>
             {agrochemicals.slice(0, 4).map((p) => (
@@ -244,11 +242,6 @@ export function BuyPageClient({
             ))}
           </Section>
 
-          <Section label="Plans & Documents" href="/buy-documents" count={documentsTotal}>
-            {documents.slice(0, 4).map((doc) => (
-              <DocumentCard key={doc.id} doc={doc} />
-            ))}
-          </Section>
 
         </main>
       </div>
