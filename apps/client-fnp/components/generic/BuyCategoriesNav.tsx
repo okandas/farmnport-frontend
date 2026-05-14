@@ -4,12 +4,11 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 
 const BUY_CATEGORIES = [
-  { label: "Pre-Orders", href: "/bookings" },
+  { label: "Forward Bookings", href: "/bookings" },
   { label: "Agrochemicals", href: "/buy-agrochemicals" },
   { label: "Animal Health", href: "/buy-animal-health" },
   { label: "Animal Feed", href: "/buy-feeds" },
   { label: "Plant Nutrition", href: "/buy-plant-nutrition" },
-  { label: "Plans & Documents", href: "/buy-documents" },
 ]
 
 export function BuyCategoriesNav() {

@@ -9,7 +9,6 @@ const NAV_ITEMS = [
     { label: "Bookings", href: "/account/bookings" },
     { label: "Incoming Bookings", href: "/account/incoming-bookings" },
     { label: "Notifications", href: "/account/notifications" },
-    { label: "Documents", href: "/account/documents" },
     { label: "Profile", href: "/account/profile" },
     { label: "Security", href: "/account/security" },
 ]

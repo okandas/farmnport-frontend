@@ -8,7 +8,6 @@ import { useEffect } from "react"
 const SECTIONS = [
     { label: "Orders", description: "Track your product orders and view order history.", href: "/account/orders" },
     { label: "Bookings", description: "Manage your livestock and delivery bookings.", href: "/account/bookings" },
-    { label: "Documents", description: "Download your purchased plans and documents.", href: "/account/documents" },
     { label: "Profile", description: "Update your name, phone number, and address.", href: "/account/profile" },
     { label: "Security", description: "Change your password and manage account security.", href: "/account/security" },
 ]

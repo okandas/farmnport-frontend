@@ -72,8 +72,8 @@ export default function BookingEventDetailPage() {
     return (
       <div className="min-h-screen flex items-center justify-center text-center">
         <div>
-          <p className="font-semibold text-lg mb-2">Pre-order not found</p>
-          <Link href="/bookings" className="text-sm text-primary underline">Back to pre-orders</Link>
+          <p className="font-semibold text-lg mb-2">Forward booking not found</p>
+          <Link href="/bookings" className="text-sm text-primary underline">Back to forward bookings</Link>
         </div>
       </div>
     )
@@ -103,7 +103,7 @@ export default function BookingEventDetailPage() {
             <span className="mx-2">/</span>
             <Link href="/buy" className="hover:text-foreground">Buy</Link>
             <span className="mx-2">/</span>
-            <Link href="/bookings" className="hover:text-foreground">Pre-Orders</Link>
+            <Link href="/bookings" className="hover:text-foreground">Forward Bookings</Link>
             <span className="mx-2">/</span>
             <span className="text-foreground line-clamp-1">{event.title}</span>
           </nav>
@@ -193,7 +193,7 @@ export default function BookingEventDetailPage() {
 
             {/* How it works */}
             <div className="bg-muted/40 rounded-xl p-5 space-y-3">
-              <h3 className="font-semibold text-sm">How Pre-Orders Work</h3>
+              <h3 className="font-semibold text-sm">How Forward Bookings Work</h3>
               <ol className="space-y-2 text-sm text-muted-foreground list-decimal list-inside">
                 <li>Enter your desired quantity and collection date</li>
                 <li>Pay the deposit to secure your reservation</li>
