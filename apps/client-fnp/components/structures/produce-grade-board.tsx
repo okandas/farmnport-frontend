@@ -143,6 +143,10 @@ export function ProduceGradeBoard({
     name: string
     slug: string
     province: string
+    latest_price_relation?: {
+      effective_date: string
+      price_data: Record<string, { pricing?: { delivered?: number } }>
+    }
   }
   const buyerRelations: BuyerEntry[] = buyersData?.data?.data ?? []
   const buyersTotal: number = buyersData?.data?.total ?? 0
@@ -288,22 +292,36 @@ export function ProduceGradeBoard({
                 <tr className="border-b text-xs text-muted-foreground">
                   <th className="text-left py-2 pr-8 font-medium w-8 tabular-nums">#</th>
                   <th className="text-left py-2 font-medium">Buyer</th>
+                  <th className="text-right py-2 font-medium">Latest Price</th>
                 </tr>
               </thead>
               <tbody>
-                {buyerRelations.map((b, i) => (
+                {buyerRelations.map((b, i) => {
+                  const rel = b.latest_price_relation
+                  const latestDelivered = rel
+                    ? Object.values(rel.price_data ?? {}).find(
+                        (v: any) => v !== null && typeof v === "object" && !Array.isArray(v) && (v?.pricing?.delivered ?? 0) > 0
+                      )?.pricing?.delivered
+                    : undefined
+                  return (
                   <tr key={i} className="border-b border-border/50 last:border-0 hover:bg-muted/40 transition-colors">
                     <td className="py-3 pr-8 text-muted-foreground tabular-nums text-xs">{(buyersPage - 1) * 20 + i + 1}</td>
                     <td className="py-3 pr-8 font-medium text-foreground capitalize">
                       <span className="inline-flex items-center gap-2">
-                        <span className="border border-border text-xs font-mono text-muted-foreground px-1.5 py-0.5 rounded shrink-0">
+                        <span className="inline-flex items-center justify-center border border-border text-xs font-mono text-muted-foreground w-7 h-6 rounded shrink-0">
                           {makeAbbveriation(b.name).toUpperCase().slice(0, 2)}
                         </span>
                         {b.name}
                       </span>
                     </td>
+                    <td className="py-3 text-right tabular-nums text-sm font-semibold">
+                      {latestDelivered
+                        ? <>${toDollars(latestDelivered)}<span className="text-xs font-normal text-muted-foreground">/kg</span></>
+                        : <span className="text-muted-foreground font-normal text-xs">—</span>}
+                    </td>
                   </tr>
-                ))}
+                  )
+                })}
               </tbody>
             </table>
           </div>
