@@ -160,7 +160,7 @@ export function Client({ slug, user }: ClientPageProps) {
                   </p>
                 </div>
                 <Link
-                  href={`/book/${client.name.toLowerCase().replace(/\s+/g, '-')}`}
+                  href={`/book/${slug}`}
                   className="block w-full text-center bg-blue-700 text-white text-sm font-semibold px-4 py-2.5 rounded-lg hover:bg-blue-800 transition-colors"
                 >
                   Book a Sale →
