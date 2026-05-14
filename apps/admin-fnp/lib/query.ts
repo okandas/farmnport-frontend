@@ -1668,3 +1668,49 @@ export function updateDeliveryLocation(id: string, data: Partial<{
 }>) {
   return api.put(`${baseUrl}/booking/admin/client-locations/${id}`, data)
 }
+
+// ── Menus: Restaurant Food Orders ─────────────────────────────────────────────
+
+export function queryMenusOrders(params?: {
+  status?: string
+  type?: string
+  restaurant_id?: string
+  p?: number
+}) {
+  const q = new URLSearchParams()
+  if (params?.status) q.set("status", params.status)
+  if (params?.type) q.set("type", params.type)
+  if (params?.restaurant_id) q.set("restaurant_id", params.restaurant_id)
+  if (params?.p) q.set("p", String(params.p))
+  return api.get(`${baseUrl}/restaurant-orders/admin/list?${q}`)
+}
+
+export function queryMenusOrder(id: string) {
+  return api.get(`${baseUrl}/restaurant-orders/admin/${id}`)
+}
+
+export function updateMenusOrderStatus(id: string, status: string, adminNotes?: string) {
+  return api.put(`${baseUrl}/restaurant-orders/admin/${id}/status`, { status, admin_notes: adminNotes })
+}
+
+// ── Menus: Table Reservations ─────────────────────────────────────────────────
+
+export function queryMenusReservations(params?: {
+  status?: string
+  restaurant_id?: string
+  p?: number
+}) {
+  const q = new URLSearchParams()
+  if (params?.status) q.set("status", params.status)
+  if (params?.restaurant_id) q.set("restaurant_id", params.restaurant_id)
+  if (params?.p) q.set("p", String(params.p))
+  return api.get(`${baseUrl}/table-reservations/admin/list?${q}`)
+}
+
+export function queryMenusReservation(id: string) {
+  return api.get(`${baseUrl}/table-reservations/admin/${id}`)
+}
+
+export function updateMenusReservationStatus(id: string, status: string, adminNotes?: string) {
+  return api.put(`${baseUrl}/table-reservations/admin/${id}/status`, { status, admin_notes: adminNotes })
+}

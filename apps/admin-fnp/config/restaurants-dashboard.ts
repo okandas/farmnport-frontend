@@ -71,6 +71,22 @@ export const restaurantsDashboardConfig: DashboardConfig = {
       ],
     },
     {
+      label: "Ordering",
+      alwaysOpen: true,
+      items: [
+        {
+          title: "Food Orders",
+          href: "/dashboard/restaurants/menus-orders",
+          icon: "shoppingBag",
+        },
+        {
+          title: "Reservations",
+          href: "/dashboard/restaurants/reservations",
+          icon: "calendarCheck",
+        },
+      ],
+    },
+    {
       label: "Subscriptions",
       alwaysOpen: true,
       items: [
