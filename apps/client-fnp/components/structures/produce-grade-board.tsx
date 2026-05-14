@@ -3,8 +3,9 @@
 import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { useQuery } from "@tanstack/react-query"
-import { queryGradeSummary, queryGradeChart, queryClients } from "@/lib/query"
-import { makeAbbveriation } from "@/lib/utilities"
+import { useQueryState } from "nuqs"
+import { queryGradeSummary, queryGradeChart, queryProduceBuyers } from "@/lib/query"
+import { makeAbbveriation, slug } from "@/lib/utilities"
 import { PriceChart } from "@/components/structures/price-chart"
 
 const toDollars = (v: number) => (v / 100).toFixed(2)
@@ -49,13 +50,15 @@ function filterByRange(history: { value: number; date: string }[], range: TimeRa
 
 export function ProduceGradeBoard({
   produce,
-  code,
-  priceType,
+  code: initialCode,
+  priceType: initialPriceType,
 }: {
   produce: string
   code: string
   priceType: string
 }) {
+  const [codeParam, setCodeParam] = useQueryState("code", { defaultValue: initialCode.toLowerCase(), shallow: true })
+  const [typeParam, setTypeParam] = useQueryState("type", { defaultValue: initialPriceType.toLowerCase(), shallow: true })
   const [timeRange, setTimeRange] = useState<TimeRange>("All")
   const [selectedKey, setSelectedKey] = useState<string | null>(null)
   const [chartKey, setChartKey] = useState(0)
@@ -71,8 +74,8 @@ export function ProduceGradeBoard({
   })
 
   const { data: buyersData, status: buyersStatus } = useQuery({
-    queryKey: ["produce-buyers", produce, buyersPage],
-    queryFn: () => queryClients("buyer", { produce: [produce], p: buyersPage }),
+    queryKey: ["produce-buyers", produce, codeParam, typeParam, buyersPage],
+    queryFn: () => queryProduceBuyers(produce, codeParam, typeParam, { p: buyersPage, limit: 10 }),
     enabled: !!produce,
     refetchOnWindowFocus: false,
   })
@@ -95,20 +98,16 @@ export function ProduceGradeBoard({
 
     let match: GradeEntry | undefined
 
-    if (code && priceType) {
-      const typeLabel = priceType === "cdm" ? "Cold Dress Mass" : "Liveweight"
+    if (codeParam && typeParam) {
+      const typeLabel = typeParam === "cdm" ? "Cold Dress Mass" : "Liveweight"
       match = gradeEntries.find(
-        e => e.code.toLowerCase() === code.toLowerCase() && e.price_type === typeLabel
+        e => e.code.toLowerCase() === codeParam.toLowerCase() && e.price_type === typeLabel
       )
-    } else if (code) {
-      match = gradeEntries.find(e => e.code.toLowerCase() === code.toLowerCase())
+    } else if (codeParam) {
+      match = gradeEntries.find(e => e.code.toLowerCase() === codeParam.toLowerCase())
     }
 
     setSelectedKey((match ?? gradeEntries[0]).key)
-
-    if (code || priceType) {
-      window.history.replaceState(null, "", `/prices/${produce}`)
-    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [produce, gradeEntries.length])
 
@@ -138,24 +137,31 @@ export function ProduceGradeBoard({
   })()
 
   type BuyerEntry = {
-    _id: string
-    name: string
-    slug: string
-    province: string
-    latest_price_relation?: {
-      effective_date: string
-      price_data: Record<string, { pricing?: { delivered?: number } }>
-    }
+    client_id: string
+    client_name: string
+    last_active: string
+    grade_delivered_usd: number
+    grade_collected_usd: number
+    has_booking: boolean
   }
   const buyerRelations: BuyerEntry[] = buyersData?.data?.data ?? []
   const buyersTotal: number = buyersData?.data?.total ?? 0
-  const buyersPageCount = Math.ceil(buyersTotal / 20)
+  const buyersPageCount = Math.ceil(buyersTotal / 10)
 
   function handleTypeSwitch(type: string) {
     const first = gradeEntries.find(e => e.price_type === type)
     if (first) { setSelectedKey(first.key); setChartKey(k => k + 1) }
   }
-  function handleGradeSelect(k: string) { setSelectedKey(k); setChartKey(k => k + 1) }
+  function handleGradeSelect(k: string) {
+    setSelectedKey(k)
+    setChartKey(n => n + 1)
+    const entry = gradeEntries.find(e => e.key === k)
+    if (entry) {
+      setCodeParam(entry.code.toLowerCase())
+      setTypeParam(entry.price_type === "Cold Dress Mass" ? "cdm" : "lwt")
+    }
+    setBuyersPage(1)
+  }
   function handleTimeRange(r: TimeRange) { setTimeRange(r); setChartKey(k => k + 1) }
 
   return (
@@ -257,7 +263,7 @@ export function ProduceGradeBoard({
           </div>
 
           {/* chart */}
-          <div>
+          <div style={{ height: 300 }}>
             {chartValues.length > 0 && (
               <PriceChart
                 values={chartValues.length === 1 ? [chartValues[0], chartValues[0]] : chartValues}
@@ -280,45 +286,63 @@ export function ProduceGradeBoard({
         {/* ── buyers section ── */}
         <div id="section-buyers" ref={buyersRef} className="px-4 md:px-8 py-8">
         <p className="text-lg font-semibold text-foreground mb-4">{produceName} Buyers</p>
-        {buyersStatus === "pending" ? null : buyerRelations.length === 0 ? (
+        {buyersStatus === "pending" ? (
+          <div className="space-y-3">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="flex items-center gap-3 py-3 border-b border-border/50 last:border-0">
+                <div className="w-6 h-4 bg-muted rounded animate-pulse shrink-0" />
+                <div className="w-7 h-6 bg-muted rounded animate-pulse shrink-0" />
+                <div className="h-4 bg-muted rounded animate-pulse flex-1 max-w-[140px]" />
+                <div className="h-4 bg-muted rounded animate-pulse w-14 ml-auto" />
+                <div className="h-4 bg-muted rounded animate-pulse w-14" />
+                <div className="h-4 bg-muted rounded animate-pulse w-14" />
+              </div>
+            ))}
+          </div>
+        ) : buyerRelations.length === 0 ? (
           <p className="text-sm text-muted-foreground">No buyers listed for this produce yet.</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b text-xs text-muted-foreground">
-                  <th className="text-left py-2 pr-8 font-medium w-8 tabular-nums">#</th>
+                  <th className="text-left py-2 pr-4 font-medium w-8 tabular-nums">#</th>
                   <th className="text-left py-2 font-medium">Buyer</th>
-                  <th className="text-right py-2 font-medium">Latest Price</th>
+                  <th className="text-left py-2 pl-2 font-medium">Collected</th>
+                  <th className="text-left py-2 pl-2 font-medium">Delivered</th>
+                  <th className="text-left py-2 pl-2 font-medium">Sell</th>
                 </tr>
               </thead>
               <tbody>
-                {buyerRelations.map((b, i) => {
-                  const rel = b.latest_price_relation
-                  const latestDelivered = rel
-                    ? Object.values(rel.price_data ?? {}).find(
-                        (v: any) => v !== null && typeof v === "object" && !Array.isArray(v) && (v?.pricing?.delivered ?? 0) > 0
-                      )?.pricing?.delivered
-                    : undefined
-                  return (
-                  <tr key={i} className="border-b border-border/50 last:border-0 hover:bg-muted/40 transition-colors">
-                    <td className="py-3 pr-8 text-muted-foreground tabular-nums text-xs">{(buyersPage - 1) * 20 + i + 1}</td>
-                    <td className="py-3 pr-8 font-medium text-foreground capitalize">
+                {buyerRelations.map((b, i) => (
+                  <tr key={b.client_id} className="border-b border-border/50 last:border-0 hover:bg-muted/40 transition-colors">
+                    <td className="py-3 pr-4 text-muted-foreground tabular-nums text-xs">{(buyersPage - 1) * 10 + i + 1}</td>
+                    <td className="py-3 font-medium text-foreground capitalize">
                       <span className="inline-flex items-center gap-2">
                         <span className="inline-flex items-center justify-center border border-border text-xs font-mono text-muted-foreground w-7 h-6 rounded shrink-0">
-                          {makeAbbveriation(b.name).toUpperCase().slice(0, 2)}
+                          {makeAbbveriation(b.client_name).toUpperCase().slice(0, 2)}
                         </span>
-                        {b.name}
+                        <Link href={`/buyer/${slug(b.client_name)}`} className="hover:underline">{b.client_name}</Link>
                       </span>
                     </td>
-                    <td className="py-3 text-right tabular-nums text-sm font-semibold">
-                      {latestDelivered
-                        ? <>${toDollars(latestDelivered)}<span className="text-xs font-normal text-muted-foreground">/kg</span></>
+                    <td className="py-3 pl-2 tabular-nums text-sm font-semibold">
+                      {b.grade_collected_usd > 0
+                        ? <>${toDollars(b.grade_collected_usd)}<span className="text-xs font-normal text-muted-foreground">/kg</span></>
                         : <span className="text-muted-foreground font-normal text-xs">—</span>}
                     </td>
+                    <td className="py-3 pl-2 tabular-nums text-sm font-semibold">
+                      {b.grade_delivered_usd > 0
+                        ? <>${toDollars(b.grade_delivered_usd)}<span className="text-xs font-normal text-muted-foreground">/kg</span></>
+                        : <span className="text-muted-foreground font-normal text-xs">—</span>}
+                    </td>
+                    <td className="py-3 pl-2">
+                      {b.has_booking
+                        ? <Link href={`/book/${slug(b.client_name)}`} className="text-xs font-medium text-primary hover:underline whitespace-nowrap">Book Now</Link>
+                        : <Link href={`/buyer/${slug(b.client_name)}`} className="text-xs font-medium text-muted-foreground hover:text-foreground hover:underline whitespace-nowrap">Contact</Link>
+                      }
+                    </td>
                   </tr>
-                  )
-                })}
+                ))}
               </tbody>
             </table>
           </div>
