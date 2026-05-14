@@ -70,12 +70,11 @@ export function ProduceGradeBoard({
     refetchOnWindowFocus: false,
   })
 
-  const { data: buyersData, status: buyersStatus, error: buyersError } = useQuery({
+  const { data: buyersData, status: buyersStatus } = useQuery({
     queryKey: ["produce-buyers", produce, buyersPage],
-    queryFn: () => { console.log("[buyers query] firing for", produce); return queryClients("buyer", { produce: [produce], p: buyersPage }) },
+    queryFn: () => queryClients("buyer", { produce: [produce], p: buyersPage }),
     enabled: !!produce,
     refetchOnWindowFocus: false,
-    retry: false,
   })
 
   const allEntries: GradeEntry[] = gradeSummaryData?.data?.data ?? []
@@ -281,9 +280,7 @@ export function ProduceGradeBoard({
         {/* ── buyers section ── */}
         <div id="section-buyers" ref={buyersRef} className="px-4 md:px-8 py-8">
         <p className="text-lg font-semibold text-foreground mb-4">{produceName} Buyers</p>
-        {buyersStatus === "pending" ? <p className="text-sm text-muted-foreground">Loading... (status: {buyersStatus})</p> : buyersStatus === "error" ? (
-          <p className="text-sm text-red-500">Error: {String(buyersError)}</p>
-        ) : buyerRelations.length === 0 ? (
+        {buyersStatus === "pending" ? null : buyerRelations.length === 0 ? (
           <p className="text-sm text-muted-foreground">No buyers listed for this produce yet.</p>
         ) : (
           <div className="overflow-x-auto">
