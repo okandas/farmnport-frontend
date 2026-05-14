@@ -60,6 +60,8 @@ import {
   BarChart3,
   Eye,
   MapPin,
+  ShoppingBag,
+  CalendarCheck,
 } from "lucide-react"
 
 export type Icon = LucideIcon
@@ -128,4 +130,6 @@ export const Icons = {
   barChart: BarChart3,
   eye: Eye,
   mapPin: MapPin,
+  shoppingBag: ShoppingBag,
+  calendarCheck: CalendarCheck,
 }
