@@ -2,13 +2,15 @@ import axios, { InternalAxiosRequestConfig } from "axios"
 import { toast } from "sonner"
 
 import { PaginationModel, ResetFormData, LoginFormData, SignUpFormData, BaseURL, FeatureFlags } from "@/lib/schemas"
-import { retrieveToken, logoutUser } from "@/lib/actions"
+import { getSession } from "next-auth/react"
+import { logoutUser } from "@/lib/actions"
 
 let api = axios.create({})
 
 api.interceptors.request.use(async(config: InternalAxiosRequestConfig) => {
 
-    const token = await retrieveToken()
+    const session = await getSession()
+    const token = (session as any)?.access_token
 
     if (token) {
         config.headers["Authorization"] = `Bearer ${token}`
