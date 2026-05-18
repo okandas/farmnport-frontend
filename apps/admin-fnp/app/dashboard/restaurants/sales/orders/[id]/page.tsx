@@ -135,7 +135,7 @@ function getNextActions(
       break
   }
 
-  if (status !== "delivered" && status !== "cancelled") {
+  if (status !== "delivered" && status !== "collected" && status !== "cancelled") {
     actions.push({ label: "Cancel Order", status: "cancelled", variant: "destructive" })
   }
 
@@ -445,7 +445,7 @@ export default function RestaurantOrderDetailPage() {
       )}
 
       {/* Cancel for non-pending, non-terminal */}
-      {order.status !== "pending" && order.status !== "delivered" && order.status !== "cancelled" && (
+      {order.status !== "pending" && order.status !== "delivered" && order.status !== "collected" && order.status !== "cancelled" && (
         <div className="flex gap-2 pt-4 border-t">
           <Button
             variant="destructive"

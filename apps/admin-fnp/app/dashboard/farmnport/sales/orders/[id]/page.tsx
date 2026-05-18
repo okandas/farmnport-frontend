@@ -131,7 +131,7 @@ function getNextActions(
       break
   }
 
-  if (status !== "delivered" && status !== "cancelled") {
+  if (status !== "delivered" && status !== "collected" && status !== "cancelled") {
     actions.push({ label: "Cancel Order", status: "cancelled", variant: "destructive" })
   }
 
