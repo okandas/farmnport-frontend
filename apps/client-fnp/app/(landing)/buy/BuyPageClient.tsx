@@ -174,24 +174,24 @@ function Section({ label, href, children, count }: {
 // ── Main client component ─────────────────────────────────────────────────────
 
 interface BuyPageClientProps {
-  agrochemicals: any[]
-  agrochemicalTotal: number
-  animalHealth: any[]
-  animalHealthTotal: number
-  feeds: any[]
-  feedsTotal: number
-  plantNutrition: any[]
-  plantNutritionTotal: number
-  documents: any[]
-  documentsTotal: number
+  agrochemicals?: any[]
+  agrochemicalTotal?: number
+  animalHealth?: any[]
+  animalHealthTotal?: number
+  feeds?: any[]
+  feedsTotal?: number
+  plantNutrition?: any[]
+  plantNutritionTotal?: number
+  documents?: any[]
+  documentsTotal?: number
 }
 
 export function BuyPageClient({
-  agrochemicals, agrochemicalTotal,
-  animalHealth, animalHealthTotal,
-  feeds, feedsTotal,
-  plantNutrition, plantNutritionTotal,
-  documents, documentsTotal,
+  agrochemicals = [], agrochemicalTotal = 0,
+  animalHealth = [], animalHealthTotal = 0,
+  feeds = [], feedsTotal = 0,
+  plantNutrition = [], plantNutritionTotal = 0,
+  documents = [], documentsTotal = 0,
 }: BuyPageClientProps) {
   return (
     <div className="mx-auto max-w-7xl px-4 lg:px-8 py-8">

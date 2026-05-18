@@ -225,6 +225,26 @@ export const dashboardConfig: DashboardConfig = {
       ],
     },
     {
+      label: "Livestock & Poultry",
+      items: [
+        {
+          title: "Products",
+          href: "/dashboard/farmnport/livestock-poultry",
+          icon: "productSearch",
+        },
+      ],
+    },
+    {
+      label: "Seed Products",
+      items: [
+        {
+          title: "Products",
+          href: "/dashboard/farmnport/seed-products",
+          icon: "productSearch",
+        },
+      ],
+    },
+    {
       label: "Programs",
       items: [
         {

@@ -17,6 +17,7 @@ const STATUS_STYLES: Record<string, string> = {
   dispatched: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400",
   ready:      "bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-400",
   delivered:  "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
+  collected:  "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
   cancelled:  "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
 }
 
@@ -27,11 +28,12 @@ const STATUS_ICONS: Record<string, React.ReactNode> = {
   dispatched: <Truck className="w-3.5 h-3.5" />,
   ready:      <CheckCircle2 className="w-3.5 h-3.5" />,
   delivered:  <CheckCircle2 className="w-3.5 h-3.5" />,
+  collected:  <CheckCircle2 className="w-3.5 h-3.5" />,
   cancelled:  <XCircle className="w-3.5 h-3.5" />,
 }
 
 const STATUS_STEPS_DELIVERY = ["pending", "paid", "processing", "dispatched", "delivered"]
-const STATUS_STEPS_COLLECT  = ["pending", "paid", "processing", "ready", "delivered"]
+const STATUS_STEPS_COLLECT  = ["pending", "paid", "processing", "ready", "collected"]
 
 function formatDate(d: string) {
   return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })
@@ -312,7 +314,7 @@ export default function OrderDetailPage() {
               <p className="text-sm text-muted-foreground">Collect in person</p>
             )}
             {order.delivered_at && (
-              <p className="text-xs text-green-700 dark:text-green-400">Delivered {formatDate(order.delivered_at)}</p>
+              <p className="text-xs text-green-700 dark:text-green-400">{order.fulfillment === "click_collect" ? "Collected" : "Delivered"} {formatDate(order.delivered_at)}</p>
             )}
           </div>
 

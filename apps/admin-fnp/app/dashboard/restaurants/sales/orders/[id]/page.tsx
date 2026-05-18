@@ -35,7 +35,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 
 const STATUS_STEPS = ["pending", "paid", "processing", "dispatched", "delivered"]
-const STATUS_STEPS_COLLECT = ["pending", "paid", "processing", "ready", "delivered"]
+const STATUS_STEPS_COLLECT = ["pending", "paid", "processing", "ready", "collected"]
 
 const STATUS_COLORS: Record<string, string> = {
   pending: "bg-yellow-100 text-yellow-800",
@@ -44,6 +44,7 @@ const STATUS_COLORS: Record<string, string> = {
   dispatched: "bg-indigo-100 text-indigo-800",
   ready: "bg-teal-100 text-teal-800",
   delivered: "bg-green-100 text-green-800",
+  collected: "bg-green-100 text-green-800",
   cancelled: "bg-red-100 text-red-800",
 }
 
@@ -54,6 +55,7 @@ const STATUS_ICONS: Record<string, React.ReactNode> = {
   dispatched: <Truck className="h-4 w-4" />,
   ready: <CheckCircle2 className="h-4 w-4" />,
   delivered: <CheckCircle2 className="h-4 w-4" />,
+  collected: <CheckCircle2 className="h-4 w-4" />,
   cancelled: <XCircle className="h-4 w-4" />,
 }
 
@@ -126,8 +128,10 @@ function getNextActions(
       }
       break
     case "dispatched":
-    case "ready":
       actions.push({ label: "Mark Delivered", status: "delivered", variant: "default" })
+      break
+    case "ready":
+      actions.push({ label: "Mark Collected", status: "collected", variant: "default" })
       break
   }
 

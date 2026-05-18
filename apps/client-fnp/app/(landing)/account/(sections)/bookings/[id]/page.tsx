@@ -73,11 +73,9 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
   const booking = (data as any)?.booking
   if (!booking) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center space-y-2">
-          <p className="font-semibold">Booking not found</p>
-          <Link href="/account/bookings" className="text-sm text-primary underline">Back to bookings</Link>
-        </div>
+      <div className="py-20 text-center space-y-2">
+        <p className="font-semibold">Booking not found</p>
+        <Link href="/account/bookings" className="text-sm text-primary underline">Back to bookings</Link>
       </div>
     )
   }
