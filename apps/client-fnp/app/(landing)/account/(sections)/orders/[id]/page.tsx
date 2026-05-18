@@ -114,8 +114,8 @@ export default function OrderDetailPage() {
 
   if (!session) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center space-y-4">
+      <div className="py-16 flex items-center justify-center">
+        <div className="text-center space-y-3">
           <Package className="w-12 h-12 mx-auto text-muted-foreground/40" />
           <p className="font-semibold">Sign in to view your order</p>
           <Link
