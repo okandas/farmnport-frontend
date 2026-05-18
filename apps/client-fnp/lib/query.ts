@@ -611,6 +611,7 @@ export function getCart() {
 
 export function addToCart(item: {
   product_id: string
+  sku?: string
   product_type: string
   product_name: string
   product_slug: string
@@ -622,12 +623,12 @@ export function addToCart(item: {
   return api.post(`${BaseURL}/cart/add`, item)
 }
 
-export function updateCartItem(product_id: string, quantity: number) {
-  return api.post(`${BaseURL}/cart/update`, { product_id, quantity })
+export function updateCartItem(product_id: string, quantity: number, sku?: string) {
+  return api.post(`${BaseURL}/cart/update`, { product_id, quantity, sku: sku ?? "" })
 }
 
-export function removeFromCart(product_id: string) {
-  return api.post(`${BaseURL}/cart/remove`, { product_id })
+export function removeFromCart(product_id: string, sku?: string) {
+  return api.post(`${BaseURL}/cart/remove`, { product_id, sku: sku ?? "" })
 }
 
 export function clearCart() {
@@ -771,4 +772,32 @@ export function queryAllDocuments(pagination?: { p?: number; category?: string }
 
 export function queryDocument(slug: string) {
   return api.get(`${BaseURL}/documents/${slug}`)
+}
+
+// ── Livestock & Poultry ───────────────────────────────────────────────────────
+
+export function queryAllLivestockPoultryProducts(pagination?: { p?: number; brand?: string[] }) {
+  const params = new URLSearchParams()
+  if (pagination?.p && pagination.p >= 2) params.set('p', pagination.p.toString())
+  pagination?.brand?.forEach(b => params.append('brand', b))
+  const qs = params.toString()
+  return api.get(qs ? `${BaseURL}/livestock-poultry/all?${qs}` : `${BaseURL}/livestock-poultry/all`)
+}
+
+export function queryLivestockPoultryProduct(slug: string) {
+  return api.get(`${BaseURL}/livestock-poultry/${slug}`)
+}
+
+// ── Seed Products ─────────────────────────────────────────────────────────────
+
+export function queryAllSeedProducts(pagination?: { p?: number; brand?: string[] }) {
+  const params = new URLSearchParams()
+  if (pagination?.p && pagination.p >= 2) params.set('p', pagination.p.toString())
+  pagination?.brand?.forEach(b => params.append('brand', b))
+  const qs = params.toString()
+  return api.get(qs ? `${BaseURL}/seed-products/all?${qs}` : `${BaseURL}/seed-products/all`)
+}
+
+export function querySeedProduct(slug: string) {
+  return api.get(`${BaseURL}/seed-products/${slug}`)
 }

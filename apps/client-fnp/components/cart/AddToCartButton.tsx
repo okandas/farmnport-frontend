@@ -8,10 +8,11 @@ import { toast } from "sonner"
 import { addToCart, getCart, updateCartItem, removeFromCart } from "@/lib/query"
 import { useCart } from "@/contexts/cart-context"
 
-export type CartProductType = "agrochemical" | "feed" | "animal_health" | "plant_nutrition" | "document"
+export type CartProductType = "agrochemical" | "feed" | "animal_health" | "plant_nutrition" | "document" | "livestock_poultry" | "seed_product"
 
 interface AddToCartButtonProps {
   productId: string
+  sku?: string
   productType: CartProductType
   productName: string
   productSlug: string
@@ -23,6 +24,7 @@ interface AddToCartButtonProps {
 
 export function AddToCartButton({
   productId,
+  sku,
   productType,
   productName,
   productSlug,
@@ -43,7 +45,9 @@ export function AddToCartButton({
     staleTime: 0,
   })
 
-  const cartItem = (cartData as any)?.items?.find((i: any) => i.product_id === productId)
+  const cartItem = (cartData as any)?.items?.find((i: any) =>
+    i.product_id === productId && (i.sku ?? "") === (sku ?? "")
+  )
   const cartQty: number = cartItem?.quantity ?? 0
 
   const addMutation = useMutation({
@@ -57,7 +61,7 @@ export function AddToCartButton({
 
   const updateMutation = useMutation({
     mutationFn: ({ qty }: { qty: number }) =>
-      qty < 1 ? removeFromCart(productId) : updateCartItem(productId, qty),
+      qty < 1 ? removeFromCart(productId, sku) : updateCartItem(productId, qty, sku),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["cart"] }),
     onError: () => toast.error("Failed to update cart"),
   })
@@ -75,6 +79,7 @@ export function AddToCartButton({
     }
     addMutation.mutate({
       product_id: productId,
+      sku,
       product_type: productType,
       product_name: productName,
       product_slug: productSlug,
