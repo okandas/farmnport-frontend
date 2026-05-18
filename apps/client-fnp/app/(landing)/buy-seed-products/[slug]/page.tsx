@@ -1,6 +1,5 @@
 import { querySeedProduct } from "@/lib/query"
 import Link from "next/link"
-import { Sprout } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { BuyProductInteractive } from "@/components/shop/BuyProductInteractive"
 
@@ -158,7 +157,6 @@ export default async function BuySeedProductPage({ params }: Props) {
                     brandHref={product.brand ? `/buy-seed-products?brand=${product.brand.id}` : undefined}
                     shopHref="/buy-seed-products"
                     loginRedirect={`/buy-seed-products/${slug}`}
-                    fallbackIcon={<Sprout className="w-28 h-28 text-muted-foreground/20" />}
                     tabsContent={tabsContent}
                 />
             </div>
