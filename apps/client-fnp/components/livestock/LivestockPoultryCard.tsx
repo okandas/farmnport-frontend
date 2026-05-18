@@ -2,7 +2,6 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { Egg } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { AddToCartButton } from "@/components/cart/AddToCartButton"
 
@@ -28,9 +27,7 @@ export function LivestockPoultryCard({ product, mode }: LivestockPoultryCardProp
               className="object-contain transition-transform duration-200 group-hover:scale-105"
             />
           ) : (
-            <div className="absolute inset-0 flex items-center justify-center bg-muted/30">
-              <Egg className="w-16 h-16 text-muted-foreground/20" />
-            </div>
+            <div className="absolute inset-0 bg-muted/30" />
           )}
         </div>
       </Link>

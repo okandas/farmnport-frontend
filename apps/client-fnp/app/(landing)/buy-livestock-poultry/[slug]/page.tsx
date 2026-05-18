@@ -1,6 +1,5 @@
 import { queryLivestockPoultryProduct } from "@/lib/query"
 import Link from "next/link"
-import { Egg } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { BuyProductInteractive } from "@/components/shop/BuyProductInteractive"
 
@@ -155,7 +154,6 @@ export default async function BuyLivestockPoultryProductPage({ params }: Props) 
                     brandHref={product.brand ? `/buy-livestock-poultry?brand=${product.brand.id}` : undefined}
                     shopHref="/buy-livestock-poultry"
                     loginRedirect={`/buy-livestock-poultry/${slug}`}
-                    fallbackIcon={<Egg className="w-28 h-28 text-muted-foreground/20" />}
                     tabsContent={tabsContent}
                 />
             </div>
