@@ -1051,6 +1051,11 @@ export function queryRecentNotifications() {
   return api.get(url)
 }
 
+export function queryNotificationsList(page: number) {
+  const url = `${baseUrl}/admin-notifications/list?p=${page}`
+  return api.get(url)
+}
+
 export function markNotificationsRead(data: { ids?: string[]; all?: boolean }) {
   const url = `${baseUrl}/user/notifications/mark-read`
   return api.post(url, data)

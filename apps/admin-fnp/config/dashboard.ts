@@ -41,17 +41,17 @@ export const dashboardConfig: DashboardConfig = {
           href: "/dashboard/farmnport/sales",
           icon: "barChart",
         },
+        {
+          title: "Sales Orders",
+          href: "/dashboard/farmnport/orders/sales",
+          icon: "shoppingCart",
+        },
       ],
     },
     {
       label: "Orders",
       alwaysOpen: true,
       items: [
-        {
-          title: "Sales Orders",
-          href: "/dashboard/farmnport/orders/sales",
-          icon: "shoppingCart",
-        },
         {
           title: "Bookings",
           href: "/dashboard/farmnport/orders/bookings",
