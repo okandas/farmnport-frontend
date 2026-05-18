@@ -12,6 +12,7 @@ import Link from "next/link"
 
 import { getCart, checkout, pollOrderStatus } from "@/lib/query"
 import { AuthenticatedUser } from "@/lib/schemas"
+import { centsToDollars } from "@/lib/utilities"
 
 const PROVINCES = [
   "Harare", "Bulawayo", "Manicaland", "Mashonaland Central",
@@ -92,7 +93,7 @@ export default function CheckoutPage() {
   })
 
   const items: CartItem[] = cartData?.items ?? []
-  const subtotal = items.reduce((s, i) => s + (i.unit_price * i.quantity) / 100, 0)
+  const subtotalCents = items.reduce((s, i) => s + (i.unit_price * i.quantity), 0)
 
   const checkoutMutation = useMutation({
     mutationFn: checkout,
@@ -475,7 +476,7 @@ export default function CheckoutPage() {
                         <p className="text-sm font-medium capitalize truncate">{item.product_name}</p>
                         <p className="text-xs text-muted-foreground">Qty {item.quantity}</p>
                       </div>
-                      <p className="text-sm font-semibold shrink-0">${((item.unit_price * item.quantity) / 100).toFixed(2)}</p>
+                      <p className="text-sm font-semibold shrink-0">{centsToDollars(item.unit_price * item.quantity)}</p>
                     </div>
                   ))}
                 </div>
@@ -484,7 +485,7 @@ export default function CheckoutPage() {
                 <div className="px-5 py-4 border-t">
                   <div className="flex justify-between font-bold text-base">
                     <span>Total</span>
-                    <span>${subtotal.toFixed(2)}</span>
+                    <span>{centsToDollars(subtotalCents)}</span>
                   </div>
                 </div>
 
@@ -500,7 +501,7 @@ export default function CheckoutPage() {
                     ) : (
                       <CreditCard className="w-4 h-4" />
                     )}
-                    Place Order · ${subtotal.toFixed(2)}
+                    Place Order · {centsToDollars(subtotalCents)}
                   </button>
                 </div>
               </div>

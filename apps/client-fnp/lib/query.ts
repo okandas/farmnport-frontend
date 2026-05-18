@@ -134,6 +134,7 @@ export function queryGradeChart(produce: string, code: string) {
   return api.get(`${BaseURL}/prices/grade-chart/${produce.toLowerCase()}/${code.toLowerCase()}`)
 }
 
+
 export function queryProducerPriceLists(pagination?: PaginationModel) {
   const params = new URLSearchParams()
   if (pagination?.p !== undefined && pagination.p >= 2) {
@@ -172,8 +173,10 @@ export function queryPriceFilterAggregates() {
   return api.get(url)
 }
 
-export function queryProduceBuyers(produceSlug: string, pagination?: PaginationModel) {
+export function queryProduceBuyers(produceSlug: string, code: string, type: string, pagination?: PaginationModel) {
   const params = new URLSearchParams()
+  if (code) params.set("code", code.toLowerCase())
+  if (type) params.set("type", type.toLowerCase())
   if (pagination?.p !== undefined && pagination.p >= 2) params.set("p", String(pagination.p))
   if (pagination?.limit) params.set("limit", String(pagination.limit))
   const qs = params.toString()
@@ -661,6 +664,10 @@ export function myOrders(page?: number) {
 
 export function getOrder(id: string) {
   return api.get(`${BaseURL}/order/${id}`)
+}
+
+export function retryOrderPayment(id: string) {
+  return api.post(`${BaseURL}/order/${id}/pay`, {})
 }
 
 // Bookings

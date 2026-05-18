@@ -16,6 +16,7 @@ import {
 
 import { useCart } from "@/contexts/cart-context"
 import { getCart, removeFromCart, updateCartItem } from "@/lib/query"
+import { centsToDollars } from "@/lib/utilities"
 
 interface CartItem {
   product_id: string
@@ -58,7 +59,7 @@ export function CartDrawer() {
   })
 
   const items: CartItem[] = cartData?.items ?? []
-  const subtotal = items.reduce((sum, i) => sum + (i.unit_price * i.quantity) / 100, 0)
+  const subtotalCents = items.reduce((sum, i) => sum + (i.unit_price * i.quantity), 0)
 
   return (
     <Sheet open={isOpen} onOpenChange={(open) => !open && closeCart()}>
@@ -146,7 +147,7 @@ export function CartDrawer() {
                       {item.product_type.replace("_", " ")}
                     </p>
                     <p className="text-sm font-bold mt-1">
-                      ${((item.unit_price * item.quantity) / 100).toFixed(2)}
+                      {centsToDollars(item.unit_price * item.quantity)}
                     </p>
 
                     {/* Qty controls */}
@@ -198,14 +199,14 @@ export function CartDrawer() {
           <div className="border-t px-6 py-4 space-y-3">
             <div className="flex justify-between font-bold text-base text-sm">
               <span>Total</span>
-              <span>${subtotal.toFixed(2)}</span>
+              <span>{centsToDollars(subtotalCents)}</span>
             </div>
             <Link
               href="/checkout"
               onClick={closeCart}
               className="block w-full text-center bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-sm py-3 rounded-full transition-colors"
             >
-              Checkout · ${subtotal.toFixed(2)}
+              Checkout · {centsToDollars(subtotalCents)}
             </Link>
           </div>
         )}
