@@ -14,7 +14,6 @@ const CATEGORIES = [
   { id: "animal-health", label: "Animal Health", href: "/buy-animal-health" },
   { id: "animal-feed", label: "Animal Feed", href: "/buy-feeds" },
   { id: "plant-nutrition", label: "Plant Nutrition", href: "/buy-plant-nutrition" },
-  { id: "documents", label: "Plans & Documents", href: "/buy-documents" },
 ]
 
 // ── Shared product card — matches AgroChemicalCard guide size exactly ─────────
