@@ -159,7 +159,6 @@ const [mounted, setMounted] = useState(false)
                           ${vp.toFixed(2)}
                         </p>
                       )}
-                      {v.quantity > 0 && <p className="text-xs text-muted-foreground mt-0.5">{v.quantity} avail.</p>}
                     </button>
                   )
                 })}

@@ -56,31 +56,40 @@ function PlantNutritionShopCard({ product }: { product: any }) {
                     </div>
                 </div>
 
-                <div className="flex items-baseline gap-2 h-7">
+                <div>
                     {(() => {
                         const hasVariants = product.variants?.length > 0
-                        const lowestVariant = hasVariants
-                            ? Math.min(...product.variants.filter((v: any) => v.sale_price > 0).map((v: any) => v.sale_price))
-                            : null
+                        const variantPrices = hasVariants
+                            ? product.variants.filter((v: any) => v.sale_price > 0).map((v: any) => v.sale_price)
+                            : []
+                        const lowestVariant = variantPrices.length > 0 ? Math.min(...variantPrices) : null
+                        const highestVariant = variantPrices.length > 0 ? Math.max(...variantPrices) : null
                         if (product.show_price && product.sale_price > 0) {
                             return (
-                                <>
+                                <div className="flex items-baseline gap-2">
                                     <span className="text-lg font-bold">${(product.sale_price / 100).toFixed(2)}</span>
                                     {product.was_price > 0 && product.was_price > product.sale_price && (
                                         <span className="text-xs text-muted-foreground line-through">${(product.was_price / 100).toFixed(2)}</span>
                                     )}
-                                </>
+                                </div>
                             )
                         }
                         if (lowestVariant) {
-                            return <span className="text-lg font-bold">From ${(lowestVariant / 100).toFixed(2)}</span>
+                            return (
+                                <div className="flex flex-col gap-0.5">
+                                    <span className="text-lg font-bold">${(lowestVariant / 100).toFixed(2)}</span>
+                                    <span className="text-xs text-muted-foreground">
+                                        Options · From ${(lowestVariant / 100).toFixed(2)}{highestVariant && highestVariant !== lowestVariant ? ` – $${(highestVariant / 100).toFixed(2)}` : ""}
+                                    </span>
+                                </div>
+                            )
                         }
                         return <span className="text-sm text-muted-foreground">Price on request</span>
                     })()}
                 </div>
                 {product.variants?.length > 0 ? (
                     <Link href={href} className="flex items-center justify-center w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium text-sm h-9 px-3 rounded-md transition-colors mt-3">
-                        Select Size
+                        Options
                     </Link>
                 ) : (
                     <AddToCartButton
