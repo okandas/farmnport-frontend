@@ -47,7 +47,7 @@ export default function OrdersPage() {
 
   if (status === "loading" || isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex items-center justify-center py-24">
         <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
       </div>
     )
@@ -55,7 +55,7 @@ export default function OrdersPage() {
 
   if (!session) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex items-center justify-center py-24">
         <div className="text-center space-y-4">
           <Package className="w-12 h-12 mx-auto text-muted-foreground/40" />
           <p className="font-semibold">Sign in to view your orders</p>

@@ -18,7 +18,8 @@ import {signOut} from "next-auth/react";
 import { ShoppingCart } from "lucide-react";
 import { useCart } from "@/contexts/cart-context";
 import { useQuery } from "@tanstack/react-query";
-import { getCart, countBookingNotifications } from "@/lib/query";
+import { getCart, countBookingNotifications } from "@/lib/query"
+import { centsToDollars } from "@/lib/utilities";
 
 
 interface MobileNavProps {
@@ -36,7 +37,7 @@ export function MobileNav({ user }: MobileNavProps) {
     })
     const cartItems: any[] = (cartData as any)?.items ?? []
     const cartCount: number = cartItems.length
-    const cartTotal: number = cartItems.reduce((s: number, i: any) => s + (i.unit_price * i.quantity) / 100, 0)
+    const cartTotalCents: number = cartItems.reduce((s: number, i: any) => s + (i.unit_price * i.quantity), 0)
 
     const { data: notifData } = useQuery({
       queryKey: ["booking-notifications-count"],
@@ -76,7 +77,7 @@ export function MobileNav({ user }: MobileNavProps) {
              <ShoppingCart className="w-4 h-4" />
              <span>{cartCount}</span>
              <span className="opacity-70">·</span>
-             <span>${cartTotal.toFixed(2)}</span>
+             <span>{centsToDollars(cartTotalCents)}</span>
            </button>
          ) : (
            <button

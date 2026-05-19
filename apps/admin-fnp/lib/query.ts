@@ -1051,6 +1051,11 @@ export function queryRecentNotifications() {
   return api.get(url)
 }
 
+export function queryNotificationsList(page: number) {
+  const url = `${baseUrl}/admin-notifications/list?p=${page}`
+  return api.get(url)
+}
+
 export function markNotificationsRead(data: { ids?: string[]; all?: boolean }) {
   const url = `${baseUrl}/user/notifications/mark-read`
   return api.post(url, data)
@@ -1669,48 +1674,50 @@ export function updateDeliveryLocation(id: string, data: Partial<{
   return api.put(`${baseUrl}/booking/admin/client-locations/${id}`, data)
 }
 
-// ── Menus: Restaurant Food Orders ─────────────────────────────────────────────
-
-export function queryMenusOrders(params?: {
-  status?: string
-  type?: string
-  restaurant_id?: string
-  p?: number
-}) {
-  const q = new URLSearchParams()
-  if (params?.status) q.set("status", params.status)
-  if (params?.type) q.set("type", params.type)
-  if (params?.restaurant_id) q.set("restaurant_id", params.restaurant_id)
-  if (params?.p) q.set("p", String(params.p))
-  return api.get(`${baseUrl}/restaurant-orders/admin/list?${q}`)
+// Livestock Poultry
+export function queryLivestockPoultryProducts(pagination?: pagination) {
+  let url = `${baseUrl}/user/livestock-poultry`
+  if (pagination?.p !== undefined && pagination.p >= 2) {
+    url = `${baseUrl}/user/livestock-poultry?p=${pagination.p}`
+  }
+  if (pagination?.search !== undefined && pagination.search.length >= 2) {
+    url = `${baseUrl}/user/livestock-poultry?search=${pagination.search}`
+  }
+  return api.get(url)
 }
 
-export function queryMenusOrder(id: string) {
-  return api.get(`${baseUrl}/restaurant-orders/admin/${id}`)
+export function queryLivestockPoultryProduct(id: string) {
+  return api.get(`${baseUrl}/user/livestock-poultry/${id}`)
 }
 
-export function updateMenusOrderStatus(id: string, status: string, adminNotes?: string) {
-  return api.put(`${baseUrl}/restaurant-orders/admin/${id}/status`, { status, admin_notes: adminNotes })
+export function addLivestockPoultryProduct(data: any) {
+  return api.post(`${baseUrl}/user/livestock-poultry/add`, data)
 }
 
-// ── Menus: Table Reservations ─────────────────────────────────────────────────
-
-export function queryMenusReservations(params?: {
-  status?: string
-  restaurant_id?: string
-  p?: number
-}) {
-  const q = new URLSearchParams()
-  if (params?.status) q.set("status", params.status)
-  if (params?.restaurant_id) q.set("restaurant_id", params.restaurant_id)
-  if (params?.p) q.set("p", String(params.p))
-  return api.get(`${baseUrl}/table-reservations/admin/list?${q}`)
+export function updateLivestockPoultryProduct(data: any) {
+  return api.post(`${baseUrl}/user/livestock-poultry/update`, data)
 }
 
-export function queryMenusReservation(id: string) {
-  return api.get(`${baseUrl}/table-reservations/admin/${id}`)
+// Seed Products
+export function querySeedProducts(pagination?: pagination) {
+  let url = `${baseUrl}/user/seed-products`
+  if (pagination?.p !== undefined && pagination.p >= 2) {
+    url = `${baseUrl}/user/seed-products?p=${pagination.p}`
+  }
+  if (pagination?.search !== undefined && pagination.search.length >= 2) {
+    url = `${baseUrl}/user/seed-products?search=${pagination.search}`
+  }
+  return api.get(url)
 }
 
-export function updateMenusReservationStatus(id: string, status: string, adminNotes?: string) {
-  return api.put(`${baseUrl}/table-reservations/admin/${id}/status`, { status, admin_notes: adminNotes })
+export function querySeedProduct(id: string) {
+  return api.get(`${baseUrl}/user/seed-products/${id}`)
+}
+
+export function addSeedProduct(data: any) {
+  return api.post(`${baseUrl}/user/seed-products/add`, data)
+}
+
+export function updateSeedProduct(data: any) {
+  return api.post(`${baseUrl}/user/seed-products/update`, data)
 }

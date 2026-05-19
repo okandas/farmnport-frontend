@@ -6,6 +6,7 @@ import { useRef } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 
 const NAV_ITEMS = [
+    { label: "Orders", href: "/account/orders" },
     { label: "Bookings", href: "/account/bookings" },
     { label: "Incoming Bookings", href: "/account/incoming-bookings" },
     { label: "Notifications", href: "/account/notifications" },
@@ -62,17 +63,17 @@ export default function AccountSectionsLayout({ children }: { children: React.Re
 
             {/* Desktop sidebar */}
             <aside className="hidden lg:block w-56 shrink-0">
-                <nav className="flex flex-col gap-1">
+                <nav className="flex flex-col divide-y border-y">
                     {NAV_ITEMS.map(({ label, href }) => {
                         const active = pathname === href || pathname.startsWith(href + "/")
                         return (
                             <Link
                                 key={href}
                                 href={href}
-                                className={`w-full text-left px-3 py-2 rounded-lg border text-sm font-medium transition-colors whitespace-nowrap ${
+                                className={`w-full text-left px-3 py-2.5 text-sm font-medium transition-colors whitespace-nowrap ${
                                     active
-                                        ? "bg-primary text-primary-foreground border-primary"
-                                        : "text-muted-foreground border-border hover:bg-primary hover:text-primary-foreground hover:border-primary"
+                                        ? "text-primary"
+                                        : "text-muted-foreground hover:text-foreground"
                                 }`}
                             >
                                 {label}

@@ -42,10 +42,13 @@ export function AuthForm({ className, ...props }: AuthFormProps) {
                 description: "Login Successful redirecting you to dashboard.",
             })
 
+            const next = searchParams.get("next");
             const entity = searchParams.get("entity");
             const wantToSee = searchParams.get("wantToSee");
 
-            if (wantToSee && entity) {
+            if (next) {
+                window.location.href = next
+            } else if (wantToSee && entity) {
                 window.location.href = `/${entity}/${wantToSee}`
             } else {
                 window.location.href = "/"

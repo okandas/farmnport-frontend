@@ -1,4 +1,5 @@
 import { CheckCircle, Package, XCircle } from "lucide-react"
+import { centsToDollars } from "@/lib/utilities"
 
 const BASE_URL = process.env.BASE_URL || process.env.NEXT_PUBLIC_BASE_URL
 
@@ -87,7 +88,7 @@ export default async function OrderVerifyPage({ params }: { params: Promise<{ id
                         {order.items?.map((item: any, i: number) => (
                             <div key={i} className="flex items-center justify-between text-sm">
                                 <span className="text-foreground">{item.product_name} <span className="text-muted-foreground">× {item.quantity}</span></span>
-                                <span className="font-medium">${Number(item.line_total).toFixed(2)}</span>
+                                <span className="font-medium">{centsToDollars(item.line_total)}</span>
                             </div>
                         ))}
                     </div>
@@ -96,7 +97,7 @@ export default async function OrderVerifyPage({ params }: { params: Promise<{ id
                 {/* Total */}
                 <div className="px-6 py-4 border-t bg-muted/20 flex items-center justify-between">
                     <p className="font-bold">Total</p>
-                    <p className="font-bold text-lg">{order.currency} ${Number(order.total).toFixed(2)}</p>
+                    <p className="font-bold text-lg">{order.currency} {centsToDollars(order.total)}</p>
                 </div>
 
             </div>

@@ -40,8 +40,7 @@ export function BuyProductInteractive({
   const hasVariants = product.variants && product.variants.length > 0
   const [selectedVariant, setSelectedVariant] = useState<any>(hasVariants ? product.variants[0] : null)
   const [selectedImage, setSelectedImage] = useState(0)
-  const [fulfillment, setFulfillment] = useState<"delivery" | "pickup">("delivery")
-  const [mounted, setMounted] = useState(false)
+const [mounted, setMounted] = useState(false)
   useEffect(() => { setMounted(true) }, [])
 
   const displayPrice = selectedVariant?.sale_price
@@ -160,7 +159,6 @@ export function BuyProductInteractive({
                           ${vp.toFixed(2)}
                         </p>
                       )}
-                      {v.quantity > 0 && <p className="text-xs text-muted-foreground mt-0.5">{v.quantity} avail.</p>}
                     </button>
                   )
                 })}
@@ -208,6 +206,7 @@ export function BuyProductInteractive({
               )}
               <AddToCartButton
                 productId={product.id}
+                sku={selectedVariant?.sku}
                 productType={productType}
                 productName={selectedVariant ? `${product.name} - ${selectedVariant.name}` : product.name}
                 productSlug={slug}
@@ -218,31 +217,7 @@ export function BuyProductInteractive({
               />
             </div>
 
-            <div className="p-5 border-b space-y-3">
-              <p className="text-sm font-bold">How do you want your item?</p>
-              <div className="grid grid-cols-2 gap-2">
-                {(["delivery", "pickup"] as const).map((mode) => (
-                  <button
-                    key={mode}
-                    onClick={() => setFulfillment(mode)}
-                    className={`relative rounded-xl border-2 p-3 text-left transition-colors ${
-                      fulfillment === mode ? "border-primary bg-primary/5" : "border-border hover:border-primary/40"
-                    }`}
-                  >
-                    {fulfillment === mode && (
-                      <span className="absolute top-2 right-2 w-4 h-4 bg-primary rounded-full flex items-center justify-center">
-                        <Check className="w-2.5 h-2.5 text-white" />
-                      </span>
-                    )}
-                    <p className="text-2xl mb-1">{mode === "delivery" ? "🚚" : "🏪"}</p>
-                    <p className="text-sm font-semibold capitalize">{mode}</p>
-                    <p className="text-xs text-muted-foreground">{mode === "delivery" ? "To your door" : "From seller"}</p>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="px-5 pb-5 space-y-2.5 text-xs text-muted-foreground border-t pt-4">
+<div className="px-5 pb-5 space-y-2.5 text-xs text-muted-foreground border-t pt-4">
               <div className="flex items-center gap-1.5">
                 <span className="font-medium text-foreground">Sold by</span>
                 <span>farmnport</span>

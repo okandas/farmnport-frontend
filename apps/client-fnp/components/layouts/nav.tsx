@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import {Avatar, AvatarFallback} from "@/components/ui/avatar";
-import {capitalizeFirstLetter, makeAbbveriation} from "@/lib/utilities";
+import {capitalizeFirstLetter, makeAbbveriation, centsToDollars} from "@/lib/utilities";
 import {signOut} from "next-auth/react";
 import {AppURL, AuthenticatedUser} from "@/lib/schemas";
 import { ShoppingCart, Sun, Moon, Monitor } from "lucide-react";
@@ -35,7 +35,7 @@ function CartIcon({ user }: { user: AuthenticatedUser | null }) {
   })
   const items: any[] = (data as any)?.items ?? []
   const count = items.length
-  const total = items.reduce((s: number, i: any) => s + (i.unit_price * i.quantity) / 100, 0)
+  const totalCents = items.reduce((s: number, i: any) => s + (i.unit_price * i.quantity), 0)
 
   if (!user || count === 0) {
     return (
@@ -58,7 +58,7 @@ function CartIcon({ user }: { user: AuthenticatedUser | null }) {
       <ShoppingCart className="w-4 h-4" />
       <span>{count}</span>
       <span className="opacity-70">·</span>
-      <span>${total.toFixed(2)}</span>
+      <span>{centsToDollars(totalCents)}</span>
     </button>
   )
 }

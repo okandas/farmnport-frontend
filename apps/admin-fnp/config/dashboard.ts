@@ -41,17 +41,17 @@ export const dashboardConfig: DashboardConfig = {
           href: "/dashboard/farmnport/sales",
           icon: "barChart",
         },
+        {
+          title: "Sales Orders",
+          href: "/dashboard/farmnport/orders/sales",
+          icon: "shoppingCart",
+        },
       ],
     },
     {
       label: "Orders",
       alwaysOpen: true,
       items: [
-        {
-          title: "Sales Orders",
-          href: "/dashboard/farmnport/orders/sales",
-          icon: "shoppingCart",
-        },
         {
           title: "Bookings",
           href: "/dashboard/farmnport/orders/bookings",
@@ -221,6 +221,26 @@ export const dashboardConfig: DashboardConfig = {
           title: "Targets",
           href: "/dashboard/farmnport/feed-targets",
           icon: "bug",
+        },
+      ],
+    },
+    {
+      label: "Livestock & Poultry",
+      items: [
+        {
+          title: "Products",
+          href: "/dashboard/farmnport/livestock-poultry",
+          icon: "productSearch",
+        },
+      ],
+    },
+    {
+      label: "Seed Products",
+      items: [
+        {
+          title: "Products",
+          href: "/dashboard/farmnport/seed-products",
+          icon: "productSearch",
         },
       ],
     },

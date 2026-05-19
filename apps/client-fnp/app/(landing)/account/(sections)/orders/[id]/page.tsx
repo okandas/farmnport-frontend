@@ -1,12 +1,14 @@
 "use client"
 
+import { useState } from "react"
 import { useParams } from "next/navigation"
 import { useSession } from "next-auth/react"
 import { useQuery } from "@tanstack/react-query"
-import { Loader2, Package, Truck, Store, CheckCircle2, XCircle, Clock, CreditCard, ChevronLeft } from "lucide-react"
+import { Loader2, Package, Truck, Store, CheckCircle2, XCircle, Clock, CreditCard, ChevronLeft, ExternalLink } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
-import { getOrder } from "@/lib/query"
+import { getOrder, retryOrderPayment, pollOrderStatus } from "@/lib/query"
+
 
 const STATUS_STYLES: Record<string, string> = {
   pending:    "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400",
@@ -15,6 +17,7 @@ const STATUS_STYLES: Record<string, string> = {
   dispatched: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400",
   ready:      "bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-400",
   delivered:  "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
+  collected:  "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
   cancelled:  "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
 }
 
@@ -25,14 +28,15 @@ const STATUS_ICONS: Record<string, React.ReactNode> = {
   dispatched: <Truck className="w-3.5 h-3.5" />,
   ready:      <CheckCircle2 className="w-3.5 h-3.5" />,
   delivered:  <CheckCircle2 className="w-3.5 h-3.5" />,
+  collected:  <CheckCircle2 className="w-3.5 h-3.5" />,
   cancelled:  <XCircle className="w-3.5 h-3.5" />,
 }
 
 const STATUS_STEPS_DELIVERY = ["pending", "paid", "processing", "dispatched", "delivered"]
-const STATUS_STEPS_COLLECT  = ["pending", "paid", "processing", "ready", "delivered"]
+const STATUS_STEPS_COLLECT  = ["pending", "paid", "processing", "ready", "collected"]
 
 function formatDate(d: string) {
-  return new Date(d).toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })
+  return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })
 }
 
 function capitalize(s: string) {
@@ -80,6 +84,7 @@ interface Order {
   payment_provider: string
   payment_method: string
   payment_ref: string
+  provider_reference?: string
   paid_at?: string
   status_history: StatusChange[]
   delivered_at?: string
@@ -90,8 +95,10 @@ export default function OrderDetailPage() {
   const params = useParams()
   const { data: session, status } = useSession()
   const orderId = params.id as string
+  const [paying, setPaying] = useState(false)
+  const [checking, setChecking] = useState(false)
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, refetch } = useQuery({
     queryKey: ["order", orderId],
     queryFn: () => getOrder(orderId).then((r) => r.data as Order),
     enabled: !!session && !!orderId,
@@ -99,7 +106,7 @@ export default function OrderDetailPage() {
 
   if (status === "loading" || isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex items-center justify-center py-24">
         <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
       </div>
     )
@@ -107,8 +114,8 @@ export default function OrderDetailPage() {
 
   if (!session) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center space-y-4">
+      <div className="py-16 flex items-center justify-center">
+        <div className="text-center space-y-3">
           <Package className="w-12 h-12 mx-auto text-muted-foreground/40" />
           <p className="font-semibold">Sign in to view your order</p>
           <Link
@@ -126,7 +133,7 @@ export default function OrderDetailPage() {
 
   if (!order) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex items-center justify-center py-24">
         <div className="text-center space-y-4">
           <Package className="w-12 h-12 mx-auto text-muted-foreground/40" />
           <p className="font-semibold">Order not found</p>
@@ -173,8 +180,49 @@ export default function OrderDetailPage() {
           <div className="border border-yellow-200 bg-yellow-50 dark:bg-yellow-900/20 dark:border-yellow-800 rounded-xl p-5 space-y-3">
             <p className="font-semibold text-sm">Payment pending</p>
             <p className="text-sm text-muted-foreground">
-              Your order is awaiting payment. If the payment window closed before you could complete it, please contact us to assist.
+              Your order is awaiting payment. Click below to complete your payment.
             </p>
+            <div className="flex items-center gap-3 flex-wrap">
+              <button
+                disabled={paying}
+                onClick={async () => {
+                  setPaying(true)
+                  try {
+                    const res = await retryOrderPayment(orderId)
+                    const redirectUrl = res.data?.redirect_url
+                    if (redirectUrl) {
+                      window.open(redirectUrl, "_blank")
+                    }
+                  } catch {
+                    // silent
+                  } finally {
+                    setPaying(false)
+                  }
+                }}
+                className="inline-flex items-center gap-2 rounded-full bg-primary text-primary-foreground text-sm font-semibold px-5 py-2 hover:bg-primary/90 transition-colors disabled:opacity-50"
+              >
+                {paying ? <Loader2 className="w-4 h-4 animate-spin" /> : <ExternalLink className="w-4 h-4" />}
+                Pay Now
+              </button>
+              <button
+                disabled={checking}
+                onClick={async () => {
+                  setChecking(true)
+                  try {
+                    await pollOrderStatus(order.payment_ref)
+                    await refetch()
+                  } catch {
+                    // silent
+                  } finally {
+                    setChecking(false)
+                  }
+                }}
+                className="inline-flex items-center gap-2 rounded-full border border-yellow-400 text-yellow-800 dark:text-yellow-300 text-sm font-semibold px-5 py-2 hover:bg-yellow-100 dark:hover:bg-yellow-900/40 transition-colors disabled:opacity-50"
+              >
+                {checking ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                I&apos;ve Paid — Check Status
+              </button>
+            </div>
           </div>
         )}
 
@@ -266,7 +314,7 @@ export default function OrderDetailPage() {
               <p className="text-sm text-muted-foreground">Collect in person</p>
             )}
             {order.delivered_at && (
-              <p className="text-xs text-green-700 dark:text-green-400">Delivered {formatDate(order.delivered_at)}</p>
+              <p className="text-xs text-green-700 dark:text-green-400">{order.fulfillment === "click_collect" ? "Collected" : "Delivered"} {formatDate(order.delivered_at)}</p>
             )}
           </div>
 
@@ -279,6 +327,9 @@ export default function OrderDetailPage() {
             <div className="text-sm space-y-1 text-muted-foreground">
               <p className="text-foreground capitalize">{order.payment_provider}</p>
               <p>Ref: <span className="font-mono text-foreground select-all cursor-text">{order.payment_ref}</span></p>
+              {order.provider_reference && (
+                <p>{capitalize(order.payment_provider)} Ref: <span className="font-mono text-foreground select-all cursor-text">{order.provider_reference}</span></p>
+              )}
               {order.paid_at && <p>Paid {formatDate(order.paid_at)}</p>}
             </div>
           </div>
