@@ -37,18 +37,8 @@ const Schema = z.object({
     housing_requirements: z.string().optional().default(""),
     management_tips: z.string().optional().default(""),
     precautions: z.array(z.string()).default([]),
-    feeding_stages: z.array(z.object({
-        stage: z.string(),
-        feed: z.string(),
-        amount: z.string(),
-        notes: z.string(),
-    })).default([]),
-    vaccination_schedule: z.array(z.object({
-        age: z.string(),
-        vaccine: z.string(),
-        route: z.string(),
-        notes: z.string(),
-    })).default([]),
+    feeding_stages: z.array(z.object({ stage: z.string(), feed: z.string(), amount: z.string(), notes: z.string() })).default([]),
+    vaccination_schedule: z.array(z.object({ age: z.string(), vaccine: z.string(), route: z.string(), notes: z.string() })).default([]),
     variants: z.array(z.object({
         name: z.string().min(1, "Variant name is required"),
         sku: z.string().default(""),
@@ -67,8 +57,24 @@ type FormModel = z.infer<typeof Schema>
 
 export default function EditLivestockPoultryPage() {
     const params = useParams()
-    const router = useRouter()
     const id = params.id as string
+
+    const { data, isLoading } = useQuery({
+        queryKey: ["livestock-poultry-product", id],
+        queryFn: () => queryLivestockPoultryProduct(id),
+        enabled: !!id,
+        refetchOnWindowFocus: false,
+    })
+
+    if (isLoading) {
+        return <div className="flex items-center justify-center py-20"><Icons.spinner className="w-6 h-6 animate-spin text-gray-400" /></div>
+    }
+
+    return <EditForm id={id} product={data?.data} />
+}
+
+function EditForm({ id, product }: { id: string; product: any }) {
+    const router = useRouter()
     const [precautionInput, setPrecautionInput] = useState("")
 
     const { data: brandsData } = useQuery({ queryKey: ["brands-list"], queryFn: () => queryBrands(), refetchOnWindowFocus: false })
@@ -79,54 +85,36 @@ export default function EditLivestockPoultryPage() {
 
     const form = useForm<FormModel>({
         defaultValues: {
-            id: "", name: "", species: "", type: "", breed: "", brand_id: "", seller_id: "",
-            farm_produce_id: "", description: "", product_overview: "",
-            performance_metrics: "", housing_requirements: "", management_tips: "",
-            precautions: [], feeding_stages: [], vaccination_schedule: [], variants: [],
-            stock_level: 0, available_for_sale: false, show_price: false, sale_price: 0, was_price: 0,
+            id: product?.id || "",
+            name: product?.name || "",
+            species: product?.species || "",
+            type: product?.type || "",
+            breed: product?.breed || "",
+            brand_id: product?.brand_id || "",
+            seller_id: product?.seller_id || "",
+            farm_produce_id: product?.farm_produce_id || "",
+            description: product?.description || "",
+            product_overview: product?.product_overview || "",
+            performance_metrics: product?.performance_metrics || "",
+            housing_requirements: product?.housing_requirements || "",
+            management_tips: product?.management_tips || "",
+            precautions: product?.precautions || [],
+            feeding_stages: product?.feeding_stages || [],
+            vaccination_schedule: product?.vaccination_schedule || [],
+            variants: (product?.variants || []).map((v: any) => ({
+                name: v.name || "",
+                sku: v.sku || "",
+                sale_price: v.sale_price || 0,
+                was_price: v.was_price || 0,
+                stock_level: v.stock_level || 0,
+            })),
+            stock_level: product?.stock_level || 0,
+            available_for_sale: product?.available_for_sale || false,
+            show_price: product?.show_price || false,
+            sale_price: product?.sale_price || 0,
+            was_price: product?.was_price || 0,
         },
         resolver: zodResolver(Schema),
-    })
-
-    const { isLoading } = useQuery({
-        queryKey: ["livestock-poultry-product", id],
-        queryFn: () => queryLivestockPoultryProduct(id),
-        enabled: !!id,
-        refetchOnWindowFocus: false,
-        onSuccess: (res: any) => {
-            const p = res?.data
-            if (!p) return
-            form.reset({
-                id: p.id,
-                name: p.name || "",
-                species: p.species || "",
-                type: p.type || "",
-                breed: p.breed || "",
-                brand_id: p.brand_id || "",
-                seller_id: p.seller_id || "",
-                farm_produce_id: p.farm_produce_id || "",
-                description: p.description || "",
-                product_overview: p.product_overview || "",
-                performance_metrics: p.performance_metrics || "",
-                housing_requirements: p.housing_requirements || "",
-                management_tips: p.management_tips || "",
-                precautions: p.precautions || [],
-                feeding_stages: p.feeding_stages || [],
-                vaccination_schedule: p.vaccination_schedule || [],
-                variants: (p.variants || []).map((v: any) => ({
-                    name: v.name || "",
-                    sku: v.sku || "",
-                    sale_price: v.sale_price || 0,
-                    was_price: v.was_price || 0,
-                    stock_level: v.stock_level || 0,
-                })),
-                stock_level: p.stock_level || 0,
-                available_for_sale: p.available_for_sale || false,
-                show_price: p.show_price || false,
-                sale_price: p.sale_price || 0,
-                was_price: p.was_price || 0,
-            })
-        },
     })
 
     const { fields: feedingFields, append: appendFeeding, remove: removeFeeding } = useFieldArray({ control: form.control, name: "feeding_stages" })
@@ -144,14 +132,6 @@ export default function EditLivestockPoultryPage() {
         onError: (error) => handleApiError(error, { context: "livestock poultry update" }),
     })
 
-    function onSubmit(data: FormModel) {
-        mutate(data)
-    }
-
-    if (isLoading) {
-        return <div className="flex items-center justify-center py-20"><Icons.spinner className="w-6 h-6 animate-spin text-gray-400" /></div>
-    }
-
     return (
         <div className="space-y-10">
             <div className="flex items-center justify-between">
@@ -165,7 +145,7 @@ export default function EditLivestockPoultryPage() {
             </div>
 
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)}>
+                <form onSubmit={form.handleSubmit((data) => mutate(data))}>
                     <input type="hidden" {...form.register("id")} />
                     <div className="space-y-12">
 
@@ -173,145 +153,96 @@ export default function EditLivestockPoultryPage() {
                         <div className="border-b border-gray-900/10 pb-12 dark:border-white/10">
                             <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">Product Information</h2>
                             <p className="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">Basic details about this livestock or poultry product.</p>
-
                             <div className="mt-10 space-y-8">
                                 <div className="px-1">
                                     <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Product Name</label>
                                     <div className="mt-2">
                                         <FormField control={form.control} name="name" render={({ field }) => (
-                                            <FormItem>
-                                                <FormControl><Input placeholder="e.g. Ross 308 Broiler Day Old Chicks" className={inputClass} {...field} /></FormControl>
-                                                <FormMessage />
-                                            </FormItem>
+                                            <FormItem><FormControl><Input placeholder="e.g. Ross 308 Broiler Day Old Chicks" className={inputClass} {...field} /></FormControl><FormMessage /></FormItem>
                                         )} />
                                     </div>
                                 </div>
-
                                 <div className="px-1 grid grid-cols-1 sm:grid-cols-2 gap-6">
                                     <div>
                                         <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Species</label>
                                         <div className="mt-2">
                                             <FormField control={form.control} name="species" render={({ field }) => (
-                                                <FormItem>
-                                                    <FormControl>
-                                                        <select className={inputClass} {...field}>
-                                                            <option value="">Select species</option>
-                                                            <option value="poultry">Poultry</option>
-                                                            <option value="cattle">Cattle</option>
-                                                            <option value="pigs">Pigs</option>
-                                                            <option value="sheep">Sheep</option>
-                                                            <option value="goats">Goats</option>
-                                                            <option value="fish">Fish</option>
-                                                        </select>
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
+                                                <FormItem><FormControl>
+                                                    <select className={inputClass} {...field}>
+                                                        <option value="">Select species</option>
+                                                        <option value="poultry">Poultry</option>
+                                                        <option value="cattle">Cattle</option>
+                                                        <option value="pigs">Pigs</option>
+                                                        <option value="sheep">Sheep</option>
+                                                        <option value="goats">Goats</option>
+                                                        <option value="fish">Fish</option>
+                                                    </select>
+                                                </FormControl><FormMessage /></FormItem>
                                             )} />
                                         </div>
                                     </div>
-
                                     <div>
                                         <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Type</label>
                                         <div className="mt-2">
                                             <FormField control={form.control} name="type" render={({ field }) => (
-                                                <FormItem>
-                                                    <FormControl><Input placeholder="e.g. Broiler, Layer, Beef, Dairy, Weaner" className={inputClass} {...field} /></FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
+                                                <FormItem><FormControl><Input placeholder="e.g. Broiler, Layer, Beef, Dairy" className={inputClass} {...field} /></FormControl><FormMessage /></FormItem>
                                             )} />
                                         </div>
                                     </div>
-
                                     <div>
                                         <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Breed</label>
                                         <div className="mt-2">
                                             <FormField control={form.control} name="breed" render={({ field }) => (
-                                                <FormItem>
-                                                    <FormControl><Input placeholder="e.g. Ross 308, Lohmann Brown, Brahman" className={inputClass} {...field} /></FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
+                                                <FormItem><FormControl><Input placeholder="e.g. Ross 308, Lohmann Brown" className={inputClass} {...field} /></FormControl><FormMessage /></FormItem>
                                             )} />
                                         </div>
                                     </div>
-
                                     <div>
                                         <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Brand</label>
                                         <div className="mt-2">
                                             <FormField control={form.control} name="brand_id" render={({ field }) => (
-                                                <FormItem>
-                                                    <FormControl>
-                                                        <select className={inputClass} {...field}>
-                                                            <option value="">Select brand</option>
-                                                            {brands.map((b: any) => <option key={b.id} value={b.id}>{b.name}</option>)}
-                                                        </select>
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
+                                                <FormItem><FormControl>
+                                                    <select className={inputClass} {...field}>
+                                                        <option value="">Select brand</option>
+                                                        {brands.map((b: any) => <option key={b.id} value={b.id}>{b.name}</option>)}
+                                                    </select>
+                                                </FormControl><FormMessage /></FormItem>
                                             )} />
                                         </div>
                                     </div>
-
                                     <div>
                                         <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Farm Produce</label>
                                         <div className="mt-2">
                                             <FormField control={form.control} name="farm_produce_id" render={({ field }) => (
-                                                <FormItem>
-                                                    <FormControl>
-                                                        <select className={inputClass} {...field}>
-                                                            <option value="">Select produce</option>
-                                                            {farmProduce.map((fp: any) => <option key={fp.id} value={fp.id}>{fp.name}</option>)}
-                                                        </select>
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
+                                                <FormItem><FormControl>
+                                                    <select className={inputClass} {...field}>
+                                                        <option value="">Select produce</option>
+                                                        {farmProduce.map((fp: any) => <option key={fp.id} value={fp.id}>{fp.name}</option>)}
+                                                    </select>
+                                                </FormControl><FormMessage /></FormItem>
                                             )} />
                                         </div>
                                     </div>
                                 </div>
-
                                 <div className="px-1">
                                     <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Description</label>
-                                    <div className="mt-2">
-                                        <FormField control={form.control} name="description" render={({ field }) => (
-                                            <FormItem><FormControl><Textarea placeholder="Brief overview" rows={3} className={inputClass} {...field} /></FormControl><FormMessage /></FormItem>
-                                        )} />
-                                    </div>
+                                    <div className="mt-2"><FormField control={form.control} name="description" render={({ field }) => (<FormItem><FormControl><Textarea rows={3} className={inputClass} {...field} /></FormControl><FormMessage /></FormItem>)} /></div>
                                 </div>
-
                                 <div className="px-1">
                                     <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Product Overview</label>
-                                    <div className="mt-2">
-                                        <FormField control={form.control} name="product_overview" render={({ field }) => (
-                                            <FormItem><FormControl><Textarea placeholder="Detailed product overview" rows={4} className={inputClass} {...field} /></FormControl><FormMessage /></FormItem>
-                                        )} />
-                                    </div>
+                                    <div className="mt-2"><FormField control={form.control} name="product_overview" render={({ field }) => (<FormItem><FormControl><Textarea rows={4} className={inputClass} {...field} /></FormControl><FormMessage /></FormItem>)} /></div>
                                 </div>
-
                                 <div className="px-1">
                                     <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Performance Metrics</label>
-                                    <div className="mt-2">
-                                        <FormField control={form.control} name="performance_metrics" render={({ field }) => (
-                                            <FormItem><FormControl><Textarea placeholder="e.g. FCR: 1.8, Days to market: 35" rows={3} className={inputClass} {...field} /></FormControl><FormMessage /></FormItem>
-                                        )} />
-                                    </div>
+                                    <div className="mt-2"><FormField control={form.control} name="performance_metrics" render={({ field }) => (<FormItem><FormControl><Textarea rows={3} className={inputClass} {...field} /></FormControl><FormMessage /></FormItem>)} /></div>
                                 </div>
-
                                 <div className="px-1">
                                     <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Housing Requirements</label>
-                                    <div className="mt-2">
-                                        <FormField control={form.control} name="housing_requirements" render={({ field }) => (
-                                            <FormItem><FormControl><Textarea placeholder="e.g. 40 chicks per sqm during brooding" rows={3} className={inputClass} {...field} /></FormControl><FormMessage /></FormItem>
-                                        )} />
-                                    </div>
+                                    <div className="mt-2"><FormField control={form.control} name="housing_requirements" render={({ field }) => (<FormItem><FormControl><Textarea rows={3} className={inputClass} {...field} /></FormControl><FormMessage /></FormItem>)} /></div>
                                 </div>
-
                                 <div className="px-1">
                                     <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Management Tips</label>
-                                    <div className="mt-2">
-                                        <FormField control={form.control} name="management_tips" render={({ field }) => (
-                                            <FormItem><FormControl><Textarea placeholder="Key management guidance" rows={3} className={inputClass} {...field} /></FormControl><FormMessage /></FormItem>
-                                        )} />
-                                    </div>
+                                    <div className="mt-2"><FormField control={form.control} name="management_tips" render={({ field }) => (<FormItem><FormControl><Textarea rows={3} className={inputClass} {...field} /></FormControl><FormMessage /></FormItem>)} /></div>
                                 </div>
                             </div>
                         </div>
@@ -333,10 +264,10 @@ export default function EditLivestockPoultryPage() {
                                     {feedingFields.map((field, index) => (
                                         <div key={field.id} className="flex items-start gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700">
                                             <div className="flex-1 grid grid-cols-1 sm:grid-cols-4 gap-3">
-                                                <div><label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Stage</label><Input placeholder="e.g. Starter (Day 1–14)" className="text-sm" {...form.register(`feeding_stages.${index}.stage`)} /></div>
-                                                <div><label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Feed</label><Input placeholder="e.g. Broiler Starter 22%" className="text-sm" {...form.register(`feeding_stages.${index}.feed`)} /></div>
-                                                <div><label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Amount</label><Input placeholder="e.g. Ad lib" className="text-sm" {...form.register(`feeding_stages.${index}.amount`)} /></div>
-                                                <div><label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Notes</label><Input placeholder="Optional" className="text-sm" {...form.register(`feeding_stages.${index}.notes`)} /></div>
+                                                <div><label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Stage</label><Input className="text-sm" {...form.register(`feeding_stages.${index}.stage`)} /></div>
+                                                <div><label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Feed</label><Input className="text-sm" {...form.register(`feeding_stages.${index}.feed`)} /></div>
+                                                <div><label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Amount</label><Input className="text-sm" {...form.register(`feeding_stages.${index}.amount`)} /></div>
+                                                <div><label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Notes</label><Input className="text-sm" {...form.register(`feeding_stages.${index}.notes`)} /></div>
                                             </div>
                                             <button type="button" onClick={() => removeFeeding(index)} className="mt-5 text-red-500 hover:text-red-700"><Icons.trash className="w-4 h-4" /></button>
                                         </div>
@@ -362,10 +293,10 @@ export default function EditLivestockPoultryPage() {
                                     {vaccinationFields.map((field, index) => (
                                         <div key={field.id} className="flex items-start gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700">
                                             <div className="flex-1 grid grid-cols-1 sm:grid-cols-4 gap-3">
-                                                <div><label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Age</label><Input placeholder="e.g. Day 1" className="text-sm" {...form.register(`vaccination_schedule.${index}.age`)} /></div>
-                                                <div><label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Vaccine</label><Input placeholder="e.g. Newcastle Disease" className="text-sm" {...form.register(`vaccination_schedule.${index}.vaccine`)} /></div>
-                                                <div><label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Route</label><Input placeholder="e.g. Eye drop" className="text-sm" {...form.register(`vaccination_schedule.${index}.route`)} /></div>
-                                                <div><label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Notes</label><Input placeholder="Optional" className="text-sm" {...form.register(`vaccination_schedule.${index}.notes`)} /></div>
+                                                <div><label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Age</label><Input className="text-sm" {...form.register(`vaccination_schedule.${index}.age`)} /></div>
+                                                <div><label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Vaccine</label><Input className="text-sm" {...form.register(`vaccination_schedule.${index}.vaccine`)} /></div>
+                                                <div><label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Route</label><Input className="text-sm" {...form.register(`vaccination_schedule.${index}.route`)} /></div>
+                                                <div><label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Notes</label><Input className="text-sm" {...form.register(`vaccination_schedule.${index}.notes`)} /></div>
                                             </div>
                                             <button type="button" onClick={() => removeVaccination(index)} className="mt-5 text-red-500 hover:text-red-700"><Icons.trash className="w-4 h-4" /></button>
                                         </div>
@@ -413,10 +344,10 @@ export default function EditLivestockPoultryPage() {
                                     {variantFields.map((field, index) => (
                                         <div key={field.id} className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700">
                                             <div className="flex-1 grid grid-cols-1 sm:grid-cols-5 gap-3">
-                                                <div className="sm:col-span-2"><label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Name</label><Input placeholder="e.g. 100 Chicks" className="text-sm" {...form.register(`variants.${index}.name`)} /></div>
-                                                <div><label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">SKU</label><Input placeholder="Optional" className="text-sm" {...form.register(`variants.${index}.sku`)} /></div>
-                                                <div><label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Sale Price ($)</label><Input type="number" step="0.01" min="0" placeholder="0.00" className="text-sm" {...form.register(`variants.${index}.sale_price`)} /></div>
-                                                <div><label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Stock</label><Input type="number" min="0" placeholder="0" className="text-sm" {...form.register(`variants.${index}.stock_level`)} /></div>
+                                                <div className="sm:col-span-2"><label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Name</label><Input className="text-sm" {...form.register(`variants.${index}.name`)} /></div>
+                                                <div><label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">SKU</label><Input className="text-sm" {...form.register(`variants.${index}.sku`)} /></div>
+                                                <div><label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Sale Price ($)</label><Input type="number" step="0.01" min="0" className="text-sm" {...form.register(`variants.${index}.sale_price`)} /></div>
+                                                <div><label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Stock</label><Input type="number" min="0" className="text-sm" {...form.register(`variants.${index}.stock_level`)} /></div>
                                             </div>
                                             <button type="button" onClick={() => removeVariant(index)} className="mt-4 text-red-500 hover:text-red-700"><Icons.trash className="w-4 h-4" /></button>
                                         </div>
@@ -431,16 +362,14 @@ export default function EditLivestockPoultryPage() {
                             <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6">
                                 <div className="sm:col-span-3 flex items-center gap-4">
                                     <FormField control={form.control} name="show_price" render={({ field }) => (
-                                        <FormItem className="flex items-center gap-2">
-                                            <FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl>
+                                        <FormItem className="flex items-center gap-2"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl>
                                             <label className="text-sm font-medium text-gray-900 dark:text-white cursor-pointer" onClick={() => field.onChange(!field.value)}>Show Price</label>
                                         </FormItem>
                                     )} />
                                 </div>
                                 <div className="sm:col-span-3 flex items-center gap-4">
                                     <FormField control={form.control} name="available_for_sale" render={({ field }) => (
-                                        <FormItem className="flex items-center gap-2">
-                                            <FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl>
+                                        <FormItem className="flex items-center gap-2"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl>
                                             <label className="text-sm font-medium text-gray-900 dark:text-white cursor-pointer" onClick={() => field.onChange(!field.value)}>Available for Sale</label>
                                         </FormItem>
                                     )} />
