@@ -1,6 +1,5 @@
 import { queryPlantNutritionProduct } from "@/lib/query"
 import Link from "next/link"
-import { Leaf } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { BuyProductInteractive } from "@/components/shop/BuyProductInteractive"
 
@@ -130,7 +129,7 @@ export default async function BuyPlantNutritionProductPage({ params }: BuyPlantN
                     shopHref="/buy-plant-nutrition"
                     guideHref={`/plant-nutrition-guides/${categorySlug}/${slug}`}
                     loginRedirect={`/buy-plant-nutrition/${slug}`}
-                    fallbackIcon={<Leaf className="w-28 h-28 text-muted-foreground/20" />}
+                    fallbackIcon={<div className="w-28 h-28 bg-muted/30 rounded-full" />}
                     tabsContent={tabsContent}
                 />
             </div>

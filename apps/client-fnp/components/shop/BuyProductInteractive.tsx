@@ -193,7 +193,6 @@ const [mounted, setMounted] = useState(false)
                   </div>
                   <p className="text-[11px] text-muted-foreground mt-2">Price when purchased online</p>
                   {savings && <p className="text-xs text-green-700 dark:text-green-400 font-medium mt-0.5">You save ${savings.toFixed(2)}</p>}
-                  {selectedVariant?.quantity > 0 && <p className="text-[11px] text-muted-foreground mt-0.5">{selectedVariant.quantity} available</p>}
                 </>
               ) : (
                 <p className="text-sm text-muted-foreground">Price on request</p>

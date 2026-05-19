@@ -174,7 +174,7 @@ export function BuyPlantNutritionClient({ initialProducts, initialTotal }: BuyPl
                     </div>
                 ) : products.length === 0 ? (
                     <div className="text-center py-12">
-                        <Leaf className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
+                        <div className="w-16 h-16 mx-auto bg-muted/30 rounded-full mb-4" />
                         <p className="text-muted-foreground">No plant nutrition products found matching your filters.</p>
                     </div>
                 ) : (
