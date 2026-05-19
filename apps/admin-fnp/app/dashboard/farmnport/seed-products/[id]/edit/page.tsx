@@ -58,22 +58,27 @@ const Schema = z.object({
 type FormModel = z.infer<typeof Schema>
 
 export default function EditSeedProductPage() {
-    const router = useRouter()
     const params = useParams()
     const id = params.id as string
-    const [precautionInput, setPrecautionInput] = useState("")
 
-    const form = useForm<FormModel>({
-        defaultValues: {
-            name: "", type: "", variety: "", brand_id: "", seller_id: "",
-            farm_produce_id: "", description: "", planting_season: "",
-            days_to_maturity: "", yield_potential: "", soil_requirements: "",
-            seed_treatment: "", management_tips: "",
-            planting_guide: [], precautions: [], variants: [],
-            stock_level: 0, available_for_sale: false, show_price: false, sale_price: 0, was_price: 0,
-        },
-        resolver: zodResolver(Schema),
+    const { data, isLoading } = useQuery({
+        queryKey: ["seed-product", id],
+        queryFn: () => querySeedProduct(id),
+        enabled: !!id,
+        refetchOnWindowFocus: false,
     })
+
+    if (isLoading) {
+        return <div className="flex items-center justify-center py-20"><Icons.spinner className="w-6 h-6 animate-spin text-gray-400" /></div>
+    }
+
+    const product = data?.data
+    return <EditSeedForm id={id} product={product} />
+}
+
+function EditSeedForm({ id, product }: { id: string; product: any }) {
+    const router = useRouter()
+    const [precautionInput, setPrecautionInput] = useState("")
 
     const { data: brandsData } = useQuery({ queryKey: ["brands-list"], queryFn: () => queryBrands(), refetchOnWindowFocus: false })
     const { data: farmProduceData } = useQuery({ queryKey: ["farm-produce-list"], queryFn: () => queryFarmProduce(), refetchOnWindowFocus: false })
@@ -81,45 +86,38 @@ export default function EditSeedProductPage() {
     const brands = brandsData?.data?.data as Brand[] || []
     const farmProduce = farmProduceData?.data?.data || []
 
-    useQuery({
-        queryKey: ["seed-product", id],
-        queryFn: () => querySeedProduct(id),
-        refetchOnWindowFocus: false,
-        enabled: !!id,
-        onSuccess: (res: any) => {
-            const p = res?.data?.data
-            if (!p) return
-            form.reset({
-                name: p.name || "",
-                type: p.type || "",
-                variety: p.variety || "",
-                brand_id: p.brand_id || "",
-                seller_id: p.seller_id || "",
-                farm_produce_id: p.farm_produce_id || "",
-                description: p.description || "",
-                planting_season: p.planting_season || "",
-                days_to_maturity: p.days_to_maturity || "",
-                yield_potential: p.yield_potential || "",
-                soil_requirements: p.soil_requirements || "",
-                seed_treatment: p.seed_treatment || "",
-                management_tips: p.management_tips || "",
-                planting_guide: p.planting_guide || [],
-                precautions: p.precautions || [],
-                variants: (p.variants || []).map((v: any) => ({
-                    name: v.name || "",
-                    sku: v.sku || "",
-                    sale_price: (v.sale_price || 0) / 100,
-                    was_price: (v.was_price || 0) / 100,
-                    stock_level: v.stock_level || 0,
-                })),
-                stock_level: p.stock_level || 0,
-                available_for_sale: p.available_for_sale || false,
-                show_price: p.show_price || false,
-                sale_price: (p.sale_price || 0) / 100,
-                was_price: (p.was_price || 0) / 100,
-            })
+    const form = useForm<FormModel>({
+        defaultValues: {
+            name: product?.name || "",
+            type: product?.type || "",
+            variety: product?.variety || "",
+            brand_id: product?.brand_id || "",
+            seller_id: product?.seller_id || "",
+            farm_produce_id: product?.farm_produce_id || "",
+            description: product?.description || "",
+            planting_season: product?.planting_season || "",
+            days_to_maturity: product?.days_to_maturity || "",
+            yield_potential: product?.yield_potential || "",
+            soil_requirements: product?.soil_requirements || "",
+            seed_treatment: product?.seed_treatment || "",
+            management_tips: product?.management_tips || "",
+            planting_guide: product?.planting_guide || [],
+            precautions: product?.precautions || [],
+            variants: (product?.variants || []).map((v: any) => ({
+                name: v.name || "",
+                sku: v.sku || "",
+                sale_price: (v.sale_price || 0) / 100,
+                was_price: (v.was_price || 0) / 100,
+                stock_level: v.stock_level || 0,
+            })),
+            stock_level: product?.stock_level || 0,
+            available_for_sale: product?.available_for_sale || false,
+            show_price: product?.show_price || false,
+            sale_price: (product?.sale_price || 0) / 100,
+            was_price: (product?.was_price || 0) / 100,
         },
-    } as any)
+        resolver: zodResolver(Schema),
+    })
 
     const { fields: guideFields, append: appendGuide, remove: removeGuide } = useFieldArray({ control: form.control, name: "planting_guide" })
     const { fields: variantFields, append: appendVariant, remove: removeVariant } = useFieldArray({ control: form.control, name: "variants" })
@@ -135,10 +133,6 @@ export default function EditSeedProductPage() {
         onError: (error) => handleApiError(error, { context: "seed product update" }),
     })
 
-    function onSubmit(data: FormModel) {
-        mutate(data)
-    }
-
     return (
         <div className="space-y-10">
             <div className="flex items-center justify-between">
@@ -152,7 +146,7 @@ export default function EditSeedProductPage() {
             </div>
 
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)}>
+                <form onSubmit={form.handleSubmit((data) => mutate(data))}>
                     <div className="space-y-12">
 
                         {/* Product Information */}
