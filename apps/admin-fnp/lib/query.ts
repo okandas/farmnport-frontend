@@ -1721,3 +1721,31 @@ export function addSeedProduct(data: any) {
 export function updateSeedProduct(data: any) {
   return api.post(`${baseUrl}/user/seed-products/update`, data)
 }
+
+// Breeds
+export function queryBreeds(pagination?: { p?: number; search?: string; farm_produce_id?: string }) {
+  let url = `${baseUrl}/breeds`
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) params.append("p", String(pagination.p))
+  if (pagination?.search !== undefined && pagination.search.length >= 2) params.append("search", pagination.search)
+  if (pagination?.farm_produce_id) params.append("farm_produce_id", pagination.farm_produce_id)
+  const qs = params.toString()
+  if (qs) url = `${baseUrl}/breeds?${qs}`
+  return api.get(url)
+}
+
+export function queryBreed(id: string) {
+  return api.get(`${baseUrl}/breeds/${id}`)
+}
+
+export function addBreed(data: { name: string; farm_produce_id: string; description?: string }) {
+  return api.post(`${baseUrl}/breeds/`, data)
+}
+
+export function updateBreed(data: { id: string; name: string; farm_produce_id: string; description?: string }) {
+  return api.put(`${baseUrl}/breeds/${data.id}`, data)
+}
+
+export function deleteBreed(id: string) {
+  return api.delete(`${baseUrl}/breeds/${id}`)
+}

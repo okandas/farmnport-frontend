@@ -173,9 +173,24 @@ export const dashboardConfig: DashboardConfig = {
           icon: "tractor",
         },
         {
-          title: "Products",
+          title: "Produce",
           href: "/dashboard/farmnport/farmproduce",
           icon: "package",
+        },
+        {
+          title: "Livestock & Poultry",
+          href: "/dashboard/farmnport/livestock-poultry",
+          icon: "productSearch",
+        },
+        {
+          title: "Seed Products",
+          href: "/dashboard/farmnport/seed-products",
+          icon: "productSearch",
+        },
+        {
+          title: "Breeds",
+          href: "/dashboard/farmnport/breeds",
+          icon: "tag",
         },
         {
           title: "Crop Groups",
@@ -221,26 +236,6 @@ export const dashboardConfig: DashboardConfig = {
           title: "Targets",
           href: "/dashboard/farmnport/feed-targets",
           icon: "bug",
-        },
-      ],
-    },
-    {
-      label: "Livestock & Poultry",
-      items: [
-        {
-          title: "Products",
-          href: "/dashboard/farmnport/livestock-poultry",
-          icon: "productSearch",
-        },
-      ],
-    },
-    {
-      label: "Seed Products",
-      items: [
-        {
-          title: "Products",
-          href: "/dashboard/farmnport/seed-products",
-          icon: "productSearch",
         },
       ],
     },

@@ -31,12 +31,12 @@ export function SeedProductsTable() {
                         placeholder="Search seed products..."
                         value={search}
                         onChange={(e) => { setSearch(e.target.value); setPage(1) }}
-                        className="pl-9 block w-full rounded-md bg-white px-3 py-1.5 text-sm text-gray-900 outline outline-1 outline-gray-300 dark:bg-white/5 dark:text-white dark:outline-white/10"
+                        className="pl-9 pr-3 block w-full rounded-md bg-white py-1.5 text-sm text-gray-900 outline outline-1 outline-gray-300 dark:bg-white/5 dark:text-white dark:outline-white/10"
                     />
                 </div>
                 <Link
                     href="/dashboard/farmnport/seed-products/new"
-                    className="inline-flex items-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 dark:bg-indigo-500 dark:hover:bg-indigo-400"
+                    className="inline-flex items-center rounded-md bg-primary px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-primary/90 dark:bg-primary dark:hover:bg-indigo-400"
                 >
                     <Icons.add className="w-4 h-4 mr-1.5" />
                     Add Product
@@ -74,7 +74,7 @@ export function SeedProductsTable() {
                                     </span>
                                 </td>
                                 <td className="px-4 py-3 text-right">
-                                    <Link href={`/dashboard/farmnport/seed-products/${product.id}/edit`} className="text-sm text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">Edit</Link>
+                                    <Link href={`/dashboard/farmnport/seed-products/${product.id}/edit`} className="text-sm text-primary hover:text-primary/80">Edit</Link>
                                 </td>
                             </tr>
                         ))}
@@ -86,7 +86,7 @@ export function SeedProductsTable() {
                 <div className="flex items-center justify-center gap-1">
                     {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
                         <button key={p} onClick={() => setPage(p)}
-                            className={`px-3 py-1.5 rounded text-sm font-medium ${p === page ? "bg-indigo-600 text-white dark:bg-indigo-500" : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-white/10"}`}>
+                            className={`px-3 py-1.5 rounded text-sm font-medium ${p === page ? "bg-primary text-white dark:bg-primary" : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-white/10"}`}>
                             {p}
                         </button>
                     ))}
