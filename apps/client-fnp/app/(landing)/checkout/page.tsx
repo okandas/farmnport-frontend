@@ -285,7 +285,7 @@ export default function CheckoutPage() {
       <div className="border-b">
         <div className="max-w-5xl mx-auto px-4 py-3">
           <nav className="flex text-sm text-muted-foreground">
-            <Link href="/" className="hover:text-foreground">Home</Link>
+            <Link href="/buy" className="hover:text-foreground">Buy</Link>
             <span className="mx-2">/</span>
             <span className="text-foreground">Checkout</span>
           </nav>

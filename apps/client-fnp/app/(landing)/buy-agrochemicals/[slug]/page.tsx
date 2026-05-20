@@ -110,9 +110,9 @@ export default async function BuyAgroChemicalPage({ params }: BuyAgroChemicalPag
             <div className="border-b">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
                     <nav className="flex text-sm text-muted-foreground">
-                        <Link href="/" className="hover:text-foreground">Home</Link>
+                        <Link href="/buy" className="hover:text-foreground">Shop</Link>
                         <span className="mx-2">/</span>
-                        <Link href="/buy-agrochemicals" className="hover:text-foreground">Shop</Link>
+                        <Link href="/buy-agrochemicals" className="hover:text-foreground">Buy Agrochemicals</Link>
                         <span className="mx-2">/</span>
                         <span className="text-foreground capitalize">{chemical.name}</span>
                     </nav>

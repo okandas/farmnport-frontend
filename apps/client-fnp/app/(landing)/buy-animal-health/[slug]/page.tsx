@@ -109,9 +109,9 @@ export default async function BuyAnimalHealthProductPage({ params }: BuyAnimalHe
             <div className="border-b">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
                     <nav className="flex text-sm text-muted-foreground">
-                        <Link href="/" className="hover:text-foreground">Home</Link>
+                        <Link href="/buy" className="hover:text-foreground">Shop</Link>
                         <span className="mx-2">/</span>
-                        <Link href="/buy-animal-health" className="hover:text-foreground">Shop</Link>
+                        <Link href="/buy-animal-health" className="hover:text-foreground">Buy Animal Health</Link>
                         <span className="mx-2">/</span>
                         <span className="text-foreground capitalize">{product.name}</span>
                     </nav>
