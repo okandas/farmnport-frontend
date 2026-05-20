@@ -13,6 +13,7 @@ const NAV_ITEMS = [
     { label: "Documents", href: "/account/documents" },
     { label: "Profile", href: "/account/profile" },
     { label: "Security", href: "/account/security" },
+    { label: "Theme", href: "/account/theme" },
 ]
 
 export default function AccountSectionsLayout({ children }: { children: React.ReactNode }) {

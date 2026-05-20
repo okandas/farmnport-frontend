@@ -15,8 +15,7 @@ import {Avatar, AvatarFallback} from "@/components/ui/avatar";
 import {capitalizeFirstLetter, makeAbbveriation, centsToDollars} from "@/lib/utilities";
 import {signOut} from "next-auth/react";
 import {AppURL, AuthenticatedUser} from "@/lib/schemas";
-import { ShoppingCart, Sun, Moon, Monitor } from "lucide-react";
-import { useTheme } from "next-themes";
+import { ShoppingCart } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useCart } from "@/contexts/cart-context";
 import { getCart, countBookingNotifications } from "@/lib/query";
@@ -88,7 +87,6 @@ function BellIcon({ user }: { user: AuthenticatedUser | null }) {
 }
 
 export function Navigation({ user }: NavigationProps) {
-  const { setTheme } = useTheme()
   return (
       <nav className="lg:flex lg:space-x-2">
         <Link href="/guides" onClick={() => sendGTMEvent({ event: 'link', value: 'GuidesTopNavigation' })}
@@ -146,18 +144,6 @@ export function Navigation({ user }: NavigationProps) {
               <DropdownMenuGroup>
                 <DropdownMenuItem asChild>
                   <Link href="/account">Account</Link>
-                </DropdownMenuItem>
-              </DropdownMenuGroup>
-              <DropdownMenuSeparator />
-              <DropdownMenuGroup>
-                <DropdownMenuItem onClick={() => setTheme("light")}>
-                  <Sun className="mr-2 h-4 w-4" /> Light
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme("dark")}>
-                  <Moon className="mr-2 h-4 w-4" /> Dark
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme("system")}>
-                  <Monitor className="mr-2 h-4 w-4" /> System
                 </DropdownMenuItem>
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
