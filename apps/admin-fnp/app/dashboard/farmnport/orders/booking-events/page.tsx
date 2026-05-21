@@ -99,7 +99,7 @@ export default function BookingEventsPage() {
               {events.map((event) => (
                 <tr key={event.id} className="hover:bg-muted/20 transition-colors">
                   <td className="px-4 py-3 font-medium">{event.title}</td>
-                  <td className="px-4 py-3 text-muted-foreground">{event.client_name ?? "—"}</td>
+                  <td className="px-4 py-3 text-muted-foreground">{event.brand_name || event.client_name || "—"}</td>
                   <td className="px-4 py-3 text-muted-foreground">{event.product_name}</td>
                   <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap">
                     {formatDate(event.open_date)} → {formatDate(event.close_date)}
