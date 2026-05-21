@@ -255,22 +255,22 @@ function EditForm({ product }: { product: any }) {
                                     </div>
                                 </div>
                                 <div className="sm:col-span-3">
-                                    <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Breed</label>
+                                    <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Client</label>
                                     <div className="mt-2">
-                                        <FormField control={form.control} name="breed_id" render={({ field }) => (
+                                        <FormField control={form.control} name="seller_id" render={({ field }) => (
                                             <FormItem>
                                                 <FormControl>
                                                     <SearchSelect
-                                                        queryKey={["breeds-select", watchedFarmProduceId]}
-                                                        queryFn={(params) => queryBreeds({ ...params, farm_produce_id: watchedFarmProduceId })}
+                                                        queryKey="users-select"
+                                                        queryFn={(params) => queryUsers(params)}
                                                         getItems={(page) => page?.data?.data || []}
                                                         value={field.value || ""}
                                                         onValueChange={field.onChange}
-                                                        getLabel={(b) => b.name}
-                                                        getValue={(b) => b.id}
-                                                        placeholder="Select breed"
-                                                        searchPlaceholder="Search breeds..."
-                                                        disabled={!watchedFarmProduceId}
+                                                        getLabel={(u) => u.name}
+                                                        getValue={(u) => u.id}
+                                                        placeholder="Select client"
+                                                        searchPlaceholder="Search clients..."
+                                                        clearable
                                                     />
                                                 </FormControl>
                                                 <FormMessage />
@@ -303,22 +303,22 @@ function EditForm({ product }: { product: any }) {
                                     </div>
                                 </div>
                                 <div className="sm:col-span-3">
-                                    <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Client</label>
+                                    <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Breed</label>
                                     <div className="mt-2">
-                                        <FormField control={form.control} name="seller_id" render={({ field }) => (
+                                        <FormField control={form.control} name="breed_id" render={({ field }) => (
                                             <FormItem>
                                                 <FormControl>
                                                     <SearchSelect
-                                                        queryKey="users-select"
-                                                        queryFn={(params) => queryUsers(params)}
+                                                        queryKey={["breeds-select", watchedFarmProduceId]}
+                                                        queryFn={(params) => queryBreeds({ ...params, farm_produce_id: watchedFarmProduceId })}
                                                         getItems={(page) => page?.data?.data || []}
                                                         value={field.value || ""}
                                                         onValueChange={field.onChange}
-                                                        getLabel={(u) => u.name}
-                                                        getValue={(u) => u.id}
-                                                        placeholder="Select client"
-                                                        searchPlaceholder="Search clients..."
-                                                        clearable
+                                                        getLabel={(b) => b.name}
+                                                        getValue={(b) => b.id}
+                                                        placeholder="Select breed"
+                                                        searchPlaceholder="Search breeds..."
+                                                        disabled={!watchedFarmProduceId}
                                                     />
                                                 </FormControl>
                                                 <FormMessage />
