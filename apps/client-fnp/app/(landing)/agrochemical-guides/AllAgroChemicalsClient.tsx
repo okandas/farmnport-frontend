@@ -96,14 +96,6 @@ export function AllAgroChemicalsClient({ initialChemicals, initialTotal }: AllAg
 
                         {totalPages > 1 && (
                             <div className="mt-8 flex justify-center gap-1">
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => handlePageChange(Math.max(1, queryState.p - 1))}
-                                    disabled={queryState.p === 1}
-                                >
-                                    Previous
-                                </Button>
                                 {Array.from({ length: totalPages }, (_, i) => i + 1)
                                     .filter(pageNum =>
                                         pageNum === 1 ||
@@ -127,14 +119,6 @@ export function AllAgroChemicalsClient({ initialChemicals, initialTotal }: AllAg
                                             </div>
                                         )
                                     })}
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => handlePageChange(queryState.p + 1)}
-                                    disabled={queryState.p >= totalPages}
-                                >
-                                    Next
-                                </Button>
                             </div>
                         )}
                     </>
