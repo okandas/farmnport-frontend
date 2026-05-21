@@ -14,6 +14,7 @@ interface SearchSelectProps {
     getItems: (page: any) => any[]
     value: string
     onValueChange: (value: string) => void
+    onItemSelect?: (item: any) => void
     getLabel: (item: any) => string
     getValue: (item: any) => string
     placeholder?: string
@@ -37,6 +38,7 @@ export function SearchSelect({
     disabled = false,
     clearable = false,
     capitalize = false,
+    onItemSelect,
     className,
 }: SearchSelectProps) {
     const [open, setOpen] = useState(false)
@@ -74,7 +76,7 @@ export function SearchSelect({
     }
 
     return (
-        <Popover open={open} onOpenChange={(o) => { setOpen(o); if (!o) setSearch("") }}>
+        <Popover open={open} onOpenChange={(o) => { setOpen(o); if (o) setSearch("") }}>
             <PopoverTrigger asChild>
                 <Button
                     type="button"
@@ -119,6 +121,7 @@ export function SearchSelect({
                                 value={getValue(item)}
                                 onSelect={() => {
                                     onValueChange(getValue(item))
+                                    onItemSelect?.(item)
                                     setOpen(false)
                                     setSearch("")
                                 }}
