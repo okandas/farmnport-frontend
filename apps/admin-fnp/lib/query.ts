@@ -96,19 +96,11 @@ export function queryLatestProductPriceList(clientID?: string) {
 }
 
 export function queryProducerPriceLists(pagination?: pagination) {
-  let url: string
-
-  if (pagination?.p !== undefined && pagination.p >= 2) {
-    url = `${baseUrl}/prices/get/producer_prices?p=${pagination.p}`
-  } else {
-    url = `${baseUrl}/prices/get/producer_prices`
-  }
-
-  if (pagination?.search !== undefined && pagination.search.length >= 2) {
-    url = `${baseUrl}/prices/get/producer_prices?search=${pagination.search}`
-  }
-
-  return api.get(url)
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) params.append("p", String(pagination.p))
+  if (pagination?.search !== undefined && pagination.search.length >= 2) params.append("search", pagination.search)
+  const qs = params.toString()
+  return api.get(qs ? `${baseUrl}/prices/get/producer_prices?${qs}` : `${baseUrl}/prices/get/producer_prices`)
 }
 
 export function queryUser(name: string) {
@@ -260,19 +252,11 @@ export function updateBrand(data: { id: string; name: string; slogan?: string })
 
 // AgroChemical Category functions
 export function queryAgroChemicalCategories(pagination?: pagination) {
-  let url: string
-
-  if (pagination?.p !== undefined && pagination.p >= 2) {
-    url = `${baseUrl}/user/agrochemical-categories?p=${pagination.p}`
-  } else {
-    url = `${baseUrl}/user/agrochemical-categories`
-  }
-
-  if (pagination?.search !== undefined && pagination.search.length >= 2) {
-    url = `${baseUrl}/user/agrochemical-categories?search=${pagination.search}`
-  }
-
-  return api.get(url)
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) params.append("p", String(pagination.p))
+  if (pagination?.search !== undefined && pagination.search.length >= 2) params.append("search", pagination.search)
+  const qs = params.toString()
+  return api.get(qs ? `${baseUrl}/user/agrochemical-categories?${qs}` : `${baseUrl}/user/agrochemical-categories`)
 }
 
 export function queryAgroChemicalCategory(id: string) {
@@ -297,19 +281,11 @@ export function deleteAgroChemicalCategories(categoryIds: string[]) {
 
 // AgroChemical Active Ingredient functions
 export function queryAgroChemicalActiveIngredients(pagination?: pagination) {
-  let url: string
-
-  if (pagination?.p !== undefined && pagination.p >= 2) {
-    url = `${baseUrl}/user/agrochemical-active-ingredients?p=${pagination.p}`
-  } else {
-    url = `${baseUrl}/user/agrochemical-active-ingredients`
-  }
-
-  if (pagination?.search !== undefined && pagination.search.length >= 2) {
-    url = `${baseUrl}/user/agrochemical-active-ingredients?search=${pagination.search}`
-  }
-
-  return api.get(url)
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) params.append("p", String(pagination.p))
+  if (pagination?.search !== undefined && pagination.search.length >= 2) params.append("search", pagination.search)
+  const qs = params.toString()
+  return api.get(qs ? `${baseUrl}/user/agrochemical-active-ingredients?${qs}` : `${baseUrl}/user/agrochemical-active-ingredients`)
 }
 
 export function queryAgroChemicalActiveIngredient(id: string) {
@@ -318,19 +294,11 @@ export function queryAgroChemicalActiveIngredient(id: string) {
 }
 
 export function queryAgroChemicalTargets(pagination?: pagination) {
-  let url: string
-
-  if (pagination?.p !== undefined && pagination.p >= 2) {
-    url = `${baseUrl}/user/agrochemical-targets?p=${pagination.p}`
-  } else {
-    url = `${baseUrl}/user/agrochemical-targets`
-  }
-
-  if (pagination?.search !== undefined && pagination.search.length >= 2) {
-    url = `${baseUrl}/user/agrochemical-targets?search=${pagination.search}`
-  }
-
-  return api.get(url)
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) params.append("p", String(pagination.p))
+  if (pagination?.search !== undefined && pagination.search.length >= 2) params.append("search", pagination.search)
+  const qs = params.toString()
+  return api.get(qs ? `${baseUrl}/user/agrochemical-targets?${qs}` : `${baseUrl}/user/agrochemical-targets`)
 }
 
 export function queryAgroChemicalTarget(id: string) {
@@ -370,19 +338,11 @@ export function deleteAgroChemicalTargets(targetIds: string[]) {
 
 // Crop Group functions
 export function queryCropGroups(pagination?: pagination) {
-  let url: string
-
-  if (pagination?.p !== undefined && pagination.p >= 2) {
-    url = `${baseUrl}/user/crop-groups?p=${pagination.p}`
-  } else {
-    url = `${baseUrl}/user/crop-groups`
-  }
-
-  if (pagination?.search !== undefined && pagination.search.length >= 2) {
-    url = `${baseUrl}/user/crop-groups?search=${pagination.search}`
-  }
-
-  return api.get(url)
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) params.append("p", String(pagination.p))
+  if (pagination?.search !== undefined && pagination.search.length >= 2) params.append("search", pagination.search)
+  const qs = params.toString()
+  return api.get(qs ? `${baseUrl}/user/crop-groups?${qs}` : `${baseUrl}/user/crop-groups`)
 }
 
 export function queryCropGroup(id: string) {
@@ -407,19 +367,11 @@ export function deleteCropGroups(groupIds: string[]) {
 
 // Weed Group functions
 export function queryWeedGroups(pagination?: pagination) {
-  let url: string
-
-  if (pagination?.p !== undefined && pagination.p >= 2) {
-    url = `${baseUrl}/user/weed-groups?p=${pagination.p}`
-  } else {
-    url = `${baseUrl}/user/weed-groups`
-  }
-
-  if (pagination?.search !== undefined && pagination.search.length >= 2) {
-    url = `${baseUrl}/user/weed-groups?search=${pagination.search}`
-  }
-
-  return api.get(url)
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) params.append("p", String(pagination.p))
+  if (pagination?.search !== undefined && pagination.search.length >= 2) params.append("search", pagination.search)
+  const qs = params.toString()
+  return api.get(qs ? `${baseUrl}/user/weed-groups?${qs}` : `${baseUrl}/user/weed-groups`)
 }
 
 export function queryWeedGroup(id: string) {
@@ -458,35 +410,19 @@ export function addFarmProduceCategory(data: { name: string; description: string
 }
 
 export function queryFarmProduceCategories(pagination?: pagination) {
-  let url: string
-
-  if (pagination?.p !== undefined && pagination.p >= 2) {
-    url = `${baseUrl}/farmproducecategories?p=${pagination.p}`
-  } else {
-    url = `${baseUrl}/farmproducecategories`
-  }
-
-  if (pagination?.search !== undefined && pagination.search.length >= 2) {
-    url = `${baseUrl}/farmproducecategories?search=${pagination.search}`
-  }
-
-  return api.get(url)
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) params.append("p", String(pagination.p))
+  if (pagination?.search !== undefined && pagination.search.length >= 2) params.append("search", pagination.search)
+  const qs = params.toString()
+  return api.get(qs ? `${baseUrl}/farmproducecategories?${qs}` : `${baseUrl}/farmproducecategories`)
 }
 
 export function queryFarmProduce(pagination?: pagination) {
-  let url: string
-
-  if (pagination?.p !== undefined && pagination.p >= 2) {
-    url = `${baseUrl}/farmproduce?p=${pagination.p}`
-  } else {
-    url = `${baseUrl}/farmproduce`
-  }
-
-  if (pagination?.search !== undefined && pagination.search.length >= 2) {
-    url = `${baseUrl}/farmproduce?search=${pagination.search}`
-  }
-
-  return api.get(url)
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) params.append("p", String(pagination.p))
+  if (pagination?.search !== undefined && pagination.search.length >= 2) params.append("search", pagination.search)
+  const qs = params.toString()
+  return api.get(qs ? `${baseUrl}/farmproduce?${qs}` : `${baseUrl}/farmproduce`)
 }
 
 export function queryAllFarmProduce() {
@@ -551,16 +487,11 @@ export function deleteBuyerContact(id: string) {
 
 // Animal Health Product functions
 export function queryAnimalHealthProducts(pagination?: pagination) {
-  let url: string
-  if (pagination?.p !== undefined && pagination.p >= 2) {
-    url = `${baseUrl}/user/animal-health-products?p=${pagination.p}`
-  } else {
-    url = `${baseUrl}/user/animal-health-products`
-  }
-  if (pagination?.search !== undefined && pagination.search.length >= 2) {
-    url = `${baseUrl}/user/animal-health-products?search=${pagination.search}`
-  }
-  return api.get(url)
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) params.append("p", String(pagination.p))
+  if (pagination?.search !== undefined && pagination.search.length >= 2) params.append("search", pagination.search)
+  const qs = params.toString()
+  return api.get(qs ? `${baseUrl}/user/animal-health-products?${qs}` : `${baseUrl}/user/animal-health-products`)
 }
 
 export function queryAnimalHealthProduct(id: string) {
@@ -580,16 +511,11 @@ export function updateAnimalHealthProduct(data: any) {
 
 // Animal Health Category functions
 export function queryAnimalHealthCategories(pagination?: pagination) {
-  let url: string
-  if (pagination?.p !== undefined && pagination.p >= 2) {
-    url = `${baseUrl}/user/animal-health-categories?p=${pagination.p}`
-  } else {
-    url = `${baseUrl}/user/animal-health-categories`
-  }
-  if (pagination?.search !== undefined && pagination.search.length >= 2) {
-    url = `${baseUrl}/user/animal-health-categories?search=${pagination.search}`
-  }
-  return api.get(url)
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) params.append("p", String(pagination.p))
+  if (pagination?.search !== undefined && pagination.search.length >= 2) params.append("search", pagination.search)
+  const qs = params.toString()
+  return api.get(qs ? `${baseUrl}/user/animal-health-categories?${qs}` : `${baseUrl}/user/animal-health-categories`)
 }
 
 export function queryAnimalHealthCategory(id: string) {
@@ -614,16 +540,11 @@ export function deleteAnimalHealthCategories(categoryIds: string[]) {
 
 // Animal Health Active Ingredient functions
 export function queryAnimalHealthActiveIngredients(pagination?: pagination) {
-  let url: string
-  if (pagination?.p !== undefined && pagination.p >= 2) {
-    url = `${baseUrl}/user/animal-health-active-ingredients?p=${pagination.p}`
-  } else {
-    url = `${baseUrl}/user/animal-health-active-ingredients`
-  }
-  if (pagination?.search !== undefined && pagination.search.length >= 2) {
-    url = `${baseUrl}/user/animal-health-active-ingredients?search=${pagination.search}`
-  }
-  return api.get(url)
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) params.append("p", String(pagination.p))
+  if (pagination?.search !== undefined && pagination.search.length >= 2) params.append("search", pagination.search)
+  const qs = params.toString()
+  return api.get(qs ? `${baseUrl}/user/animal-health-active-ingredients?${qs}` : `${baseUrl}/user/animal-health-active-ingredients`)
 }
 
 export function queryAnimalHealthActiveIngredient(id: string) {
@@ -648,16 +569,11 @@ export function deleteAnimalHealthActiveIngredients(ingredientIds: string[]) {
 
 // Animal Health Target functions
 export function queryAnimalHealthTargets(pagination?: pagination) {
-  let url: string
-  if (pagination?.p !== undefined && pagination.p >= 2) {
-    url = `${baseUrl}/user/animal-health-targets?p=${pagination.p}`
-  } else {
-    url = `${baseUrl}/user/animal-health-targets`
-  }
-  if (pagination?.search !== undefined && pagination.search.length >= 2) {
-    url = `${baseUrl}/user/animal-health-targets?search=${pagination.search}`
-  }
-  return api.get(url)
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) params.append("p", String(pagination.p))
+  if (pagination?.search !== undefined && pagination.search.length >= 2) params.append("search", pagination.search)
+  const qs = params.toString()
+  return api.get(qs ? `${baseUrl}/user/animal-health-targets?${qs}` : `${baseUrl}/user/animal-health-targets`)
 }
 
 export function queryAnimalHealthTarget(id: string) {
@@ -748,16 +664,11 @@ export function deleteCdmPrice(priceId: string) {
 
 // Feed Product functions
 export function queryFeedProducts(pagination?: pagination) {
-  let url: string
-  if (pagination?.p !== undefined && pagination.p >= 2) {
-    url = `${baseUrl}/user/feed-products?p=${pagination.p}`
-  } else {
-    url = `${baseUrl}/user/feed-products`
-  }
-  if (pagination?.search !== undefined && pagination.search.length >= 2) {
-    url = `${baseUrl}/user/feed-products?search=${pagination.search}`
-  }
-  return api.get(url)
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) params.append("p", String(pagination.p))
+  if (pagination?.search !== undefined && pagination.search.length >= 2) params.append("search", pagination.search)
+  const qs = params.toString()
+  return api.get(qs ? `${baseUrl}/user/feed-products?${qs}` : `${baseUrl}/user/feed-products`)
 }
 
 export function queryFeedProduct(id: string) {
@@ -777,16 +688,11 @@ export function updateFeedProduct(data: any) {
 
 // Feed Category functions
 export function queryFeedCategories(pagination?: pagination) {
-  let url: string
-  if (pagination?.p !== undefined && pagination.p >= 2) {
-    url = `${baseUrl}/user/feed-categories?p=${pagination.p}`
-  } else {
-    url = `${baseUrl}/user/feed-categories`
-  }
-  if (pagination?.search !== undefined && pagination.search.length >= 2) {
-    url = `${baseUrl}/user/feed-categories?search=${pagination.search}`
-  }
-  return api.get(url)
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) params.append("p", String(pagination.p))
+  if (pagination?.search !== undefined && pagination.search.length >= 2) params.append("search", pagination.search)
+  const qs = params.toString()
+  return api.get(qs ? `${baseUrl}/user/feed-categories?${qs}` : `${baseUrl}/user/feed-categories`)
 }
 
 export function queryFeedCategory(id: string) {
@@ -811,16 +717,11 @@ export function deleteFeedCategories(categoryIds: string[]) {
 
 // Feed Active Ingredient functions
 export function queryFeedActiveIngredients(pagination?: pagination) {
-  let url: string
-  if (pagination?.p !== undefined && pagination.p >= 2) {
-    url = `${baseUrl}/user/feed-active-ingredients?p=${pagination.p}`
-  } else {
-    url = `${baseUrl}/user/feed-active-ingredients`
-  }
-  if (pagination?.search !== undefined && pagination.search.length >= 2) {
-    url = `${baseUrl}/user/feed-active-ingredients?search=${pagination.search}`
-  }
-  return api.get(url)
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) params.append("p", String(pagination.p))
+  if (pagination?.search !== undefined && pagination.search.length >= 2) params.append("search", pagination.search)
+  const qs = params.toString()
+  return api.get(qs ? `${baseUrl}/user/feed-active-ingredients?${qs}` : `${baseUrl}/user/feed-active-ingredients`)
 }
 
 export function queryFeedActiveIngredient(id: string) {
@@ -845,16 +746,11 @@ export function deleteFeedActiveIngredients(ingredientIds: string[]) {
 
 // Feed Nutritional Spec functions
 export function queryFeedNutritionalSpecs(pagination?: pagination) {
-  let url: string
-  if (pagination?.p !== undefined && pagination.p >= 2) {
-    url = `${baseUrl}/user/feed-nutritional-specs?p=${pagination.p}`
-  } else {
-    url = `${baseUrl}/user/feed-nutritional-specs`
-  }
-  if (pagination?.search !== undefined && pagination.search.length >= 2) {
-    url = `${baseUrl}/user/feed-nutritional-specs?search=${pagination.search}`
-  }
-  return api.get(url)
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) params.append("p", String(pagination.p))
+  if (pagination?.search !== undefined && pagination.search.length >= 2) params.append("search", pagination.search)
+  const qs = params.toString()
+  return api.get(qs ? `${baseUrl}/user/feed-nutritional-specs?${qs}` : `${baseUrl}/user/feed-nutritional-specs`)
 }
 
 export function queryFeedNutritionalSpec(id: string) {
@@ -879,16 +775,11 @@ export function deleteFeedNutritionalSpecs(specIds: string[]) {
 
 // Feed Target functions
 export function queryFeedTargets(pagination?: pagination) {
-  let url: string
-  if (pagination?.p !== undefined && pagination.p >= 2) {
-    url = `${baseUrl}/user/feed-targets?p=${pagination.p}`
-  } else {
-    url = `${baseUrl}/user/feed-targets`
-  }
-  if (pagination?.search !== undefined && pagination.search.length >= 2) {
-    url = `${baseUrl}/user/feed-targets?search=${pagination.search}`
-  }
-  return api.get(url)
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) params.append("p", String(pagination.p))
+  if (pagination?.search !== undefined && pagination.search.length >= 2) params.append("search", pagination.search)
+  const qs = params.toString()
+  return api.get(qs ? `${baseUrl}/user/feed-targets?${qs}` : `${baseUrl}/user/feed-targets`)
 }
 
 export function queryFeedTarget(id: string) {
@@ -913,16 +804,11 @@ export function deleteFeedTargets(targetIds: string[]) {
 
 // Feeding Program functions
 export function queryFeedingPrograms(pagination?: pagination) {
-  let url: string
-  if (pagination?.p !== undefined && pagination.p >= 2) {
-    url = `${baseUrl}/user/feeding-programs?p=${pagination.p}`
-  } else {
-    url = `${baseUrl}/user/feeding-programs`
-  }
-  if (pagination?.search !== undefined && pagination.search.length >= 2) {
-    url = `${baseUrl}/user/feeding-programs?search=${pagination.search}`
-  }
-  return api.get(url)
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) params.append("p", String(pagination.p))
+  if (pagination?.search !== undefined && pagination.search.length >= 2) params.append("search", pagination.search)
+  const qs = params.toString()
+  return api.get(qs ? `${baseUrl}/user/feeding-programs?${qs}` : `${baseUrl}/user/feeding-programs`)
 }
 
 export function queryFeedingProgram(id: string) {
@@ -1600,10 +1486,14 @@ export function createBookingEvent(data: {
   description?: string
   client_id: string
   client_name: string
+  brand_id?: string
+  brand_name?: string
   product_id: string
   product_name: string
   product_slug: string
   product_type: string
+  unit?: string
+  name?: string
   unit_price: number
   deposit_per_unit: number
   min_quantity?: number
@@ -1623,10 +1513,14 @@ export function updateBookingEvent(id: string, data: Partial<{
   description: string
   client_id: string
   client_name: string
+  brand_id: string
+  brand_name: string
   product_id: string
   product_name: string
   product_slug: string
   product_type: string
+  unit: string
+  name: string
   status: string
   total_available: number
   unit_price: number
@@ -1637,6 +1531,7 @@ export function updateBookingEvent(id: string, data: Partial<{
   close_date: string
   image_src: string
   delivery_locations: { id: string; name: string }[]
+  collection_locations: { id: string; name: string }[]
 }>) {
   return api.put(`${baseUrl}/booking/admin/events/${id}`, data)
 }
@@ -1676,15 +1571,14 @@ export function updateDeliveryLocation(id: string, data: Partial<{
 }
 
 // Livestock Poultry
-export function queryLivestockPoultryProducts(pagination?: pagination) {
-  let url = `${baseUrl}/user/livestock-poultry`
-  if (pagination?.p !== undefined && pagination.p >= 2) {
-    url = `${baseUrl}/user/livestock-poultry?p=${pagination.p}`
-  }
-  if (pagination?.search !== undefined && pagination.search.length >= 2) {
-    url = `${baseUrl}/user/livestock-poultry?search=${pagination.search}`
-  }
-  return api.get(url)
+export function queryLivestockPoultryProducts(pagination?: { p?: number; search?: string; seller_id?: string; brand_id?: string }) {
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) params.append("p", String(pagination.p))
+  if (pagination?.search !== undefined && pagination.search.length >= 2) params.append("search", pagination.search)
+  if (pagination?.seller_id) params.append("seller_id", pagination.seller_id)
+  if (pagination?.brand_id) params.append("brand_id", pagination.brand_id)
+  const qs = params.toString()
+  return api.get(qs ? `${baseUrl}/user/livestock-poultry?${qs}` : `${baseUrl}/user/livestock-poultry`)
 }
 
 export function queryLivestockPoultryProduct(id: string) {
@@ -1700,15 +1594,14 @@ export function updateLivestockPoultryProduct(data: any) {
 }
 
 // Seed Products
-export function querySeedProducts(pagination?: pagination) {
-  let url = `${baseUrl}/user/seed-products`
-  if (pagination?.p !== undefined && pagination.p >= 2) {
-    url = `${baseUrl}/user/seed-products?p=${pagination.p}`
-  }
-  if (pagination?.search !== undefined && pagination.search.length >= 2) {
-    url = `${baseUrl}/user/seed-products?search=${pagination.search}`
-  }
-  return api.get(url)
+export function querySeedProducts(pagination?: { p?: number; search?: string; seller_id?: string; brand_id?: string }) {
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) params.append("p", String(pagination.p))
+  if (pagination?.search !== undefined && pagination.search.length >= 2) params.append("search", pagination.search)
+  if (pagination?.seller_id) params.append("seller_id", pagination.seller_id)
+  if (pagination?.brand_id) params.append("brand_id", pagination.brand_id)
+  const qs = params.toString()
+  return api.get(qs ? `${baseUrl}/user/seed-products?${qs}` : `${baseUrl}/user/seed-products`)
 }
 
 export function querySeedProduct(id: string) {
