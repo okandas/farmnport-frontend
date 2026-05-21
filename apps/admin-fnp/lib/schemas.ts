@@ -1165,6 +1165,7 @@ export const RestaurantLocationSchema = z.object({
   operating_hours: z.array(OperatingHourSchema).default([]),
   status: z.enum(["active", "inactive", "closed"]).default("active"),
   accessible: z.boolean().optional(),
+  pre_orders_enabled: z.boolean().default(false),
   created: z.string().optional(),
   updated: z.string().optional(),
 })
