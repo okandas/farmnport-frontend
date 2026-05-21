@@ -120,15 +120,13 @@ export default function BookingEventDetailPage() {
                 <Image src={event.image_src} alt={event.title} fill className="object-cover" />
               </div>
             ) : (
-              <div className="aspect-square w-full rounded-2xl border bg-muted/40 flex items-center justify-center">
-                <CalendarDays className="w-24 h-24 text-muted-foreground/20" />
-              </div>
+              <div className="aspect-square w-full rounded-2xl border bg-muted/40" />
             )}
 
             <div className="mt-4 flex gap-3 flex-wrap">
               <span className="text-xs px-3 py-1 rounded-full bg-green-100 text-green-800 font-medium">Open for bookings</span>
               <span className="text-xs px-3 py-1 rounded-full bg-muted text-muted-foreground font-medium">
-                {available.toLocaleString()} of {event.total_available.toLocaleString()} left
+                {available.toLocaleString()} of {event.total_available.toLocaleString()} {event.unit} left
               </span>
             </div>
           </div>
@@ -173,13 +171,13 @@ export default function BookingEventDetailPage() {
               <div className="rounded-xl border bg-muted/30 p-4">
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Available</p>
                 <p className="text-lg font-bold">{available.toLocaleString()}</p>
-                <p className="text-xs text-muted-foreground mt-1">of {event.total_available.toLocaleString()} total</p>
+                <p className="text-xs text-muted-foreground mt-1">of {event.total_available.toLocaleString()} {event.unit} total</p>
               </div>
               <div className="rounded-xl border bg-muted/30 p-4">
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Min Order</p>
                 <p className="text-lg font-bold">{minQty.toLocaleString()}</p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  {event.max_quantity > 0 ? `max ${event.max_quantity.toLocaleString()} units` : "units minimum"}
+                  {event.max_quantity > 0 ? `max ${event.max_quantity.toLocaleString()} ${event.unit}` : `${event.unit} minimum`}
                 </p>
               </div>
               <div className="rounded-xl border bg-muted/30 p-4">

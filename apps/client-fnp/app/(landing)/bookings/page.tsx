@@ -4,8 +4,7 @@ import { useQuery } from "@tanstack/react-query"
 import Link from "next/link"
 import { CalendarDays, Loader2 } from "lucide-react"
 
-import { listBookingEvents, queryClients, listDeliveryLocations } from "@/lib/query"
-import { slug } from "@/lib/utilities"
+import { listBookingEvents } from "@/lib/query"
 import { BuyCategoriesNav } from "@/components/generic/BuyCategoriesNav"
 import { Icons } from "@/components/icons/lucide"
 
@@ -21,9 +20,8 @@ function EventCard({ event }: { event: any }) {
       className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-md hover:border-primary/50 transition-all group flex flex-col"
     >
       <div className="p-5 flex flex-col gap-3 flex-1">
-        <div className="flex items-start justify-between gap-2">
+        <div>
           <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-800 font-medium shrink-0">Open</span>
-          <CalendarDays className="w-4 h-4 text-muted-foreground shrink-0" />
         </div>
         <div>
           <h3 className="font-semibold text-sm leading-tight group-hover:text-primary transition-colors line-clamp-2">
@@ -76,19 +74,7 @@ export default function BookingEventsPage() {
     queryFn: () => listBookingEvents({ status: "open" }),
   })
 
-  const { data: buyersData } = useQuery({
-    queryKey: ["buyers-with-booking"],
-    queryFn: () => queryClients("buyer", { has_booking: "true" }).then((r) => r.data),
-  })
-
-  const { data: locationsData } = useQuery({
-    queryKey: ["all-client-locations"],
-    queryFn: () => listDeliveryLocations().then((r) => r.data),
-  })
-
   const events: any[] = data?.data?.events ?? []
-  const buyers: any[] = buyersData?.data ?? []
-  const allLocations: any[] = locationsData?.locations ?? []
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
@@ -126,7 +112,7 @@ export default function BookingEventsPage() {
               </div>
             ) : (
               <div className="mb-4 text-sm text-muted-foreground">
-                {events.length} open {events.length === 1 ? "batch" : "batches"}
+                {events.length} Open {events.length === 1 ? "Lot" : "Lots"}
               </div>
             )}
 
@@ -135,50 +121,6 @@ export default function BookingEventsPage() {
                 {events.map((event: any) => (
                   <EventCard key={event.id} event={event} />
                 ))}
-              </div>
-            )}
-
-            {buyers.length > 0 && (
-              <div className="mt-10">
-                <h2 className="text-xl font-bold mb-1">Book a Delivery Slot</h2>
-                <p className="text-sm text-muted-foreground mb-4">These buyers are accepting deliveries — book a drop-off slot directly.</p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {buyers.map((buyer: any) => {
-                    const buyerLocs = allLocations.filter((l: any) => l.client_id === buyer.id)
-                    const slots = [...new Set(buyerLocs.flatMap((l: any) => l.time_slots ?? []))]
-                    return (
-                      <Link
-                        key={buyer.id}
-                        href={`/book-delivery/${slug(buyer.name)}`}
-                        className="flex flex-col gap-3 border rounded-xl overflow-hidden hover:shadow-md hover:border-primary/50 transition-all group"
-                      >
-                        <div className="p-4 space-y-1">
-                          <div className="flex items-center gap-1.5">
-                            <p className="text-sm font-semibold capitalize">{buyer.name}</p>
-                            {buyer.verified && (
-                              <span className="flex items-center gap-0.5 text-[11px] font-medium text-green-700">
-                                <Icons.verified className="h-3.5 w-3.5 shrink-0" aria-hidden="true" color="#228B22" />
-                                verified
-                              </span>
-                            )}
-                          </div>
-                          {buyer.city && <p className="text-xs text-muted-foreground capitalize">{buyer.city}</p>}
-                          {buyer.primary_category?.name && (
-                            <p className="text-xs text-muted-foreground">Booking slots for {buyer.primary_category.name}</p>
-                          )}
-                          {slots.length > 0 && (
-                            <p className="text-xs text-muted-foreground">{slots.join(" · ")}</p>
-                          )}
-                        </div>
-                        <div className="px-4 pb-4">
-                          <div className="w-full text-center text-xs font-medium py-2 rounded-lg border group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-colors">
-                            Book Slot
-                          </div>
-                        </div>
-                      </Link>
-                    )
-                  })}
-                </div>
               </div>
             )}
           </main>
