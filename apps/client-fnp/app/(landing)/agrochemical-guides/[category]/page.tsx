@@ -67,7 +67,7 @@ export default async function AgroChemicalCategoryPage({ params }: CategoryPageP
                 </div>
             </div>
 
-            <div className="mx-auto max-w-7xl px-6 lg:px-8 py-12">
+            <div className="mx-auto max-w-7xl px-6 lg:px-8 py-6">
                 {/* Header */}
                 <div className="mb-8">
                     <h1 className="text-4xl font-bold tracking-tight font-heading mb-4 capitalize">

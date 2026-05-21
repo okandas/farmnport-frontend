@@ -3,9 +3,8 @@
 import { useQuery } from "@tanstack/react-query"
 import { queryAnimalHealthProductsByCategory } from "@/lib/query"
 import { Button } from "@/components/ui/button"
-import { Beaker } from "lucide-react"
 import { AnimalHealthFilterSidebar } from "@/components/generic/animalHealthFilterSidebar"
-import { AnimalHealthCard } from "@/components/animalhealth/AnimalHealthCard"
+import { ProductCard } from "@/components/shared/ProductCard"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
 import Link from "next/link"
 
@@ -94,7 +93,6 @@ export function AnimalHealthCategoryClient({ category, categoryName, initialProd
                         </div>
                     ) : products.length === 0 ? (
                         <div className="text-center py-12">
-                            <Beaker className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
                             <p className="text-muted-foreground mb-4">No {typeof categoryName === 'string' ? categoryName.toLowerCase() : ''} products found matching your filters.</p>
                             <Link href="/animal-health-guides">
                                 <Button variant="outline">View All Animal Health Products</Button>
@@ -104,9 +102,13 @@ export function AnimalHealthCategoryClient({ category, categoryName, initialProd
                         <>
                             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
                                 {products.map((product: any) => (
-                                    <AnimalHealthCard
+                                    <ProductCard
                                         key={product.id}
-                                        product={product}
+                                        href={`/animal-health-guides/${product.animal_health_category?.slug || "all"}/${product.slug}`}
+                                        imageSrc={product.images?.[0]?.img?.src}
+                                        name={product.name}
+                                        brand={product.brand?.name}
+                                        meta={product.animal_health_category?.name}
                                         mode="guide"
                                     />
                                 ))}

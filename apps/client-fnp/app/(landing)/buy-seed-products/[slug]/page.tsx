@@ -1,4 +1,4 @@
-import { querySeedProduct } from "@/lib/query"
+import { querySeedProduct, listBookingEvents } from "@/lib/query"
 import Link from "next/link"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { BuyProductInteractive } from "@/components/shop/BuyProductInteractive"
@@ -9,9 +9,16 @@ interface Props {
 
 export default async function BuySeedProductPage({ params }: Props) {
     const { slug } = await params
-    const response = await querySeedProduct(slug)
+    const [response, bookingRes] = await Promise.all([
+        querySeedProduct(slug),
+        listBookingEvents({ status: "open" }),
+    ])
     const product = response?.data
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://farmnport.com'
+
+    const openEvent = (bookingRes?.data?.events ?? []).find(
+        (e: any) => e.product_id && product?.id && e.product_id === product.id
+    )
 
     if (!product) {
         return (
@@ -158,6 +165,23 @@ export default async function BuySeedProductPage({ params }: Props) {
                     shopHref="/buy-seed-products"
                     loginRedirect={`/buy-seed-products/${slug}`}
                     tabsContent={tabsContent}
+                    ctaSlot={
+                        openEvent ? (
+                            <Link
+                                href={`/bookings/${openEvent.slug}`}
+                                className="mt-3 flex w-full items-center justify-center gap-2 bg-primary text-primary-foreground font-semibold py-2.5 rounded-xl hover:bg-primary/90 transition-colors text-sm"
+                            >
+                                Pre-order Now
+                            </Link>
+                        ) : (
+                            <Link
+                                href="/bookings"
+                                className="mt-3 flex w-full items-center justify-center gap-2 bg-muted text-foreground font-semibold py-2.5 rounded-xl hover:bg-muted/80 transition-colors text-sm"
+                            >
+                                View Pre-order Batches
+                            </Link>
+                        )
+                    }
                 />
             </div>
         </div>

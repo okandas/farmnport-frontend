@@ -21,6 +21,7 @@ interface BuyProductInteractiveProps {
   loginRedirect: string
   fallbackIcon?: ReactNode
   tabsContent: ReactNode
+  ctaSlot?: ReactNode
 }
 
 export function BuyProductInteractive({
@@ -36,6 +37,7 @@ export function BuyProductInteractive({
   loginRedirect,
   fallbackIcon,
   tabsContent,
+  ctaSlot,
 }: BuyProductInteractiveProps) {
   const hasVariants = product.variants && product.variants.length > 0
   const [selectedVariant, setSelectedVariant] = useState<any>(hasVariants ? product.variants[0] : null)
@@ -104,9 +106,7 @@ const [mounted, setMounted] = useState(false)
                 priority
               />
             ) : (
-              <div className="absolute inset-0 flex items-center justify-center">
-                {fallbackIcon}
-              </div>
+              <div className="absolute inset-0 bg-muted/30" />
             )}
           </div>
         </div>
@@ -203,17 +203,19 @@ const [mounted, setMounted] = useState(false)
                   <span className="text-xs font-medium text-red-700 dark:text-red-400">Out of stock</span>
                 </div>
               )}
-              <AddToCartButton
-                productId={product.id}
-                sku={selectedVariant?.sku}
-                productType={productType}
-                productName={selectedVariant ? `${product.name} - ${selectedVariant.name}` : product.name}
-                productSlug={slug}
-                imageSrc={product.images?.[0]?.img?.src}
-                unitPrice={displayPrice}
-                available={product.available_for_sale}
-                loginRedirect={loginRedirect}
-              />
+              {ctaSlot ?? (
+                <AddToCartButton
+                  productId={product.id}
+                  sku={selectedVariant?.sku}
+                  productType={productType}
+                  productName={selectedVariant ? `${product.name} - ${selectedVariant.name}` : product.name}
+                  productSlug={slug}
+                  imageSrc={product.images?.[0]?.img?.src}
+                  unitPrice={displayPrice}
+                  available={product.available_for_sale}
+                  loginRedirect={loginRedirect}
+                />
+              )}
             </div>
 
 <div className="px-5 pb-5 space-y-2.5 text-xs text-muted-foreground border-t pt-4">

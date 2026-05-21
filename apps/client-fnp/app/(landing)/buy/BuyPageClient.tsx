@@ -2,11 +2,11 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { ArrowRight, CalendarDays } from "lucide-react"
+import { ArrowRight } from "lucide-react"
 import { useQuery } from "@tanstack/react-query"
 import { Button } from "@/components/ui/button"
-import { formatProductName } from "@/lib/utilities"
 import { listBookingEvents } from "@/lib/query"
+import { ProductCard } from "@/components/shared/ProductCard"
 
 const CATEGORIES = [
   { id: "pre-orders", label: "Pre-Orders", href: "/bookings" },
@@ -14,55 +14,8 @@ const CATEGORIES = [
   { id: "animal-health", label: "Animal Health", href: "/buy-animal-health" },
   { id: "animal-feed", label: "Animal Feed", href: "/buy-feeds" },
   { id: "plant-nutrition", label: "Plant Nutrition", href: "/buy-plant-nutrition" },
+  { id: "seeds", label: "Seeds", href: "/buy-seed-products" },
 ]
-
-// ── Shared product card — matches AgroChemicalCard guide size exactly ─────────
-
-function ProductCard({ href, imageSrc, name, brand, meta }: {
-  href: string
-  imageSrc?: string
-  name: string
-  brand?: string
-  meta?: string
-}) {
-  return (
-    <div className="bg-card border border-border rounded-lg overflow-hidden transition-all duration-200 hover:shadow-lg hover:border-primary/50 group">
-      <Link href={href} className="block">
-        <div className="relative aspect-square bg-white">
-          {imageSrc ? (
-            <Image
-              src={imageSrc}
-              alt={name}
-              fill
-              sizes="(max-width: 640px) 50vw, 25vw"
-              className="object-contain transition-transform duration-200 group-hover:scale-105"
-            />
-          ) : (
-            <div className="absolute inset-0 bg-muted/30" />
-          )}
-        </div>
-      </Link>
-      <div className="p-4 space-y-3 border-t">
-        {brand && (
-          <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">{brand}</p>
-        )}
-        <Link href={href}>
-          <h3 className="font-semibold text-sm leading-tight line-clamp-2 min-h-[2.5rem] capitalize group-hover:text-primary transition-colors">
-            {formatProductName(name)}
-          </h3>
-        </Link>
-        {meta && (
-          <div className="flex items-center gap-4 text-xs text-muted-foreground pt-2 border-t">
-            <span>{meta}</span>
-          </div>
-        )}
-        <Link href={href} className="block">
-          <Button variant="outline" className="w-full" size="sm">View Product</Button>
-        </Link>
-      </div>
-    </div>
-  )
-}
 
 // ── Document card ─────────────────────────────────────────────────────────────
 
@@ -83,7 +36,7 @@ function DocumentCard({ doc }: { doc: any }) {
       </Link>
       <div className="p-4 space-y-3 border-t">
         <Link href={href}>
-          <h3 className="font-semibold text-sm leading-tight line-clamp-2 min-h-[2.5rem] group-hover:text-primary transition-colors">{doc.title}</h3>
+          <h3 className="font-semibold text-sm leading-tight line-clamp-2 group-hover:text-primary transition-colors">{doc.title}</h3>
         </Link>
         <div className="flex items-center gap-4 text-xs pt-2 border-t">
           <span className="font-semibold text-primary">{price}</span>
@@ -118,24 +71,17 @@ function PreOrdersSection() {
           View all <ArrowRight className="h-3.5 w-3.5" />
         </Link>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {events.slice(0, 3).map((event: any) => (
-          <Link
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+        {events.slice(0, 4).map((event: any) => (
+          <ProductCard
             key={event.id}
             href={`/bookings/${event.slug}`}
-            className="border rounded-xl p-4 hover:border-primary/40 hover:shadow-sm transition-all space-y-2"
-          >
-            <div className="flex items-center justify-between">
-              <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-800 font-medium">Open</span>
-              <CalendarDays className="w-4 h-4 text-muted-foreground" />
-            </div>
-            <h3 className="font-semibold text-sm leading-tight">{event.title}</h3>
-            <p className="text-xs text-muted-foreground">{event.client_name} · {event.product_name}</p>
-            <div className="pt-1 border-t flex items-center justify-between text-xs">
-              <span className="text-muted-foreground">${(event.unit_price / 100).toFixed(2)}/unit</span>
-              <span className="text-muted-foreground">${(event.deposit_per_unit / 100).toFixed(2)} deposit</span>
-            </div>
-          </Link>
+            name={event.title}
+            brand={event.product_name}
+            meta={event.unit_price > 0 ? `$${(event.unit_price / 100).toFixed(2)}` : undefined}
+            mode="guide"
+            buttonLabel="Pre-order"
+          />
         ))}
       </div>
     </section>
@@ -181,6 +127,8 @@ interface BuyPageClientProps {
   feedsTotal?: number
   plantNutrition?: any[]
   plantNutritionTotal?: number
+  seeds?: any[]
+  seedsTotal?: number
   documents?: any[]
   documentsTotal?: number
 }
@@ -190,6 +138,7 @@ export function BuyPageClient({
   animalHealth = [], animalHealthTotal = 0,
   feeds = [], feedsTotal = 0,
   plantNutrition = [], plantNutritionTotal = 0,
+  seeds = [], seedsTotal = 0,
   documents = [], documentsTotal = 0,
 }: BuyPageClientProps) {
   return (
@@ -221,33 +170,41 @@ export function BuyPageClient({
 
           <Section label="Agrochemicals" href="/buy-agrochemicals" count={agrochemicalTotal}>
             {agrochemicals.slice(0, 4).map((p) => (
-              <ProductCard key={p.id} href={`/buy-agrochemicals/${p.slug}`} imageSrc={p.images?.[0]?.img?.src} name={p.name} brand={p.brand?.name} meta={p.agrochemical_category?.name} />
+              <ProductCard key={p.id} mode="buy" href={`/buy-agrochemicals/${p.slug}`} imageSrc={p.images?.[0]?.img?.src} name={p.name} brand={p.brand?.name} meta={p.agrochemical_category?.name} productId={p.id} productType="agrochemical" productSlug={p.slug} showPrice={p.show_price} salePrice={p.sale_price} wasPrice={p.was_price} showWasPrice={p.show_was_price} availableForSale={p.available_for_sale} />
             ))}
           </Section>
 
           <Section label="Animal Health" href="/buy-animal-health" count={animalHealthTotal}>
             {animalHealth.slice(0, 4).map((p) => (
-              <ProductCard key={p.id} href={`/buy-animal-health/${p.slug}`} imageSrc={p.images?.[0]?.img?.src} name={p.name} brand={p.brand?.name} meta={p.animal_health_category?.name} />
+              <ProductCard key={p.id} mode="buy" href={`/buy-animal-health/${p.slug}`} imageSrc={p.images?.[0]?.img?.src} name={p.name} brand={p.brand?.name} meta={p.animal_health_category?.name} productId={p.id} productType="animal_health" productSlug={p.slug} showPrice={p.show_price} salePrice={p.sale_price} wasPrice={p.was_price} showWasPrice={p.show_was_price} availableForSale={p.available_for_sale} />
             ))}
           </Section>
 
           <Section label="Animal Feed" href="/buy-feeds" count={feedsTotal}>
             {feeds.slice(0, 4).map((p) => (
-              <ProductCard key={p.id} href={`/buy-feeds/${p.slug}`} imageSrc={p.images?.[0]?.img?.src} name={p.name} brand={p.brand?.name} meta={p.animal ? `${p.animal}${p.phase ? ` · ${p.phase}` : ""}` : undefined} />
+              <ProductCard key={p.id} mode="buy" href={`/buy-feeds/${p.slug}`} imageSrc={p.images?.[0]?.img?.src} name={p.name} brand={p.brand?.name} meta={p.animal ? `${p.animal}${p.phase ? ` · ${p.phase}` : ""}` : undefined} productId={p.id} productType="feed" productSlug={p.slug} showPrice={p.show_price} salePrice={p.sale_price} wasPrice={p.was_price} showWasPrice={p.show_was_price} availableForSale={p.available_for_sale} />
             ))}
           </Section>
 
           <Section label="Plant Nutrition" href="/buy-plant-nutrition" count={plantNutritionTotal}>
             {plantNutrition.slice(0, 4).map((p) => (
-              <ProductCard key={p.id} href={`/buy-plant-nutrition/${p.slug}`} imageSrc={p.images?.[0]?.img?.src} name={p.name} brand={p.brand?.name} meta={p.plant_nutrition_category?.name} />
+              <ProductCard key={p.id} mode="buy" href={`/buy-plant-nutrition/${p.slug}`} imageSrc={p.images?.[0]?.img?.src} name={p.name} brand={p.brand?.name} meta={p.plant_nutrition_category?.name} productId={p.id} productType="plant_nutrition" productSlug={p.slug} showPrice={p.show_price} salePrice={p.sale_price} wasPrice={p.was_price} showWasPrice={p.show_was_price} availableForSale={p.available_for_sale} />
             ))}
           </Section>
 
-          <Section label="Plans & Documents" href="/buy-documents" count={documentsTotal}>
-            {documents.slice(0, 4).map((doc) => (
-              <DocumentCard key={doc.id} doc={doc} />
+          <Section label="Seeds" href="/buy-seed-products" count={seedsTotal}>
+            {seeds.slice(0, 4).map((p) => (
+              <ProductCard key={p.id} mode="buy" href={`/buy-seed-products/${p.slug}`} imageSrc={p.images?.[0]?.img?.src} name={p.name} brand={p.brand?.name} meta={p.variety ? `${p.variety}${p.type ? ` · ${p.type.replace("_", " ")}` : ""}` : undefined} productId={p.id} productType="seed_product" productSlug={p.slug} showPrice={p.show_price} salePrice={p.sale_price} wasPrice={p.was_price} showWasPrice={p.show_was_price} availableForSale={p.available_for_sale} />
             ))}
           </Section>
+
+          {documents.length > 0 && (
+            <Section label="Plans & Documents" href="/buy-documents" count={documentsTotal}>
+              {documents.slice(0, 4).map((doc) => (
+                <DocumentCard key={doc.id} doc={doc} />
+              ))}
+            </Section>
+          )}
 
         </main>
       </div>

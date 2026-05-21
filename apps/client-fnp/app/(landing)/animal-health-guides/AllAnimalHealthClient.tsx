@@ -3,9 +3,8 @@
 import { useQuery } from "@tanstack/react-query"
 import { queryAllAnimalHealthProducts } from "@/lib/query"
 import { Button } from "@/components/ui/button"
-import { Beaker } from "lucide-react"
 import { AnimalHealthFilterSidebar } from "@/components/generic/animalHealthFilterSidebar"
-import { AnimalHealthCard } from "@/components/animalhealth/AnimalHealthCard"
+import { ProductCard } from "@/components/shared/ProductCard"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
 
 interface AllAnimalHealthClientProps {
@@ -77,14 +76,21 @@ export function AllAnimalHealthClient({ initialProducts, initialTotal }: AllAnim
                     </div>
                 ) : products.length === 0 ? (
                     <div className="text-center py-12">
-                        <Beaker className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
                         <p className="text-muted-foreground">No animal health products found matching your filters.</p>
                     </div>
                 ) : (
                     <>
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
                             {products.map((product: any) => (
-                                <AnimalHealthCard key={product.id} product={product} mode="guide" />
+                                <ProductCard
+                                    key={product.id}
+                                    href={`/animal-health-guides/${product.animal_health_category?.slug || "all"}/${product.slug}`}
+                                    imageSrc={product.images?.[0]?.img?.src}
+                                    name={product.name}
+                                    brand={product.brand?.name}
+                                    meta={product.animal_health_category?.name}
+                                    mode="guide"
+                                />
                             ))}
                         </div>
 

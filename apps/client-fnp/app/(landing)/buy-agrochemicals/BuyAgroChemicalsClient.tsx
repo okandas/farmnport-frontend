@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query"
 import { queryAllAgroChemicals } from "@/lib/query"
 import { Button } from "@/components/ui/button"
 import { AgroChemicalFilterSidebar } from "@/components/generic/agroChemicalFilterSidebar"
-import { AgroChemicalCard } from "@/components/agrochemical/AgroChemicalCard"
+import { ProductCard } from "@/components/shared/ProductCard"
 import { BuyCategoriesNav } from "@/components/generic/BuyCategoriesNav"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
 import { Beaker } from "lucide-react"
@@ -92,10 +92,22 @@ export function BuyAgroChemicalsClient({ initialChemicals, initialTotal }: BuyAg
 
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
                             {chemicals.map((chemical: any) => (
-                                <AgroChemicalCard
+                                <ProductCard
                                     key={chemical.id}
-                                    chemical={chemical}
-                                    mode="shop"
+                                    href={`/buy-agrochemicals/${chemical.slug}`}
+                                    imageSrc={chemical.images?.[0]?.img?.src}
+                                    name={chemical.name}
+                                    brand={chemical.brand?.name}
+                                    meta={chemical.agrochemical_category?.name}
+                                    mode="buy"
+                                    productId={chemical.id}
+                                    productType="agrochemical"
+                                    productSlug={chemical.slug}
+                                    showPrice={chemical.show_price}
+                                    salePrice={chemical.sale_price}
+                                    wasPrice={chemical.was_price}
+                                    showWasPrice={chemical.show_was_price}
+                                    availableForSale={chemical.available_for_sale}
                                 />
                             ))}
                         </div>

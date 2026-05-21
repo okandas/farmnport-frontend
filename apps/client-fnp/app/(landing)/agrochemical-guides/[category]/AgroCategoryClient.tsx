@@ -5,7 +5,7 @@ import { queryAgroChemicalsByCategory } from "@/lib/query"
 import { Button } from "@/components/ui/button"
 import { Beaker } from "lucide-react"
 import { AgroChemicalFilterSidebar } from "@/components/generic/agroChemicalFilterSidebar"
-import { AgroChemicalCard } from "@/components/agrochemical/AgroChemicalCard"
+import { ProductCard } from "@/components/shared/ProductCard"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
 import Link from "next/link"
 
@@ -90,9 +90,13 @@ export function AgroCategoryClient({ category, categoryName, initialChemicals, i
                     <>
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
                             {chemicals.map((chemical: any) => (
-                                <AgroChemicalCard
+                                <ProductCard
                                     key={chemical.id}
-                                    chemical={chemical}
+                                    href={`/agrochemical-guides/${chemical.agrochemical_category?.slug || "all"}/${chemical.slug}`}
+                                    imageSrc={chemical.images?.[0]?.img?.src}
+                                    name={chemical.name}
+                                    brand={chemical.brand?.name}
+                                    meta={chemical.agrochemical_category?.name}
                                     mode="guide"
                                 />
                             ))}

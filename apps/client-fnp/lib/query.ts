@@ -801,3 +801,7 @@ export function queryAllSeedProducts(pagination?: { p?: number; brand?: string[]
 export function querySeedProduct(slug: string) {
   return api.get(`${BaseURL}/seed-products/${slug}`)
 }
+
+export function querySeedProductFilterAggregates() {
+  return api.get(`${BaseURL}/seed-products/aggregates/filters`)
+}

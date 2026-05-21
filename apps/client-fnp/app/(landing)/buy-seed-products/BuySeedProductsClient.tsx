@@ -1,18 +1,20 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
-import { Sprout } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { queryAllSeedProducts } from "@/lib/query"
-import { SeedProductCard } from "@/components/seeds/SeedProductCard"
+import { ProductCard } from "@/components/shared/ProductCard"
+import { BuyCategoriesNav } from "@/components/generic/BuyCategoriesNav"
+import { SeedFilterSidebar } from "@/components/generic/seedFilterSidebar"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
 
 interface BuySeedProductsClientProps {
   initialProducts: any[]
   initialTotal: number
+  bookingEvents: any[]
 }
 
-export function BuySeedProductsClient({ initialProducts, initialTotal }: BuySeedProductsClientProps) {
+export function BuySeedProductsClient({ initialProducts, initialTotal, bookingEvents }: BuySeedProductsClientProps) {
   const [queryState, setQueryState] = useQueryStates({
     brand: parseAsArrayOf(parseAsString),
     p: parseAsInteger.withDefault(1),
@@ -39,54 +41,92 @@ export function BuySeedProductsClient({ initialProducts, initialTotal }: BuySeed
   }
 
   return (
-    <div>
-      {isLoading ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="animate-pulse">
-              <div className="bg-card border border-border rounded-lg overflow-hidden">
-                <div className="aspect-square bg-muted" />
-                <div className="p-4 space-y-3 border-t">
-                  <div className="h-3 bg-muted rounded w-1/3" />
-                  <div className="h-4 bg-muted rounded w-4/5" />
-                  <div className="h-10 bg-muted rounded mt-4" />
+    <div className="flex flex-col lg:flex-row gap-8">
+      <aside className="w-full lg:w-64 flex-shrink-0">
+        <BuyCategoriesNav />
+        <SeedFilterSidebar />
+      </aside>
+
+      <main className="flex-1">
+        {isLoading ? (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="animate-pulse">
+                <div className="bg-card border border-border rounded-lg overflow-hidden">
+                  <div className="aspect-square bg-muted" />
+                  <div className="p-4 space-y-3 border-t">
+                    <div className="h-3 bg-muted rounded w-1/3" />
+                    <div className="h-4 bg-muted rounded w-4/5" />
+                    <div className="h-10 bg-muted rounded mt-4" />
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
-      ) : products.length === 0 ? (
-        <div className="text-center py-12">
-          <Sprout className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-          <p className="text-muted-foreground">No seed products found.</p>
-        </div>
-      ) : (
-        <>
-          <div className="mb-4 text-sm text-muted-foreground">
-            Showing {products.length} of {productsData?.data?.total || 0} products
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-            {products.map((product: any) => (
-              <SeedProductCard key={product.id} product={product} mode="shop" />
             ))}
           </div>
-          {totalPages > 1 && (
-            <div className="mt-8 flex justify-center gap-1">
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
-                <Button
-                  key={pageNum}
-                  variant={queryState.p === pageNum ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => handlePageChange(pageNum)}
-                  className="min-w-[40px]"
-                >
-                  {pageNum}
-                </Button>
-              ))}
+        ) : products.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">No seed products found.</p>
+          </div>
+        ) : (
+          <>
+            <div className="mb-4 text-sm text-muted-foreground">
+              Showing {products.length} of {productsData?.data?.total || 0} products
             </div>
-          )}
-        </>
-      )}
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+              {products.map((product: any) => {
+                const bookingEvent = bookingEvents.find((e: any) => e.product_id === product.id)
+                return (
+                  <ProductCard
+                    key={product.id}
+                    href={`/buy-seed-products/${product.slug}`}
+                    imageSrc={product.images?.[0]?.img?.src}
+                    name={product.name}
+                    brand={product.brand?.name}
+                    meta={[product.variety, product.type?.replace("_", " ")].filter(Boolean).join(" · ")}
+                    mode="buy"
+                    productId={product.id}
+                    productType="seed_product"
+                    productSlug={product.slug}
+                    showPrice={product.show_price}
+                    salePrice={product.sale_price}
+                    wasPrice={product.was_price}
+                    showWasPrice={product.show_was_price}
+                    availableForSale={product.available_for_sale}
+                    preorderHref={bookingEvent ? `/bookings/${bookingEvent.slug}` : undefined}
+                  />
+                )
+              })}
+            </div>
+            {totalPages > 1 && (
+              <div className="mt-8 flex justify-center gap-1">
+                {Array.from({ length: totalPages }, (_, i) => i + 1)
+                  .filter(pageNum =>
+                    pageNum === 1 ||
+                    pageNum === totalPages ||
+                    (pageNum >= queryState.p - 2 && pageNum <= queryState.p + 2)
+                  )
+                  .map((pageNum, idx, arr) => {
+                    const prevPageNum = arr[idx - 1]
+                    const showEllipsis = prevPageNum && pageNum - prevPageNum > 1
+                    return (
+                      <div key={pageNum} className="flex items-center gap-1">
+                        {showEllipsis && <span className="px-2 text-muted-foreground">...</span>}
+                        <Button
+                          variant={queryState.p === pageNum ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => handlePageChange(pageNum)}
+                          className="min-w-[40px]"
+                        >
+                          {pageNum}
+                        </Button>
+                      </div>
+                    )
+                  })}
+              </div>
+            )}
+          </>
+        )}
+      </main>
     </div>
   )
 }

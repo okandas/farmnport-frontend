@@ -16,7 +16,7 @@ export default async function BuyLivestockPoultryPage() {
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
-            <div className="mx-auto max-w-7xl px-6 lg:px-8 py-12">
+            <div className="mx-auto max-w-7xl px-6 lg:px-8 py-6">
                 <nav className="flex items-center gap-1.5 text-xs text-muted-foreground mb-6">
                     <Link href="/" className="hover:text-foreground transition-colors">Home</Link>
                     <span>/</span>

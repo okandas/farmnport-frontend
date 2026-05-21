@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { ActiveIngredientsList } from "@/components/shared/ActiveIngredientUnitsKey"
 import Image from "next/image"
-import { Beaker, AlertTriangle } from "lucide-react"
+import { AlertTriangle } from "lucide-react"
 import Link from "next/link"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
 import { capitalizeFirstLetter, formatUnit } from "@/lib/utilities"
@@ -76,9 +76,7 @@ export default async function AnimalHealthGuidePage({ params }: GuidePageProps) 
             <div className="min-h-screen bg-background flex items-center justify-center px-4 pb-4">
                 <div className="text-center max-w-md">
                     <div className="mb-6">
-                        <div className="mx-auto w-20 h-20 bg-muted rounded-full flex items-center justify-center">
-                            <Beaker className="w-10 h-10 text-muted-foreground" />
-                        </div>
+                        <div className="mx-auto w-20 h-20 bg-muted rounded-full" />
                     </div>
                     <h2 className="text-2xl font-semibold mb-2">Guide Not Found</h2>
                     <p className="text-muted-foreground mb-6">
@@ -284,9 +282,7 @@ export default async function AnimalHealthGuidePage({ params }: GuidePageProps) 
                                     priority
                                 />
                             ) : (
-                                <div className="absolute inset-0 flex items-center justify-center">
-                                    <Beaker className="w-24 h-24 text-muted-foreground/30" />
-                                </div>
+                                <div className="absolute inset-0 bg-muted/30" />
                             )}
                         </div>
 

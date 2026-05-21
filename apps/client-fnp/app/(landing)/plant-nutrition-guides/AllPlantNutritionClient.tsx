@@ -3,9 +3,8 @@
 import { useQuery } from "@tanstack/react-query"
 import { queryAllPlantNutritionProducts } from "@/lib/query"
 import { Button } from "@/components/ui/button"
-import { Leaf } from "lucide-react"
-import { PlantNutritionCard } from "@/components/plantnutrition/PlantNutritionCard"
 import { PlantNutritionFilterSidebar } from "@/components/generic/plantNutritionFilterSidebar"
+import { ProductCard } from "@/components/shared/ProductCard"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
 
 interface AllPlantNutritionClientProps {
@@ -76,14 +75,21 @@ export function AllPlantNutritionClient({ initialProducts, initialTotal }: AllPl
                 </div>
             ) : products.length === 0 ? (
                 <div className="text-center py-12">
-                    <Leaf className="w-16 h-16 text-muted-foreground/30 mx-auto mb-4" />
                     <p className="text-muted-foreground">No products found matching your filters.</p>
                 </div>
             ) : (
                 <>
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
                         {products.map((product: any) => (
-                            <PlantNutritionCard key={product.id} product={product} />
+                            <ProductCard
+                                key={product.id}
+                                href={`/plant-nutrition-guides/${product.plant_nutrition_category?.slug || "all"}/${product.slug}`}
+                                imageSrc={product.images?.[0]?.img?.src}
+                                name={product.name}
+                                brand={product.brand?.name}
+                                meta={product.plant_nutrition_category?.name}
+                                mode="guide"
+                            />
                         ))}
                     </div>
 

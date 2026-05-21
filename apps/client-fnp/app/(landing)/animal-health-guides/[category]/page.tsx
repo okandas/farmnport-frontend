@@ -63,7 +63,7 @@ export default async function AnimalHealthCategoryPage({ params }: CategoryPageP
                 </div>
             </div>
 
-            <div className="mx-auto max-w-7xl px-6 lg:px-8 py-12">
+            <div className="mx-auto max-w-7xl px-6 lg:px-8 py-6">
                 <AnimalHealthCategoryClient
                     category={category}
                     categoryName={categoryName}

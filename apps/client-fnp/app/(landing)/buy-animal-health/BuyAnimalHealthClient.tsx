@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query"
 import { queryAllAnimalHealthProducts } from "@/lib/query"
 import { Button } from "@/components/ui/button"
 import { AnimalHealthFilterSidebar } from "@/components/generic/animalHealthFilterSidebar"
-import { AnimalHealthCard } from "@/components/animalhealth/AnimalHealthCard"
+import { ProductCard } from "@/components/shared/ProductCard"
 import { BuyCategoriesNav } from "@/components/generic/BuyCategoriesNav"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
 import { Beaker } from "lucide-react"
@@ -92,10 +92,22 @@ export function BuyAnimalHealthClient({ initialProducts, initialTotal }: BuyAnim
 
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
                             {products.map((product: any) => (
-                                <AnimalHealthCard
+                                <ProductCard
                                     key={product.id}
-                                    product={product}
-                                    mode="shop"
+                                    href={`/buy-animal-health/${product.slug}`}
+                                    imageSrc={product.images?.[0]?.img?.src}
+                                    name={product.name}
+                                    brand={product.brand?.name}
+                                    meta={product.animal_health_category?.name}
+                                    mode="buy"
+                                    productId={product.id}
+                                    productType="animal_health"
+                                    productSlug={product.slug}
+                                    showPrice={product.show_price}
+                                    salePrice={product.sale_price}
+                                    wasPrice={product.was_price}
+                                    showWasPrice={product.show_was_price}
+                                    availableForSale={product.available_for_sale}
                                 />
                             ))}
                         </div>
