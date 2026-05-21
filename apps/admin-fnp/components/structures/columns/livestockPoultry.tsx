@@ -29,6 +29,7 @@ export const livestockPoultryColumns: ColumnDef<any>[] = [
   {
     accessorKey: "name",
     header: "Name",
+    cell: ({ row }) => <span className="capitalize">{row.getValue("name")}</span>,
   },
   {
     accessorKey: "farm_produce",
