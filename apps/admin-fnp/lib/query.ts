@@ -227,17 +227,18 @@ export function deleteAgroChemicals(productIds: string[]) {
 
 // Brand functions
 export function queryBrands(pagination?: pagination) {
-  let url: string
+  const params = new URLSearchParams()
 
   if (pagination?.p !== undefined && pagination.p >= 2) {
-    url = `${baseUrl}/user/brands?p=${pagination.p}`
-  } else {
-    url = `${baseUrl}/user/brands`
+    params.append('p', pagination.p.toString())
   }
 
   if (pagination?.search !== undefined && pagination.search.length >= 2) {
-    url = `${baseUrl}/user/brands?search=${pagination.search}`
+    params.append('search', pagination.search)
   }
+
+  const queryString = params.toString()
+  const url = queryString ? `${baseUrl}/user/brands?${queryString}` : `${baseUrl}/user/brands`
 
   return api.get(url)
 }

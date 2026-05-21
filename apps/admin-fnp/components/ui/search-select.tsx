@@ -42,7 +42,7 @@ export function SearchSelect({
     const [open, setOpen] = useState(false)
     const [search, setSearch] = useState("")
     const [debouncedSearch, setDebouncedSearch] = useState("")
-    const sentinelRef = useRef<HTMLDivElement>(null)
+    const listRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
         const t = setTimeout(() => setDebouncedSearch(search), 300)
@@ -65,20 +65,13 @@ export function SearchSelect({
     const selectedItem = items.find((item) => getValue(item) === value)
     const selectedLabel = selectedItem ? getLabel(selectedItem) : value ? `ID: ${value.slice(-6)}` : ""
 
-    useEffect(() => {
-        const sentinel = sentinelRef.current
-        if (!sentinel || !open) return
-        const observer = new IntersectionObserver(
-            (entries) => {
-                if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
-                    fetchNextPage()
-                }
-            },
-            { threshold: 0.1 }
-        )
-        observer.observe(sentinel)
-        return () => observer.disconnect()
-    }, [hasNextPage, isFetchingNextPage, fetchNextPage, open, items.length])
+    function handleScroll() {
+        const el = listRef.current
+        if (!el || !hasNextPage || isFetchingNextPage) return
+        if (el.scrollTop + el.clientHeight >= el.scrollHeight - 40) {
+            fetchNextPage()
+        }
+    }
 
     return (
         <Popover open={open} onOpenChange={(o) => { setOpen(o); if (!o) setSearch("") }}>
@@ -116,7 +109,7 @@ export function SearchSelect({
                         value={search}
                         onValueChange={setSearch}
                     />
-                    <CommandList className="max-h-56 overflow-y-auto">
+                    <CommandList ref={listRef} className="max-h-56 overflow-y-auto" onScroll={handleScroll}>
                         {!isLoading && items.length === 0 && (
                             <CommandEmpty>No results found.</CommandEmpty>
                         )}
@@ -135,7 +128,7 @@ export function SearchSelect({
                                 {getLabel(item)}
                             </CommandItem>
                         ))}
-                        <div ref={sentinelRef} className="px-3 py-1.5 text-center text-xs text-gray-400">
+                        <div className="px-3 py-1.5 text-center text-xs text-gray-400">
                             {isFetchingNextPage && "Loading more..."}
                         </div>
                     </CommandList>
