@@ -9,7 +9,7 @@ import { useMutation, useQuery } from "@tanstack/react-query"
 import * as z from "zod"
 
 import { querySeedProduct, updateSeedProduct, queryBrands, queryUsers, queryFarmProduceCategories, queryFarmProduceByCategory, queryBreeds } from "@/lib/query"
-import { cn } from "@/lib/utilities"
+import { cn, dollarsToCents } from "@/lib/utilities"
 import { buttonVariants } from "@/components/ui/button"
 import { Icons } from "@/components/icons/lucide"
 import { toast } from "@/components/ui/use-toast"
@@ -151,7 +151,16 @@ function EditForm({ product, id }: { product: any; id: string }) {
     })
 
     function onSubmit(data: FormModel) {
-        mutate(data)
+        mutate({
+            ...data,
+            sale_price: dollarsToCents(data.sale_price),
+            was_price: dollarsToCents(data.was_price),
+            variants: data.variants.map((v) => ({
+                ...v,
+                sale_price: dollarsToCents(v.sale_price),
+                was_price: dollarsToCents(v.was_price),
+            })),
+        })
     }
 
     return (
@@ -193,6 +202,8 @@ function EditForm({ product, id }: { product: any; id: string }) {
                                                         getValue={(cat) => cat.slug}
                                                         placeholder="Select category"
                                                         searchPlaceholder="Search categories..."
+                                                        clearable
+                                                        capitalize
                                                     />
                                                 </FormControl>
                                                 <FormMessage />
@@ -224,7 +235,7 @@ function EditForm({ product, id }: { product: any; id: string }) {
                                                             <CommandList className="max-h-56">
                                                                 <CommandEmpty>No produce found.</CommandEmpty>
                                                                 {filteredProduce.map((fp: any) => (
-                                                                    <CommandItem key={fp.id} value={fp.id} onSelect={() => { field.onChange(fp.id); form.setValue("breed_id", ""); setProduceOpen(false); setProduceSearch("") }}>
+                                                                    <CommandItem key={fp.id} value={fp.id} onSelect={() => { field.onChange(fp.id); form.setValue("breed_id", ""); setProduceOpen(false); setProduceSearch("") }} className="capitalize">
                                                                         <Check className={cn("mr-2 h-4 w-4 shrink-0", fp.id === field.value ? "opacity-100" : "opacity-0")} />
                                                                         {fp.name}
                                                                     </CommandItem>
@@ -255,6 +266,7 @@ function EditForm({ product, id }: { product: any; id: string }) {
                                                         placeholder="Select client"
                                                         searchPlaceholder="Search clients..."
                                                         clearable
+                                                        capitalize
                                                     />
                                                 </FormControl>
                                                 <FormMessage />
@@ -279,6 +291,7 @@ function EditForm({ product, id }: { product: any; id: string }) {
                                                         placeholder="Select brand"
                                                         searchPlaceholder="Search brands..."
                                                         clearable
+                                                        capitalize
                                                     />
                                                 </FormControl>
                                                 <FormMessage />
@@ -303,6 +316,8 @@ function EditForm({ product, id }: { product: any; id: string }) {
                                                         placeholder="Select variety"
                                                         searchPlaceholder="Search varieties..."
                                                         disabled={!watchedFarmProduceId}
+                                                        clearable
+                                                        capitalize
                                                     />
                                                 </FormControl>
                                                 <FormMessage />

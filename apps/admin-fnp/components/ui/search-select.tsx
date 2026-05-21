@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react"
 import { useInfiniteQuery } from "@tanstack/react-query"
-import { Check, ChevronsUpDown } from "lucide-react"
+import { Check, ChevronsUpDown, X } from "lucide-react"
 import { cn } from "@/lib/utilities"
 import { Button } from "@/components/ui/button"
 import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
@@ -20,6 +20,7 @@ interface SearchSelectProps {
     searchPlaceholder?: string
     disabled?: boolean
     clearable?: boolean
+    capitalize?: boolean
     className?: string
 }
 
@@ -35,6 +36,7 @@ export function SearchSelect({
     searchPlaceholder = "Search...",
     disabled = false,
     clearable = false,
+    capitalize = false,
     className,
 }: SearchSelectProps) {
     const [open, setOpen] = useState(false)
@@ -92,8 +94,19 @@ export function SearchSelect({
                         className
                     )}
                 >
-                    <span className="truncate">{selectedLabel || placeholder}</span>
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    <span className={cn("truncate", capitalize && "capitalize")}>{selectedLabel || placeholder}</span>
+                    <span className="ml-2 flex items-center gap-1 shrink-0">
+                        {clearable && value && (
+                            <span
+                                role="button"
+                                onClick={(e) => { e.stopPropagation(); onValueChange(""); setSearch("") }}
+                                className="rounded-full p-0.5 hover:bg-gray-200 dark:hover:bg-white/20 text-muted-foreground"
+                            >
+                                <X className="h-3 w-3" />
+                            </span>
+                        )}
+                        <ChevronsUpDown className="h-4 w-4 opacity-50" />
+                    </span>
                 </Button>
             </PopoverTrigger>
             <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
@@ -107,15 +120,6 @@ export function SearchSelect({
                         {!isLoading && items.length === 0 && (
                             <CommandEmpty>No results found.</CommandEmpty>
                         )}
-                        {clearable && value && (
-                            <CommandItem
-                                value="__clear__"
-                                onSelect={() => { onValueChange(""); setOpen(false); setSearch("") }}
-                                className="text-muted-foreground italic"
-                            >
-                                Clear selection
-                            </CommandItem>
-                        )}
                         {items.map((item) => (
                             <CommandItem
                                 key={getValue(item)}
@@ -125,6 +129,7 @@ export function SearchSelect({
                                     setOpen(false)
                                     setSearch("")
                                 }}
+                                className={capitalize ? "capitalize" : undefined}
                             >
                                 <Check className={cn("mr-2 h-4 w-4 shrink-0", getValue(item) === value ? "opacity-100" : "opacity-0")} />
                                 {getLabel(item)}

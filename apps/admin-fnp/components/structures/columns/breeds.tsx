@@ -36,15 +36,15 @@ export const breedColumns: ColumnDef<any>[] = [
     header: "Farm Produce",
     cell: ({ row }) => {
       const fp = row.original.farm_produce
-      return <span>{fp?.name || "—"}</span>
+      return <span className="capitalize">{fp?.name || "—"}</span>
     },
   },
   {
-    accessorKey: "description",
-    header: "Description",
+    accessorKey: "category",
+    header: "Category",
     cell: ({ row }) => {
-      const desc = row.getValue("description") as string
-      return <span className="text-muted-foreground">{desc || "—"}</span>
+      const fp = row.original.farm_produce
+      return <span className="text-muted-foreground capitalize">{fp?.category_slug?.replace(/-/g, " ") || "—"}</span>
     },
   },
   {

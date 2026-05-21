@@ -36,7 +36,7 @@ export const seedProductColumns: ColumnDef<any>[] = [
     header: "Farm Produce",
     cell: ({ row }) => {
       const fp = row.original.farm_produce
-      return <span>{fp?.name || "—"}</span>
+      return <span className="capitalize">{fp?.name || "—"}</span>
     },
   },
   {
@@ -44,7 +44,7 @@ export const seedProductColumns: ColumnDef<any>[] = [
     header: "Variety",
     cell: ({ row }) => {
       const breed = row.original.breed_obj
-      return <span>{breed?.name || "—"}</span>
+      return <span className="capitalize">{breed?.name || "—"}</span>
     },
   },
   {
@@ -52,7 +52,7 @@ export const seedProductColumns: ColumnDef<any>[] = [
     header: "Brand",
     cell: ({ row }) => {
       const brand = row.original.brand
-      return <span>{brand?.name || "—"}</span>
+      return <span className="capitalize">{brand?.name || "—"}</span>
     },
   },
   {
