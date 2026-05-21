@@ -8,7 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import * as z from "zod"
 
-import { queryLivestockPoultryProduct, updateLivestockPoultryProduct, queryBrands, queryFarmProduceCategories, queryFarmProduceByCategory, queryBreeds } from "@/lib/query"
+import { queryLivestockPoultryProduct, updateLivestockPoultryProduct, queryBrands, queryUsers, queryFarmProduceCategories, queryFarmProduceByCategory, queryBreeds } from "@/lib/query"
 import { cn } from "@/lib/utilities"
 import { buttonVariants } from "@/components/ui/button"
 import { Icons } from "@/components/icons/lucide"
@@ -55,6 +55,9 @@ const Schema = z.object({
     show_price: z.boolean().default(false),
     sale_price: z.coerce.number().default(0),
     was_price: z.coerce.number().default(0),
+}).refine((data) => !!data.brand_id || !!data.seller_id, {
+    message: "Either a Brand or a Client must be selected",
+    path: ["brand_id"],
 })
 
 type FormModel = z.infer<typeof Schema>
@@ -201,7 +204,7 @@ function EditForm({ product }: { product: any }) {
                                                         queryFn={(params) => queryFarmProduceCategories(params)}
                                                         getItems={(page) => page?.data?.data || []}
                                                         value={field.value || ""}
-                                                        onValueChange={(v) => { field.onChange(v); form.setValue("farm_produce_id", "") }}
+                                                        onValueChange={(v) => { field.onChange(v); form.setValue("farm_produce_id", ""); form.setValue("breed_id", "") }}
                                                         getLabel={(cat) => cat.name}
                                                         getValue={(cat) => cat.slug}
                                                         placeholder="Select category"
@@ -237,7 +240,7 @@ function EditForm({ product }: { product: any }) {
                                                             <CommandList className="max-h-56">
                                                                 <CommandEmpty>No produce found.</CommandEmpty>
                                                                 {filteredProduce.map((fp: any) => (
-                                                                    <CommandItem key={fp.id} value={fp.id} onSelect={() => { field.onChange(fp.id); setProduceOpen(false); setProduceSearch("") }}>
+                                                                    <CommandItem key={fp.id} value={fp.id} onSelect={() => { field.onChange(fp.id); form.setValue("breed_id", ""); setProduceOpen(false); setProduceSearch("") }}>
                                                                         <Check className={cn("mr-2 h-4 w-4 shrink-0", fp.id === field.value ? "opacity-100" : "opacity-0")} />
                                                                         {fp.name}
                                                                     </CommandItem>
@@ -267,6 +270,7 @@ function EditForm({ product }: { product: any }) {
                                                         getValue={(b) => b.id}
                                                         placeholder="Select breed"
                                                         searchPlaceholder="Search breeds..."
+                                                        disabled={!watchedFarmProduceId}
                                                     />
                                                 </FormControl>
                                                 <FormMessage />
@@ -290,6 +294,31 @@ function EditForm({ product }: { product: any }) {
                                                         getValue={(b) => b.id}
                                                         placeholder="Select brand"
                                                         searchPlaceholder="Search brands..."
+                                                        clearable
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )} />
+                                    </div>
+                                </div>
+                                <div className="sm:col-span-3">
+                                    <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Client</label>
+                                    <div className="mt-2">
+                                        <FormField control={form.control} name="seller_id" render={({ field }) => (
+                                            <FormItem>
+                                                <FormControl>
+                                                    <SearchSelect
+                                                        queryKey="users-select"
+                                                        queryFn={(params) => queryUsers(params)}
+                                                        getItems={(page) => page?.data?.data || []}
+                                                        value={field.value || ""}
+                                                        onValueChange={field.onChange}
+                                                        getLabel={(u) => u.name}
+                                                        getValue={(u) => u.id}
+                                                        placeholder="Select client"
+                                                        searchPlaceholder="Search clients..."
+                                                        clearable
                                                     />
                                                 </FormControl>
                                                 <FormMessage />

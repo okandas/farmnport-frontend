@@ -8,7 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import * as z from "zod"
 
-import { querySeedProduct, updateSeedProduct, queryBrands, queryFarmProduceCategories, queryFarmProduceByCategory, queryBreeds } from "@/lib/query"
+import { querySeedProduct, updateSeedProduct, queryBrands, queryUsers, queryFarmProduceCategories, queryFarmProduceByCategory, queryBreeds } from "@/lib/query"
 import { cn } from "@/lib/utilities"
 import { buttonVariants } from "@/components/ui/button"
 import { Icons } from "@/components/icons/lucide"
@@ -18,7 +18,6 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from "@/component
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
 import { Check, ChevronsUpDown } from "lucide-react"
@@ -28,7 +27,7 @@ const inputClass = "block w-full rounded-md bg-white px-3 py-1.5 text-base text-
 
 const Schema = z.object({
     name: z.string().default(""),
-    type: z.string().min(1, "Type is required"),
+    category_slug: z.string().optional().default(""),
     breed_id: z.string().optional().default(""),
     brand_id: z.string().optional().default(""),
     seller_id: z.string().optional().default(""),
@@ -57,85 +56,85 @@ const Schema = z.object({
     show_price: z.boolean().default(false),
     sale_price: z.coerce.number().default(0),
     was_price: z.coerce.number().default(0),
+}).refine((data) => !!data.brand_id || !!data.seller_id, {
+    message: "Either a Brand or a Client must be selected",
+    path: ["brand_id"],
 })
 
 type FormModel = z.infer<typeof Schema>
 
 export default function EditSeedProductPage() {
-    const router = useRouter()
     const params = useParams()
     const id = params.id as string
+
+    const { data, isLoading } = useQuery({
+        queryKey: ["seed-product", id],
+        queryFn: () => querySeedProduct(id),
+        enabled: !!id,
+        refetchOnWindowFocus: false,
+    })
+
+    if (isLoading) {
+        return <div className="flex items-center justify-center py-20"><Icons.spinner className="w-6 h-6 animate-spin text-gray-400" /></div>
+    }
+
+    return <EditForm product={data?.data} id={id} />
+}
+
+function EditForm({ product, id }: { product: any; id: string }) {
+    const router = useRouter()
     const [precautionInput, setPrecautionInput] = useState("")
-    const [categorySlug, setCategorySlug] = useState("")
     const [produceOpen, setProduceOpen] = useState(false)
     const [produceSearch, setProduceSearch] = useState("")
 
     const form = useForm<FormModel>({
         defaultValues: {
-            name: "", type: "", breed_id: "", brand_id: "", seller_id: "",
-            farm_produce_id: "", description: "", planting_season: "",
-            days_to_maturity: "", yield_potential: "", soil_requirements: "",
-            seed_treatment: "", management_tips: "",
-            planting_guide: [], precautions: [], variants: [],
-            stock_level: 0, available_for_sale: false, show_price: false, sale_price: 0, was_price: 0,
+            name: product?.name || "",
+            category_slug: product?.farm_produce?.category_slug || "",
+            breed_id: product?.breed_id || "",
+            brand_id: product?.brand_id || "",
+            seller_id: product?.seller_id || "",
+            farm_produce_id: product?.farm_produce_id || "",
+            description: product?.description || "",
+            planting_season: product?.planting_season || "",
+            days_to_maturity: product?.days_to_maturity || "",
+            yield_potential: product?.yield_potential || "",
+            soil_requirements: product?.soil_requirements || "",
+            seed_treatment: product?.seed_treatment || "",
+            management_tips: product?.management_tips || "",
+            planting_guide: product?.planting_guide || [],
+            precautions: product?.precautions || [],
+            variants: (product?.variants || []).map((v: any) => ({
+                name: v.name || "",
+                sku: v.sku || "",
+                sale_price: (v.sale_price || 0) / 100,
+                was_price: (v.was_price || 0) / 100,
+                stock_level: v.stock_level || 0,
+            })),
+            stock_level: product?.stock_level || 0,
+            available_for_sale: product?.available_for_sale || false,
+            show_price: product?.show_price || false,
+            sale_price: (product?.sale_price || 0) / 100,
+            was_price: (product?.was_price || 0) / 100,
         },
         resolver: zodResolver(Schema),
     })
 
+    const watchedCategorySlug = form.watch("category_slug")
+    const watchedFarmProduceId = form.watch("farm_produce_id")
+
     const { data: produceData } = useQuery({
-        queryKey: ["farm-produce-by-category", categorySlug],
-        queryFn: () => queryFarmProduceByCategory(categorySlug),
-        enabled: !!categorySlug,
+        queryKey: ["farm-produce-by-category", watchedCategorySlug],
+        queryFn: () => queryFarmProduceByCategory(watchedCategorySlug!),
+        enabled: !!watchedCategorySlug,
         refetchOnWindowFocus: false,
     })
-
-    const watchedFarmProduceId = form.watch("farm_produce_id")
 
     const allProduce = produceData?.data?.data || []
     const filteredProduce = produceSearch.length >= 1
         ? allProduce.filter((fp: any) => fp.name.toLowerCase().includes(produceSearch.toLowerCase()))
         : allProduce
-    const selectedProduce = allProduce.find((fp: any) => fp.id === watchedFarmProduceId)
-
-    useQuery({
-        queryKey: ["seed-product", id],
-        queryFn: () => querySeedProduct(id),
-        refetchOnWindowFocus: false,
-        enabled: !!id,
-        onSuccess: (res: any) => {
-            const p = res?.data?.data
-            if (!p) return
-            form.reset({
-                name: p.name || "",
-                type: p.type || "",
-                breed_id: p.breed_id || "",
-                brand_id: p.brand_id || "",
-                seller_id: p.seller_id || "",
-                farm_produce_id: p.farm_produce_id || "",
-                description: p.description || "",
-                planting_season: p.planting_season || "",
-                days_to_maturity: p.days_to_maturity || "",
-                yield_potential: p.yield_potential || "",
-                soil_requirements: p.soil_requirements || "",
-                seed_treatment: p.seed_treatment || "",
-                management_tips: p.management_tips || "",
-                planting_guide: p.planting_guide || [],
-                precautions: p.precautions || [],
-                variants: (p.variants || []).map((v: any) => ({
-                    name: v.name || "",
-                    sku: v.sku || "",
-                    sale_price: (v.sale_price || 0) / 100,
-                    was_price: (v.was_price || 0) / 100,
-                    stock_level: v.stock_level || 0,
-                })),
-                stock_level: p.stock_level || 0,
-                available_for_sale: p.available_for_sale || false,
-                show_price: p.show_price || false,
-                sale_price: (p.sale_price || 0) / 100,
-                was_price: (p.was_price || 0) / 100,
-            })
-        },
-    } as any)
+    const selectedProduce = allProduce.find((fp: any) => fp.id === watchedFarmProduceId) || product?.farm_produce
 
     const { fields: guideFields, append: appendGuide, remove: removeGuide } = useFieldArray({ control: form.control, name: "planting_guide" })
     const { fields: variantFields, append: appendVariant, remove: removeVariant } = useFieldArray({ control: form.control, name: "variants" })
@@ -181,17 +180,24 @@ export default function EditSeedProductPage() {
                                 <div className="sm:col-span-3">
                                     <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Category</label>
                                     <div className="mt-2">
-                                        <SearchSelect
-                                            queryKey="farm-produce-categories-select"
-                                            queryFn={(params) => queryFarmProduceCategories(params)}
-                                            getItems={(page) => page?.data?.data || []}
-                                            value={categorySlug}
-                                            onValueChange={(v) => { setCategorySlug(v); form.setValue("farm_produce_id", "") }}
-                                            getLabel={(cat) => cat.name}
-                                            getValue={(cat) => cat.slug}
-                                            placeholder="Select category"
-                                            searchPlaceholder="Search categories..."
-                                        />
+                                        <FormField control={form.control} name="category_slug" render={({ field }) => (
+                                            <FormItem>
+                                                <FormControl>
+                                                    <SearchSelect
+                                                        queryKey="farm-produce-categories-select"
+                                                        queryFn={(params) => queryFarmProduceCategories(params)}
+                                                        getItems={(page) => page?.data?.data || []}
+                                                        value={field.value || ""}
+                                                        onValueChange={(v) => { field.onChange(v); form.setValue("farm_produce_id", ""); form.setValue("breed_id", "") }}
+                                                        getLabel={(cat) => cat.name}
+                                                        getValue={(cat) => cat.slug}
+                                                        placeholder="Select category"
+                                                        searchPlaceholder="Search categories..."
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )} />
                                     </div>
                                 </div>
                                 <div className="sm:col-span-3">
@@ -204,10 +210,10 @@ export default function EditSeedProductPage() {
                                                         <FormControl>
                                                             <button
                                                                 type="button"
-                                                                disabled={!categorySlug}
+                                                                disabled={!watchedCategorySlug}
                                                                 className={cn("w-full flex items-center justify-between rounded-md bg-white dark:bg-white/5 px-3 py-1.5 text-sm text-left outline outline-1 -outline-offset-1 outline-gray-300 dark:outline-white/10 disabled:opacity-50", !field.value && "text-gray-400 dark:text-gray-500")}
                                                             >
-                                                                <span className="truncate">{selectedProduce ? selectedProduce.name : categorySlug ? "Select produce" : "Select category first"}</span>
+                                                                <span className="truncate">{selectedProduce ? selectedProduce.name : watchedCategorySlug ? "Select produce" : "Select category first"}</span>
                                                                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                                             </button>
                                                         </FormControl>
@@ -218,7 +224,7 @@ export default function EditSeedProductPage() {
                                                             <CommandList className="max-h-56">
                                                                 <CommandEmpty>No produce found.</CommandEmpty>
                                                                 {filteredProduce.map((fp: any) => (
-                                                                    <CommandItem key={fp.id} value={fp.id} onSelect={() => { field.onChange(fp.id); setProduceOpen(false); setProduceSearch("") }}>
+                                                                    <CommandItem key={fp.id} value={fp.id} onSelect={() => { field.onChange(fp.id); form.setValue("breed_id", ""); setProduceOpen(false); setProduceSearch("") }}>
                                                                         <Check className={cn("mr-2 h-4 w-4 shrink-0", fp.id === field.value ? "opacity-100" : "opacity-0")} />
                                                                         {fp.name}
                                                                     </CommandItem>
@@ -233,46 +239,22 @@ export default function EditSeedProductPage() {
                                     </div>
                                 </div>
                                 <div className="sm:col-span-3">
-                                    <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Type</label>
+                                    <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Client</label>
                                     <div className="mt-2">
-                                        <FormField control={form.control} name="type" render={({ field }) => (
-                                            <FormItem>
-                                                <Select value={field.value} onValueChange={field.onChange}>
-                                                    <FormControl>
-                                                        <SelectTrigger className={inputClass}>
-                                                            <SelectValue placeholder="Select type" />
-                                                        </SelectTrigger>
-                                                    </FormControl>
-                                                    <SelectContent>
-                                                        <SelectItem value="seed_potato">Seed Potato</SelectItem>
-                                                        <SelectItem value="tuber">Tuber</SelectItem>
-                                                        <SelectItem value="maize">Maize</SelectItem>
-                                                        <SelectItem value="vegetable">Vegetable</SelectItem>
-                                                        <SelectItem value="pasture">Pasture</SelectItem>
-                                                        <SelectItem value="other">Other</SelectItem>
-                                                    </SelectContent>
-                                                </Select>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )} />
-                                    </div>
-                                </div>
-                                <div className="sm:col-span-3">
-                                    <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Variety / Breed</label>
-                                    <div className="mt-2">
-                                        <FormField control={form.control} name="breed_id" render={({ field }) => (
+                                        <FormField control={form.control} name="seller_id" render={({ field }) => (
                                             <FormItem>
                                                 <FormControl>
                                                     <SearchSelect
-                                                        queryKey={["breeds-select", watchedFarmProduceId]}
-                                                        queryFn={(params) => queryBreeds({ ...params, farm_produce_id: watchedFarmProduceId })}
+                                                        queryKey="users-select"
+                                                        queryFn={(params) => queryUsers(params)}
                                                         getItems={(page) => page?.data?.data || []}
                                                         value={field.value || ""}
                                                         onValueChange={field.onChange}
-                                                        getLabel={(b) => b.name}
-                                                        getValue={(b) => b.id}
-                                                        placeholder="Select variety"
-                                                        searchPlaceholder="Search varieties..."
+                                                        getLabel={(u) => u.name}
+                                                        getValue={(u) => u.id}
+                                                        placeholder="Select client"
+                                                        searchPlaceholder="Search clients..."
+                                                        clearable
                                                     />
                                                 </FormControl>
                                                 <FormMessage />
@@ -296,6 +278,31 @@ export default function EditSeedProductPage() {
                                                         getValue={(b) => b.id}
                                                         placeholder="Select brand"
                                                         searchPlaceholder="Search brands..."
+                                                        clearable
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )} />
+                                    </div>
+                                </div>
+                                <div className="sm:col-span-3">
+                                    <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Variety / Breed</label>
+                                    <div className="mt-2">
+                                        <FormField control={form.control} name="breed_id" render={({ field }) => (
+                                            <FormItem>
+                                                <FormControl>
+                                                    <SearchSelect
+                                                        queryKey={["breeds-select", watchedFarmProduceId]}
+                                                        queryFn={(params) => queryBreeds({ ...params, farm_produce_id: watchedFarmProduceId })}
+                                                        getItems={(page) => page?.data?.data || []}
+                                                        value={field.value || ""}
+                                                        onValueChange={field.onChange}
+                                                        getLabel={(b) => b.name}
+                                                        getValue={(b) => b.id}
+                                                        placeholder="Select variety"
+                                                        searchPlaceholder="Search varieties..."
+                                                        disabled={!watchedFarmProduceId}
                                                     />
                                                 </FormControl>
                                                 <FormMessage />

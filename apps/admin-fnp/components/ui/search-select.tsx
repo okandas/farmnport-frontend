@@ -19,6 +19,7 @@ interface SearchSelectProps {
     placeholder?: string
     searchPlaceholder?: string
     disabled?: boolean
+    clearable?: boolean
     className?: string
 }
 
@@ -33,6 +34,7 @@ export function SearchSelect({
     placeholder = "Select...",
     searchPlaceholder = "Search...",
     disabled = false,
+    clearable = false,
     className,
 }: SearchSelectProps) {
     const [open, setOpen] = useState(false)
@@ -104,6 +106,15 @@ export function SearchSelect({
                     <CommandList className="max-h-56 overflow-y-auto">
                         {!isLoading && items.length === 0 && (
                             <CommandEmpty>No results found.</CommandEmpty>
+                        )}
+                        {clearable && value && (
+                            <CommandItem
+                                value="__clear__"
+                                onSelect={() => { onValueChange(""); setOpen(false); setSearch("") }}
+                                className="text-muted-foreground italic"
+                            >
+                                Clear selection
+                            </CommandItem>
                         )}
                         {items.map((item) => (
                             <CommandItem
