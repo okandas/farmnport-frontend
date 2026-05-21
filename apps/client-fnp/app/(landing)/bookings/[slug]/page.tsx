@@ -24,7 +24,6 @@ export default function BookingEventDetailPage() {
   const queryClient = useQueryClient()
 
   const [quantity, setQuantity] = useState("")
-  const [notes, setNotes] = useState("")
 
   const { data, isLoading } = useQuery({
     queryKey: ["booking-event", slug],
@@ -48,7 +47,6 @@ export default function BookingEventDetailPage() {
         event_id: event?.id,
         quantity: parseInt(quantity),
         phone,
-        notes: notes || undefined,
       }),
     onSuccess: () => {
       toast.success("Booking placed successfully")
@@ -235,7 +233,7 @@ export default function BookingEventDetailPage() {
                     value={quantity}
                     onChange={(e) => setQuantity(e.target.value)}
                     placeholder={`e.g. ${minQty}`}
-                    className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                    className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                 </div>
 
@@ -249,16 +247,6 @@ export default function BookingEventDetailPage() {
                   />
                 </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-muted-foreground">Notes</label>
-                  <textarea
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    rows={2}
-                    placeholder="Any special requirements..."
-                    className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
-                  />
-                </div>
 
                 {qty >= minQty && (
                   <div className="bg-muted/50 rounded-lg p-3 text-sm space-y-1.5">
