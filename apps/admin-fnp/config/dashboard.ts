@@ -19,6 +19,16 @@ export const dashboardConfig: DashboardConfig = {
       ],
     },
     {
+      label: "Communications",
+      items: [
+        {
+          title: "Blast",
+          href: "/dashboard/farmnport/blast",
+          icon: "send",
+        },
+      ],
+    },
+    {
       label: "Pricing",
       items: [
         {

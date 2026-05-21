@@ -8,6 +8,7 @@ import {
   OrderConfirmationEmail,
   OrderDispatchEmail,
   OrderStatusEmail,
+  BlastEmail,
 } from "@/emails"
 
 const resend = new Resend(process.env.RESEND_API_KEY)
@@ -54,6 +55,13 @@ export async function POST(req: NextRequest) {
       subject = `Order ${(props as { orderNumber?: string }).orderNumber ?? ""} update`
       html = await render(OrderStatusEmail(props as Parameters<typeof OrderStatusEmail>[0]))
       break
+
+    case "blast": {
+      const p = props as Parameters<typeof BlastEmail>[0]
+      subject = (props as { subject?: string }).subject ?? "Message from farmnport"
+      html = await render(BlastEmail(p))
+      break
+    }
 
     default:
       return NextResponse.json({ error: `Unknown template: ${template}` }, { status: 400 })
