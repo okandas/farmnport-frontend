@@ -1,7 +1,7 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
-import { queryAllAgroChemicals } from "@/lib/query"
+import { queryBuyAgroChemicals } from "@/lib/query"
 import { Button } from "@/components/ui/button"
 import { AgroChemicalFilterSidebar } from "@/components/generic/agroChemicalFilterSidebar"
 import { ProductCard } from "@/components/shared/ProductCard"
@@ -30,7 +30,7 @@ export function BuyAgroChemicalsClient({ initialChemicals, initialTotal }: BuyAg
 
     const { data: chemicalsData, isLoading: chemicalsLoading } = useQuery({
         queryKey: ["agrochemicals-shop", queryState.p, queryState.brand, queryState.target, queryState.active_ingredient],
-        queryFn: () => queryAllAgroChemicals({
+        queryFn: () => queryBuyAgroChemicals({
             p: queryState.p,
             brand: queryState.brand || [],
             target: queryState.target || [],

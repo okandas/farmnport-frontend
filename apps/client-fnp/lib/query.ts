@@ -278,6 +278,18 @@ export function queryAllAgroChemicals(pagination?: PaginationModel & { search?: 
   return api.get(url)
 }
 
+export function queryBuyAgroChemicals(pagination?: PaginationModel & { search?: string, brand?: string[], target?: string[], active_ingredient?: string[], used_on?: string[] }) {
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) params.set('p', pagination.p.toString())
+  if (pagination?.search && pagination.search.length >= 2) params.set('search', pagination.search)
+  pagination?.brand?.forEach(b => params.append('brand', b))
+  pagination?.target?.forEach(t => params.append('target', t))
+  pagination?.active_ingredient?.forEach(ai => params.append('active_ingredient', ai))
+  pagination?.used_on?.forEach(uo => params.append('used_on', uo))
+  const qs = params.toString()
+  return api.get(qs ? `${BaseURL}/agrochemical/buy?${qs}` : `${BaseURL}/agrochemical/buy`)
+}
+
 export function queryAgroChemicalsByCategory(options: { category: string } & PaginationModel & { brand?: string[], target?: string[], active_ingredient?: string[] }) {
   const params = new URLSearchParams()
 
