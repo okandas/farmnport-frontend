@@ -37,7 +37,7 @@ export default async function FeedDetailPage({ params }: FeedDetailPageProps) {
                         We couldn&apos;t find the feed product you&apos;re looking for.
                     </p>
                     <Link
-                        href="/feeds"
+                        href="/feed-guides"
                         className="inline-flex items-center justify-center rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 transition-colors"
                     >
                         Browse All Feed Products

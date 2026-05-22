@@ -4,7 +4,7 @@ const guides = [
     { key: "agrochemical", label: "Agrochemical", href: "/agrochemical-guides" },
     { key: "plant-nutrition", label: "Plant Nutrition", href: "/plant-nutrition-guides" },
     { key: "animal-health", label: "Animal Health", href: "/animal-health-guides" },
-    { key: "animal-nutrition", label: "Animal Nutrition", href: "/feeds" },
+    { key: "animal-nutrition", label: "Animal Nutrition", href: "/feed-guides" },
     { key: "seeds", label: "Seeds", href: "/seed-guides" },
 ]
 

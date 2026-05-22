@@ -114,7 +114,7 @@ export function FeedListingClient({ initialData, initialTotal }: FeedListingClie
                                     className="bg-card border border-border rounded-lg overflow-hidden transition-all duration-200 hover:shadow-lg hover:border-primary/50 group"
                                 >
                                     {/* Image */}
-                                    <Link href={`/feeds/${product.slug}`} className="block">
+                                    <Link href={`/feed-guides/${product.slug}`} className="block">
                                         <div className="relative aspect-square bg-white">
                                             {product.images?.[0]?.img?.src ? (
                                                 <Image
@@ -137,7 +137,7 @@ export function FeedListingClient({ initialData, initialTotal }: FeedListingClie
                                                 {product.brand.name}
                                             </p>
                                         )}
-                                        <Link href={`/feeds/${product.slug}`}>
+                                        <Link href={`/feed-guides/${product.slug}`}>
                                             <h3 className="font-semibold text-sm leading-tight line-clamp-2 min-h-[2.5rem] group-hover:text-primary transition-colors capitalize">
                                                 {product.name}
                                             </h3>
@@ -154,7 +154,7 @@ export function FeedListingClient({ initialData, initialTotal }: FeedListingClie
                                         )}
 
                                         {/* CTA */}
-                                        <Link href={`/feeds/${product.slug}`} className="block pt-2">
+                                        <Link href={`/feed-guides/${product.slug}`} className="block pt-2">
                                             <Button variant="outline" className="w-full" size="sm">
                                                 View Guide
                                             </Button>

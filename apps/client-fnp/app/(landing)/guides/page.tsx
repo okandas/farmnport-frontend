@@ -16,7 +16,7 @@ const sections = [
     {
         title: "Animal Nutrition",
         description: "Livestock feed products across all categories and animal types — browse feeds by animal, phase, and form.",
-        href: "/feeds",
+        href: "/feed-guides",
     },
     {
         title: "Plant Nutrition Guides",

@@ -21,7 +21,7 @@ export function FeedBreadcrumb({ productName }: { productName: string }) {
         <nav className="flex text-sm text-muted-foreground">
             <Link href="/" className="hover:text-foreground">Home</Link>
             <span className="mx-2">/</span>
-            <Link href="/feeds" className="hover:text-foreground">Feeds</Link>
+            <Link href="/feed-guides" className="hover:text-foreground">Feed Guides</Link>
             <span className="mx-2">/</span>
             <span className="text-foreground capitalize">{productName}</span>
         </nav>

@@ -70,7 +70,7 @@ export function LoggedOutLanding() {
                                             { label: "Guides", href: "/guides" },
                                             { label: "Spray Programs", href: "/spray-programs" },
                                             { label: "Feed Programs", href: "/feeding-programs" },
-                                            { label: "Feeds", href: "/feeds" },
+                                            { label: "Feed Guides", href: "/feed-guides" },
                                             { label: "Buyers", href: "/buyers" },
                                             { label: "Farmers", href: "/farmers" },
                                         ].map(({ label, href }) => (

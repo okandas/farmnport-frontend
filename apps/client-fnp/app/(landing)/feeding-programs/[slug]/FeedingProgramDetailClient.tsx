@@ -407,7 +407,7 @@ export function FeedingProgramDetailClient({ program, slug }: FeedingProgramDeta
 
                                                 {rec.feed_product_slug && (
                                                     <Link
-                                                        href={`/feeds/${rec.feed_product_slug}?ref=${slug}`}
+                                                        href={`/feed-guides/${rec.feed_product_slug}?ref=${slug}`}
                                                         className="flex-shrink-0 text-xs font-medium text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 opacity-0 group-hover:opacity-100"
                                                     >
                                                         View
@@ -504,7 +504,7 @@ export function FeedingProgramDetailClient({ program, slug }: FeedingProgramDeta
                         {quickViewRec.feed_product_slug && (
                             <div className="px-5 pb-5">
                                 <Link
-                                    href={`/feeds/${quickViewRec.feed_product_slug}?ref=${slug}`}
+                                    href={`/feed-guides/${quickViewRec.feed_product_slug}?ref=${slug}`}
                                     className="flex items-center justify-center gap-1 w-full py-2 rounded-full text-sm font-semibold border border-primary text-primary hover:bg-primary/5 transition-colors"
                                     onClick={() => setQuickViewRec(null)}
                                 >

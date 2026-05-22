@@ -334,7 +334,7 @@ export default async function BuyFeedPage({ params }: BuyFeedPageProps) {
                     categoryName={product.feed_category?.name}
                     brandHref={product.brand ? `/buy-feeds?brand=${product.brand.name}` : undefined}
                     shopHref="/buy-feeds"
-                    guideHref={`/feeds/${slug}`}
+                    guideHref={`/feed-guides/${slug}`}
                     guideLabel="View Feed Guide →"
                     loginRedirect={`/buy-feeds/${slug}`}
                     fallbackIcon={<Egg className="w-28 h-28 text-muted-foreground/20" />}
