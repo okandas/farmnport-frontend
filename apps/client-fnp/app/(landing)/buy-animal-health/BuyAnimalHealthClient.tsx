@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query"
 import { queryBuyAnimalHealthProducts } from "@/lib/query"
 import { Button } from "@/components/ui/button"
-import { AnimalHealthFilterSidebar } from "@/components/generic/animalHealthFilterSidebar"
+import { AnimalHealthBuyFilterSidebar } from "@/components/generic/animalHealthFilterSidebar"
 import { ProductCard } from "@/components/shared/ProductCard"
 import { BuyCategoriesNav } from "@/components/generic/BuyCategoriesNav"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
@@ -53,7 +53,7 @@ export function BuyAnimalHealthClient({ initialProducts, initialTotal }: BuyAnim
             {/* Sidebar Filters */}
             <aside className="w-full lg:w-64 flex-shrink-0">
                 <BuyCategoriesNav />
-                <AnimalHealthFilterSidebar />
+                <AnimalHealthBuyFilterSidebar />
             </aside>
 
             {/* Main Content */}

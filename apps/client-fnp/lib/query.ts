@@ -465,7 +465,18 @@ export function queryAnimalHealthFilterAggregates(filters?: { brand?: string[], 
   filters?.active_ingredient?.forEach(v => params.append('active_ingredient', v))
   filters?.used_on?.forEach(v => params.append('used_on', v))
   const qs = params.toString()
-  return api.get(`${BaseURL}/animalhealth/aggregates/filters${qs ? `?${qs}` : ''}`)
+  return api.get(`${BaseURL}/animalhealth/all/aggregates/filters${qs ? `?${qs}` : ''}`)
+}
+
+export function queryAnimalHealthBuyFilterAggregates(filters?: { brand?: string[], category?: string[], target?: string[], active_ingredient?: string[], used_on?: string[] }) {
+  const params = new URLSearchParams()
+  filters?.brand?.forEach(v => params.append('brand', v))
+  filters?.category?.forEach(v => params.append('category', v))
+  filters?.target?.forEach(v => params.append('target', v))
+  filters?.active_ingredient?.forEach(v => params.append('active_ingredient', v))
+  filters?.used_on?.forEach(v => params.append('used_on', v))
+  const qs = params.toString()
+  return api.get(`${BaseURL}/animalhealth/buy/aggregates/filters${qs ? `?${qs}` : ''}`)
 }
 
 export function queryAnimalHealthProduct(slug: string) {
@@ -541,7 +552,17 @@ export function queryFeedFilterAggregates(filters?: { brand?: string[], animal?:
   filters?.phase?.forEach(v => params.append('phase', v))
   filters?.sub_type?.forEach(v => params.append('sub_type', v))
   const qs = params.toString()
-  return api.get(`${BaseURL}/feed/aggregates/filters${qs ? `?${qs}` : ''}`)
+  return api.get(`${BaseURL}/feed/all/aggregates/filters${qs ? `?${qs}` : ''}`)
+}
+
+export function queryFeedBuyFilterAggregates(filters?: { brand?: string[], animal?: string[], phase?: string[], sub_type?: string[] }) {
+  const params = new URLSearchParams()
+  filters?.brand?.forEach(v => params.append('brand', v))
+  filters?.animal?.forEach(v => params.append('animal', v))
+  filters?.phase?.forEach(v => params.append('phase', v))
+  filters?.sub_type?.forEach(v => params.append('sub_type', v))
+  const qs = params.toString()
+  return api.get(`${BaseURL}/feed/buy/aggregates/filters${qs ? `?${qs}` : ''}`)
 }
 
 // Feeding Programs
@@ -648,7 +669,17 @@ export function queryPlantNutritionFilterAggregates(filters?: { brand?: string[]
   filters?.active_ingredient?.forEach(v => params.append('active_ingredient', v))
   filters?.used_on?.forEach(v => params.append('used_on', v))
   const qs = params.toString()
-  return api.get(`${BaseURL}/plantnutrition/aggregates/filters${qs ? `?${qs}` : ''}`)
+  return api.get(`${BaseURL}/plantnutrition/all/aggregates/filters${qs ? `?${qs}` : ''}`)
+}
+
+export function queryPlantNutritionBuyFilterAggregates(filters?: { brand?: string[], category?: string[], active_ingredient?: string[], used_on?: string[] }) {
+  const params = new URLSearchParams()
+  filters?.brand?.forEach(v => params.append('brand', v))
+  filters?.category?.forEach(v => params.append('category', v))
+  filters?.active_ingredient?.forEach(v => params.append('active_ingredient', v))
+  filters?.used_on?.forEach(v => params.append('used_on', v))
+  const qs = params.toString()
+  return api.get(`${BaseURL}/plantnutrition/buy/aggregates/filters${qs ? `?${qs}` : ''}`)
 }
 
 // Cart
@@ -866,5 +897,9 @@ export function querySeedProduct(slug: string) {
 }
 
 export function querySeedProductFilterAggregates() {
-  return api.get(`${BaseURL}/seed-products/aggregates/filters`)
+  return api.get(`${BaseURL}/seed-products/all/aggregates/filters`)
+}
+
+export function querySeedProductBuyFilterAggregates() {
+  return api.get(`${BaseURL}/seed-products/buy/aggregates/filters`)
 }

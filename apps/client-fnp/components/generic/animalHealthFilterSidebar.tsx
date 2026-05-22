@@ -11,7 +11,7 @@ import { Filter, X, Search } from "lucide-react"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { useQuery } from "@tanstack/react-query"
 import { useState, useMemo } from "react"
-import { queryAnimalHealthFilterAggregates } from "@/lib/query"
+import { queryAnimalHealthFilterAggregates, queryAnimalHealthBuyFilterAggregates } from "@/lib/query"
 import { sendGTMEvent } from "@next/third-parties/google"
 
 interface FilterItem {
@@ -110,9 +110,11 @@ function SearchableCheckboxList({
 function FilterContent({
   onClearAll,
   categorySlug,
+  fetchAggregates,
 }: {
   onClearAll: () => void
   categorySlug?: string
+  fetchAggregates: typeof queryAnimalHealthFilterAggregates
 }) {
   const [queryState, setQueryState] = useQueryStates({
     brand: parseAsArrayOf(parseAsString),
@@ -123,9 +125,9 @@ function FilterContent({
 
   // Fetch aggregate data for animal health — cascade by active filters
   const { data: aggregateData, isLoading: isLoadingAggregates } = useQuery({
-    queryKey: ["animal-health-filter-aggregates", categorySlug, queryState.brand, queryState.target, queryState.active_ingredient, queryState.used_on],
+    queryKey: ["animal-health-filter-aggregates", fetchAggregates.name, categorySlug, queryState.brand, queryState.target, queryState.active_ingredient, queryState.used_on],
     queryFn: async () => {
-      const response = await queryAnimalHealthFilterAggregates({
+      const response = await fetchAggregates({
         brand: queryState.brand ?? [],
         category: categorySlug ? [categorySlug] : [],
         target: queryState.target ?? [],
@@ -225,7 +227,7 @@ function FilterContent({
   )
 }
 
-export function AnimalHealthFilterSidebar({ categorySlug }: { categorySlug?: string } = {}) {
+function AnimalHealthFilterSidebarBase({ categorySlug, fetchAggregates }: { categorySlug?: string; fetchAggregates: typeof queryAnimalHealthFilterAggregates }) {
   const isDesktop = useMediaQuery("(min-width: 1024px)")
   const [, setQueryState] = useQueryStates({
     brand: parseAsArrayOf(parseAsString),
@@ -246,7 +248,7 @@ export function AnimalHealthFilterSidebar({ categorySlug }: { categorySlug?: str
   if (isDesktop) {
     return (
       <div>
-        <FilterContent onClearAll={handleClearAll} categorySlug={categorySlug} />
+        <FilterContent onClearAll={handleClearAll} categorySlug={categorySlug} fetchAggregates={fetchAggregates} />
       </div>
     )
   }
@@ -263,8 +265,16 @@ export function AnimalHealthFilterSidebar({ categorySlug }: { categorySlug?: str
         <SheetHeader className="mb-4">
           <SheetTitle>Filter Animal Health Products</SheetTitle>
         </SheetHeader>
-        <FilterContent onClearAll={handleClearAll} categorySlug={categorySlug} />
+        <FilterContent onClearAll={handleClearAll} categorySlug={categorySlug} fetchAggregates={fetchAggregates} />
       </SheetContent>
     </Sheet>
   )
+}
+
+export function AnimalHealthFilterSidebar({ categorySlug }: { categorySlug?: string } = {}) {
+  return <AnimalHealthFilterSidebarBase categorySlug={categorySlug} fetchAggregates={queryAnimalHealthFilterAggregates} />
+}
+
+export function AnimalHealthBuyFilterSidebar({ categorySlug }: { categorySlug?: string } = {}) {
+  return <AnimalHealthFilterSidebarBase categorySlug={categorySlug} fetchAggregates={queryAnimalHealthBuyFilterAggregates} />
 }

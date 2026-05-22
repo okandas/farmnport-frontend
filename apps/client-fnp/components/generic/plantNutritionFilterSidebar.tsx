@@ -11,7 +11,7 @@ import { Filter, X, Search } from "lucide-react"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { useQuery } from "@tanstack/react-query"
 import { useState, useMemo } from "react"
-import { queryPlantNutritionFilterAggregates } from "@/lib/query"
+import { queryPlantNutritionFilterAggregates, queryPlantNutritionBuyFilterAggregates } from "@/lib/query"
 import { sendGTMEvent } from "@next/third-parties/google"
 
 interface FilterItem {
@@ -106,7 +106,7 @@ function SearchableCheckboxList({
   )
 }
 
-function FilterContent({ onClearAll, hideCategory, categorySlug }: { onClearAll: () => void; hideCategory?: boolean; categorySlug?: string }) {
+function FilterContent({ onClearAll, hideCategory, categorySlug, fetchAggregates }: { onClearAll: () => void; hideCategory?: boolean; categorySlug?: string; fetchAggregates: typeof queryPlantNutritionFilterAggregates }) {
   const [queryState, setQueryState] = useQueryStates({
     brand: parseAsArrayOf(parseAsString),
     category: parseAsArrayOf(parseAsString),
@@ -116,9 +116,9 @@ function FilterContent({ onClearAll, hideCategory, categorySlug }: { onClearAll:
 
   // Fetch aggregate data for plant nutrition — cascade by active filters
   const { data: aggregateData, isLoading: isLoadingAggregates } = useQuery({
-    queryKey: ["plant-nutrition-filter-aggregates", categorySlug, queryState.brand, queryState.category, queryState.active_ingredient, queryState.used_on],
+    queryKey: ["plant-nutrition-filter-aggregates", fetchAggregates.name, categorySlug, queryState.brand, queryState.category, queryState.active_ingredient, queryState.used_on],
     queryFn: async () => {
-      const response = await queryPlantNutritionFilterAggregates({
+      const response = await fetchAggregates({
         brand: queryState.brand ?? [],
         category: categorySlug ? [categorySlug, ...(queryState.category ?? [])] : (queryState.category ?? []),
         active_ingredient: queryState.active_ingredient ?? [],
@@ -208,7 +208,7 @@ function FilterContent({ onClearAll, hideCategory, categorySlug }: { onClearAll:
   )
 }
 
-export function PlantNutritionFilterSidebar({ hideCategory, categorySlug }: { hideCategory?: boolean; categorySlug?: string }) {
+function PlantNutritionFilterSidebarBase({ hideCategory, categorySlug, fetchAggregates }: { hideCategory?: boolean; categorySlug?: string; fetchAggregates: typeof queryPlantNutritionFilterAggregates }) {
   const isDesktop = useMediaQuery("(min-width: 1024px)")
   const [, setQueryState] = useQueryStates({
     used_on: parseAsArrayOf(parseAsString),
@@ -224,7 +224,7 @@ export function PlantNutritionFilterSidebar({ hideCategory, categorySlug }: { hi
   if (isDesktop) {
     return (
       <div>
-        <FilterContent onClearAll={handleClearAll} hideCategory={hideCategory} categorySlug={categorySlug} />
+        <FilterContent onClearAll={handleClearAll} hideCategory={hideCategory} categorySlug={categorySlug} fetchAggregates={fetchAggregates} />
       </div>
     )
   }
@@ -241,8 +241,16 @@ export function PlantNutritionFilterSidebar({ hideCategory, categorySlug }: { hi
         <SheetHeader className="mb-4">
           <SheetTitle>Filter Plant Nutrition Products</SheetTitle>
         </SheetHeader>
-        <FilterContent onClearAll={handleClearAll} hideCategory={hideCategory} categorySlug={categorySlug} />
+        <FilterContent onClearAll={handleClearAll} hideCategory={hideCategory} categorySlug={categorySlug} fetchAggregates={fetchAggregates} />
       </SheetContent>
     </Sheet>
   )
+}
+
+export function PlantNutritionFilterSidebar({ hideCategory, categorySlug }: { hideCategory?: boolean; categorySlug?: string }) {
+  return <PlantNutritionFilterSidebarBase hideCategory={hideCategory} categorySlug={categorySlug} fetchAggregates={queryPlantNutritionFilterAggregates} />
+}
+
+export function PlantNutritionBuyFilterSidebar({ hideCategory, categorySlug }: { hideCategory?: boolean; categorySlug?: string }) {
+  return <PlantNutritionFilterSidebarBase hideCategory={hideCategory} categorySlug={categorySlug} fetchAggregates={queryPlantNutritionBuyFilterAggregates} />
 }

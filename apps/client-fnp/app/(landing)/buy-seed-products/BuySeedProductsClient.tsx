@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { queryBuySeedProducts } from "@/lib/query"
 import { ProductCard } from "@/components/shared/ProductCard"
 import { BuyCategoriesNav } from "@/components/generic/BuyCategoriesNav"
-import { SeedFilterSidebar } from "@/components/generic/seedFilterSidebar"
+import { SeedBuyFilterSidebar } from "@/components/generic/seedFilterSidebar"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
 
 interface BuySeedProductsClientProps {
@@ -44,7 +44,7 @@ export function BuySeedProductsClient({ initialProducts, initialTotal, bookingEv
     <div className="flex flex-col lg:flex-row gap-8">
       <aside className="w-full lg:w-64 flex-shrink-0">
         <BuyCategoriesNav />
-        <SeedFilterSidebar />
+        <SeedBuyFilterSidebar />
       </aside>
 
       <main className="flex-1">

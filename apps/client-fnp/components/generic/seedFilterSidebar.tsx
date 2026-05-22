@@ -11,7 +11,7 @@ import { Filter, X, Search } from "lucide-react"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { useQuery } from "@tanstack/react-query"
 import { useState, useMemo } from "react"
-import { querySeedProductFilterAggregates } from "@/lib/query"
+import { querySeedProductFilterAggregates, querySeedProductBuyFilterAggregates } from "@/lib/query"
 
 interface FilterItem {
   _id: string
@@ -90,14 +90,14 @@ function SearchableCheckboxList({
   )
 }
 
-function FilterContent({ onClearAll }: { onClearAll: () => void }) {
+function FilterContent({ onClearAll, fetchAggregates }: { onClearAll: () => void; fetchAggregates: typeof querySeedProductFilterAggregates }) {
   const [queryState, setQueryState] = useQueryStates({
     brand: parseAsArrayOf(parseAsString),
   })
 
   const { data: aggregateData, isLoading } = useQuery({
-    queryKey: ["seed-product-filter-aggregates"],
-    queryFn: () => querySeedProductFilterAggregates().then((r) => r.data),
+    queryKey: ["seed-product-filter-aggregates", fetchAggregates.name],
+    queryFn: () => fetchAggregates().then((r) => r.data),
   })
 
   const brandItems: FilterItem[] = useMemo(() => aggregateData?.brands || [], [aggregateData])
@@ -151,7 +151,7 @@ function FilterContent({ onClearAll }: { onClearAll: () => void }) {
   )
 }
 
-export function SeedFilterSidebar() {
+function SeedFilterSidebarBase({ fetchAggregates }: { fetchAggregates: typeof querySeedProductFilterAggregates }) {
   const isDesktop = useMediaQuery("(min-width: 1024px)")
   const [, setQueryState] = useQueryStates({ brand: parseAsArrayOf(parseAsString) })
 
@@ -160,7 +160,7 @@ export function SeedFilterSidebar() {
   if (isDesktop) {
     return (
       <div>
-        <FilterContent onClearAll={handleClearAll} />
+        <FilterContent onClearAll={handleClearAll} fetchAggregates={fetchAggregates} />
       </div>
     )
   }
@@ -177,8 +177,16 @@ export function SeedFilterSidebar() {
         <SheetHeader className="mb-4">
           <SheetTitle>Filter Seeds</SheetTitle>
         </SheetHeader>
-        <FilterContent onClearAll={handleClearAll} />
+        <FilterContent onClearAll={handleClearAll} fetchAggregates={fetchAggregates} />
       </SheetContent>
     </Sheet>
   )
+}
+
+export function SeedFilterSidebar() {
+  return <SeedFilterSidebarBase fetchAggregates={querySeedProductFilterAggregates} />
+}
+
+export function SeedBuyFilterSidebar() {
+  return <SeedFilterSidebarBase fetchAggregates={querySeedProductBuyFilterAggregates} />
 }

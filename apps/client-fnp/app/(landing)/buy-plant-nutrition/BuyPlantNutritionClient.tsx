@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query"
 import { queryBuyPlantNutritionProducts } from "@/lib/query"
 import { Button } from "@/components/ui/button"
-import { PlantNutritionFilterSidebar } from "@/components/generic/plantNutritionFilterSidebar"
+import { PlantNutritionBuyFilterSidebar } from "@/components/generic/plantNutritionFilterSidebar"
 import { BuyCategoriesNav } from "@/components/generic/BuyCategoriesNav"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
 import { Leaf } from "lucide-react"
@@ -148,7 +148,7 @@ export function BuyPlantNutritionClient({ initialProducts, initialTotal }: BuyPl
         <div className="flex flex-col lg:flex-row gap-8">
             <aside className="w-full lg:w-64 flex-shrink-0">
                 <BuyCategoriesNav />
-                <PlantNutritionFilterSidebar />
+                <PlantNutritionBuyFilterSidebar />
             </aside>
 
             <main className="flex-1">

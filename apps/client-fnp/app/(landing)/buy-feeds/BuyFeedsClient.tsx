@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query"
 import { queryBuyFeedProducts } from "@/lib/query"
 import { Button } from "@/components/ui/button"
-import { FeedFilterSidebar } from "@/components/generic/feedFilterSidebar"
+import { FeedBuyFilterSidebar } from "@/components/generic/feedFilterSidebar"
 import { BuyCategoriesNav } from "@/components/generic/BuyCategoriesNav"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
 import Image from "next/image"
@@ -115,7 +115,7 @@ export function BuyFeedsClient({ initialProducts, initialTotal }: BuyFeedsClient
         <div className="flex flex-col lg:flex-row gap-8">
             <aside className="w-full lg:w-64 flex-shrink-0">
                 <BuyCategoriesNav />
-                <FeedFilterSidebar />
+                <FeedBuyFilterSidebar />
             </aside>
 
             <main className="flex-1">
