@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { queryAllAnimalHealthProducts } from "@/lib/query"
+import { queryBuyAnimalHealthProducts } from "@/lib/query"
 import { BuyAnimalHealthClient } from "./BuyAnimalHealthClient"
 
 export default async function BuyAnimalHealthPage() {
@@ -7,7 +7,7 @@ export default async function BuyAnimalHealthPage() {
     let initialTotal = 0
 
     try {
-        const response = await queryAllAnimalHealthProducts({
+        const response = await queryBuyAnimalHealthProducts({
             p: 1,
             brand: [],
             target: [],

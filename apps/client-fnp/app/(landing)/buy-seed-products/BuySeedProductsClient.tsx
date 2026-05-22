@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query"
 import { Button } from "@/components/ui/button"
-import { queryAllSeedProducts } from "@/lib/query"
+import { queryBuySeedProducts } from "@/lib/query"
 import { ProductCard } from "@/components/shared/ProductCard"
 import { BuyCategoriesNav } from "@/components/generic/BuyCategoriesNav"
 import { SeedFilterSidebar } from "@/components/generic/seedFilterSidebar"
@@ -24,7 +24,7 @@ export function BuySeedProductsClient({ initialProducts, initialTotal, bookingEv
 
   const { data: productsData, isLoading } = useQuery({
     queryKey: ["seed-products-shop", queryState.p, queryState.brand],
-    queryFn: () => queryAllSeedProducts({
+    queryFn: () => queryBuySeedProducts({
       p: queryState.p,
       brand: queryState.brand || [],
     }),

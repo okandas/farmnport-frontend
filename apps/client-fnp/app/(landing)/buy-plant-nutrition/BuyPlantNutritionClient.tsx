@@ -1,7 +1,7 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
-import { queryAllPlantNutritionProducts } from "@/lib/query"
+import { queryBuyPlantNutritionProducts } from "@/lib/query"
 import { Button } from "@/components/ui/button"
 import { PlantNutritionFilterSidebar } from "@/components/generic/plantNutritionFilterSidebar"
 import { BuyCategoriesNav } from "@/components/generic/BuyCategoriesNav"
@@ -125,7 +125,7 @@ export function BuyPlantNutritionClient({ initialProducts, initialTotal }: BuyPl
 
     const { data: productsData, isLoading: productsLoading } = useQuery({
         queryKey: ["plant-nutrition-shop", queryState.p, queryState.brand, queryState.category, queryState.active_ingredient, queryState.used_on],
-        queryFn: () => queryAllPlantNutritionProducts({
+        queryFn: () => queryBuyPlantNutritionProducts({
             p: queryState.p,
             brand: queryState.brand || [],
             category: queryState.category || [],

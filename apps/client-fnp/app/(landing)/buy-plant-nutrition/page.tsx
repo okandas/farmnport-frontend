@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { queryAllPlantNutritionProducts } from "@/lib/query"
+import { queryBuyPlantNutritionProducts } from "@/lib/query"
 import { BuyPlantNutritionClient } from "./BuyPlantNutritionClient"
 
 export default async function BuyPlantNutritionPage() {
@@ -7,7 +7,7 @@ export default async function BuyPlantNutritionPage() {
     let initialTotal = 0
 
     try {
-        const response = await queryAllPlantNutritionProducts({ p: 1 })
+        const response = await queryBuyPlantNutritionProducts({ p: 1 })
         initialProducts = response?.data?.data || []
         initialTotal = response?.data?.total || 0
     } catch (error) {

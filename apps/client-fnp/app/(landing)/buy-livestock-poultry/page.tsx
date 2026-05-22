@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { queryAllLivestockPoultryProducts } from "@/lib/query"
+import { queryBuyLivestockPoultryProducts } from "@/lib/query"
 import { BuyLivestockPoultryClient } from "./BuyLivestockPoultryClient"
 
 export default async function BuyLivestockPoultryPage() {
@@ -7,7 +7,7 @@ export default async function BuyLivestockPoultryPage() {
     let initialTotal = 0
 
     try {
-        const response = await queryAllLivestockPoultryProducts({ p: 1, brand: [] })
+        const response = await queryBuyLivestockPoultryProducts({ p: 1, brand: [] })
         initialProducts = response?.data?.data || []
         initialTotal = response?.data?.total || 0
     } catch (error) {

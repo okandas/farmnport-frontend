@@ -408,6 +408,17 @@ export function queryAllAnimalHealthProducts(pagination?: PaginationModel & { br
   return api.get(url)
 }
 
+export function queryBuyAnimalHealthProducts(pagination?: PaginationModel & { brand?: string[], target?: string[], active_ingredient?: string[], used_on?: string[] }) {
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) params.set('p', pagination.p.toString())
+  pagination?.brand?.forEach(b => params.append('brand', b))
+  pagination?.target?.forEach(t => params.append('target', t))
+  pagination?.active_ingredient?.forEach(ai => params.append('active_ingredient', ai))
+  pagination?.used_on?.forEach(uo => params.append('used_on', uo))
+  const qs = params.toString()
+  return api.get(qs ? `${BaseURL}/animalhealth/buy?${qs}` : `${BaseURL}/animalhealth/buy`)
+}
+
 export function queryAnimalHealthProductsByCategory(options: { category: string } & PaginationModel & { brand?: string[], target?: string[], active_ingredient?: string[], used_on?: string[] }) {
   const params = new URLSearchParams()
 
@@ -486,6 +497,19 @@ export function queryAllFeedProducts(pagination?: PaginationModel & { search?: s
   const url = queryString ? `${BaseURL}/feed/all?${queryString}` : `${BaseURL}/feed/all`
 
   return api.get(url)
+}
+
+export function queryBuyFeedProducts(pagination?: PaginationModel & { search?: string, category?: string[], brand?: string[], animal?: string[], phase?: string[], sub_type?: string[] }) {
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) params.set('p', pagination.p.toString())
+  if (pagination?.search && pagination.search.length >= 2) params.set('search', pagination.search)
+  pagination?.category?.forEach(c => params.append('category', c))
+  pagination?.brand?.forEach(b => params.append('brand', b))
+  pagination?.animal?.forEach(a => params.append('animal', a))
+  pagination?.phase?.forEach(ph => params.append('phase', ph))
+  pagination?.sub_type?.forEach(st => params.append('sub_type', st))
+  const qs = params.toString()
+  return api.get(qs ? `${BaseURL}/feed/buy?${qs}` : `${BaseURL}/feed/buy`)
 }
 
 export function queryFeedProduct(slug: string) {
@@ -576,6 +600,17 @@ export function queryAllPlantNutritionProducts(pagination?: PaginationModel & { 
   }
   const qs = params.toString()
   return api.get(qs ? `${BaseURL}/plantnutrition/all?${qs}` : `${BaseURL}/plantnutrition/all`)
+}
+
+export function queryBuyPlantNutritionProducts(pagination?: PaginationModel & { brand?: string[], category?: string[], active_ingredient?: string[], used_on?: string[] }) {
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) params.set('p', pagination.p.toString())
+  pagination?.brand?.forEach(b => params.append('brand', b))
+  pagination?.category?.forEach(c => params.append('category', c))
+  pagination?.active_ingredient?.forEach(ai => params.append('active_ingredient', ai))
+  pagination?.used_on?.forEach(u => params.append('used_on', u))
+  const qs = params.toString()
+  return api.get(qs ? `${BaseURL}/plantnutrition/buy?${qs}` : `${BaseURL}/plantnutrition/buy`)
 }
 
 export function queryPlantNutritionProductsByCategory(options: { category: string } & PaginationModel & { brand?: string[] }) {
@@ -784,6 +819,14 @@ export function queryAllLivestockPoultryProducts(pagination?: { p?: number; bran
   return api.get(qs ? `${BaseURL}/livestock-poultry/all?${qs}` : `${BaseURL}/livestock-poultry/all`)
 }
 
+export function queryBuyLivestockPoultryProducts(pagination?: { p?: number; brand?: string[] }) {
+  const params = new URLSearchParams()
+  if (pagination?.p && pagination.p >= 2) params.set('p', pagination.p.toString())
+  pagination?.brand?.forEach(b => params.append('brand', b))
+  const qs = params.toString()
+  return api.get(qs ? `${BaseURL}/livestock-poultry/buy?${qs}` : `${BaseURL}/livestock-poultry/buy`)
+}
+
 export function queryLivestockPoultryProduct(slug: string) {
   return api.get(`${BaseURL}/livestock-poultry/${slug}`)
 }
@@ -796,6 +839,14 @@ export function queryAllSeedProducts(pagination?: { p?: number; brand?: string[]
   pagination?.brand?.forEach(b => params.append('brand', b))
   const qs = params.toString()
   return api.get(qs ? `${BaseURL}/seed-products/all?${qs}` : `${BaseURL}/seed-products/all`)
+}
+
+export function queryBuySeedProducts(pagination?: { p?: number; brand?: string[] }) {
+  const params = new URLSearchParams()
+  if (pagination?.p && pagination.p >= 2) params.set('p', pagination.p.toString())
+  pagination?.brand?.forEach(b => params.append('brand', b))
+  const qs = params.toString()
+  return api.get(qs ? `${BaseURL}/seed-products/buy?${qs}` : `${BaseURL}/seed-products/buy`)
 }
 
 export function querySeedProduct(slug: string) {

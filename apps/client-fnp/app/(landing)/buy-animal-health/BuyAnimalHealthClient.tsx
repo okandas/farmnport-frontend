@@ -1,7 +1,7 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
-import { queryAllAnimalHealthProducts } from "@/lib/query"
+import { queryBuyAnimalHealthProducts } from "@/lib/query"
 import { Button } from "@/components/ui/button"
 import { AnimalHealthFilterSidebar } from "@/components/generic/animalHealthFilterSidebar"
 import { ProductCard } from "@/components/shared/ProductCard"
@@ -30,7 +30,7 @@ export function BuyAnimalHealthClient({ initialProducts, initialTotal }: BuyAnim
 
     const { data: productsData, isLoading: productsLoading } = useQuery({
         queryKey: ["animal-health-shop", queryState.p, queryState.brand, queryState.target, queryState.active_ingredient],
-        queryFn: () => queryAllAnimalHealthProducts({
+        queryFn: () => queryBuyAnimalHealthProducts({
             p: queryState.p,
             brand: queryState.brand || [],
             target: queryState.target || [],

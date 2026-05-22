@@ -1,7 +1,7 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
-import { queryAllFeedProducts } from "@/lib/query"
+import { queryBuyFeedProducts } from "@/lib/query"
 import { Button } from "@/components/ui/button"
 import { FeedFilterSidebar } from "@/components/generic/feedFilterSidebar"
 import { BuyCategoriesNav } from "@/components/generic/BuyCategoriesNav"
@@ -92,7 +92,7 @@ export function BuyFeedsClient({ initialProducts, initialTotal }: BuyFeedsClient
 
     const { data: productsData, isLoading: productsLoading } = useQuery({
         queryKey: ["feeds-shop", queryState.p, queryState.brand, queryState.animal, queryState.phase, queryState.sub_type],
-        queryFn: () => queryAllFeedProducts({
+        queryFn: () => queryBuyFeedProducts({
             p: queryState.p,
             brand: queryState.brand || [],
             animal: queryState.animal || [],

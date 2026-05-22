@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { queryAllSeedProducts, listBookingEvents } from "@/lib/query"
+import { queryBuySeedProducts, listBookingEvents } from "@/lib/query"
 import { BuySeedProductsClient } from "./BuySeedProductsClient"
 
 export default async function BuySeedProductsPage() {
@@ -9,7 +9,7 @@ export default async function BuySeedProductsPage() {
 
     try {
         const [productsRes, bookingsRes] = await Promise.all([
-            queryAllSeedProducts({ p: 1, brand: [] }),
+            queryBuySeedProducts({ p: 1, brand: [] }),
             listBookingEvents({ status: "open" }),
         ])
         initialProducts = productsRes?.data?.data || []
