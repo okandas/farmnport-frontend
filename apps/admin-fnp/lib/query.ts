@@ -1541,7 +1541,6 @@ export function queryClientLocations() {
 }
 
 export function createDeliveryLocation(data: {
-  client_id: string
   types?: string[]
   name: string
   address: string
@@ -1556,7 +1555,6 @@ export function createDeliveryLocation(data: {
 }
 
 export function updateDeliveryLocation(id: string, data: Partial<{
-  client_id: string
   types: string[]
   name: string
   address: string

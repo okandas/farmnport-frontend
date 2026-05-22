@@ -7,18 +7,14 @@ import { Plus, X, Loader2 } from "lucide-react"
 import Link from "next/link"
 import { toast } from "@/components/ui/use-toast"
 
-import { createDeliveryLocation, queryUsers } from "@/lib/query"
+import { createDeliveryLocation } from "@/lib/query"
 import { LocationPicker } from "@/components/ui/location-picker"
 import { DashboardHeader } from "@/components/state/dashboardHeader"
 import { DashboardShell } from "@/components/state/dashboardShell"
-import { SearchSelect } from "@/components/ui/search-select"
-
 const inputCls = "block w-full rounded-md bg-background px-3 py-1.5 text-sm text-foreground outline outline-1 -outline-offset-1 outline-border placeholder:text-muted-foreground focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-ring"
 const labelCls = "block text-sm/6 font-medium text-foreground"
 
 const EMPTY_FORM = {
-  client_id: "",
-  client_name: "",
   types: ["delivery", "pickup"] as string[],
   name: "",
   address: "",
@@ -87,7 +83,6 @@ export default function NewDeliveryLocationPage() {
   const mutation = useMutation({
     mutationFn: () =>
       createDeliveryLocation({
-        client_id: form.client_id,
         types: form.types,
         name: form.name,
         address: form.address,
@@ -110,33 +105,6 @@ export default function NewDeliveryLocationPage() {
       <DashboardHeader heading="New Delivery And Pickup Location" text="Add a collection hub for customer orders." />
 
       <div className="mt-4 space-y-0 divide-y divide-border">
-
-        {/* Owner */}
-        <div className="grid grid-cols-1 gap-x-8 gap-y-10 py-10 md:grid-cols-3">
-          <div>
-            <h2 className="text-base/7 font-semibold text-foreground">Owner</h2>
-            <p className="mt-1 text-sm/6 text-muted-foreground">The client who owns or manages this location. One client can have multiple locations.</p>
-          </div>
-          <div className="max-w-2xl md:col-span-2">
-            <label className={labelCls}>Owner *</label>
-            <div className="mt-2">
-              <SearchSelect
-                queryKey="client-location-clients"
-                queryFn={(params) => queryUsers(params)}
-                getItems={(page) => page?.data?.data || []}
-                value={form.client_id}
-                onValueChange={(v) => set("client_id", v)}
-                onItemSelect={(u) => setForm((f) => ({ ...f, client_id: u.id, client_name: u.name }))}
-                getLabel={(u) => u.name}
-                getValue={(u) => u.id}
-                placeholder="Select client"
-                searchPlaceholder="Search clients..."
-                clearable
-                capitalize
-              />
-            </div>
-          </div>
-        </div>
 
         {/* Location Details */}
         <div className="grid grid-cols-1 gap-x-8 gap-y-10 py-10 md:grid-cols-3">
@@ -270,7 +238,7 @@ export default function NewDeliveryLocationPage() {
         </Link>
         <button
           onClick={() => mutation.mutate()}
-          disabled={mutation.isPending || !form.client_id || !form.name || !form.address || !form.city}
+          disabled={mutation.isPending || !form.name || !form.address || !form.city}
           className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 disabled:opacity-50 transition-colors"
         >
           {mutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}

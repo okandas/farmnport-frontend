@@ -526,6 +526,9 @@ export const AgroChemicalSchema = z.object({
   sale_price: z.coerce.number().nonnegative().default(0),
   show_was_price: z.boolean().default(false),
   was_price: z.coerce.number().nonnegative().default(0),
+  delivery_available: z.boolean().default(false),
+  pickup_location_ids: z.array(z.string()).optional().default([]),
+  delivery_location_ids: z.array(z.string()).optional().default([]),
   created: z.string().optional(),
   updated: z.string().optional(),
 })
@@ -789,6 +792,9 @@ export const AnimalHealthProductSchema = z.object({
   })).default([]),
   precautions: z.array(z.string()).default([]),
   status: z.enum(["active", "inactive"]).default("active"),
+  delivery_available: z.boolean().default(false),
+  pickup_location_ids: z.array(z.string()).optional().default([]),
+  delivery_location_ids: z.array(z.string()).optional().default([]),
   created: z.string().optional(),
   updated: z.string().optional(),
 })

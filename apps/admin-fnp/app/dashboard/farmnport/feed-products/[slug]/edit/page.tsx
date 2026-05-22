@@ -1,13 +1,13 @@
 "use client"
 
-import { use } from "react"
+import { use, useState } from "react"
 import Link from "next/link"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { useForm, useFieldArray } from "react-hook-form"
 import { useRouter } from "next/navigation"
 
-import { updateFeedProduct, queryFeedProduct, queryBrands, queryFeedCategories, queryFeedNutritionalSpecs } from "@/lib/query"
+import { updateFeedProduct, queryFeedProduct, queryBrands, queryFeedCategories, queryFeedNutritionalSpecs, queryClientLocations } from "@/lib/query"
 import { Brand, FeedCategory, FeedProduct, FeedNutritionalSpec } from "@/lib/schemas"
 import { cn } from "@/lib/utilities"
 import { buttonVariants } from "@/components/ui/button"
@@ -24,6 +24,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
+import { LocationMultiSelect, SelectedLocation } from "@/components/ui/location-multi-select"
 import * as z from "zod"
 
 const EditFeedProductSchema = z.object({
@@ -75,6 +76,7 @@ const EditFeedProductSchema = z.object({
     show_price: z.boolean().default(true),
     sale_price: z.coerce.number().nonnegative().default(0),
     was_price: z.coerce.number().nonnegative().default(0),
+    delivery_available: z.boolean().default(false),
 })
 
 type EditFeedProductModel = z.infer<typeof EditFeedProductSchema>
@@ -112,6 +114,25 @@ export default function EditFeedProductPage({ params }: { params: Promise<{ slug
     const categories = categoriesData?.data?.data as FeedCategory[] || []
     const availableSpecs = nutritionalSpecsData?.data?.data as FeedNutritionalSpec[] || []
 
+    const [pickupLocations, setPickupLocations] = useState<SelectedLocation[] | null>(null)
+    const [deliveryLocations, setDeliveryLocations] = useState<SelectedLocation[] | null>(null)
+
+    const { data: locationsData } = useQuery({
+        queryKey: ["admin-client-locations"],
+        queryFn: () => queryClientLocations(),
+        refetchOnWindowFocus: false,
+    })
+    const allLocations: { id: string; name: string; active: boolean }[] = locationsData?.data?.locations ?? []
+
+    if (pickupLocations === null && product && allLocations.length > 0) {
+        const ids: string[] = (product as any).pickup_location_ids ?? []
+        setPickupLocations(ids.map((id: string) => allLocations.find((l) => l.id === id)).filter(Boolean) as SelectedLocation[])
+    }
+    if (deliveryLocations === null && product && allLocations.length > 0) {
+        const ids: string[] = (product as any).delivery_location_ids ?? []
+        setDeliveryLocations(ids.map((id: string) => allLocations.find((l) => l.id === id)).filter(Boolean) as SelectedLocation[])
+    }
+
     const form = useForm<EditFeedProductModel>({
         defaultValues: {
             id: product?.id || "",
@@ -138,6 +159,7 @@ export default function EditFeedProductPage({ params }: { params: Promise<{ slug
             show_price: product?.show_price ?? true,
             sale_price: product?.sale_price ?? 0,
             was_price: product?.was_price ?? 0,
+            delivery_available: (product as any)?.delivery_available ?? false,
         },
         values: product ? {
             id: product.id,
@@ -164,6 +186,7 @@ export default function EditFeedProductPage({ params }: { params: Promise<{ slug
             show_price: product.show_price ?? true,
             sale_price: product.sale_price ?? 0,
             was_price: product.was_price ?? 0,
+            delivery_available: (product as any).delivery_available ?? false,
         } : undefined,
         resolver: zodResolver(EditFeedProductSchema),
     })
@@ -204,7 +227,11 @@ export default function EditFeedProductPage({ params }: { params: Promise<{ slug
     })
 
     async function onSubmit(data: EditFeedProductModel) {
-        mutate(data)
+        mutate({
+            ...data,
+            pickup_location_ids: (pickupLocations ?? []).map((l) => l.id),
+            delivery_location_ids: (deliveryLocations ?? []).map((l) => l.id),
+        } as any)
     }
 
     if (isLoading) {
@@ -1007,6 +1034,40 @@ export default function EditFeedProductPage({ params }: { params: Promise<{ slug
                                     </FormItem>
                                 )}
                             />
+                        </div>
+                    </div>
+                </div>
+
+                {/* Fulfillment */}
+                <div className="border-b border-gray-900/10 dark:border-gray-100/10 pb-12">
+                    <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">Fulfillment</h2>
+                    <p className="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">Where customers can collect or receive this product.</p>
+                    <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
+                        <div className="sm:col-span-6">
+                            <label className="block text-sm/6 font-medium text-gray-900 dark:text-white mb-2">Pickup Locations</label>
+                            <LocationMultiSelect
+                                queryKey="feed-pickup-locations"
+                                allLocations={allLocations}
+                                selected={pickupLocations ?? []}
+                                onChange={setPickupLocations}
+                            />
+                        </div>
+                        <div className="sm:col-span-6">
+                            <label className="block text-sm/6 font-medium text-gray-900 dark:text-white mb-2">Delivery Locations</label>
+                            <LocationMultiSelect
+                                queryKey="feed-delivery-locations"
+                                allLocations={allLocations}
+                                selected={deliveryLocations ?? []}
+                                onChange={setDeliveryLocations}
+                            />
+                        </div>
+                        <div className="sm:col-span-6 flex items-center gap-4">
+                            <FormField control={form.control} name="delivery_available" render={({ field }) => (
+                                <FormItem className="flex items-center gap-2">
+                                    <FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl>
+                                    <label className="text-sm font-medium text-gray-900 dark:text-white cursor-pointer" onClick={() => field.onChange(!field.value)}>Delivery Available (free-form address)</label>
+                                </FormItem>
+                            )} />
                         </div>
                     </div>
                 </div>

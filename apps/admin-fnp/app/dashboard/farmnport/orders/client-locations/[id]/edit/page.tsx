@@ -65,8 +65,6 @@ export default function EditDeliveryLocationPage() {
   const { id } = useParams<{ id: string }>()
   const router = useRouter()
   const [form, setForm] = useState({
-    client_id: "",
-    client_name: "",
     name: "",
     address: "",
     city: "",
@@ -89,8 +87,6 @@ export default function EditDeliveryLocationPage() {
       const loc = data?.data?.locations?.find((l: any) => l.id === id)
       if (loc) {
         setForm({
-          client_id: loc.client_id ?? "",
-          client_name: loc.client_name ?? "",
           name: loc.name,
           address: loc.address,
           city: loc.city,
@@ -133,22 +129,6 @@ export default function EditDeliveryLocationPage() {
       <DashboardHeader heading="Edit Delivery Location" text="Update drop-off hub details." />
 
       <div className="mt-4 space-y-0 divide-y divide-border">
-
-        {/* Buyer */}
-        {form.client_name && (
-          <div className="grid grid-cols-1 gap-x-8 gap-y-10 py-10 md:grid-cols-3">
-            <div>
-              <h2 className="text-base/7 font-semibold text-foreground">Buyer</h2>
-              <p className="mt-1 text-sm/6 text-muted-foreground">This location belongs to this buyer.</p>
-            </div>
-            <div className="max-w-2xl md:col-span-2">
-              <label className={labelCls}>Buyer</label>
-              <div className="mt-2">
-                <input value={form.client_name} readOnly className={`${inputCls} bg-muted text-muted-foreground cursor-not-allowed`} />
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Location Details */}
         <div className="grid grid-cols-1 gap-x-8 gap-y-10 py-10 md:grid-cols-3">

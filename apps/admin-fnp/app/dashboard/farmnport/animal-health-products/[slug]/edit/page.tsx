@@ -1,13 +1,13 @@
 "use client"
 
-import { use } from "react"
+import { use, useState } from "react"
 import Link from "next/link"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { useForm, useFieldArray } from "react-hook-form"
 import { useRouter } from "next/navigation"
 
-import { updateAnimalHealthProduct, queryAnimalHealthProduct, queryBrands, queryAnimalHealthCategories } from "@/lib/query"
+import { updateAnimalHealthProduct, queryAnimalHealthProduct, queryBrands, queryAnimalHealthCategories, queryClientLocations } from "@/lib/query"
 import { FormAnimalHealthProductSchema, FormAnimalHealthProductModel, AnimalHealthProduct, Brand, AnimalHealthCategory } from "@/lib/schemas"
 import { cn, centsToDollarsFormInputs, dollarsToCents } from "@/lib/utilities"
 import { buttonVariants, Button } from "@/components/ui/button"
@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { FileInput } from "@/components/structures/controls/file-input"
+import { LocationMultiSelect, SelectedLocation } from "@/components/ui/location-multi-select"
 
 export default function EditAnimalHealthProductPage({ params }: { params: Promise<{ slug: string }> }) {
     const router = useRouter()
@@ -51,6 +52,25 @@ export default function EditAnimalHealthProductPage({ params }: { params: Promis
     const brands = brandsData?.data?.data as Brand[] || []
     const categories = categoriesData?.data?.data as AnimalHealthCategory[] || []
 
+    const [pickupLocations, setPickupLocations] = useState<SelectedLocation[] | null>(null)
+    const [deliveryLocations, setDeliveryLocations] = useState<SelectedLocation[] | null>(null)
+
+    const { data: locationsData } = useQuery({
+        queryKey: ["admin-client-locations"],
+        queryFn: () => queryClientLocations(),
+        refetchOnWindowFocus: false,
+    })
+    const allLocations: { id: string; name: string; active: boolean }[] = locationsData?.data?.locations ?? []
+
+    if (pickupLocations === null && product && allLocations.length > 0) {
+        const ids: string[] = (product as any).pickup_location_ids ?? []
+        setPickupLocations(ids.map((id: string) => allLocations.find((l) => l.id === id)).filter(Boolean) as SelectedLocation[])
+    }
+    if (deliveryLocations === null && product && allLocations.length > 0) {
+        const ids: string[] = (product as any).delivery_location_ids ?? []
+        setDeliveryLocations(ids.map((id: string) => allLocations.find((l) => l.id === id)).filter(Boolean) as SelectedLocation[])
+    }
+
     const form = useForm<FormAnimalHealthProductModel>({
         defaultValues: {
             id: product?.id || "",
@@ -68,6 +88,9 @@ export default function EditAnimalHealthProductPage({ params }: { params: Promis
             variants: product?.variants || [],
             precautions: product?.precautions || [],
             status: product?.status ?? "active",
+            delivery_available: product?.delivery_available ?? false,
+            pickup_location_ids: product?.pickup_location_ids ?? [],
+            delivery_location_ids: product?.delivery_location_ids ?? [],
         },
         values: product ? {
             id: product.id,
@@ -90,6 +113,9 @@ export default function EditAnimalHealthProductPage({ params }: { params: Promis
             })) || [],
             precautions: product.precautions || [],
             status: product.status ?? "active",
+            delivery_available: product.delivery_available ?? false,
+            pickup_location_ids: product.pickup_location_ids ?? [],
+            delivery_location_ids: product.delivery_location_ids ?? [],
         } : undefined,
         resolver: zodResolver(FormAnimalHealthProductSchema),
     })
@@ -132,6 +158,8 @@ export default function EditAnimalHealthProductPage({ params }: { params: Promis
                 was_price: dollarsToCents(v.was_price),
                 wholesale_price: dollarsToCents(v.wholesale_price ?? 0),
             })),
+            pickup_location_ids: (pickupLocations ?? []).map((l) => l.id),
+            delivery_location_ids: (deliveryLocations ?? []).map((l) => l.id),
         })
     }
 
@@ -626,6 +654,40 @@ export default function EditAnimalHealthProductPage({ params }: { params: Promis
                                 <Icons.add className="w-4 h-4 mr-1" />
                                 Add Precaution
                             </Button>
+                        </div>
+                    </div>
+
+                    {/* Fulfillment */}
+                    <div className="border-b border-gray-900/10 dark:border-gray-100/10 pb-12 mt-6">
+                        <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">Fulfillment</h2>
+                        <p className="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">Where customers can collect or receive this product.</p>
+                        <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
+                            <div className="sm:col-span-6">
+                                <label className="block text-sm/6 font-medium text-gray-900 dark:text-white mb-2">Pickup Locations</label>
+                                <LocationMultiSelect
+                                    queryKey="animal-health-pickup-locations"
+                                    allLocations={allLocations}
+                                    selected={pickupLocations ?? []}
+                                    onChange={setPickupLocations}
+                                />
+                            </div>
+                            <div className="sm:col-span-6">
+                                <label className="block text-sm/6 font-medium text-gray-900 dark:text-white mb-2">Delivery Locations</label>
+                                <LocationMultiSelect
+                                    queryKey="animal-health-delivery-locations"
+                                    allLocations={allLocations}
+                                    selected={deliveryLocations ?? []}
+                                    onChange={setDeliveryLocations}
+                                />
+                            </div>
+                            <div className="sm:col-span-6 flex items-center gap-4">
+                                <FormField control={form.control} name="delivery_available" render={({ field }) => (
+                                    <FormItem className="flex items-center gap-2">
+                                        <FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl>
+                                        <label className="text-sm font-medium text-gray-900 dark:text-white cursor-pointer" onClick={() => field.onChange(!field.value)}>Delivery Available (free-form address)</label>
+                                    </FormItem>
+                                )} />
+                            </div>
                         </div>
                     </div>
 

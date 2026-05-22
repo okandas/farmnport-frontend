@@ -8,7 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import * as z from "zod"
 
-import { querySeedProduct, updateSeedProduct, queryBrands, queryUsers, queryFarmProduceCategories, queryFarmProduceByCategory, queryBreeds } from "@/lib/query"
+import { querySeedProduct, updateSeedProduct, queryBrands, queryUsers, queryFarmProduceCategories, queryFarmProduceByCategory, queryBreeds, queryClientLocations } from "@/lib/query"
 import { cn, dollarsToCents } from "@/lib/utilities"
 import { buttonVariants } from "@/components/ui/button"
 import { Icons } from "@/components/icons/lucide"
@@ -22,6 +22,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
 import { Check, ChevronsUpDown } from "lucide-react"
 import { SearchSelect } from "@/components/ui/search-select"
+import { LocationMultiSelect, SelectedLocation } from "@/components/ui/location-multi-select"
 
 const inputClass = "block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-primary sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-primary"
 
@@ -56,6 +57,7 @@ const Schema = z.object({
     show_price: z.boolean().default(false),
     sale_price: z.coerce.number().default(0),
     was_price: z.coerce.number().default(0),
+    delivery_available: z.boolean().default(false),
 }).refine((data) => !!data.brand_id || !!data.seller_id, {
     message: "Either a Brand or a Client must be selected",
     path: ["brand_id"],
@@ -86,6 +88,8 @@ function EditForm({ product, id }: { product: any; id: string }) {
     const [precautionInput, setPrecautionInput] = useState("")
     const [produceOpen, setProduceOpen] = useState(false)
     const [produceSearch, setProduceSearch] = useState("")
+    const [pickupLocations, setPickupLocations] = useState<SelectedLocation[] | null>(null)
+    const [deliveryLocations, setDeliveryLocations] = useState<SelectedLocation[] | null>(null)
 
     const form = useForm<FormModel>({
         defaultValues: {
@@ -116,6 +120,7 @@ function EditForm({ product, id }: { product: any; id: string }) {
             show_price: product?.show_price || false,
             sale_price: (product?.sale_price || 0) / 100,
             was_price: (product?.was_price || 0) / 100,
+            delivery_available: product?.delivery_available || false,
         },
         resolver: zodResolver(Schema),
     })
@@ -135,6 +140,22 @@ function EditForm({ product, id }: { product: any; id: string }) {
         ? allProduce.filter((fp: any) => fp.name.toLowerCase().includes(produceSearch.toLowerCase()))
         : allProduce
     const selectedProduce = allProduce.find((fp: any) => fp.id === watchedFarmProduceId) || product?.farm_produce
+
+    const { data: locationsData } = useQuery({
+        queryKey: ["admin-client-locations"],
+        queryFn: () => queryClientLocations(),
+        refetchOnWindowFocus: false,
+    })
+    const allLocations: { id: string; name: string; active: boolean }[] = locationsData?.data?.locations ?? []
+
+    if (pickupLocations === null && product && allLocations.length > 0) {
+        const ids: string[] = product.pickup_location_ids ?? []
+        setPickupLocations(ids.map((id: string) => allLocations.find((l) => l.id === id)).filter(Boolean) as SelectedLocation[])
+    }
+    if (deliveryLocations === null && product && allLocations.length > 0) {
+        const ids: string[] = product.delivery_location_ids ?? []
+        setDeliveryLocations(ids.map((id: string) => allLocations.find((l) => l.id === id)).filter(Boolean) as SelectedLocation[])
+    }
 
     const { fields: guideFields, append: appendGuide, remove: removeGuide } = useFieldArray({ control: form.control, name: "planting_guide" })
     const { fields: variantFields, append: appendVariant, remove: removeVariant } = useFieldArray({ control: form.control, name: "variants" })
@@ -160,6 +181,8 @@ function EditForm({ product, id }: { product: any; id: string }) {
                 sale_price: dollarsToCents(v.sale_price),
                 was_price: dollarsToCents(v.was_price),
             })),
+            pickup_location_ids: (pickupLocations ?? []).map((l) => l.id),
+            delivery_location_ids: (deliveryLocations ?? []).map((l) => l.id),
         })
     }
 
@@ -539,6 +562,42 @@ function EditForm({ product, id }: { product: any; id: string }) {
                                 <div className="sm:col-span-2">
                                     <FormField control={form.control} name="stock_level" render={({ field }) => (
                                         <FormItem><label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Stock Level</label><FormControl><Input type="number" min="0" placeholder="0" {...field} /></FormControl><FormMessage /></FormItem>
+                                    )} />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Fulfillment */}
+                        <div className="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-gray-900/10 pb-12 md:grid-cols-3 dark:border-white/10">
+                            <div>
+                                <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">Fulfillment</h2>
+                                <p className="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">Where customers can collect or receive this product.</p>
+                            </div>
+                            <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6 md:col-span-2">
+                                <div className="sm:col-span-6">
+                                    <label className="block text-sm/6 font-medium text-gray-900 dark:text-white mb-2">Pickup Locations</label>
+                                    <LocationMultiSelect
+                                        queryKey="seed-pickup-locations"
+                                        allLocations={allLocations}
+                                        selected={pickupLocations ?? []}
+                                        onChange={setPickupLocations}
+                                    />
+                                </div>
+                                <div className="sm:col-span-6">
+                                    <label className="block text-sm/6 font-medium text-gray-900 dark:text-white mb-2">Delivery Locations</label>
+                                    <LocationMultiSelect
+                                        queryKey="seed-delivery-locations"
+                                        allLocations={allLocations}
+                                        selected={deliveryLocations ?? []}
+                                        onChange={setDeliveryLocations}
+                                    />
+                                </div>
+                                <div className="sm:col-span-6 flex items-center gap-4">
+                                    <FormField control={form.control} name="delivery_available" render={({ field }) => (
+                                        <FormItem className="flex items-center gap-2">
+                                            <FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl>
+                                            <label className="text-sm font-medium text-gray-900 dark:text-white cursor-pointer" onClick={() => field.onChange(!field.value)}>Delivery Available (free-form address)</label>
+                                        </FormItem>
                                     )} />
                                 </div>
                             </div>
