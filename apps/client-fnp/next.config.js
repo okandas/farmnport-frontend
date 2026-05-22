@@ -4,6 +4,8 @@ const nextConfig = {
   output: "standalone",
   async redirects() {
     return [
+      { source: '/feeds', destination: '/feed-guides', permanent: true },
+      { source: '/feeds/:slug', destination: '/feed-guides/:slug', permanent: true },
       { source: '/prices/lwt', destination: '/prices', permanent: true },
       { source: '/prices/lwt/:path*', destination: '/prices', permanent: true },
       { source: '/prices/cdm', destination: '/prices', permanent: true },
