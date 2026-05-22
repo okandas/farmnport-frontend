@@ -172,7 +172,7 @@ function FilterContent({
         </div>
       )}
 
-      <Accordion type="multiple" className="w-full flex-1" defaultValue={defaultSideBarData}>
+      <Accordion type="multiple" className="w-full flex-1" defaultValue={[]}>
         {filterSections.map((section) => {
           const selectedFilters = queryState[section.key as keyof typeof queryState] || []
 

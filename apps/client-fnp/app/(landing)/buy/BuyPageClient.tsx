@@ -161,8 +161,7 @@ export function BuyPageClient({
 
         {/* ── Sidebar ── */}
         <aside className="hidden lg:flex flex-col w-56 flex-shrink-0">
-          <div className="sticky top-6">
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-2">Categories</p>
+          <div>
             <nav className="flex flex-col gap-0.5">
               {visibleCategories.map(({ label, href }) => (
                 <Link

@@ -38,7 +38,7 @@ function FilterContent({ onClearAll }: { onClearAll: () => void }) {
         </div>
       )}
 
-      <Accordion type="multiple" className="w-full flex-1" defaultValue={["Category"]}>
+      <Accordion type="multiple" className="w-full flex-1" defaultValue={[]}>
         <AccordionItem value="Category">
           <AccordionTrigger>
             <div className="flex items-center justify-between w-full pr-2">

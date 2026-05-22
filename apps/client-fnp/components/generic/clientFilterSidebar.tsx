@@ -293,7 +293,7 @@ function FilterContent({
         </div>
       )}
 
-      <Accordion type="multiple" className="w-full flex-1" defaultValue={filterSections.filter(s => (queryState[s.key as keyof typeof queryState] ?? []).length > 0).map(s => s.name)}>
+      <Accordion type="multiple" className="w-full flex-1" defaultValue={[]}>
         {filterSections.map((section) => {
           const selectedFilters = queryState[section.key as keyof typeof queryState] || []
 

@@ -246,7 +246,7 @@ function FeedFilterContent({ onClearAll }: { onClearAll: () => void }) {
         </div>
       )}
 
-      <Accordion type="multiple" className="w-full flex-1" defaultValue={filterSections.filter(s => { const v = queryState[s.key as keyof typeof queryState]; return Array.isArray(v) ? v.length > 0 : false }).map(s => s.name).concat(["Feeding Stage", "Livestock Type"]).filter((v, i, a) => a.indexOf(v) === i)}>
+      <Accordion type="multiple" className="w-full flex-1" defaultValue={[]}>
         {filterSections.map((section) => {
           const selectedFilters = queryState[section.key as keyof typeof queryState] as string[] || []
 

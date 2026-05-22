@@ -227,7 +227,7 @@ function FilterContent({
         </div>
       )}
 
-      <Accordion type="multiple" className="w-full flex-1" defaultValue={filterSections.filter(s => { const raw = (queryState as any)[s.key]; return Array.isArray(raw) ? raw.length > 0 : !!raw }).map(s => s.name).concat(["Used On", "Targets"]).filter((v, i, a) => a.indexOf(v) === i)}>
+      <Accordion type="multiple" className="w-full flex-1" defaultValue={[]}>
         {filterSections.map((section) => {
           const raw = (queryState as any)[section.key]
           const selectedFilters: string[] = Array.isArray(raw) ? raw : (raw ? [raw] : [])

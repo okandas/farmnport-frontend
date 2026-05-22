@@ -23,6 +23,11 @@ const sections = [
         description: "Fertilizers, foliar feeds, biostimulants, and plant growth regulators — active ingredients and application rates.",
         href: "/plant-nutrition-guides",
     },
+    {
+        title: "Seed Guides",
+        description: "Certified seed varieties — potatoes, maize, tomatoes, chillies, vegetables and more from trusted suppliers.",
+        href: "/buy-seed-products",
+    },
 ]
 
 export default function GuidesPage() {
@@ -50,8 +55,8 @@ export default function GuidesPage() {
 
             {/* Guide Sections */}
             <section className="py-10 lg:py-14">
-                <div className="mx-auto max-w-4xl px-6 lg:px-8">
-                    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="mx-auto max-w-7xl px-6 lg:px-8">
+                    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
                         {sections.map(({ title, description, href }) => (
                             <Link
                                 key={href}

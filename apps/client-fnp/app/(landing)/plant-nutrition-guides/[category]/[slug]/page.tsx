@@ -159,9 +159,7 @@ export default async function PlantNutritionGuidePage({ params }: GuidePageProps
                                     priority
                                 />
                             ) : (
-                                <div className="absolute inset-0 flex items-center justify-center">
-                                    <Beaker className="w-24 h-24 text-muted-foreground/30" />
-                                </div>
+                                <div className="absolute inset-0 bg-muted/30" />
                             )}
                         </div>
 
