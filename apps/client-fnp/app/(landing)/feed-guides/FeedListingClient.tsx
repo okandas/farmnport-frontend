@@ -3,22 +3,9 @@
 import { useQuery } from "@tanstack/react-query"
 import { queryAllFeedProducts } from "@/lib/query"
 import { Button } from "@/components/ui/button"
-import Link from "next/link"
-import Image from "next/image"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
 import { FeedFilterSidebar } from "@/components/generic/feedFilterSidebar"
-
-function toFeedingProgramAnimal(animal: string): string {
-    const a = animal.toLowerCase()
-    if (a === "poultry" || a.startsWith("chicken")) return "chickens"
-    if (a.startsWith("cattle") || a.startsWith("beef")) return "cattle"
-    if (a.startsWith("pig") || a.startsWith("pork") || a === "swine") return "pigs"
-    if (a.startsWith("sheep") || a.startsWith("lamb")) return "sheep"
-    if (a.startsWith("goat")) return "goats"
-    if (a.startsWith("duck")) return "ducks"
-    if (a.startsWith("turkey")) return "turkeys"
-    return a
-}
+import { ProductCard } from "@/components/shared/ProductCard"
 
 interface FeedListingClientProps {
     initialData: any[]
@@ -109,58 +96,15 @@ export function FeedListingClient({ initialData, initialTotal }: FeedListingClie
 
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
                             {products.map((product: any) => (
-                                <div
+                                <ProductCard
                                     key={product.id}
-                                    className="bg-card border border-border rounded-lg overflow-hidden transition-all duration-200 hover:shadow-lg hover:border-primary/50 group"
-                                >
-                                    {/* Image */}
-                                    <Link href={`/feed-guides/${product.slug}`} className="block">
-                                        <div className="relative aspect-square bg-white">
-                                            {product.images?.[0]?.img?.src ? (
-                                                <Image
-                                                    src={product.images[0].img.src}
-                                                    alt={product.name}
-                                                    fill
-                                                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                                                    className="object-contain transition-transform duration-200 group-hover:scale-105"
-                                                />
-                                            ) : (
-                                                <div className="absolute inset-0 bg-muted/30" />
-                                            )}
-                                        </div>
-                                    </Link>
-
-                                    {/* Content */}
-                                    <div className="p-4 space-y-3 border-t">
-                                        {product.brand && (
-                                            <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">
-                                                {product.brand.name}
-                                            </p>
-                                        )}
-                                        <Link href={`/feed-guides/${product.slug}`}>
-                                            <h3 className="font-semibold text-sm leading-tight line-clamp-2 min-h-[2.5rem] group-hover:text-primary transition-colors capitalize">
-                                                {product.name}
-                                            </h3>
-                                        </Link>
-
-                                        {/* Animal pill */}
-                                        {product.animal && (
-                                            <Link
-                                                href={`/feeding-programs?animal=${toFeedingProgramAnimal(product.animal)}`}
-                                                className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 hover:bg-amber-200 dark:hover:bg-amber-900/60 transition-colors capitalize"
-                                            >
-                                                {product.animal}
-                                            </Link>
-                                        )}
-
-                                        {/* CTA */}
-                                        <Link href={`/feed-guides/${product.slug}`} className="block pt-2">
-                                            <Button variant="outline" className="w-full" size="sm">
-                                                View Guide
-                                            </Button>
-                                        </Link>
-                                    </div>
-                                </div>
+                                    href={`/feed-guides/${product.slug}`}
+                                    imageSrc={product.images?.[0]?.img?.src}
+                                    name={product.name}
+                                    brand={product.brand?.name}
+                                    meta={product.animal}
+                                    mode="guide"
+                                />
                             ))}
                         </div>
 

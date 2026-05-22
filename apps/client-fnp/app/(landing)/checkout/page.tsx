@@ -10,7 +10,7 @@ import { Check, Loader2, ShoppingCart, Truck, Store, CreditCard, Smartphone, Glo
 import Image from "next/image"
 import Link from "next/link"
 
-import { getCart, checkout, pollOrderStatus } from "@/lib/query"
+import { getCart, checkout, pollOrderStatus, queryClient as fetchClient } from "@/lib/query"
 import { AuthenticatedUser } from "@/lib/schemas"
 import { centsToDollars } from "@/lib/utilities"
 
@@ -82,6 +82,17 @@ export default function CheckoutPage() {
       method: "ecocash",
     },
   })
+
+  const { data: profileData } = useQuery({
+    queryKey: ["my-profile", user?.username],
+    queryFn: () => fetchClient((user!.username as string).replace(/ /g, "-")).then((r) => r.data),
+    enabled: !!user?.username,
+  })
+
+  useEffect(() => {
+    if (profileData?.phone) setValue("phone", profileData.phone)
+    if (user?.email) setValue("email", user.email as string)
+  }, [profileData, user, setValue])
 
   const fulfillment = watch("fulfillment")
   const method = watch("method")
