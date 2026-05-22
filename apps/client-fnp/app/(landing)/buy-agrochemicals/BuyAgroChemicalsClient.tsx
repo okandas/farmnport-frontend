@@ -42,6 +42,9 @@ export function BuyAgroChemicalsClient({ initialChemicals, initialTotal }: BuyAg
 
     const chemicals = chemicalsData?.data?.data || []
     const totalPages = Math.ceil((chemicalsData?.data?.total || 0) / 20)
+    const activeBrandName = queryState.brand?.length === 1 && chemicals[0]?.brand?.name
+      ? chemicals[0].brand.name
+      : null
 
     const handlePageChange = (newPage: number) => {
         setQueryState({ p: newPage })
@@ -58,6 +61,9 @@ export function BuyAgroChemicalsClient({ initialChemicals, initialTotal }: BuyAg
 
             {/* Main Content */}
             <main className="flex-1">
+                {activeBrandName && (
+                    <h2 className="text-lg font-semibold mb-4 capitalize">{activeBrandName}</h2>
+                )}
                 {chemicalsLoading ? (
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
                         {[...Array(6)].map((_, i) => (
@@ -108,6 +114,7 @@ export function BuyAgroChemicalsClient({ initialChemicals, initialTotal }: BuyAg
                                     wasPrice={chemical.was_price}
                                     showWasPrice={chemical.show_was_price}
                                     availableForSale={chemical.available_for_sale}
+                                    stockLevel={chemical.stock_level}
                                 />
                             ))}
                         </div>

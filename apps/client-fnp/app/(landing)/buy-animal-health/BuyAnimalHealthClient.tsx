@@ -108,6 +108,7 @@ export function BuyAnimalHealthClient({ initialProducts, initialTotal }: BuyAnim
                                     wasPrice={product.was_price}
                                     showWasPrice={product.show_was_price}
                                     availableForSale={product.available_for_sale}
+                                    stockLevel={product.stock_level}
                                 />
                             ))}
                         </div>

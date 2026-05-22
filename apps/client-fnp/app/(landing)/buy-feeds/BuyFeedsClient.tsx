@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button"
 import { FeedFilterSidebar } from "@/components/generic/feedFilterSidebar"
 import { BuyCategoriesNav } from "@/components/generic/BuyCategoriesNav"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
-import { Egg } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { AddToCartButton } from "@/components/cart/AddToCartButton"
@@ -142,7 +141,6 @@ export function BuyFeedsClient({ initialProducts, initialTotal }: BuyFeedsClient
                     </div>
                 ) : products.length === 0 ? (
                     <div className="text-center py-12">
-                        <Egg className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
                         <p className="text-muted-foreground">No feed products found matching your filters.</p>
                     </div>
                 ) : (

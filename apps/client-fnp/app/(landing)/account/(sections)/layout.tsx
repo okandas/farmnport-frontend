@@ -64,7 +64,7 @@ export default function AccountSectionsLayout({ children }: { children: React.Re
 
             {/* Desktop sidebar */}
             <aside className="hidden lg:block w-56 shrink-0">
-                <nav className="flex flex-col divide-y border-y">
+                <nav className="flex flex-col">
                     {NAV_ITEMS.map(({ label, href }) => {
                         const active = pathname === href || pathname.startsWith(href + "/")
                         return (

@@ -223,7 +223,7 @@ export function FilterSidebar({ hideProduce }: { hideProduce?: boolean } = {}) {
   // Desktop: Sticky sidebar
   if (isDesktop) {
     return (
-      <div className="sticky top-20 mt-[20px]">
+      <div>
         <FilterContent onClearAll={handleClearAll} hideProduce={hideProduce} />
       </div>
     )

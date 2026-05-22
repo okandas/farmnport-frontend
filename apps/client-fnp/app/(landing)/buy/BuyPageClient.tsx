@@ -131,6 +131,7 @@ interface BuyPageClientProps {
   seedsTotal?: number
   documents?: any[]
   documentsTotal?: number
+  bookingEvents?: any[]
 }
 
 export function BuyPageClient({
@@ -140,7 +141,20 @@ export function BuyPageClient({
   plantNutrition = [], plantNutritionTotal = 0,
   seeds = [], seedsTotal = 0,
   documents = [], documentsTotal = 0,
+  bookingEvents = [],
 }: BuyPageClientProps) {
+  const categoryTotals: Record<string, number> = {
+    "agrochemicals": agrochemicalTotal,
+    "animal-health": animalHealthTotal,
+    "animal-feed": feedsTotal,
+    "plant-nutrition": plantNutritionTotal,
+    "seeds": seedsTotal,
+  }
+
+  const visibleCategories = CATEGORIES.filter(
+    ({ id }) => id === "pre-orders" || (categoryTotals[id] ?? 0) > 0
+  )
+
   return (
     <div className="mx-auto max-w-7xl px-4 lg:px-8 py-8">
       <div className="flex gap-8">
@@ -150,7 +164,7 @@ export function BuyPageClient({
           <div className="sticky top-6">
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-2">Categories</p>
             <nav className="flex flex-col gap-0.5">
-              {CATEGORIES.map(({ label, href }) => (
+              {visibleCategories.map(({ label, href }) => (
                 <Link
                   key={href}
                   href={href}
@@ -168,35 +182,48 @@ export function BuyPageClient({
 
           <PreOrdersSection />
 
-          <Section label="Agrochemicals" href="/buy-agrochemicals" count={agrochemicalTotal}>
-            {agrochemicals.slice(0, 4).map((p) => (
-              <ProductCard key={p.id} mode="buy" href={`/buy-agrochemicals/${p.slug}`} imageSrc={p.images?.[0]?.img?.src} name={p.name} brand={p.brand?.name} meta={p.agrochemical_category?.name} productId={p.id} productType="agrochemical" productSlug={p.slug} showPrice={p.show_price} salePrice={p.sale_price} wasPrice={p.was_price} showWasPrice={p.show_was_price} availableForSale={p.available_for_sale} />
-            ))}
-          </Section>
+          {agrochemicalTotal > 0 && (
+            <Section label="Agrochemicals" href="/buy-agrochemicals" count={agrochemicalTotal}>
+              {agrochemicals.slice(0, 4).map((p) => (
+                <ProductCard key={p.id} mode="buy" href={`/buy-agrochemicals/${p.slug}`} imageSrc={p.images?.[0]?.img?.src} name={p.name} brand={p.brand?.name} meta={p.agrochemical_category?.name} productId={p.id} productType="agrochemical" productSlug={p.slug} showPrice={p.show_price} salePrice={p.sale_price} wasPrice={p.was_price} showWasPrice={p.show_was_price} availableForSale={p.available_for_sale} stockLevel={p.stock_level} />
+              ))}
+            </Section>
+          )}
 
-          <Section label="Animal Health" href="/buy-animal-health" count={animalHealthTotal}>
-            {animalHealth.slice(0, 4).map((p) => (
-              <ProductCard key={p.id} mode="buy" href={`/buy-animal-health/${p.slug}`} imageSrc={p.images?.[0]?.img?.src} name={p.name} brand={p.brand?.name} meta={p.animal_health_category?.name} productId={p.id} productType="animal_health" productSlug={p.slug} showPrice={p.show_price} salePrice={p.sale_price} wasPrice={p.was_price} showWasPrice={p.show_was_price} availableForSale={p.available_for_sale} />
-            ))}
-          </Section>
+          {animalHealthTotal > 0 && (
+            <Section label="Animal Health" href="/buy-animal-health" count={animalHealthTotal}>
+              {animalHealth.slice(0, 4).map((p) => (
+                <ProductCard key={p.id} mode="buy" href={`/buy-animal-health/${p.slug}`} imageSrc={p.images?.[0]?.img?.src} name={p.name} brand={p.brand?.name} meta={p.animal_health_category?.name} productId={p.id} productType="animal_health" productSlug={p.slug} showPrice={p.show_price} salePrice={p.sale_price} wasPrice={p.was_price} showWasPrice={p.show_was_price} availableForSale={p.available_for_sale} stockLevel={p.stock_level} />
+              ))}
+            </Section>
+          )}
 
-          <Section label="Animal Feed" href="/buy-feeds" count={feedsTotal}>
-            {feeds.slice(0, 4).map((p) => (
-              <ProductCard key={p.id} mode="buy" href={`/buy-feeds/${p.slug}`} imageSrc={p.images?.[0]?.img?.src} name={p.name} brand={p.brand?.name} meta={p.animal ? `${p.animal}${p.phase ? ` · ${p.phase}` : ""}` : undefined} productId={p.id} productType="feed" productSlug={p.slug} showPrice={p.show_price} salePrice={p.sale_price} wasPrice={p.was_price} showWasPrice={p.show_was_price} availableForSale={p.available_for_sale} />
-            ))}
-          </Section>
+          {feedsTotal > 0 && (
+            <Section label="Animal Feed" href="/buy-feeds" count={feedsTotal}>
+              {feeds.slice(0, 4).map((p) => (
+                <ProductCard key={p.id} mode="buy" href={`/buy-feeds/${p.slug}`} imageSrc={p.images?.[0]?.img?.src} name={p.name} brand={p.brand?.name} meta={p.animal ? `${p.animal}${p.phase ? ` · ${p.phase}` : ""}` : undefined} productId={p.id} productType="feed" productSlug={p.slug} showPrice={p.show_price} salePrice={p.sale_price} wasPrice={p.was_price} showWasPrice={p.show_was_price} availableForSale={p.available_for_sale} />
+              ))}
+            </Section>
+          )}
 
-          <Section label="Plant Nutrition" href="/buy-plant-nutrition" count={plantNutritionTotal}>
-            {plantNutrition.slice(0, 4).map((p) => (
-              <ProductCard key={p.id} mode="buy" href={`/buy-plant-nutrition/${p.slug}`} imageSrc={p.images?.[0]?.img?.src} name={p.name} brand={p.brand?.name} meta={p.plant_nutrition_category?.name} productId={p.id} productType="plant_nutrition" productSlug={p.slug} showPrice={p.show_price} salePrice={p.sale_price} wasPrice={p.was_price} showWasPrice={p.show_was_price} availableForSale={p.available_for_sale} />
-            ))}
-          </Section>
+          {plantNutritionTotal > 0 && (
+            <Section label="Plant Nutrition" href="/buy-plant-nutrition" count={plantNutritionTotal}>
+              {plantNutrition.slice(0, 4).map((p) => (
+                <ProductCard key={p.id} mode="buy" href={`/buy-plant-nutrition/${p.slug}`} imageSrc={p.images?.[0]?.img?.src} name={p.name} brand={p.brand?.name} meta={p.plant_nutrition_category?.name} productId={p.id} productType="plant_nutrition" productSlug={p.slug} showPrice={p.show_price} salePrice={p.sale_price} wasPrice={p.was_price} showWasPrice={p.show_was_price} availableForSale={p.available_for_sale} />
+              ))}
+            </Section>
+          )}
 
-          <Section label="Seeds" href="/buy-seed-products" count={seedsTotal}>
-            {seeds.slice(0, 4).map((p) => (
-              <ProductCard key={p.id} mode="buy" href={`/buy-seed-products/${p.slug}`} imageSrc={p.images?.[0]?.img?.src} name={p.name} brand={p.brand?.name} meta={p.variety ? `${p.variety}${p.type ? ` · ${p.type.replace("_", " ")}` : ""}` : undefined} productId={p.id} productType="seed_product" productSlug={p.slug} showPrice={p.show_price} salePrice={p.sale_price} wasPrice={p.was_price} showWasPrice={p.show_was_price} availableForSale={p.available_for_sale} />
-            ))}
-          </Section>
+          {seedsTotal > 0 && (
+            <Section label="Seeds" href="/buy-seed-products" count={seedsTotal}>
+              {seeds.slice(0, 4).map((p) => {
+                const bookingEvent = bookingEvents.find((e: any) => e.product_id === p.id)
+                return (
+                  <ProductCard key={p.id} mode="buy" href={`/buy-seed-products/${p.slug}`} imageSrc={p.images?.[0]?.img?.src} name={p.name} brand={p.brand?.name} meta={p.variety ? `${p.variety}${p.type ? ` · ${p.type.replace("_", " ")}` : ""}` : undefined} productId={p.id} productType="seed_product" productSlug={p.slug} showPrice={p.show_price} salePrice={p.sale_price} wasPrice={p.was_price} showWasPrice={p.show_was_price} availableForSale={p.available_for_sale} preorderHref={bookingEvent ? `/bookings/${bookingEvent.slug}` : undefined} />
+                )
+              })}
+            </Section>
+          )}
 
           {documents.length > 0 && (
             <Section label="Plans & Documents" href="/buy-documents" count={documentsTotal}>

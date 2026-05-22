@@ -6,7 +6,6 @@ import { CalendarDays, Loader2 } from "lucide-react"
 
 import { listBookingEvents } from "@/lib/query"
 import { BuyCategoriesNav } from "@/components/generic/BuyCategoriesNav"
-import { Icons } from "@/components/icons/lucide"
 
 function formatDate(d: string) {
   return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
@@ -17,51 +16,47 @@ function EventCard({ event }: { event: any }) {
   return (
     <Link
       href={`/bookings/${event.slug}`}
-      className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-md hover:border-primary/50 transition-all group flex flex-col"
+      className="bg-card border border-border rounded-lg overflow-hidden hover:shadow-lg hover:border-primary/50 transition-all duration-200 group flex flex-col"
     >
-      <div className="p-5 flex flex-col gap-3 flex-1">
-        <div>
-          <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-800 font-medium shrink-0">Open</span>
-        </div>
-        <div>
-          <h3 className="font-semibold text-sm leading-tight group-hover:text-primary transition-colors line-clamp-2">
-            {event.title}
-          </h3>
-          <div className="flex items-center gap-1.5 mt-1">
-            <p className="text-xs text-muted-foreground">{event.client_name}</p>
-            {event.client_verified && (
-              <span className="flex items-center gap-0.5 text-[11px] font-medium text-green-700">
-                <Icons.verified className="h-3.5 w-3.5 shrink-0" aria-hidden="true" color="#228B22" />
-                verified
-              </span>
-            )}
-          </div>
-        </div>
-        {event.description && (
-          <p className="text-xs text-muted-foreground line-clamp-2">{event.description}</p>
+      {/* Image area — matches ProductCard */}
+      <div className="relative aspect-square bg-muted/30">
+        {event.image_src && (
+          <img src={event.image_src} alt={event.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-200 group-hover:scale-105" />
         )}
-        <div className="mt-auto pt-3 border-t space-y-1.5 text-xs">
+      </div>
+
+      <div className="p-4 space-y-3 border-t flex flex-col flex-1">
+        <h3 className="font-semibold text-sm leading-tight line-clamp-2 group-hover:text-primary transition-colors">
+          {event.title}
+        </h3>
+
+        <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">{event.client_name}</p>
+
+        <div className="text-xs text-muted-foreground pt-2 border-t space-y-1.5">
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Unit price</span>
-            <span className="font-semibold">${(event.unit_price / 100).toFixed(2)}</span>
+            <span>Unit price</span>
+            <span className="font-semibold text-foreground">${(event.unit_price / 100).toFixed(2)}</span>
           </div>
+          {event.deposit_per_unit > 0 && (
+            <div className="flex justify-between">
+              <span>Deposit/unit</span>
+              <span className="font-medium text-foreground">${(event.deposit_per_unit / 100).toFixed(2)}</span>
+            </div>
+          )}
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Deposit/unit</span>
-            <span className="font-medium">${(event.deposit_per_unit / 100).toFixed(2)}</span>
+            <span>Available</span>
+            <span className="font-medium text-foreground">{available} of {event.total_available}</span>
           </div>
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Available</span>
-            <span className="font-medium">{available} of {event.total_available}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Closes</span>
-            <span className="font-medium">{formatDate(event.close_date)}</span>
+          <div className="flex items-center justify-between">
+            <span>Closes</span>
+            <span className="font-medium text-foreground">{formatDate(event.close_date)}</span>
           </div>
         </div>
-      </div>
-      <div className="px-5 pb-5">
-        <div className="w-full text-center text-xs font-medium py-2 rounded-lg border group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-colors">
-          Reserve Now
+
+        <div className="mt-auto pt-1">
+          <div className="w-full text-center text-sm font-medium py-2 rounded-md border hover:bg-muted transition-colors">
+            Reserve Now
+          </div>
         </div>
       </div>
     </Link>

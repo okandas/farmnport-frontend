@@ -20,6 +20,7 @@ interface ProductCardProps {
   wasPrice?: number
   showWasPrice?: boolean
   availableForSale?: boolean
+  stockLevel?: number
   productId?: string
   productType?: CartProductType
   productSlug?: string
@@ -30,8 +31,9 @@ interface ProductCardProps {
 export function ProductCard({
   href, imageSrc, name, brand, meta, mode, buttonLabel = "View Guide",
   showPrice, salePrice, wasPrice, showWasPrice, availableForSale,
-  productId, productType, productSlug, loginRedirect, preorderHref,
+  productId, productType, productSlug, loginRedirect, preorderHref, stockLevel,
 }: ProductCardProps) {
+  const inStock = availableForSale && (stockLevel === undefined || stockLevel > 0)
   return (
     <div className="bg-card border border-border rounded-lg overflow-hidden transition-all duration-200 hover:shadow-lg hover:border-primary/50 group">
       <Link href={href} className="block">
@@ -75,7 +77,7 @@ export function ProductCard({
                 )}
               </div>
             )}
-            {!availableForSale && preorderHref ? (
+            {!inStock && preorderHref ? (
               <Link href={preorderHref} className="block mt-3">
                 <Button variant="outline" className="w-full" size="sm">Pre-order</Button>
               </Link>
@@ -87,7 +89,7 @@ export function ProductCard({
                 productSlug={productSlug!}
                 imageSrc={imageSrc}
                 unitPrice={showPrice && salePrice && salePrice > 0 ? salePrice : null}
-                available={availableForSale}
+                available={inStock}
                 loginRedirect={loginRedirect ?? href}
               />
             )}

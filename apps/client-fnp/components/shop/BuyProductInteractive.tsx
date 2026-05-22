@@ -40,6 +40,7 @@ export function BuyProductInteractive({
   ctaSlot,
 }: BuyProductInteractiveProps) {
   const hasVariants = product.variants && product.variants.length > 0
+  const inStock = product.available_for_sale && (product.stock_level === undefined || product.stock_level > 0)
   const [selectedVariant, setSelectedVariant] = useState<any>(hasVariants ? product.variants[0] : null)
   const [selectedImage, setSelectedImage] = useState(0)
 const [mounted, setMounted] = useState(false)
@@ -197,7 +198,7 @@ const [mounted, setMounted] = useState(false)
               ) : (
                 <p className="text-sm text-muted-foreground">Price on request</p>
               )}
-              {!product.available_for_sale && (
+              {!inStock && (
                 <div className="flex items-center gap-1.5 mt-1">
                   <div className="h-1.5 w-1.5 rounded-full bg-red-500" />
                   <span className="text-xs font-medium text-red-700 dark:text-red-400">Out of stock</span>
@@ -212,7 +213,7 @@ const [mounted, setMounted] = useState(false)
                   productSlug={slug}
                   imageSrc={product.images?.[0]?.img?.src}
                   unitPrice={displayPrice}
-                  available={product.available_for_sale}
+                  available={inStock}
                   loginRedirect={loginRedirect}
                 />
               )}

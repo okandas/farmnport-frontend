@@ -6,6 +6,7 @@ import {
   queryAllPlantNutritionProducts,
   queryAllSeedProducts,
   queryAllDocuments,
+  listBookingEvents,
 } from "@/lib/query"
 
 import { BuyPageClient } from "./BuyPageClient"
@@ -20,14 +21,16 @@ async function fetchSection(fn: () => Promise<any>) {
 }
 
 export default async function BuyPage() {
-  const [agro, animalHealth, feeds, plantNutrition, seeds, documents] = await Promise.all([
+  const [agro, animalHealth, feeds, plantNutrition, seeds, documents, bookingsRes] = await Promise.all([
     fetchSection(() => queryAllAgroChemicals({ p: 1, brand: [], target: [], active_ingredient: [] })),
     fetchSection(() => queryAllAnimalHealthProducts({ p: 1, brand: [], target: [], active_ingredient: [], used_on: [] })),
     fetchSection(() => queryAllFeedProducts({ p: 1 })),
     fetchSection(() => queryAllPlantNutritionProducts({ p: 1, brand: [], category: [], active_ingredient: [], used_on: [] })),
     fetchSection(() => queryAllSeedProducts({ p: 1 })),
     fetchSection(() => queryAllDocuments({ p: 1 })),
+    listBookingEvents({ status: "open" }).catch(() => null),
   ])
+  const bookingEvents: any[] = bookingsRes?.data?.events ?? []
 
   return (
     <main className="bg-gradient-to-b from-background to-muted/20 min-h-screen">
@@ -63,6 +66,7 @@ export default async function BuyPage() {
         seedsTotal={seeds.total}
         documents={documents.data}
         documentsTotal={documents.total}
+        bookingEvents={bookingEvents}
       />
     </main>
   )
