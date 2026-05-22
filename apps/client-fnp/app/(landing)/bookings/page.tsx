@@ -18,15 +18,14 @@ function EventCard({ event }: { event: any }) {
       href={`/bookings/${event.slug}`}
       className="bg-card border border-border rounded-lg overflow-hidden hover:shadow-lg hover:border-primary/50 transition-all duration-200 group flex flex-col"
     >
-      {/* Image area — matches ProductCard */}
-      <div className="relative aspect-square bg-muted/30">
+      <div className="relative h-36 bg-muted/30">
         {event.image_src && (
           <img src={event.image_src} alt={event.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-200 group-hover:scale-105" />
         )}
       </div>
 
       <div className="p-4 space-y-3 border-t flex flex-col flex-1">
-        <h3 className="font-semibold text-sm leading-tight line-clamp-2 group-hover:text-primary transition-colors">
+        <h3 className="font-semibold text-sm leading-tight group-hover:text-primary transition-colors">
           {event.title}
         </h3>
 
