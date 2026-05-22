@@ -163,24 +163,19 @@ export default async function BuySeedProductPage({ params }: Props) {
                     categoryName={[product.variety, product.type?.replace("_", " ")].filter(Boolean).join(" · ")}
                     brandHref={product.brand ? `/buy-seed-products?brand=${product.brand.id}` : undefined}
                     shopHref="/buy-seed-products"
+                    guideHref={`/seed-guides/${slug}`}
+                    guideLabel="View Seed Guide & Growing Information →"
                     loginRedirect={`/buy-seed-products/${slug}`}
                     tabsContent={tabsContent}
                     ctaSlot={
-                        openEvent ? (
+                        (!product.available_for_sale || product.stock_level === 0) && openEvent ? (
                             <Link
                                 href={`/bookings/${openEvent.slug}`}
                                 className="mt-3 flex w-full items-center justify-center gap-2 bg-primary text-primary-foreground font-semibold py-2.5 rounded-xl hover:bg-primary/90 transition-colors text-sm"
                             >
                                 Pre-order Now
                             </Link>
-                        ) : (
-                            <Link
-                                href="/bookings"
-                                className="mt-3 flex w-full items-center justify-center gap-2 bg-muted text-foreground font-semibold py-2.5 rounded-xl hover:bg-muted/80 transition-colors text-sm"
-                            >
-                                View Pre-order Batches
-                            </Link>
-                        )
+                        ) : undefined
                     }
                 />
             </div>

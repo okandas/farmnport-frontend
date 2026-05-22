@@ -35,7 +35,7 @@ export default async function AnimalHealthGuidesPage() {
 
     return (
         <main className="bg-gradient-to-b from-background to-muted/20">
-            <section className="py-14 lg:py-20 bg-muted/30">
+            <section className="py-6 lg:py-8 bg-muted/30">
                 <div className="mx-auto max-w-7xl px-6 lg:px-8">
                     <nav className="flex text-sm text-muted-foreground mb-6">
                         <Link href="/guides" className="hover:text-foreground transition-colors">Guides</Link>

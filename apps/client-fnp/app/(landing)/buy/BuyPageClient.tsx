@@ -218,7 +218,7 @@ export function BuyPageClient({
               {seeds.slice(0, 4).map((p) => {
                 const bookingEvent = bookingEvents.find((e: any) => e.product_id === p.id)
                 return (
-                  <ProductCard key={p.id} mode="buy" href={`/buy-seed-products/${p.slug}`} imageSrc={p.images?.[0]?.img?.src} name={p.name} brand={p.brand?.name} meta={p.variety ? `${p.variety}${p.type ? ` · ${p.type.replace("_", " ")}` : ""}` : undefined} productId={p.id} productType="seed_product" productSlug={p.slug} showPrice={p.show_price} salePrice={p.sale_price} wasPrice={p.was_price} showWasPrice={p.show_was_price} availableForSale={p.available_for_sale} preorderHref={bookingEvent ? `/bookings/${bookingEvent.slug}` : undefined} />
+                  <ProductCard key={p.id} mode="buy" href={`/buy-seed-products/${p.slug}`} imageSrc={p.images?.[0]?.img?.src} name={p.name} brand={p.brand?.name} meta={p.variety ? `${p.variety}${p.type ? ` · ${p.type.replace("_", " ")}` : ""}` : undefined} productId={p.id} productType="seed_product" productSlug={p.slug} showPrice={p.show_price} salePrice={p.sale_price} wasPrice={p.was_price} showWasPrice={p.show_was_price} availableForSale={p.available_for_sale} hasVariants={p.variants && p.variants.length > 0} preorderHref={bookingEvent ? `/bookings/${bookingEvent.slug}` : undefined} />
                 )
               })}
             </Section>

@@ -26,12 +26,13 @@ interface ProductCardProps {
   productSlug?: string
   loginRedirect?: string
   preorderHref?: string
+  hasVariants?: boolean
 }
 
 export function ProductCard({
   href, imageSrc, name, brand, meta, mode, buttonLabel = "View Guide",
   showPrice, salePrice, wasPrice, showWasPrice, availableForSale,
-  productId, productType, productSlug, loginRedirect, preorderHref, stockLevel,
+  productId, productType, productSlug, loginRedirect, preorderHref, stockLevel, hasVariants,
 }: ProductCardProps) {
   const inStock = availableForSale && (stockLevel === undefined || stockLevel > 0)
   return (
@@ -69,7 +70,7 @@ export function ProductCard({
 
         {mode === "buy" ? (
           <div className="space-y-2">
-            {showPrice && salePrice && salePrice > 0 && (
+            {!hasVariants && showPrice && salePrice && salePrice > 0 && (
               <div className="flex items-baseline gap-2">
                 <span className="text-lg font-bold">${(salePrice / 100).toFixed(2)}</span>
                 {showWasPrice && wasPrice && wasPrice > 0 && wasPrice > salePrice && (
@@ -77,7 +78,11 @@ export function ProductCard({
                 )}
               </div>
             )}
-            {!inStock && preorderHref ? (
+            {hasVariants ? (
+              <Link href={href} className="block mt-3">
+                <Button variant="outline" className="w-full" size="sm">Choose Options</Button>
+              </Link>
+            ) : !inStock && preorderHref ? (
               <Link href={preorderHref} className="block mt-3">
                 <Button variant="outline" className="w-full" size="sm">Pre-order</Button>
               </Link>

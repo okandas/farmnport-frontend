@@ -26,7 +26,7 @@ const sections = [
     {
         title: "Seed Guides",
         description: "Certified seed varieties — potatoes, maize, tomatoes, chillies, vegetables and more from trusted suppliers.",
-        href: "/buy-seed-products",
+        href: "/seed-guides",
     },
 ]
 

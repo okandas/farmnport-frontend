@@ -92,6 +92,7 @@ export function BuySeedProductsClient({ initialProducts, initialTotal, bookingEv
                     wasPrice={product.was_price}
                     showWasPrice={product.show_was_price}
                     availableForSale={product.available_for_sale}
+                    hasVariants={product.variants && product.variants.length > 0}
                     preorderHref={bookingEvent ? `/bookings/${bookingEvent.slug}` : undefined}
                   />
                 )
