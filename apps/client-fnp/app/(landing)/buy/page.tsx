@@ -1,10 +1,10 @@
 import Link from "next/link"
 import {
-  queryAllAgroChemicals,
-  queryAllAnimalHealthProducts,
-  queryAllFeedProducts,
-  queryAllPlantNutritionProducts,
-  queryAllSeedProducts,
+  queryBuyAgroChemicals,
+  queryBuyAnimalHealthProducts,
+  queryBuyFeedProducts,
+  queryBuyPlantNutritionProducts,
+  queryBuySeedProducts,
   queryAllDocuments,
   listBookingEvents,
 } from "@/lib/query"
@@ -22,11 +22,11 @@ async function fetchSection(fn: () => Promise<any>) {
 
 export default async function BuyPage() {
   const [agro, animalHealth, feeds, plantNutrition, seeds, documents, bookingsRes] = await Promise.all([
-    fetchSection(() => queryAllAgroChemicals({ p: 1, brand: [], target: [], active_ingredient: [] })),
-    fetchSection(() => queryAllAnimalHealthProducts({ p: 1, brand: [], target: [], active_ingredient: [], used_on: [] })),
-    fetchSection(() => queryAllFeedProducts({ p: 1 })),
-    fetchSection(() => queryAllPlantNutritionProducts({ p: 1, brand: [], category: [], active_ingredient: [], used_on: [] })),
-    fetchSection(() => queryAllSeedProducts({ p: 1 })),
+    fetchSection(() => queryBuyAgroChemicals({ p: 1, brand: [], target: [], active_ingredient: [] })),
+    fetchSection(() => queryBuyAnimalHealthProducts({ p: 1, brand: [], target: [], active_ingredient: [], used_on: [] })),
+    fetchSection(() => queryBuyFeedProducts({ p: 1 })),
+    fetchSection(() => queryBuyPlantNutritionProducts({ p: 1, brand: [], category: [], active_ingredient: [], used_on: [] })),
+    fetchSection(() => queryBuySeedProducts({ p: 1 })),
     fetchSection(() => queryAllDocuments({ p: 1 })),
     listBookingEvents({ status: "open" }).catch(() => null),
   ])
