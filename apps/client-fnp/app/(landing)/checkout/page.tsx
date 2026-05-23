@@ -6,7 +6,7 @@ import { useSession } from "next-auth/react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
-import { Check, Loader2, ShoppingCart, CreditCard, Smartphone, Globe } from "lucide-react"
+import { Check, Loader2, ShoppingCart, CreditCard, Smartphone, Globe, Truck, Store } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 
@@ -20,11 +20,21 @@ const PAYMENT_METHODS = [
   { value: "",        label: "PayNow Web",         description: "Choose your method on PayNow",       icon: Globe },
 ]
 
+const PROVINCES = [
+  "Harare", "Bulawayo", "Manicaland", "Mashonaland Central",
+  "Mashonaland East", "Mashonaland West", "Masvingo",
+  "Matabeleland North", "Matabeleland South", "Midlands",
+]
+
 interface CheckoutForm {
   phone: string
   email: string
   provider: string
   method: string
+  address_name: string
+  address_line: string
+  city: string
+  province: string
 }
 
 interface CartItem {
@@ -67,6 +77,7 @@ export default function CheckoutPage() {
   const [redirectUrl, setRedirectUrl] = useState("")
   const [selectedMethod, setSelectedMethod] = useState("")
   const [selectedLocationId, setSelectedLocationId] = useState("")
+  const [fulfillment, setFulfillment] = useState<"click_collect" | "delivery">("click_collect")
   const [step, setStep] = useState<"form" | "waiting" | "success">("form")
 
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<CheckoutForm>({
@@ -97,6 +108,7 @@ export default function CheckoutPage() {
   const pickupLocations = items
     .flatMap((i) => i.fulfillment?.pickup_locations ?? [])
     .filter((loc, idx, arr) => arr.findIndex((l) => l.id === loc.id) === idx)
+  const deliveryAvailable = items.every((i) => i.fulfillment?.delivery_available)
   const subtotalCents = items.reduce((s, i) => s + (i.unit_price * i.quantity), 0)
 
   useEffect(() => {
@@ -145,8 +157,15 @@ export default function CheckoutPage() {
       method: data.method,
       phone: data.phone,
       email: data.email || user?.email || "",
-      fulfillment: "click_collect",
-      collection_location_id: selectedLocationId || undefined,
+      fulfillment,
+      collection_location_id: fulfillment === "click_collect" ? selectedLocationId || undefined : undefined,
+      address: fulfillment === "delivery" ? {
+        name: data.address_name,
+        phone: data.phone,
+        address: data.address_line,
+        city: data.city,
+        province: data.province,
+      } : undefined,
       order_type: "retail",
     })
   }
@@ -198,7 +217,7 @@ export default function CheckoutPage() {
             <h1 className="text-2xl font-bold">Payment Confirmed!</h1>
             <p className="text-muted-foreground mt-1">Your order <span className="font-semibold text-foreground">{orderNumber}</span> has been placed.</p>
           </div>
-          <p className="text-sm text-muted-foreground">Bring your QR code to the collection point to pick up your order.</p>
+          <p className="text-sm text-muted-foreground">{fulfillment === "delivery" ? "We'll be in touch with your delivery details." : "Bring your QR code to the collection point to pick up your order."}</p>
           <div className="flex flex-col gap-3">
             <Link href="/account/orders" className="block w-full text-center bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-sm py-3 rounded-full transition-colors">
               View My Orders
@@ -269,8 +288,41 @@ export default function CheckoutPage() {
             {/* ── Left: Form ── */}
             <div className="space-y-6">
 
+              {/* Fulfillment selector — only show if delivery is available */}
+              {deliveryAvailable && (
+                <section className="border rounded-xl p-5 space-y-3">
+                  <h2 className="font-semibold">Fulfillment Method</h2>
+                  <div className="grid grid-cols-2 gap-3">
+                    {([
+                      { value: "click_collect", label: "Click & Collect", description: "Pick up from a collection point", icon: Store },
+                      { value: "delivery",      label: "Delivery",         description: "Delivered to your address",       icon: Truck },
+                    ] as const).map((opt) => {
+                      const Icon = opt.icon
+                      const active = fulfillment === opt.value
+                      return (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          onClick={() => setFulfillment(opt.value)}
+                          className={`relative rounded-xl border-2 p-4 text-left transition-colors ${active ? "border-primary bg-primary/5" : "border-border hover:border-primary/40"}`}
+                        >
+                          {active && (
+                            <span className="absolute top-2 right-2 w-4 h-4 bg-primary rounded-full flex items-center justify-center">
+                              <Check className="w-2.5 h-2.5 text-white" />
+                            </span>
+                          )}
+                          <Icon className="w-5 h-5 mb-2 text-muted-foreground" />
+                          <p className="font-semibold text-sm">{opt.label}</p>
+                          <p className="text-xs text-muted-foreground">{opt.description}</p>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </section>
+              )}
+
               {/* Collection Points */}
-              {pickupLocations.length > 0 && (
+              {fulfillment === "click_collect" && pickupLocations.length > 0 && (
                 <section className="border rounded-xl p-5 space-y-3">
                   <h2 className="font-semibold">Collection Point</h2>
                   {pickupLocations.map((loc) => (
@@ -298,6 +350,57 @@ export default function CheckoutPage() {
                       </div>
                     </button>
                   ))}
+                </section>
+              )}
+
+              {/* Delivery Address */}
+              {fulfillment === "delivery" && (
+                <section className="border rounded-xl p-5 space-y-4">
+                  <h2 className="font-semibold">Delivery Address</h2>
+                  <div className="grid gap-4">
+                    <div>
+                      <label className="text-sm font-medium block mb-1">Full Name</label>
+                      <input
+                        {...register("address_name", { required: fulfillment === "delivery" ? "Name is required" : false })}
+                        placeholder="Your name"
+                        className="w-full border rounded-lg px-3 py-2 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+                      />
+                      {errors.address_name && <p className="text-xs text-destructive mt-1">{errors.address_name.message}</p>}
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium block mb-1">Street Address</label>
+                      <input
+                        {...register("address_line", { required: fulfillment === "delivery" ? "Address is required" : false })}
+                        placeholder="123 Main Street"
+                        className="w-full border rounded-lg px-3 py-2 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+                      />
+                      {errors.address_line && <p className="text-xs text-destructive mt-1">{errors.address_line.message}</p>}
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="text-sm font-medium block mb-1">City / Town</label>
+                        <input
+                          {...register("city", { required: fulfillment === "delivery" ? "City is required" : false })}
+                          placeholder="Harare"
+                          className="w-full border rounded-lg px-3 py-2 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+                        />
+                        {errors.city && <p className="text-xs text-destructive mt-1">{errors.city.message}</p>}
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium block mb-1">Province</label>
+                        <select
+                          {...register("province", { required: fulfillment === "delivery" ? "Province is required" : false })}
+                          className="w-full border rounded-lg px-3 py-2 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+                        >
+                          <option value="">Select...</option>
+                          {PROVINCES.map((p) => (
+                            <option key={p} value={p}>{p}</option>
+                          ))}
+                        </select>
+                        {errors.province && <p className="text-xs text-destructive mt-1">{errors.province.message}</p>}
+                      </div>
+                    </div>
+                  </div>
                 </section>
               )}
 
@@ -397,7 +500,7 @@ export default function CheckoutPage() {
                 <div className="px-5 pb-5">
                   <button
                     type="submit"
-                    disabled={checkoutMutation.isPending || items.length === 0 || (pickupLocations.length > 0 && !selectedLocationId)}
+                    disabled={checkoutMutation.isPending || items.length === 0 || (fulfillment === "click_collect" && pickupLocations.length > 0 && !selectedLocationId)}
                     className="flex items-center justify-center gap-2 w-full bg-primary hover:bg-primary/90 disabled:opacity-60 text-primary-foreground font-semibold text-sm py-3 rounded-full transition-colors"
                   >
                     {checkoutMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <CreditCard className="w-4 h-4" />}
