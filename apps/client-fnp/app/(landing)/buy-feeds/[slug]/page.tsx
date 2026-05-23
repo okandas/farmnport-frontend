@@ -1,9 +1,11 @@
+import type { Metadata } from 'next'
 import Image from "next/image"
 import { Egg, AlertTriangle } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
 import { BaseURL } from "@/lib/schemas"
+import { buildBuyMetadata } from "@/lib/utilities"
 import { BuyProductInteractive } from "@/components/shop/BuyProductInteractive"
 import { BackToProgram } from "./BackToProgram"
 import Link from "next/link"
@@ -24,6 +26,13 @@ async function getFeedProduct(slug: string) {
     } catch {
         return null
     }
+}
+
+export async function generateMetadata({ params }: BuyFeedPageProps): Promise<Metadata> {
+    const { slug } = await params
+    const product = await getFeedProduct(slug)
+    if (!product) return { title: 'Livestock Feed | farmnport.com' }
+    return buildBuyMetadata(product, product.feed_category?.name || 'Livestock Feed', `/buy-feeds/${slug}`)
 }
 
 export default async function BuyFeedPage({ params }: BuyFeedPageProps) {

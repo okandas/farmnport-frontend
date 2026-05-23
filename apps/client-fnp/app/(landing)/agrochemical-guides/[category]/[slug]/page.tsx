@@ -5,7 +5,7 @@ import Image from "next/image"
 import { Beaker, AlertTriangle } from "lucide-react"
 import Link from "next/link"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
-import { capitalizeFirstLetter } from "@/lib/utilities"
+import { capitalizeFirstLetter, buildGuideMetadata } from "@/lib/utilities"
 import { SprayProgramBackLink } from "./SprayProgramBackLink"
 import { FertilizerApplicationRates } from "@/components/agrochemical/FertilizerApplicationRates"
 import { AgrochemicalDosageTable } from "@/components/agrochemical/AgrochemicalDosageTable"
@@ -38,17 +38,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     'View dosage rates, label information, and application guidelines on farmnport.com.',
   ].filter(Boolean).join('. ')
 
-  return {
-    title: `${chemical.name} – ${categorySingularTitle} Dosage, Label & Guide | farmnport.com`,
-    description,
-    alternates: { canonical: `/agrochemical-guides/${category}/${slug}` },
-    openGraph: {
-      title: `${chemical.name} – ${categorySingularTitle} Guide`,
-      description,
-      siteName: 'farmnport',
-      type: 'website',
-    },
-  }
+  return buildGuideMetadata(chemical, categorySingularTitle, 'Dosage, Label & Guide', description, `/agrochemical-guides/${category}/${slug}`)
 }
 
 interface GuidePageProps {

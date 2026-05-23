@@ -1,4 +1,6 @@
+import type { Metadata } from 'next'
 import { queryAgroChemical } from "@/lib/query"
+import { buildBuyMetadata } from "@/lib/utilities"
 import Link from "next/link"
 import { Beaker } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -6,6 +8,14 @@ import { BuyProductInteractive } from "@/components/shop/BuyProductInteractive"
 
 interface BuyAgroChemicalPageProps {
     params: Promise<{ slug: string }>
+}
+
+export async function generateMetadata({ params }: BuyAgroChemicalPageProps): Promise<Metadata> {
+    const { slug } = await params
+    const response = await queryAgroChemical(slug).catch(() => null)
+    const chemical = response?.data
+    if (!chemical) return { title: 'Agrochemical | farmnport.com' }
+    return buildBuyMetadata(chemical, chemical.agrochemical_category?.name || 'Agrochemical', `/buy-agrochemicals/${slug}`)
 }
 
 export default async function BuyAgroChemicalPage({ params }: BuyAgroChemicalPageProps) {

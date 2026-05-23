@@ -1,10 +1,20 @@
+import type { Metadata } from 'next'
 import { queryPlantNutritionProduct } from "@/lib/query"
+import { buildBuyMetadata } from "@/lib/utilities"
 import Link from "next/link"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { BuyProductInteractive } from "@/components/shop/BuyProductInteractive"
 
 interface BuyPlantNutritionProductPageProps {
     params: Promise<{ slug: string }>
+}
+
+export async function generateMetadata({ params }: BuyPlantNutritionProductPageProps): Promise<Metadata> {
+    const { slug } = await params
+    const response = await queryPlantNutritionProduct(slug).catch(() => null)
+    const product = response?.data
+    if (!product) return { title: 'Plant Nutrition Product | farmnport.com' }
+    return buildBuyMetadata(product, product.plant_nutrition_category?.name || 'Plant Nutrition', `/buy-plant-nutrition/${slug}`, 'Zimbabwe crops')
 }
 
 export default async function BuyPlantNutritionProductPage({ params }: BuyPlantNutritionProductPageProps) {

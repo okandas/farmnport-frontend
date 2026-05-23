@@ -1,10 +1,21 @@
+import type { Metadata } from 'next'
 import { queryLivestockPoultryProduct } from "@/lib/query"
+import { buildBuyMetadata } from "@/lib/utilities"
 import Link from "next/link"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { BuyProductInteractive } from "@/components/shop/BuyProductInteractive"
 
 interface Props {
     params: Promise<{ slug: string }>
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+    const { slug } = await params
+    const response = await queryLivestockPoultryProduct(slug).catch(() => null)
+    const product = response?.data
+    if (!product) return { title: 'Livestock & Poultry | farmnport.com' }
+    const category = [product.species, product.type].filter(Boolean).join(' ') || 'Livestock & Poultry'
+    return buildBuyMetadata(product, category, `/buy-livestock-poultry/${slug}`)
 }
 
 export default async function BuyLivestockPoultryProductPage({ params }: Props) {

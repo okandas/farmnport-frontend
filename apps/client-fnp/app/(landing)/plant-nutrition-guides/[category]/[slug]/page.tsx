@@ -3,7 +3,7 @@ import Image from "next/image"
 import { Beaker, AlertTriangle } from "lucide-react"
 import Link from "next/link"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
-import { capitalizeFirstLetter } from "@/lib/utilities"
+import { capitalizeFirstLetter, buildGuideMetadata } from "@/lib/utilities"
 import { BaseURL } from "@/lib/schemas"
 import { FertilizerApplicationRates } from "@/components/agrochemical/FertilizerApplicationRates"
 import { AgrochemicalDosageTable } from "@/components/agrochemical/AgrochemicalDosageTable"
@@ -36,17 +36,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     'View application rates and usage guidelines on farmnport.com.',
   ].filter(Boolean).join('. ')
 
-  return {
-    title: `${product.name} – ${categorySingularTitle} Application Rates & Guide | farmnport.com`,
-    description,
-    alternates: { canonical: `/plant-nutrition-guides/${category}/${slug}` },
-    openGraph: {
-      title: `${product.name} – ${categorySingularTitle} Guide`,
-      description,
-      siteName: 'farmnport',
-      type: 'website',
-    },
-  }
+  return buildGuideMetadata(product, categorySingularTitle, 'Application Rates & Guide', description, `/plant-nutrition-guides/${category}/${slug}`)
 }
 
 interface GuidePageProps {

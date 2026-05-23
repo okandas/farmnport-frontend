@@ -4,7 +4,7 @@ import Image from "next/image"
 import { AlertTriangle } from "lucide-react"
 import Link from "next/link"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
-import { capitalizeFirstLetter, formatUnit } from "@/lib/utilities"
+import { capitalizeFirstLetter, formatUnit, buildGuideMetadata } from "@/lib/utilities"
 import { BaseURL } from "@/lib/schemas"
 import { WantToBuyCTA } from "@/components/shared/WantToBuyCTA"
 
@@ -34,17 +34,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     'View dosage rates and usage guidelines on farmnport.com.',
   ].filter(Boolean).join('. ')
 
-  return {
-    title: `${product.name} – ${categorySingularTitle} Dosage & Guide | farmnport.com`,
-    description,
-    alternates: { canonical: `/animal-health-guides/${category}/${slug}` },
-    openGraph: {
-      title: `${product.name} – ${categorySingularTitle} Guide`,
-      description,
-      siteName: 'farmnport',
-      type: 'website',
-    },
-  }
+  return buildGuideMetadata(product, categorySingularTitle, 'Dosage & Guide', description, `/animal-health-guides/${category}/${slug}`)
 }
 
 interface GuidePageProps {
