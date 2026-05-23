@@ -1,4 +1,6 @@
+import type { Metadata } from 'next'
 import { queryAgroChemical } from "@/lib/query"
+import { formatProductName } from "@/lib/utilities"
 import Link from "next/link"
 import { Beaker } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -6,6 +8,27 @@ import { BuyProductInteractive } from "@/components/shop/BuyProductInteractive"
 
 interface BuyAgroChemicalPageProps {
     params: Promise<{ slug: string }>
+}
+
+export async function generateMetadata({ params }: BuyAgroChemicalPageProps): Promise<Metadata> {
+    const { slug } = await params
+    const response = await queryAgroChemical(slug).catch(() => null)
+    const chemical = response?.data
+    if (!chemical) return { title: 'Agrochemical | farmnport.com' }
+    const name = formatProductName(chemical.name)
+    const brand = chemical.brand?.name ? ` ${formatProductName(chemical.brand.name)}` : ''
+    const category = chemical.agrochemical_category?.name || 'Agrochemical'
+    return {
+        title: `${name}${brand} – Buy ${category} Zimbabwe | farmnport.com`,
+        description: chemical.description || `Buy ${name}${brand}. ${category} for Zimbabwe farmers. View dosage rates, pricing and order online at farmnport.com.`,
+        alternates: { canonical: `/buy-agrochemicals/${slug}` },
+        openGraph: {
+            title: `${name}${brand} – ${category} | farmnport.com`,
+            description: chemical.description || `Buy ${name}${brand} online. ${category} for Zimbabwe farmers.`,
+            siteName: 'farmnport',
+            type: 'website',
+        },
+    }
 }
 
 export default async function BuyAgroChemicalPage({ params }: BuyAgroChemicalPageProps) {

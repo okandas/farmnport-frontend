@@ -1,10 +1,33 @@
+import type { Metadata } from 'next'
 import { queryPlantNutritionProduct } from "@/lib/query"
+import { formatProductName } from "@/lib/utilities"
 import Link from "next/link"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { BuyProductInteractive } from "@/components/shop/BuyProductInteractive"
 
 interface BuyPlantNutritionProductPageProps {
     params: Promise<{ slug: string }>
+}
+
+export async function generateMetadata({ params }: BuyPlantNutritionProductPageProps): Promise<Metadata> {
+    const { slug } = await params
+    const response = await queryPlantNutritionProduct(slug).catch(() => null)
+    const product = response?.data
+    if (!product) return { title: 'Plant Nutrition Product | farmnport.com' }
+    const name = formatProductName(product.name)
+    const brand = product.brand?.name ? ` ${formatProductName(product.brand.name)}` : ''
+    const category = product.plant_nutrition_category?.name || 'Plant Nutrition'
+    return {
+        title: `${name}${brand} – Buy ${category} Zimbabwe | farmnport.com`,
+        description: product.description || `Buy ${name}${brand}. ${category} for Zimbabwe crops. View application rates, pricing and order online at farmnport.com.`,
+        alternates: { canonical: `/buy-plant-nutrition/${slug}` },
+        openGraph: {
+            title: `${name}${brand} – ${category} | farmnport.com`,
+            description: product.description || `Buy ${name}${brand} online. ${category} for Zimbabwe crops.`,
+            siteName: 'farmnport',
+            type: 'website',
+        },
+    }
 }
 
 export default async function BuyPlantNutritionProductPage({ params }: BuyPlantNutritionProductPageProps) {

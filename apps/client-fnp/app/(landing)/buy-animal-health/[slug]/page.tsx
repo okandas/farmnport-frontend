@@ -1,4 +1,6 @@
+import type { Metadata } from 'next'
 import { queryAnimalHealthProduct } from "@/lib/query"
+import { formatProductName } from "@/lib/utilities"
 import Link from "next/link"
 import { Beaker } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -6,6 +8,27 @@ import { BuyProductInteractive } from "@/components/shop/BuyProductInteractive"
 
 interface BuyAnimalHealthProductPageProps {
     params: Promise<{ slug: string }>
+}
+
+export async function generateMetadata({ params }: BuyAnimalHealthProductPageProps): Promise<Metadata> {
+    const { slug } = await params
+    const response = await queryAnimalHealthProduct(slug).catch(() => null)
+    const product = response?.data
+    if (!product) return { title: 'Animal Health Product | farmnport.com' }
+    const name = formatProductName(product.name)
+    const brand = product.brand?.name ? ` ${formatProductName(product.brand.name)}` : ''
+    const category = product.animal_health_category?.name || 'Animal Health'
+    return {
+        title: `${name}${brand} – Buy ${category} Zimbabwe | farmnport.com`,
+        description: product.description || `Buy ${name}${brand}. ${category} for poultry and livestock in Zimbabwe. View dosage, pricing and order online at farmnport.com.`,
+        alternates: { canonical: `/buy-animal-health/${slug}` },
+        openGraph: {
+            title: `${name}${brand} – ${category} | farmnport.com`,
+            description: product.description || `Buy ${name}${brand} online. ${category} for Zimbabwe farmers.`,
+            siteName: 'farmnport',
+            type: 'website',
+        },
+    }
 }
 
 export default async function BuyAnimalHealthProductPage({ params }: BuyAnimalHealthProductPageProps) {
