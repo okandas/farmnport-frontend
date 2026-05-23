@@ -212,7 +212,7 @@ const [mounted, setMounted] = useState(false)
                   productName={selectedVariant ? `${product.name} - ${selectedVariant.name}` : product.name}
                   productSlug={slug}
                   imageSrc={product.images?.[0]?.img?.src}
-                  unitPrice={displayPrice}
+                  unitPrice={selectedVariant?.sale_price || product.sale_price || 0}
                   available={inStock}
                   loginRedirect={loginRedirect}
                 />

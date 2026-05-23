@@ -60,6 +60,7 @@ export function AddToCartButton({
       if (err?.response?.status === 409) {
         toast.warning("This item can't be added to your current cart.", {
           description: "Your cart contains items with a different delivery method. Start a new cart with this item?",
+          duration: Infinity,
           action: {
             label: "Start new cart",
             onClick: async () => {
@@ -100,7 +101,7 @@ export function AddToCartButton({
       product_name: productName,
       product_slug: productSlug,
       image_src: imageSrc ?? "",
-      unit_price: Math.round((unitPrice ?? 0) * 100),
+      unit_price: Math.round(unitPrice ?? 0),
       quantity: 1,
     })
   }
