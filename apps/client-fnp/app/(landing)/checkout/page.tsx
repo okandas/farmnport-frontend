@@ -99,6 +99,12 @@ export default function CheckoutPage() {
     .filter((loc, idx, arr) => arr.findIndex((l) => l.id === loc.id) === idx)
   const subtotalCents = items.reduce((s, i) => s + (i.unit_price * i.quantity), 0)
 
+  useEffect(() => {
+    if (pickupLocations.length === 1 && !selectedLocationId) {
+      setSelectedLocationId(pickupLocations[0].id)
+    }
+  }, [pickupLocations.length])
+
   const checkoutMutation = useMutation({
     mutationFn: checkout,
     onSuccess: (res) => {
