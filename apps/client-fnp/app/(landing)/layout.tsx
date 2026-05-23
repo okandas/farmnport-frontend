@@ -8,7 +8,7 @@ interface RootLayoutProps {
 
 export default function LandingLayout({ children }: RootLayoutProps) {
     return (
-        <main className="flex flex-col min-h-screen">
+        <main>
             <ImpersonationBanner />
             <SiteHeader />
             {children}

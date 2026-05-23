@@ -27,15 +27,23 @@ interface ProductCardProps {
   loginRedirect?: string
   preorderHref?: string
   hasVariants?: boolean
+  variantPriceRange?: { min: number; max: number }
   pickupOnly?: boolean
 }
 
 export function ProductCard({
   href, imageSrc, name, brand, meta, mode, buttonLabel = "View Guide",
   showPrice, salePrice, wasPrice, showWasPrice, availableForSale,
-  productId, productType, productSlug, loginRedirect, preorderHref, stockLevel, hasVariants, pickupOnly,
+  productId, productType, productSlug, loginRedirect, preorderHref, stockLevel, hasVariants, variantPriceRange, pickupOnly,
 }: ProductCardProps) {
   const inStock = availableForSale && (stockLevel === undefined || stockLevel > 0)
+
+  const variantPriceLabel = variantPriceRange
+    ? variantPriceRange.min === variantPriceRange.max
+      ? `$${(variantPriceRange.min / 100).toFixed(2)}`
+      : `$${(variantPriceRange.min / 100).toFixed(2)} – $${(variantPriceRange.max / 100).toFixed(2)}`
+    : null
+
   return (
     <div className="bg-card border border-border rounded-lg overflow-hidden transition-all duration-200 hover:shadow-lg hover:border-primary/50 group">
       <Link href={href} className="block">
@@ -85,9 +93,14 @@ export function ProductCard({
               </div>
             )}
             {hasVariants ? (
-              <Link href={href} className="block mt-3">
-                <Button variant="outline" className="w-full" size="sm">Choose Options</Button>
-              </Link>
+              <>
+                {variantPriceLabel && (
+                  <p className="text-lg text-muted-foreground">{variantPriceLabel}</p>
+                )}
+                <Link href={href} className="block mt-3">
+                  <Button variant="outline" className="w-full" size="sm">Choose Options</Button>
+                </Link>
+              </>
             ) : !inStock && preorderHref ? (
               <Link href={preorderHref} className="block mt-3">
                 <Button variant="outline" className="w-full" size="sm">Pre-order</Button>
