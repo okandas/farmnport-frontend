@@ -3,7 +3,7 @@ import Image from "next/image"
 import { Beaker, AlertTriangle } from "lucide-react"
 import Link from "next/link"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
-import { capitalizeFirstLetter } from "@/lib/utilities"
+import { capitalizeFirstLetter, buildGuideMetadata } from "@/lib/utilities"
 import { BaseURL } from "@/lib/schemas"
 import { FertilizerApplicationRates } from "@/components/agrochemical/FertilizerApplicationRates"
 import { AgrochemicalDosageTable } from "@/components/agrochemical/AgrochemicalDosageTable"
@@ -28,7 +28,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const crops = Array.from(new Set<string>((product.dosage_rates ?? []).slice(0, 3).map((r: any) => r.crop))).join(', ')
   const ingredients = (product.active_ingredients ?? []).slice(0, 2).map((ai: any) => ai.name).join(', ')
   const brand = product.brand?.name ? ` by ${product.brand.name}` : ''
-  const brandInTitle = product.brand?.name ? ` ${product.brand.name}` : ''
 
   const description = [
     `${product.name}${brand} is ${article} ${categorySingular} for Zimbabwe crops`,
@@ -37,17 +36,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     'View application rates and usage guidelines on farmnport.com.',
   ].filter(Boolean).join('. ')
 
-  return {
-    title: `${product.name}${brandInTitle} – ${categorySingularTitle} Application Rates & Guide | farmnport.com`,
-    description,
-    alternates: { canonical: `/plant-nutrition-guides/${category}/${slug}` },
-    openGraph: {
-      title: `${product.name}${brandInTitle} – ${categorySingularTitle} Guide`,
-      description,
-      siteName: 'farmnport',
-      type: 'website',
-    },
-  }
+  return buildGuideMetadata(product, categorySingularTitle, 'Application Rates & Guide', description, `/plant-nutrition-guides/${category}/${slug}`)
 }
 
 interface GuidePageProps {

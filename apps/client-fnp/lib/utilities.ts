@@ -121,6 +121,27 @@ export function formatProductName(name?: string): string {
   }).join(" ")
 }
 
+export function buildGuideMetadata(
+  product: { name: string; brand?: { name: string } | null },
+  categorySingularTitle: string,
+  titleSuffix: string,
+  description: string,
+  route: string
+) {
+  const brandInTitle = product.brand?.name ? ` ${product.brand.name}` : ''
+  return {
+    title: `${product.name}${brandInTitle} – ${categorySingularTitle} ${titleSuffix} | farmnport.com`,
+    description,
+    alternates: { canonical: route },
+    openGraph: {
+      title: `${product.name}${brandInTitle} – ${categorySingularTitle} Guide`,
+      description,
+      siteName: 'farmnport',
+      type: 'website' as const,
+    },
+  }
+}
+
 export function buildBuyMetadata(
   product: { name: string; description?: string; brand?: { name: string } | null },
   category: string,

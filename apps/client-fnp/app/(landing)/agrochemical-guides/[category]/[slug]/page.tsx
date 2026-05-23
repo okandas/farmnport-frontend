@@ -5,7 +5,7 @@ import Image from "next/image"
 import { Beaker, AlertTriangle } from "lucide-react"
 import Link from "next/link"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
-import { capitalizeFirstLetter } from "@/lib/utilities"
+import { capitalizeFirstLetter, buildGuideMetadata } from "@/lib/utilities"
 import { SprayProgramBackLink } from "./SprayProgramBackLink"
 import { FertilizerApplicationRates } from "@/components/agrochemical/FertilizerApplicationRates"
 import { AgrochemicalDosageTable } from "@/components/agrochemical/AgrochemicalDosageTable"
@@ -29,9 +29,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const article = /^[aeiou]/i.test(categorySingular) ? 'an' : 'a'
   const crops = Array.from(new Set<string>((chemical.dosage_rates ?? []).slice(0, 3).map((r: any) => r.crop))).join(', ')
   const ingredients = (chemical.active_ingredients ?? []).slice(0, 2).map((ai: any) => ai.name).join(', ')
-  const brandSuffix = chemical.brand?.name ? ` by ${chemical.brand.name}` : ''
-  const brandInTitle = chemical.brand?.name ? ` ${chemical.brand.name}` : ''
-  const brand = brandSuffix
+  const brand = chemical.brand?.name ? ` by ${chemical.brand.name}` : ''
 
   const description = [
     `${chemical.name}${brand} is ${article} ${categorySingular} for Zimbabwe farmers`,
@@ -40,17 +38,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     'View dosage rates, label information, and application guidelines on farmnport.com.',
   ].filter(Boolean).join('. ')
 
-  return {
-    title: `${chemical.name}${brandInTitle} – ${categorySingularTitle} Dosage, Label & Guide | farmnport.com`,
-    description,
-    alternates: { canonical: `/agrochemical-guides/${category}/${slug}` },
-    openGraph: {
-      title: `${chemical.name}${brandInTitle} – ${categorySingularTitle} Guide`,
-      description,
-      siteName: 'farmnport',
-      type: 'website',
-    },
-  }
+  return buildGuideMetadata(chemical, categorySingularTitle, 'Dosage, Label & Guide', description, `/agrochemical-guides/${category}/${slug}`)
 }
 
 interface GuidePageProps {
