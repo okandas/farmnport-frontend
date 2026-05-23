@@ -5,7 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
-import { addToCart, getCart, updateCartItem, removeFromCart } from "@/lib/query"
+import { addToCart, clearCart, getCart, updateCartItem, removeFromCart } from "@/lib/query"
 import { useCart } from "@/contexts/cart-context"
 
 export type CartProductType = "agrochemical" | "feed" | "animal_health" | "plant_nutrition" | "document" | "livestock_poultry" | "seed_product"
@@ -56,7 +56,23 @@ export function AddToCartButton({
       qc.invalidateQueries({ queryKey: ["cart"] })
       openCart()
     },
-    onError: () => toast.error("Failed to add to cart"),
+    onError: (err: any, variables) => {
+      if (err?.response?.status === 409) {
+        toast.warning("This item can't be added to your current cart.", {
+          description: "Your cart contains items with a different delivery method. Start a new cart with this item?",
+          action: {
+            label: "Start new cart",
+            onClick: async () => {
+              await clearCart()
+              addMutation.mutate(variables)
+            },
+          },
+          cancel: { label: "Cancel", onClick: () => {} },
+        })
+        return
+      }
+      toast.error("Failed to add to cart")
+    },
   })
 
   const updateMutation = useMutation({

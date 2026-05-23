@@ -6,7 +6,7 @@ import { useSession } from "next-auth/react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
-import { Check, Loader2, ShoppingCart, Truck, Store, CreditCard, Smartphone, Globe } from "lucide-react"
+import { Check, Loader2, ShoppingCart, CreditCard, Smartphone, Globe } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 
@@ -14,26 +14,15 @@ import { getCart, checkout, pollOrderStatus, queryClient as fetchClient } from "
 import { AuthenticatedUser } from "@/lib/schemas"
 import { centsToDollars } from "@/lib/utilities"
 
-const PROVINCES = [
-  "Harare", "Bulawayo", "Manicaland", "Mashonaland Central",
-  "Mashonaland East", "Mashonaland West", "Masvingo",
-  "Matabeleland North", "Matabeleland South", "Midlands",
-]
-
 const PAYMENT_METHODS = [
-  { value: "ecocash", label: "EcoCash",          description: "Mobile money prompt to your phone",   icon: Smartphone },
-  { value: "vmc",     label: "Visa / Mastercard", description: "Pay securely online with your card",  icon: CreditCard },
-  { value: "",        label: "PayNow Web",         description: "Choose your method on PayNow",        icon: Globe },
+  { value: "ecocash", label: "EcoCash",          description: "Mobile money prompt to your phone",  icon: Smartphone },
+  { value: "vmc",     label: "Visa / Mastercard", description: "Pay securely online with your card", icon: CreditCard },
+  { value: "",        label: "PayNow Web",         description: "Choose your method on PayNow",       icon: Globe },
 ]
 
 interface CheckoutForm {
-  fulfillment: "delivery" | "click_collect"
   phone: string
   email: string
-  address_name: string
-  address_line: string
-  city: string
-  province: string
   provider: string
   method: string
 }
@@ -46,6 +35,10 @@ interface CartItem {
   image_src: string
   unit_price: number
   quantity: number
+  fulfillment?: {
+    delivery_available: boolean
+    pickup_locations?: { id: string; name: string; address: string; city: string; time_slots?: string[] }[]
+  }
 }
 
 interface Cart {
@@ -73,14 +66,11 @@ export default function CheckoutPage() {
   const [orderNumber, setOrderNumber] = useState("")
   const [redirectUrl, setRedirectUrl] = useState("")
   const [selectedMethod, setSelectedMethod] = useState("")
+  const [selectedLocationId, setSelectedLocationId] = useState("")
   const [step, setStep] = useState<"form" | "waiting" | "success">("form")
 
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<CheckoutForm>({
-    defaultValues: {
-      fulfillment: "delivery",
-      provider: "paynow",
-      method: "ecocash",
-    },
+    defaultValues: { provider: "paynow", method: "ecocash" },
   })
 
   const { data: profileData } = useQuery({
@@ -91,10 +81,10 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     if (profileData?.phone) setValue("phone", profileData.phone)
-    if (user?.email) setValue("email", user.email as string)
+    const email = profileData?.email || user?.email
+    if (email) setValue("email", email as string)
   }, [profileData, user, setValue])
 
-  const fulfillment = watch("fulfillment")
   const method = watch("method")
 
   const { data: cartData, isLoading: cartLoading } = useQuery({
@@ -104,6 +94,9 @@ export default function CheckoutPage() {
   })
 
   const items: CartItem[] = cartData?.items ?? []
+  const pickupLocations = items
+    .flatMap((i) => i.fulfillment?.pickup_locations ?? [])
+    .filter((loc, idx, arr) => arr.findIndex((l) => l.id === loc.id) === idx)
   const subtotalCents = items.reduce((s, i) => s + (i.unit_price * i.quantity), 0)
 
   const checkoutMutation = useMutation({
@@ -114,12 +107,10 @@ export default function CheckoutPage() {
       setPollRef(data.reference)
       setSelectedMethod(method)
       qc.invalidateQueries({ queryKey: ["cart"] })
-
       if (data.redirect_url && data.redirect_url.startsWith("http")) {
         setRedirectUrl(data.redirect_url)
         window.open(data.redirect_url, "_blank")
       }
-
       setStep("waiting")
       setPolling(true)
     },
@@ -143,24 +134,15 @@ export default function CheckoutPage() {
   }, [polling, pollRef])
 
   function onSubmit(data: CheckoutForm) {
-    const payload: any = {
+    checkoutMutation.mutate({
       provider: data.provider,
       method: data.method,
       phone: data.phone,
       email: data.email || user?.email || "",
-      fulfillment: data.fulfillment,
+      fulfillment: "click_collect",
+      collection_location_id: selectedLocationId || undefined,
       order_type: "retail",
-    }
-    if (data.fulfillment === "delivery") {
-      payload.address = {
-        name: data.address_name,
-        phone: data.phone,
-        address: data.address_line,
-        city: data.city,
-        province: data.province,
-      }
-    }
-    checkoutMutation.mutate(payload)
+    })
   }
 
   if (status === "loading" || cartLoading) {
@@ -177,10 +159,7 @@ export default function CheckoutPage() {
         <div className="text-center space-y-4">
           <ShoppingCart className="w-12 h-12 mx-auto text-muted-foreground/40" />
           <p className="font-semibold">Sign in to checkout</p>
-          <Link
-            href="/login?next=/checkout"
-            className="inline-flex items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-semibold px-6 py-2.5 hover:bg-primary/90 transition-colors"
-          >
+          <Link href="/login?next=/checkout" className="inline-flex items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-semibold px-6 py-2.5 hover:bg-primary/90 transition-colors">
             Sign In
           </Link>
         </div>
@@ -194,10 +173,7 @@ export default function CheckoutPage() {
         <div className="text-center space-y-4">
           <ShoppingCart className="w-12 h-12 mx-auto text-muted-foreground/40" />
           <p className="font-semibold">Your cart is empty</p>
-          <Link
-            href="/buy-agrochemicals"
-            className="inline-flex items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-semibold px-6 py-2.5 hover:bg-primary/90 transition-colors"
-          >
+          <Link href="/buy-agrochemicals" className="inline-flex items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-semibold px-6 py-2.5 hover:bg-primary/90 transition-colors">
             Shop Now
           </Link>
         </div>
@@ -216,20 +192,12 @@ export default function CheckoutPage() {
             <h1 className="text-2xl font-bold">Payment Confirmed!</h1>
             <p className="text-muted-foreground mt-1">Your order <span className="font-semibold text-foreground">{orderNumber}</span> has been placed.</p>
           </div>
-          <p className="text-sm text-muted-foreground">
-            We&apos;ll prepare your order and be in touch with delivery details.
-          </p>
+          <p className="text-sm text-muted-foreground">Bring your QR code to the collection point to pick up your order.</p>
           <div className="flex flex-col gap-3">
-            <Link
-              href="/account/orders"
-              className="block w-full text-center bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-sm py-3 rounded-full transition-colors"
-            >
+            <Link href="/account/orders" className="block w-full text-center bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-sm py-3 rounded-full transition-colors">
               View My Orders
             </Link>
-            <Link
-              href="/buy-agrochemicals"
-              className="block w-full text-center border hover:bg-muted text-sm font-medium py-3 rounded-full transition-colors"
-            >
+            <Link href="/buy-agrochemicals" className="block w-full text-center border hover:bg-muted text-sm font-medium py-3 rounded-full transition-colors">
               Continue Shopping
             </Link>
           </div>
@@ -241,7 +209,6 @@ export default function CheckoutPage() {
   if (step === "waiting") {
     const isExpress = selectedMethod === "ecocash"
     const methodLabel = PAYMENT_METHODS.find(m => m.value === selectedMethod)?.label || "PayNow"
-
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
         <div className="max-w-md w-full text-center space-y-6">
@@ -250,40 +217,24 @@ export default function CheckoutPage() {
             <h1 className="text-xl font-bold">Complete Your Payment</h1>
             <p className="text-muted-foreground mt-1 text-sm">Order <span className="font-semibold text-foreground">{orderNumber}</span></p>
           </div>
-
           {isExpress ? (
             <div className="bg-muted rounded-xl p-5 text-sm space-y-2">
               <p className="font-medium">Check your phone</p>
-              <p className="text-muted-foreground text-xs">
-                An {methodLabel} payment prompt has been sent to your phone. Approve it to confirm your order.
-              </p>
+              <p className="text-muted-foreground text-xs">An {methodLabel} payment prompt has been sent to your phone. Approve it to confirm your order.</p>
             </div>
           ) : (
             <div className="bg-muted rounded-xl p-5 text-sm space-y-2">
               <p className="font-medium">Payment window opened</p>
-              <p className="text-muted-foreground text-xs">
-                Complete your payment in the PayNow window, then return here — this page updates automatically.
-              </p>
+              <p className="text-muted-foreground text-xs">Complete your payment in the PayNow window, then return here — this page updates automatically.</p>
             </div>
           )}
-
           <p className="text-xs text-muted-foreground">Waiting for payment confirmation...</p>
-
           {!isExpress && redirectUrl && (
-            <a
-              href={redirectUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-sm px-8 py-3 rounded-full transition-colors"
-            >
+            <a href={redirectUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-sm px-8 py-3 rounded-full transition-colors">
               Re-open Payment Window
             </a>
           )}
-
-          <button
-            onClick={() => router.push("/account/orders")}
-            className="block w-full text-center border hover:bg-muted text-sm font-medium py-3 rounded-full transition-colors"
-          >
+          <button onClick={() => router.push("/account/orders")} className="block w-full text-center border hover:bg-muted text-sm font-medium py-3 rounded-full transition-colors">
             Go to My Orders
           </button>
         </div>
@@ -307,95 +258,40 @@ export default function CheckoutPage() {
         <h1 className="text-2xl font-bold mb-8">Checkout</h1>
 
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="grid lg:grid-cols-[1fr_360px] gap-8 items-start">
+          <div className="grid lg:grid-cols-[1fr_480px] gap-8 items-start">
 
             {/* ── Left: Form ── */}
             <div className="space-y-6">
 
-              {/* Fulfillment */}
-              <section className="border rounded-xl p-5 space-y-4">
-                <h2 className="font-semibold">Delivery Method</h2>
-                <div className="grid grid-cols-2 gap-3">
-                  {(["delivery", "click_collect"] as const).map((opt) => (
+              {/* Collection Points */}
+              {pickupLocations.length > 0 && (
+                <section className="border rounded-xl p-5 space-y-3">
+                  <h2 className="font-semibold">Collection Point</h2>
+                  {pickupLocations.map((loc) => (
                     <button
-                      key={opt}
+                      key={loc.id}
                       type="button"
-                      onClick={() => setValue("fulfillment", opt)}
-                      className={`relative rounded-xl border-2 p-4 text-left transition-colors ${
-                        fulfillment === opt ? "border-primary bg-primary/5" : "border-border hover:border-primary/40"
+                      onClick={() => setSelectedLocationId(loc.id)}
+                      className={`w-full text-left rounded-xl border-2 p-4 transition-colors ${
+                        selectedLocationId === loc.id ? "border-primary bg-primary/5" : "border-border hover:border-primary/40"
                       }`}
                     >
-                      {fulfillment === opt && (
-                        <span className="absolute top-2 right-2 w-4 h-4 bg-primary rounded-full flex items-center justify-center">
-                          <Check className="w-2.5 h-2.5 text-white" />
-                        </span>
-                      )}
-                      {opt === "delivery" ? (
-                        <>
-                          <Truck className="w-5 h-5 mb-2 text-muted-foreground" />
-                          <p className="font-semibold text-sm">Delivery</p>
-                          <p className="text-xs text-muted-foreground">To your address</p>
-                        </>
-                      ) : (
-                        <>
-                          <Store className="w-5 h-5 mb-2 text-muted-foreground" />
-                          <p className="font-semibold text-sm">Pickup</p>
-                          <p className="text-xs text-muted-foreground">Collect in person</p>
-                        </>
-                      )}
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <p className="font-semibold text-sm">{loc.name}</p>
+                          <p className="text-xs text-muted-foreground mt-0.5">{loc.address}, {loc.city}</p>
+                          {loc.time_slots && loc.time_slots.length > 0 && (
+                            <p className="text-xs text-muted-foreground mt-0.5">{loc.time_slots.join(" · ")}</p>
+                          )}
+                        </div>
+                        {selectedLocationId === loc.id && (
+                          <span className="shrink-0 w-4 h-4 bg-primary rounded-full flex items-center justify-center mt-0.5">
+                            <Check className="w-2.5 h-2.5 text-white" />
+                          </span>
+                        )}
+                      </div>
                     </button>
                   ))}
-                </div>
-              </section>
-
-              {/* Delivery address */}
-              {fulfillment === "delivery" && (
-                <section className="border rounded-xl p-5 space-y-4">
-                  <h2 className="font-semibold">Delivery Address</h2>
-                  <div className="grid gap-4">
-                    <div>
-                      <label className="text-sm font-medium block mb-1">Full Name</label>
-                      <input
-                        {...register("address_name", { required: "Name is required" })}
-                        placeholder="Your name"
-                        className="w-full border rounded-lg px-3 py-2 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-ring"
-                      />
-                      {errors.address_name && <p className="text-xs text-destructive mt-1">{errors.address_name.message}</p>}
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium block mb-1">Street Address</label>
-                      <input
-                        {...register("address_line", { required: "Address is required" })}
-                        placeholder="123 Main Street"
-                        className="w-full border rounded-lg px-3 py-2 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-ring"
-                      />
-                      {errors.address_line && <p className="text-xs text-destructive mt-1">{errors.address_line.message}</p>}
-                    </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className="text-sm font-medium block mb-1">City / Town</label>
-                        <input
-                          {...register("city", { required: "City is required" })}
-                          placeholder="Harare"
-                          className="w-full border rounded-lg px-3 py-2 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-ring"
-                        />
-                        {errors.city && <p className="text-xs text-destructive mt-1">{errors.city.message}</p>}
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium block mb-1">Province</label>
-                        <select
-                          {...register("province", { required: "Province is required" })}
-                          className="w-full border rounded-lg px-3 py-2 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-ring"
-                        >
-                          <option value="">Select...</option>
-                          {PROVINCES.map((p) => (
-                            <option key={p} value={p}>{p}</option>
-                          ))}
-                        </select>
-                        {errors.province && <p className="text-xs text-destructive mt-1">{errors.province.message}</p>}
-                      </div>
-                    </div>
-                  </div>
                 </section>
               )}
 
@@ -421,14 +317,13 @@ export default function CheckoutPage() {
                       {...register("email")}
                       type="email"
                       placeholder="you@example.com"
-                      defaultValue={user?.email ?? ""}
                       className="w-full border rounded-lg px-3 py-2 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-ring"
                     />
                   </div>
                 </div>
               </section>
 
-              {/* Payment method */}
+              {/* Payment Method */}
               <section className="border rounded-xl p-5 space-y-4">
                 <h2 className="font-semibold">Payment Method</h2>
                 <div className="grid grid-cols-3 gap-3">
@@ -457,22 +352,18 @@ export default function CheckoutPage() {
                   })}
                 </div>
                 {method === "ecocash" && (
-                  <p className="text-xs text-muted-foreground">
-                    A payment prompt will be sent to the phone number you entered above.
-                  </p>
+                  <p className="text-xs text-muted-foreground">A payment prompt will be sent to the phone number you entered above.</p>
                 )}
               </section>
 
             </div>
 
-            {/* ── Right: Order summary ── */}
+            {/* ── Right: Order Summary ── */}
             <div className="sticky top-20">
               <div className="border rounded-xl overflow-hidden">
                 <div className="px-5 py-4 border-b bg-muted/30">
                   <h2 className="font-semibold">Order Summary</h2>
                 </div>
-
-                {/* Items */}
                 <div className="divide-y max-h-64 overflow-y-auto">
                   {items.map((item) => (
                     <div key={item.product_id} className="flex gap-3 p-4">
@@ -480,7 +371,7 @@ export default function CheckoutPage() {
                         {item.image_src ? (
                           <Image src={item.image_src} alt={item.product_name} fill sizes="48px" className="object-contain p-1" />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center text-muted-foreground/20 text-lg">📦</div>
+                          <div className="w-full h-full bg-muted/30" />
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
@@ -491,32 +382,25 @@ export default function CheckoutPage() {
                     </div>
                   ))}
                 </div>
-
-                {/* Totals */}
                 <div className="px-5 py-4 border-t">
                   <div className="flex justify-between font-bold text-base">
                     <span>Total</span>
                     <span>{centsToDollars(subtotalCents)}</span>
                   </div>
                 </div>
-
-                {/* CTA */}
                 <div className="px-5 pb-5">
                   <button
                     type="submit"
-                    disabled={checkoutMutation.isPending || items.length === 0}
+                    disabled={checkoutMutation.isPending || items.length === 0 || (pickupLocations.length > 0 && !selectedLocationId)}
                     className="flex items-center justify-center gap-2 w-full bg-primary hover:bg-primary/90 disabled:opacity-60 text-primary-foreground font-semibold text-sm py-3 rounded-full transition-colors"
                   >
-                    {checkoutMutation.isPending ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <CreditCard className="w-4 h-4" />
-                    )}
+                    {checkoutMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <CreditCard className="w-4 h-4" />}
                     Place Order · {centsToDollars(subtotalCents)}
                   </button>
                 </div>
               </div>
             </div>
+
           </div>
         </form>
       </div>

@@ -60,7 +60,7 @@ export function LocationMultiSelect({
       )}
 
       <SearchSelect
-        queryKey={[queryKey ?? "location-multi-select", selected.map((s) => s.id).join(",")]}
+        queryKey={[queryKey ?? "location-multi-select", selected.map((s) => s.id).join(","), String(available.length)]}
         queryFn={({ search }) =>
           Promise.resolve({
             data: {

@@ -727,6 +727,7 @@ export function checkout(data: {
     city: string
     province: string
   }
+  collection_location_id?: string
   order_type?: string
 }) {
   return api.post(`${BaseURL}/order/checkout`, data)
