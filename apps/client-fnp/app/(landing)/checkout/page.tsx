@@ -161,7 +161,7 @@ export default function CheckoutPage() {
 
   if (!session) {
     return (
-      <div className="h-[75vh] flex items-center justify-center">
+      <div className="min-h-[75vh] flex items-center justify-center">
         <div className="text-center space-y-4">
           <ShoppingCart className="w-12 h-12 mx-auto text-muted-foreground/40" />
           <p className="font-semibold">Sign in to checkout</p>
@@ -175,7 +175,7 @@ export default function CheckoutPage() {
 
   if (items.length === 0 && step === "form") {
     return (
-      <div className="h-[75vh] flex items-center justify-center">
+      <div className="min-h-[75vh] flex items-center justify-center">
         <div className="text-center space-y-4">
           <ShoppingCart className="w-12 h-12 mx-auto text-muted-foreground/40" />
           <p className="font-semibold">Your cart is empty</p>
