@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
 import { BaseURL } from "@/lib/schemas"
-import { formatProductName } from "@/lib/utilities"
+import { buildBuyMetadata } from "@/lib/utilities"
 import { BuyProductInteractive } from "@/components/shop/BuyProductInteractive"
 import { BackToProgram } from "./BackToProgram"
 import Link from "next/link"
@@ -32,20 +32,7 @@ export async function generateMetadata({ params }: BuyFeedPageProps): Promise<Me
     const { slug } = await params
     const product = await getFeedProduct(slug)
     if (!product) return { title: 'Livestock Feed | farmnport.com' }
-    const name = formatProductName(product.name)
-    const brand = product.brand?.name ? ` ${formatProductName(product.brand.name)}` : ''
-    const category = product.feed_category?.name || 'Livestock Feed'
-    return {
-        title: `${name}${brand} – Buy ${category} Zimbabwe | farmnport.com`,
-        description: product.description || `Buy ${name}${brand}. ${category} for Zimbabwe farmers. View feeding programs, pricing and order online at farmnport.com.`,
-        alternates: { canonical: `/buy-feeds/${slug}` },
-        openGraph: {
-            title: `${name}${brand} – ${category} | farmnport.com`,
-            description: product.description || `Buy ${name}${brand} online. ${category} for Zimbabwe farmers.`,
-            siteName: 'farmnport',
-            type: 'website',
-        },
-    }
+    return buildBuyMetadata(product, product.feed_category?.name || 'Livestock Feed', `/buy-feeds/${slug}`)
 }
 
 export default async function BuyFeedPage({ params }: BuyFeedPageProps) {

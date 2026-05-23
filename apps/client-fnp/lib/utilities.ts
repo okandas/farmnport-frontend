@@ -120,3 +120,26 @@ export function formatProductName(name?: string): string {
     return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
   }).join(" ")
 }
+
+export function buildBuyMetadata(
+  product: { name: string; description?: string; brand?: { name: string } | null },
+  category: string,
+  route: string,
+  descriptionContext: string = 'Zimbabwe farmers'
+) {
+  const name = formatProductName(product.name)
+  const brand = product.brand?.name ? ` ${formatProductName(product.brand.name)}` : ''
+  const description = product.description ||
+    `Buy ${name}${brand}. ${category} for ${descriptionContext}. View pricing and order online at farmnport.com.`
+  return {
+    title: `${name}${brand} – Buy ${category} Zimbabwe | farmnport.com`,
+    description,
+    alternates: { canonical: route },
+    openGraph: {
+      title: `${name}${brand} – ${category} | farmnport.com`,
+      description,
+      siteName: 'farmnport',
+      type: 'website' as const,
+    },
+  }
+}
