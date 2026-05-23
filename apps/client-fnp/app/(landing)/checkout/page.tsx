@@ -161,7 +161,7 @@ export default function CheckoutPage() {
 
   if (!session) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="py-32 flex items-center justify-center">
         <div className="text-center space-y-4">
           <ShoppingCart className="w-12 h-12 mx-auto text-muted-foreground/40" />
           <p className="font-semibold">Sign in to checkout</p>
