@@ -26,6 +26,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const usedOn = (product.used_on ?? []).slice(0, 3).join(', ')
   const ingredients = (product.active_ingredients ?? []).slice(0, 2).map((ai: any) => ai.name).join(', ')
   const brand = product.brand?.name ? ` by ${product.brand.name}` : ''
+  const brandInTitle = product.brand?.name ? ` ${product.brand.name}` : ''
 
   const description = [
     `${product.name}${brand} is ${article} ${categorySingular}`,
@@ -35,11 +36,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   ].filter(Boolean).join('. ')
 
   return {
-    title: `${product.name} – ${categorySingularTitle} Dosage & Guide | farmnport.com`,
+    title: `${product.name}${brandInTitle} – ${categorySingularTitle} Dosage & Guide | farmnport.com`,
     description,
     alternates: { canonical: `/animal-health-guides/${category}/${slug}` },
     openGraph: {
-      title: `${product.name} – ${categorySingularTitle} Guide`,
+      title: `${product.name}${brandInTitle} – ${categorySingularTitle} Guide`,
       description,
       siteName: 'farmnport',
       type: 'website',

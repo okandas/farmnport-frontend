@@ -29,7 +29,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const article = /^[aeiou]/i.test(categorySingular) ? 'an' : 'a'
   const crops = Array.from(new Set<string>((chemical.dosage_rates ?? []).slice(0, 3).map((r: any) => r.crop))).join(', ')
   const ingredients = (chemical.active_ingredients ?? []).slice(0, 2).map((ai: any) => ai.name).join(', ')
-  const brand = chemical.brand?.name ? ` by ${chemical.brand.name}` : ''
+  const brandSuffix = chemical.brand?.name ? ` by ${chemical.brand.name}` : ''
+  const brandInTitle = chemical.brand?.name ? ` ${chemical.brand.name}` : ''
+  const brand = brandSuffix
 
   const description = [
     `${chemical.name}${brand} is ${article} ${categorySingular} for Zimbabwe farmers`,
@@ -39,11 +41,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   ].filter(Boolean).join('. ')
 
   return {
-    title: `${chemical.name} – ${categorySingularTitle} Dosage, Label & Guide | farmnport.com`,
+    title: `${chemical.name}${brandInTitle} – ${categorySingularTitle} Dosage, Label & Guide | farmnport.com`,
     description,
     alternates: { canonical: `/agrochemical-guides/${category}/${slug}` },
     openGraph: {
-      title: `${chemical.name} – ${categorySingularTitle} Guide`,
+      title: `${chemical.name}${brandInTitle} – ${categorySingularTitle} Guide`,
       description,
       siteName: 'farmnport',
       type: 'website',

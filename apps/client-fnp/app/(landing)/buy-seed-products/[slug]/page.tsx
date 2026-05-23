@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { querySeedProduct } from "@/lib/query"
 import Link from "next/link"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -5,6 +6,26 @@ import { BuyProductInteractive } from "@/components/shop/BuyProductInteractive"
 
 interface Props {
     params: Promise<{ slug: string }>
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+    const { slug } = await params
+    const response = await querySeedProduct(slug).catch(() => null)
+    const product = response?.data
+    if (!product) return { title: 'Seed Product | farmnport.com' }
+    const variety = product.variety ? ` — ${product.variety}` : ""
+    const brand = product.brand.name
+    return {
+        title: `${product.name} ${brand}${variety} – Buy Seeds | farmnport.com`,
+        description: product.description || `Buy ${product.name} ${brand}${variety} seeds. Certified seed variety. View planting guide, yield potential, and order online.`,
+        alternates: { canonical: `/buy-seed-products/${slug}` },
+        openGraph: {
+            title: `${product.name} ${brand} – Buy Seeds`,
+            description: product.description || `${product.name} ${brand}${variety} certified seed variety.`,
+            siteName: 'farmnport',
+            type: 'website',
+        },
+    }
 }
 
 export default async function BuySeedProductPage({ params }: Props) {
