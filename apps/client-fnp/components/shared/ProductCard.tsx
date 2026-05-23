@@ -27,12 +27,13 @@ interface ProductCardProps {
   loginRedirect?: string
   preorderHref?: string
   hasVariants?: boolean
+  pickupOnly?: boolean
 }
 
 export function ProductCard({
   href, imageSrc, name, brand, meta, mode, buttonLabel = "View Guide",
   showPrice, salePrice, wasPrice, showWasPrice, availableForSale,
-  productId, productType, productSlug, loginRedirect, preorderHref, stockLevel, hasVariants,
+  productId, productType, productSlug, loginRedirect, preorderHref, stockLevel, hasVariants, pickupOnly,
 }: ProductCardProps) {
   const inStock = availableForSale && (stockLevel === undefined || stockLevel > 0)
   return (
@@ -49,6 +50,11 @@ export function ProductCard({
             />
           ) : (
             <div className="absolute inset-0 bg-muted/30" />
+          )}
+          {pickupOnly && (
+            <span className="absolute top-2 left-2 bg-background/90 text-foreground text-[10px] font-medium px-2 py-0.5 rounded-full border border-border">
+              Pickup only
+            </span>
           )}
         </div>
       </Link>

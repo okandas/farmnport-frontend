@@ -109,6 +109,7 @@ export function BuyAnimalHealthClient({ initialProducts, initialTotal }: BuyAnim
                                     showWasPrice={product.show_was_price}
                                     availableForSale={product.available_for_sale}
                                     stockLevel={product.stock_level}
+                                    pickupOnly={product.pickup_location_ids?.length > 0 && !product.delivery_available && !(product.delivery_location_ids?.length > 0)}
                                 />
                             ))}
                         </div>

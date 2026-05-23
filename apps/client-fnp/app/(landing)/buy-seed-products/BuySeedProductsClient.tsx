@@ -94,6 +94,7 @@ export function BuySeedProductsClient({ initialProducts, initialTotal, bookingEv
                     availableForSale={product.available_for_sale}
                     hasVariants={product.variants && product.variants.length > 0}
                     preorderHref={bookingEvent ? `/bookings/${bookingEvent.slug}` : undefined}
+                    pickupOnly={product.pickup_location_ids?.length > 0 && !product.delivery_available && !(product.delivery_location_ids?.length > 0)}
                   />
                 )
               })}

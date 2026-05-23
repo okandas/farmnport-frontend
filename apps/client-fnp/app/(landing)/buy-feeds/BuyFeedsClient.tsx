@@ -6,72 +6,11 @@ import { Button } from "@/components/ui/button"
 import { FeedBuyFilterSidebar } from "@/components/generic/feedFilterSidebar"
 import { BuyCategoriesNav } from "@/components/generic/BuyCategoriesNav"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
-import Image from "next/image"
-import Link from "next/link"
-import { AddToCartButton } from "@/components/cart/AddToCartButton"
+import { ProductCard } from "@/components/shared/ProductCard"
 
 interface BuyFeedsClientProps {
     initialProducts: any[]
     initialTotal: number
-}
-
-function FeedCard({ product }: { product: any }) {
-    const href = `/buy-feeds/${product.slug}`
-    return (
-        <div className="bg-card border border-border rounded-lg overflow-hidden transition-all duration-200 hover:shadow-lg hover:border-primary/50 group">
-            <Link href={href} className="block">
-                <div className="relative aspect-square bg-white">
-                    {product.images && product.images[0] && product.images[0].img?.src ? (
-                        <Image
-                            src={product.images[0].img.src}
-                            alt={product.name}
-                            fill
-                            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                            className="object-contain transition-transform duration-200 group-hover:scale-105"
-                        />
-                    ) : (
-                        <div className="absolute inset-0 bg-muted/30" />
-                    )}
-                </div>
-            </Link>
-
-            <div className="p-4 space-y-3 border-t">
-                {product.brand && (
-                    <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">
-                        {product.brand.name}
-                    </p>
-                )}
-
-                <Link href={href}>
-                    <h3 className="font-semibold text-sm leading-tight capitalize line-clamp-2 min-h-[2.5rem] group-hover:text-primary transition-colors">
-                        {product.name}
-                    </h3>
-                </Link>
-
-                <div className="flex items-baseline gap-2 h-7">
-                    {product.show_price && product.sale_price > 0 ? (
-                        <>
-                            <span className="text-lg font-bold">${(product.sale_price / 100).toFixed(2)}</span>
-                            {product.was_price > 0 && product.was_price > product.sale_price && (
-                                <span className="text-xs text-muted-foreground line-through">${(product.was_price / 100).toFixed(2)}</span>
-                            )}
-                        </>
-                    ) : (
-                        <span className="text-sm text-muted-foreground">Price on request</span>
-                    )}
-                </div>
-                <AddToCartButton
-                    productId={product.id}
-                    productType="feed"
-                    productName={product.name}
-                    productSlug={product.slug}
-                    imageSrc={product.images?.[0]?.img?.src}
-                    unitPrice={product.show_price && product.sale_price > 0 ? product.sale_price : null}
-                    loginRedirect={href}
-                />
-            </div>
-        </div>
-    )
 }
 
 export function BuyFeedsClient({ initialProducts, initialTotal }: BuyFeedsClientProps) {
@@ -151,7 +90,24 @@ export function BuyFeedsClient({ initialProducts, initialTotal }: BuyFeedsClient
 
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
                             {products.map((product: any) => (
-                                <FeedCard key={product.id} product={product} />
+                                <ProductCard
+                                    key={product.id}
+                                    href={`/buy-feeds/${product.slug}`}
+                                    imageSrc={product.images?.[0]?.img?.src}
+                                    name={product.name}
+                                    brand={product.brand?.name}
+                                    mode="buy"
+                                    productId={product.id}
+                                    productType="feed"
+                                    productSlug={product.slug}
+                                    showPrice={product.show_price}
+                                    salePrice={product.sale_price}
+                                    wasPrice={product.was_price}
+                                    showWasPrice={product.show_was_price}
+                                    availableForSale={product.available_for_sale}
+                                    stockLevel={product.stock_level}
+                                    pickupOnly={product.pickup_location_ids?.length > 0 && !product.delivery_available && !(product.delivery_location_ids?.length > 0)}
+                                />
                             ))}
                         </div>
 
