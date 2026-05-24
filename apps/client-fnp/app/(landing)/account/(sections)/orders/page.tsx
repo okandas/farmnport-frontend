@@ -96,7 +96,7 @@ export default function OrdersPage() {
         ) : (
           <div className="space-y-3">
             {orders.map((order) => (
-              <Link key={order.id} href={`/account/orders/${order.id}`} className="block border rounded-xl p-4 hover:bg-muted/30 transition-colors">
+              <Link key={order.id} href={`/account/orders/${order.order_number}`} className="block border rounded-xl p-4 hover:bg-muted/30 transition-colors">
                 <div className="flex items-start justify-between gap-3">
                   <div className="space-y-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">

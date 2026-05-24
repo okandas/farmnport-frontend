@@ -31,8 +31,8 @@ export interface OrderRow {
 
 function orderDetailHref(order: OrderRow) {
   return order.order_type === "restaurant"
-    ? `/dashboard/restaurants/sales/orders/${order.id}`
-    : `/dashboard/farmnport/sales/orders/${order.id}`
+    ? `/dashboard/restaurants/sales/orders/${order.order_number}`
+    : `/dashboard/farmnport/sales/orders/${order.order_number}`
 }
 
 export const orderColumns: ColumnDef<OrderRow>[] = [
