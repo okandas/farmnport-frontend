@@ -110,7 +110,7 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
         <div className="border rounded-xl p-5 space-y-4">
           <div className="flex items-center gap-2 text-sm font-semibold capitalize">
             {booking.type === "delivery" || booking.type === "pickup" ? <Truck className="w-4 h-4" /> : <CalendarDays className="w-4 h-4" />}
-            {booking.type === "pre-order" ? "Pre-Order" : capitalize(booking.type)} Booking
+            {booking.type === "pre-order" ? "Forward" : capitalize(booking.type)} Booking
           </div>
 
           {booking.type === "pre-order" && booking.pre_order && (

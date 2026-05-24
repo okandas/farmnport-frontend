@@ -78,11 +78,11 @@ export default function BookingEventsPage() {
           <span>/</span>
           <Link href="/buy" className="hover:text-foreground transition-colors">Buy</Link>
           <span>/</span>
-          <span className="text-foreground font-medium">Pre-Orders</span>
+          <span className="text-foreground font-medium">Forward Bookings</span>
         </nav>
 
         <div className="mb-8">
-          <h1 className="text-4xl font-bold tracking-tight font-heading mb-2">Pre-Order Batches</h1>
+          <h1 className="text-4xl font-bold tracking-tight font-heading mb-2">Forward Booking Batches</h1>
           <p className="text-lg text-muted-foreground">Reserve livestock and farm produce from upcoming supplier batches.</p>
         </div>
 
@@ -102,7 +102,7 @@ export default function BookingEventsPage() {
               <div className="text-center py-20 space-y-3">
                 <CalendarDays className="w-12 h-12 mx-auto text-muted-foreground/40" />
                 <p className="font-semibold">No open batches right now</p>
-                <p className="text-sm text-muted-foreground">Check back soon for upcoming pre-order batches.</p>
+                <p className="text-sm text-muted-foreground">Check back soon for upcoming forward booking batches.</p>
               </div>
             ) : (
               <div className="mb-4 text-sm text-muted-foreground">

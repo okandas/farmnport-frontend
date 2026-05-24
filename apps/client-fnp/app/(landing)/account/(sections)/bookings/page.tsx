@@ -118,7 +118,7 @@ export default function BookingsPage() {
                       </span>
                       <span className="text-xs text-muted-foreground capitalize flex items-center gap-1">
                         {booking.type === "delivery" ? <Truck className="w-3 h-3" /> : booking.type === "pickup" ? <Truck className="w-3 h-3" /> : <CalendarDays className="w-3 h-3" />}
-                        {booking.type === "pre-order" ? "Pre-Order" : booking.type}
+                        {booking.type === "pre-order" ? "Forward Booking" : booking.type}
                       </span>
                     </div>
 
