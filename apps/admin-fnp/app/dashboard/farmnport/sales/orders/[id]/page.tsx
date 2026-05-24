@@ -433,7 +433,15 @@ export default function OrderDetailPage() {
           <Separator className="my-4" />
 
           <div className="space-y-1 text-sm">
-            <div className="flex justify-between font-medium text-base">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Subtotal</span>
+              <span>{centsToDollars(order.subtotal)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Shipping</span>
+              <span>{order.delivery_fee > 0 ? centsToDollars(order.delivery_fee) : "Free"}</span>
+            </div>
+            <div className="flex justify-between font-medium text-base pt-1 border-t">
               <span>Total</span>
               <span>{centsToDollars(order.total)}</span>
             </div>
