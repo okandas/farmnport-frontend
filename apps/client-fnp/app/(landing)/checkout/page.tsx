@@ -109,6 +109,7 @@ export default function CheckoutPage() {
     if (profileData?.phone) setValue("phone", profileData.phone)
     const email = profileData?.email || user?.email
     if (email) setValue("email", email as string)
+    if (profileData?.name) setValue("address_name", profileData.name)
   }, [profileData, user, setValue])
 
   const method = watch("method")
@@ -126,12 +127,12 @@ export default function CheckoutPage() {
   const deliveryAvailable = items.every((i) => i.fulfillment?.delivery_available)
   const subtotalCents = items.reduce((s, i) => s + (i.unit_price * i.quantity), 0)
 
-  // Tumira hubs — shown when cart has pickup_available items but no static pickup locations
-  const needsTumira = items.some((i) => i.fulfillment?.pickup_available) && pickupLocations.length === 0
+  const needsTumira = fulfillment === "click_collect" || items.some((i) => i.fulfillment?.pickup_available)
   const { data: tumiraData } = useQuery({
     queryKey: ["tumira-locations"],
     queryFn: () => queryTumira().then((r) => r.data?.locations as Tumira[]),
     enabled: needsTumira,
+
   })
   const tumiraLocations: Tumira[] = tumiraData ?? []
   const selectedTumira = tumiraLocations.find((l) => l.id === selectedLocationId)
@@ -190,7 +191,7 @@ export default function CheckoutPage() {
     return () => clearInterval(interval)
   }, [polling, pollRef])
 
-  function onSubmit(data: CheckoutForm) {
+function onSubmit(data: CheckoutForm) {
     checkoutMutation.mutate({
       provider: data.provider,
       method: data.method,
@@ -343,7 +344,7 @@ export default function CheckoutPage() {
                         <button
                           key={opt.value}
                           type="button"
-                          onClick={() => setFulfillment(opt.value)}
+                          onClick={() => { setFulfillment(opt.value); setSelectedLocationId("") }}
                           className={`relative rounded-xl border-2 p-4 text-left transition-colors ${active ? "border-primary bg-primary/5" : "border-border hover:border-primary/40"}`}
                         >
                           {active && (
@@ -362,7 +363,7 @@ export default function CheckoutPage() {
               )}
 
               {/* Tumira Pickup Points */}
-              {fulfillment === "click_collect" && needsTumira && tumiraLocations.length > 0 && (() => {
+              {needsTumira && tumiraLocations.length > 0 && (() => {
                 const selected = tumiraLocations.find((l) => l.id === selectedLocationId)
                 const filtered = tumiraLocations.filter((l) =>
                   tumiraSearch === "" ||
@@ -446,7 +447,7 @@ export default function CheckoutPage() {
               })()}
 
               {/* Static Collection Points */}
-              {fulfillment === "click_collect" && pickupLocations.length > 0 && (
+              {needsTumira && pickupLocations.length > 0 && (
                 <section className="border rounded-xl p-5 space-y-3">
                   <h2 className="font-semibold">Collection Point</h2>
                   {pickupLocations.map((loc) => (
@@ -557,7 +558,7 @@ export default function CheckoutPage() {
               </section>
 
               {/* Payment Method */}
-              <section className="border rounded-xl p-5 space-y-4">
+              <section className="rounded-xl p-5 space-y-4">
                 <h2 className="font-semibold">Payment Method</h2>
                 <div className="grid grid-cols-3 gap-3">
                   {PAYMENT_METHODS.map((pm) => {
@@ -663,7 +664,7 @@ export default function CheckoutPage() {
                 <div className="px-5 pb-5">
                   <button
                     type="submit"
-                    disabled={checkoutMutation.isPending || items.length === 0 || (fulfillment === "click_collect" && (pickupLocations.length > 0 || needsTumira) && !selectedLocationId)}
+                    disabled={checkoutMutation.isPending || items.length === 0 || (needsTumira && (pickupLocations.length > 0 || needsTumira) && !selectedLocationId)}
                     className="flex items-center justify-center gap-2 w-full bg-primary hover:bg-primary/90 disabled:opacity-60 text-primary-foreground font-semibold text-sm py-3 rounded-full transition-colors"
                   >
                     {checkoutMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <CreditCard className="w-4 h-4" />}
