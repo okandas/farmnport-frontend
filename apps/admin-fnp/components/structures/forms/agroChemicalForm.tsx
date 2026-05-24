@@ -83,6 +83,7 @@ export function AgroChemicalForm({ agroChemical, mode = "create" }: AgroChemical
             show_was_price: agroChemical?.show_was_price ?? false,
             was_price: agroChemical?.was_price ?? 0,
             delivery_available: agroChemical?.delivery_available ?? false,
+            pickup_available: agroChemical?.pickup_available ?? false,
             pickup_location_ids: agroChemical?.pickup_location_ids ?? [],
             delivery_location_ids: agroChemical?.delivery_location_ids ?? [],
         },
@@ -938,6 +939,12 @@ export function AgroChemicalForm({ agroChemical, mode = "create" }: AgroChemical
                                 <FormItem className="flex items-center gap-2">
                                     <FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl>
                                     <label className="text-sm font-medium text-gray-900 dark:text-white cursor-pointer" onClick={() => field.onChange(!field.value)}>Delivery Available (free-form address)</label>
+                                </FormItem>
+                            )} />
+                            <FormField control={form.control} name="pickup_available" render={({ field }) => (
+                                <FormItem className="flex items-center gap-2">
+                                    <FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl>
+                                    <label className="text-sm font-medium text-gray-900 dark:text-white cursor-pointer" onClick={() => field.onChange(!field.value)}>Pick Up Available (tumira api pickup points)</label>
                                 </FormItem>
                             )} />
                         </div>
