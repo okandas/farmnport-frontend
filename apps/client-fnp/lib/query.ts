@@ -730,6 +730,7 @@ export function checkout(data: {
     province: string
   }
   collection_location_id?: string
+  fulfillment_fee?: number
   order_type?: string
 }) {
   return api.post(`${BaseURL}/order/checkout`, data)

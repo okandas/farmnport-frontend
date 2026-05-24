@@ -197,7 +197,8 @@ export default function CheckoutPage() {
       phone: data.phone,
       email: data.email || user?.email || "",
       fulfillment,
-      collection_location_id: fulfillment === "click_collect" ? selectedLocationId || undefined : undefined,
+      collection_location_id: selectedLocationId,
+      fulfillment_fee: tumiraFee,
       address: fulfillment === "delivery" ? {
         name: data.address_name,
         phone: data.phone,
@@ -384,7 +385,7 @@ export default function CheckoutPage() {
                       <MapPin className="w-4 h-4 text-muted-foreground shrink-0" />
                       <span className="text-sm">
                         {selected
-                          ? <span className="font-medium">{selected.name} — {selected.city}</span>
+                          ? <span className="flex flex-col"><span className="font-medium text-sm">{selected.name}</span><span className="text-xs text-muted-foreground">{selected.address}, {selected.city}</span></span>
                           : <span className="text-muted-foreground">{tumiraLocations.length} pickup locations available</span>
                         }
                       </span>
