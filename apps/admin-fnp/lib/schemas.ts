@@ -1290,29 +1290,6 @@ export type MenuItemCategoryResponse = {
   data: MenuItemCategory[]
 }
 
-// Menu Category
-export const MenuCategorySchema = z.object({
-  id: z.string(),
-  name: z.string().min(1, "Name is required").max(120, "Name cannot exceed 120 characters"),
-  description: z.string().default(""),
-  slug: z.string().optional(),
-  created: z.string().optional(),
-  updated: z.string().optional(),
-})
-
-export const FormMenuCategorySchema = MenuCategorySchema.pick({
-  name: true,
-  description: true,
-})
-
-export type MenuCategory = z.infer<typeof MenuCategorySchema>
-export type FormMenuCategoryModel = z.infer<typeof FormMenuCategorySchema>
-
-export type MenuCategoryResponse = {
-  total: number
-  data: MenuCategory[]
-}
-
 // Cuisine Category
 export const CuisineCategorySchema = z.object({
   id: z.string(),

@@ -1,20 +1,14 @@
 import Link from "next/link"
-import {
-  queryBuyAgroChemicals,
-  queryBuyAnimalHealthProducts,
-  queryBuyFeedProducts,
-  queryBuyPlantNutritionProducts,
-  queryBuySeedProducts,
-  queryAllDocuments,
-  listBookingEvents,
-} from "@/lib/query"
-
 import { BuyPageClient } from "./BuyPageClient"
 
-async function fetchSection(fn: () => Promise<any>) {
+const BASE = (process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3744") + "/v1"
+
+async function fetchSection(url: string) {
   try {
-    const res = await fn()
-    return { data: res?.data?.data || [], total: res?.data?.total || 0 }
+    const res = await fetch(url, { cache: "no-store" })
+    if (!res.ok) return { data: [], total: 0 }
+    const json = await res.json()
+    return { data: json.data || [], total: json.total || 0 }
   } catch {
     return { data: [], total: 0 }
   }
@@ -22,15 +16,15 @@ async function fetchSection(fn: () => Promise<any>) {
 
 export default async function BuyPage() {
   const [agro, animalHealth, feeds, plantNutrition, seeds, documents, bookingsRes] = await Promise.all([
-    fetchSection(() => queryBuyAgroChemicals({ p: 1, brand: [], target: [], active_ingredient: [] })),
-    fetchSection(() => queryBuyAnimalHealthProducts({ p: 1, brand: [], target: [], active_ingredient: [], used_on: [] })),
-    fetchSection(() => queryBuyFeedProducts({ p: 1 })),
-    fetchSection(() => queryBuyPlantNutritionProducts({ p: 1, brand: [], category: [], active_ingredient: [], used_on: [] })),
-    fetchSection(() => queryBuySeedProducts({ p: 1 })),
-    fetchSection(() => queryAllDocuments({ p: 1 })),
-    listBookingEvents({ status: "open" }).catch(() => null),
+    fetchSection(`${BASE}/agrochemical/buy`),
+    fetchSection(`${BASE}/animalhealth/buy`),
+    fetchSection(`${BASE}/feed/buy`),
+    fetchSection(`${BASE}/plantnutrition/buy`),
+    fetchSection(`${BASE}/seed-products/buy`),
+    fetchSection(`${BASE}/documents`),
+    fetch(`${BASE}/booking/events?status=open`, { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
   ])
-  const bookingEvents: any[] = bookingsRes?.data?.events ?? []
+  const bookingEvents: any[] = bookingsRes?.events ?? []
 
   return (
     <main className="bg-gradient-to-b from-background to-muted/20 min-h-screen">
