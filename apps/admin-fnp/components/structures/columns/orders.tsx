@@ -29,6 +29,12 @@ export interface OrderRow {
   created: string
 }
 
+function orderDetailHref(order: OrderRow) {
+  return order.order_type === "restaurant"
+    ? `/dashboard/restaurants/sales/orders/${order.id}`
+    : `/dashboard/farmnport/sales/orders/${order.id}`
+}
+
 export const orderColumns: ColumnDef<OrderRow>[] = [
   {
     id: "select",
@@ -58,7 +64,7 @@ export const orderColumns: ColumnDef<OrderRow>[] = [
       const order = row.original
       return (
         <Link
-          href={`/dashboard/farmnport/sales/orders/${order.id}`}
+          href={orderDetailHref(order)}
           className="font-medium text-primary hover:underline"
         >
           {order.order_number}
@@ -131,7 +137,7 @@ export const orderColumns: ColumnDef<OrderRow>[] = [
       const order = row.original
       return (
         <Link
-          href={`/dashboard/restaurants/sales/orders/${order.id}`}
+          href={orderDetailHref(order)}
           className="text-sm font-medium text-blue-600 hover:text-blue-800"
         >
           View
