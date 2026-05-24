@@ -29,7 +29,7 @@ export interface OrderRow {
   created: string
 }
 
-function orderDetailHref(order: OrderRow) {
+export function orderDetailHref(order: { order_type: string; order_number: string }) {
   return order.order_type === "restaurant"
     ? `/dashboard/restaurants/sales/orders/${order.order_number}`
     : `/dashboard/farmnport/sales/orders/${order.order_number}`

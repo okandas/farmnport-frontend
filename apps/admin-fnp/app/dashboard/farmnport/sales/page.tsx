@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query"
 import { ArrowRight } from "lucide-react"
 
 import { querySalesStats, queryOrders } from "@/lib/query"
+import { orderDetailHref } from "@/components/structures/columns/orders"
 import { centsToDollars } from "@/lib/utilities"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -197,7 +198,7 @@ export default function SalesOverviewPage() {
               {recentOrders.map((order) => (
                 <Link
                   key={order.id}
-                  href={`/dashboard/farmnport/sales/orders/${order.order_number}`}
+                  href={orderDetailHref(order)}
                   className="flex items-center justify-between rounded-lg border p-3 hover:bg-muted/50 transition-colors"
                 >
                   <div className="flex items-center gap-3">

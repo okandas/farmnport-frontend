@@ -12,6 +12,7 @@ import {
 } from "lucide-react"
 
 import { querySalesStats, queryOrders } from "@/lib/query"
+import { orderDetailHref } from "@/components/structures/columns/orders"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -40,6 +41,7 @@ interface SalesStats {
 interface Order {
   id: string
   order_number: string
+  order_type: string
   client_name: string
   status: string
   total: number
@@ -199,7 +201,7 @@ export default function RestaurantSalesPage() {
               {recentOrders.map((order) => (
                 <Link
                   key={order.id}
-                  href={`/dashboard/restaurants/sales/orders/${order.order_number}`}
+                  href={orderDetailHref(order)}
                   className="flex items-center justify-between rounded-lg border p-3 hover:bg-muted/50 transition-colors"
                 >
                   <div>
