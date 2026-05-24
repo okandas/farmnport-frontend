@@ -36,7 +36,7 @@ const STATUS_STEPS_DELIVERY = ["pending", "paid", "processing", "dispatched", "d
 const STATUS_STEPS_COLLECT  = ["pending", "paid", "processing", "ready", "collected"]
 
 function formatDate(d: string) {
-  return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })
+  return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: true })
 }
 
 function capitalize(s: string) {
