@@ -100,14 +100,6 @@ export const orderColumns: ColumnDef<OrderRow>[] = [
     },
   },
   {
-    accessorKey: "order_type",
-    header: "Channel",
-    cell: ({ row }) => {
-      const type = row.getValue("order_type") as string
-      return <span className="text-sm capitalize">{type.replace("_", " ")}</span>
-    },
-  },
-  {
     accessorKey: "fulfillment",
     header: "Fulfillment",
     cell: ({ row }) => {
@@ -123,7 +115,13 @@ export const orderColumns: ColumnDef<OrderRow>[] = [
     accessorKey: "created",
     header: "Date",
     cell: ({ row }) => {
-      return <span className="text-sm">{formatDate(row.original.created)}</span>
+      const d = new Date(row.original.created)
+      return (
+        <div>
+          <span className="text-sm">{formatDate(row.original.created)}</span>
+          <p className="text-xs text-muted-foreground">{d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}</p>
+        </div>
+      )
     },
   },
   {
