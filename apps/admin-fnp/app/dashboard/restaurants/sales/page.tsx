@@ -199,7 +199,7 @@ export default function RestaurantSalesPage() {
               {recentOrders.map((order) => (
                 <Link
                   key={order.id}
-                  href={`/dashboard/restaurants/sales/orders/${order.id}`}
+                  href={`/dashboard/restaurants/sales/orders/${order.order_number}`}
                   className="flex items-center justify-between rounded-lg border p-3 hover:bg-muted/50 transition-colors"
                 >
                   <div>
