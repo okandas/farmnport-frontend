@@ -284,7 +284,17 @@ export default function OrderDetailPage() {
           </div>
           {/* Totals */}
           <div className="px-5 py-4 border-t space-y-2 bg-muted/10">
-            <div className="flex justify-between font-bold text-base">
+            <div className="flex justify-between text-sm text-muted-foreground">
+              <span>Subtotal</span>
+              <span>${(order.subtotal / 100).toFixed(2)}</span>
+            </div>
+            {order.delivery_fee > 0 && (
+              <div className="flex justify-between text-sm text-muted-foreground">
+                <span>Shipping</span>
+                <span>${(order.delivery_fee / 100).toFixed(2)}</span>
+              </div>
+            )}
+            <div className="flex justify-between font-bold text-base pt-1 border-t">
               <span>Total</span>
               <span>${(order.total / 100).toFixed(2)}</span>
             </div>
