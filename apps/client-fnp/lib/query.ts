@@ -737,6 +737,10 @@ export function pollOrderStatus(reference: string) {
   return api.post(`${BaseURL}/order/poll`, { reference })
 }
 
+export function queryTumira() {
+  return api.get(`${BaseURL}/tumira/`)
+}
+
 export function myOrders(page?: number) {
   const url = page && page >= 2 ? `${BaseURL}/order/my-orders?p=${page}` : `${BaseURL}/order/my-orders`
   return api.get(url)

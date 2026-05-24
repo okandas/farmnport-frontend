@@ -6,11 +6,11 @@ import { useSession } from "next-auth/react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
-import { Check, Loader2, ShoppingCart, CreditCard, Smartphone, Globe, Truck, Store, Minus, Plus, Trash2 } from "lucide-react"
+import { Check, Loader2, ShoppingCart, CreditCard, Smartphone, Globe, Truck, Store, Minus, Plus, Trash2, Shield, MapPin, ChevronDown } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 
-import { getCart, checkout, pollOrderStatus, queryClient as fetchClient, updateCartItem, removeFromCart } from "@/lib/query"
+import { getCart, checkout, pollOrderStatus, queryClient as fetchClient, updateCartItem, removeFromCart, queryTumira } from "@/lib/query"
 import { AuthenticatedUser } from "@/lib/schemas"
 import { centsToDollars } from "@/lib/utilities"
 
@@ -53,6 +53,14 @@ interface CartItem {
   }
 }
 
+interface Tumira {
+  id: string
+  name: string
+  address: string
+  city: string
+  time_slots?: string[]
+}
+
 interface Cart {
   items: CartItem[]
 }
@@ -79,7 +87,11 @@ export default function CheckoutPage() {
   const [redirectUrl, setRedirectUrl] = useState("")
   const [selectedMethod, setSelectedMethod] = useState("")
   const [selectedLocationId, setSelectedLocationId] = useState("")
+  const [tumiraSearch, setTumiraSearch] = useState("")
+  const [tumiraOpen, setTumiraOpen] = useState(false)
   const [fulfillment, setFulfillment] = useState<"click_collect" | "delivery">("click_collect")
+
+  const TUMIRA_FEE = 500 // cents — replace with real Tumira rate when API is integrated
   const [step, setStep] = useState<"form" | "waiting" | "success">("form")
 
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<CheckoutForm>({
@@ -112,6 +124,15 @@ export default function CheckoutPage() {
     .filter((loc, idx, arr) => arr.findIndex((l) => l.id === loc.id) === idx)
   const deliveryAvailable = items.every((i) => i.fulfillment?.delivery_available)
   const subtotalCents = items.reduce((s, i) => s + (i.unit_price * i.quantity), 0)
+
+  // Tumira hubs — shown when cart has pickup_available items but no static pickup locations
+  const needsTumira = items.some((i) => i.fulfillment?.pickup_available) && pickupLocations.length === 0
+  const { data: tumiraData } = useQuery({
+    queryKey: ["tumira-locations"],
+    queryFn: () => queryTumira().then((r) => r.data?.locations as Tumira[]),
+    enabled: needsTumira,
+  })
+  const tumiraLocations: Tumira[] = tumiraData ?? []
 
   useEffect(() => {
     if (pickupLocations.length === 1 && !selectedLocationId) {
@@ -336,7 +357,86 @@ export default function CheckoutPage() {
                 </section>
               )}
 
-              {/* Collection Points */}
+              {/* Tumira Pickup Points */}
+              {fulfillment === "click_collect" && needsTumira && tumiraLocations.length > 0 && (() => {
+                const selected = tumiraLocations.find((l) => l.id === selectedLocationId)
+                const filtered = tumiraLocations.filter((l) =>
+                  tumiraSearch === "" ||
+                  l.name.toLowerCase().includes(tumiraSearch.toLowerCase()) ||
+                  l.city.toLowerCase().includes(tumiraSearch.toLowerCase())
+                )
+                return (
+                  <section className="border rounded-xl p-5 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h2 className="font-semibold">Collection Point</h2>
+                      <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                        <Shield className="w-3 h-3" /> Powered by Tumira
+                      </span>
+                    </div>
+
+                    {/* Badge */}
+                    <div className="flex items-center gap-2 rounded-lg bg-muted/50 px-3 py-2">
+                      <MapPin className="w-4 h-4 text-muted-foreground shrink-0" />
+                      <span className="text-sm">
+                        {selected
+                          ? <span className="font-medium">{selected.name} — {selected.city}</span>
+                          : <span className="text-muted-foreground">{tumiraLocations.length} pickup locations available</span>
+                        }
+                      </span>
+                      {selected && (
+                        <button
+                          type="button"
+                          onClick={() => { setSelectedLocationId(""); setTumiraSearch(""); setTumiraOpen(false) }}
+                          className="ml-auto text-xs text-muted-foreground hover:text-foreground"
+                        >
+                          Change
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Searchable dropdown */}
+                    {!selected && (
+                      <div className="relative">
+                        <div className="flex items-center border rounded-lg px-3 py-2 gap-2 focus-within:ring-2 focus-within:ring-ring">
+                          <input
+                            type="text"
+                            placeholder="Search locations..."
+                            value={tumiraSearch}
+                            onChange={(e) => { setTumiraSearch(e.target.value); setTumiraOpen(true) }}
+                            onFocus={() => setTumiraOpen(true)}
+                            className="flex-1 text-sm bg-transparent outline-none"
+                          />
+                          <ChevronDown className="w-4 h-4 text-muted-foreground shrink-0" />
+                        </div>
+                        {tumiraOpen && (
+                          <div className="absolute z-10 mt-1 w-full border rounded-lg bg-background shadow-md overflow-hidden">
+                            {filtered.length === 0 ? (
+                              <p className="px-4 py-3 text-sm text-muted-foreground">No locations found</p>
+                            ) : (
+                              filtered.map((loc) => (
+                                <button
+                                  key={loc.id}
+                                  type="button"
+                                  onClick={() => { setSelectedLocationId(loc.id); setTumiraOpen(false); setTumiraSearch("") }}
+                                  className="w-full text-left px-4 py-3 hover:bg-muted/50 transition-colors border-b last:border-b-0"
+                                >
+                                  <p className="text-sm font-medium">{loc.name}</p>
+                                  <p className="text-xs text-muted-foreground">{loc.address}, {loc.city}</p>
+                                  {loc.time_slots && loc.time_slots.length > 0 && (
+                                    <p className="text-xs text-muted-foreground">{loc.time_slots.join(" · ")}</p>
+                                  )}
+                                </button>
+                              ))
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </section>
+                )
+              })()}
+
+              {/* Static Collection Points */}
               {fulfillment === "click_collect" && pickupLocations.length > 0 && (
                 <section className="border rounded-xl p-5 space-y-3">
                   <h2 className="font-semibold">Collection Point</h2>
@@ -532,20 +632,30 @@ export default function CheckoutPage() {
                     </div>
                   ))}
                 </div>
-                <div className="px-5 py-4 border-t">
-                  <div className="flex justify-between font-bold text-base">
-                    <span>Total</span>
+                <div className="px-5 py-4 border-t space-y-2">
+                  <div className="flex justify-between text-sm text-muted-foreground">
+                    <span>Subtotal</span>
                     <span>{centsToDollars(subtotalCents)}</span>
+                  </div>
+                  {needsTumira && (
+                    <div className="flex justify-between text-sm text-muted-foreground">
+                      <span className="flex items-center gap-1"><Shield className="w-3 h-3" /> Tumira pickup fee</span>
+                      <span>{centsToDollars(TUMIRA_FEE)}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between font-bold text-base pt-1 border-t">
+                    <span>Total</span>
+                    <span>{centsToDollars(subtotalCents + (needsTumira ? TUMIRA_FEE : 0))}</span>
                   </div>
                 </div>
                 <div className="px-5 pb-5">
                   <button
                     type="submit"
-                    disabled={checkoutMutation.isPending || items.length === 0 || (fulfillment === "click_collect" && pickupLocations.length > 0 && !selectedLocationId)}
+                    disabled={checkoutMutation.isPending || items.length === 0 || (fulfillment === "click_collect" && (pickupLocations.length > 0 || needsTumira) && !selectedLocationId)}
                     className="flex items-center justify-center gap-2 w-full bg-primary hover:bg-primary/90 disabled:opacity-60 text-primary-foreground font-semibold text-sm py-3 rounded-full transition-colors"
                   >
                     {checkoutMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <CreditCard className="w-4 h-4" />}
-                    Place Order · {centsToDollars(subtotalCents)}
+                    Place Order · {centsToDollars(subtotalCents + (needsTumira ? TUMIRA_FEE : 0))}
                   </button>
                 </div>
               </div>
