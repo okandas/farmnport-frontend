@@ -77,6 +77,7 @@ const EditFeedProductSchema = z.object({
     sale_price: z.coerce.number().nonnegative().default(0),
     was_price: z.coerce.number().nonnegative().default(0),
     delivery_available: z.boolean().default(false),
+    pickup_available: z.boolean().default(false),
 })
 
 type EditFeedProductModel = z.infer<typeof EditFeedProductSchema>
@@ -160,6 +161,7 @@ export default function EditFeedProductPage({ params }: { params: Promise<{ slug
             sale_price: product?.sale_price ?? 0,
             was_price: product?.was_price ?? 0,
             delivery_available: (product as any)?.delivery_available ?? false,
+            pickup_available: (product as any)?.pickup_available ?? false,
         },
         values: product ? {
             id: product.id,
@@ -187,6 +189,7 @@ export default function EditFeedProductPage({ params }: { params: Promise<{ slug
             sale_price: product.sale_price ?? 0,
             was_price: product.was_price ?? 0,
             delivery_available: (product as any).delivery_available ?? false,
+            pickup_available: (product as any).pickup_available ?? false,
         } : undefined,
         resolver: zodResolver(EditFeedProductSchema),
     })
@@ -1066,6 +1069,12 @@ export default function EditFeedProductPage({ params }: { params: Promise<{ slug
                                 <FormItem className="flex items-center gap-2">
                                     <FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl>
                                     <label className="text-sm font-medium text-gray-900 dark:text-white cursor-pointer" onClick={() => field.onChange(!field.value)}>Delivery Available (free-form address)</label>
+                                </FormItem>
+                            )} />
+                            <FormField control={form.control} name="pickup_available" render={({ field }) => (
+                                <FormItem className="flex items-center gap-2">
+                                    <FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl>
+                                    <label className="text-sm font-medium text-gray-900 dark:text-white cursor-pointer" onClick={() => field.onChange(!field.value)}>Pick Up Available (tumira api pickup points)</label>
                                 </FormItem>
                             )} />
                         </div>

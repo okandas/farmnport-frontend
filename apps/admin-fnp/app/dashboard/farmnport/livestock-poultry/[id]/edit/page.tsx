@@ -57,6 +57,7 @@ const Schema = z.object({
     sale_price: z.coerce.number().default(0),
     was_price: z.coerce.number().default(0),
     delivery_available: z.boolean().default(false),
+    pickup_available: z.boolean().default(false),
 }).refine((data) => !!data.brand_id || !!data.seller_id, {
     message: "Either a Brand or a Client must be selected",
     path: ["brand_id"],
@@ -122,6 +123,7 @@ function EditForm({ product }: { product: any }) {
             sale_price: product?.sale_price || 0,
             was_price: product?.was_price || 0,
             delivery_available: product?.delivery_available || false,
+            pickup_available: (product as any)?.pickup_available || false,
         },
         resolver: zodResolver(Schema),
     })
@@ -591,6 +593,12 @@ function EditForm({ product }: { product: any }) {
                                         <FormItem className="flex items-center gap-2">
                                             <FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl>
                                             <label className="text-sm font-medium text-gray-900 dark:text-white cursor-pointer" onClick={() => field.onChange(!field.value)}>Delivery Available (free-form address)</label>
+                                        </FormItem>
+                                    )} />
+                                    <FormField control={form.control} name="pickup_available" render={({ field }) => (
+                                        <FormItem className="flex items-center gap-2">
+                                            <FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl>
+                                            <label className="text-sm font-medium text-gray-900 dark:text-white cursor-pointer" onClick={() => field.onChange(!field.value)}>Pick Up Available (tumira api pickup points)</label>
                                         </FormItem>
                                     )} />
                                 </div>
