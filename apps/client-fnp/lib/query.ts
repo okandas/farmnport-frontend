@@ -744,6 +744,10 @@ export function queryTumira() {
   return api.get(`${BaseURL}/tumira/`)
 }
 
+export function queryTumiraDeliveryRates(payload: { name: string; address: string; city: string; province: string }) {
+  return api.post(`${BaseURL}/tumira/delivery-rates`, payload)
+}
+
 export function myOrders(page?: number) {
   const url = page && page >= 2 ? `${BaseURL}/order/my-orders?p=${page}` : `${BaseURL}/order/my-orders`
   return api.get(url)

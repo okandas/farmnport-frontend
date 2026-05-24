@@ -10,7 +10,7 @@ import { Check, Loader2, ShoppingCart, CreditCard, Smartphone, Globe, Truck, Sto
 import Image from "next/image"
 import Link from "next/link"
 
-import { getCart, checkout, pollOrderStatus, queryClient as fetchClient, updateCartItem, removeFromCart, queryTumira } from "@/lib/query"
+import { getCart, checkout, pollOrderStatus, queryClient as fetchClient, updateCartItem, removeFromCart, queryTumira, queryTumiraDeliveryRates } from "@/lib/query"
 import { AuthenticatedUser } from "@/lib/schemas"
 import { centsToDollars } from "@/lib/utilities"
 
@@ -53,6 +53,13 @@ interface CartItem {
   }
 }
 
+interface DeliveryCourier {
+  id: string
+  name: string
+  rate: number // cents
+  eta: string
+}
+
 interface Tumira {
   id: string
   name: string
@@ -92,6 +99,7 @@ export default function CheckoutPage() {
   const [tumiraSearch, setTumiraSearch] = useState("")
   const [tumiraOpen, setTumiraOpen] = useState(false)
   const [fulfillment, setFulfillment] = useState<"click_collect" | "delivery">("click_collect")
+  const [selectedCourierId, setSelectedCourierId] = useState("")
 
   const [step, setStep] = useState<"form" | "waiting" | "success">("form")
 
@@ -113,6 +121,15 @@ export default function CheckoutPage() {
   }, [profileData, user, setValue])
 
   const method = watch("method")
+  const [watchedName, watchedAddress, watchedCity, watchedProvince] = watch(["address_name", "address_line", "city", "province"])
+  const deliveryAddressComplete = fulfillment === "delivery" && !!(watchedName && watchedAddress && watchedCity && watchedProvince)
+
+  const { data: deliveryRatesData, isFetching: ratesFetching } = useQuery({
+    queryKey: ["tumira-delivery-rates", watchedName, watchedAddress, watchedCity, watchedProvince],
+    queryFn: () => queryTumiraDeliveryRates({ name: watchedName, address: watchedAddress, city: watchedCity, province: watchedProvince }).then((r) => r.data?.couriers as DeliveryCourier[]),
+    enabled: deliveryAddressComplete,
+    staleTime: 60_000,
+  })
 
   const { data: cartData, isLoading: cartLoading } = useQuery({
     queryKey: ["cart"],
@@ -137,6 +154,10 @@ export default function CheckoutPage() {
   const tumiraLocations: Tumira[] = tumiraData ?? []
   const selectedTumira = tumiraLocations.find((l) => l.id === selectedLocationId)
   const tumiraFee = selectedTumira?.rate ?? 0
+
+  const deliveryCouriers: DeliveryCourier[] = deliveryRatesData ?? []
+  const selectedCourier = deliveryCouriers.find((c) => c.id === selectedCourierId)
+  const deliveryFee = selectedCourier?.rate ?? 0
 
   useEffect(() => {
     if (pickupLocations.length === 1 && !selectedLocationId) {
@@ -199,7 +220,7 @@ function onSubmit(data: CheckoutForm) {
       email: data.email || user?.email || "",
       fulfillment,
       collection_location_id: selectedLocationId,
-      fulfillment_fee: tumiraFee,
+      fulfillment_fee: fulfillment === "delivery" ? deliveryFee : tumiraFee,
       address: fulfillment === "delivery" ? {
         name: data.address_name,
         phone: data.phone,
@@ -331,7 +352,7 @@ function onSubmit(data: CheckoutForm) {
 
               {/* Fulfillment selector — only show if delivery is available */}
               {deliveryAvailable && (
-                <section className="border rounded-xl p-5 space-y-3">
+                <section className="rounded-xl p-5 space-y-3">
                   <h2 className="font-semibold">Fulfillment Method</h2>
                   <div className="grid grid-cols-2 gap-3">
                     {([
@@ -480,7 +501,7 @@ function onSubmit(data: CheckoutForm) {
 
               {/* Delivery Address */}
               {fulfillment === "delivery" && (
-                <section className="border rounded-xl p-5 space-y-4">
+                <section className="rounded-xl p-5 space-y-4">
                   <h2 className="font-semibold">Delivery Address</h2>
                   <div className="grid gap-4">
                     <div>
@@ -529,8 +550,58 @@ function onSubmit(data: CheckoutForm) {
                 </section>
               )}
 
+              {/* Delivery Courier — fires when all address fields filled */}
+              {fulfillment === "delivery" && (
+                <section className="border rounded-xl p-5 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h2 className="font-semibold">Delivery Options</h2>
+                    <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <Shield className="w-3 h-3" /> Powered by Tumira
+                    </span>
+                  </div>
+                  {!deliveryAddressComplete ? (
+                    <p className="text-xs text-muted-foreground">Fill in your address above to see delivery options.</p>
+                  ) : ratesFetching ? (
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" /> Getting rates...
+                    </div>
+                  ) : deliveryCouriers.length === 0 ? (
+                    <p className="text-xs text-muted-foreground">No door-to-door options available for your area. Select a Tumira hub close to <span className="font-medium text-foreground">{watchedCity}</span> under Click &amp; Collect to collect your order nearby.</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {deliveryCouriers.map((courier) => {
+                        const active = selectedCourierId === courier.id
+                        return (
+                          <button
+                            key={courier.id}
+                            type="button"
+                            onClick={() => setSelectedCourierId(courier.id)}
+                            className={`w-full text-left rounded-xl border-2 p-4 transition-colors ${active ? "border-primary bg-primary/5" : "border-border hover:border-primary/40"}`}
+                          >
+                            <div className="flex items-center justify-between gap-2">
+                              <div>
+                                <p className="font-semibold text-sm">{courier.name}</p>
+                                <p className="text-xs text-muted-foreground">{courier.eta}</p>
+                              </div>
+                              <div className="flex items-center gap-2 shrink-0">
+                                <span className="text-sm font-semibold">{centsToDollars(courier.rate)}</span>
+                                {active && (
+                                  <span className="w-4 h-4 bg-primary rounded-full flex items-center justify-center">
+                                    <Check className="w-2.5 h-2.5 text-white" />
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </button>
+                        )
+                      })}
+                    </div>
+                  )}
+                </section>
+              )}
+
               {/* Contact */}
-              <section className="border rounded-xl p-5 space-y-4">
+              <section className="rounded-xl p-5 space-y-4">
                 <h2 className="font-semibold">Contact Details</h2>
                 <div className="grid gap-4">
                   <div>
@@ -656,9 +727,18 @@ function onSubmit(data: CheckoutForm) {
                       <span>{centsToDollars(tumiraFee)}</span>
                     </div>
                   )}
+                  {fulfillment === "delivery" && deliveryFee > 0 && (
+                    <div className="flex justify-between text-sm text-muted-foreground">
+                      <span className="flex items-center gap-1">
+                        <Shield className="w-3 h-3" />
+                        {selectedCourier ? `${selectedCourier.name} delivery fee` : "Delivery fee"}
+                      </span>
+                      <span>{centsToDollars(deliveryFee)}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between font-bold text-base pt-1 border-t">
                     <span>Total</span>
-                    <span>{centsToDollars(subtotalCents + (needsTumira ? tumiraFee : 0))}</span>
+                    <span>{centsToDollars(subtotalCents + (needsTumira ? tumiraFee : 0) + (fulfillment === "delivery" ? deliveryFee : 0))}</span>
                   </div>
                 </div>
                 <div className="px-5 pb-5">
@@ -668,7 +748,7 @@ function onSubmit(data: CheckoutForm) {
                     className="flex items-center justify-center gap-2 w-full bg-primary hover:bg-primary/90 disabled:opacity-60 text-primary-foreground font-semibold text-sm py-3 rounded-full transition-colors"
                   >
                     {checkoutMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <CreditCard className="w-4 h-4" />}
-                    Place Order · {centsToDollars(subtotalCents + (needsTumira ? tumiraFee : 0))}
+                    Place Order · {centsToDollars(subtotalCents + (needsTumira ? tumiraFee : 0) + (fulfillment === "delivery" ? deliveryFee : 0))}
                   </button>
                 </div>
               </div>
