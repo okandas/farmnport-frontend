@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { querySeedProduct, listBookingEvents } from "@/lib/query"
+import { serverFetch } from "@/lib/serverFetch"
 import { formatProductName } from "@/lib/utilities"
 import Link from "next/link"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -11,8 +11,7 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const { slug } = await params
-    const response = await querySeedProduct(slug).catch(() => null)
-    const product = response?.data
+    const product = await serverFetch(`/seed-products/${slug}`).catch(() => null)
     if (!product) return { title: 'Seed Product | farmnport.com' }
     const variety = product.variety ? ` — ${product.variety}` : ""
     const name = formatProductName(product.name)
@@ -32,14 +31,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function BuySeedProductPage({ params }: Props) {
     const { slug } = await params
-    const [response, bookingRes] = await Promise.all([
-        querySeedProduct(slug),
-        listBookingEvents({ status: "open" }),
+    const [product, bookingRes] = await Promise.all([
+        serverFetch(`/seed-products/${slug}`).catch(() => null),
+        serverFetch(`/booking/events?status=open`).catch(() => null),
     ])
-    const product = response?.data
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://farmnport.com'
 
-    const openEvent = (bookingRes?.data?.events ?? []).find(
+    const openEvent = (bookingRes?.events ?? []).find(
         (e: any) => e.product_id && product?.id && e.product_id === product.id
     )
 

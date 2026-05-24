@@ -1,14 +1,14 @@
 import Link from "next/link"
 import { Egg } from "lucide-react"
-import { queryPublishedFeedingPrograms } from "@/lib/query"
+import { serverFetch } from "@/lib/serverFetch"
 import { FeedingProgramsGrid } from "@/components/structures/feeding-programs-grid"
 
 export default async function FeedingProgramsPage() {
     let programs: any[] = []
 
     try {
-        const data = await queryPublishedFeedingPrograms()
-        programs = data?.data?.data || []
+        const data = await serverFetch("/feedingprograms/")
+        programs = data?.data || []
     } catch (error) {
         console.error("Error fetching feeding programs:", error)
     }

@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { queryBuyFeedProducts } from "@/lib/query"
+import { serverFetch } from "@/lib/serverFetch"
 import { BuyFeedsClient } from "./BuyFeedsClient"
 
 export default async function BuyFeedsPage() {
@@ -7,9 +7,9 @@ export default async function BuyFeedsPage() {
     let initialTotal = 0
 
     try {
-        const response = await queryBuyFeedProducts({ p: 1 })
-        initialProducts = response?.data?.data || []
-        initialTotal = response?.data?.total || 0
+        const result = await serverFetch("/feed/buy")
+        initialProducts = result?.data || []
+        initialTotal = result?.total || 0
     } catch (error) {
         console.error("Error fetching feed products:", error)
     }

@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { queryBuyPlantNutritionProducts } from "@/lib/query"
+import { serverFetch } from "@/lib/serverFetch"
 import { BuyPlantNutritionClient } from "./BuyPlantNutritionClient"
 
 export default async function BuyPlantNutritionPage() {
@@ -7,9 +7,9 @@ export default async function BuyPlantNutritionPage() {
     let initialTotal = 0
 
     try {
-        const response = await queryBuyPlantNutritionProducts({ p: 1 })
-        initialProducts = response?.data?.data || []
-        initialTotal = response?.data?.total || 0
+        const result = await serverFetch("/plantnutrition/buy")
+        initialProducts = result?.data || []
+        initialTotal = result?.total || 0
     } catch (error) {
         console.error("Error fetching plant nutrition products:", error)
     }

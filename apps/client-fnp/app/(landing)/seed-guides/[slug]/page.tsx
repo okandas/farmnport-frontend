@@ -1,4 +1,4 @@
-import { querySeedProduct } from "@/lib/query"
+import { serverFetch } from "@/lib/serverFetch"
 import Image from "next/image"
 import Link from "next/link"
 import { WantToBuyCTA } from "@/components/shared/WantToBuyCTA"
@@ -10,8 +10,7 @@ interface Props {
 
 export async function generateMetadata({ params }: Props) {
     const { slug } = await params
-    const response = await querySeedProduct(slug).catch(() => null)
-    const product = response?.data
+    const product = await serverFetch(`/seed-products/${slug}`).catch(() => null)
     if (!product) return {}
     const variety = product.variety ? ` — ${product.variety}` : ""
     return {
@@ -29,8 +28,7 @@ export async function generateMetadata({ params }: Props) {
 
 export default async function SeedGuidePage({ params }: Props) {
     const { slug } = await params
-    const response = await querySeedProduct(slug).catch(() => null)
-    const product = response?.data
+    const product = await serverFetch(`/seed-products/${slug}`).catch(() => null)
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://farmnport.com"
 
     if (!product) {

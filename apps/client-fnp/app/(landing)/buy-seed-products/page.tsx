@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { queryBuySeedProducts, listBookingEvents } from "@/lib/query"
+import { serverFetch } from "@/lib/serverFetch"
 import { BuySeedProductsClient } from "./BuySeedProductsClient"
 
 export default async function BuySeedProductsPage() {
@@ -9,12 +9,12 @@ export default async function BuySeedProductsPage() {
 
     try {
         const [productsRes, bookingsRes] = await Promise.all([
-            queryBuySeedProducts({ p: 1, brand: [] }),
-            listBookingEvents({ status: "open" }),
+            serverFetch("/seed-products/buy"),
+            serverFetch("/booking/events?status=open"),
         ])
-        initialProducts = productsRes?.data?.data || []
-        initialTotal = productsRes?.data?.total || 0
-        bookingEvents = bookingsRes?.data?.events || []
+        initialProducts = productsRes?.data || []
+        initialTotal = productsRes?.total || 0
+        bookingEvents = bookingsRes?.events || []
     } catch (error) {
         console.error("Error fetching seed products:", error)
     }

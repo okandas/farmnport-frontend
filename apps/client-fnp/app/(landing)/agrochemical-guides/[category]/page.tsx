@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { queryAgroChemicalsByCategory } from "@/lib/query"
+import { serverFetch } from "@/lib/serverFetch"
 import Link from "next/link"
 import { AgroCategoryClient } from "./AgroCategoryClient"
 
@@ -34,15 +34,9 @@ export default async function AgroChemicalCategoryPage({ params }: CategoryPageP
     let initialTotal = 0
 
     try {
-        const response = await queryAgroChemicalsByCategory({
-            category,
-            p: 1,
-            brand: [],
-            target: [],
-            active_ingredient: [],
-        })
-        initialChemicals = response?.data?.data || []
-        initialTotal = response?.data?.total || 0
+        const result = await serverFetch(`/agrochemical/category/${category}`)
+        initialChemicals = result?.data || []
+        initialTotal = result?.total || 0
     } catch (error) {
         console.error("Error fetching agrochemicals by category:", error)
     }

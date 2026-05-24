@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { queryPlantNutritionProduct } from "@/lib/query"
+import { serverFetch } from "@/lib/serverFetch"
 import { buildBuyMetadata } from "@/lib/utilities"
 import Link from "next/link"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -11,8 +11,7 @@ interface BuyPlantNutritionProductPageProps {
 
 export async function generateMetadata({ params }: BuyPlantNutritionProductPageProps): Promise<Metadata> {
     const { slug } = await params
-    const response = await queryPlantNutritionProduct(slug).catch(() => null)
-    const product = response?.data
+    const product = await serverFetch(`/plantnutrition/${slug}`).catch(() => null)
     if (!product) return { title: 'Plant Nutrition Product | farmnport.com' }
     return buildBuyMetadata(product, product.plant_nutrition_category?.name || 'Plant Nutrition', `/buy-plant-nutrition/${slug}`, 'Zimbabwe crops')
 }
@@ -20,8 +19,7 @@ export async function generateMetadata({ params }: BuyPlantNutritionProductPageP
 export default async function BuyPlantNutritionProductPage({ params }: BuyPlantNutritionProductPageProps) {
     const { slug } = await params
 
-    const response = await queryPlantNutritionProduct(slug)
-    const product = response?.data
+    const product = await serverFetch(`/plantnutrition/${slug}`)
 
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://farmnport.com'
 

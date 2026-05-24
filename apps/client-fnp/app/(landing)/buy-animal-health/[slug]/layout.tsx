@@ -1,5 +1,5 @@
 import { Metadata } from 'next'
-import { queryAnimalHealthProduct } from '@/lib/query'
+import { serverFetch } from '@/lib/serverFetch'
 
 interface LayoutProps {
   children: React.ReactNode
@@ -12,8 +12,7 @@ export async function generateMetadata({ params }: LayoutProps): Promise<Metadat
   const { slug } = await params
 
   try {
-    const response = await queryAnimalHealthProduct(slug)
-    const product = response?.data
+    const product = await serverFetch(`/animalhealth/${slug}`)
 
     if (!product) {
       return {

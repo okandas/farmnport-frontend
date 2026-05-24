@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { queryAnimalHealthProduct } from "@/lib/query"
+import { serverFetch } from "@/lib/serverFetch"
 import { buildBuyMetadata } from "@/lib/utilities"
 import Link from "next/link"
 import { Beaker } from "lucide-react"
@@ -12,8 +12,7 @@ interface BuyAnimalHealthProductPageProps {
 
 export async function generateMetadata({ params }: BuyAnimalHealthProductPageProps): Promise<Metadata> {
     const { slug } = await params
-    const response = await queryAnimalHealthProduct(slug).catch(() => null)
-    const product = response?.data
+    const product = await serverFetch(`/animalhealth/${slug}`).catch(() => null)
     if (!product) return { title: 'Animal Health Product | farmnport.com' }
     return buildBuyMetadata(product, product.animal_health_category?.name || 'Animal Health', `/buy-animal-health/${slug}`, 'poultry and livestock in Zimbabwe')
 }
@@ -21,8 +20,7 @@ export async function generateMetadata({ params }: BuyAnimalHealthProductPagePro
 export default async function BuyAnimalHealthProductPage({ params }: BuyAnimalHealthProductPageProps) {
     const { slug } = await params
 
-    const response = await queryAnimalHealthProduct(slug)
-    const product = response?.data
+    const product = await serverFetch(`/animalhealth/${slug}`)
 
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://farmnport.com'
 

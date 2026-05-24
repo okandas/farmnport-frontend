@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { queryAgroChemical } from "@/lib/query"
+import { serverFetch } from "@/lib/serverFetch"
 import { ActiveIngredientsList } from "@/components/shared/ActiveIngredientUnitsKey"
 import Image from "next/image"
 import { Beaker, AlertTriangle } from "lucide-react"
@@ -16,8 +16,7 @@ type Props = { params: Promise<{ category: string; slug: string }> }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { category, slug } = await params
-  const response = await queryAgroChemical(slug).catch(() => null)
-  const chemical = response?.data
+  const chemical = await serverFetch(`/agrochemical/${slug}`).catch(() => null)
 
   if (!chemical) {
     return { title: 'Agrochemical Guide | farmnport.com' }
@@ -51,8 +50,7 @@ interface GuidePageProps {
 export default async function AgroChemicalGuidePage({ params }: GuidePageProps) {
     const { category, slug } = await params
 
-    const response = await queryAgroChemical(slug)
-    const chemical = response?.data
+    const chemical = await serverFetch(`/agrochemical/${slug}`)
 
     const categorySlug = chemical?.agrochemical_category?.slug || ""
     const targetLabel: Record<string, string> = {

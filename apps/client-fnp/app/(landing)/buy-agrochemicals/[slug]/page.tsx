@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { queryAgroChemical } from "@/lib/query"
+import { serverFetch } from "@/lib/serverFetch"
 import { buildBuyMetadata } from "@/lib/utilities"
 import Link from "next/link"
 import { Beaker } from "lucide-react"
@@ -12,8 +12,7 @@ interface BuyAgroChemicalPageProps {
 
 export async function generateMetadata({ params }: BuyAgroChemicalPageProps): Promise<Metadata> {
     const { slug } = await params
-    const response = await queryAgroChemical(slug).catch(() => null)
-    const chemical = response?.data
+    const chemical = await serverFetch(`/agrochemical/${slug}`).catch(() => null)
     if (!chemical) return { title: 'Agrochemical | farmnport.com' }
     return buildBuyMetadata(chemical, chemical.agrochemical_category?.name || 'Agrochemical', `/buy-agrochemicals/${slug}`)
 }
@@ -21,8 +20,7 @@ export async function generateMetadata({ params }: BuyAgroChemicalPageProps): Pr
 export default async function BuyAgroChemicalPage({ params }: BuyAgroChemicalPageProps) {
     const { slug } = await params
 
-    const response = await queryAgroChemical(slug)
-    const chemical = response?.data
+    const chemical = await serverFetch(`/agrochemical/${slug}`)
 
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://farmnport.com'
 

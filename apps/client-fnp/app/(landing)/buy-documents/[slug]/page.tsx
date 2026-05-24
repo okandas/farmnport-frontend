@@ -1,4 +1,4 @@
-import { queryDocument } from "@/lib/query"
+import { serverFetch } from "@/lib/serverFetch"
 import { notFound } from "next/navigation"
 import { AddToCartButton } from "@/components/cart/AddToCartButton"
 import { FileText, Download, Tag } from "lucide-react"
@@ -10,8 +10,8 @@ interface Props {
 export async function generateMetadata({ params }: Props) {
     const { slug } = await params
     try {
-        const res = await queryDocument(slug)
-        const doc = res?.data?.document
+        const res = await serverFetch(`/documents/${slug}`)
+        const doc = res?.document
         return {
             title: `${doc?.title} | farm&port`,
             description: doc?.description,
@@ -26,8 +26,8 @@ export default async function DocumentDetailPage({ params }: Props) {
     let doc: any = null
 
     try {
-        const res = await queryDocument(slug)
-        doc = res?.data?.document
+        const res = await serverFetch(`/documents/${slug}`)
+        doc = res?.document
     } catch {
         notFound()
     }

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { queryLivestockPoultryProduct } from "@/lib/query"
+import { serverFetch } from "@/lib/serverFetch"
 import { buildBuyMetadata } from "@/lib/utilities"
 import Link from "next/link"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -11,8 +11,7 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const { slug } = await params
-    const response = await queryLivestockPoultryProduct(slug).catch(() => null)
-    const product = response?.data
+    const product = await serverFetch(`/livestock-poultry/${slug}`).catch(() => null)
     if (!product) return { title: 'Livestock & Poultry | farmnport.com' }
     const category = [product.species, product.type].filter(Boolean).join(' ') || 'Livestock & Poultry'
     return buildBuyMetadata(product, category, `/buy-livestock-poultry/${slug}`)
@@ -20,8 +19,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function BuyLivestockPoultryProductPage({ params }: Props) {
     const { slug } = await params
-    const response = await queryLivestockPoultryProduct(slug)
-    const product = response?.data
+    const product = await serverFetch(`/livestock-poultry/${slug}`)
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://farmnport.com'
 
     if (!product) {

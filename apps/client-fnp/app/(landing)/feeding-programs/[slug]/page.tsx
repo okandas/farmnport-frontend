@@ -1,4 +1,4 @@
-import { queryFeedingProgramBySlug } from "@/lib/query"
+import { serverFetch } from "@/lib/serverFetch"
 import { notFound } from "next/navigation"
 import { FeedingProgramDetailClient } from "./FeedingProgramDetailClient"
 
@@ -12,8 +12,7 @@ export default async function FeedingProgramDetailPage({ params }: FeedingProgra
     let program: any = null
 
     try {
-        const response = await queryFeedingProgramBySlug(slug)
-        program = response?.data
+        program = await serverFetch(`/feedingprograms/${slug}`)
     } catch (error) {
         console.error("Error fetching feeding program:", error)
     }

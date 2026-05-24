@@ -1,5 +1,5 @@
 import { Metadata } from 'next'
-import { queryFeedProduct } from '@/lib/query'
+import { serverFetch } from '@/lib/serverFetch'
 import { capitalizeFirstLetter } from '@/lib/utilities'
 
 interface LayoutProps {
@@ -13,8 +13,7 @@ export async function generateMetadata({ params }: LayoutProps): Promise<Metadat
   const { slug } = await params
 
   try {
-    const response = await queryFeedProduct(slug)
-    const product = response?.data
+    const product = await serverFetch(`/feed/${slug}`)
 
     if (!product) {
       return {

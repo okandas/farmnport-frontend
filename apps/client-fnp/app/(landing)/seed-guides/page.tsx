@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { AllSeedGuidesClient } from "./AllSeedGuidesClient"
-import { queryAllSeedProducts } from "@/lib/query"
+import { serverFetch } from "@/lib/serverFetch"
 import { OtherGuidesLinks } from "@/components/shared/OtherGuidesLinks"
 
 export const metadata = {
@@ -16,10 +16,10 @@ export const metadata = {
 }
 
 export default async function SeedGuidesPage() {
-    const productsRes = await queryAllSeedProducts({ p: 1, brand: [] }).catch(() => null)
+    const productsRes = await serverFetch("/seed-products/all").catch(() => null)
 
-    const initialProducts = productsRes?.data?.data || []
-    const initialTotal = productsRes?.data?.total || 0
+    const initialProducts = productsRes?.data || []
+    const initialTotal = productsRes?.total || 0
 
     return (
         <main className="bg-gradient-to-b from-background to-muted/20">

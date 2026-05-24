@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { AllAgroChemicalsClient } from "./AllAgroChemicalsClient"
-import { queryAllAgroChemicals } from "@/lib/query"
+import { serverFetch } from "@/lib/serverFetch"
 import { OtherGuidesLinks } from "@/components/shared/OtherGuidesLinks"
 
 export const metadata = {
@@ -16,10 +16,10 @@ export const metadata = {
 }
 
 export default async function AgrochemicalGuidesPage() {
-    const chemicalsRes = await queryAllAgroChemicals({ p: 1, search: "", brand: [], target: [], active_ingredient: [], used_on: [] }).catch(() => null)
+    const chemicalsRes = await serverFetch("/agrochemical/all").catch(() => null)
 
-    const initialChemicals = chemicalsRes?.data?.data || []
-    const initialTotal = chemicalsRes?.data?.total || 0
+    const initialChemicals = chemicalsRes?.data || []
+    const initialTotal = chemicalsRes?.total || 0
 
     return (
         <main className="bg-gradient-to-b from-background to-muted/20">

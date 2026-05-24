@@ -1,4 +1,4 @@
-import { querySprayProgramBySlug } from "@/lib/query"
+import { serverFetch } from "@/lib/serverFetch"
 import { notFound } from "next/navigation"
 import { SprayProgramDetailClient } from "./SprayProgramDetailClient"
 
@@ -12,8 +12,7 @@ export default async function SprayProgramDetailPage({ params }: SprayProgramDet
     let program: any = null
 
     try {
-        const response = await querySprayProgramBySlug(slug)
-        program = response?.data
+        program = await serverFetch(`/sprayprograms/${slug}`)
     } catch (error) {
         console.error("Error fetching spray program:", error)
     }
