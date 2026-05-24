@@ -1,13 +1,9 @@
-import { Suspense } from "react"
 import { capitalizeFirstLetter, plural } from "@/lib/utilities"
 import { Farmers } from "@/components/layouts/farmers"
 import { retrieveUser } from "@/lib/actions"
 import type { Metadata, ResolvingMetadata } from "next";
-import {AppURL, getFarmerSeo} from "@/lib/schemas";
-import { ClientFilterSidebar } from "@/components/generic/clientFilterSidebar"
-import { ActionsSidebar } from "@/components/generic/actions-sidebar"
-import { CrossSellBanner } from "@/components/monetization/cross-sell-banner"
-import { ProductResources } from "@/components/monetization/product-resources"
+import {AppURL, FarmerSeo} from "@/lib/schemas";
+import { FilterSidebar } from "@/components/generic/filterSidebar"
 
 
 type Props = {
@@ -18,40 +14,14 @@ type Props = {
 export async function generateMetadata({ params }: Props,  parent: ResolvingMetadata): Promise<Metadata> {
   const { product } = await params
   const name = capitalizeFirstLetter(plural(product))
-  const description = getFarmerSeo(product)
+  const description = FarmerSeo[product]
 
   return {
     alternates: {
       canonical: `${AppURL}/farmers/${product.toLowerCase()}`,
     },
-    title: `${name} Farmers in Zimbabwe | farmnport`,
+    title: `${name} Farmers in Zimbabwe | farmnport.com`,
     description,
-    keywords: `${name} farmers, ${product} suppliers, ${product} growers, Zimbabwe farmers, agricultural producers, farm produce suppliers`,
-    authors: [{ name: 'farmnport' }],
-    openGraph: {
-      title: `${name} Farmers in Zimbabwe`,
-      description,
-      url: `${AppURL}/farmers/${product.toLowerCase()}`,
-      siteName: 'farmnport',
-      locale: 'en_US',
-      type: 'website',
-    },
-    twitter: {
-      card: 'summary',
-      title: `${name} Farmers in Zimbabwe`,
-      description,
-    },
-    robots: {
-      index: true,
-      follow: true,
-      googleBot: {
-        index: true,
-        follow: true,
-        'max-video-preview': -1,
-        'max-image-preview': 'large',
-        'max-snippet': -1,
-      },
-    },
   }
 }
 
@@ -63,38 +33,26 @@ export default async function FarmersProductPage({ params }: FarmerProductPagePr
 
   const user = await retrieveUser()
   const { product } = await params
-  const name = capitalizeFirstLetter(plural(product))
 
   return (
     <main>
       <div className="mx-auto max-w-7xl px-6 lg:px-8 min-h-[70lvh]">
-        <h1 className="text-3xl font-bold font-heading pt-8 pb-4">
-          {name} Farmers in Zimbabwe
-        </h1>
-        <p className="text-muted-foreground mb-6">
-          Buy quality {product} directly from trusted farmers across Zimbabwe at fair farm-gate prices.
-        </p>
-
-        <CrossSellBanner product={product} context="farmer" />
-        <ProductResources product={product} />
-
         <div className="lg:flex lg:space-x-10">
-          <div className="hidden lg:block lg:w-64 relative">
-            <ClientFilterSidebar type="farmers" hideProduce hideCategory product={product} />
+
+          <div className="hidden lg:block lg:w-44 relative">
+            <FilterSidebar />
           </div>
 
-          <div className="lg:flex-1">
-            <div className="lg:hidden mb-4">
-              <ClientFilterSidebar type="farmers" hideProduce hideCategory product={product} />
+          <div className="lg:w-2/3">
+            <div className="space-y-8 mt-[21px]">
+              <div>
+                <h1 className="text-2xl font-semibold">{capitalizeFirstLetter(plural(product))} Farmers in Zimbabwe</h1>
+                <p className="text-base text-muted-foreground pt-1">Buy fresh {plural(product)} produce directly from local farmers.</p>
+              </div>
             </div>
-            <Suspense><Farmers user={user} queryBy={product} /></Suspense>
-          </div>
-
-          <div className="hidden lg:block lg:w-80 relative">
-            <ActionsSidebar type="farmers" product={product} showPremiumCTA={false} />
+            <Farmers user={user} queryBy={product} />
           </div>
         </div>
-
       </div>
     </main>
   )

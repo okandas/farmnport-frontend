@@ -1,22 +1,36 @@
-import { Suspense } from "react"
 import { Buyers } from "@/components/layouts/buyers"
 import { retrieveUser } from "@/lib/actions"
-import { ClientFilterSidebar } from "@/components/generic/clientFilterSidebar"
-import { ActionsSidebar } from "@/components/generic/actions-sidebar"
+import { FilterSidebar } from "@/components/generic/filterSidebar"
 
 
 export const metadata = {
-    title: 'Sell Your Farm Produce Directly – Reach Buyers Faster | farmnport.com',
-    description: 'Farmers, sell your fresh produce directly to buyers. Access fairer markets, build customer relationships, and reduce dependency on traditional channels.',
+    title: 'Sell Your Farm Produce Directly – Reach Buyers Faster. | farmnport.com',
+    description: `Farmers, sell your fresh produce directly to buyers! Access fairer markets,
+      build customer relationships, and reduce dependency on traditional channels.`,
     alternates: {
-        canonical: '/buyers',
+        canonical: `/buyers`,
     },
     openGraph: {
-        title: 'Sell Your Farm Produce Directly – Reach Buyers Faster',
-        description: 'Farmers, sell your fresh produce directly to buyers across Zimbabwe. Access fairer markets and build customer relationships.',
-        url: '/buyers',
-        siteName: 'farmnport',
-        type: 'website',
+        type: "website",
+        locale: "en_US",
+        url: "https://farmnport.com/buyers",
+        siteName: "Farmnport",
+        title: 'Sell Your Farm Produce Directly – Reach Buyers Faster.',
+        description: "Farmers, sell your fresh produce directly to buyers! Access fairer markets, build customer relationships, and reduce dependency on traditional channels.",
+        images: [
+            {
+                url: "/og-image.png",
+                width: 1200,
+                height: 630,
+                alt: "Farmnport Buyers - Sell Your Farm Produce Directly",
+            },
+        ],
+    },
+    twitter: {
+        card: "summary_large_image",
+        title: 'Sell Your Farm Produce Directly – Reach Buyers Faster.',
+        description: "Farmers, sell your fresh produce directly to buyers! Access fairer markets, build customer relationships, and reduce dependency on traditional channels.",
+        images: ["/og-image.png"],
     },
 }
 
@@ -27,27 +41,14 @@ export default async function BuyersPage() {
     return (
         <main>
             <div className="mx-auto max-w-7xl px-6 lg:px-8 min-h-[70lvh]">
-                <h1 className="text-3xl font-bold font-heading pt-8 pb-4">
-                    Agricultural Produce Buyers in Zimbabwe
-                </h1>
-                <p className="text-muted-foreground mb-6">
-                    Sell your farm produce directly to verified buyers across Zimbabwe. Browse buyers by category and connect today.
-                </p>
                 <div className="lg:flex lg:space-x-10">
 
-                    <div className="hidden lg:block lg:w-64 relative">
-                        <ClientFilterSidebar type="buyers" />
+                    <div className="hidden lg:block lg:w-44 relative">
+                        <FilterSidebar />
                     </div>
 
-                    <div className="lg:flex-1">
-                        <div className="lg:hidden mb-4">
-                            <ClientFilterSidebar type="buyers" />
-                        </div>
-                        <Suspense><Buyers user={user} /></Suspense>
-                    </div>
-
-                    <div className="hidden lg:block lg:w-80 relative">
-                        <ActionsSidebar type="buyers" />
+                    <div className="lg:w-2/3">
+                        <Buyers user={user} />
                     </div>
                 </div>
             </div>
