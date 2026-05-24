@@ -299,7 +299,7 @@ export default async function AnimalHealthGuidePage({ params }: GuidePageProps) 
                         )}
 
                         {/* Want to Buy CTA */}
-                        <WantToBuyCTA available_for_sale={product.available_for_sale} name={product.name} href={`/buy-animal-health/${slug}`} />
+                        <WantToBuyCTA available_for_sale={product.available_for_sale} name={product.name} brand={product.brand?.name} href={`/buy-animal-health/${slug}`} />
 
                         {/* Precautions */}
                         {product.precautions && product.precautions.length > 0 && (

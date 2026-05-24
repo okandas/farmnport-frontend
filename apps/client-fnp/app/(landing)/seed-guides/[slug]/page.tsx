@@ -116,7 +116,7 @@ export default async function SeedGuidePage({ params }: Props) {
                             </div>
                         )}
 
-                        <WantToBuyCTA available_for_sale={product.available_for_sale} name={product.name} href={`/buy-seed-products/${slug}`} />
+                        <WantToBuyCTA available_for_sale={product.available_for_sale} name={product.name} brand={product.brand?.name} href={`/buy-seed-products/${slug}`} />
 
                         {/* Precautions */}
                         {product.precautions?.length > 0 && (
