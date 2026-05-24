@@ -74,7 +74,7 @@ export function MenuCategoriesTable() {
       columns={menuCategoryColumns}
       data={categories}
       newUrl="/dashboard/restaurants/menu-categories/new"
-      tableName="Category"
+      tableName="Menu Category"
       total={total}
       pagination={pagination}
       setPagination={setPagination}
