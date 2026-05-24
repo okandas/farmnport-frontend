@@ -80,6 +80,7 @@ interface Order {
   total: number
   currency: string
   fulfillment: string
+  collection_location?: { id: string; name: string; address: string; city: string }
   delivery_address?: DeliveryAddress
   payment_provider: string
   payment_method: string
@@ -303,7 +304,13 @@ export default function OrderDetailPage() {
                 {order.fulfillment === "click_collect" ? "Click & Collect" : "Delivery"}
               </h2>
             </div>
-            {order.delivery_address ? (
+            {order.collection_location ? (
+              <div className="text-sm space-y-0.5">
+                <p className="font-medium">{order.collection_location.name}</p>
+                {order.collection_location.address && <p className="text-muted-foreground">{order.collection_location.address}</p>}
+                {order.collection_location.city && <p className="text-muted-foreground">{order.collection_location.city}</p>}
+              </div>
+            ) : order.delivery_address ? (
               <div className="text-sm space-y-1 text-muted-foreground">
                 <p className="text-foreground font-medium">{order.delivery_address.name}</p>
                 <p>{order.delivery_address.address}</p>

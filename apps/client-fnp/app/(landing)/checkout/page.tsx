@@ -6,11 +6,11 @@ import { useSession } from "next-auth/react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
-import { Check, Loader2, ShoppingCart, CreditCard, Smartphone, Globe, Truck, Store } from "lucide-react"
+import { Check, Loader2, ShoppingCart, CreditCard, Smartphone, Globe, Truck, Store, Minus, Plus, Trash2 } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 
-import { getCart, checkout, pollOrderStatus, queryClient as fetchClient } from "@/lib/query"
+import { getCart, checkout, pollOrderStatus, queryClient as fetchClient, updateCartItem, removeFromCart } from "@/lib/query"
 import { AuthenticatedUser } from "@/lib/schemas"
 import { centsToDollars } from "@/lib/utilities"
 
@@ -45,8 +45,10 @@ interface CartItem {
   image_src: string
   unit_price: number
   quantity: number
+  sku: string
   fulfillment?: {
     delivery_available: boolean
+    pickup_available: boolean
     pickup_locations?: { id: string; name: string; address: string; city: string; time_slots?: string[] }[]
   }
 }
@@ -136,6 +138,19 @@ export default function CheckoutPage() {
       toast.error(err?.response?.data?.message || "Checkout failed. Please try again.")
     },
   })
+
+  const updateMutation = useMutation({
+    mutationFn: ({ product_id, quantity, sku }: { product_id: string; quantity: number; sku?: string }) =>
+      updateCartItem(product_id, quantity, sku),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["cart"] }),
+  })
+
+  const removeMutation = useMutation({
+    mutationFn: ({ product_id, sku }: { product_id: string; sku?: string }) =>
+      removeFromCart(product_id, sku),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["cart"] }),
+  })
+
 
   useEffect(() => {
     if (!polling || !pollRef) return
@@ -473,9 +488,9 @@ export default function CheckoutPage() {
                 <div className="px-5 py-4 border-b bg-muted/30">
                   <h2 className="font-semibold">Order Summary</h2>
                 </div>
-                <div className="divide-y max-h-64 overflow-y-auto">
+                <div className="divide-y max-h-96 overflow-y-auto">
                   {items.map((item) => (
-                    <div key={item.product_id} className="flex gap-3 p-4">
+                    <div key={`${item.product_id}-${item.sku}`} className="flex gap-3 p-4">
                       <div className="relative w-12 h-12 rounded-lg border bg-white overflow-hidden shrink-0">
                         {item.image_src ? (
                           <Image src={item.image_src} alt={item.product_name} fill sizes="48px" className="object-contain p-1" />
@@ -483,9 +498,35 @@ export default function CheckoutPage() {
                           <div className="w-full h-full bg-muted/30" />
                         )}
                       </div>
-                      <div className="flex-1 min-w-0">
+                      <div className="flex-1 min-w-0 space-y-1">
                         <p className="text-sm font-medium capitalize truncate">{item.product_name}</p>
-                        <p className="text-xs text-muted-foreground">Qty {item.quantity}</p>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => item.quantity > 1
+                              ? updateMutation.mutate({ product_id: item.product_id, quantity: item.quantity - 1, sku: item.sku })
+                              : removeMutation.mutate({ product_id: item.product_id, sku: item.sku })
+                            }
+                            className="w-6 h-6 rounded-full border flex items-center justify-center hover:bg-muted transition-colors"
+                          >
+                            <Minus className="w-3 h-3" />
+                          </button>
+                          <span className="text-xs font-medium w-4 text-center">{item.quantity}</span>
+                          <button
+                            type="button"
+                            onClick={() => updateMutation.mutate({ product_id: item.product_id, quantity: item.quantity + 1, sku: item.sku })}
+                            className="w-6 h-6 rounded-full border flex items-center justify-center hover:bg-muted transition-colors"
+                          >
+                            <Plus className="w-3 h-3" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => removeMutation.mutate({ product_id: item.product_id, sku: item.sku })}
+                            className="ml-1 text-muted-foreground hover:text-destructive transition-colors"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
                       </div>
                       <p className="text-sm font-semibold shrink-0">{centsToDollars(item.unit_price * item.quantity)}</p>
                     </div>
