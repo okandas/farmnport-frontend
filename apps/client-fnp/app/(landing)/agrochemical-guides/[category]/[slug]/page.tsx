@@ -11,6 +11,7 @@ import { FertilizerApplicationRates } from "@/components/agrochemical/Fertilizer
 import { AgrochemicalDosageTable } from "@/components/agrochemical/AgrochemicalDosageTable"
 import { ProductTargets } from "@/components/agrochemical/ProductTargets"
 import { WantToBuyCTA } from "@/components/shared/WantToBuyCTA"
+import { GuideProductTitle } from "@/components/shared/GuideProductTitle"
 
 type Props = { params: Promise<{ category: string; slug: string }> }
 
@@ -242,9 +243,7 @@ export default async function AgroChemicalGuidePage({ params }: GuidePageProps) 
                     {/* Right - Product Info */}
                     <div className="space-y-6">
                         {/* Product Name */}
-                        <h1 className="text-3xl lg:text-4xl font-bold capitalize leading-tight">
-                            {chemical.name}
-                        </h1>
+                        <GuideProductTitle name={chemical.name} brand={chemical.brand?.name} />
 
                         {/* Category Badge & Buy Link */}
                         <div className="flex items-center gap-3 flex-wrap">

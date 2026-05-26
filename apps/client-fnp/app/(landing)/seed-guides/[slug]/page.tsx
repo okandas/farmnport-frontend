@@ -2,6 +2,7 @@ import { serverFetch } from "@/lib/serverFetch"
 import Image from "next/image"
 import Link from "next/link"
 import { WantToBuyCTA } from "@/components/shared/WantToBuyCTA"
+import { GuideProductTitle } from "@/components/shared/GuideProductTitle"
 import { formatProductName } from "@/lib/utilities"
 
 interface Props {
@@ -136,17 +137,8 @@ export default async function SeedGuidePage({ params }: Props) {
 
                     {/* Right - Product Info */}
                     <div className="space-y-6">
-                        {/* Brand */}
-                        {product.brand && (
-                            <Link href={`/seed-guides?brand=${product.brand.id}`} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                                {product.brand.name}
-                            </Link>
-                        )}
-
                         {/* Product Name */}
-                        <h1 className="text-3xl lg:text-4xl font-bold capitalize leading-tight">
-                            {product.name}
-                        </h1>
+                        <GuideProductTitle name={product.name} brand={product.brand?.name} />
 
                         {/* Category Badge */}
                         {categoryLabel && (

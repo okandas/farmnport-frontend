@@ -5,6 +5,7 @@ import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
 import { BaseURL } from "@/lib/schemas"
 import { FeedBreadcrumb } from "./FeedBreadcrumb"
 import { WantToBuyCTA } from "@/components/shared/WantToBuyCTA"
+import { GuideProductTitle } from "@/components/shared/GuideProductTitle"
 
 interface FeedDetailPageProps {
     params: Promise<{ slug: string }>
@@ -136,18 +137,13 @@ export default async function FeedDetailPage({ params }: FeedDetailPageProps) {
 
                     {/* Right - Product Info */}
                     <div className="space-y-6">
-                        <h1 className="text-3xl lg:text-4xl font-bold capitalize leading-tight">
-                            {product.name}
-                        </h1>
+                        <GuideProductTitle name={product.name} brand={product.brand?.name} />
 
                         <div className="flex items-center gap-3 flex-wrap">
                             {product.feed_category && (
                                 <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
                                     {product.feed_category.name}
                                 </span>
-                            )}
-                            {product.brand && (
-                                <span className="text-sm text-muted-foreground">by {product.brand.name}</span>
                             )}
                         </div>
 

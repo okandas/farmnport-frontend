@@ -5,6 +5,7 @@ import { AlertTriangle } from "lucide-react"
 import Link from "next/link"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
 import { capitalizeFirstLetter, formatUnit, buildGuideMetadata } from "@/lib/utilities"
+import { GuideProductTitle } from "@/components/shared/GuideProductTitle"
 import { BaseURL } from "@/lib/schemas"
 import { WantToBuyCTA } from "@/components/shared/WantToBuyCTA"
 
@@ -323,9 +324,7 @@ export default async function AnimalHealthGuidePage({ params }: GuidePageProps) 
                     {/* Right - Product Info */}
                     <div className="space-y-6">
                         {/* Product Name */}
-                        <h1 className="text-3xl lg:text-4xl font-bold capitalize leading-tight">
-                            {product.name}
-                        </h1>
+                        <GuideProductTitle name={product.name} brand={product.brand?.name} />
 
                         {/* Category Badge */}
                         <div className="flex items-center gap-3 flex-wrap">
