@@ -20,6 +20,13 @@ const PAYMENT_METHODS = [
   { value: "",        label: "PayNow Web",         description: "Choose your method on PayNow",       icon: Globe },
 ]
 
+const SERVICE_TYPE_LABELS: Record<string, string> = {
+  door_to_door: "Delivered to your address",
+  ship_to_door: "Delivered to your address",
+  hub_to_hub: "Collect at a hub near you",
+  door_to_hub: "Collect at a hub near you",
+}
+
 const PROVINCES = [
   "Harare", "Bulawayo", "Manicaland", "Mashonaland Central",
   "Mashonaland East", "Mashonaland West", "Masvingo",
@@ -56,7 +63,7 @@ interface CartItem {
 interface DeliveryCourier {
   courier_id: string
   courier_name: string
-  service_type: string
+  service_type: "door_to_door" | "ship_to_door" | "hub_to_hub" | "door_to_hub"
   price_cents: number
   estimated_days: number
   estimated_hours: number
@@ -162,6 +169,13 @@ export default function CheckoutPage() {
   const deliveryCouriers: DeliveryCourier[] = deliveryRatesData ?? []
   const selectedCourier = deliveryCouriers.find((c) => c.courier_id === selectedCourierId)
   const deliveryFee = selectedCourier?.price_cents ?? 0
+  const doorToDoorCouriers = deliveryCouriers.filter((c) => c.service_type === "door_to_door" || c.service_type === "ship_to_door")
+  const noDoorToDoor = deliveryAddressComplete && !ratesFetching && deliveryCouriers.length > 0 && doorToDoorCouriers.length === 0
+  const nearbyHubs = watchedCity ? tumiraLocations.filter((l) =>
+    l.city.toLowerCase() === watchedCity.toLowerCase() ||
+    l.city.toLowerCase().includes(watchedCity.toLowerCase()) ||
+    watchedCity.toLowerCase().includes(l.city.toLowerCase())
+  ) : []
 
   useEffect(() => {
     if (pickupLocations.length === 1 && !selectedLocationId) {
@@ -231,6 +245,7 @@ function onSubmit(data: CheckoutForm) {
         address: data.address_line,
         city: data.city,
         province: data.province,
+        ...(selectedCourier ? { courier_id: selectedCourier.courier_id, courier_name: selectedCourier.courier_name, service_type: selectedCourier.service_type } : {}),
       } : undefined,
       order_type: "retail",
     })
@@ -506,7 +521,21 @@ function onSubmit(data: CheckoutForm) {
               {/* Delivery Address */}
               {fulfillment === "delivery" && (
                 <section className="rounded-xl p-5 space-y-4">
-                  <h2 className="font-semibold">Delivery Address</h2>
+                  <div className="flex items-center justify-between">
+                    <h2 className="font-semibold">Delivery Address</h2>
+                    {(selectedCourier || (deliveryAddressComplete && deliveryCouriers.length > 0)) && (
+                      <button type="button" onClick={() => { setSelectedCourierId(""); setValue("address_line", ""); setValue("city", ""); setValue("province", "") }} className="text-xs text-muted-foreground hover:text-foreground">
+                        Change
+                      </button>
+                    )}
+                  </div>
+                  {(selectedCourier || (deliveryAddressComplete && deliveryCouriers.length > 0)) ? (
+                    <div className="text-sm space-y-0.5">
+                      <p className="font-medium capitalize">{watchedName}</p>
+                      <p className="text-muted-foreground">{watchedAddress}</p>
+                      <p className="text-muted-foreground">{watchedCity}{watchedProvince ? `, ${watchedProvince}` : ""}</p>
+                    </div>
+                  ) : (
                   <div className="grid gap-4">
                     <div>
                       <label className="text-sm font-medium block mb-1">Full Name</label>
@@ -551,56 +580,96 @@ function onSubmit(data: CheckoutForm) {
                       </div>
                     </div>
                   </div>
+                  )}
                 </section>
               )}
 
               {/* Delivery Courier — fires when all address fields filled */}
               {fulfillment === "delivery" && (
                 <section className="rounded-xl p-5 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <h2 className="font-semibold">Delivery Options {deliveryCouriers.length > 0 && <span className="text-muted-foreground font-normal text-sm">({deliveryCouriers.length})</span>}</h2>
-                    <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                      <Shield className="w-3 h-3" /> Powered by Tumira
-                    </span>
-                  </div>
+                  {!selectedCourier && (
+                    <div className="flex items-center justify-between">
+                      <h2 className="font-semibold">Delivery Options {doorToDoorCouriers.length > 0 && <span className="text-muted-foreground font-normal text-sm">({doorToDoorCouriers.length})</span>}</h2>
+                      <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                        <Shield className="w-3 h-3" /> Powered by Tumira
+                      </span>
+                    </div>
+                  )}
                   {!deliveryAddressComplete ? (
                     <p className="text-xs text-muted-foreground">Fill in your address above to see delivery options.</p>
                   ) : ratesFetching ? (
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       <Loader2 className="w-3.5 h-3.5 animate-spin" /> Getting rates...
                     </div>
-                  ) : deliveryCouriers.length === 0 ? (
-                    <p className="text-xs text-muted-foreground">No door-to-door options available for your area. Select a Tumira hub close to <span className="font-medium text-foreground">{watchedCity}</span> under Click &amp; Collect to collect your order nearby.</p>
-                  ) : (
-                    <div className="space-y-2">
-                      {/* Search */}
-                      <input
-                        type="text"
-                        placeholder="Search couriers..."
-                        value={courierSearch}
-                        onChange={(e) => setCourierSearch(e.target.value)}
-                        className="w-full border rounded-lg px-3 py-2 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-ring"
-                      />
-                      {/* Selected badge */}
-                      {selectedCourier && (
-                        <div className="flex items-center justify-between rounded-lg bg-primary/5 border border-primary px-3 py-2">
-                          <div>
-                            <p className="text-sm font-medium">{selectedCourier.courier_name}</p>
-                            <p className="text-xs text-muted-foreground">
-                              {selectedCourier.estimated_days > 0 ? `${selectedCourier.estimated_days} day${selectedCourier.estimated_days > 1 ? "s" : ""}` : `${selectedCourier.estimated_hours} hr${selectedCourier.estimated_hours > 1 ? "s" : ""}`}
-                            </p>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-semibold">{centsToDollars(selectedCourier.price_cents)}</span>
-                            <button type="button" onClick={() => setSelectedCourierId("")} className="text-xs text-muted-foreground hover:text-foreground">Change</button>
-                          </div>
+                  ) : noDoorToDoor ? (
+                    <div className="space-y-3">
+                      <p className="text-xs text-muted-foreground">
+                        No door-to-door delivery available for <span className="font-medium text-foreground">{watchedCity}</span>.
+                        {nearbyHubs.length > 0
+                          ? ` Select a nearby pickup hub to collect your order.`
+                          : ` No pickup hubs available near you at this time.`}
+                      </p>
+                      {nearbyHubs.length > 0 && (
+                        <div className="space-y-1">
+                          {nearbyHubs.map((hub) => (
+                            <button
+                              key={hub.id}
+                              type="button"
+                              onClick={() => {
+                                setSelectedLocationId(hub.id)
+                                setFulfillment("click_collect")
+                                setSelectedCourierId("")
+                              }}
+                              className="w-full text-left rounded-lg border p-3 hover:bg-muted/50 transition-colors"
+                            >
+                              <div className="flex items-center justify-between gap-2">
+                                <div>
+                                  <p className="text-sm font-medium">{hub.name}</p>
+                                  <p className="text-xs text-muted-foreground">{hub.address}, {hub.city}</p>
+                                  <p className="text-xs text-primary font-medium">{hub.courier_name}</p>
+                                </div>
+                                <span className="text-sm font-semibold shrink-0">{centsToDollars(hub.rate)}</span>
+                              </div>
+                            </button>
+                          ))}
                         </div>
                       )}
+                    </div>
+                  ) : deliveryCouriers.length === 0 ? (
+                    <p className="text-xs text-muted-foreground">No delivery options available for your area.</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {/* Search — hidden when courier selected */}
+                      {!selectedCourier && (
+                        <input
+                          type="text"
+                          placeholder="Search couriers..."
+                          value={courierSearch}
+                          onChange={(e) => setCourierSearch(e.target.value)}
+                          className="w-full border rounded-lg px-3 py-2 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+                        />
+                      )}
+                      {/* Selected badge */}
+                      {selectedCourier && (() => {
+                        const isHubPickup = selectedCourier.service_type === "hub_to_hub" || selectedCourier.service_type === "door_to_hub"
+                        return (
+                          <div className="rounded-lg bg-primary/5 border border-primary px-3 py-3 space-y-1">
+                            <div className="flex items-center justify-between">
+                              <p className="text-sm font-medium">{selectedCourier.courier_name}</p>
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm font-semibold">{centsToDollars(selectedCourier.price_cents)}</span>
+                                <button type="button" onClick={() => setSelectedCourierId("")} className="text-xs text-muted-foreground hover:text-foreground">Change</button>
+                              </div>
+                            </div>
+                            <p className="text-xs text-muted-foreground">{SERVICE_TYPE_LABELS[selectedCourier.service_type] ?? ""}</p>
+                          </div>
+                        )
+                      })()}
                       {/* Scrollable list — hidden once selected */}
                       {!selectedCourier && (
                         <div className="h-52 overflow-y-auto space-y-1 pr-1">
                           {(() => {
-                            const filtered = deliveryCouriers.filter((c) =>
+                            const filtered = doorToDoorCouriers.filter((c) =>
                               courierSearch === "" || c.courier_name.toLowerCase().includes(courierSearch.toLowerCase())
                             )
                             if (filtered.length === 0) {
@@ -610,27 +679,22 @@ function onSubmit(data: CheckoutForm) {
                                 </div>
                               )
                             }
-                            return filtered.map((courier) => {
-                              const eta = courier.estimated_days > 0
-                                ? `${courier.estimated_days} day${courier.estimated_days > 1 ? "s" : ""}`
-                                : `${courier.estimated_hours} hr${courier.estimated_hours > 1 ? "s" : ""}`
-                              return (
+                            return filtered.map((courier) => (
                                 <button
                                   key={courier.courier_id}
                                   type="button"
                                   onClick={() => { setSelectedCourierId(courier.courier_id); setCourierSearch("") }}
-                                  className="w-full text-left rounded-lg p-3 transition-colors hover:bg-muted/50 border border-transparent hover:border-border"
+                                  className={`w-full text-left rounded-lg p-3 transition-colors border ${selectedCourierId === courier.courier_id ? "border-primary bg-primary/5" : "border-transparent hover:bg-muted/50 hover:border-border"}`}
                                 >
-                                  <div className="flex items-center justify-between gap-2">
+                                  <div className="flex items-start justify-between gap-2">
                                     <div>
                                       <p className="font-semibold text-sm">{courier.courier_name}</p>
-                                      <p className="text-xs text-muted-foreground">{eta}</p>
+                                      <p className="text-xs text-muted-foreground">{SERVICE_TYPE_LABELS[courier.service_type] ?? ""}</p>
                                     </div>
                                     <span className="text-sm font-semibold shrink-0">{centsToDollars(courier.price_cents)}</span>
                                   </div>
                                 </button>
-                              )
-                            })
+                              ))
                           })()}
                         </div>
                       )}

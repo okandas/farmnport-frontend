@@ -8,6 +8,7 @@ import { Loader2, Package, Truck, Store, CheckCircle2, XCircle, Clock, CreditCar
 import Image from "next/image"
 import Link from "next/link"
 import { getOrder, retryOrderPayment, pollOrderStatus } from "@/lib/query"
+import { centsToDollars } from "@/lib/utilities"
 
 
 const STATUS_STYLES: Record<string, string> = {
@@ -68,6 +69,9 @@ interface DeliveryAddress {
   address: string
   city: string
   province: string
+  courier_id?: string
+  courier_name?: string
+  service_type?: string
 }
 
 interface Order {
@@ -276,9 +280,9 @@ export default function OrderDetailPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium capitalize">{item.product_name}</p>
-                  <p className="text-xs text-muted-foreground">Qty {item.quantity} × ${(item.unit_price / 100).toFixed(2)}</p>
+                  <p className="text-xs text-muted-foreground">Qty {item.quantity} × {centsToDollars(item.unit_price)}</p>
                 </div>
-                <p className="text-sm font-semibold shrink-0">${(item.line_total / 100).toFixed(2)}</p>
+                <p className="text-sm font-semibold shrink-0">{centsToDollars(item.line_total)}</p>
               </div>
             ))}
           </div>
@@ -286,17 +290,17 @@ export default function OrderDetailPage() {
           <div className="px-5 py-4 border-t space-y-2 bg-muted/10">
             <div className="flex justify-between text-sm text-muted-foreground">
               <span>Subtotal</span>
-              <span>${(order.subtotal / 100).toFixed(2)}</span>
+              <span>{centsToDollars(order.subtotal)}</span>
             </div>
             {order.delivery_fee > 0 && (
-              <div className="flex justify-between text-sm text-muted-foreground">
-                <span>Shipping</span>
-                <span>${(order.delivery_fee / 100).toFixed(2)}</span>
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>{order.delivery_address?.courier_name ? `Shipping by ${order.delivery_address.courier_name}` : "Shipping"}</span>
+                <span>{centsToDollars(order.delivery_fee)}</span>
               </div>
             )}
             <div className="flex justify-between font-bold text-base pt-1 border-t">
               <span>Total</span>
-              <span>${(order.total / 100).toFixed(2)}</span>
+              <span>{centsToDollars(order.total)}</span>
             </div>
           </div>
         </div>
@@ -321,11 +325,14 @@ export default function OrderDetailPage() {
                 {order.collection_location.city && <p className="text-muted-foreground">{order.collection_location.city}</p>}
               </div>
             ) : order.delivery_address ? (
-              <div className="text-sm space-y-1 text-muted-foreground">
-                <p className="text-foreground font-medium">{order.delivery_address.name}</p>
+              <div className="text-xs space-y-1 text-muted-foreground">
+                <p className="text-foreground font-medium capitalize">{order.delivery_address.name}</p>
                 <p>{order.delivery_address.address}</p>
                 <p>{order.delivery_address.city}, {order.delivery_address.province}</p>
                 {order.delivery_address.phone && <p>{order.delivery_address.phone}</p>}
+                {order.delivery_address.courier_name && (
+                  <p className="pt-1 text-xs">Shipment handled by <span className="text-foreground font-medium">{order.delivery_address.courier_name}</span></p>
+                )}
               </div>
             ) : (
               <p className="text-sm text-muted-foreground">Collect in person</p>

@@ -73,6 +73,8 @@ interface DeliveryAddress {
   address: string
   city: string
   province: string
+  courier_id?: string
+  courier_name?: string
 }
 
 interface Order {
@@ -357,6 +359,10 @@ export default function OrderDetailPage() {
             {order.delivery_address && (
               <>
                 <p>
+                  <span className="text-muted-foreground">Recipient:</span>{" "}
+                  {order.delivery_address.name}
+                </p>
+                <p>
                   <span className="text-muted-foreground">Address:</span>{" "}
                   {order.delivery_address.address}
                 </p>
@@ -365,6 +371,12 @@ export default function OrderDetailPage() {
                   {order.delivery_address.city},{" "}
                   {order.delivery_address.province}
                 </p>
+                {order.delivery_address.courier_name && (
+                  <p>
+                    <span className="text-muted-foreground">Courier:</span>{" "}
+                    {order.delivery_address.courier_name}
+                  </p>
+                )}
               </>
             )}
             {order.delivered_at && (
@@ -438,7 +450,9 @@ export default function OrderDetailPage() {
               <span>{centsToDollars(order.subtotal)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Shipping</span>
+              <span className="text-muted-foreground">
+                {order.delivery_address?.courier_name ? order.delivery_address.courier_name : "Shipping"}
+              </span>
               <span>{order.delivery_fee > 0 ? centsToDollars(order.delivery_fee) : "Free"}</span>
             </div>
             <div className="flex justify-between font-medium text-base pt-1 border-t">
