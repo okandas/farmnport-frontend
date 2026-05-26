@@ -54,10 +54,13 @@ interface CartItem {
 }
 
 interface DeliveryCourier {
-  id: string
-  name: string
-  rate: number // cents
-  eta: string
+  courier_id: string
+  courier_name: string
+  service_type: string
+  price_cents: number
+  estimated_days: number
+  estimated_hours: number
+  weight_limit_grams: number
 }
 
 interface Tumira {
@@ -100,6 +103,7 @@ export default function CheckoutPage() {
   const [tumiraOpen, setTumiraOpen] = useState(false)
   const [fulfillment, setFulfillment] = useState<"click_collect" | "delivery">("click_collect")
   const [selectedCourierId, setSelectedCourierId] = useState("")
+  const [courierSearch, setCourierSearch] = useState("")
 
   const [step, setStep] = useState<"form" | "waiting" | "success">("form")
 
@@ -156,8 +160,8 @@ export default function CheckoutPage() {
   const tumiraFee = selectedTumira?.rate ?? 0
 
   const deliveryCouriers: DeliveryCourier[] = deliveryRatesData ?? []
-  const selectedCourier = deliveryCouriers.find((c) => c.id === selectedCourierId)
-  const deliveryFee = selectedCourier?.rate ?? 0
+  const selectedCourier = deliveryCouriers.find((c) => c.courier_id === selectedCourierId)
+  const deliveryFee = selectedCourier?.price_cents ?? 0
 
   useEffect(() => {
     if (pickupLocations.length === 1 && !selectedLocationId) {
@@ -552,9 +556,9 @@ function onSubmit(data: CheckoutForm) {
 
               {/* Delivery Courier — fires when all address fields filled */}
               {fulfillment === "delivery" && (
-                <section className="border rounded-xl p-5 space-y-3">
+                <section className="rounded-xl p-5 space-y-3">
                   <div className="flex items-center justify-between">
-                    <h2 className="font-semibold">Delivery Options</h2>
+                    <h2 className="font-semibold">Delivery Options {deliveryCouriers.length > 0 && <span className="text-muted-foreground font-normal text-sm">({deliveryCouriers.length})</span>}</h2>
                     <span className="flex items-center gap-1 text-xs text-muted-foreground">
                       <Shield className="w-3 h-3" /> Powered by Tumira
                     </span>
@@ -569,32 +573,67 @@ function onSubmit(data: CheckoutForm) {
                     <p className="text-xs text-muted-foreground">No door-to-door options available for your area. Select a Tumira hub close to <span className="font-medium text-foreground">{watchedCity}</span> under Click &amp; Collect to collect your order nearby.</p>
                   ) : (
                     <div className="space-y-2">
-                      {deliveryCouriers.map((courier) => {
-                        const active = selectedCourierId === courier.id
-                        return (
-                          <button
-                            key={courier.id}
-                            type="button"
-                            onClick={() => setSelectedCourierId(courier.id)}
-                            className={`w-full text-left rounded-xl border-2 p-4 transition-colors ${active ? "border-primary bg-primary/5" : "border-border hover:border-primary/40"}`}
-                          >
-                            <div className="flex items-center justify-between gap-2">
-                              <div>
-                                <p className="font-semibold text-sm">{courier.name}</p>
-                                <p className="text-xs text-muted-foreground">{courier.eta}</p>
-                              </div>
-                              <div className="flex items-center gap-2 shrink-0">
-                                <span className="text-sm font-semibold">{centsToDollars(courier.rate)}</span>
-                                {active && (
-                                  <span className="w-4 h-4 bg-primary rounded-full flex items-center justify-center">
-                                    <Check className="w-2.5 h-2.5 text-white" />
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                          </button>
-                        )
-                      })}
+                      {/* Search */}
+                      <input
+                        type="text"
+                        placeholder="Search couriers..."
+                        value={courierSearch}
+                        onChange={(e) => setCourierSearch(e.target.value)}
+                        className="w-full border rounded-lg px-3 py-2 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+                      />
+                      {/* Selected badge */}
+                      {selectedCourier && (
+                        <div className="flex items-center justify-between rounded-lg bg-primary/5 border border-primary px-3 py-2">
+                          <div>
+                            <p className="text-sm font-medium">{selectedCourier.courier_name}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {selectedCourier.estimated_days > 0 ? `${selectedCourier.estimated_days} day${selectedCourier.estimated_days > 1 ? "s" : ""}` : `${selectedCourier.estimated_hours} hr${selectedCourier.estimated_hours > 1 ? "s" : ""}`}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-semibold">{centsToDollars(selectedCourier.price_cents)}</span>
+                            <button type="button" onClick={() => setSelectedCourierId("")} className="text-xs text-muted-foreground hover:text-foreground">Change</button>
+                          </div>
+                        </div>
+                      )}
+                      {/* Scrollable list — hidden once selected */}
+                      {!selectedCourier && (
+                        <div className="h-52 overflow-y-auto space-y-1 pr-1">
+                          {(() => {
+                            const filtered = deliveryCouriers.filter((c) =>
+                              courierSearch === "" || c.courier_name.toLowerCase().includes(courierSearch.toLowerCase())
+                            )
+                            if (filtered.length === 0) {
+                              return (
+                                <div className="flex items-center justify-center py-6 text-sm text-muted-foreground">
+                                  No couriers match &ldquo;{courierSearch}&rdquo;
+                                </div>
+                              )
+                            }
+                            return filtered.map((courier) => {
+                              const eta = courier.estimated_days > 0
+                                ? `${courier.estimated_days} day${courier.estimated_days > 1 ? "s" : ""}`
+                                : `${courier.estimated_hours} hr${courier.estimated_hours > 1 ? "s" : ""}`
+                              return (
+                                <button
+                                  key={courier.courier_id}
+                                  type="button"
+                                  onClick={() => { setSelectedCourierId(courier.courier_id); setCourierSearch("") }}
+                                  className="w-full text-left rounded-lg p-3 transition-colors hover:bg-muted/50 border border-transparent hover:border-border"
+                                >
+                                  <div className="flex items-center justify-between gap-2">
+                                    <div>
+                                      <p className="font-semibold text-sm">{courier.courier_name}</p>
+                                      <p className="text-xs text-muted-foreground">{eta}</p>
+                                    </div>
+                                    <span className="text-sm font-semibold shrink-0">{centsToDollars(courier.price_cents)}</span>
+                                  </div>
+                                </button>
+                              )
+                            })
+                          })()}
+                        </div>
+                      )}
                     </div>
                   )}
                 </section>
@@ -731,7 +770,7 @@ function onSubmit(data: CheckoutForm) {
                     <div className="flex justify-between text-sm text-muted-foreground">
                       <span className="flex items-center gap-1">
                         <Shield className="w-3 h-3" />
-                        {selectedCourier ? `${selectedCourier.name} delivery fee` : "Delivery fee"}
+                        {selectedCourier ? `${selectedCourier.courier_name} delivery fee` : "Delivery fee"}
                       </span>
                       <span>{centsToDollars(deliveryFee)}</span>
                     </div>
