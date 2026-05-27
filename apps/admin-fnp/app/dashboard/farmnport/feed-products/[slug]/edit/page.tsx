@@ -23,8 +23,9 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Checkbox } from "@/components/ui/checkbox"
-import { LocationMultiSelect, SelectedLocation } from "@/components/ui/location-multi-select"
+import { SelectedLocation } from "@/components/ui/location-multi-select"
+import { ProductPricingSection } from "@/components/structures/forms/product-pricing-section"
+import { ProductFulfillmentSection } from "@/components/structures/forms/product-fulfillment-section"
 import * as z from "zod"
 
 const EditFeedProductSchema = z.object({
@@ -76,8 +77,12 @@ const EditFeedProductSchema = z.object({
     show_price: z.boolean().default(true),
     sale_price: z.coerce.number().nonnegative().default(0),
     was_price: z.coerce.number().nonnegative().default(0),
+    weight_grams: z.coerce.number().int().nonnegative().default(0),
     delivery_available: z.boolean().default(false),
     pickup_available: z.boolean().default(false),
+}).refine(data => !data.available_for_sale || data.weight_grams > 0, {
+    message: "Weight is required before enabling available for sale",
+    path: ["weight_grams"],
 })
 
 type EditFeedProductModel = z.infer<typeof EditFeedProductSchema>
@@ -160,6 +165,7 @@ export default function EditFeedProductPage({ params }: { params: Promise<{ slug
             show_price: product?.show_price ?? true,
             sale_price: product?.sale_price ?? 0,
             was_price: product?.was_price ?? 0,
+            weight_grams: product?.weight_grams ?? 0,
             delivery_available: (product as any)?.delivery_available ?? false,
             pickup_available: (product as any)?.pickup_available ?? false,
         },
@@ -188,6 +194,7 @@ export default function EditFeedProductPage({ params }: { params: Promise<{ slug
             show_price: product.show_price ?? true,
             sale_price: product.sale_price ?? 0,
             was_price: product.was_price ?? 0,
+            weight_grams: product.weight_grams ?? 0,
             delivery_available: (product as any).delivery_available ?? false,
             pickup_available: (product as any).pickup_available ?? false,
         } : undefined,
@@ -949,137 +956,18 @@ export default function EditFeedProductPage({ params }: { params: Promise<{ slug
                     )}
                 </div>
 
-                {/* Pricing & Stock */}
-                <div className="border-b border-gray-900/10 dark:border-gray-100/10 pb-12">
-                    <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">Pricing & Stock</h2>
-                    <p className="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">Guide pricing and inventory information.</p>
+                <ProductPricingSection control={form.control} />
 
-                    <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6">
-                        <div className="sm:col-span-3 flex items-center gap-4">
-                            <FormField
-                                control={form.control}
-                                name="show_price"
-                                render={({ field }) => (
-                                    <FormItem className="flex items-center gap-2">
-                                        <FormControl>
-                                            <Checkbox
-                                                checked={field.value}
-                                                onCheckedChange={field.onChange}
-                                            />
-                                        </FormControl>
-                                        <label className="text-sm font-medium text-gray-900 dark:text-white cursor-pointer" onClick={() => field.onChange(!field.value)}>
-                                            Show Price on Guides
-                                        </label>
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
-                        <div className="sm:col-span-3 flex items-center gap-4">
-                            <FormField
-                                control={form.control}
-                                name="available_for_sale"
-                                render={({ field }) => (
-                                    <FormItem className="flex items-center gap-2">
-                                        <FormControl>
-                                            <Checkbox
-                                                checked={field.value}
-                                                onCheckedChange={field.onChange}
-                                            />
-                                        </FormControl>
-                                        <label className="text-sm font-medium text-gray-900 dark:text-white cursor-pointer" onClick={() => field.onChange(!field.value)}>
-                                            Available for Sale
-                                        </label>
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
-                        <div className="sm:col-span-2">
-                            <FormField
-                                control={form.control}
-                                name="sale_price"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Sale Price (USD)</label>
-                                        <FormControl>
-                                            <Input type="number" step="0.01" min="0" placeholder="0.00" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
-                        <div className="sm:col-span-2">
-                            <FormField
-                                control={form.control}
-                                name="was_price"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Was Price (USD)</label>
-                                        <FormControl>
-                                            <Input type="number" step="0.01" min="0" placeholder="0.00" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
-                        <div className="sm:col-span-2">
-                            <FormField
-                                control={form.control}
-                                name="stock_level"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Stock Level</label>
-                                        <FormControl>
-                                            <Input type="number" min="0" placeholder="0" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
-                    </div>
-                </div>
-
-                {/* Fulfillment */}
-                <div className="border-b border-gray-900/10 dark:border-gray-100/10 pb-12">
-                    <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">Fulfillment</h2>
-                    <p className="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">Where customers can collect or receive this product.</p>
-                    <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
-                        <div className="sm:col-span-6">
-                            <label className="block text-sm/6 font-medium text-gray-900 dark:text-white mb-2">Pickup Locations</label>
-                            <LocationMultiSelect
-                                queryKey="feed-pickup-locations"
-                                allLocations={allLocations}
-                                selected={pickupLocations ?? []}
-                                onChange={setPickupLocations}
-                            />
-                        </div>
-                        <div className="sm:col-span-6">
-                            <label className="block text-sm/6 font-medium text-gray-900 dark:text-white mb-2">Delivery Locations</label>
-                            <LocationMultiSelect
-                                queryKey="feed-delivery-locations"
-                                allLocations={allLocations}
-                                selected={deliveryLocations ?? []}
-                                onChange={setDeliveryLocations}
-                            />
-                        </div>
-                        <div className="sm:col-span-6 flex items-center gap-4">
-                            <FormField control={form.control} name="delivery_available" render={({ field }) => (
-                                <FormItem className="flex items-center gap-2">
-                                    <FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl>
-                                    <label className="text-sm font-medium text-gray-900 dark:text-white cursor-pointer" onClick={() => field.onChange(!field.value)}>Delivery Available (free-form address)</label>
-                                </FormItem>
-                            )} />
-                            <FormField control={form.control} name="pickup_available" render={({ field }) => (
-                                <FormItem className="flex items-center gap-2">
-                                    <FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl>
-                                    <label className="text-sm font-medium text-gray-900 dark:text-white cursor-pointer" onClick={() => field.onChange(!field.value)}>Pick Up Available (tumira api pickup points)</label>
-                                </FormItem>
-                            )} />
-                        </div>
-                    </div>
-                </div>
+                <ProductFulfillmentSection
+                    control={form.control}
+                    allLocations={allLocations}
+                    pickupLocations={pickupLocations ?? []}
+                    setPickupLocations={setPickupLocations}
+                    deliveryLocations={deliveryLocations ?? []}
+                    setDeliveryLocations={setDeliveryLocations}
+                    pickupQueryKey="feed-pickup-locations"
+                    deliveryQueryKey="feed-delivery-locations"
+                />
 
                     <div className="mt-6 flex items-center justify-end gap-x-6">
                         <button
