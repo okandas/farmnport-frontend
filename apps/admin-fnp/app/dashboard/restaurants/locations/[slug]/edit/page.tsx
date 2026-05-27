@@ -58,6 +58,7 @@ const EditFormSchema = RestaurantLocationSchema.pick({
     whatsapp_available: true,
     show_number: true,
     pre_orders_enabled: true,
+    drive_through: true,
 }).extend({
     city: z.string().min(1, "City is required"),
 })
@@ -135,6 +136,7 @@ function EditLocationForm({ location, restaurants }: { location: RestaurantLocat
             whatsapp_available: location.whatsapp_available || false,
             show_number: location.show_number || false,
             pre_orders_enabled: location.pre_orders_enabled || false,
+            drive_through: location.drive_through ?? false,
             operating_hours: location.operating_hours?.length ? location.operating_hours : defaultHours,
         },
         resolver: zodResolver(EditFormSchema),
@@ -599,6 +601,25 @@ function EditLocationForm({ location, restaurants }: { location: RestaurantLocat
                                                 </FormControl>
                                                 <FormLabel className="text-sm font-medium cursor-pointer text-gray-900 dark:text-white">
                                                     Pre-orders enabled
+                                                </FormLabel>
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                                <div className="sm:col-span-3">
+                                    <FormField
+                                        control={form.control}
+                                        name="drive_through"
+                                        render={({ field }) => (
+                                            <FormItem className="flex items-center space-x-2 space-y-0">
+                                                <FormControl>
+                                                    <Checkbox
+                                                        checked={field.value}
+                                                        onCheckedChange={field.onChange}
+                                                    />
+                                                </FormControl>
+                                                <FormLabel className="text-sm font-medium cursor-pointer text-gray-900 dark:text-white">
+                                                    Drive-through
                                                 </FormLabel>
                                             </FormItem>
                                         )}
