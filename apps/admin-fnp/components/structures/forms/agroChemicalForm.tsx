@@ -82,6 +82,7 @@ export function AgroChemicalForm({ agroChemical, mode = "create" }: AgroChemical
             sale_price: agroChemical?.sale_price ?? 0,
             show_was_price: agroChemical?.show_was_price ?? false,
             was_price: agroChemical?.was_price ?? 0,
+            weight_grams: agroChemical?.weight_grams ?? 0,
             delivery_available: agroChemical?.delivery_available ?? false,
             pickup_available: agroChemical?.pickup_available ?? false,
             pickup_location_ids: agroChemical?.pickup_location_ids ?? [],
@@ -735,6 +736,21 @@ export function AgroChemicalForm({ agroChemical, mode = "create" }: AgroChemical
                                         )}
                                     />
                                 </div>
+                                <div>
+                                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Weight (g)</label>
+                                    <FormField
+                                        control={form.control}
+                                        name={`variants.${index}.weight_grams`}
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormControl>
+                                                    <Input type="number" min="0" placeholder="0" {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
                                 <div className="flex items-end gap-2">
                                     <div className="flex-1">
                                         <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Stock</label>
@@ -761,7 +777,7 @@ export function AgroChemicalForm({ agroChemical, mode = "create" }: AgroChemical
                             type="button"
                             variant="outline"
                             size="sm"
-                            onClick={() => appendVariant({ sku: "", name: "", sale_price: 0, was_price: 0, stock_level: 0 })}
+                            onClick={() => appendVariant({ sku: "", name: "", sale_price: 0, was_price: 0, weight_grams: 0, stock_level: 0 })}
                         >
                             + Add Pack Size
                         </Button>
@@ -887,6 +903,21 @@ export function AgroChemicalForm({ agroChemical, mode = "create" }: AgroChemical
                                         <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Was Price (USD)</label>
                                         <FormControl>
                                             <Input type="number" step="0.01" min="0" placeholder="0.00" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+                        <div className="sm:col-span-2">
+                            <FormField
+                                control={form.control}
+                                name="weight_grams"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Weight (grams)</label>
+                                        <FormControl>
+                                            <Input type="number" min="0" placeholder="0" {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>

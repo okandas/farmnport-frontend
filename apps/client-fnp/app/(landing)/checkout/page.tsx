@@ -53,6 +53,7 @@ interface CartItem {
   unit_price: number
   quantity: number
   sku: string
+  weight_grams?: number
   fulfillment?: {
     delivery_available: boolean
     pickup_available: boolean
@@ -107,7 +108,7 @@ export default function CheckoutPage() {
   const [selectedMethod, setSelectedMethod] = useState("")
   const [selectedLocationId, setSelectedLocationId] = useState("")
   const [tumiraSearch, setTumiraSearch] = useState("")
-  const [tumiraOpen, setTumiraOpen] = useState(false)
+  const [tumiraVisible, setTumiraVisible] = useState(4)
   const [fulfillment, setFulfillment] = useState<"click_collect" | "delivery">("click_collect")
   const [selectedCourierId, setSelectedCourierId] = useState("")
   const [courierSearch, setCourierSearch] = useState("")
@@ -135,13 +136,6 @@ export default function CheckoutPage() {
   const [watchedName, watchedAddress, watchedCity, watchedProvince] = watch(["address_name", "address_line", "city", "province"])
   const deliveryAddressComplete = fulfillment === "delivery" && !!(watchedName && watchedAddress && watchedCity && watchedProvince)
 
-  const { data: deliveryRatesData, isFetching: ratesFetching } = useQuery({
-    queryKey: ["tumira-delivery-rates", watchedName, watchedAddress, watchedCity, watchedProvince],
-    queryFn: () => queryTumiraDeliveryRates({ name: watchedName, address: watchedAddress, city: watchedCity, province: watchedProvince }).then((r) => r.data?.couriers as DeliveryCourier[]),
-    enabled: deliveryAddressComplete,
-    staleTime: 60_000,
-  })
-
   const { data: cartData, isLoading: cartLoading } = useQuery({
     queryKey: ["cart"],
     queryFn: () => getCart().then((r) => r.data as Cart),
@@ -149,6 +143,18 @@ export default function CheckoutPage() {
   })
 
   const items: CartItem[] = cartData?.items ?? []
+  const totalWeightGrams = items.reduce((sum, item) => sum + item.quantity * (item.weight_grams || 5000), 0)
+
+  const { data: deliveryRatesData, isFetching: ratesFetching } = useQuery({
+    queryKey: ["tumira-delivery-rates", watchedName, watchedAddress, watchedCity, watchedProvince, totalWeightGrams],
+    queryFn: () => queryTumiraDeliveryRates({
+      from: { name: "Farmnport", address: "Harare CBD", city: "Harare", province: "Harare" },
+      to: { name: watchedName, address: watchedAddress, city: watchedCity, province: watchedProvince },
+      parcel: { weight_grams: totalWeightGrams || 5000 },
+    }).then((r) => r.data?.couriers as DeliveryCourier[]),
+    enabled: deliveryAddressComplete,
+    staleTime: 60_000,
+  })
   const pickupLocations = items
     .flatMap((i) => i.fulfillment?.pickup_locations ?? [])
     .filter((loc, idx, arr) => arr.findIndex((l) => l.id === loc.id) === idx)
@@ -156,11 +162,18 @@ export default function CheckoutPage() {
   const subtotalCents = items.reduce((s, i) => s + (i.unit_price * i.quantity), 0)
 
   const needsTumira = fulfillment === "click_collect" || items.some((i) => i.fulfillment?.pickup_available)
-  const { data: tumiraData } = useQuery({
-    queryKey: ["tumira-locations"],
-    queryFn: () => queryTumira().then((r) => r.data?.locations as Tumira[]),
-    enabled: needsTumira,
 
+  const [debouncedSearch, setDebouncedSearch] = useState("")
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(tumiraSearch), 300)
+    return () => clearTimeout(t)
+  }, [tumiraSearch])
+
+  const { data: tumiraData } = useQuery({
+    queryKey: ["tumira-locations", debouncedSearch],
+    queryFn: () => queryTumira(debouncedSearch).then((r) => r.data?.locations as Tumira[]),
+    enabled: needsTumira,
+    placeholderData: (prev: Tumira[] | undefined) => prev,
   })
   const tumiraLocations: Tumira[] = tumiraData ?? []
   const selectedTumira = tumiraLocations.find((l) => l.id === selectedLocationId)
@@ -403,14 +416,9 @@ function onSubmit(data: CheckoutForm) {
               )}
 
               {/* Tumira Pickup Points */}
-              {needsTumira && tumiraLocations.length > 0 && (() => {
+              {needsTumira && (() => {
                 const selected = tumiraLocations.find((l) => l.id === selectedLocationId)
-                const filtered = tumiraLocations.filter((l) =>
-                  tumiraSearch === "" ||
-                  l.name.toLowerCase().includes(tumiraSearch.toLowerCase()) ||
-                  l.city.toLowerCase().includes(tumiraSearch.toLowerCase()) ||
-                  l.courier_name.toLowerCase().includes(tumiraSearch.toLowerCase())
-                )
+                const filtered = tumiraLocations
                 return (
                   <section className="border rounded-xl p-5 space-y-3">
                     <div className="flex items-center justify-between">
@@ -427,13 +435,13 @@ function onSubmit(data: CheckoutForm) {
                       <span className="text-sm">
                         {selected
                           ? <span className="flex flex-col"><span className="font-medium text-sm">{selected.name}</span><span className="text-xs text-muted-foreground">{selected.address}, {selected.city}</span></span>
-                          : <span className="text-muted-foreground">{tumiraLocations.length} pickup locations available</span>
+                          : <span className="text-muted-foreground">{tumiraSearch ? `${tumiraLocations.length} result${tumiraLocations.length !== 1 ? "s" : ""}` : "Search for a pickup hub"}</span>
                         }
                       </span>
                       {selected && (
                         <button
                           type="button"
-                          onClick={() => { setSelectedLocationId(""); setTumiraSearch(""); setTumiraOpen(true) }}
+                          onClick={() => { setSelectedLocationId(""); setTumiraSearch("") }}
                           className="ml-auto text-xs text-muted-foreground hover:text-foreground"
                         >
                           Change
@@ -441,45 +449,47 @@ function onSubmit(data: CheckoutForm) {
                       )}
                     </div>
 
-                    {/* Searchable dropdown */}
+                    {/* Searchable list with infinite scroll */}
                     {!selected && (
-                      <div className="relative">
-                        <div
-                          className="flex items-center border rounded-lg px-3 py-2 gap-2 focus-within:ring-2 focus-within:ring-ring cursor-text"
-                          onClick={() => setTumiraOpen(true)}
-                        >
+                      <div className="space-y-2">
+                        <div className="flex items-center border rounded-lg px-3 py-2 gap-2 focus-within:ring-2 focus-within:ring-ring">
                           <input
                             type="text"
                             placeholder="Search by city, hub or courier..."
                             value={tumiraSearch}
-                            onChange={(e) => { setTumiraSearch(e.target.value); setTumiraOpen(true) }}
-                            onFocus={() => setTumiraOpen(true)}
+                            onChange={(e) => { setTumiraSearch(e.target.value); setTumiraVisible(4) }}
                             className="flex-1 text-sm bg-transparent outline-none"
                           />
                         </div>
-                        {tumiraOpen && tumiraSearch.length > 0 && (
-                          <div className="absolute z-10 mt-1 w-full border rounded-lg bg-background shadow-md overflow-hidden">
-                            {filtered.length === 0 ? (
-                              <p className="px-4 py-2.5 text-sm text-muted-foreground">No locations found</p>
-                            ) : (
-                              filtered.map((loc) => (
-                                <button
-                                  key={loc.id}
-                                  type="button"
-                                  onClick={() => { setSelectedLocationId(loc.id); setTumiraOpen(false); setTumiraSearch("") }}
-                                  className="w-full text-left px-4 py-2.5 hover:bg-muted/50 transition-colors border-b last:border-b-0 flex items-center justify-between gap-3"
-                                >
-                                  <div className="min-w-0">
-                                    <p className="text-sm font-medium">{loc.name}</p>
-                                    <p className="text-xs text-muted-foreground">{loc.address}, {loc.city}</p>
-                                    <p className="text-xs"><span className="text-primary font-medium">{loc.courier_name}</span> <span className="text-muted-foreground">hub</span></p>
-                                  </div>
-                                  <span className="text-xs font-semibold shrink-0">{centsToDollars(loc.rate ?? 0)}</span>
-                                </button>
-                              ))
-                            )}
-                          </div>
-                        )}
+                        <div
+                          className="border rounded-lg overflow-y-auto max-h-64"
+                          onScroll={(e) => {
+                            const el = e.currentTarget
+                            if (el.scrollTop + el.clientHeight >= el.scrollHeight - 40) {
+                              setTumiraVisible((v) => Math.min(v + 4, filtered.length))
+                            }
+                          }}
+                        >
+                          {filtered.length === 0 ? (
+                            <p className="px-4 py-3 text-sm text-muted-foreground">No locations found</p>
+                          ) : (
+                            filtered.slice(0, tumiraVisible).map((loc) => (
+                              <button
+                                key={loc.id}
+                                type="button"
+                                onClick={() => { setSelectedLocationId(loc.id); setTumiraSearch("") }}
+                                className="w-full text-left px-4 py-3 hover:bg-muted/50 transition-colors border-b last:border-b-0 flex items-center justify-between gap-3"
+                              >
+                                <div className="min-w-0">
+                                  <p className="text-sm font-medium">{loc.name}</p>
+                                  <p className="text-xs text-muted-foreground">{loc.address}, {loc.city}</p>
+                                  <p className="text-xs"><span className="text-primary font-medium">{loc.courier_name}</span> <span className="text-muted-foreground">hub</span></p>
+                                </div>
+                                <span className="text-xs font-semibold shrink-0">{centsToDollars(loc.rate ?? 0)}</span>
+                              </button>
+                            ))
+                          )}
+                        </div>
                       </div>
                     )}
                   </section>
@@ -651,7 +661,6 @@ function onSubmit(data: CheckoutForm) {
                       )}
                       {/* Selected badge */}
                       {selectedCourier && (() => {
-                        const isHubPickup = selectedCourier.service_type === "hub_to_hub" || selectedCourier.service_type === "door_to_hub"
                         return (
                           <div className="rounded-lg bg-primary/5 border border-primary px-3 py-3 space-y-1">
                             <div className="flex items-center justify-between">

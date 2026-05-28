@@ -517,6 +517,7 @@ export const AgroChemicalSchema = z.object({
     was_price: z.coerce.number().nonnegative().default(0),
     wholesale_price: z.coerce.number().nonnegative().default(0),
     stock_level: z.coerce.number().int().nonnegative().default(0),
+    weight_grams: z.coerce.number().int().nonnegative().default(0),
   })).optional().default([]),
   precautions: z.array(z.string()).optional().default([]),
   product_overview: z.string().optional().default(""),
@@ -526,12 +527,16 @@ export const AgroChemicalSchema = z.object({
   sale_price: z.coerce.number().nonnegative().default(0),
   show_was_price: z.boolean().default(false),
   was_price: z.coerce.number().nonnegative().default(0),
+  weight_grams: z.coerce.number().int().nonnegative().default(0),
   delivery_available: z.boolean().default(false),
   pickup_available: z.boolean().default(false),
   pickup_location_ids: z.array(z.string()).optional().default([]),
   delivery_location_ids: z.array(z.string()).optional().default([]),
   created: z.string().optional(),
   updated: z.string().optional(),
+}).refine(data => !data.available_for_sale || data.weight_grams > 0, {
+  message: "Weight is required before enabling available for sale",
+  path: ["weight_grams"],
 })
 
 export const ActiveIngredientRelationSchema = z.object({
@@ -790,15 +795,20 @@ export const AnimalHealthProductSchema = z.object({
     sale_price: z.coerce.number().nonnegative().default(0),
     was_price: z.coerce.number().nonnegative().default(0),
     wholesale_price: z.coerce.number().nonnegative().default(0),
+    weight_grams: z.coerce.number().int().nonnegative().default(0),
   })).default([]),
   precautions: z.array(z.string()).default([]),
   status: z.enum(["active", "inactive"]).default("active"),
+  weight_grams: z.coerce.number().int().nonnegative().default(0),
   delivery_available: z.boolean().default(false),
   pickup_available: z.boolean().default(false),
   pickup_location_ids: z.array(z.string()).optional().default([]),
   delivery_location_ids: z.array(z.string()).optional().default([]),
   created: z.string().optional(),
   updated: z.string().optional(),
+}).refine(data => !data.available_for_sale || data.weight_grams > 0, {
+  message: "Weight is required before enabling available for sale",
+  path: ["weight_grams"],
 })
 
 export const FormAnimalHealthProductSchema = AnimalHealthProductSchema
@@ -1002,8 +1012,12 @@ export const FeedProductSchema = z.object({
   show_price: z.boolean().default(true),
   sale_price: z.coerce.number().nonnegative().default(0),
   was_price: z.coerce.number().nonnegative().default(0),
+  weight_grams: z.coerce.number().int().nonnegative().default(0),
   created: z.string().optional(),
   updated: z.string().optional(),
+}).refine(data => !data.available_for_sale || data.weight_grams > 0, {
+  message: "Weight is required before enabling available for sale",
+  path: ["weight_grams"],
 })
 
 export const FormFeedProductSchema = FeedProductSchema

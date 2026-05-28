@@ -740,11 +740,16 @@ export function pollOrderStatus(reference: string) {
   return api.post(`${BaseURL}/order/poll`, { reference })
 }
 
-export function queryTumira() {
-  return api.get(`${BaseURL}/tumira/`)
+export function queryTumira(search?: string) {
+  const qs = search ? `?search=${encodeURIComponent(search)}` : ""
+  return api.get(`${BaseURL}/tumira/${qs}`)
 }
 
-export function queryTumiraDeliveryRates(payload: { name: string; address: string; city: string; province: string }) {
+export function queryTumiraDeliveryRates(payload: {
+  from: { name: string; address: string; city: string; province: string }
+  to: { name: string; address: string; city: string; province: string }
+  parcel: { weight_grams: number }
+}) {
   return api.post(`${BaseURL}/tumira/delivery-rates`, payload)
 }
 
@@ -914,4 +919,14 @@ export function querySeedProductFilterAggregates() {
 
 export function querySeedProductBuyFilterAggregates() {
   return api.get(`${BaseURL}/seed-products/buy/aggregates/filters`)
+}
+
+// ── Tumira Shipping Rates ──────────────────────────────────────────────────────
+
+export function queryTumiraRates(payload: {
+  from: { name: string; address: string; city: string; province: string }
+  to: { name: string; address: string; city: string; province: string }
+  parcel: { weight_grams: number; length_cm?: number; width_cm?: number; height_cm?: number }
+}) {
+  return api.post(`${BaseURL}/v1/tumira/delivery-rates`, payload)
 }

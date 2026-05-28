@@ -18,6 +18,11 @@ let base = process.env.NEXT_PUBLIC_BASE_URL
 let version = "/v1"
 let baseUrl = base + version
 
+let tumiraBase = process.env.NEXT_PUBLIC_TUMIRA_URL
+let tumiraUrl = tumiraBase + version
+let tumiraAdminUrl = tumiraBase + version + "/admin"
+let tumiraSecret = process.env.NEXT_PUBLIC_TUMIRA_SECRET || ""
+
 let api = axios.create({})
 
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
@@ -1640,4 +1645,64 @@ export function updateBreed(data: { id: string; name: string; farm_produce_id: s
 
 export function deleteBreed(id: string) {
   return api.delete(`${baseUrl}/breeds/${id}`)
+}
+
+// ── Tumira ────────────────────────────────────────────────────────────────────
+
+type tumiraPagination = { p?: number; search?: string; limit?: number }
+
+const tumiraAdminHeaders = { "X-Admin-Secret": tumiraSecret }
+
+export function queryTumiraWards(pagination?: tumiraPagination) {
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) params.set("p", String(pagination.p))
+  if (pagination?.search && pagination.search.length >= 2) params.set("search", pagination.search)
+  if (pagination?.limit !== undefined) params.set("limit", String(pagination.limit))
+  const qs = params.toString()
+  return api.get(`${tumiraAdminUrl}/zones${qs ? `?${qs}` : ""}`, { headers: tumiraAdminHeaders })
+}
+
+export function queryTumiraCouriers(pagination?: tumiraPagination) {
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) params.set("p", String(pagination.p))
+  if (pagination?.search && pagination.search.length >= 2) params.set("search", pagination.search)
+  if (pagination?.limit !== undefined) params.set("limit", String(pagination.limit))
+  const qs = params.toString()
+  return api.get(`${tumiraAdminUrl}/couriers${qs ? `?${qs}` : ""}`, { headers: tumiraAdminHeaders })
+}
+
+export function queryTumiraCourierRates(pagination?: tumiraPagination) {
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) params.set("p", String(pagination.p))
+  if (pagination?.search && pagination.search.length >= 2) params.set("search", pagination.search)
+  if (pagination?.limit !== undefined) params.set("limit", String(pagination.limit))
+  const qs = params.toString()
+  return api.get(`${tumiraAdminUrl}/courier-rates${qs ? `?${qs}` : ""}`, { headers: tumiraAdminHeaders })
+}
+
+export function queryTumiraDeliveryPoints(pagination?: tumiraPagination) {
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) params.set("p", String(pagination.p))
+  if (pagination?.search && pagination.search.length >= 2) params.set("search", pagination.search)
+  if (pagination?.limit !== undefined) params.set("limit", String(pagination.limit))
+  const qs = params.toString()
+  return api.get(`${tumiraAdminUrl}/points${qs ? `?${qs}` : ""}`, { headers: tumiraAdminHeaders })
+}
+
+export function queryTumiraVanityCodes(pagination?: tumiraPagination) {
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) params.set("p", String(pagination.p))
+  if (pagination?.search && pagination.search.length >= 2) params.set("search", pagination.search)
+  if (pagination?.limit !== undefined) params.set("limit", String(pagination.limit))
+  const qs = params.toString()
+  return api.get(`${tumiraAdminUrl}/vanity${qs ? `?${qs}` : ""}`, { headers: tumiraAdminHeaders })
+}
+
+export function queryTumiraCourierCollectionPoints(params?: { p?: number; limit?: number; courier_id?: string }) {
+  const qs = new URLSearchParams()
+  if (params?.p !== undefined && params.p >= 2) qs.set("p", String(params.p))
+  if (params?.limit !== undefined) qs.set("limit", String(params.limit))
+  if (params?.courier_id) qs.set("courier_id", params.courier_id)
+  const q = qs.toString()
+  return api.get(`${tumiraAdminUrl}/courier-collection-points${q ? `?${q}` : ""}`, { headers: tumiraAdminHeaders })
 }

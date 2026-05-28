@@ -63,6 +63,7 @@ import {
   MessageSquare,
   Send,
   Mail,
+  Box,
 } from "lucide-react"
 
 export type Icon = LucideIcon
@@ -134,4 +135,5 @@ export const Icons = {
   messageSquare: MessageSquare,
   send: Send,
   mail: Mail,
+  box: Box,
 }

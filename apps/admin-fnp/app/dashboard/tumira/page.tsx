@@ -21,7 +21,7 @@ export default function TumiraPage() {
       label: "Network",
       items: [
         {
-          href: "/dashboard/tumira/delivery-points",
+          href: "/dashboard/tumira/collection-points",
           name: "Collection Points",
           description: "Registered delivery point codes.",
         },

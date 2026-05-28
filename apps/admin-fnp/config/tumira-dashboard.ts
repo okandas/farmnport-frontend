@@ -36,8 +36,13 @@ export const tumiraDashboardConfig: DashboardConfig = {
       items: [
         {
           title: "Collection Points",
-          href: "/dashboard/tumira/delivery-points",
-          icon: "layers",
+          href: "/dashboard/tumira/collection-points",
+          icon: "box",
+        },
+        {
+          title: "Courier Collection Points",
+          href: "/dashboard/tumira/courier-collection-points",
+          icon: "send",
         },
         {
           title: "Wards",
