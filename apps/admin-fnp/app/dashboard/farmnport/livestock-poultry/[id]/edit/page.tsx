@@ -17,12 +17,13 @@ import { handleApiError } from "@/lib/error-handler"
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Checkbox } from "@/components/ui/checkbox"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
 import { Check, ChevronsUpDown } from "lucide-react"
 import { SearchSelect } from "@/components/ui/search-select"
-import { LocationMultiSelect, SelectedLocation } from "@/components/ui/location-multi-select"
+import { SelectedLocation } from "@/components/ui/location-multi-select"
+import { ProductPricingSection } from "@/components/structures/forms/product-pricing-section"
+import { ProductFulfillmentSection } from "@/components/structures/forms/product-fulfillment-section"
 
 const inputClass = "block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-primary sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-primary"
 
@@ -56,6 +57,7 @@ const Schema = z.object({
     show_price: z.boolean().default(false),
     sale_price: z.coerce.number().default(0),
     was_price: z.coerce.number().default(0),
+    weight_grams: z.coerce.number().int().nonnegative().default(0),
     delivery_available: z.boolean().default(false),
     pickup_available: z.boolean().default(false),
 }).refine((data) => !!data.brand_id || !!data.seller_id, {
@@ -122,6 +124,7 @@ function EditForm({ product }: { product: any }) {
             show_price: product?.show_price || false,
             sale_price: product?.sale_price || 0,
             was_price: product?.was_price || 0,
+            weight_grams: product?.weight_grams ?? 0,
             delivery_available: product?.delivery_available || false,
             pickup_available: (product as any)?.pickup_available || false,
         },
@@ -524,86 +527,18 @@ function EditForm({ product }: { product: any }) {
                             </div>
                         </div>
 
-                        {/* Pricing & Stock */}
-                        <div className="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-gray-900/10 pb-12 md:grid-cols-3 dark:border-white/10">
-                            <div>
-                                <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">Pricing & Stock</h2>
-                                <p className="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">Visibility and base pricing settings.</p>
-                            </div>
-                            <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6 md:col-span-2">
-                                <div className="sm:col-span-3 flex items-center gap-4">
-                                    <FormField control={form.control} name="show_price" render={({ field }) => (
-                                        <FormItem className="flex items-center gap-2"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl>
-                                            <label className="text-sm font-medium text-gray-900 dark:text-white cursor-pointer" onClick={() => field.onChange(!field.value)}>Show Price</label>
-                                        </FormItem>
-                                    )} />
-                                </div>
-                                <div className="sm:col-span-3 flex items-center gap-4">
-                                    <FormField control={form.control} name="available_for_sale" render={({ field }) => (
-                                        <FormItem className="flex items-center gap-2"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl>
-                                            <label className="text-sm font-medium text-gray-900 dark:text-white cursor-pointer" onClick={() => field.onChange(!field.value)}>Available for Sale</label>
-                                        </FormItem>
-                                    )} />
-                                </div>
-                                <div className="sm:col-span-2">
-                                    <FormField control={form.control} name="sale_price" render={({ field }) => (
-                                        <FormItem><label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Sale Price (USD)</label><FormControl><Input type="number" step="0.01" min="0" placeholder="0.00" {...field} /></FormControl><FormMessage /></FormItem>
-                                    )} />
-                                </div>
-                                <div className="sm:col-span-2">
-                                    <FormField control={form.control} name="was_price" render={({ field }) => (
-                                        <FormItem><label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Was Price (USD)</label><FormControl><Input type="number" step="0.01" min="0" placeholder="0.00" {...field} /></FormControl><FormMessage /></FormItem>
-                                    )} />
-                                </div>
-                                <div className="sm:col-span-2">
-                                    <FormField control={form.control} name="stock_level" render={({ field }) => (
-                                        <FormItem><label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Stock Level</label><FormControl><Input type="number" min="0" placeholder="0" {...field} /></FormControl><FormMessage /></FormItem>
-                                    )} />
-                                </div>
-                            </div>
-                        </div>
+                        <ProductPricingSection control={form.control} />
 
-                        {/* Fulfillment */}
-                        <div className="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-gray-900/10 pb-12 md:grid-cols-3 dark:border-white/10">
-                            <div>
-                                <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">Fulfillment</h2>
-                                <p className="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">Where customers can collect or receive this product.</p>
-                            </div>
-                            <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6 md:col-span-2">
-                                <div className="sm:col-span-6">
-                                    <label className="block text-sm/6 font-medium text-gray-900 dark:text-white mb-2">Pickup Locations</label>
-                                    <LocationMultiSelect
-                                        queryKey="livestock-pickup-locations"
-                                        allLocations={allLocations}
-                                        selected={pickupLocations ?? []}
-                                        onChange={setPickupLocations}
-                                    />
-                                </div>
-                                <div className="sm:col-span-6">
-                                    <label className="block text-sm/6 font-medium text-gray-900 dark:text-white mb-2">Delivery Locations</label>
-                                    <LocationMultiSelect
-                                        queryKey="livestock-delivery-locations"
-                                        allLocations={allLocations}
-                                        selected={deliveryLocations ?? []}
-                                        onChange={setDeliveryLocations}
-                                    />
-                                </div>
-                                <div className="sm:col-span-6 flex items-center gap-4">
-                                    <FormField control={form.control} name="delivery_available" render={({ field }) => (
-                                        <FormItem className="flex items-center gap-2">
-                                            <FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl>
-                                            <label className="text-sm font-medium text-gray-900 dark:text-white cursor-pointer" onClick={() => field.onChange(!field.value)}>Delivery Available (free-form address)</label>
-                                        </FormItem>
-                                    )} />
-                                    <FormField control={form.control} name="pickup_available" render={({ field }) => (
-                                        <FormItem className="flex items-center gap-2">
-                                            <FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl>
-                                            <label className="text-sm font-medium text-gray-900 dark:text-white cursor-pointer" onClick={() => field.onChange(!field.value)}>Pick Up Available (tumira api pickup points)</label>
-                                        </FormItem>
-                                    )} />
-                                </div>
-                            </div>
-                        </div>
+                        <ProductFulfillmentSection
+                            control={form.control}
+                            allLocations={allLocations}
+                            pickupLocations={pickupLocations ?? []}
+                            setPickupLocations={setPickupLocations}
+                            deliveryLocations={deliveryLocations ?? []}
+                            setDeliveryLocations={setDeliveryLocations}
+                            pickupQueryKey="livestock-pickup-locations"
+                            deliveryQueryKey="livestock-delivery-locations"
+                        />
 
                     </div>
 
