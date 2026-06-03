@@ -156,29 +156,29 @@ export function Contacts({ user, client, quickOverview }: ContactPageProps) {
     }
 
     return (
-        <section className="space-y-8 py-1">
-           <div className="py-4">
+        <section className={quickOverview ? "" : "space-y-8 py-1"}>
+           <div className={quickOverview ? "py-1" : "py-4"}>
                 <dl className="grid grid-cols-1 lg:grid-cols-2 text-sm leading-6">
                     <div className="flex gap-x-4 py-2">
-                        <dt>
-                            <span className="sr-only">Joined</span>
-                            <Icons.calender className="h-6 w-5" aria-hidden="true" />
+                        <dt className="flex items-center gap-1 text-xs text-muted-foreground w-24 shrink-0">
+                            <Icons.calender className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                            Date Joined
                         </dt>
-                        <dd className="text-sm font-medium leading-6 text-muted-foreground">{formatDate(client.created)}</dd>
+                        <dd className="text-sm font-medium leading-6">· {formatDate(client.created)}</dd>
                     </div>
                     {client.address && (
                         <div className="flex gap-x-4 py-1">
-                            <dt>
-                                <span className="sr-only">Address</span>
-                                <Icons.map className="h-6 w-5" aria-hidden="true" />
+                            <dt className="flex items-center gap-1 text-xs text-muted-foreground w-24 shrink-0">
+                                <Icons.map className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                                Address
                             </dt>
-                            <dd className="text-sm font-medium leading-6 text-muted-foreground">{client.address}</dd>
+                            <dd className="text-sm font-medium leading-6">{client.address?.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}</dd>
                         </div>
                     )}
                     <div className="flex gap-x-4 py-1">
-                        <dt>
-                            <span className="sr-only">Phone</span>
-                            <Icons.phone className="h-6 w-5" aria-hidden="true" />
+                        <dt className="flex items-center gap-1 text-xs text-muted-foreground w-24 shrink-0">
+                            <Icons.phone className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                            Phone
                         </dt>
 
                         {
@@ -189,16 +189,16 @@ export function Contacts({ user, client, quickOverview }: ContactPageProps) {
 
                     </div>
                     <div className="flex gap-x-4 py-1">
-                        <dt>
-                            <span className="sr-only">City, Province</span>
-                            <Icons.landmark className="h-6 w-5" aria-hidden="true" />
+                        <dt className="flex items-center gap-1 text-xs text-muted-foreground w-24 shrink-0">
+                            <Icons.landmark className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                            City, Province
                         </dt>
-                        <dd className="text-sm font-medium leading-6 text-muted-foreground">{client.city?.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}, {client.province?.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}</dd>
+                        <dd className="text-sm font-medium leading-6">· {client.city?.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}, {client.province?.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}</dd>
                     </div>
                     <div className="flex gap-x-4 py-1">
-                        <dt>
-                            <span className="sr-only">Email</span>
-                            <Icons.mail className="h-6 w-5" aria-hidden="true" />
+                        <dt className="flex items-center gap-1 text-xs text-muted-foreground w-24 shrink-0">
+                            <Icons.mail className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                            Email
                         </dt>
 
                         {
@@ -207,29 +207,23 @@ export function Contacts({ user, client, quickOverview }: ContactPageProps) {
                             : (<ShowEmail email={client.email} />)
                         }
                     </div>
-                    { quickOverview ?
-                            <div className="flex gap-x-4 py-1">
-                                <dt>
-                                    <span className="sr-only">Quick overview</span>
-                                    <Icons.info className="h-6 w-5" aria-hidden="true" />
-                                </dt>
-                                <div>
-                                    <dd className="text-sm font-medium leading-6 text-muted-foreground">{capitalizeFirstLetter(client.type)} primarily specializes in <span className="font-semibold text-foreground">{client.primary_category?.name ? capitalizeFirstLetter(client.primary_category.name) : 'Agriculture'}</span></dd>
-                                    <dd className="text-sm font-medium leading-6 text-muted-foreground">Mainly buying <span className="font-semibold text-foreground">{client.main_produce?.name ? capitalizeFirstLetter(plural(client.main_produce.name)) : 'various products'}</span></dd>
-                                  {client.other_produce && client.other_produce.length > 0 ? (
-                                      <dd className="text-sm font-medium leading-6 text-muted-foreground">and {client.type == 'buyer' ? "sources ": "produces "}
-                                        <span className="font-semibold text-foreground">{client.other_produce.length}</span> other agricultural {plural("product", client.other_produce.length)}, see more
-                                      </dd>
-                                    )
-                                    :
-                                    null
-                                  }
-                                </div>
 
-                            </div>
-                        :
-                            null
-                     }
+                    {quickOverview && (client.main_produce || (client.other_produce && client.other_produce.length > 0)) && (
+                        <div className="flex gap-x-4 py-1">
+                            <dt className="flex items-center gap-1 text-xs text-muted-foreground w-24 shrink-0">
+                                <Icons.info className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                                Produces
+                            </dt>
+                            <ul className="space-y-0.5">
+                                {client.main_produce?.name && (
+                                    <li className="text-sm text-foreground">· {capitalizeFirstLetter(client.main_produce.name)}</li>
+                                )}
+                                {client.other_produce?.map((p: any, i: number) => (
+                                    <li key={i} className="text-sm text-foreground">· {capitalizeFirstLetter(p.name)}</li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
 
                 </dl>
             </div>

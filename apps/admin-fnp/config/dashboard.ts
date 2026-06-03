@@ -32,13 +32,8 @@ export const dashboardConfig: DashboardConfig = {
       label: "Pricing",
       items: [
         {
-          title: "LWT Prices",
-          href: "/dashboard/farmnport/prices",
-          icon: "billing",
-        },
-        {
-          title: "CDM Prices",
-          href: "/dashboard/farmnport/cdm-prices",
+          title: "Price Series",
+          href: "/dashboard/farmnport/prices/series",
           icon: "billing",
         },
       ],
@@ -59,7 +54,7 @@ export const dashboardConfig: DashboardConfig = {
       ],
     },
     {
-      label: "Orders",
+      label: "Pre Orders",
       alwaysOpen: true,
       items: [
         {
@@ -83,24 +78,9 @@ export const dashboardConfig: DashboardConfig = {
       label: "Analytics",
       items: [
         {
-          title: "Most Viewed Contacts",
-          href: "/dashboard/farmnport/contact-views/most-viewed",
+          title: "Analytics",
+          href: "/dashboard/farmnport/analytics",
           icon: "eye",
-        },
-        {
-          title: "Recent Views",
-          href: "/dashboard/farmnport/analytics/recent-views",
-          icon: "calender",
-        },
-        {
-          title: "User Views",
-          href: "/dashboard/farmnport/analytics/user-views",
-          icon: "user",
-        },
-        {
-          title: "Recent User Views",
-          href: "/dashboard/farmnport/analytics/recent-user-views",
-          icon: "calender",
         },
       ],
     },

@@ -11,7 +11,7 @@ import { useQueryStates, parseAsArrayOf, parseAsString } from "nuqs"
 import { Filter, X, Search } from "lucide-react"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { useQuery } from "@tanstack/react-query"
-import { queryPriceFilterAggregates } from "@/lib/query"
+import { queryPriceFilterAggregates, queryClientFilterAggregates } from "@/lib/query"
 import { useState, useMemo } from "react"
 
 interface FilterItem {
@@ -96,61 +96,40 @@ function SearchableCheckboxList({
   )
 }
 
-function FilterContent({
+function ClientFilterContent({
   onClearAll,
-  hideProduce
+  hideProduce,
+  clientType
 }: {
   onClearAll: () => void
   hideProduce?: boolean
+  clientType: "farmers" | "buyers"
 }) {
   const [queryState, setQueryState] = useQueryStates({
-    produce: parseAsArrayOf(parseAsString),
-    clients: parseAsArrayOf(parseAsString),
+    produce: parseAsString,
+    category: parseAsString,
   })
 
-  // Fetch aggregate data
-  const { data: aggregateData, isLoading: isLoadingAggregates } = useQuery({
-    queryKey: ["price-filter-aggregates"],
+  const { data: aggregateData, isLoading } = useQuery({
+    queryKey: ["client-filter-aggregates", clientType],
     queryFn: async () => {
-      const response = await queryPriceFilterAggregates()
+      const response = await queryClientFilterAggregates(clientType)
       return response.data
     },
   })
 
-  const produceItems = useMemo(() => {
-    return aggregateData?.produce || []
-  }, [aggregateData])
+  const produceItems: FilterItem[] = useMemo(() => aggregateData?.produce || [], [aggregateData])
+  const categoryItems: FilterItem[] = useMemo(() => aggregateData?.categories || [], [aggregateData])
 
-  const clientItems = useMemo(() => {
-    return aggregateData?.clients || []
-  }, [aggregateData])
-
-  const handleToggle = (filterKey: string, value: string) => {
-    const currentValues = queryState[filterKey as keyof typeof queryState] || []
-    const newValues = currentValues.includes(value)
-      ? currentValues.filter(v => v !== value)
-      : [...currentValues, value]
-
-    setQueryState({
-      [filterKey]: newValues.length > 0 ? newValues : null
-    })
+  const handleSelect = (filterKey: "produce" | "category", value: string) => {
+    setQueryState({ [filterKey]: queryState[filterKey] === value ? null : value })
   }
 
-  const totalFilters = Object.values(queryState).reduce((acc, val) => acc + (val?.length || 0), 0)
+  const totalFilters = [queryState.produce, queryState.category].filter(Boolean).length
 
   const filterSections = [
-    ...(!hideProduce ? [{
-      name: "produce",
-      key: "produce",
-      items: produceItems,
-      isLoading: isLoadingAggregates
-    }] : []),
-    {
-      name: "clients",
-      key: "clients",
-      items: clientItems,
-      isLoading: isLoadingAggregates
-    },
+    ...(!hideProduce ? [{ name: "produce", key: "produce" as const, items: produceItems }] : []),
+    { name: "category", key: "category" as const, items: categoryItems },
   ]
 
   return (
@@ -160,12 +139,7 @@ function FilterContent({
           <span className="text-sm text-muted-foreground">
             {totalFilters} filter{totalFilters !== 1 ? 's' : ''} applied
           </span>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onClearAll}
-            className="h-8 px-2 lg:px-3"
-          >
+          <Button variant="ghost" size="sm" onClick={onClearAll} className="h-8 px-2 lg:px-3">
             Clear all
             <X className="ml-2 h-4 w-4" />
           </Button>
@@ -174,7 +148,92 @@ function FilterContent({
 
       <Accordion type="multiple" className="w-full flex-1" defaultValue={[]}>
         {filterSections.map((section) => {
-          const selectedFilters = queryState[section.key as keyof typeof queryState] || []
+          const selected = queryState[section.key]
+
+          return (
+            <AccordionItem value={section.name} key={section.key}>
+              <AccordionTrigger>
+                <div className="flex items-center justify-between w-full pr-2">
+                  <span>{capitalizeFirstLetter(section.name)}</span>
+                  {selected && (
+                    <span className="text-xs bg-primary text-primary-foreground rounded-full px-2 py-0.5">1</span>
+                  )}
+                </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                <SearchableCheckboxList
+                  items={section.items}
+                  filterKey={section.key}
+                  selectedItems={selected ? [selected] : []}
+                  onToggle={(value) => handleSelect(section.key, value)}
+                  title={section.name}
+                  isLoading={isLoading}
+                />
+              </AccordionContent>
+            </AccordionItem>
+          )
+        })}
+      </Accordion>
+    </div>
+  )
+}
+
+function FilterContent({
+  onClearAll,
+  hideProduce,
+}: {
+  onClearAll: () => void
+  hideProduce?: boolean
+}) {
+  const [queryState, setQueryState] = useQueryStates({
+    produce: parseAsArrayOf(parseAsString),
+    clients: parseAsArrayOf(parseAsString),
+  })
+
+  const { data: aggregateData, isLoading: isLoadingAggregates } = useQuery({
+    queryKey: ["price-filter-aggregates"],
+    queryFn: async () => {
+      const response = await queryPriceFilterAggregates()
+      return response.data
+    },
+  })
+
+  const produceItems = useMemo(() => aggregateData?.produce || [], [aggregateData])
+  const clientItems = useMemo(() => aggregateData?.clients || [], [aggregateData])
+
+  const handleToggle = (filterKey: string, value: string) => {
+    const currentValues = (queryState as any)[filterKey] || []
+    const newValues = currentValues.includes(value)
+      ? currentValues.filter((v: string) => v !== value)
+      : [...currentValues, value]
+
+    setQueryState({ [filterKey]: newValues.length > 0 ? newValues : null } as any)
+  }
+
+  const totalFilters = Object.values(queryState).reduce((acc, val) => acc + (val?.length || 0), 0)
+
+  const filterSections = [
+    ...(!hideProduce ? [{ name: "produce", key: "produce", items: produceItems, isLoading: isLoadingAggregates }] : []),
+    { name: "clients", key: "clients", items: clientItems, isLoading: isLoadingAggregates },
+  ]
+
+  return (
+    <div className="flex flex-col h-full">
+      {totalFilters > 0 && (
+        <div className="flex items-center justify-between mb-4 pb-4 border-b">
+          <span className="text-sm text-muted-foreground">
+            {totalFilters} filter{totalFilters !== 1 ? 's' : ''} applied
+          </span>
+          <Button variant="ghost" size="sm" onClick={onClearAll} className="h-8 px-2 lg:px-3">
+            Clear all
+            <X className="ml-2 h-4 w-4" />
+          </Button>
+        </div>
+      )}
+
+      <Accordion type="multiple" className="w-full flex-1" defaultValue={[]}>
+        {filterSections.map((section) => {
+          const selectedFilters = (queryState as any)[section.key] || []
 
           return (
             <AccordionItem value={section.name} key={section.key}>
@@ -206,27 +265,32 @@ function FilterContent({
   )
 }
 
-export function FilterSidebar({ hideProduce }: { hideProduce?: boolean } = {}) {
+export function FilterSidebar({ hideProduce, clientType }: { hideProduce?: boolean, clientType?: "farmers" | "buyers" } = {}) {
   const isDesktop = useMediaQuery("(min-width: 1024px)")
-  const [, setQueryState] = useQueryStates({
+  const [, setPriceQueryState] = useQueryStates({
     produce: parseAsArrayOf(parseAsString),
     clients: parseAsArrayOf(parseAsString),
   })
+  const [, setClientQueryState] = useQueryStates({
+    produce: parseAsString,
+    category: parseAsString,
+  })
 
   const handleClearAll = () => {
-    setQueryState({
-      produce: null,
-      clients: null,
-    })
+    if (clientType) {
+      setClientQueryState({ produce: null, category: null })
+    } else {
+      setPriceQueryState({ produce: null, clients: null })
+    }
   }
+
+  const content = clientType
+    ? <ClientFilterContent onClearAll={handleClearAll} hideProduce={hideProduce} clientType={clientType} />
+    : <FilterContent onClearAll={handleClearAll} hideProduce={hideProduce} />
 
   // Desktop: Sticky sidebar
   if (isDesktop) {
-    return (
-      <div>
-        <FilterContent onClearAll={handleClearAll} hideProduce={hideProduce} />
-      </div>
-    )
+    return <div>{content}</div>
   }
 
   // Mobile: Sheet with trigger button
@@ -240,9 +304,9 @@ export function FilterSidebar({ hideProduce }: { hideProduce?: boolean } = {}) {
       </SheetTrigger>
       <SheetContent side="left" className="w-[300px] sm:w-[400px] overflow-y-auto">
         <SheetHeader className="mb-4">
-          <SheetTitle>Filter Prices</SheetTitle>
+          <SheetTitle>Filter {clientType ? capitalizeFirstLetter(clientType) : "Prices"}</SheetTitle>
         </SheetHeader>
-        <FilterContent onClearAll={handleClearAll} hideProduce={hideProduce} />
+        {content}
       </SheetContent>
     </Sheet>
   )

@@ -132,7 +132,7 @@ export default function BookPage() {
           <nav className="flex text-sm text-muted-foreground">
             <Link href="/" className="hover:text-foreground">Home</Link>
             <span className="mx-2">/</span>
-            <Link href={`/buy/${slug}`} className="hover:text-foreground capitalize">{buyerName}</Link>
+            <Link href={`/buyer/${slug}`} className="hover:text-foreground capitalize">{buyerName}</Link>
             <span className="mx-2">/</span>
             <span className="text-foreground">Book a Sale</span>
           </nav>
@@ -341,7 +341,7 @@ export default function BookPage() {
 
             {/* Submit */}
             <div className="p-5 flex items-center justify-between">
-              <Link href={`/buy/${slug}`} className="text-sm text-muted-foreground hover:text-foreground">
+              <Link href={`/buyer/${slug}`} className="text-sm text-muted-foreground hover:text-foreground">
                 Cancel
               </Link>
               <button

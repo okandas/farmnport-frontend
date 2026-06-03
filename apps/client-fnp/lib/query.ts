@@ -132,6 +132,22 @@ export function queryGradeSummary() {
   return api.get(`${BaseURL}/prices/grade-summary`)
 }
 
+export function querySeriesSummary() {
+  return api.get(`${BaseURL}/prices/series/summary`)
+}
+
+export function queryHeadSummary() {
+  return api.get(`${BaseURL}/prices/series/head-summary`)
+}
+
+export function querySeriesChart(category: string, code: string, templateType: string) {
+  return api.get(`${BaseURL}/prices/series/chart?category=${encodeURIComponent(category)}&code=${encodeURIComponent(code)}&template_type=${encodeURIComponent(templateType)}`)
+}
+
+export function querySeriesBuyers(category: string, code: string, templateType: string) {
+  return api.get(`${BaseURL}/prices/series/buyers?category=${encodeURIComponent(category)}&code=${encodeURIComponent(code)}&template_type=${encodeURIComponent(templateType)}`)
+}
+
 export function queryGradeChart(produce: string, code: string) {
   return api.get(`${BaseURL}/prices/grade-chart/${produce.toLowerCase()}/${code.toLowerCase()}`)
 }
@@ -747,10 +763,18 @@ export function queryTumira(search?: string) {
 
 export function queryTumiraDeliveryRates(payload: {
   from: { name: string; address: string; city: string; province: string }
-  to: { name: string; address: string; city: string; province: string }
+  to: { name: string; address: string; city: string; province: string; lat?: number; lng?: number }
   parcel: { weight_grams: number }
 }) {
   return api.post(`${BaseURL}/tumira/delivery-rates`, payload)
+}
+
+export function queryTumiraCheckAddress(address: string, city: string) {
+  return api.get(`${BaseURL}/tumira/geocode/check?address=${encodeURIComponent(address)}&city=${encodeURIComponent(city)}`)
+}
+
+export function queryTumiraConfirmPin(payload: { address: string; city: string; lat: number; lng: number }) {
+  return api.post(`${BaseURL}/tumira/geocode/confirm-pin`, payload)
 }
 
 export function myOrders(page?: number) {

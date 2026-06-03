@@ -4,9 +4,10 @@ import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { useQuery } from "@tanstack/react-query"
 import { useQueryState } from "nuqs"
-import { queryGradeSummary, queryGradeChart, queryProduceBuyers } from "@/lib/query"
+import { querySeriesSummary, querySeriesChart, querySeriesBuyers } from "@/lib/query"
 import { makeAbbveriation, slug } from "@/lib/utilities"
 import { PriceChart } from "@/components/structures/price-chart"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 const toDollars = (v: number) => (v / 100).toFixed(2)
 type GradeEntry = {
@@ -25,27 +26,72 @@ type GradeEntry = {
 type TimeRange = "1M" | "3M" | "6M" | "1Y" | "All"
 const TIME_RANGES: TimeRange[] = ["1M", "3M", "6M", "1Y", "All"]
 
-function ProduceStats({ totalBuyers, gradeCount }: { totalBuyers: number; gradeCount: number }) {
+function ProduceStats({ totalBuyers, gradeCount, avg, high, low, maxHead, minHead }: {
+  totalBuyers: number
+  gradeCount: number
+  avg: number
+  high: number
+  low: number
+  maxHead: number
+  minHead: number
+}) {
   return (
     <>
-      <div className="mb-4 pb-4 border-b flex items-center justify-between">
+      <div className="mb-3 pb-3 border-b flex items-center justify-between">
         <p className="text-sm text-muted-foreground">Available Buyers</p>
         <p className="text-sm font-semibold text-foreground">{totalBuyers}</p>
       </div>
-      <div className="flex items-center justify-between">
+      <div className="mb-3 pb-3 border-b flex items-center justify-between">
         <p className="text-sm text-muted-foreground">Available Grade Prices</p>
         <p className="text-sm font-semibold text-foreground">{gradeCount}</p>
       </div>
+      {avg > 0 && (
+        <>
+          <div className="mb-3 pb-3 border-b flex items-center justify-between">
+            <p className="text-sm text-muted-foreground">Avg Price</p>
+            <p className="text-sm font-semibold text-foreground">${(avg / 100).toFixed(2)}/kg</p>
+          </div>
+          <div className="mb-3 pb-3 border-b flex items-center justify-between">
+            <p className="text-sm text-muted-foreground">All-time High</p>
+            <p className="text-sm font-semibold text-green-600">${(high / 100).toFixed(2)}/kg</p>
+          </div>
+          <div className={`flex items-center justify-between ${(maxHead > 0 || minHead > 0) ? "mb-2 pb-2 border-b" : ""}`}>
+            <p className="text-sm text-muted-foreground">All-time Low</p>
+            <p className="text-sm font-semibold text-red-500">${(low / 100).toFixed(2)}/kg</p>
+          </div>
+        </>
+      )}
+      {maxHead > 0 && (
+        <div className="mb-3 pb-3 border-b flex items-center justify-between">
+          <p className="text-sm text-muted-foreground">Max Per Head</p>
+          <p className="text-sm font-semibold text-foreground">${(maxHead / 100).toFixed(2)}</p>
+        </div>
+      )}
+      {minHead > 0 && (
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-muted-foreground">Min Per Head</p>
+          <p className="text-sm font-semibold text-foreground">${(minHead / 100).toFixed(2)}</p>
+        </div>
+      )}
     </>
   )
 }
 
+// Point-based slicing — calculates how many entries to show based on the
+// actual density of the data (total points / total days spanned), so it
+// stays correct regardless of import frequency or missed weeks.
+// TODO: switch to time-based once data is reliably imported every week:
+//   const now = Date.now()
+//   const days = range === "1M" ? 30 : range === "3M" ? 90 : range === "6M" ? 180 : 365
+//   const cutoff = now - days * 86400000
+//   return history.filter(p => new Date(p.date).getTime() >= cutoff)
 function filterByRange(history: { value: number; date: string }[], range: TimeRange) {
-  if (range === "All") return history
-  const now = Date.now()
+  if (range === "All" || history.length < 2) return history
   const days = range === "1M" ? 30 : range === "3M" ? 90 : range === "6M" ? 180 : 365
-  const cutoff = now - days * 86400000
-  return history.filter(p => new Date(p.date).getTime() >= cutoff)
+  const spanDays = (new Date(history[history.length - 1].date).getTime() - new Date(history[0].date).getTime()) / 86400000
+  const pointsPerDay = history.length / spanDays
+  const points = Math.max(1, Math.round(pointsPerDay * days))
+  return history.slice(-points)
 }
 
 export function ProduceGradeBoard({
@@ -67,29 +113,45 @@ export function ProduceGradeBoard({
   const overviewRef = useRef<HTMLDivElement>(null)
   const buyersRef = useRef<HTMLDivElement>(null)
 
-  const { data: gradeSummaryData } = useQuery({
-    queryKey: ["grade-summary"],
-    queryFn: queryGradeSummary,
+  const { data: seriesSummaryData } = useQuery({
+    queryKey: ["series-summary"],
+    queryFn: querySeriesSummary,
     refetchOnWindowFocus: false,
   })
 
-  const { data: buyersData, status: buyersStatus } = useQuery({
-    queryKey: ["produce-buyers", produce, codeParam, typeParam, buyersPage],
-    queryFn: () => queryProduceBuyers(produce, codeParam, typeParam, { p: buyersPage, limit: 10 }),
-    enabled: !!produce,
-    refetchOnWindowFocus: false,
-  })
-
-  const allEntries: GradeEntry[] = gradeSummaryData?.data?.data ?? []
-  const produceBuyers: Record<string, number> = gradeSummaryData?.data?.produce_buyers ?? {}
+  const allEntries: GradeEntry[] = (seriesSummaryData?.data?.data ?? []).map((e: any) => ({
+    key: `${e.template_type}_${e.category}_${e.code}_${e.name}`,
+    produce: e.category.charAt(0) + e.category.slice(1).toLowerCase(),
+    grade: e.name,
+    code: e.code,
+    price_type: e.template_type === "cdm" ? "Cold Dress Mass" : "Liveweight",
+    avg: e.avg,
+    high: e.high,
+    low: e.low,
+    trend: e.trend,
+    buyer_count: e.buyer_count,
+  }))
 
   const gradeEntries = allEntries
     .filter(e => e.produce.toLowerCase() === produce.toLowerCase())
     .sort((a, b) => b.avg - a.avg)
 
   const produceName = produce.charAt(0).toUpperCase() + produce.slice(1)
-  const totalBuyers = produceBuyers[produceName] ?? 0
   const priceTypes = Array.from(new Set(gradeEntries.map(e => e.price_type)))
+
+  const activeCategory = produce.toUpperCase()
+  const activeTemplateType = typeParam === "cdm" ? "cdm" : "lwt"
+
+  const { data: buyersData, status: buyersStatus } = useQuery({
+    queryKey: ["series-buyers", activeCategory, codeParam, activeTemplateType],
+    queryFn: () => querySeriesBuyers(activeCategory, codeParam, activeTemplateType),
+    enabled: !!codeParam,
+    refetchOnWindowFocus: false,
+  })
+
+  const buyerRelations: BuyerEntry[] = buyersData?.data?.data ?? []
+  const buyersTotal: number = buyersData?.data?.total ?? 0
+  const totalBuyers = buyersTotal
 
 
   useEffect(() => {
@@ -117,8 +179,8 @@ export function ProduceGradeBoard({
   const peerGrades = gradeEntries.filter(e => e.price_type === activeType)
 
   const { data: chartData } = useQuery({
-    queryKey: ["grade-chart", produce, activeKey],
-    queryFn: () => queryGradeChart(produce, best?.code ?? ""),
+    queryKey: ["series-chart", activeCategory, best?.code, activeTemplateType],
+    queryFn: () => querySeriesChart(activeCategory, best?.code ?? "", activeTemplateType),
     enabled: !!activeKey && !!best,
     refetchOnWindowFocus: false,
   })
@@ -142,10 +204,11 @@ export function ProduceGradeBoard({
     last_active: string
     grade_delivered_usd: number
     grade_collected_usd: number
+    avg_amount_head: number
+    max_amount_head: number
+    min_amount_head: number
     has_booking: boolean
   }
-  const buyerRelations: BuyerEntry[] = buyersData?.data?.data ?? []
-  const buyersTotal: number = buyersData?.data?.total ?? 0
   const buyersPageCount = Math.ceil(buyersTotal / 10)
 
   function handleTypeSwitch(type: string) {
@@ -201,7 +264,7 @@ export function ProduceGradeBoard({
 
           {best && (
             <div className="hidden md:block">
-              <ProduceStats totalBuyers={totalBuyers} gradeCount={peerGrades.length} />
+              <ProduceStats totalBuyers={totalBuyers} gradeCount={peerGrades.length} avg={best?.avg ?? 0} high={best?.high ?? 0} low={best?.low ?? 0} maxHead={buyerRelations[0]?.max_amount_head ?? 0} minHead={buyerRelations[0]?.min_amount_head ?? 0} />
             </div>
           )}
         </div>
@@ -228,24 +291,19 @@ export function ProduceGradeBoard({
             </div>
           )}
 
-          {/* grade pills + time range */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2 sm:gap-4">
-            <div className="flex items-center gap-1 flex-wrap">
-              {peerGrades.map(e => (
-                <button
-                  key={e.key}
-                  onClick={() => handleGradeSelect(e.key)}
-                  className={`px-3 py-1 rounded-lg text-xs font-medium border transition-all duration-200 ${
-                    activeKey === e.key
-                      ? "bg-foreground text-background border-foreground shadow-sm"
-                      : "bg-background text-muted-foreground border-border hover:text-foreground"
-                  }`}
-                >
-                  {e.grade}
-                </button>
-              ))}
-            </div>
-            <div className="flex items-center gap-0.5 bg-muted rounded-xl p-1 self-start sm:shrink-0">
+          {/* grade select + time range */}
+          <div className="flex items-center justify-between gap-2 mb-4">
+            <Select value={activeKey} onValueChange={handleGradeSelect}>
+              <SelectTrigger className="h-8 text-xs w-48 focus:ring-0 focus:ring-offset-0">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {peerGrades.map(e => (
+                  <SelectItem key={e.key} value={e.key} className="text-xs">{e.grade}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <div className="flex items-center gap-0.5 bg-muted rounded-xl p-1">
               {TIME_RANGES.map(r => (
                 <button
                   key={r}
@@ -276,7 +334,7 @@ export function ProduceGradeBoard({
           {/* stats — mobile only */}
           {best && (
             <div className="md:hidden mt-6 pt-4 border-t">
-              <ProduceStats totalBuyers={totalBuyers} gradeCount={peerGrades.length} />
+              <ProduceStats totalBuyers={totalBuyers} gradeCount={peerGrades.length} avg={best?.avg ?? 0} high={best?.high ?? 0} low={best?.low ?? 0} maxHead={buyerRelations[0]?.max_amount_head ?? 0} minHead={buyerRelations[0]?.min_amount_head ?? 0} />
             </div>
           )}
         </div>
@@ -308,41 +366,66 @@ export function ProduceGradeBoard({
                 <tr className="border-b text-xs text-muted-foreground">
                   <th className="text-left py-2 pr-4 font-medium w-8 tabular-nums">#</th>
                   <th className="text-left py-2 font-medium">Buyer</th>
-                  <th className="text-left py-2 pl-2 font-medium">Collected</th>
-                  <th className="text-left py-2 pl-2 font-medium">Delivered</th>
-                  <th className="text-left py-2 pl-2 font-medium">Sell</th>
+                  <th className="text-left py-2 pl-2 font-medium">Per kg</th>
+                  <th className="text-left py-2 pl-2 font-medium">Average Per Head</th>
+                  <th className="text-left py-2 pl-2 font-medium">Change</th>
+                  <th className="text-left py-2 pl-2 font-medium">Booking</th>
                 </tr>
               </thead>
               <tbody>
-                {buyerRelations.map((b, i) => (
-                  <tr key={b.client_id} className="border-b border-border/50 last:border-0 hover:bg-muted/40 transition-colors">
-                    <td className="py-3 pr-4 text-muted-foreground tabular-nums text-xs">{(buyersPage - 1) * 10 + i + 1}</td>
-                    <td className="py-3 font-medium text-foreground capitalize">
-                      <span className="inline-flex items-center gap-2">
-                        <span className="inline-flex items-center justify-center border border-border text-xs font-mono text-muted-foreground w-7 h-6 rounded shrink-0">
-                          {makeAbbveriation(b.client_name).toUpperCase().slice(0, 2)}
+                {buyerRelations.map((b, i) => {
+                  const currentPrice = b.grade_delivered_usd > 0 ? b.grade_delivered_usd : b.grade_collected_usd
+                  const trend = best?.trend ?? []
+                  const pct = trend.length >= 2 && trend[trend.length - 2]
+                    ? ((trend[trend.length - 1] - trend[trend.length - 2]) / trend[trend.length - 2]) * 100
+                    : null
+                  return (
+                    <tr key={b.client_id} className="border-b border-border/50 last:border-0 hover:bg-muted/40 transition-colors">
+                      <td className="py-3 pr-4 text-muted-foreground tabular-nums text-xs">{(buyersPage - 1) * 10 + i + 1}</td>
+                      <td className="py-3 font-medium text-foreground capitalize">
+                        <span className="inline-flex items-center gap-2">
+                          <span className="inline-flex items-center justify-center border border-border text-xs font-mono text-muted-foreground w-7 h-6 rounded shrink-0">
+                            {makeAbbveriation(b.client_name).toUpperCase().slice(0, 2)}
+                          </span>
+                          <Link href={`/buyer/${slug(b.client_name)}`} className="hover:underline">{b.client_name}</Link>
                         </span>
-                        <Link href={`/buyer/${slug(b.client_name)}`} className="hover:underline">{b.client_name}</Link>
-                      </span>
-                    </td>
-                    <td className="py-3 pl-2 tabular-nums text-sm font-semibold">
-                      {b.grade_collected_usd > 0
-                        ? <>${toDollars(b.grade_collected_usd)}<span className="text-xs font-normal text-muted-foreground">/kg</span></>
-                        : <span className="text-muted-foreground font-normal text-xs">—</span>}
-                    </td>
-                    <td className="py-3 pl-2 tabular-nums text-sm font-semibold">
-                      {b.grade_delivered_usd > 0
-                        ? <>${toDollars(b.grade_delivered_usd)}<span className="text-xs font-normal text-muted-foreground">/kg</span></>
-                        : <span className="text-muted-foreground font-normal text-xs">—</span>}
-                    </td>
-                    <td className="py-3 pl-2">
-                      {b.has_booking
-                        ? <Link href={`/book/${slug(b.client_name)}`} className="text-xs font-medium text-primary hover:underline whitespace-nowrap">Book Now</Link>
-                        : <Link href={`/buyer/${slug(b.client_name)}`} className="text-xs font-medium text-muted-foreground hover:text-foreground hover:underline whitespace-nowrap">Contact</Link>
-                      }
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                      <td className="py-3 pl-2 tabular-nums text-sm font-semibold">
+                        {currentPrice > 0
+                          ? <>${toDollars(currentPrice)}<span className="text-xs font-normal text-muted-foreground">/kg</span></>
+                          : <span className="text-muted-foreground font-normal text-xs">—</span>}
+                      </td>
+                      <td className="py-3 pl-2 tabular-nums">
+                        {b.avg_amount_head > 0 || b.max_amount_head > 0 ? (
+                          <>
+                            {b.avg_amount_head > 0 && (
+                              <div className="text-sm font-semibold">${toDollars(b.avg_amount_head)}</div>
+                            )}
+                            {b.max_amount_head > 0 && (
+                              <div className="text-xs text-muted-foreground">Max ${toDollars(b.max_amount_head)}</div>
+                            )}
+                            {b.min_amount_head > 0 && (
+                              <div className="text-xs text-muted-foreground">Min ${toDollars(b.min_amount_head)}</div>
+                            )}
+                          </>
+                        ) : (
+                          <span className="text-muted-foreground font-normal text-xs">—</span>
+                        )}
+                      </td>
+                      <td className="py-3 pl-2 tabular-nums text-xs font-medium">
+                        {pct !== null
+                          ? <span className={pct >= 0 ? "text-green-600" : "text-red-500"}>{pct >= 0 ? "▲" : "▼"} {Math.abs(pct).toFixed(1)}%</span>
+                          : <span className="text-muted-foreground">—</span>}
+                      </td>
+                      <td className="py-3 pl-2">
+                        {b.has_booking
+                          ? <Link href={`/book/${slug(b.client_name)}`} className="inline-flex items-center px-3 py-1.5 rounded-md bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-colors whitespace-nowrap">Book Now →</Link>
+                          : <Link href={`/buyer/${slug(b.client_name)}`} className="text-xs font-medium text-muted-foreground hover:text-foreground hover:underline whitespace-nowrap">Contact</Link>
+                        }
+                      </td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
           </div>

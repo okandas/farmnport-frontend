@@ -846,11 +846,6 @@ export function queryContactViewsStats() {
   return api.get(url)
 }
 
-export function queryTopViewedContacts(page: number, limit: number) {
-  const url = `${baseUrl}/views/admin/top-viewed?page=${page}&limit=${limit}`
-  return api.get(url)
-}
-
 export function queryTopViewers(page: number, limit: number) {
   const url = `${baseUrl}/views/admin/top-viewers?page=${page}&limit=${limit}`
   return api.get(url)
@@ -858,16 +853,6 @@ export function queryTopViewers(page: number, limit: number) {
 
 export function queryRecentViewedContacts(page: number, limit: number) {
   const url = `${baseUrl}/views/admin/recent-viewed?page=${page}&limit=${limit}`
-  return api.get(url)
-}
-
-export function queryUserViews(page: number, limit: number) {
-  const url = `${baseUrl}/views/admin/user-views?page=${page}&limit=${limit}`
-  return api.get(url)
-}
-
-export function queryRecentUserViews(page: number, limit: number) {
-  const url = `${baseUrl}/views/admin/recent-user-views?page=${page}&limit=${limit}`
   return api.get(url)
 }
 
@@ -1698,6 +1683,15 @@ export function queryTumiraVanityCodes(pagination?: tumiraPagination) {
   return api.get(`${tumiraAdminUrl}/vanity${qs ? `?${qs}` : ""}`, { headers: tumiraAdminHeaders })
 }
 
+export function queryTumiraGeocodedAddresses(pagination?: tumiraPagination) {
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) params.set("p", String(pagination.p))
+  if (pagination?.search && pagination.search.length >= 2) params.set("search", pagination.search)
+  if (pagination?.limit !== undefined) params.set("limit", String(pagination.limit))
+  const qs = params.toString()
+  return api.get(`${tumiraAdminUrl}/geocoded-addresses${qs ? `?${qs}` : ""}`, { headers: tumiraAdminHeaders })
+}
+
 export function queryTumiraCourierCollectionPoints(params?: { p?: number; limit?: number; courier_id?: string }) {
   const qs = new URLSearchParams()
   if (params?.p !== undefined && params.p >= 2) qs.set("p", String(params.p))
@@ -1705,4 +1699,18 @@ export function queryTumiraCourierCollectionPoints(params?: { p?: number; limit?
   if (params?.courier_id) qs.set("courier_id", params.courier_id)
   const q = qs.toString()
   return api.get(`${tumiraAdminUrl}/courier-collection-points${q ? `?${q}` : ""}`, { headers: tumiraAdminHeaders })
+}
+
+// Livestock price series
+export function queryImportPriceSeries(data: { entries: unknown[]; overwrite: boolean }) {
+  return api.post(`${baseUrl}/prices/series/import`, data)
+}
+
+export function queryPriceSeries(params?: { client_id?: string; category?: string; template_type?: string }) {
+  const qs = new URLSearchParams()
+  if (params?.client_id) qs.set("client_id", params.client_id)
+  if (params?.category) qs.set("category", params.category)
+  if (params?.template_type) qs.set("template_type", params.template_type)
+  const q = qs.toString()
+  return api.get(`${baseUrl}/prices/series${q ? `?${q}` : ""}`)
 }

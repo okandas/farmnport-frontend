@@ -40,11 +40,11 @@ export default async function FarmersPage() {
 
   return (
     <main>
-      <div className="mx-auto max-w-7xl px-6 lg:px-8 min-h-[70lvh]">
+      <div className="mx-auto max-w-7xl px-6 lg:px-8 min-h-[70lvh] py-8">
         <div className="lg:flex lg:space-x-10">
 
           <div className="hidden lg:block lg:w-44 relative">
-            <FilterSidebar />
+            <FilterSidebar clientType="farmers" />
           </div>
 
           <div className="lg:w-2/3">

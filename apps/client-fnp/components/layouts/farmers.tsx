@@ -42,10 +42,12 @@ export function Farmers({user, queryBy}: FarmersPageProps) {
 
   // Search params
   const page = Number(searchParams?.get("page")) ?? 1
+  const produceFilter = searchParams?.get("produce") ?? ""
+  const categoryFilter = searchParams?.get("category") ?? ""
 
   const {data, isError, isFetching} = useQuery({
-    queryKey: ["results-farmers", {p: page}],
-    queryFn: () => queryBy != undefined ? queryClientsByProduct('farmer', queryBy, {p: page}) : queryClients('farmer', {p: page}),
+    queryKey: ["results-farmers", {p: page, produce: produceFilter, category: categoryFilter}],
+    queryFn: () => queryBy != undefined ? queryClientsByProduct('farmer', queryBy, {p: page}) : queryClients('farmer', {p: page, produce: produceFilter ? [produceFilter] : [], category: categoryFilter ? [categoryFilter] : []}),
     refetchOnWindowFocus: false
   })
 

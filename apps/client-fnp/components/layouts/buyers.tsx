@@ -46,16 +46,16 @@ export function Buyers({user, queryBy}: BuyersPageProps) {
   // Search params
   const page = Number(searchParams?.get("page")) ?? 1
   const provinceFilters = searchParams?.getAll("province") ?? []
-  const produceFilters = searchParams?.getAll("produce") ?? []
-  const categoryFilters = searchParams?.getAll("category") ?? []
+  const produceFilter = searchParams?.get("produce") ?? ""
+  const categoryFilter = searchParams?.get("category") ?? ""
   const paymentTermsFilters = searchParams?.getAll("payment_terms") ?? []
   const pricingFilters = searchParams?.getAll("pricing") ?? []
   const verifiedFilters = searchParams?.getAll("verified") ?? []
   const hasBookingFilter = searchParams?.get("has_booking") ?? ""
 
   const {data, isError, isFetching} = useQuery({
-    queryKey: ["results-buyers", {p: page, province: provinceFilters, produce: produceFilters, category: categoryFilters, payment_terms: paymentTermsFilters, pricing: pricingFilters, verified: verifiedFilters, has_booking: hasBookingFilter, queryBy}],
-    queryFn: () => queryBy != undefined ? queryClientsByProduct('buyer', queryBy, {p: page, province: provinceFilters, verified: verifiedFilters}) : queryClients('buyer', {p: page, province: provinceFilters, produce: produceFilters, category: categoryFilters, payment_terms: paymentTermsFilters, pricing: pricingFilters, verified: verifiedFilters, has_booking: hasBookingFilter || undefined}),
+    queryKey: ["results-buyers", {p: page, province: provinceFilters, produce: produceFilter, category: categoryFilter, payment_terms: paymentTermsFilters, pricing: pricingFilters, verified: verifiedFilters, has_booking: hasBookingFilter, queryBy}],
+    queryFn: () => queryBy != undefined ? queryClientsByProduct('buyer', queryBy, {p: page, province: provinceFilters, verified: verifiedFilters}) : queryClients('buyer', {p: page, province: provinceFilters, produce: produceFilter ? [produceFilter] : [], category: categoryFilter ? [categoryFilter] : [], payment_terms: paymentTermsFilters, pricing: pricingFilters, verified: verifiedFilters, has_booking: hasBookingFilter || undefined}),
     refetchOnWindowFocus: false
   })
 
@@ -158,9 +158,9 @@ export function Buyers({user, queryBy}: BuyersPageProps) {
               <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-muted flex items-center justify-center text-muted-foreground">
                 <span className="text-lg font-bold">{buyer.name.charAt(0).toUpperCase()}</span>
               </div>
-              <div className="flex-1 min-w-0">
+              <div className="flex-1 min-w-0 space-y-1.5">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <h4 className="text-lg font-semibold group-hover:text-primary transition-colors truncate">
+                  <h4 className="text-lg font-semibold leading-snug group-hover:text-primary transition-colors truncate">
                     {capitalizeFirstLetter(buyer.name)}
                   </h4>
                   {buyer.verified && (
@@ -177,7 +177,7 @@ export function Buyers({user, queryBy}: BuyersPageProps) {
                     </Badge>
                   )}
                 </div>
-                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-sm text-muted-foreground">
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground leading-relaxed">
                   <span className="flex items-center gap-1">
                     <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -185,8 +185,6 @@ export function Buyers({user, queryBy}: BuyersPageProps) {
                     </svg>
                     {buyer.city?.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}, {buyer.province?.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
                   </span>
-                  <span className="hidden sm:inline">•</span>
-                  <span>Buying {buyer.main_produce?.name ? capitalizeFirstLetter(plural(buyer.main_produce.name)) : 'Various Products'}</span>
                   {buyer.primary_category && (
                     <>
                       <span className="hidden sm:inline">•</span>
