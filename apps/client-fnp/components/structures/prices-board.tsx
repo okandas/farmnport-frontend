@@ -2,7 +2,8 @@
 
 import Link from "next/link"
 import { useQuery } from "@tanstack/react-query"
-import { queryProducerPriceLists, queryCdmPrices, queryMarketStats, queryGradeSummary } from "@/lib/query"
+import { queryProducerPriceLists, queryCdmPrices, queryMarketStats, querySeriesSummary } from "@/lib/query"
+import { PricesTabNav } from "@/components/structures/prices-tab-nav"
 
 type MarketStat = {
   effective_date: string
@@ -82,9 +83,9 @@ export function PricesBoard() {
     queryFn: () => queryProducerPriceLists({ p: 1, limit: 1 } as any),
     refetchOnWindowFocus: false,
   })
-  const { data: gradeSummaryData } = useQuery({
-    queryKey: ["grade-summary"],
-    queryFn: queryGradeSummary,
+  const { data: seriesSummaryData } = useQuery({
+    queryKey: ["series-summary"],
+    queryFn: querySeriesSummary,
     refetchOnWindowFocus: false,
   })
 
@@ -106,7 +107,38 @@ export function PricesBoard() {
     low: number
     trend: number[]
   }
-  const gradeEntries: GradeEntry[] = gradeSummaryData?.data?.data ?? []
+
+  type SeriesEntry = {
+    code: string
+    name: string
+    category: string
+    template_type: string
+    avg: number
+    high: number
+    low: number
+    trend: number[]
+  }
+
+  const categoryToDisplay = (cat: string): string => {
+    const map: Record<string, string> = {
+      CHICKENS: "Chicken",
+      PIGS: "Pigs",
+    }
+    return map[cat] ?? (cat.charAt(0) + cat.slice(1).toLowerCase())
+  }
+
+  const rawSeriesEntries: SeriesEntry[] = seriesSummaryData?.data?.data ?? []
+  const gradeEntries: GradeEntry[] = rawSeriesEntries.map(e => ({
+    key: `${e.template_type}_${e.category}_${e.code}_${e.name}`,
+    produce: categoryToDisplay(e.category),
+    grade: e.name,
+    code: e.code,
+    price_type: e.template_type === "cdm" ? "Cold Dress Mass" : "Liveweight",
+    avg: e.avg,
+    high: e.high,
+    low: e.low,
+    trend: e.trend,
+  }))
 
   type GradeItem = {
     key: string
@@ -285,19 +317,21 @@ export function PricesBoard() {
           </ul>
 
           {/* ── Grade price table ── */}
+          <PricesTabNav />
           {gradeEntries.length > 0 && (
-            <div className="mt-2">
-              <div className="overflow-x-auto border-t border-b border-border">
-                <table className="w-full text-base">
+            <div className="mt-2 px-4 md:px-8 py-4">
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-border text-sm text-muted-foreground">
-                      <th className="text-left px-6 py-4 font-medium w-12">#</th>
-                      <th className="text-left px-6 py-4 font-medium min-w-[220px]">Produce · Grade</th>
-                      <th className="text-right px-6 py-4 font-medium">Average</th>
-                      <th className="text-right px-6 py-4 font-medium hidden sm:table-cell">Change</th>
-                      <th className="text-right px-6 py-4 font-medium hidden sm:table-cell">High</th>
-                      <th className="text-right px-6 py-4 font-medium hidden sm:table-cell">Low</th>
-                      <th className="text-right px-6 py-4 font-medium hidden lg:table-cell w-24">Trend</th>
+                    <tr className="border-b text-xs text-muted-foreground">
+                      <th className="text-left py-2 pr-4 font-medium w-8 tabular-nums">#</th>
+                      <th className="text-left py-2 font-medium">Code</th>
+                      <th className="text-left py-2 pl-2 font-medium">Produce · Grade</th>
+                      <th className="text-left py-2 pl-2 font-medium">Average</th>
+                      <th className="text-left py-2 pl-2 font-medium hidden sm:table-cell">Change</th>
+                      <th className="text-left py-2 pl-2 font-medium hidden sm:table-cell">High</th>
+                      <th className="text-left py-2 pl-2 font-medium hidden sm:table-cell">Low</th>
+                      <th className="text-left py-2 pl-2 font-medium hidden lg:table-cell">Trend</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -307,20 +341,20 @@ export function PricesBoard() {
                         const color = gradeColor((entry.produce ?? "").toLowerCase())
                         return (
                           <tr key={entry.key} className="border-b border-border/50 last:border-0 hover:bg-muted/40 transition-colors">
-                            <td className="px-6 py-4 text-sm text-muted-foreground tabular-nums w-12">{idx + 1}</td>
-                            <td className="px-6 py-4 min-w-[220px]">
-                              <div className="flex items-center gap-3">
-                                <span className={`inline-flex items-center justify-center rounded-md px-2 py-0.5 text-[10px] font-bold ring-1 ring-inset w-8 shrink-0 ${color}`}>{entry.code}</span>
-                                <div>
-                                  <Link href={`/prices/${entry.produce.toLowerCase()}?code=${entry.code.toLowerCase()}&type=${entry.price_type === "Cold Dress Mass" ? "cdm" : "lwt"}`} className="font-medium text-foreground leading-tight hover:text-foreground/70">{entry.produce} <span className="text-muted-foreground font-normal text-sm">· {entry.grade}</span></Link>
-                                  <p className="text-xs text-muted-foreground leading-tight mt-0.5 italic">{entry.price_type}</p>
-                                </div>
-                              </div>
+                            <td className="py-3 pr-4 text-muted-foreground tabular-nums text-xs">{idx + 1}</td>
+                            <td className="py-3">
+                              <span className={`inline-flex items-center justify-center rounded-md px-2 py-0.5 text-xs font-bold ring-1 ring-inset min-w-[36px] shrink-0 ${color}`}>{entry.code}</span>
                             </td>
-                            <td className="px-6 py-4 text-right tabular-nums font-semibold">
-                              ${toDollars(entry.avg)}
+                            <td className="py-3 pl-2 font-medium text-foreground">
+                              <Link href={`/prices/${entry.produce.toLowerCase()}?code=${entry.code.toLowerCase()}&type=${entry.price_type === "Cold Dress Mass" ? "cdm" : "lwt"}`} className="hover:underline">
+                                {entry.produce} <span className="text-muted-foreground font-normal">· {entry.grade}</span>
+                              </Link>
+                              <p className="text-xs text-muted-foreground leading-tight mt-0.5 italic">{entry.price_type}</p>
                             </td>
-                            <td className="px-6 py-4 text-right tabular-nums text-sm font-medium hidden sm:table-cell">
+                            <td className="py-3 pl-2 tabular-nums font-semibold">
+                              ${toDollars(entry.avg)}<span className="text-xs font-normal text-muted-foreground">/kg</span>
+                            </td>
+                            <td className="py-3 pl-2 tabular-nums font-medium hidden sm:table-cell">
                               {(() => {
                                 const t = entry.trend ?? []
                                 if (t.length < 2) return <span className="text-muted-foreground">—</span>
@@ -331,13 +365,13 @@ export function PricesBoard() {
                                 return <span className={up ? "text-green-600 dark:text-green-400" : "text-red-500 dark:text-red-400"}>{up ? "▲" : "▼"} {up ? "+" : ""}{pct.toFixed(2)}%</span>
                               })()}
                             </td>
-                            <td className="px-6 py-4 text-right tabular-nums text-sm font-medium text-green-600 dark:text-green-400 hidden sm:table-cell">
+                            <td className="py-3 pl-2 tabular-nums font-medium text-green-600 dark:text-green-400 hidden sm:table-cell">
                               {entry.high ? `$${toDollars(entry.high)}` : <span className="text-muted-foreground font-normal">—</span>}
                             </td>
-                            <td className="px-6 py-4 text-right tabular-nums text-sm font-medium text-red-500 dark:text-red-400 hidden sm:table-cell">
+                            <td className="py-3 pl-2 tabular-nums font-medium text-red-500 dark:text-red-400 hidden sm:table-cell">
                               {entry.low ? `$${toDollars(entry.low)}` : <span className="text-muted-foreground font-normal">—</span>}
                             </td>
-                            <td className="px-6 py-4 text-right hidden lg:table-cell">
+                            <td className="py-3 pl-2 hidden lg:table-cell">
                               <MiniSparkline values={entry.trend ?? []} />
                             </td>
                           </tr>

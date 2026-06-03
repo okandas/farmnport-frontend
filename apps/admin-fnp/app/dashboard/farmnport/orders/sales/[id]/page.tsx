@@ -70,6 +70,12 @@ interface DeliveryAddress {
   address: string
   city: string
   province: string
+  courier_name?: string
+  service_type?: string
+  lat?: number
+  lng?: number
+  distance_km?: number
+  distance_source?: string
 }
 
 interface Order {
@@ -360,6 +366,30 @@ export default function OrderDetailPage() {
                   {order.delivery_address.city},{" "}
                   {order.delivery_address.province}
                 </p>
+                {order.delivery_address.courier_name && (
+                  <p>
+                    <span className="text-muted-foreground">Courier:</span>{" "}
+                    {order.delivery_address.courier_name}
+                    {order.delivery_address.service_type ? ` · ${order.delivery_address.service_type.replace(/_/g, " ")}` : ""}
+                  </p>
+                )}
+                {order.delivery_address.distance_km && (
+                  <p>
+                    <span className="text-muted-foreground">Distance:</span>{" "}
+                    {order.delivery_address.distance_km} km
+                    {order.delivery_address.distance_source ? ` (${order.delivery_address.distance_source})` : ""}
+                  </p>
+                )}
+                {order.delivery_address.lat && order.delivery_address.lng && (
+                  <a
+                    href={`https://www.google.com/maps?q=${order.delivery_address.lat},${order.delivery_address.lng}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+                  >
+                    <Package className="h-4 w-4" /> Shipping To
+                  </a>
+                )}
               </>
             )}
             {order.delivered_at && (

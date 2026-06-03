@@ -94,7 +94,7 @@ interface Order {
   total: number
   currency: string
   fulfillment: string
-  collection_location?: { id: string; name: string; address: string; city: string }
+  collection_location?: { id: string; name: string; address: string; city: string; courier_name?: string }
   delivery_address?: DeliveryAddress
   payment_provider: string
   payment_method: string
@@ -344,16 +344,13 @@ export default function OrderDetailPage() {
             {order.collection_location && (
               <>
                 <p>
+                  <span className="text-muted-foreground">Hub:</span>{" "}
+                  Tumira Hub{order.collection_location.courier_name ? ` by ${order.collection_location.courier_name}` : ""}
+                </p>
+                <p>
                   <span className="text-muted-foreground">Location:</span>{" "}
                   {order.collection_location.name}
                 </p>
-                {order.collection_location.address && (
-                  <p>
-                    <span className="text-muted-foreground">Address:</span>{" "}
-                    {order.collection_location.address}
-                    {order.collection_location.city ? `, ${order.collection_location.city}` : ""}
-                  </p>
-                )}
               </>
             )}
             {order.delivery_address && (

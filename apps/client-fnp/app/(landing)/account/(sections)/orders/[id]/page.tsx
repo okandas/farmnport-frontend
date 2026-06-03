@@ -84,7 +84,7 @@ interface Order {
   total: number
   currency: string
   fulfillment: string
-  collection_location?: { id: string; name: string; address: string; city: string }
+  collection_location?: { id: string; name: string; address: string; city: string; courier_name?: string }
   delivery_address?: DeliveryAddress
   payment_provider: string
   payment_method: string
@@ -320,9 +320,8 @@ export default function OrderDetailPage() {
             </div>
             {order.collection_location ? (
               <div className="text-sm space-y-0.5">
-                <p className="font-medium">{order.collection_location.name}</p>
-                {order.collection_location.address && <p className="text-muted-foreground">{order.collection_location.address}</p>}
-                {order.collection_location.city && <p className="text-muted-foreground">{order.collection_location.city}</p>}
+                <p className="font-medium">Tumira Hub{order.collection_location.courier_name ? ` by ${order.collection_location.courier_name}` : ""}</p>
+                <p className="text-muted-foreground">{order.collection_location.name}</p>
               </div>
             ) : order.delivery_address ? (
               <div className="text-xs space-y-1 text-muted-foreground">

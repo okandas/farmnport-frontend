@@ -1,18 +1,20 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
-import { Check, Loader2, ShoppingCart, CreditCard, Smartphone, Globe, Truck, Store, Minus, Plus, Trash2, Shield, MapPin } from "lucide-react"
+import { Check, Loader2, ShoppingCart, CreditCard, Smartphone, Globe, Truck, Store, Minus, Plus, Trash2, Shield, MapPin, Info } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 
-import { getCart, checkout, pollOrderStatus, queryClient as fetchClient, updateCartItem, removeFromCart, queryTumira, queryTumiraDeliveryRates } from "@/lib/query"
+import { getCart, checkout, pollOrderStatus, queryClient as fetchClient, updateCartItem, removeFromCart, queryTumira, queryTumiraDeliveryRates, queryTumiraCheckAddress, queryTumiraConfirmPin } from "@/lib/query"
 import { AuthenticatedUser } from "@/lib/schemas"
 import { centsToDollars } from "@/lib/utilities"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 const PAYMENT_METHODS = [
   { value: "ecocash", label: "EcoCash",          description: "Mobile money prompt to your phone",  icon: Smartphone },
@@ -39,7 +41,9 @@ interface CheckoutForm {
   provider: string
   method: string
   address_name: string
-  address_line: string
+  house_number: string
+  street: string
+  suburb: string
   city: string
   province: string
 }
@@ -69,6 +73,8 @@ interface DeliveryCourier {
   estimated_days: number
   estimated_hours: number
   weight_limit_grams: number
+  distance_km?: number
+  distance_source?: string
 }
 
 interface Tumira {
@@ -112,8 +118,19 @@ export default function CheckoutPage() {
   const [fulfillment, setFulfillment] = useState<"click_collect" | "delivery">("click_collect")
   const [selectedCourierId, setSelectedCourierId] = useState("")
   const [courierSearch, setCourierSearch] = useState("")
+  const [addressConfirmed, setAddressConfirmed] = useState(false)
+  const [geochecking, setGeochecking] = useState(false)
+  const [confirmingPin, setConfirmingPin] = useState(false)
+  const [pinLat, setPinLat] = useState<number | null>(null)
+  const [pinLng, setPinLng] = useState<number | null>(null)
+  const [pinModalOpen, setPinModalOpen] = useState(false)
+  const mapRef = useRef<HTMLDivElement>(null)
+  const markerRef = useRef<any>(null)
+  const pendingPinRef = useRef<{ lat: number; lng: number } | null>(null)
+  const preCentreRef = useRef<{ lat: number; lng: number } | null>(null)
 
-  const [step, setStep] = useState<"form" | "waiting" | "success">("form")
+  const [step, setStep] = useState<"form" | "waiting" | "success" | "cancelled">("form")
+  const [orderId, setOrderId] = useState("")
 
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<CheckoutForm>({
     defaultValues: { provider: "paynow", method: "ecocash" },
@@ -133,8 +150,9 @@ export default function CheckoutPage() {
   }, [profileData, user, setValue])
 
   const method = watch("method")
-  const [watchedName, watchedAddress, watchedCity, watchedProvince] = watch(["address_name", "address_line", "city", "province"])
-  const deliveryAddressComplete = fulfillment === "delivery" && !!(watchedName && watchedAddress && watchedCity && watchedProvince)
+  const [watchedName, watchedHouseNumber, watchedStreet, watchedSuburb, watchedCity, watchedProvince] = watch(["address_name", "house_number", "street", "suburb", "city", "province"])
+  const watchedAddress = [watchedHouseNumber, watchedStreet, watchedSuburb].filter(Boolean).join(", ")
+  const deliveryAddressComplete = fulfillment === "delivery" && !!(watchedName && watchedHouseNumber && watchedStreet && watchedSuburb && watchedCity && watchedProvince)
 
   const { data: cartData, isLoading: cartLoading } = useQuery({
     queryKey: ["cart"],
@@ -145,15 +163,82 @@ export default function CheckoutPage() {
   const items: CartItem[] = cartData?.items ?? []
   const totalWeightGrams = items.reduce((sum, item) => sum + item.quantity * (item.weight_grams || 5000), 0)
 
-  const { data: deliveryRatesData, isFetching: ratesFetching } = useQuery({
-    queryKey: ["tumira-delivery-rates", watchedName, watchedAddress, watchedCity, watchedProvince, totalWeightGrams],
+  // reset confirmation + pin when address changes
+  useEffect(() => {
+    setAddressConfirmed(false)
+    setPinLat(null)
+    setPinLng(null)
+    preCentreRef.current = null
+  }, [watchedName, watchedHouseNumber, watchedStreet, watchedSuburb, watchedCity, watchedProvince])
+
+  // initialise Google Maps inside the modal when it opens
+  useEffect(() => {
+    if (!pinModalOpen || !mapRef.current) return
+    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+    if (!apiKey) return
+
+    const initMap = () => {
+      const google = (window as any).google
+      const defaultCenter = preCentreRef.current ?? { lat: -17.8292, lng: 31.0522 } // pre-centred from check response or Harare CBD
+      const map = new google.maps.Map(mapRef.current, {
+        center: defaultCenter,
+        zoom: 13,
+        disableDefaultUI: true,
+        zoomControl: true,
+      })
+      const marker = new google.maps.Marker({
+        position: defaultCenter,
+        map,
+        draggable: true,
+        title: "Your delivery location",
+      })
+      markerRef.current = marker
+      pendingPinRef.current = defaultCenter
+
+      const onPositionChange = () => {
+        const pos = marker.getPosition()
+        if (pos) pendingPinRef.current = { lat: pos.lat(), lng: pos.lng() }
+      }
+      google.maps.event.addListener(marker, "dragend", onPositionChange)
+      map.addListener("click", (e: any) => {
+        marker.setPosition(e.latLng)
+        pendingPinRef.current = { lat: e.latLng.lat(), lng: e.latLng.lng() }
+      })
+    }
+
+    if ((window as any).google?.maps) {
+      initMap()
+    } else {
+      const existing = document.getElementById("google-maps-sdk")
+      if (!existing) {
+        const script = document.createElement("script")
+        script.id = "google-maps-sdk"
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}`
+        script.async = true
+        script.onload = initMap
+        document.head.appendChild(script)
+      } else {
+        existing.addEventListener("load", initMap)
+      }
+    }
+  }, [pinModalOpen])
+
+  const { data: deliveryRatesData, isFetching: ratesFetching, isError: ratesError } = useQuery({
+    queryKey: ["tumira-delivery-rates", watchedName, watchedAddress, watchedCity, watchedProvince, totalWeightGrams, pinLat, pinLng],
     queryFn: () => queryTumiraDeliveryRates({
       from: { name: "Farmnport", address: "Harare CBD", city: "Harare", province: "Harare" },
-      to: { name: watchedName, address: watchedAddress, city: watchedCity, province: watchedProvince },
+      to: {
+        name: watchedName,
+        address: watchedAddress,
+        city: watchedCity,
+        province: watchedProvince,
+        ...(pinLat !== null && pinLng !== null ? { lat: pinLat, lng: pinLng } : {}),
+      },
       parcel: { weight_grams: totalWeightGrams || 5000 },
     }).then((r) => r.data?.couriers as DeliveryCourier[]),
-    enabled: deliveryAddressComplete,
+    enabled: deliveryAddressComplete && addressConfirmed,
     staleTime: 60_000,
+    retry: 2,
   })
   const pickupLocations = items
     .flatMap((i) => i.fulfillment?.pickup_locations ?? [])
@@ -201,6 +286,7 @@ export default function CheckoutPage() {
     onSuccess: (res) => {
       const data = res.data as CheckoutResponse
       setOrderNumber(data.order_number)
+      setOrderId(data.order_id)
       setPollRef(data.reference)
       setSelectedMethod(method)
       qc.invalidateQueries({ queryKey: ["cart"] })
@@ -237,6 +323,9 @@ export default function CheckoutPage() {
         if (res.data?.paid) {
           setPolling(false)
           setStep("success")
+        } else if (["Cancelled", "Disputed", "Refunded"].includes(res.data?.status)) {
+          setPolling(false)
+          setStep("cancelled")
         }
       } catch {}
     }, 4000)
@@ -250,15 +339,22 @@ function onSubmit(data: CheckoutForm) {
       phone: data.phone,
       email: data.email || user?.email || "",
       fulfillment,
-      collection_location_id: selectedLocationId,
+      ...(selectedTumira ? { collection_location: {
+        name: selectedTumira.name,
+        address: selectedTumira.address,
+        city: selectedTumira.city,
+        courier_name: selectedTumira.courier_name,
+        rate: selectedTumira.rate,
+      } } : {}),
       fulfillment_fee: fulfillment === "delivery" ? deliveryFee : tumiraFee,
       address: fulfillment === "delivery" ? {
         name: data.address_name,
         phone: data.phone,
-        address: data.address_line,
+        address: [data.house_number, data.street, data.suburb].filter(Boolean).join(", "),
         city: data.city,
         province: data.province,
-        ...(selectedCourier ? { courier_id: selectedCourier.courier_id, courier_name: selectedCourier.courier_name, service_type: selectedCourier.service_type } : {}),
+        ...(pinLat !== null && pinLng !== null ? { lat: pinLat, lng: pinLng } : {}),
+        ...(selectedCourier ? { courier_id: selectedCourier.courier_id, courier_name: selectedCourier.courier_name, service_type: selectedCourier.service_type, distance_km: selectedCourier.distance_km, distance_source: selectedCourier.distance_source } : {}),
       } : undefined,
       order_type: "retail",
     })
@@ -294,6 +390,28 @@ function onSubmit(data: CheckoutForm) {
           <p className="font-semibold">Your cart is empty</p>
           <Link href="/buy-agrochemicals" className="inline-flex items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-semibold px-6 py-2.5 hover:bg-primary/90 transition-colors">
             Shop Now
+          </Link>
+        </div>
+      </div>
+    )
+  }
+
+  if (step === "cancelled") {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <div className="max-w-md w-full text-center space-y-6">
+          <div className="w-16 h-16 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mx-auto">
+            <span className="text-2xl">✕</span>
+          </div>
+          <div>
+            <h1 className="text-xl font-bold">Payment Cancelled</h1>
+            <p className="text-muted-foreground mt-1 text-sm">Order <span className="font-semibold text-foreground">{orderNumber}</span></p>
+          </div>
+          <div className="bg-muted rounded-xl p-5 text-sm text-muted-foreground">
+            Your payment was cancelled or declined by your payment provider. You can retry payment from your order.
+          </div>
+          <Link href={`/account/orders/${orderId}`} className="block w-full text-center bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-sm py-3 rounded-full transition-colors">
+            Retry Payment
           </Link>
         </div>
       </div>
@@ -532,9 +650,19 @@ function onSubmit(data: CheckoutForm) {
               {fulfillment === "delivery" && (
                 <section className="rounded-xl p-5 space-y-4">
                   <div className="flex items-center justify-between">
-                    <h2 className="font-semibold">Delivery Address</h2>
+                    <div className="flex items-center gap-1.5">
+                      <h2 className="font-semibold">Delivery Address</h2>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Info className="w-3.5 h-3.5 text-muted-foreground cursor-pointer translate-y-px" />
+                          </TooltipTrigger>
+                          <TooltipContent side="right" className="rounded-md text-[10px] max-w-[140px]">Please enter your correct address for accurate delivery</TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
                     {(selectedCourier || (deliveryAddressComplete && deliveryCouriers.length > 0)) && (
-                      <button type="button" onClick={() => { setSelectedCourierId(""); setValue("address_line", ""); setValue("city", ""); setValue("province", "") }} className="text-xs text-muted-foreground hover:text-foreground">
+                      <button type="button" onClick={() => { setSelectedCourierId(""); setValue("house_number", ""); setValue("street", ""); setValue("suburb", ""); setValue("city", ""); setValue("province", "") }} className="text-xs text-muted-foreground hover:text-foreground">
                         Change
                       </button>
                     )}
@@ -557,13 +685,31 @@ function onSubmit(data: CheckoutForm) {
                       {errors.address_name && <p className="text-xs text-destructive mt-1">{errors.address_name.message}</p>}
                     </div>
                     <div>
-                      <label className="text-sm font-medium block mb-1">Street Address</label>
+                      <label className="text-sm font-medium block mb-1">House / Flat No. / Building</label>
                       <input
-                        {...register("address_line", { required: fulfillment === "delivery" ? "Address is required" : false })}
-                        placeholder="123 Main Street"
+                        {...register("house_number", { required: fulfillment === "delivery" ? "House / flat number is required" : false })}
+                        placeholder="Flat 24, Block 24"
                         className="w-full border rounded-lg px-3 py-2 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-ring"
                       />
-                      {errors.address_line && <p className="text-xs text-destructive mt-1">{errors.address_line.message}</p>}
+                      {errors.house_number && <p className="text-xs text-destructive mt-1">{errors.house_number.message}</p>}
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium block mb-1">Street / Complex</label>
+                      <input
+                        {...register("street", { required: fulfillment === "delivery" ? "Street is required" : false })}
+                        placeholder="Zambezi Flats, Quendon Road"
+                        className="w-full border rounded-lg px-3 py-2 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+                      />
+                      {errors.street && <p className="text-xs text-destructive mt-1">{errors.street.message}</p>}
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium block mb-1">Suburb</label>
+                      <input
+                        {...register("suburb", { required: fulfillment === "delivery" ? "Suburb is required" : false })}
+                        placeholder="Malbereign"
+                        className="w-full border rounded-lg px-3 py-2 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+                      />
+                      {errors.suburb && <p className="text-xs text-destructive mt-1">{errors.suburb.message}</p>}
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       <div>
@@ -577,18 +723,52 @@ function onSubmit(data: CheckoutForm) {
                       </div>
                       <div>
                         <label className="text-sm font-medium block mb-1">Province</label>
-                        <select
-                          {...register("province", { required: fulfillment === "delivery" ? "Province is required" : false })}
-                          className="w-full border rounded-lg px-3 py-2 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+                        <Select
+                          value={watchedProvince}
+                          onValueChange={(val) => setValue("province", val, { shouldValidate: true })}
                         >
-                          <option value="">Select...</option>
-                          {PROVINCES.map((p) => (
-                            <option key={p} value={p}>{p}</option>
-                          ))}
-                        </select>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select..." />
+                          </SelectTrigger>
+                          <SelectContent className="max-h-48 overflow-y-auto">
+                            {PROVINCES.map((p) => (
+                              <SelectItem key={p} value={p}>{p}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                         {errors.province && <p className="text-xs text-destructive mt-1">{errors.province.message}</p>}
                       </div>
                     </div>
+                    {deliveryAddressComplete && !addressConfirmed && (
+                      <button
+                        type="button"
+                        disabled={geochecking}
+                        onClick={async () => {
+                          setGeochecking(true)
+                          try {
+                            const res = await queryTumiraCheckAddress(watchedAddress, watchedCity)
+                            const result = res.data
+                            if (!result.needs_pin_drop) {
+                              setPinLat(result.lat)
+                              setPinLng(result.lng)
+                              setAddressConfirmed(true)
+                            } else {
+                              if (result.lat && result.lng) {
+                                preCentreRef.current = { lat: result.lat, lng: result.lng }
+                              }
+                              setPinModalOpen(true)
+                            }
+                          } catch {
+                            setPinModalOpen(true)
+                          } finally {
+                            setGeochecking(false)
+                          }
+                        }}
+                        className="mt-2 w-full rounded-lg bg-primary text-primary-foreground px-4 py-2 text-sm font-medium hover:bg-primary/90 disabled:opacity-60 flex items-center justify-center gap-2"
+                      >
+                        {geochecking ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Checking...</> : "Confirm your delivery location →"}
+                      </button>
+                    )}
                   </div>
                   )}
                 </section>
@@ -607,9 +787,22 @@ function onSubmit(data: CheckoutForm) {
                   )}
                   {!deliveryAddressComplete ? (
                     <p className="text-xs text-muted-foreground">Fill in your address above to see delivery options.</p>
+                  ) : !addressConfirmed ? (
+                    <p className="text-xs text-muted-foreground">Confirm your delivery location above to see options.</p>
                   ) : ratesFetching ? (
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       <Loader2 className="w-3.5 h-3.5 animate-spin" /> Getting rates...
+                    </div>
+                  ) : ratesError ? (
+                    <div className="space-y-2">
+                      <p className="text-xs text-muted-foreground">Could not fetch delivery rates. Please try again.</p>
+                      <button
+                        type="button"
+                        onClick={() => setAddressConfirmed(false)}
+                        className="text-xs font-medium text-primary hover:underline"
+                      >
+                        Try Again
+                      </button>
                     </div>
                   ) : noDoorToDoor ? (
                     <div className="space-y-3">
@@ -645,8 +838,28 @@ function onSubmit(data: CheckoutForm) {
                         </div>
                       )}
                     </div>
-                  ) : deliveryCouriers.length === 0 ? (
-                    <p className="text-xs text-muted-foreground">No delivery options available for your area.</p>
+                  ) : addressConfirmed && deliveryCouriers.length === 0 ? (
+                    <div className="space-y-3">
+                      <p className="text-xs text-muted-foreground">No delivery options available for your area.</p>
+                      <button
+                        type="button"
+                        onClick={() => setAddressConfirmed(false)}
+                        className="text-xs font-medium text-primary hover:underline"
+                      >
+                        Try Again
+                      </button>
+                      <div className="rounded-lg border border-dashed p-3 space-y-1.5">
+                        <p className="text-xs font-medium">Try Click &amp; Collect instead</p>
+                        <p className="text-xs text-muted-foreground">Pick up your order from a Tumira hub near you.</p>
+                        <button
+                          type="button"
+                          onClick={() => { setFulfillment("click_collect"); setSelectedCourierId("") }}
+                          className="text-xs font-medium text-primary hover:underline"
+                        >
+                          Select a pickup point →
+                        </button>
+                      </div>
+                    </div>
                   ) : (
                     <div className="space-y-2">
                       {/* Search — hidden when courier selected */}
@@ -676,7 +889,7 @@ function onSubmit(data: CheckoutForm) {
                       })()}
                       {/* Scrollable list — hidden once selected */}
                       {!selectedCourier && (
-                        <div className="h-52 overflow-y-auto space-y-1 pr-1">
+                        <div className="space-y-1 pr-1">
                           {(() => {
                             const filtered = doorToDoorCouriers.filter((c) =>
                               courierSearch === "" || c.courier_name.toLowerCase().includes(courierSearch.toLowerCase())
@@ -856,7 +1069,7 @@ function onSubmit(data: CheckoutForm) {
                 <div className="px-5 pb-5">
                   <button
                     type="submit"
-                    disabled={checkoutMutation.isPending || items.length === 0 || (needsTumira && (pickupLocations.length > 0 || needsTumira) && !selectedLocationId)}
+                    disabled={checkoutMutation.isPending || items.length === 0 || (needsTumira && (pickupLocations.length > 0 || needsTumira) && !selectedLocationId) || (fulfillment === "delivery" && !selectedCourierId)}
                     className="flex items-center justify-center gap-2 w-full bg-primary hover:bg-primary/90 disabled:opacity-60 text-primary-foreground font-semibold text-sm py-3 rounded-full transition-colors"
                   >
                     {checkoutMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <CreditCard className="w-4 h-4" />}
@@ -869,6 +1082,54 @@ function onSubmit(data: CheckoutForm) {
           </div>
         </form>
       </div>
+
+      {/* ── Pin Drop Modal ── */}
+      {pinModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-background rounded-xl w-full max-w-lg shadow-xl overflow-hidden">
+            <div className="px-5 py-4 border-b flex items-center justify-between">
+              <div>
+                <p className="font-semibold text-sm">Confirm your delivery location</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Move the pin to your exact address, then confirm</p>
+              </div>
+              <button type="button" onClick={() => setPinModalOpen(false)} className="text-muted-foreground hover:text-foreground text-lg leading-none">✕</button>
+            </div>
+            <div ref={mapRef} className="w-full h-72 bg-muted/30" />
+            <div className="px-5 py-4 flex gap-3 justify-end">
+              <button
+                type="button"
+                onClick={() => setPinModalOpen(false)}
+                className="text-sm px-4 py-2 rounded-lg border hover:bg-muted transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={confirmingPin}
+                onClick={async () => {
+                  if (!pendingPinRef.current) return
+                  const { lat, lng } = pendingPinRef.current
+                  setConfirmingPin(true)
+                  try {
+                    await queryTumiraConfirmPin({ address: watchedAddress, city: watchedCity, lat, lng })
+                  } catch {
+                    // save failed — still proceed with rates using confirmed coords
+                  } finally {
+                    setConfirmingPin(false)
+                  }
+                  setPinLat(lat)
+                  setPinLng(lng)
+                  setAddressConfirmed(true)
+                  setPinModalOpen(false)
+                }}
+                className="text-sm px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors font-medium disabled:opacity-60 flex items-center gap-2"
+              >
+                {confirmingPin ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Saving...</> : "Confirm Location"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
