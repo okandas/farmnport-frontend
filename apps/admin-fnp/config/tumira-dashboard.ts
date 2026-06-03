@@ -15,6 +15,17 @@ export const tumiraDashboardConfig: DashboardConfig = {
       ],
     },
     {
+      label: "Address Intelligence",
+      alwaysOpen: true,
+      items: [
+        {
+          title: "Geocoded Addresses",
+          href: "/dashboard/tumira/geocoded-addresses",
+          icon: "mapPin",
+        },
+      ],
+    },
+    {
       label: "Couriers",
       alwaysOpen: true,
       items: [
