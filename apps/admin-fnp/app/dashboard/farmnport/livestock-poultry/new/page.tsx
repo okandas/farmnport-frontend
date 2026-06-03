@@ -455,7 +455,7 @@ export default function NewLivestockPoultryPage() {
                             )}
                         </div>
 
-                        <ProductPricingSection control={form.control} />
+                        <ProductPricingSection />
 
                     </div>
 

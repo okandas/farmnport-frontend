@@ -364,10 +364,9 @@ export default function EditAnimalHealthProductPage({ params }: { params: Promis
                             </div>
                         </div>
 
-                        <ProductPricingSection control={form.control} />
+                        <ProductPricingSection />
 
                         <ProductVariantsSection
-                            control={form.control}
                             variantFields={variantFields}
                             appendVariant={appendVariant}
                             removeVariant={removeVariant}
@@ -456,7 +455,6 @@ export default function EditAnimalHealthProductPage({ params }: { params: Promis
                     </div>
 
                     <ProductFulfillmentSection
-                        control={form.control}
                         allLocations={allLocations}
                         pickupLocations={pickupLocations ?? []}
                         setPickupLocations={setPickupLocations}

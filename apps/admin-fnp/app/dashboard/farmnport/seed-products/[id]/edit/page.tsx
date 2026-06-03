@@ -531,10 +531,9 @@ function EditForm({ product, id }: { product: any; id: string }) {
                             </div>
                         </div>
 
-                        <ProductPricingSection control={form.control} />
+                        <ProductPricingSection />
 
                         <ProductFulfillmentSection
-                            control={form.control}
                             allLocations={allLocations}
                             pickupLocations={pickupLocations ?? []}
                             setPickupLocations={setPickupLocations}

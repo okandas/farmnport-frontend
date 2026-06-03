@@ -1,12 +1,11 @@
 "use client"
 
-import { Control } from "react-hook-form"
+import { useFormContext } from "react-hook-form"
 import { Checkbox } from "@/components/ui/checkbox"
 import { FormControl, FormField, FormItem } from "@/components/ui/form"
 import { LocationMultiSelect, SelectedLocation } from "@/components/ui/location-multi-select"
 
 interface ProductFulfillmentSectionProps {
-    control: Control<any>
     allLocations: { id: string; name: string; active: boolean }[]
     pickupLocations: SelectedLocation[]
     setPickupLocations: (locs: SelectedLocation[]) => void
@@ -17,7 +16,6 @@ interface ProductFulfillmentSectionProps {
 }
 
 export function ProductFulfillmentSection({
-    control,
     allLocations,
     pickupLocations,
     setPickupLocations,
@@ -26,6 +24,7 @@ export function ProductFulfillmentSection({
     pickupQueryKey,
     deliveryQueryKey,
 }: ProductFulfillmentSectionProps) {
+    const { control } = useFormContext()
     return (
         <div className="border-b border-gray-900/10 dark:border-gray-100/10 pb-12 mt-6">
             <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">Fulfillment</h2>

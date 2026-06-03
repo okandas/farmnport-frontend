@@ -373,7 +373,7 @@ export default function NewSeedProductPage() {
                             )}
                         </div>
 
-                        <ProductPricingSection control={form.control} />
+                        <ProductPricingSection />
 
                     </div>
 

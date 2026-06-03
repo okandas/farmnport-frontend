@@ -1,13 +1,12 @@
 "use client"
 
-import { Control, FieldArrayWithId, UseFieldArrayAppend, UseFieldArrayRemove } from "react-hook-form"
+import { useFormContext, FieldArrayWithId, UseFieldArrayAppend, UseFieldArrayRemove } from "react-hook-form"
 import { FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Icons } from "@/components/icons/lucide"
 
 interface ProductVariantsSectionProps {
-    control: Control<any>
     variantFields: FieldArrayWithId<any, any, "id">[]
     appendVariant: UseFieldArrayAppend<any, any>
     removeVariant: UseFieldArrayRemove
@@ -15,12 +14,12 @@ interface ProductVariantsSectionProps {
 }
 
 export function ProductVariantsSection({
-    control,
     variantFields,
     appendVariant,
     removeVariant,
     watchedVariants,
 }: ProductVariantsSectionProps) {
+    const { control } = useFormContext()
     return (
         <div className="border-b border-gray-900/10 dark:border-gray-100/10 pb-12">
             <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">Pack Sizes / Variants</h2>

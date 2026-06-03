@@ -862,7 +862,7 @@ export default function NewFeedProductPage() {
                     )}
                 </div>
 
-                <ProductPricingSection control={form.control} />
+                <ProductPricingSection />
 
                     <div className="mt-6 flex items-center justify-end gap-x-6">
                         <button

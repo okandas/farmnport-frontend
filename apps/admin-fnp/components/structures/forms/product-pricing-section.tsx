@@ -1,15 +1,12 @@
 "use client"
 
-import { Control } from "react-hook-form"
+import { useFormContext } from "react-hook-form"
 import { Checkbox } from "@/components/ui/checkbox"
 import { FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 
-interface ProductPricingSectionProps {
-    control: Control<any>
-}
-
-export function ProductPricingSection({ control }: ProductPricingSectionProps) {
+export function ProductPricingSection() {
+    const { control } = useFormContext()
     return (
         <div className="border-b border-gray-900/10 dark:border-gray-100/10 pb-12">
             <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">Pricing & Stock</h2>

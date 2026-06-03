@@ -35,6 +35,11 @@ export default function CreateAgroChemicalPage() {
         show_was_price: false,
         sale_price: 0,
         was_price: 0,
+        weight_grams: 0,
+        delivery_available: false,
+        pickup_available: false,
+        pickup_location_ids: [],
+        delivery_location_ids: [],
     })
 
     return (

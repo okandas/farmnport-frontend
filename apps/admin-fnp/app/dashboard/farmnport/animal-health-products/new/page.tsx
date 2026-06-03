@@ -149,10 +149,9 @@ export default function NewAnimalHealthProductPage() {
                             </div>
                         </div>
 
-                        <ProductPricingSection control={form.control} />
+                        <ProductPricingSection />
 
                         <ProductVariantsSection
-                            control={form.control}
                             variantFields={variantFields}
                             appendVariant={appendVariant}
                             removeVariant={removeVariant}

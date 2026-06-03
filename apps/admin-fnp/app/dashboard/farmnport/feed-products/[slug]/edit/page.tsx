@@ -956,10 +956,9 @@ export default function EditFeedProductPage({ params }: { params: Promise<{ slug
                     )}
                 </div>
 
-                <ProductPricingSection control={form.control} />
+                <ProductPricingSection />
 
                 <ProductFulfillmentSection
-                    control={form.control}
                     allLocations={allLocations}
                     pickupLocations={pickupLocations ?? []}
                     setPickupLocations={setPickupLocations}

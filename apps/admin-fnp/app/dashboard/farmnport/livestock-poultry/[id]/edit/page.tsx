@@ -21,6 +21,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
 import { Check, ChevronsUpDown } from "lucide-react"
 import { SearchSelect } from "@/components/ui/search-select"
+import { Checkbox } from "@/components/ui/checkbox"
 import { SelectedLocation } from "@/components/ui/location-multi-select"
 import { ProductPricingSection } from "@/components/structures/forms/product-pricing-section"
 import { ProductFulfillmentSection } from "@/components/structures/forms/product-fulfillment-section"
@@ -527,10 +528,9 @@ function EditForm({ product }: { product: any }) {
                             </div>
                         </div>
 
-                        <ProductPricingSection control={form.control} />
+                        <ProductPricingSection />
 
                         <ProductFulfillmentSection
-                            control={form.control}
                             allLocations={allLocations}
                             pickupLocations={pickupLocations ?? []}
                             setPickupLocations={setPickupLocations}
