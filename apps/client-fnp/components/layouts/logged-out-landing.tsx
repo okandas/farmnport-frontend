@@ -15,22 +15,22 @@ interface MarketplaceCounts {
     farmers: number
 }
 
-export function LoggedOutLanding({ counts }: { counts: MarketplaceCounts }) {
+export function LoggedOutLanding({ counts = { buyers: 0, farmers: 0 } }: { counts?: MarketplaceCounts }) {
     return (
         <main>
-            <div className="py-12 lg:py-16">
+            <div className="py-6 lg:py-8">
                 <div className="mx-auto max-w-7xl px-6 lg:px-8">
                     <div className="mx-auto max-w-2xl text-center">
                         <div className="mb-6 inline-flex">
-                            <Link href="/prices" onClick={() => sendGTMEvent({ event: "click", value: "PricingCTAHero" })}>
-                                <div className="relative rounded-full px-3 py-1 text-sm leading-6 bg-gradient-to-r from-green-500 to-emerald-600 text-white ring-2 ring-green-500/50 hover:ring-green-600 transition-all animate-pulse hover:animate-none hover:scale-105 shadow-lg hover:shadow-green-500/50">
-                                    New! <span className="whitespace-nowrap font-semibold">Check Market Prices <span aria-hidden="true">&rarr;</span></span>
+                            <Link href="/buy" onClick={() => sendGTMEvent({ event: "click", value: "PricingCTAHero" })}>
+                                <div className="text-sm leading-6 text-green-600 dark:text-green-400 font-medium">
+                                    New! <span className="whitespace-nowrap font-semibold">Buy Online <span aria-hidden="true">&rarr;</span></span>
                                 </div>
                             </Link>
                         </div>
                         <h1 className="text-4xl font-bold tracking-tight sm:text-6xl font-heading">Getting You To Market.</h1>
                         <p className="mt-6 text-lg leading-8 text-muted-foreground sm:text-xl sm:leading-8">
-                            Its never been easier to pre plan your harvest sales, with fresh farm produce buyers at the tip of your fingers. Farmnport the best place to find buyers for your agriproduce.
+                            Pre-order day-old chicks and harvests, buy and sell fresh produce, livestock, seeds and farm inputs — with full traceability.
                         </p>
                         {(counts.buyers > 0 || counts.farmers > 0) && (
                             <div className="mt-8 flex items-center justify-center gap-x-8 sm:gap-x-12">
@@ -55,13 +55,13 @@ export function LoggedOutLanding({ counts }: { counts: MarketplaceCounts }) {
                         {/* For Farmers - Large Card */}
                         <div className="flex p-px lg:col-span-4 lg:row-span-2">
                             <div className="w-full overflow-hidden rounded-lg bg-card shadow outline outline-1 outline-black/5 max-lg:rounded-t-[2rem] lg:rounded-tl-[2rem] dark:shadow-none dark:outline-white/15">
-                                <div className="p-10">
+                                <div className="p-6">
                                     <h3 className="text-sm/4 font-semibold text-muted-foreground">For Farmers</h3>
                                     <p className="mt-2 text-lg font-medium tracking-tight">Everything you need to succeed</p>
                                     <p className="mt-2 max-w-lg text-sm/6 text-muted-foreground">
                                         Plan your harvest, source affordable inputs, get expert agronomist support, and access the latest seeds, breeds and vaccines.
                                     </p>
-                                    <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                    <div className="mt-6 grid grid-cols-2 gap-4">
                                         {[
                                             { company: "Planning", title: "Plan, Grow and Sell Produce", logo: logoPlanning },
                                             { company: "Inputs", title: "Source affordable inputs", logo: logoInputs },
@@ -88,9 +88,9 @@ export function LoggedOutLanding({ counts }: { counts: MarketplaceCounts }) {
                             <div className="w-full overflow-hidden rounded-lg bg-card shadow outline outline-1 outline-black/5 lg:rounded-tr-[2rem] dark:shadow-none dark:outline-white/15">
                                 <div className="p-6">
                                     <h3 className="text-sm/4 font-semibold text-muted-foreground">Direct Buyers</h3>
-                                    <p className="mt-2 text-lg font-medium tracking-tight">Sell directly to buyers</p>
+                                    <p className="mt-2 text-lg font-medium tracking-tight">Sell directly to verified buyers</p>
                                     <p className="mt-2 max-w-lg text-sm/6 text-muted-foreground">
-                                        Connect with {counts.buyers > 0 ? `${counts.buyers.toLocaleString()}+` : ''} buyers actively sourcing fresh farm produce across Zimbabwe.
+                                        {counts.buyers > 0 ? `${counts.buyers.toLocaleString()}+ buyers` : 'Buyers'} actively sourcing fresh produce, livestock, poultry and seeds. Get your farm profile approved and start placing lots.
                                     </p>
                                 </div>
                             </div>
@@ -101,37 +101,40 @@ export function LoggedOutLanding({ counts }: { counts: MarketplaceCounts }) {
                             <div className="w-full overflow-hidden rounded-lg bg-card shadow outline outline-1 outline-black/5 dark:shadow-none dark:outline-white/15">
                                 <div className="p-6">
                                     <h3 className="text-sm/4 font-semibold text-muted-foreground">Market Prices</h3>
-                                    <p className="mt-2 text-lg font-medium tracking-tight">Real-time pricing data</p>
+                                    <p className="mt-2 text-lg font-medium tracking-tight">Market prices for crops, livestock and inputs</p>
                                     <p className="mt-2 max-w-lg text-sm/6 text-muted-foreground">
-                                        Get accurate market prices to plan your harvest sales and maximize profitability.
+                                        Get accurate market prices to plan your sales and purchases and maximize profitability.
                                     </p>
                                 </div>
                             </div>
                         </div>
 
                         {/* CTA Card - Full Width */}
-                        <div className="flex p-px lg:col-span-6">
-                            <div className="w-full overflow-hidden rounded-lg bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20 shadow outline outline-1 outline-black/5 max-lg:rounded-b-[2rem] lg:rounded-b-[2rem] dark:shadow-none dark:outline-white/15">
-                                <div className="p-10">
-                                    <h3 className="text-sm/4 font-semibold text-orange-600 dark:text-orange-500">Get Started Today</h3>
-                                    <p className="mt-2 text-lg font-medium tracking-tight">Join {counts.farmers > 0 ? `${counts.farmers.toLocaleString()}+` : ''} farmers on the platform</p>
-                                    <p className="mt-2 max-w-lg text-sm/6 text-muted-foreground mb-6">
-                                        Build a profitable agricultural business with access to verified buyers, market insights, quality inputs and expert guidance all in one platform.
-                                    </p>
-                                    <Link href="/signup">
-                                        <Button className="bg-orange-700 hover:bg-orange-800 text-white dark:bg-orange-500 dark:hover:bg-orange-400 justify-center" onClick={() => sendGTMEvent({ event: "link", value: "SignupHeroNavigation" })}>
-                                            Get Started
-                                            <ArrowDownIcon className="h-4 w-4 text-white" />
-                                        </Button>
-                                    </Link>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
-            <FeaturedPopularSection />
             <Featured />
+            <FeaturedPopularSection />
+            <section className="bg-background py-6 lg:py-8">
+                <div className="mx-auto max-w-7xl px-6 lg:px-8">
+                    <div className="w-full overflow-hidden rounded-2xl bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20 shadow outline outline-1 outline-black/5 dark:shadow-none dark:outline-white/15">
+                        <div className="p-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+                            <div>
+                                <p className="text-lg font-medium tracking-tight">Join {counts.farmers > 0 ? `${counts.farmers.toLocaleString()}+` : ''} farmers on the platform</p>
+                                <p className="mt-1 text-sm/6 text-muted-foreground">
+                                    Pre-order, buy and sell fresh produce, livestock, seeds and farm inputs — with full traceability.
+                                </p>
+                            </div>
+                            <Link href="/signup" className="shrink-0">
+                                <Button className="bg-orange-700 hover:bg-orange-800 text-white dark:bg-orange-500 dark:hover:bg-orange-400" onClick={() => sendGTMEvent({ event: "link", value: "SignupHeroNavigation" })}>
+                                    Get Started
+                                    <ArrowDownIcon className="h-4 w-4 text-white" />
+                                </Button>
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </main>
     )
 }
@@ -176,7 +179,7 @@ function Featured() {
         },
         {
             name: "Market Prices",
-            description: "Real-time livestock pricing data to plan your sales and maximize profit.",
+            description: "Market prices for crops, livestock and inputs to plan your sales and maximize profit.",
             href: "/prices",
             event: "LandingMarketPrices",
             icon: (
@@ -199,7 +202,7 @@ function Featured() {
     ]
 
     return (
-        <section className="bg-background py-12 lg:py-16">
+        <section className="bg-background py-6 lg:py-8">
             <div className="mx-auto max-w-7xl px-6 lg:px-8">
                 <div className="mx-auto max-w-2xl lg:mx-0">
                     <h2 className="mb-4 text-4xl font-bold leading-none tracking-tight sm:text-5xl font-heading">
@@ -268,7 +271,7 @@ function FeaturedPopularSection() {
 
 
     return (
-        <div className="py-12 lg:py-16">
+        <div className="py-6 lg:py-8">
             <div className="mx-auto max-w-7xl px-6 lg:px-8">
                 <div className="mx-auto max-w-2xl lg:mx-0">
                     <h2 className="mb-4 text-4xl font-bold leading-none tracking-tight sm:text-5xl font-heading">
