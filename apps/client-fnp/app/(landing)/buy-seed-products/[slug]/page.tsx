@@ -12,7 +12,7 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const { slug } = await params
     const product = await serverFetch(`/seed-products/${slug}`).catch(() => null)
-    if (!product) return { title: 'Seed Product | farmnport.com' }
+    if (!product) return { title: 'Seed Product | farmnport.com', robots: { index: false } }
     const variety = product.variety ? ` — ${product.variety}` : ""
     const name = formatProductName(product.name)
     const brand = formatProductName(product.brand.name)

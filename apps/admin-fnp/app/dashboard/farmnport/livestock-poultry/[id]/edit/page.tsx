@@ -59,6 +59,7 @@ const Schema = z.object({
     sale_price: z.coerce.number().default(0),
     was_price: z.coerce.number().default(0),
     weight_grams: z.coerce.number().int().nonnegative().default(0),
+    is_test: z.boolean().default(false),
     delivery_available: z.boolean().default(false),
     pickup_available: z.boolean().default(false),
 }).refine((data) => !!data.brand_id || !!data.seller_id, {
@@ -126,6 +127,7 @@ function EditForm({ product }: { product: any }) {
             sale_price: product?.sale_price || 0,
             was_price: product?.was_price || 0,
             weight_grams: product?.weight_grams ?? 0,
+            is_test: (product as any)?.is_test ?? false,
             delivery_available: product?.delivery_available || false,
             pickup_available: (product as any)?.pickup_available || false,
         },

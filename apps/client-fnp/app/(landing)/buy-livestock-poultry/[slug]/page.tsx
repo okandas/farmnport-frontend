@@ -12,7 +12,7 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const { slug } = await params
     const product = await serverFetch(`/livestock-poultry/${slug}`).catch(() => null)
-    if (!product) return { title: 'Livestock & Poultry | farmnport.com' }
+    if (!product) return { title: 'Livestock & Poultry | farmnport.com', robots: { index: false } }
     const category = [product.species, product.type].filter(Boolean).join(' ') || 'Livestock & Poultry'
     return buildBuyMetadata(product, category, `/buy-livestock-poultry/${slug}`)
 }

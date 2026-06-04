@@ -45,6 +45,22 @@ export function ProductPricingSection() {
                         )}
                     />
                 </div>
+                <div className="sm:col-span-3 flex items-center gap-4">
+                    <FormField
+                        control={control}
+                        name="is_test"
+                        render={({ field }) => (
+                            <FormItem className="flex items-center gap-2">
+                                <FormControl>
+                                    <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                                </FormControl>
+                                <label className="text-sm font-medium text-orange-600 dark:text-orange-400 cursor-pointer" onClick={() => field.onChange(!field.value)}>
+                                    Test Product
+                                </label>
+                            </FormItem>
+                        )}
+                    />
+                </div>
                 <div className="sm:col-span-2">
                     <FormField
                         control={control}

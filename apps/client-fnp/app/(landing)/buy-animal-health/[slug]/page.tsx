@@ -13,7 +13,7 @@ interface BuyAnimalHealthProductPageProps {
 export async function generateMetadata({ params }: BuyAnimalHealthProductPageProps): Promise<Metadata> {
     const { slug } = await params
     const product = await serverFetch(`/animalhealth/${slug}`).catch(() => null)
-    if (!product) return { title: 'Animal Health Product | farmnport.com' }
+    if (!product) return { title: 'Animal Health Product | farmnport.com', robots: { index: false } }
     return buildBuyMetadata(product, product.animal_health_category?.name || 'Animal Health', `/buy-animal-health/${slug}`, 'poultry and livestock in Zimbabwe')
 }
 

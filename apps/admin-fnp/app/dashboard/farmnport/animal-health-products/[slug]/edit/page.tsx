@@ -8,7 +8,7 @@ import { useForm, useFieldArray } from "react-hook-form"
 import { useRouter } from "next/navigation"
 
 import { updateAnimalHealthProduct, queryAnimalHealthProduct, queryBrands, queryAnimalHealthCategories, queryClientLocations } from "@/lib/query"
-import { FormAnimalHealthProductSchema, FormAnimalHealthProductModel, AnimalHealthProduct, Brand, AnimalHealthCategory } from "@/lib/schemas"
+import { FormAnimalHealthProductSchema, AnimalHealthProduct, Brand, AnimalHealthCategory } from "@/lib/schemas"
 import { cn, centsToDollarsFormInputs, dollarsToCents } from "@/lib/utilities"
 import { buttonVariants, Button } from "@/components/ui/button"
 import { Icons } from "@/components/icons/lucide"
@@ -73,7 +73,7 @@ export default function EditAnimalHealthProductPage({ params }: { params: Promis
         setDeliveryLocations(ids.map((id: string) => allLocations.find((l) => l.id === id)).filter(Boolean) as SelectedLocation[])
     }
 
-    const form = useForm<FormAnimalHealthProductModel>({
+    const form = useForm({
         defaultValues: {
             id: product?.id || "",
             name: product?.name || "",
@@ -88,6 +88,7 @@ export default function EditAnimalHealthProductPage({ params }: { params: Promis
             sale_price: product?.sale_price ?? 0,
             was_price: product?.was_price ?? 0,
             weight_grams: product?.weight_grams ?? 0,
+            is_test: (product as any)?.is_test ?? false,
             variants: product?.variants || [],
             precautions: product?.precautions || [],
             status: product?.status ?? "active",
@@ -122,6 +123,7 @@ export default function EditAnimalHealthProductPage({ params }: { params: Promis
             pickup_available: (product as any)?.pickup_available ?? false,
             pickup_location_ids: product.pickup_location_ids ?? [],
             delivery_location_ids: product.delivery_location_ids ?? [],
+            is_test: (product as any).is_test ?? false,
         } : undefined,
         resolver: zodResolver(FormAnimalHealthProductSchema),
     })
@@ -153,12 +155,12 @@ export default function EditAnimalHealthProductPage({ params }: { params: Promis
         },
     })
 
-    async function onSubmit(data: FormAnimalHealthProductModel) {
+    async function onSubmit(data: any) {
         mutate({
             ...data,
             sale_price: dollarsToCents(data.sale_price),
             was_price: dollarsToCents(data.was_price),
-            variants: data.variants.map(v => ({
+            variants: data.variants.map((v: any) => ({
                 ...v,
                 sale_price: dollarsToCents(v.sale_price),
                 was_price: dollarsToCents(v.was_price),

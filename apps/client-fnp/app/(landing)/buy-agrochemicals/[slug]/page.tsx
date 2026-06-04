@@ -13,7 +13,7 @@ interface BuyAgroChemicalPageProps {
 export async function generateMetadata({ params }: BuyAgroChemicalPageProps): Promise<Metadata> {
     const { slug } = await params
     const chemical = await serverFetch(`/agrochemical/${slug}`).catch(() => null)
-    if (!chemical) return { title: 'Agrochemical | farmnport.com' }
+    if (!chemical) return { title: 'Agrochemical | farmnport.com', robots: { index: false } }
     return buildBuyMetadata(chemical, chemical.agrochemical_category?.name || 'Agrochemical', `/buy-agrochemicals/${slug}`)
 }
 

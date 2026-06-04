@@ -12,7 +12,7 @@ interface BuyPlantNutritionProductPageProps {
 export async function generateMetadata({ params }: BuyPlantNutritionProductPageProps): Promise<Metadata> {
     const { slug } = await params
     const product = await serverFetch(`/plantnutrition/${slug}`).catch(() => null)
-    if (!product) return { title: 'Plant Nutrition Product | farmnport.com' }
+    if (!product) return { title: 'Plant Nutrition Product | farmnport.com', robots: { index: false } }
     return buildBuyMetadata(product, product.plant_nutrition_category?.name || 'Plant Nutrition', `/buy-plant-nutrition/${slug}`, 'Zimbabwe crops')
 }
 

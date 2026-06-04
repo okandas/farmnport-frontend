@@ -61,6 +61,7 @@ const Schema = z.object({
     sale_price: z.coerce.number().default(0),
     was_price: z.coerce.number().default(0),
     weight_grams: z.coerce.number().int().nonnegative().default(0),
+    is_test: z.boolean().default(false),
 })
 
 type FormModel = z.infer<typeof Schema>

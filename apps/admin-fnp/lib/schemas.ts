@@ -528,6 +528,7 @@ export const AgroChemicalSchema = z.object({
   show_was_price: z.boolean().default(false),
   was_price: z.coerce.number().nonnegative().default(0),
   weight_grams: z.coerce.number().int().nonnegative().default(0),
+  is_test: z.boolean().default(false),
   delivery_available: z.boolean().default(false),
   pickup_available: z.boolean().default(false),
   pickup_location_ids: z.array(z.string()).optional().default([]),
@@ -800,6 +801,7 @@ export const AnimalHealthProductSchema = z.object({
   precautions: z.array(z.string()).default([]),
   status: z.enum(["active", "inactive"]).default("active"),
   weight_grams: z.coerce.number().int().nonnegative().default(0),
+  is_test: z.boolean().default(false),
   delivery_available: z.boolean().default(false),
   pickup_available: z.boolean().default(false),
   pickup_location_ids: z.array(z.string()).optional().default([]),
@@ -1013,6 +1015,7 @@ export const FeedProductSchema = z.object({
   sale_price: z.coerce.number().nonnegative().default(0),
   was_price: z.coerce.number().nonnegative().default(0),
   weight_grams: z.coerce.number().int().nonnegative().default(0),
+  is_test: z.boolean().default(false),
   created: z.string().optional(),
   updated: z.string().optional(),
 }).refine(data => !data.available_for_sale || data.weight_grams > 0, {
@@ -1188,6 +1191,7 @@ export const RestaurantLocationSchema = z.object({
   status: z.enum(["active", "inactive", "closed"]).default("active"),
   accessible: z.boolean().optional(),
   pre_orders_enabled: z.boolean().default(false),
+  drive_through: z.boolean().default(false),
   created: z.string().optional(),
   updated: z.string().optional(),
 })

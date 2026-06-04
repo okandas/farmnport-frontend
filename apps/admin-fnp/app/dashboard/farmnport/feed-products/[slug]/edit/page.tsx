@@ -78,6 +78,7 @@ const EditFeedProductSchema = z.object({
     sale_price: z.coerce.number().nonnegative().default(0),
     was_price: z.coerce.number().nonnegative().default(0),
     weight_grams: z.coerce.number().int().nonnegative().default(0),
+    is_test: z.boolean().default(false),
     delivery_available: z.boolean().default(false),
     pickup_available: z.boolean().default(false),
 }).refine(data => !data.available_for_sale || data.weight_grams > 0, {
@@ -166,6 +167,7 @@ export default function EditFeedProductPage({ params }: { params: Promise<{ slug
             sale_price: product?.sale_price ?? 0,
             was_price: product?.was_price ?? 0,
             weight_grams: product?.weight_grams ?? 0,
+            is_test: (product as any)?.is_test ?? false,
             delivery_available: (product as any)?.delivery_available ?? false,
             pickup_available: (product as any)?.pickup_available ?? false,
         },
@@ -197,6 +199,7 @@ export default function EditFeedProductPage({ params }: { params: Promise<{ slug
             weight_grams: product.weight_grams ?? 0,
             delivery_available: (product as any).delivery_available ?? false,
             pickup_available: (product as any).pickup_available ?? false,
+            is_test: (product as any).is_test ?? false,
         } : undefined,
         resolver: zodResolver(EditFeedProductSchema),
     })

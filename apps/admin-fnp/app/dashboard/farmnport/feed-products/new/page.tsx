@@ -75,6 +75,7 @@ const NewFeedProductSchema = z.object({
     sale_price: z.coerce.number().nonnegative().default(0),
     was_price: z.coerce.number().nonnegative().default(0),
     weight_grams: z.coerce.number().int().nonnegative().default(0),
+    is_test: z.boolean().default(false),
 }).refine(data => !data.available_for_sale || data.weight_grams > 0, {
     message: "Weight is required before enabling available for sale",
     path: ["weight_grams"],
