@@ -102,7 +102,7 @@ export function BuyPlantNutritionClient({ initialProducts, initialTotal }: BuyPl
                                     productId={product.id}
                                     productType="plant_nutrition"
                                     productSlug={product.slug}
-                                    showPrice={product.show_price}
+                                   
                                     salePrice={product.sale_price}
                                     wasPrice={product.was_price}
                                     showWasPrice={product.show_was_price}

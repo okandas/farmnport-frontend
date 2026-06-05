@@ -39,7 +39,6 @@ export default function NewAnimalHealthProductPage() {
             dosage_rates: [],
             stock_level: 0,
             available_for_sale: false,
-            show_price: true,
             sale_price: 0,
             was_price: 0,
             weight_grams: 0,

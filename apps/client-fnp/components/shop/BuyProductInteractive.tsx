@@ -48,7 +48,7 @@ const [mounted, setMounted] = useState(false)
 
   const displayPrice = selectedVariant?.sale_price
     ? selectedVariant.sale_price / 100
-    : product.show_price && product.sale_price > 0
+    : product.sale_price > 0
     ? product.sale_price / 100
     : null
 

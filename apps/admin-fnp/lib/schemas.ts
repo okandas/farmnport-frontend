@@ -523,7 +523,6 @@ export const AgroChemicalSchema = z.object({
   product_overview: z.string().optional().default(""),
   stock_level: z.coerce.number().int().nonnegative().default(0),
   available_for_sale: z.boolean().default(false),
-  show_price: z.boolean().default(true),
   sale_price: z.coerce.number().nonnegative().default(0),
   show_was_price: z.boolean().default(false),
   was_price: z.coerce.number().nonnegative().default(0),
@@ -786,7 +785,6 @@ export const AnimalHealthProductSchema = z.object({
   })),
   stock_level: z.coerce.number().int().nonnegative().default(0),
   available_for_sale: z.boolean().default(false),
-  show_price: z.boolean().default(true),
   sale_price: z.coerce.number().nonnegative().default(0),
   was_price: z.coerce.number().nonnegative().default(0),
   variants: z.array(z.object({
@@ -1011,7 +1009,6 @@ export const FeedProductSchema = z.object({
   })).optional().default([]),
   stock_level: z.coerce.number().int().nonnegative().default(0),
   available_for_sale: z.boolean().default(false),
-  show_price: z.boolean().default(true),
   sale_price: z.coerce.number().nonnegative().default(0),
   was_price: z.coerce.number().nonnegative().default(0),
   weight_grams: z.coerce.number().int().nonnegative().default(0),

@@ -13,7 +13,6 @@ interface BuyFeedActionsProps {
         id: string
         name: string
         slug: string
-        show_price?: boolean
         sale_price?: number
         available_for_sale?: boolean
         images?: { img?: { src?: string } }[]
@@ -36,7 +35,7 @@ export function BuyFeedActions({ product }: BuyFeedActionsProps) {
     const cartItem = (cartData as any)?.items?.find((i: any) => i.product_id === product.id)
     const cartQty: number = cartItem?.quantity ?? 0
 
-    const displayPrice = product.show_price && product.sale_price && product.sale_price > 0
+    const displayPrice = product.sale_price && product.sale_price > 0
         ? product.sale_price / 100
         : null
 

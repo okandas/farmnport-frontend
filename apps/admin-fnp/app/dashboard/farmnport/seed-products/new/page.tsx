@@ -50,7 +50,6 @@ const Schema = z.object({
     })).default([]),
     stock_level: z.coerce.number().int().nonnegative().default(0),
     available_for_sale: z.boolean().default(false),
-    show_price: z.boolean().default(false),
     sale_price: z.coerce.number().default(0),
     was_price: z.coerce.number().default(0),
     weight_grams: z.coerce.number().int().nonnegative().default(0),
@@ -70,7 +69,6 @@ export default function NewSeedProductPage() {
             days_to_maturity: "", yield_potential: "", soil_requirements: "",
             seed_treatment: "", management_tips: "",
             planting_guide: [], precautions: [], variants: [],
-            stock_level: 0, available_for_sale: false, show_price: false, sale_price: 0, was_price: 0, weight_grams: 0,
         },
         resolver: zodResolver(Schema),
     })

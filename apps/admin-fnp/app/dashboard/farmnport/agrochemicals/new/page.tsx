@@ -31,7 +31,6 @@ export default function CreateAgroChemicalPage() {
         product_overview: "",
         stock_level: 0,
         available_for_sale: false,
-        show_price: true,
         show_was_price: false,
         sale_price: 0,
         was_price: 0,

@@ -100,7 +100,7 @@ export function BuyFeedsClient({ initialProducts, initialTotal }: BuyFeedsClient
                                     productId={product.id}
                                     productType="feed"
                                     productSlug={product.slug}
-                                    showPrice={product.show_price}
+                                   
                                     salePrice={product.sale_price}
                                     wasPrice={product.was_price}
                                     showWasPrice={product.show_was_price}

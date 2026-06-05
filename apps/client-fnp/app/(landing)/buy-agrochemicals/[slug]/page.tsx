@@ -39,7 +39,7 @@ export default async function BuyAgroChemicalPage({ params }: BuyAgroChemicalPag
             "@type": "Offer",
             "url": `${baseUrl}/buy-agrochemicals/${slug}`,
             "priceCurrency": "USD",
-            "price": chemical.show_price && chemical.sale_price > 0 ? (chemical.sale_price / 100).toFixed(2) : "0.00",
+            "price": chemical.sale_price > 0 ? (chemical.sale_price / 100).toFixed(2) : "0.00",
             "availability": chemical.available_for_sale ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
             "seller": { "@type": "Organization", "name": "farmnport" }
         }

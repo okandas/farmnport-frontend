@@ -64,7 +64,7 @@ export default async function BuySeedProductPage({ params }: Props) {
             "@type": "Offer",
             "url": `${baseUrl}/buy-seed-products/${slug}`,
             "priceCurrency": "USD",
-            "price": product.show_price && product.sale_price > 0 ? (product.sale_price / 100).toFixed(2) : "0.00",
+            "price": product.sale_price > 0 ? (product.sale_price / 100).toFixed(2) : "0.00",
             "availability": product.available_for_sale ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
             "seller": { "@type": "Organization", "name": "farmnport" }
         }

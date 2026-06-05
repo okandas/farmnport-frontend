@@ -87,7 +87,7 @@ export function BuySeedProductsClient({ initialProducts, initialTotal, bookingEv
                     productId={product.id}
                     productType="seed_product"
                     productSlug={product.slug}
-                    showPrice={product.show_price}
+                   
                     salePrice={product.sale_price}
                     wasPrice={product.was_price}
                     showWasPrice={product.show_was_price}

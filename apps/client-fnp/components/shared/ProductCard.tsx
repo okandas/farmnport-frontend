@@ -15,7 +15,6 @@ interface ProductCardProps {
   mode: "buy" | "guide"
   buttonLabel?: string
   // buy mode
-  showPrice?: boolean
   salePrice?: number
   wasPrice?: number
   showWasPrice?: boolean
@@ -33,7 +32,7 @@ interface ProductCardProps {
 
 export function ProductCard({
   href, imageSrc, name, brand, meta, mode, buttonLabel = "View Guide",
-  showPrice, salePrice, wasPrice, showWasPrice, availableForSale,
+  salePrice, wasPrice, showWasPrice, availableForSale,
   productId, productType, productSlug, loginRedirect, preorderHref, stockLevel, hasVariants, variantPriceRange, pickupOnly,
 }: ProductCardProps) {
   const inStock = availableForSale && (stockLevel === undefined || stockLevel > 0)
@@ -84,7 +83,7 @@ export function ProductCard({
 
         {mode === "buy" ? (
           <div className="space-y-2">
-            {!hasVariants && showPrice && salePrice && salePrice > 0 && (
+            {!hasVariants && salePrice && salePrice > 0 && (
               <div className="flex items-baseline gap-2">
                 <span className="text-lg font-bold">${(salePrice / 100).toFixed(2)}</span>
                 {showWasPrice && wasPrice && wasPrice > 0 && wasPrice > salePrice && (
@@ -112,7 +111,7 @@ export function ProductCard({
                 productName={name}
                 productSlug={productSlug!}
                 imageSrc={imageSrc}
-                unitPrice={showPrice && salePrice && salePrice > 0 ? salePrice : null}
+                unitPrice={salePrice && salePrice > 0 ? salePrice : null}
                 available={inStock}
                 loginRedirect={loginRedirect ?? href}
               />

@@ -16,22 +16,6 @@ export function ProductPricingSection() {
                 <div className="sm:col-span-3 flex items-center gap-4">
                     <FormField
                         control={control}
-                        name="show_price"
-                        render={({ field }) => (
-                            <FormItem className="flex items-center gap-2">
-                                <FormControl>
-                                    <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-                                </FormControl>
-                                <label className="text-sm font-medium text-gray-900 dark:text-white cursor-pointer" onClick={() => field.onChange(!field.value)}>
-                                    Show Price on Guides
-                                </label>
-                            </FormItem>
-                        )}
-                    />
-                </div>
-                <div className="sm:col-span-3 flex items-center gap-4">
-                    <FormField
-                        control={control}
                         name="available_for_sale"
                         render={({ field }) => (
                             <FormItem className="flex items-center gap-2">

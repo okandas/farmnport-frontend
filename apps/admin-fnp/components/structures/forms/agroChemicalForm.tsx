@@ -78,7 +78,6 @@ export function AgroChemicalForm({ agroChemical, mode = "create" }: AgroChemical
             product_overview: agroChemical?.product_overview || "",
             stock_level: agroChemical?.stock_level ?? 0,
             available_for_sale: agroChemical?.available_for_sale ?? false,
-            show_price: agroChemical?.show_price ?? true,
             sale_price: agroChemical?.sale_price ?? 0,
             show_was_price: agroChemical?.show_was_price ?? false,
             was_price: agroChemical?.was_price ?? 0,
@@ -824,25 +823,6 @@ export function AgroChemicalForm({ agroChemical, mode = "create" }: AgroChemical
                     <p className="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">Guide pricing and inventory information.</p>
 
                     <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6">
-                        <div className="sm:col-span-3 flex items-center gap-4">
-                            <FormField
-                                control={form.control}
-                                name="show_price"
-                                render={({ field }) => (
-                                    <FormItem className="flex items-center gap-2">
-                                        <FormControl>
-                                            <Checkbox
-                                                checked={field.value}
-                                                onCheckedChange={field.onChange}
-                                            />
-                                        </FormControl>
-                                        <label className="text-sm font-medium text-gray-900 dark:text-white cursor-pointer" onClick={() => field.onChange(!field.value)}>
-                                            Show Price on Guides
-                                        </label>
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
                         <div className="sm:col-span-3 flex items-center gap-4">
                             <FormField
                                 control={form.control}

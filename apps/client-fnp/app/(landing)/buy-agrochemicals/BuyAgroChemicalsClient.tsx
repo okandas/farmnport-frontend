@@ -109,7 +109,7 @@ export function BuyAgroChemicalsClient({ initialChemicals, initialTotal }: BuyAg
                                     productId={chemical.id}
                                     productType="agrochemical"
                                     productSlug={chemical.slug}
-                                    showPrice={chemical.show_price}
+                                   
                                     salePrice={chemical.sale_price}
                                     wasPrice={chemical.was_price}
                                     showWasPrice={chemical.show_was_price}

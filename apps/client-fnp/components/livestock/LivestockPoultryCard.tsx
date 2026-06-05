@@ -58,7 +58,7 @@ export function LivestockPoultryCard({ product, mode }: LivestockPoultryCardProp
         {mode === "shop" ? (
           <div className="pt-3 space-y-2">
             <div className="flex items-baseline gap-2 h-7">
-              {product.show_price && product.sale_price > 0 ? (
+              {product.sale_price > 0 ? (
                 <>
                   <span className="text-lg font-bold">${(product.sale_price / 100).toFixed(2)}</span>
                   {product.was_price > 0 && product.was_price > product.sale_price && (
@@ -75,7 +75,7 @@ export function LivestockPoultryCard({ product, mode }: LivestockPoultryCardProp
               productName={product.name}
               productSlug={product.slug}
               imageSrc={product.images?.[0]?.img?.src}
-              unitPrice={product.show_price && product.sale_price > 0 ? product.sale_price : null}
+              unitPrice={product.sale_price > 0 ? product.sale_price : null}
               loginRedirect={href}
             />
           </div>
