@@ -1712,5 +1712,5 @@ export function queryPriceSeries(params?: { client_id?: string; category?: strin
   if (params?.category) qs.set("category", params.category)
   if (params?.template_type) qs.set("template_type", params.template_type)
   const q = qs.toString()
-  return api.get(`${baseUrl}/prices/series${q ? `?${q}` : ""}`)
+  return api.get(`${baseUrl}/prices/series/all${q ? `?${q}` : ""}`)
 }

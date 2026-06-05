@@ -21,7 +21,7 @@ export default async function BuyPage() {
     fetchSection(`${BASE}/feed/buy`),
     fetchSection(`${BASE}/plantnutrition/buy`),
     fetchSection(`${BASE}/seed-products/buy`),
-    fetchSection(`${BASE}/documents`),
+    fetchSection(`${BASE}/documents/all`),
     fetch(`${BASE}/booking/events?status=open`, { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
   ])
   const bookingEvents: any[] = bookingsRes?.events ?? []
