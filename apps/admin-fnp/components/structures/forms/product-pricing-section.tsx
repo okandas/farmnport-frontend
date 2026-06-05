@@ -13,12 +13,12 @@ export function ProductPricingSection() {
             <p className="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">Guide pricing and inventory information.</p>
 
             <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6">
-                <div className="sm:col-span-3 flex items-center gap-4">
+                <div className="sm:col-span-6 flex items-center gap-8">
                     <FormField
                         control={control}
                         name="available_for_sale"
                         render={({ field }) => (
-                            <FormItem className="flex items-center gap-2">
+                            <FormItem className="flex items-center gap-2 space-y-0">
                                 <FormControl>
                                     <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                                 </FormControl>
@@ -28,13 +28,11 @@ export function ProductPricingSection() {
                             </FormItem>
                         )}
                     />
-                </div>
-                <div className="sm:col-span-3 flex items-center gap-4">
                     <FormField
                         control={control}
                         name="is_test"
                         render={({ field }) => (
-                            <FormItem className="flex items-center gap-2">
+                            <FormItem className="flex items-center gap-2 space-y-0">
                                 <FormControl>
                                     <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                                 </FormControl>
