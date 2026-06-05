@@ -103,7 +103,10 @@ export function DataTable<TData, TValue>({
               <Input
                 placeholder={searchPlaceholder || `Search for ${tableName.toLowerCase()}...`}
                 value={inputValue}
-                onChange={(event) => setInputValue(event.target.value)}
+                onChange={(event) => {
+                  setInputValue(event.target.value)
+                  if (event.target.value === "") setSearch("")
+                }}
                 onKeyDown={(event) => { if (event.key === "Enter") setSearch(inputValue) }}
                 className="h-8 w-[150px] lg:w-[250px]"
               />

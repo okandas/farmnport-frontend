@@ -1706,11 +1706,12 @@ export function queryImportPriceSeries(data: { entries: unknown[]; overwrite: bo
   return api.post(`${baseUrl}/prices/series/import`, data)
 }
 
-export function queryPriceSeries(params?: { client_id?: string; category?: string; template_type?: string }) {
+export function queryPriceSeries(params?: { client_id?: string; category?: string; template_type?: string; search?: string }) {
   const qs = new URLSearchParams()
   if (params?.client_id) qs.set("client_id", params.client_id)
   if (params?.category) qs.set("category", params.category)
   if (params?.template_type) qs.set("template_type", params.template_type)
+  if (params?.search) qs.set("search", params.search)
   const q = qs.toString()
   return api.get(`${baseUrl}/prices/series/all${q ? `?${q}` : ""}`)
 }

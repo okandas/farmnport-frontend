@@ -19,12 +19,33 @@ export const dashboardConfig: DashboardConfig = {
       ],
     },
     {
-      label: "Communications",
+      label: "User Management",
+      alwaysOpen: true,
       items: [
         {
-          title: "Blast",
-          href: "/dashboard/farmnport/blast",
-          icon: "send",
+          title: "Users",
+          href: "/dashboard/farmnport/users",
+          icon: "user",
+        },
+        {
+          title: "Administrators",
+          href: "/dashboard/farmnport/admins",
+          icon: "construction",
+        },
+        {
+          title: "Buyer Contacts",
+          href: "/dashboard/farmnport/buyer-contacts",
+          icon: "badgeCheck",
+        },
+      ],
+    },
+    {
+      label: "Analytics",
+      items: [
+        {
+          title: "Analytics",
+          href: "/dashboard/farmnport/analytics",
+          icon: "eye",
         },
       ],
     },
@@ -35,6 +56,16 @@ export const dashboardConfig: DashboardConfig = {
           title: "Price Series",
           href: "/dashboard/farmnport/prices/series",
           icon: "billing",
+        },
+      ],
+    },
+    {
+      label: "Communications",
+      items: [
+        {
+          title: "Blast",
+          href: "/dashboard/farmnport/blast",
+          icon: "send",
         },
       ],
     },
@@ -55,7 +86,6 @@ export const dashboardConfig: DashboardConfig = {
     },
     {
       label: "Pre Orders",
-      alwaysOpen: true,
       items: [
         {
           title: "Bookings",
@@ -71,36 +101,6 @@ export const dashboardConfig: DashboardConfig = {
           title: "Client Locations",
           href: "/dashboard/farmnport/orders/client-locations",
           icon: "mapPin",
-        },
-      ],
-    },
-    {
-      label: "Analytics",
-      items: [
-        {
-          title: "Analytics",
-          href: "/dashboard/farmnport/analytics",
-          icon: "eye",
-        },
-      ],
-    },
-    {
-      label: "Management",
-      items: [
-        {
-          title: "Users",
-          href: "/dashboard/farmnport/users",
-          icon: "user",
-        },
-        {
-          title: "Administrators",
-          href: "/dashboard/farmnport/admins",
-          icon: "construction",
-        },
-        {
-          title: "Buyer Contacts",
-          href: "/dashboard/farmnport/buyer-contacts",
-          icon: "badgeCheck",
         },
       ],
     },

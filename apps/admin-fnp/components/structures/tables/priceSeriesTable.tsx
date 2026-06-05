@@ -56,12 +56,13 @@ export function PriceSeriesTable({ refreshKey }: Props) {
   }, [clientId, templateFilter, categoryFilter])
 
   const { isError, isLoading, isFetching, refetch, data, error } = useQuery({
-    queryKey: ["price-series", refreshKey, clientId, Array.from(templateFilter)[0], Array.from(categoryFilter)[0]],
+    queryKey: ["price-series", refreshKey, clientId, Array.from(templateFilter)[0], Array.from(categoryFilter)[0], search],
     queryFn: () =>
       queryPriceSeries({
         client_id: clientId || undefined,
         template_type: Array.from(templateFilter)[0] || undefined,
         category: Array.from(categoryFilter)[0] || undefined,
+        search: search || undefined,
       }),
     refetchOnWindowFocus: false,
   })
