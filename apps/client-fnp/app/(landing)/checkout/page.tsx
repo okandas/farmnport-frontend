@@ -265,7 +265,7 @@ export default function CheckoutPage() {
 
   const tumiraLocations: Tumira[] = tumiraData ?? []
   const selectedTumira = tumiraLocations.find((l) => l.id === selectedLocationId)
-  const tumiraFee = isTestOrder ? 5 : (selectedTumira?.rate ?? 0)
+  const tumiraFee = isTestOrder && selectedTumira ? 5 : (selectedTumira?.rate ?? 0)
 
   const deliveryCouriers: DeliveryCourier[] = deliveryRatesData ?? []
   const selectedCourier = deliveryCouriers.find((c) => c.courier_id === selectedCourierId)
@@ -278,11 +278,6 @@ export default function CheckoutPage() {
     watchedCity.toLowerCase().includes(l.city.toLowerCase())
   ) : []
 
-  useEffect(() => {
-    if (pickupLocations.length === 1 && !selectedLocationId) {
-      setSelectedLocationId(pickupLocations[0].id)
-    }
-  }, [pickupLocations.length])
 
   const checkoutMutation = useMutation({
     mutationFn: checkout,

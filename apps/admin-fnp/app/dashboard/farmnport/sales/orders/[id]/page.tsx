@@ -99,6 +99,7 @@ interface Order {
   payment_provider: string
   payment_method: string
   payment_ref: string
+  provider_reference?: string
   paid_at?: string
   verify_token: string
   status_history: StatusChange[]
@@ -320,6 +321,12 @@ export default function OrderDetailPage() {
               <span className="text-muted-foreground">Reference:</span>{" "}
               {order.payment_ref}
             </p>
+            {order.provider_reference && (
+              <p>
+                <span className="text-muted-foreground capitalize">{order.payment_provider} Ref:</span>{" "}
+                {order.provider_reference}
+              </p>
+            )}
             {order.paid_at && (
               <p>
                 <span className="text-muted-foreground">Paid at:</span>{" "}

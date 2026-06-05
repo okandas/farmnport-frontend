@@ -145,7 +145,7 @@ const [mounted, setMounted] = useState(false)
                     <button
                       key={idx}
                       onClick={() => setSelectedVariant(v)}
-                      className={`relative px-4 py-2.5 rounded-lg border-2 text-sm transition-colors text-left ${
+                      className={`relative px-4 py-2.5 pr-5 rounded-lg border-2 text-sm transition-colors text-left ${
                         isSelected ? "border-primary bg-primary/5" : "border-border hover:border-primary/40"
                       }`}
                     >
