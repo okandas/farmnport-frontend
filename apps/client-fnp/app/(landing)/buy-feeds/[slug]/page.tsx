@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { notFound } from "next/navigation"
 import Image from "next/image"
 import { Egg, AlertTriangle } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
@@ -39,16 +40,7 @@ export default async function BuyFeedPage({ params }: BuyFeedPageProps) {
     const { slug } = await params
     const product = await getFeedProduct(slug)
 
-    if (!product) {
-        return (
-            <div className="min-h-screen bg-background flex items-center justify-center">
-                <div className="text-center">
-                    <h2 className="text-2xl font-bold mb-2">Product Not Found</h2>
-                    <p className="text-muted-foreground">The product you&apos;re looking for doesn&apos;t exist.</p>
-                </div>
-            </div>
-        )
-    }
+    if (!product) notFound()
 
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://farmnport.com'
 

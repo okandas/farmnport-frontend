@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { notFound } from "next/navigation"
 import { serverFetch } from "@/lib/serverFetch"
 import { buildBuyMetadata } from "@/lib/utilities"
 import Link from "next/link"
@@ -20,7 +21,8 @@ export async function generateMetadata({ params }: BuyAgroChemicalPageProps): Pr
 export default async function BuyAgroChemicalPage({ params }: BuyAgroChemicalPageProps) {
     const { slug } = await params
 
-    const chemical = await serverFetch(`/agrochemical/${slug}`)
+    const chemical = await serverFetch(`/agrochemical/${slug}`).catch(() => null)
+    if (!chemical) notFound()
 
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://farmnport.com'
 

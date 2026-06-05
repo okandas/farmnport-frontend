@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { notFound } from "next/navigation"
 import { serverFetch } from "@/lib/serverFetch"
 import { formatProductName } from "@/lib/utilities"
 import Link from "next/link"
@@ -40,6 +41,8 @@ export default async function BuySeedProductPage({ params }: Props) {
     const openEvent = (bookingRes?.events ?? []).find(
         (e: any) => e.product_id && product?.id && e.product_id === product.id
     )
+
+    if (!product) notFound()
 
     if (!product) {
         return (

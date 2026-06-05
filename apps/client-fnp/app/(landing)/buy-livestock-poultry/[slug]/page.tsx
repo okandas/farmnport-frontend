@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { notFound } from "next/navigation"
 import { serverFetch } from "@/lib/serverFetch"
 import { buildBuyMetadata } from "@/lib/utilities"
 import Link from "next/link"
@@ -19,7 +20,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function BuyLivestockPoultryProductPage({ params }: Props) {
     const { slug } = await params
-    const product = await serverFetch(`/livestock-poultry/${slug}`)
+    const product = await serverFetch(`/livestock-poultry/${slug}`).catch(() => null)
+    if (!product) notFound()
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://farmnport.com'
 
     if (!product) {
