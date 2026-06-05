@@ -80,7 +80,7 @@ export function BuyAnimalHealthClient({ initialProducts, initialTotal }: BuyAnim
                     </div>
                 ) : products.length === 0 ? (
                     <div className="text-center py-12">
-                        <Beaker className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
+                        
                         <p className="text-muted-foreground">No animal health products found matching your filters.</p>
                     </div>
                 ) : (

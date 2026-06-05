@@ -86,7 +86,7 @@ export function BuyAgroChemicalsClient({ initialChemicals, initialTotal }: BuyAg
                     </div>
                 ) : chemicals.length === 0 ? (
                     <div className="text-center py-12">
-                        <Beaker className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
+                        
                         <p className="text-muted-foreground">No agrochemicals found matching your filters.</p>
                     </div>
                 ) : (

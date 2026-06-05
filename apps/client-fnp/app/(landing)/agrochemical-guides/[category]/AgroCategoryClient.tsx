@@ -3,7 +3,6 @@
 import { useQuery } from "@tanstack/react-query"
 import { queryAgroChemicalsByCategory } from "@/lib/query"
 import { Button } from "@/components/ui/button"
-import { Beaker } from "lucide-react"
 import { AgroChemicalFilterSidebar } from "@/components/generic/agroChemicalFilterSidebar"
 import { ProductCard } from "@/components/shared/ProductCard"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
@@ -80,7 +79,7 @@ export function AgroCategoryClient({ category, categoryName, initialChemicals, i
                     </div>
                 ) : chemicals.length === 0 ? (
                     <div className="text-center py-12">
-                        <Beaker className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
+                        
                         <p className="text-muted-foreground mb-4">No {categoryName.toLowerCase()} found matching your filters.</p>
                         <Link href="/agrochemical-guides">
                             <Button variant="outline">View All Agrochemicals</Button>
