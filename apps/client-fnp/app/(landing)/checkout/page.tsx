@@ -58,6 +58,7 @@ interface CartItem {
   quantity: number
   sku: string
   weight_grams?: number
+  is_test?: boolean
   fulfillment?: {
     delivery_available: boolean
     pickup_available: boolean
@@ -260,13 +261,15 @@ export default function CheckoutPage() {
     enabled: needsTumira,
     placeholderData: (prev: Tumira[] | undefined) => prev,
   })
+  const isTestOrder = items.some((i) => i.is_test)
+
   const tumiraLocations: Tumira[] = tumiraData ?? []
   const selectedTumira = tumiraLocations.find((l) => l.id === selectedLocationId)
-  const tumiraFee = selectedTumira?.rate ?? 0
+  const tumiraFee = isTestOrder ? 5 : (selectedTumira?.rate ?? 0)
 
   const deliveryCouriers: DeliveryCourier[] = deliveryRatesData ?? []
   const selectedCourier = deliveryCouriers.find((c) => c.courier_id === selectedCourierId)
-  const deliveryFee = selectedCourier?.price_cents ?? 0
+  const deliveryFee = isTestOrder ? 5 : (selectedCourier?.price_cents ?? 0)
   const doorToDoorCouriers = deliveryCouriers.filter((c) => c.service_type === "door_to_door" || c.service_type === "ship_to_door")
   const noDoorToDoor = deliveryAddressComplete && !ratesFetching && deliveryCouriers.length > 0 && doorToDoorCouriers.length === 0
   const nearbyHubs = watchedCity ? tumiraLocations.filter((l) =>

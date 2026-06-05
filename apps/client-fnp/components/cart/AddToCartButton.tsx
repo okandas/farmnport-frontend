@@ -58,21 +58,27 @@ export function AddToCartButton({
     },
     onError: (err: any, variables) => {
       if (err?.response?.status === 409) {
-        toast.warning("This item has a different pickup method.", {
-          description: "Complete and pay for your current cart first, then add this item.",
-          duration: Infinity,
-          action: {
-            label: "Go to checkout",
-            onClick: () => router.push("/checkout"),
-          },
-          cancel: {
-            label: "Start new cart",
-            onClick: async () => {
-              await clearCart()
-              addMutation.mutate(variables)
+        const isTestConflict = err?.response?.data?.message === "test_conflict"
+        toast.warning(
+          isTestConflict
+            ? "Test products cannot be mixed with real products."
+            : "This item has a different pickup method.",
+          {
+            description: "Complete and pay for your current cart first, then add this item.",
+            duration: Infinity,
+            action: {
+              label: "Go to checkout",
+              onClick: () => router.push("/checkout"),
             },
-          },
-        })
+            cancel: {
+              label: "Start new cart",
+              onClick: async () => {
+                await clearCart()
+                addMutation.mutate(variables)
+              },
+            },
+          }
+        )
         return
       }
       toast.error("Failed to add to cart")
