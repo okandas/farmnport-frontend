@@ -152,7 +152,7 @@ export function BuyPageClient({
   }
 
   const visibleCategories = CATEGORIES.filter(
-    ({ id }) => id === "pre-orders" || (categoryTotals[id] ?? 0) > 0
+    ({ id }) => (id === "pre-orders" && bookingEvents.length > 0) || (categoryTotals[id] ?? 0) > 0
   )
 
   return (
@@ -184,7 +184,7 @@ export function BuyPageClient({
           {agrochemicalTotal > 0 && (
             <Section label="Agrochemicals" href="/buy-agrochemicals" count={agrochemicalTotal}>
               {agrochemicals.slice(0, 4).map((p) => (
-                <ProductCard key={p.id} mode="buy" href={`/buy-agrochemicals/${p.slug}`} imageSrc={p.images?.[0]?.img?.src} name={p.name} brand={p.brand?.name} meta={p.agrochemical_category?.name} productId={p.id} productType="agrochemical" productSlug={p.slug} salePrice={p.sale_price} wasPrice={p.was_price} showWasPrice={p.show_was_price} availableForSale={p.available_for_sale} stockLevel={p.stock_level} />
+                <ProductCard key={p.id} mode="buy" href={`/buy-agrochemicals/${p.slug}`} imageSrc={p.images?.[0]?.img?.src} name={p.name} brand={p.brand?.name} meta={p.agrochemical_category?.name} productId={p.id} productType="agrochemical" productSlug={p.slug} salePrice={p.sale_price} wasPrice={p.was_price} showWasPrice={p.show_was_price} availableForSale={p.available_for_sale} stockLevel={p.stock_level} hasVariants={p.variants?.length > 0} variantPriceRange={p.variant_price_range} pickupOnly={p.pickup_location_ids?.length > 0 && !p.delivery_available && !(p.delivery_location_ids?.length > 0)} />
               ))}
             </Section>
           )}
@@ -192,7 +192,7 @@ export function BuyPageClient({
           {animalHealthTotal > 0 && (
             <Section label="Animal Health" href="/buy-animal-health" count={animalHealthTotal}>
               {animalHealth.slice(0, 4).map((p) => (
-                <ProductCard key={p.id} mode="buy" href={`/buy-animal-health/${p.slug}`} imageSrc={p.images?.[0]?.img?.src} name={p.name} brand={p.brand?.name} meta={p.animal_health_category?.name} productId={p.id} productType="animal_health" productSlug={p.slug} salePrice={p.sale_price} wasPrice={p.was_price} showWasPrice={p.show_was_price} availableForSale={p.available_for_sale} stockLevel={p.stock_level} />
+                <ProductCard key={p.id} mode="buy" href={`/buy-animal-health/${p.slug}`} imageSrc={p.images?.[0]?.img?.src} name={p.name} brand={p.brand?.name} meta={p.animal_health_category?.name} productId={p.id} productType="animal_health" productSlug={p.slug} salePrice={p.sale_price} wasPrice={p.was_price} showWasPrice={p.show_was_price} availableForSale={p.available_for_sale} stockLevel={p.stock_level} hasVariants={p.variants?.length > 0} variantPriceRange={p.variant_price_range} pickupOnly={p.pickup_location_ids?.length > 0 && !p.delivery_available && !(p.delivery_location_ids?.length > 0)} />
               ))}
             </Section>
           )}
@@ -230,6 +230,13 @@ export function BuyPageClient({
                 <DocumentCard key={doc.id} doc={doc} />
               ))}
             </Section>
+          )}
+
+          {agrochemicalTotal === 0 && animalHealthTotal === 0 && feedsTotal === 0 && plantNutritionTotal === 0 && seedsTotal === 0 && documents.length === 0 && bookingEvents.length === 0 && (
+            <div className="py-16 text-center">
+              <p className="text-lg font-semibold">Products Coming Soon</p>
+              <p className="text-sm text-muted-foreground mt-1">We&apos;re stocking up. Check back shortly.</p>
+            </div>
           )}
 
         </main>

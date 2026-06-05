@@ -83,7 +83,7 @@ export function ProductCard({
 
         {mode === "buy" ? (
           <div className="space-y-2">
-            {!hasVariants && salePrice && salePrice > 0 && (
+            {!hasVariants && (salePrice ?? 0) > 0 && (
               <div className="flex items-baseline gap-2">
                 <span className="text-lg font-bold">${(salePrice / 100).toFixed(2)}</span>
                 {showWasPrice && wasPrice && wasPrice > 0 && wasPrice > salePrice && (

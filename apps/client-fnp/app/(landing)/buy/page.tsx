@@ -1,13 +1,10 @@
 import Link from "next/link"
 import { BuyPageClient } from "./BuyPageClient"
+import { serverFetch } from "@/lib/serverFetch"
 
-const BASE = (process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3744") + "/v1"
-
-async function fetchSection(url: string) {
+async function fetchSection(path: string) {
   try {
-    const res = await fetch(url, { cache: "no-store" })
-    if (!res.ok) return { data: [], total: 0 }
-    const json = await res.json()
+    const json = await serverFetch(path)
     return { data: json.data || [], total: json.total || 0 }
   } catch {
     return { data: [], total: 0 }
@@ -16,20 +13,20 @@ async function fetchSection(url: string) {
 
 export default async function BuyPage() {
   const [agro, animalHealth, feeds, plantNutrition, seeds, documents, bookingsRes] = await Promise.all([
-    fetchSection(`${BASE}/agrochemical/buy`),
-    fetchSection(`${BASE}/animalhealth/buy`),
-    fetchSection(`${BASE}/feed/buy`),
-    fetchSection(`${BASE}/plantnutrition/buy`),
-    fetchSection(`${BASE}/seed-products/buy`),
-    fetchSection(`${BASE}/documents/all`),
-    fetch(`${BASE}/booking/events?status=open`, { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
+    fetchSection("/agrochemical/buy"),
+    fetchSection("/animalhealth/buy"),
+    fetchSection("/feed/buy"),
+    fetchSection("/plantnutrition/buy"),
+    fetchSection("/seed-products/buy"),
+    fetchSection("/documents/all"),
+    serverFetch("/booking/events?status=open").catch(() => null),
   ])
   const bookingEvents: any[] = bookingsRes?.events ?? []
 
   return (
     <main className="bg-gradient-to-b from-background to-muted/20 min-h-screen">
       {/* Hero */}
-      <section className="py-6 lg:py-8 border-b border-border">
+      <section className="py-6 lg:py-8">
         <div className="mx-auto max-w-7xl px-4 lg:px-8">
           <nav className="flex items-center gap-1.5 text-xs text-muted-foreground mb-3">
             <Link href="/" className="hover:text-foreground transition-colors">Home</Link>

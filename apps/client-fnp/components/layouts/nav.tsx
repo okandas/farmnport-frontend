@@ -148,10 +148,8 @@ export function Navigation({ user }: NavigationProps) {
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
-                <DropdownMenuItem asChild>
-                  <Link href="#" onClick={() => signOut({ redirectTo: AppURL })}>
-                    Logout
-                  </Link>
+                <DropdownMenuItem onClick={() => signOut({ redirectTo: AppURL })}>
+                  Logout
                 </DropdownMenuItem>
               </DropdownMenuGroup>
 

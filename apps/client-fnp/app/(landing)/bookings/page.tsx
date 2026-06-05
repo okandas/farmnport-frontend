@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query"
 import Link from "next/link"
-import { CalendarDays, Loader2 } from "lucide-react"
+import { Loader2 } from "lucide-react"
 
 import { listBookingEvents } from "@/lib/query"
 import { BuyCategoriesNav } from "@/components/generic/BuyCategoriesNav"
@@ -100,7 +100,6 @@ export default function BookingEventsPage() {
               </div>
             ) : events.length === 0 ? (
               <div className="text-center py-20 space-y-3">
-                <CalendarDays className="w-12 h-12 mx-auto text-muted-foreground/40" />
                 <p className="font-semibold">No open batches right now</p>
                 <p className="text-sm text-muted-foreground">Check back soon for upcoming forward booking batches.</p>
               </div>
