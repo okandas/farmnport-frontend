@@ -7,7 +7,7 @@ import {
     Sprout, AlertTriangle, ChevronRight, Droplets,
     Bug, Leaf, TrendingUp, Beaker, Shield, X
 } from "lucide-react"
-import { capitalizeFirstLetter } from "@/lib/utilities"
+import { capitalizeFirstLetter, titleCase } from "@/lib/utilities"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
 
 // Unified stage styling -- clean, minimal
@@ -108,7 +108,7 @@ export function SprayProgramDetailClient({ program, slug }: SprayProgramDetailCl
                         <span className="mx-2">/</span>
                         <Link href="/spray-programs" className="hover:text-foreground">Spray Programs</Link>
                         <span className="mx-2">/</span>
-                        <span className="text-foreground">{capitalizeFirstLetter(program.name)}</span>
+                        <span className="text-foreground">{titleCase(program.name)}</span>
                     </nav>
                 </div>
             </div>
@@ -143,7 +143,7 @@ export function SprayProgramDetailClient({ program, slug }: SprayProgramDetailCl
                                 )}
                             </div>
                             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground">
-                                {capitalizeFirstLetter(program.name)}
+                                {titleCase(program.name)}
                             </h1>
                             {program.scientific_name && (
                                 <p className="mt-1 text-base sm:text-lg italic text-muted-foreground/80">
@@ -176,7 +176,7 @@ export function SprayProgramDetailClient({ program, slug }: SprayProgramDetailCl
                                 )}
                             </div>
                             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold">
-                                {capitalizeFirstLetter(program.name)}
+                                {titleCase(program.name)}
                             </h1>
                             {program.scientific_name && (
                                 <p className="mt-1 text-base sm:text-lg italic text-muted-foreground/80">
@@ -201,7 +201,7 @@ export function SprayProgramDetailClient({ program, slug }: SprayProgramDetailCl
                             {/* Overview tab */}
                             <button
                                 onClick={() => scrollToStage(0)}
-                                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                                className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
                                     activeStage === 0
                                         ? "bg-primary text-primary-foreground"
                                         : "text-muted-foreground hover:text-foreground hover:bg-muted"
@@ -220,7 +220,7 @@ export function SprayProgramDetailClient({ program, slug }: SprayProgramDetailCl
                                     <button
                                         key={index}
                                         onClick={() => scrollToStage(tabIndex)}
-                                        className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                                        className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
                                             isActive
                                                 ? "bg-primary text-primary-foreground"
                                                 : "text-muted-foreground hover:text-foreground hover:bg-muted"
@@ -228,7 +228,7 @@ export function SprayProgramDetailClient({ program, slug }: SprayProgramDetailCl
                                     >
                                         <span className="flex items-center gap-2">
                                             <span className={`w-2 h-2 rounded-full ${isActive ? "bg-primary-foreground" : STAGE_STYLE.dot}`} />
-                                            {capitalizeFirstLetter(stage.name)}
+                                            {titleCase(stage.name)}
                                         </span>
                                     </button>
                                 )
@@ -267,7 +267,7 @@ export function SprayProgramDetailClient({ program, slug }: SprayProgramDetailCl
                                     <span className="text-xs text-muted-foreground">Brand:</span>
                                     <button
                                         onClick={() => setSelectedBrand(null)}
-                                        className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                                        className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${
                                             !selectedBrand
                                                 ? "bg-foreground text-background"
                                                 : "bg-muted text-muted-foreground hover:text-foreground"
@@ -279,7 +279,7 @@ export function SprayProgramDetailClient({ program, slug }: SprayProgramDetailCl
                                         <button
                                             key={brand}
                                             onClick={() => setSelectedBrand(brand)}
-                                            className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                                            className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${
                                                 selectedBrand === brand
                                                     ? "bg-foreground text-background"
                                                     : "bg-muted text-muted-foreground hover:text-foreground"
@@ -301,7 +301,7 @@ export function SprayProgramDetailClient({ program, slug }: SprayProgramDetailCl
                                             </th>
                                             {stages.map((stage: any, idx: number) => (
                                                 <th key={idx} className="text-center p-3 border-r border-border last:border-r-0 min-w-[140px] bg-muted">
-                                                    <div className="text-xs font-semibold text-foreground">{capitalizeFirstLetter(stage.name)}</div>
+                                                    <div className="text-xs font-semibold text-foreground">{titleCase(stage.name)}</div>
                                                     {stage.timing_description && (
                                                         <div className="text-[10px] text-muted-foreground font-normal mt-0.5">{stage.timing_description}</div>
                                                     )}
@@ -391,7 +391,7 @@ export function SprayProgramDetailClient({ program, slug }: SprayProgramDetailCl
                                 <div className="flex items-start justify-between flex-wrap gap-3">
                                     <div>
                                         <h2 className="text-xl sm:text-2xl font-bold text-foreground">
-                                            {capitalizeFirstLetter(stage.name)}
+                                            {titleCase(stage.name)}
                                         </h2>
                                         {stage.description && (
                                             <p className="text-sm text-muted-foreground mt-1 max-w-2xl">

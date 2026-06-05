@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { Layers, ChevronRight, Filter } from "lucide-react"
-import { capitalizeFirstLetter } from "@/lib/utilities"
+import { capitalizeFirstLetter, titleCase } from "@/lib/utilities"
 import { useQueryState, parseAsString } from "nuqs"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
@@ -117,7 +117,7 @@ export function FeedingProgramsGrid({ programs }: FeedingProgramsGridProps) {
           {filtered.map((program: any) => (
             <Link key={program.id} href={`/feeding-programs/${program.slug}`} className="group rounded-xl border bg-card overflow-hidden hover:shadow-md hover:border-primary/20 transition-all">
               <div className="p-4">
-                <h2 className="text-sm font-bold font-heading mb-1 group-hover:text-primary transition-colors">{capitalizeFirstLetter(program.name)}</h2>
+                <h2 className="text-sm font-bold font-heading mb-1 group-hover:text-primary transition-colors">{titleCase(program.name)}</h2>
                 {program.farm_produce_name && (
                   <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-600/10 dark:bg-amber-950/30 dark:text-amber-400 mb-2">{capitalizeFirstLetter(program.farm_produce_name)}</span>
                 )}

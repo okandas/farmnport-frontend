@@ -7,7 +7,7 @@ import {
     Egg, ChevronRight, TrendingUp, Shield, Heart,
     ArrowRight, Sprout, Flag, X, AlertTriangle
 } from "lucide-react"
-import { capitalizeFirstLetter } from "@/lib/utilities"
+import { capitalizeFirstLetter, titleCase } from "@/lib/utilities"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
 
 const STAGE_STYLE = {
@@ -110,7 +110,7 @@ export function FeedingProgramDetailClient({ program, slug }: FeedingProgramDeta
                         <span className="mx-2">/</span>
                         <Link href="/feeding-programs" className="hover:text-foreground transition-colors">Feeding Programs</Link>
                         <span className="mx-2">/</span>
-                        <span className="text-foreground">{capitalizeFirstLetter(program.name)}</span>
+                        <span className="text-foreground">{titleCase(program.name)}</span>
                     </nav>
                 </div>
             </div>
@@ -141,7 +141,7 @@ export function FeedingProgramDetailClient({ program, slug }: FeedingProgramDeta
                                 </span>
                             </div>
                             <h1 className="text-3xl sm:text-4xl font-bold font-heading tracking-tight">
-                                {capitalizeFirstLetter(program.name)}
+                                {titleCase(program.name)}
                             </h1>
                             {program.description && (
                                 <p className="mt-2 text-sm sm:text-base text-muted-foreground max-w-2xl">
@@ -164,7 +164,7 @@ export function FeedingProgramDetailClient({ program, slug }: FeedingProgramDeta
                             </span>
                         </div>
                         <h1 className="text-3xl sm:text-4xl font-bold font-heading tracking-tight">
-                            {capitalizeFirstLetter(program.name)}
+                            {titleCase(program.name)}
                         </h1>
                         {program.description && (
                             <p className="mt-2 text-sm text-muted-foreground max-w-2xl">
@@ -182,7 +182,7 @@ export function FeedingProgramDetailClient({ program, slug }: FeedingProgramDeta
                         <div className="flex gap-1 overflow-x-auto py-3 scrollbar-hide">
                             <button
                                 onClick={() => scrollToStage(0)}
-                                className={`flex-shrink-0 px-3.5 py-1.5 rounded-full text-sm font-medium transition-all ${
+                                className={`flex-shrink-0 px-3.5 py-1.5 rounded-md text-sm font-medium transition-all ${
                                     activeStage === 0
                                         ? "bg-primary text-primary-foreground shadow-sm"
                                         : "text-muted-foreground hover:text-foreground hover:bg-muted"
@@ -200,7 +200,7 @@ export function FeedingProgramDetailClient({ program, slug }: FeedingProgramDeta
                                     <button
                                         key={index}
                                         onClick={() => scrollToStage(tabIndex)}
-                                        className={`flex-shrink-0 px-3.5 py-1.5 rounded-full text-sm font-medium transition-all ${
+                                        className={`flex-shrink-0 px-3.5 py-1.5 rounded-md text-sm font-medium transition-all ${
                                             isActive
                                                 ? "bg-primary text-primary-foreground shadow-sm"
                                                 : "text-muted-foreground hover:text-foreground hover:bg-muted"
@@ -208,7 +208,7 @@ export function FeedingProgramDetailClient({ program, slug }: FeedingProgramDeta
                                     >
                                         <span className="flex items-center gap-2">
                                             <span className={`w-1.5 h-1.5 rounded-full ${isActive ? "bg-primary-foreground" : STAGE_STYLE.dot}`} />
-                                            {capitalizeFirstLetter(stage.name)}
+                                            {titleCase(stage.name)}
                                         </span>
                                     </button>
                                 )
@@ -248,7 +248,7 @@ export function FeedingProgramDetailClient({ program, slug }: FeedingProgramDeta
                                     <span className="text-xs text-muted-foreground mr-1">Brand:</span>
                                     <button
                                         onClick={() => setSelectedBrand(null)}
-                                        className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                                        className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${
                                             !selectedBrand
                                                 ? "bg-primary text-primary-foreground shadow-sm"
                                                 : "border bg-card text-muted-foreground hover:text-foreground hover:border-primary/20"
@@ -260,7 +260,7 @@ export function FeedingProgramDetailClient({ program, slug }: FeedingProgramDeta
                                         <button
                                             key={brand}
                                             onClick={() => setSelectedBrand(brand)}
-                                            className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                                            className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${
                                                 selectedBrand === brand
                                                     ? "bg-primary text-primary-foreground shadow-sm"
                                                     : "border bg-card text-muted-foreground hover:text-foreground hover:border-primary/20"
@@ -282,7 +282,7 @@ export function FeedingProgramDetailClient({ program, slug }: FeedingProgramDeta
                                             </th>
                                             {stages.map((stage: any, idx: number) => (
                                                 <th key={idx} className="text-center px-4 py-3 min-w-[140px]">
-                                                    <div className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">{capitalizeFirstLetter(stage.name)}</div>
+                                                    <div className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">{titleCase(stage.name)}</div>
                                                     {stage.timing_description && (
                                                         <div className="text-[10px] text-muted-foreground/70 font-normal mt-0.5">{stage.timing_description}</div>
                                                     )}
@@ -363,7 +363,7 @@ export function FeedingProgramDetailClient({ program, slug }: FeedingProgramDeta
                                 <div className="flex items-start justify-between flex-wrap gap-3">
                                     <div>
                                         <h2 className="text-lg font-bold font-heading tracking-tight">
-                                            {capitalizeFirstLetter(stage.name)}
+                                            {titleCase(stage.name)}
                                         </h2>
                                         {stage.description && (
                                             <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
