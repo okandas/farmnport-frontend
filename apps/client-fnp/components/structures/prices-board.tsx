@@ -203,18 +203,33 @@ export function PricesBoard({ mode = "kg" }: { mode?: Mode }) {
                     const pct = seriesTrendPct(item.trend ?? [])
                     const color = gradeColor((item.category ?? "").toLowerCase())
                     return (
-                      <li key={`${item.code}_${item.name}`} className="flex items-center gap-2">
-                        <span className={`inline-flex items-center justify-center rounded-md px-2 py-0.5 text-xs font-bold ring-1 ring-inset min-w-[36px] shrink-0 ${color}`}>{item.code}</span>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-baseline justify-between gap-2">
-                            <p className="text-sm font-semibold text-foreground leading-tight">{mode === "head" ? categoryToDisplay(item.category) : item.name}</p>
-                            <p className="text-sm font-semibold tabular-nums shrink-0">
-                              ${toDollars(item.avg)}<span className="text-xs font-normal text-muted-foreground">{unit}</span>
-                              {pct !== null && <span className={`ml-1.5 text-xs font-medium ${pct >= 0 ? "text-green-600" : "text-red-500"}`}>{pct >= 0 ? "▲" : "▼"} {pct >= 0 ? "+" : ""}{pct.toFixed(1)}%</span>}
-                            </p>
+                      <li key={`${item.code}_${item.name}`} className={`flex gap-2 ${mode === "head" ? "items-center" : "items-start"}`}>
+                        <span className={`inline-flex items-center justify-center rounded-md px-2 py-0.5 text-xs font-bold ring-1 ring-inset shrink-0 ${mode === "head" ? "w-12" : "min-w-[36px] mt-0.5"} ${color}`}>{item.code}</span>
+                        {mode === "head" ? (
+                          <div className="flex-1 min-w-0 flex items-center justify-between gap-2">
+                            <div className="min-w-0">
+                              <p className="text-sm font-semibold text-foreground truncate">{categoryToDisplay(item.category)}</p>
+                              <p className="text-[11px] text-muted-foreground leading-tight truncate">{item.name}</p>
+                            </div>
+                            <div className="shrink-0 text-right">
+                              <p className="text-sm font-semibold tabular-nums">${toDollars(item.avg)}</p>
+                              <p className={`text-xs font-medium tabular-nums ${pct === null ? "text-muted-foreground" : pct >= 0 ? "text-green-600" : "text-red-500"}`}>
+                                {pct === null ? "—" : `${pct >= 0 ? "▲ +" : "▼ "}${pct.toFixed(1)}%`}
+                              </p>
+                            </div>
                           </div>
-                          {mode !== "head" && <p className="text-[11px] text-muted-foreground leading-tight">{categoryToDisplay(item.category)}</p>}
-                        </div>
+                        ) : (
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-baseline justify-between gap-2">
+                              <p className="text-sm font-semibold text-foreground leading-tight">{item.name}</p>
+                              <p className="text-sm font-semibold tabular-nums shrink-0">
+                                ${toDollars(item.avg)}<span className="text-xs font-normal text-muted-foreground">/kg</span>
+                                {pct !== null && <span className={`ml-1.5 text-xs font-medium ${pct >= 0 ? "text-green-600" : "text-red-500"}`}>{pct >= 0 ? "▲" : "▼"} {pct >= 0 ? "+" : ""}{pct.toFixed(1)}%</span>}
+                              </p>
+                            </div>
+                            <p className="text-[11px] text-muted-foreground leading-tight">{categoryToDisplay(item.category)}</p>
+                          </div>
+                        )}
                       </li>
                     )
                   })}
@@ -230,18 +245,31 @@ export function PricesBoard({ mode = "kg" }: { mode?: Mode }) {
                   {topGainers.map(item => {
                     const color = gradeColor((item.category ?? "").toLowerCase())
                     return (
-                      <li key={`${item.code}_${item.name}`} className="flex items-center gap-2">
-                        <span className={`inline-flex items-center justify-center rounded-md px-2 py-0.5 text-xs font-bold ring-1 ring-inset min-w-[36px] shrink-0 ${color}`}>{item.code}</span>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-baseline justify-between gap-2">
-                            <p className="text-sm font-semibold text-foreground leading-tight">{mode === "head" ? categoryToDisplay(item.category) : item.name}</p>
-                            <p className="text-sm font-semibold tabular-nums shrink-0">
-                              ${toDollars(item.avg)}<span className="text-xs font-normal text-muted-foreground">{unit}</span>
-                              <span className={`ml-1.5 text-xs font-medium ${item.pct! >= 0 ? "text-green-600" : "text-red-500"}`}>{item.pct! >= 0 ? "▲ +" : "▼ "}{item.pct!.toFixed(1)}%</span>
-                            </p>
+                      <li key={`${item.code}_${item.name}`} className={`flex gap-2 ${mode === "head" ? "items-center" : "items-start"}`}>
+                        <span className={`inline-flex items-center justify-center rounded-md px-2 py-0.5 text-xs font-bold ring-1 ring-inset shrink-0 ${mode === "head" ? "w-12" : "min-w-[36px] mt-0.5"} ${color}`}>{item.code}</span>
+                        {mode === "head" ? (
+                          <div className="flex-1 min-w-0 flex items-center justify-between gap-2">
+                            <div className="min-w-0">
+                              <p className="text-sm font-semibold text-foreground truncate">{categoryToDisplay(item.category)}</p>
+                              <p className="text-[11px] text-muted-foreground leading-tight truncate">{item.name}</p>
+                            </div>
+                            <div className="shrink-0 text-right">
+                              <p className="text-sm font-semibold tabular-nums">${toDollars(item.avg)}</p>
+                              <p className={`text-xs font-medium tabular-nums ${item.pct! >= 0 ? "text-green-600" : "text-red-500"}`}>{item.pct! >= 0 ? "▲ +" : "▼ "}{item.pct!.toFixed(1)}%</p>
+                            </div>
                           </div>
-                          {mode !== "head" && <p className="text-[11px] text-muted-foreground leading-tight">{categoryToDisplay(item.category)}</p>}
-                        </div>
+                        ) : (
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-baseline justify-between gap-2">
+                              <p className="text-sm font-semibold text-foreground leading-tight">{item.name}</p>
+                              <p className="text-sm font-semibold tabular-nums shrink-0">
+                                ${toDollars(item.avg)}<span className="text-xs font-normal text-muted-foreground">/kg</span>
+                                <span className={`ml-1.5 text-xs font-medium ${item.pct! >= 0 ? "text-green-600" : "text-red-500"}`}>{item.pct! >= 0 ? "▲ +" : "▼ "}{item.pct!.toFixed(1)}%</span>
+                              </p>
+                            </div>
+                            <p className="text-[11px] text-muted-foreground leading-tight">{categoryToDisplay(item.category)}</p>
+                          </div>
+                        )}
                       </li>
                     )
                   })}
