@@ -63,7 +63,7 @@ function SearchableCheckboxList({
           />
         </div>
       )}
-      <div className="max-h-[300px] overflow-y-auto space-y-2">
+      <div className="max-h-[300px] overflow-y-auto space-y-2 pr-3">
         {filteredItems.length === 0 ? (
           <p className="text-sm text-muted-foreground py-2">No results found</p>
         ) : (
