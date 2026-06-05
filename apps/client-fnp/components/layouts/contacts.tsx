@@ -164,7 +164,7 @@ export function Contacts({ user, client, quickOverview }: ContactPageProps) {
                             <Icons.calender className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                             Date Joined
                         </dt>
-                        <dd className="text-sm font-medium leading-6">· {formatDate(client.created)}</dd>
+                        <dd className="text-sm font-medium leading-6">{formatDate(client.created)}</dd>
                     </div>
                     {client.address && (
                         <div className="flex gap-x-4 py-1">
@@ -193,7 +193,7 @@ export function Contacts({ user, client, quickOverview }: ContactPageProps) {
                             <Icons.landmark className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                             City, Province
                         </dt>
-                        <dd className="text-sm font-medium leading-6">· {client.city?.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}, {client.province?.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}</dd>
+                        <dd className="text-sm font-medium leading-6">{client.city?.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}, {client.province?.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}</dd>
                     </div>
                     <div className="flex gap-x-4 py-1">
                         <dt className="flex items-center gap-1 text-xs text-muted-foreground w-24 shrink-0">
@@ -216,10 +216,10 @@ export function Contacts({ user, client, quickOverview }: ContactPageProps) {
                             </dt>
                             <ul className="space-y-0.5">
                                 {client.main_produce?.name && (
-                                    <li className="text-sm text-foreground">· {capitalizeFirstLetter(client.main_produce.name)}</li>
+                                    <li className="text-sm text-foreground">{capitalizeFirstLetter(client.main_produce.name)}</li>
                                 )}
                                 {client.other_produce?.map((p: any, i: number) => (
-                                    <li key={i} className="text-sm text-foreground">· {capitalizeFirstLetter(p.name)}</li>
+                                    <li key={i} className="text-sm text-foreground">{capitalizeFirstLetter(p.name)}</li>
                                 ))}
                             </ul>
                         </div>
