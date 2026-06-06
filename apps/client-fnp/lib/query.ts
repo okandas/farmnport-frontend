@@ -148,6 +148,10 @@ export function querySeriesBuyers(category: string, code: string, templateType: 
   return api.get(`${BaseURL}/prices/series/buyers?category=${encodeURIComponent(category)}&code=${encodeURIComponent(code)}&template_type=${encodeURIComponent(templateType)}`)
 }
 
+export function querySeriesClientHistory(clientSlug: string, category: string) {
+  return api.get(`${BaseURL}/prices/series/client?client_slug=${encodeURIComponent(clientSlug)}&category=${encodeURIComponent(category)}`)
+}
+
 export function queryGradeChart(produce: string, code: string) {
   return api.get(`${BaseURL}/prices/grade-chart/${produce.toLowerCase()}/${code.toLowerCase()}`)
 }
