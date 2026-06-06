@@ -75,7 +75,7 @@ export default function OrderDispatchEmail({
 
           {/* Header */}
           <Section style={header}>
-            <Text style={brandName}>farm<span style={amp}>&amp;</span>port</Text>
+            <Text style={brandName}>farmnport</Text>
             <Text style={brandTagline}>internal dispatch alert</Text>
           </Section>
 
@@ -171,7 +171,7 @@ export default function OrderDispatchEmail({
           {/* Footer */}
           <Section style={footer}>
             <Text style={footerText}>
-              farm&amp;port internal notification &nbsp;·&nbsp; do not reply to this email
+              farmnport internal notification &nbsp;·&nbsp; do not reply to this email
             </Text>
           </Section>
 
@@ -204,7 +204,7 @@ const header: React.CSSProperties = {
 
 const brandName: React.CSSProperties = {
   fontSize: "22px",
-  fontWeight: "700",
+  fontWeight: "600",
   color: "#0f172a",
   margin: "0 0 2px",
   letterSpacing: "-0.3px",
@@ -274,7 +274,7 @@ const subValue: React.CSSProperties = {
 
 const sectionLabel: React.CSSProperties = {
   fontSize: "11px",
-  fontWeight: "700",
+  fontWeight: "600",
   textTransform: "uppercase",
   letterSpacing: "0.08em",
   color: "#94a3b8",
@@ -310,7 +310,7 @@ const priceCol: React.CSSProperties = {
 
 const qty: React.CSSProperties = {
   fontSize: "14px",
-  fontWeight: "700",
+  fontWeight: "600",
   color: "#ea580c",
   margin: 0,
 }
@@ -352,14 +352,14 @@ const totalAmount: React.CSSProperties = {
 
 const grandLabel: React.CSSProperties = {
   fontSize: "15px",
-  fontWeight: "700",
+  fontWeight: "600",
   color: "#0f172a",
   margin: 0,
 }
 
 const grandAmount: React.CSSProperties = {
   fontSize: "15px",
-  fontWeight: "700",
+  fontWeight: "600",
   color: "#ea580c",
   margin: 0,
   textAlign: "right",

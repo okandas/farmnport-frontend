@@ -22,13 +22,13 @@ export default function MagicLinkEmail({
   return (
     <Html lang="en">
       <Head />
-      <Preview>Reset your farm&port password — link expires in 20 minutes.</Preview>
+      <Preview>Reset your farmnport password — link expires in 20 minutes.</Preview>
       <Body style={body}>
         <Container style={container}>
 
           {/* Header */}
           <Section style={header}>
-            <Text style={brandName}>farm<span style={amp}>&amp;</span>port</Text>
+            <Text style={brandName}>farmnport</Text>
             <Text style={brandTagline}>getting you to market</Text>
           </Section>
 
@@ -37,7 +37,7 @@ export default function MagicLinkEmail({
             <Text style={greeting}>Password reset</Text>
             <Text style={paragraph}>Hi {name},</Text>
             <Text style={paragraph}>
-              We received a request to reset the password for your farm&amp;port account.
+              We received a request to reset the password for your farmnport account.
               Click the button below to choose a new password.
             </Text>
             <Section style={buttonWrapper}>
@@ -52,16 +52,16 @@ export default function MagicLinkEmail({
               This link expires in <strong>20 minutes</strong>. If you didn't request a password
               reset you can safely ignore this email.
             </Text>
-            <Text style={signoff}>the farm&amp;port team</Text>
+            <Text style={signoff}>the farmnport team</Text>
           </Section>
 
           {/* Footer */}
           <Section style={footer}>
             <Text style={footerText}>
-              farm&amp;port &nbsp;·&nbsp; 13 Grace Rd, Winston Park, Marondera, Zimbabwe
+              farmnport &nbsp;·&nbsp; 13 Grace Rd, Winston Park, Marondera, Zimbabwe
             </Text>
             <Text style={footerText}>
-              © {new Date().getFullYear()} farm&amp;port. All rights reserved.
+              © {new Date().getFullYear()} farmnport. All rights reserved.
             </Text>
           </Section>
 
@@ -94,7 +94,7 @@ const header: React.CSSProperties = {
 
 const brandName: React.CSSProperties = {
   fontSize: "22px",
-  fontWeight: "700",
+  fontWeight: "600",
   color: "#0f172a",
   margin: "0 0 2px",
   letterSpacing: "-0.3px",
@@ -118,7 +118,7 @@ const content: React.CSSProperties = {
 
 const greeting: React.CSSProperties = {
   fontSize: "24px",
-  fontWeight: "700",
+  fontWeight: "600",
   color: "#0f172a",
   margin: "0 0 20px",
 }

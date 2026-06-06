@@ -71,7 +71,7 @@ export default function OrderConfirmationEmail({
 
           {/* Header */}
           <Section style={header}>
-            <Text style={brandName}>farm<span style={amp}>&amp;</span>port</Text>
+            <Text style={brandName}>farmnport</Text>
             <Text style={brandTagline}>getting you to market</Text>
           </Section>
 
@@ -154,16 +154,16 @@ export default function OrderConfirmationEmail({
             </Section>
 
             <Hr style={divider} />
-            <Text style={signoff}>the farm&amp;port team</Text>
+            <Text style={signoff}>the farmnport team</Text>
           </Section>
 
           {/* Footer */}
           <Section style={footer}>
             <Text style={footerText}>
-              farm&amp;port &nbsp;·&nbsp; 13 Grace Rd, Winston Park, Marondera, Zimbabwe
+              farmnport &nbsp;·&nbsp; 13 Grace Rd, Winston Park, Marondera, Zimbabwe
             </Text>
             <Text style={footerText}>
-              © {new Date().getFullYear()} farm&amp;port. All rights reserved.
+              © {new Date().getFullYear()} farmnport. All rights reserved.
             </Text>
           </Section>
 
@@ -196,7 +196,7 @@ const header: React.CSSProperties = {
 
 const brandName: React.CSSProperties = {
   fontSize: "22px",
-  fontWeight: "700",
+  fontWeight: "600",
   color: "#0f172a",
   margin: "0 0 2px",
   letterSpacing: "-0.3px",
@@ -241,7 +241,7 @@ const pill: React.CSSProperties = {
 
 const greeting: React.CSSProperties = {
   fontSize: "22px",
-  fontWeight: "700",
+  fontWeight: "600",
   color: "#0f172a",
   margin: "0 0 12px",
 }
@@ -270,14 +270,14 @@ const orderCardLabel: React.CSSProperties = {
 
 const orderCardNumber: React.CSSProperties = {
   fontSize: "20px",
-  fontWeight: "700",
+  fontWeight: "600",
   color: "#0f172a",
   margin: 0,
 }
 
 const sectionLabel: React.CSSProperties = {
   fontSize: "11px",
-  fontWeight: "700",
+  fontWeight: "600",
   textTransform: "uppercase",
   letterSpacing: "0.08em",
   color: "#94a3b8",
@@ -343,14 +343,14 @@ const totalAmount: React.CSSProperties = {
 
 const grandLabel: React.CSSProperties = {
   fontSize: "15px",
-  fontWeight: "700",
+  fontWeight: "600",
   color: "#0f172a",
   margin: 0,
 }
 
 const grandAmount: React.CSSProperties = {
   fontSize: "15px",
-  fontWeight: "700",
+  fontWeight: "600",
   color: "#ea580c",
   margin: 0,
   textAlign: "right",

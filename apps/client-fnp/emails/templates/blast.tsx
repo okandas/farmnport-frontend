@@ -13,14 +13,14 @@ export default function BlastEmail({ name = "Member", message = "" }: BlastEmail
       <Body style={body}>
         <Container style={container}>
           <Section style={content}>
-            <Text style={brand}>farm<span style={{ color: "#ea580c" }}>&amp;</span>port</Text>
+            <Text style={brand}>farmnport</Text>
             <Text style={greeting}>Hi {name},</Text>
             <Text style={paragraph}>{message}</Text>
             <Hr style={divider} />
-            <Text style={signoff}>the farm&amp;port team</Text>
+            <Text style={signoff}>the farmnport team</Text>
           </Section>
           <Section style={footer}>
-            <Text style={footerText}>farm&amp;port · Zimbabwe's Agricultural Marketplace</Text>
+            <Text style={footerText}>farmnport · Zimbabwe's Agricultural Marketplace</Text>
           </Section>
         </Container>
       </Body>
@@ -31,7 +31,7 @@ export default function BlastEmail({ name = "Member", message = "" }: BlastEmail
 const body: React.CSSProperties = { backgroundColor: "#f8fafc", fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", margin: 0, padding: "40px 0" }
 const container: React.CSSProperties = { backgroundColor: "#ffffff", margin: "0 auto", maxWidth: "580px", borderRadius: "8px", overflow: "hidden", boxShadow: "0 1px 3px rgba(0,0,0,0.08)" }
 const content: React.CSSProperties = { padding: "32px 40px 24px" }
-const brand: React.CSSProperties = { fontSize: "20px", fontWeight: "700", color: "#0f172a", margin: "0 0 20px" }
+const brand: React.CSSProperties = { fontSize: "20px", fontWeight: "600", color: "#0f172a", margin: "0 0 20px" }
 const greeting: React.CSSProperties = { fontSize: "18px", fontWeight: "600", color: "#0f172a", margin: "0 0 12px" }
 const paragraph: React.CSSProperties = { fontSize: "15px", lineHeight: "1.7", color: "#475569", margin: "0 0 16px", whiteSpace: "pre-wrap" }
 const divider: React.CSSProperties = { borderColor: "#e2e8f0", margin: "20px 0" }
