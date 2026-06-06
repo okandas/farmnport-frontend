@@ -2,8 +2,8 @@ import { BuyerProducePriceHistory } from "@/components/structures/buyer-produce-
 import type { Metadata } from "next"
 import { capitalizeFirstLetter } from "@/lib/utilities"
 
-interface SheetProducePageProps {
-  params: Promise<{ sheet: string; produce: string }>
+interface SheetCategoryPageProps {
+  params: Promise<{ produce: string; category: string }>
 }
 
 function parseSheetSlug(sheet: string): { clientSlug: string; clientName: string; effectiveDate: string | null } {
@@ -14,36 +14,36 @@ function parseSheetSlug(sheet: string): { clientSlug: string; clientName: string
   return { clientSlug: sheet, clientName, effectiveDate }
 }
 
-export async function generateMetadata({ params }: SheetProducePageProps): Promise<Metadata> {
-  const { sheet, produce } = await params
+export async function generateMetadata({ params }: SheetCategoryPageProps): Promise<Metadata> {
+  const { produce: sheet, category } = await params
   const { clientName, effectiveDate } = parseSheetSlug(sheet)
-  const produceName = capitalizeFirstLetter(produce)
+  const categoryName = capitalizeFirstLetter(category)
   const dateLabel = effectiveDate ? ` – ${effectiveDate}` : ""
   return {
-    title: `${clientName} ${produceName} Prices${dateLabel} | farmnport.com`,
-    description: `View ${clientName}'s ${produceName.toLowerCase()} price history on farmnport.com.`,
-    alternates: { canonical: `/prices/${sheet}/${produce}` },
+    title: `${clientName} ${categoryName} Prices${dateLabel} | farmnport.com`,
+    description: `View ${clientName}'s ${categoryName.toLowerCase()} price history on farmnport.com.`,
+    alternates: { canonical: `/prices/${sheet}/${category}` },
     openGraph: {
-      title: `${clientName} ${produceName} Prices Zimbabwe`,
-      description: `View ${clientName}'s ${produceName.toLowerCase()} price history on farmnport.com.`,
-      url: `/prices/${sheet}/${produce}`,
+      title: `${clientName} ${categoryName} Prices Zimbabwe`,
+      description: `View ${clientName}'s ${categoryName.toLowerCase()} price history on farmnport.com.`,
+      url: `/prices/${sheet}/${category}`,
       siteName: "farmnport",
       type: "website",
     },
   }
 }
 
-export default async function BuyerProducePage({ params }: SheetProducePageProps) {
-  const { sheet, produce } = await params
+export default async function BuyerCategoryPage({ params }: SheetCategoryPageProps) {
+  const { produce: sheet, category } = await params
   const { clientSlug, clientName, effectiveDate } = parseSheetSlug(sheet)
 
   return (
     <>
-      <h1 className="sr-only">{clientName} {capitalizeFirstLetter(produce)} Prices Zimbabwe</h1>
+      <h1 className="sr-only">{clientName} {capitalizeFirstLetter(category)} Prices Zimbabwe</h1>
       <BuyerProducePriceHistory
         clientSlug={clientSlug}
         clientName={clientName}
-        produce={produce}
+        produce={category}
         effectiveDate={effectiveDate}
       />
     </>

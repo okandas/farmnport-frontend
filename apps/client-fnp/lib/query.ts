@@ -148,8 +148,14 @@ export function querySeriesBuyers(category: string, code: string, templateType: 
   return api.get(`${BaseURL}/prices/series/buyers?category=${encodeURIComponent(category)}&code=${encodeURIComponent(code)}&template_type=${encodeURIComponent(templateType)}`)
 }
 
-export function querySeriesClientHistory(clientSlug: string, category: string) {
-  return api.get(`${BaseURL}/prices/series/client?client_slug=${encodeURIComponent(clientSlug)}&category=${encodeURIComponent(category)}`)
+export function querySeriesClientHistory(clientSlug: string, category: string, date: string) {
+  return api.get(`${BaseURL}/prices/series/client?client_slug=${encodeURIComponent(clientSlug)}&category=${encodeURIComponent(category)}&date=${encodeURIComponent(date)}`)
+}
+
+export function querySeriesClientDates(clientSlug: string, category: string, p: number, limit = 10) {
+  const params = new URLSearchParams({ client_slug: clientSlug, p: String(p), limit: String(limit) })
+  if (category) params.set("category", category)
+  return api.get(`${BaseURL}/prices/series/client/dates?${params.toString()}`)
 }
 
 export function queryGradeChart(produce: string, code: string) {

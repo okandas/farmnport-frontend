@@ -1,8 +1,9 @@
 "use client"
 
 import Link from "next/link"
+import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
-import { querySeriesClientHistory } from "@/lib/query"
+import { querySeriesClientHistory, querySeriesClientDates } from "@/lib/query"
 import { capitalizeFirstLetter, slug } from "@/lib/utilities"
 
 interface SeriesEntry {
@@ -22,15 +23,22 @@ interface SeriesEntry {
   weight_max_grams?: number
 }
 
+interface DateEntry {
+  date: string
+  count: number
+  categories: string[]
+  types: string[]
+}
+
 const codeColors = [
-  "bg-blue-50 text-blue-700 ring-blue-600/20",
-  "bg-green-50 text-green-700 ring-green-600/20",
-  "bg-amber-50 text-amber-700 ring-amber-600/20",
-  "bg-purple-50 text-purple-700 ring-purple-600/20",
-  "bg-rose-50 text-rose-700 ring-rose-600/20",
-  "bg-cyan-50 text-cyan-700 ring-cyan-600/20",
-  "bg-orange-50 text-orange-700 ring-orange-600/20",
-  "bg-teal-50 text-teal-700 ring-teal-600/20",
+  "bg-blue-50 text-blue-700 ring-blue-600/20 dark:bg-blue-950/30 dark:text-blue-400 dark:ring-blue-500/20",
+  "bg-green-50 text-green-700 ring-green-600/20 dark:bg-green-950/30 dark:text-green-400 dark:ring-green-500/20",
+  "bg-amber-50 text-amber-700 ring-amber-600/20 dark:bg-amber-950/30 dark:text-amber-400 dark:ring-amber-500/20",
+  "bg-purple-50 text-purple-700 ring-purple-600/20 dark:bg-purple-950/30 dark:text-purple-400 dark:ring-purple-500/20",
+  "bg-rose-50 text-rose-700 ring-rose-600/20 dark:bg-rose-950/30 dark:text-rose-400 dark:ring-rose-500/20",
+  "bg-cyan-50 text-cyan-700 ring-cyan-600/20 dark:bg-cyan-950/30 dark:text-cyan-400 dark:ring-cyan-500/20",
+  "bg-orange-50 text-orange-700 ring-orange-600/20 dark:bg-orange-950/30 dark:text-orange-400 dark:ring-orange-500/20",
+  "bg-teal-50 text-teal-700 ring-teal-600/20 dark:bg-teal-950/30 dark:text-teal-400 dark:ring-teal-500/20",
 ]
 
 function codeColor(code: string): string {
@@ -51,53 +59,46 @@ function weightDisplay(minG?: number, maxG?: number): string {
   return max != null ? `${min}–${max} kg` : `${min}+ kg`
 }
 
-function toDateKey(isoDate: string): string {
-  return new Date(isoDate).toISOString().split("T")[0]
-}
-
-function GradeTable({ entries }: { entries: SeriesEntry[] }) {
+function GradeTable({ entries, date }: { entries: SeriesEntry[]; date: string }) {
   return (
-    <div className="overflow-x-auto rounded-lg border">
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="border-b bg-muted/30 text-xs text-muted-foreground">
-            <th className="text-left py-2.5 px-4 font-medium">Code</th>
-            <th className="text-left py-2.5 px-4 font-medium">Grade</th>
-            <th className="text-left py-2.5 px-4 font-medium hidden sm:table-cell">Weight Band</th>
-            <th className="text-right py-2.5 px-4 font-medium">Delivered</th>
-            <th className="text-right py-2.5 px-4 font-medium">Collected</th>
-          </tr>
-        </thead>
-        <tbody>
-          {entries.map((entry, i) => {
-            const delivered = entry.pricing?.delivered ?? entry.price_per_kg
-            const collected = entry.pricing?.collected
-            const weight = weightDisplay(entry.weight_min_grams, entry.weight_max_grams)
-            return (
-              <tr
-                key={`${entry.code}-${i}`}
-                className="border-b border-border/50 last:border-0 hover:bg-muted/30 transition-colors"
-              >
-                <td className="py-3 px-4">
-                  <span className={`font-mono text-xs px-1.5 py-0.5 rounded-md ring-1 ring-inset whitespace-nowrap ${codeColor(entry.code)}`}>
-                    {entry.code}
-                  </span>
-                </td>
-                <td className="py-3 px-4 font-medium text-foreground">{entry.name}</td>
-                <td className="py-3 px-4 text-muted-foreground hidden sm:table-cell">
-                  {weight || "—"}
-                </td>
-                <td className="py-3 px-4 tabular-nums font-semibold text-right">
-                  {centsToDisplay(delivered)}
-                </td>
-                <td className="py-3 px-4 tabular-nums font-medium text-right text-muted-foreground">
-                  {centsToDisplay(collected)}
-                </td>
-              </tr>
-            )
-          })}
-        </tbody>
-      </table>
+    <div className="rounded-xl border bg-card shadow-sm">
+      <div className="px-5 py-2.5 border-b flex items-center justify-between">
+        <h4 className="text-sm font-semibold text-foreground">Prices</h4>
+        <span className="text-xs text-muted-foreground">{new Date(date).toLocaleDateString("en-GB")}</span>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="min-w-full">
+          <thead>
+            <tr className="border-b">
+              <th className="px-4 py-2 text-left text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Code</th>
+              <th className="px-4 py-2 text-left text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Grade</th>
+              <th className="px-4 py-2 text-left text-[11px] font-medium uppercase tracking-wider text-muted-foreground hidden sm:table-cell">Weight</th>
+              <th className="px-4 py-2 text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Delivered</th>
+              <th className="px-4 py-2 text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Collected</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border/50">
+            {entries.map((entry, i) => {
+              const delivered = entry.pricing?.delivered ?? entry.price_per_kg
+              const collected = entry.pricing?.collected
+              const weight = weightDisplay(entry.weight_min_grams, entry.weight_max_grams)
+              return (
+                <tr key={`${entry.code}-${i}`} className="transition-colors hover:bg-muted/40">
+                  <td className="px-4 py-2.5">
+                    <span className={`inline-flex items-center justify-center rounded-md px-2 py-0.5 text-xs font-bold ring-1 ring-inset min-w-[36px] ${codeColor(entry.code)}`}>
+                      {entry.code}
+                    </span>
+                  </td>
+                  <td className="px-4 py-2.5 text-sm font-medium text-foreground">{entry.name}</td>
+                  <td className="px-4 py-2.5 text-sm text-muted-foreground hidden sm:table-cell">{weight || "—"}</td>
+                  <td className="px-4 py-2.5 text-right text-sm font-semibold text-foreground tabular-nums">{centsToDisplay(delivered)}</td>
+                  <td className="px-4 py-2.5 text-right text-sm text-muted-foreground tabular-nums">{centsToDisplay(collected)}</td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      </div>
     </div>
   )
 }
@@ -113,140 +114,143 @@ export function BuyerProducePriceHistory({
   produce: string
   effectiveDate: string | null
 }) {
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ["series-client-history", clientSlug, produce],
-    queryFn: () => querySeriesClientHistory(clientSlug, produce),
+  const [historyPage, setHistoryPage] = useState(1)
+  const nameSlug = slug(clientName)
+  const activeDate = effectiveDate ?? ""
+
+  const { data: gradeData, isLoading: gradesLoading, isError } = useQuery({
+    queryKey: ["series-client-history", clientSlug, produce, activeDate],
+    queryFn: () => querySeriesClientHistory(clientSlug, produce, activeDate),
+    enabled: !!activeDate,
     refetchOnWindowFocus: false,
   })
 
-  const allEntries: SeriesEntry[] = data?.data?.data ?? []
+  const { data: datesData, isLoading: datesLoading } = useQuery({
+    queryKey: ["series-client-dates", clientSlug, produce, historyPage],
+    queryFn: () => querySeriesClientDates(clientSlug, produce, historyPage),
+    refetchOnWindowFocus: false,
+  })
+
+  const gradeEntries: SeriesEntry[] = gradeData?.data?.data ?? []
+  const dateEntries: DateEntry[] = datesData?.data?.data ?? []
+  const totalDates: number = datesData?.data?.total ?? 0
+  const totalPages = Math.ceil(totalDates / 10)
   const produceName = capitalizeFirstLetter(produce)
 
-  // Group all entries by effective date (date string "YYYY-MM-DD")
-  const byDate = allEntries.reduce<Record<string, SeriesEntry[]>>((acc, e) => {
-    const key = toDateKey(e.effective_date)
-    if (!acc[key]) acc[key] = []
-    acc[key].push(e)
-    return acc
-  }, {})
-
-  // Sorted dates descending
-  const sortedDates = Object.keys(byDate).sort((a, b) => b.localeCompare(a))
-
-  // The "active" date — from URL slug or the most recent
-  const activeDate = effectiveDate ?? sortedDates[0] ?? null
-  const activeEntries = activeDate ? (byDate[activeDate] ?? []) : []
-
-  const nameSlug = slug(clientName)
+  // If no effectiveDate in URL, use the first date from the list
+  const resolvedDate = activeDate || (dateEntries[0]?.date ?? null)
 
   return (
     <main className="min-h-screen">
-      <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-5xl mx-auto">
+      <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-5xl mx-auto space-y-8">
 
         {/* Breadcrumb */}
-        <p className="text-sm text-muted-foreground mb-6 flex items-center gap-1.5 flex-wrap">
+        <p className="text-sm text-muted-foreground flex items-center gap-1.5 flex-wrap">
           <Link href="/prices" className="hover:text-foreground">Prices</Link>
           <span>/</span>
           <Link href={`/buyer/${nameSlug}`} className="hover:text-foreground">{clientName}</Link>
           <span>/</span>
           <span className="text-foreground font-semibold">{produceName}</span>
-          {activeDate && (
+          {resolvedDate && (
             <>
               <span>/</span>
-              <span className="text-foreground">{new Date(activeDate).toLocaleDateString("en-GB")}</span>
+              <span className="text-foreground">{new Date(resolvedDate).toLocaleDateString("en-GB")}</span>
             </>
           )}
         </p>
 
-        {/* Heading */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-foreground">{clientName}</h2>
-          <p className="text-sm text-muted-foreground mt-1">
-            {produceName} prices · {sortedDates.length} upload{sortedDates.length !== 1 ? "s" : ""}
-          </p>
-        </div>
-
-        {isLoading ? (
-          <div className="space-y-2">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="h-10 bg-muted/40 rounded animate-pulse" />
-            ))}
-          </div>
-        ) : isError ? (
+        {isError ? (
           <p className="text-sm text-muted-foreground">Failed to load price history.</p>
-        ) : allEntries.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No price data found for {clientName} — {produceName}.</p>
         ) : (
-          <div className="space-y-10">
+          <>
+            <div>
+              <h2 className="text-2xl font-bold text-foreground">{clientName}</h2>
+              <p className="text-sm text-muted-foreground mt-1">
+                {produceName} · {totalDates} upload{totalDates !== 1 ? "s" : ""}
+              </p>
+            </div>
 
             {/* Active date grades */}
-            {activeDate && activeEntries.length > 0 && (
-              <section>
-                <p className="text-sm font-semibold text-foreground mb-3">
-                  Prices for {new Date(activeDate).toLocaleDateString("en-GB")}
-                </p>
-                <GradeTable entries={activeEntries} />
-              </section>
-            )}
-
-            {/* Upload history table */}
-            <section>
-              <p className="text-sm font-semibold text-foreground mb-3">Upload History</p>
-              <div className="overflow-x-auto rounded-lg border">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b bg-muted/30 text-xs text-muted-foreground">
-                      <th className="text-left py-2.5 px-4 font-medium">Date</th>
-                      <th className="text-left py-2.5 px-4 font-medium">Grades</th>
-                      <th className="text-left py-2.5 px-4 font-medium hidden sm:table-cell">Type</th>
-                      <th className="text-right py-2.5 px-4 font-medium">View</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {sortedDates.map((dateKey) => {
-                      const rows = byDate[dateKey]
-                      const isActive = dateKey === activeDate
-                      const slug_ = `${nameSlug}-${dateKey}`
-                      const types = [...new Set(rows.map(r => r.template_type.toUpperCase()))]
-                      return (
-                        <tr
-                          key={dateKey}
-                          className={`border-b border-border/50 last:border-0 transition-colors ${isActive ? "bg-primary/5" : "hover:bg-muted/30"}`}
-                        >
-                          <td className="py-3 px-4 tabular-nums font-medium whitespace-nowrap">
-                            {isActive
-                              ? <span className="text-foreground">{new Date(dateKey).toLocaleDateString("en-GB")}</span>
-                              : <Link href={`/prices/${slug_}/${produce}`} className="hover:underline text-foreground">
-                                  {new Date(dateKey).toLocaleDateString("en-GB")}
-                                </Link>
-                            }
-                          </td>
-                          <td className="py-3 px-4 text-muted-foreground">
-                            {rows.length} grade{rows.length !== 1 ? "s" : ""}
-                          </td>
-                          <td className="py-3 px-4 text-muted-foreground hidden sm:table-cell">
-                            {types.join(", ")}
-                          </td>
-                          <td className="py-3 px-4 text-right">
-                            {isActive ? (
-                              <span className="text-xs text-primary font-medium">Viewing</span>
-                            ) : (
-                              <Link
-                                href={`/prices/${slug_}/${produce}`}
-                                className="text-xs text-muted-foreground hover:text-foreground hover:underline"
-                              >
-                                View →
-                              </Link>
-                            )}
-                          </td>
-                        </tr>
-                      )
-                    })}
-                  </tbody>
-                </table>
+            {gradesLoading ? (
+              <div className="space-y-3">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="h-12 bg-muted/40 rounded-xl animate-pulse" />
+                ))}
               </div>
-            </section>
-          </div>
+            ) : gradeEntries.length > 0 && resolvedDate ? (
+              <GradeTable entries={gradeEntries} date={resolvedDate} />
+            ) : null}
+
+            {/* Upload history */}
+            <div className="rounded-xl border bg-card shadow-sm">
+              <div className="px-5 py-2.5 border-b flex items-center justify-between">
+                <h4 className="text-sm font-semibold text-foreground">Upload History</h4>
+                {totalDates > 0 && <span className="text-xs text-muted-foreground">{totalDates} submission{totalDates !== 1 ? "s" : ""}</span>}
+              </div>
+              {datesLoading ? (
+                <div className="p-4 space-y-2">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <div key={i} className="h-9 bg-muted/40 rounded-lg animate-pulse" />
+                  ))}
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full">
+                    <thead>
+                      <tr className="border-b">
+                        <th className="px-4 py-2 text-left text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Date</th>
+                        <th className="px-4 py-2 text-left text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Grades</th>
+                        <th className="px-4 py-2 text-left text-[11px] font-medium uppercase tracking-wider text-muted-foreground hidden sm:table-cell">Type</th>
+                        <th className="px-4 py-2 text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground">View</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border/50">
+                      {dateEntries.map((d) => {
+                        const isActive = d.date === resolvedDate
+                        const slug_ = `${nameSlug}-${d.date}`
+                        return (
+                          <tr key={d.date} className={`transition-colors ${isActive ? "bg-primary/5" : "hover:bg-muted/40"}`}>
+                            <td className="px-4 py-2.5 text-sm font-medium text-foreground tabular-nums whitespace-nowrap">
+                              {isActive
+                                ? new Date(d.date).toLocaleDateString("en-GB")
+                                : <Link href={`/prices/${slug_}/${produce}`} className="hover:underline">{new Date(d.date).toLocaleDateString("en-GB")}</Link>
+                              }
+                            </td>
+                            <td className="px-4 py-2.5 text-sm text-muted-foreground">{d.count} grade{d.count !== 1 ? "s" : ""}</td>
+                            <td className="px-4 py-2.5 text-sm text-muted-foreground hidden sm:table-cell">
+                              {d.types.map(t => t.toUpperCase()).join(", ")}
+                            </td>
+                            <td className="px-4 py-2.5 text-right">
+                              {isActive
+                                ? <span className="text-xs font-medium text-primary">Viewing</span>
+                                : <Link href={`/prices/${slug_}/${produce}`} className="text-xs text-muted-foreground hover:text-foreground hover:underline">View →</Link>
+                              }
+                            </td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              {totalPages > 1 && (
+                <div className="flex items-center justify-center gap-1 px-4 py-3 border-t">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(n => (
+                    <button
+                      key={n}
+                      onClick={() => setHistoryPage(n)}
+                      className={`w-8 h-8 rounded-lg text-xs font-medium transition-colors ${
+                        historyPage === n ? "bg-foreground text-background" : "text-muted-foreground hover:bg-muted"
+                      }`}
+                    >
+                      {n}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </>
         )}
       </div>
     </main>

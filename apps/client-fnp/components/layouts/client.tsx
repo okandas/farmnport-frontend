@@ -15,6 +15,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { BuyerContacts } from "@/components/structures/buyer-contacts"
 import { ProductResources } from "@/components/monetization/product-resources"
+import { BuyerPriceUploads } from "@/components/structures/buyer-price-uploads"
 
 
 interface ClientPageProps {
@@ -234,6 +235,12 @@ export function Client({ slug, user }: ClientPageProps) {
               </div>
             )}
         </div>
+
+        {client.type === 'buyer' && (
+          <div id="price-history">
+            <BuyerPriceUploads clientName={client.name} />
+          </div>
+        )}
       </div>
     </div>
   )
