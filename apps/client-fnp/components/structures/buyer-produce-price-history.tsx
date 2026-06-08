@@ -56,6 +56,11 @@ function centsToDisplay(cents?: number): string {
   return `$${(cents / 100).toFixed(2)}`
 }
 
+function gramsToKg(grams?: number): string {
+  if (grams == null || grams === 0) return "—"
+  return `${(grams / 1000).toFixed(1)} kg`
+}
+
 function weightDisplay(minG?: number, maxG?: number): string {
   if (minG == null) return ""
   const min = minG / 1000
@@ -88,7 +93,10 @@ function GradeTable({ entries, date }: { entries: SeriesEntry[]; date: string })
               ) : isLwt ? (
                 <>
                   <th className="px-4 py-2 text-left text-[11px] font-medium uppercase tracking-wider text-muted-foreground hidden sm:table-cell">Avg Weight</th>
-                  <th className="px-4 py-2 text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Per kg</th>
+                  <th className="px-4 py-2 text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground hidden sm:table-cell">Per kg</th>
+                  <th className="px-4 py-2 text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Avg/Head</th>
+                  <th className="px-4 py-2 text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground hidden sm:table-cell">Max/Head</th>
+                  <th className="px-4 py-2 text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground hidden sm:table-cell">Min/Head</th>
                 </>
               ) : (
                 <>
@@ -117,9 +125,12 @@ function GradeTable({ entries, date }: { entries: SeriesEntry[]; date: string })
                 ) : isLwt ? (
                   <>
                     <td className="px-4 py-2.5 text-sm text-muted-foreground hidden sm:table-cell">
-                      {entry.avg_weight_grams ? `${(entry.avg_weight_grams / 1000).toFixed(1)} kg` : "—"}
+                      {gramsToKg(entry.avg_weight_grams)}
                     </td>
-                    <td className="px-4 py-2.5 text-right text-sm font-semibold text-foreground tabular-nums">{centsToDisplay(entry.price_per_kg)}</td>
+                    <td className="px-4 py-2.5 text-right text-sm text-muted-foreground tabular-nums hidden sm:table-cell">{centsToDisplay(entry.price_per_kg)}</td>
+                    <td className="px-4 py-2.5 text-right text-sm font-semibold text-foreground tabular-nums">{centsToDisplay(entry.avg_amount_head)}</td>
+                    <td className="px-4 py-2.5 text-right text-sm text-muted-foreground tabular-nums hidden sm:table-cell">{centsToDisplay(entry.max_amount_head)}</td>
+                    <td className="px-4 py-2.5 text-right text-sm text-muted-foreground tabular-nums hidden sm:table-cell">{centsToDisplay(entry.min_amount_head)}</td>
                   </>
                 ) : (
                   <>

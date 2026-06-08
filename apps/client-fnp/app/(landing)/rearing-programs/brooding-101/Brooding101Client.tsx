@@ -23,10 +23,10 @@ function SubHeading({ title }: { title: string }) {
 
 function BulletList({ items }: { items: string[] }) {
     return (
-        <ul className="space-y-2">
+        <ul className="space-y-3">
             {items.map((item, i) => (
-                <li key={i} className="flex gap-2.5 text-sm text-muted-foreground leading-relaxed">
-                    <span className="mt-2 w-1.5 h-1.5 rounded-full bg-primary/60 flex-shrink-0" />
+                <li key={i} className="flex gap-3 text-sm text-foreground/80 leading-relaxed">
+                    <span className="mt-[5px] w-2 h-2 rounded-full bg-amber-500 flex-shrink-0" />
                     {item}
                 </li>
             ))}
