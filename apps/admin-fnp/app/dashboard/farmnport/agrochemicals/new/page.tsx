@@ -39,6 +39,7 @@ export default function CreateAgroChemicalPage() {
         pickup_available: false,
         pickup_location_ids: [],
         delivery_location_ids: [],
+        is_test: false,
     })
 
     return (
