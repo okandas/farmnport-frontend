@@ -21,6 +21,7 @@ interface SeriesEntry {
   price_per_kg?: number
   weight_min_grams?: number
   weight_max_grams?: number
+  avg_weight_grams?: number
   avg_amount_head?: number
   max_amount_head?: number
   min_amount_head?: number
@@ -64,6 +65,7 @@ function weightDisplay(minG?: number, maxG?: number): string {
 
 function GradeTable({ entries, date }: { entries: SeriesEntry[]; date: string }) {
   const isHeadPriced = entries.some(e => (e.avg_amount_head ?? 0) > 0)
+  const isLwt = !isHeadPriced && entries[0]?.template_type === "lwt"
 
   return (
     <div className="rounded-xl border bg-card shadow-sm">
@@ -82,6 +84,11 @@ function GradeTable({ entries, date }: { entries: SeriesEntry[]; date: string })
                   <th className="px-4 py-2 text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Avg/Head</th>
                   <th className="px-4 py-2 text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground hidden sm:table-cell">Max/Head</th>
                   <th className="px-4 py-2 text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground hidden sm:table-cell">Min/Head</th>
+                </>
+              ) : isLwt ? (
+                <>
+                  <th className="px-4 py-2 text-left text-[11px] font-medium uppercase tracking-wider text-muted-foreground hidden sm:table-cell">Avg Weight</th>
+                  <th className="px-4 py-2 text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Per kg</th>
                 </>
               ) : (
                 <>
@@ -107,10 +114,17 @@ function GradeTable({ entries, date }: { entries: SeriesEntry[]; date: string })
                     <td className="px-4 py-2.5 text-right text-sm text-muted-foreground tabular-nums hidden sm:table-cell">{centsToDisplay(entry.max_amount_head)}</td>
                     <td className="px-4 py-2.5 text-right text-sm text-muted-foreground tabular-nums hidden sm:table-cell">{centsToDisplay(entry.min_amount_head)}</td>
                   </>
+                ) : isLwt ? (
+                  <>
+                    <td className="px-4 py-2.5 text-sm text-muted-foreground hidden sm:table-cell">
+                      {entry.avg_weight_grams ? `${(entry.avg_weight_grams / 1000).toFixed(1)} kg` : "—"}
+                    </td>
+                    <td className="px-4 py-2.5 text-right text-sm font-semibold text-foreground tabular-nums">{centsToDisplay(entry.price_per_kg)}</td>
+                  </>
                 ) : (
                   <>
                     <td className="px-4 py-2.5 text-sm text-muted-foreground hidden sm:table-cell">{weightDisplay(entry.weight_min_grams, entry.weight_max_grams) || "—"}</td>
-                    <td className="px-4 py-2.5 text-right text-sm font-semibold text-foreground tabular-nums">{centsToDisplay(entry.pricing?.delivered ?? entry.price_per_kg)}</td>
+                    <td className="px-4 py-2.5 text-right text-sm font-semibold text-foreground tabular-nums">{centsToDisplay(entry.pricing?.delivered)}</td>
                     <td className="px-4 py-2.5 text-right text-sm text-muted-foreground tabular-nums">{centsToDisplay(entry.pricing?.collected)}</td>
                   </>
                 )}

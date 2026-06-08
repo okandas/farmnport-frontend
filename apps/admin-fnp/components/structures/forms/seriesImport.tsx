@@ -33,6 +33,9 @@ type SeriesEntry = {
   weight_max_grams?: number
   avg_weight_grams?: number
   price_per_kg?: number // cents
+  avg_amount_head?: number // cents
+  max_amount_head?: number // cents
+  min_amount_head?: number // cents
   pricing: {
     collected?: number // cents
     delivered?: number // cents
@@ -198,6 +201,9 @@ async function parseSheet(file: File): Promise<ParsedSeries> {
             // LWT
             const avgKgRaw = row[3]?.toString().trim()
             const pricePerKgRaw = row[4]?.toString().trim()
+            const avgAmountHeadRaw = row[5]?.toString().trim()
+            const maxAmountHeadRaw = row[6]?.toString().trim()
+            const minAmountHeadRaw = row[7]?.toString().trim()
             const collectedRaw = row[8]?.toString().trim()
             const deliveredRaw = row[9]?.toString().trim()
             const notes = row[12]?.toString().trim() || undefined
@@ -207,11 +213,15 @@ async function parseSheet(file: File): Promise<ParsedSeries> {
             const collected = toCents(collectedRaw)
             const delivered = toCents(deliveredRaw)
             const pricePerKgCents = pricePerKgUsd && !isNaN(pricePerKgUsd) ? Math.round(pricePerKgUsd * 100) : undefined
+            const avgAmountHead = toCents(avgAmountHeadRaw)
+            const maxAmountHead = toCents(maxAmountHeadRaw)
+            const minAmountHead = toCents(minAmountHeadRaw)
 
             if (
               collected === undefined &&
               delivered === undefined &&
-              pricePerKgCents === undefined
+              pricePerKgCents === undefined &&
+              avgAmountHead === undefined
             )
               continue
 
@@ -237,6 +247,9 @@ async function parseSheet(file: File): Promise<ParsedSeries> {
               weight_max_grams: weightMax,
               avg_weight_grams: avgKg ? Math.round(avgKg * 1000) : undefined,
               price_per_kg: pricePerKgCents,
+              avg_amount_head: avgAmountHead,
+              max_amount_head: maxAmountHead,
+              min_amount_head: minAmountHead,
               pricing: {
                 collected,
                 delivered,
