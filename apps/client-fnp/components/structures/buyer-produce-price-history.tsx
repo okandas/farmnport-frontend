@@ -21,6 +21,9 @@ interface SeriesEntry {
   price_per_kg?: number
   weight_min_grams?: number
   weight_max_grams?: number
+  avg_amount_head?: number
+  max_amount_head?: number
+  min_amount_head?: number
 }
 
 interface DateEntry {
@@ -60,6 +63,8 @@ function weightDisplay(minG?: number, maxG?: number): string {
 }
 
 function GradeTable({ entries, date }: { entries: SeriesEntry[]; date: string }) {
+  const isHeadPriced = entries.some(e => (e.avg_amount_head ?? 0) > 0)
+
   return (
     <div className="rounded-xl border bg-card shadow-sm">
       <div className="px-5 py-2.5 border-b flex items-center justify-between">
@@ -72,30 +77,45 @@ function GradeTable({ entries, date }: { entries: SeriesEntry[]; date: string })
             <tr className="border-b">
               <th className="px-4 py-2 text-left text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Code</th>
               <th className="px-4 py-2 text-left text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Grade</th>
-              <th className="px-4 py-2 text-left text-[11px] font-medium uppercase tracking-wider text-muted-foreground hidden sm:table-cell">Weight</th>
-              <th className="px-4 py-2 text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Delivered</th>
-              <th className="px-4 py-2 text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Collected</th>
+              {isHeadPriced ? (
+                <>
+                  <th className="px-4 py-2 text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Avg/Head</th>
+                  <th className="px-4 py-2 text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground hidden sm:table-cell">Max/Head</th>
+                  <th className="px-4 py-2 text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground hidden sm:table-cell">Min/Head</th>
+                </>
+              ) : (
+                <>
+                  <th className="px-4 py-2 text-left text-[11px] font-medium uppercase tracking-wider text-muted-foreground hidden sm:table-cell">Weight</th>
+                  <th className="px-4 py-2 text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Delivered</th>
+                  <th className="px-4 py-2 text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Collected</th>
+                </>
+              )}
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
-            {entries.map((entry, i) => {
-              const delivered = entry.pricing?.delivered ?? entry.price_per_kg
-              const collected = entry.pricing?.collected
-              const weight = weightDisplay(entry.weight_min_grams, entry.weight_max_grams)
-              return (
-                <tr key={`${entry.code}-${i}`} className="transition-colors hover:bg-muted/40">
-                  <td className="px-4 py-2.5">
-                    <span className={`inline-flex items-center justify-center rounded-md px-2 py-0.5 text-xs font-bold ring-1 ring-inset min-w-[36px] ${codeColor(entry.code)}`}>
-                      {entry.code}
-                    </span>
-                  </td>
-                  <td className="px-4 py-2.5 text-sm font-medium text-foreground">{entry.name}</td>
-                  <td className="px-4 py-2.5 text-sm text-muted-foreground hidden sm:table-cell">{weight || "—"}</td>
-                  <td className="px-4 py-2.5 text-right text-sm font-semibold text-foreground tabular-nums">{centsToDisplay(delivered)}</td>
-                  <td className="px-4 py-2.5 text-right text-sm text-muted-foreground tabular-nums">{centsToDisplay(collected)}</td>
-                </tr>
-              )
-            })}
+            {entries.map((entry, i) => (
+              <tr key={`${entry.code}-${i}`} className="transition-colors hover:bg-muted/40">
+                <td className="px-4 py-2.5">
+                  <span className={`inline-flex items-center justify-center rounded-md px-2 py-0.5 text-xs font-bold ring-1 ring-inset min-w-[36px] ${codeColor(entry.code)}`}>
+                    {entry.code}
+                  </span>
+                </td>
+                <td className="px-4 py-2.5 text-sm font-medium text-foreground">{entry.name}</td>
+                {isHeadPriced ? (
+                  <>
+                    <td className="px-4 py-2.5 text-right text-sm font-semibold text-foreground tabular-nums">{centsToDisplay(entry.avg_amount_head)}</td>
+                    <td className="px-4 py-2.5 text-right text-sm text-muted-foreground tabular-nums hidden sm:table-cell">{centsToDisplay(entry.max_amount_head)}</td>
+                    <td className="px-4 py-2.5 text-right text-sm text-muted-foreground tabular-nums hidden sm:table-cell">{centsToDisplay(entry.min_amount_head)}</td>
+                  </>
+                ) : (
+                  <>
+                    <td className="px-4 py-2.5 text-sm text-muted-foreground hidden sm:table-cell">{weightDisplay(entry.weight_min_grams, entry.weight_max_grams) || "—"}</td>
+                    <td className="px-4 py-2.5 text-right text-sm font-semibold text-foreground tabular-nums">{centsToDisplay(entry.pricing?.delivered ?? entry.price_per_kg)}</td>
+                    <td className="px-4 py-2.5 text-right text-sm text-muted-foreground tabular-nums">{centsToDisplay(entry.pricing?.collected)}</td>
+                  </>
+                )}
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
@@ -218,7 +238,7 @@ export function BuyerProducePriceHistory({
                             </td>
                             <td className="px-4 py-2.5 text-sm text-muted-foreground">{d.count} grade{d.count !== 1 ? "s" : ""}</td>
                             <td className="px-4 py-2.5 text-sm text-muted-foreground hidden sm:table-cell">
-                              {d.types.map(t => t.toUpperCase()).join(", ")}
+                              {d.types.map(t => t === "cdm" ? "Cold Dress Mass" : t === "lwt" ? "Liveweight" : t.toUpperCase()).join(", ")}
                             </td>
                             <td className="px-4 py-2.5 text-right">
                               {isActive

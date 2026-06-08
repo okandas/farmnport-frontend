@@ -11,6 +11,13 @@ interface DateEntry {
   count: number
   categories: string[]
   types: string[]
+  has_head: boolean
+}
+
+const typeLabel = (t: string) => {
+  if (t === "cdm") return "Cold Dress Mass"
+  if (t === "lwt") return "Liveweight"
+  return t.toUpperCase()
 }
 
 export function BuyerPriceUploads({ clientName }: { clientName: string }) {
@@ -76,7 +83,7 @@ export function BuyerPriceUploads({ clientName }: { clientName: string }) {
                   </div>
                 </td>
                 <td className="px-4 py-2.5 text-sm text-muted-foreground hidden sm:table-cell">
-                  {d.types.map(t => t.toUpperCase()).join(", ")}
+                  {[...d.types.map(typeLabel), ...(d.has_head ? ["Per Head"] : [])].join(", ")}
                 </td>
                 <td className="px-4 py-2.5 text-right">
                   <Link

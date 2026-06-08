@@ -82,6 +82,7 @@ export function AgroChemicalForm({ agroChemical, mode = "create" }: AgroChemical
             show_was_price: agroChemical?.show_was_price ?? false,
             was_price: agroChemical?.was_price ?? 0,
             weight_grams: agroChemical?.weight_grams ?? 0,
+            is_test: agroChemical?.is_test ?? false,
             delivery_available: agroChemical?.delivery_available ?? false,
             pickup_available: agroChemical?.pickup_available ?? false,
             pickup_location_ids: agroChemical?.pickup_location_ids ?? [],

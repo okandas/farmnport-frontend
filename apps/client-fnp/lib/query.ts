@@ -144,6 +144,10 @@ export function querySeriesChart(category: string, code: string, templateType: s
   return api.get(`${BaseURL}/prices/series/chart?category=${encodeURIComponent(category)}&code=${encodeURIComponent(code)}&template_type=${encodeURIComponent(templateType)}`)
 }
 
+export function querySeriesHeadChart(category: string, code: string, templateType: string) {
+  return api.get(`${BaseURL}/prices/series/head-chart?category=${encodeURIComponent(category)}&code=${encodeURIComponent(code)}&template_type=${encodeURIComponent(templateType)}`)
+}
+
 export function querySeriesBuyers(category: string, code: string, templateType: string) {
   return api.get(`${BaseURL}/prices/series/buyers?category=${encodeURIComponent(category)}&code=${encodeURIComponent(code)}&template_type=${encodeURIComponent(templateType)}`)
 }
