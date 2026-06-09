@@ -18,12 +18,19 @@ import { ProductResources } from "@/components/monetization/product-resources"
 import { BuyerPriceUploads } from "@/components/structures/buyer-price-uploads"
 
 
+interface LatestPrices {
+  date: string
+  category: string
+  entries: any[]
+}
+
 interface ClientPageProps {
   slug: string
   user: AuthenticatedUser | null
+  latestPrices?: LatestPrices | null
 }
 
-export function Client({ slug, user }: ClientPageProps) {
+export function Client({ slug, user, latestPrices }: ClientPageProps) {
   const router = useRouter()
   const [showPhone, setShowPhone] = useState(false)
   const [showEmail, setShowEmail] = useState(false)
@@ -83,7 +90,7 @@ export function Client({ slug, user }: ClientPageProps) {
             <div className="flex-1 min-w-0">
               <div className="flex flex-wrap items-center gap-3 mb-2">
                 <h1 className="text-3xl font-bold tracking-tight">
-                  {capitalizeFirstLetter(client.name)}
+                  {titleCase(client.name)}
                 </h1>
                 {client.verified ? (
                   <Badge className="bg-green-100 text-green-800 hover:bg-green-100 border-green-200">
@@ -217,7 +224,7 @@ export function Client({ slug, user }: ClientPageProps) {
             {(client.has_booking || client.has_pickup) && client.type === 'buyer' && (
               <div className="flex-1 bg-blue-50 border border-blue-200 rounded-xl p-4 space-y-3">
                 <div>
-                  <p className="font-semibold text-sm text-blue-900">Sell to {capitalizeFirstLetter(client.name)}</p>
+                  <p className="font-semibold text-sm text-blue-900">Sell to {titleCase(client.name)}</p>
                   <p className="text-xs text-blue-700 mt-1 leading-relaxed">
                     {client.has_booking && client.has_pickup
                       ? "Select a drop-off location or request pickup, and pick a date to reserve your slot."
@@ -238,7 +245,7 @@ export function Client({ slug, user }: ClientPageProps) {
 
         {client.type === 'buyer' && (
           <div id="price-history">
-            <BuyerPriceUploads clientName={client.name} />
+            <BuyerPriceUploads clientName={client.name} latestPrices={latestPrices} />
           </div>
         )}
       </div>

@@ -10,7 +10,7 @@ function parseSheetSlug(sheet: string): { clientSlug: string; clientName: string
   const dateMatch = sheet.match(/-(\d{4}-\d{2}-\d{2})$/)
   const effectiveDate = dateMatch ? dateMatch[1] : null
   const nameSlug = effectiveDate ? sheet.slice(0, sheet.length - effectiveDate.length - 1) : sheet
-  const clientName = nameSlug.split("-").map(w => capitalizeFirstLetter(w)).join(" ")
+  const clientName = nameSlug.split("-").map(w => w.length <= 2 ? w.toUpperCase() : capitalizeFirstLetter(w)).join(" ")
   return { clientSlug: sheet, clientName, effectiveDate }
 }
 
@@ -18,14 +18,20 @@ export async function generateMetadata({ params }: SheetCategoryPageProps): Prom
   const { produce: sheet, category } = await params
   const { clientName, effectiveDate } = parseSheetSlug(sheet)
   const categoryName = capitalizeFirstLetter(category)
-  const dateLabel = effectiveDate ? ` – ${effectiveDate}` : ""
+  const dateLabel = effectiveDate ? new Date(effectiveDate).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }) : ""
+  const title = dateLabel
+    ? `${clientName} ${categoryName} Prices ${dateLabel} Zimbabwe | farmnport.com`
+    : `${clientName} ${categoryName} Prices Zimbabwe | farmnport.com`
+  const description = dateLabel
+    ? `${clientName} ${categoryName.toLowerCase()} livestock prices in Zimbabwe as of ${dateLabel}. View grade-by-grade pricing including liveweight and per-head rates on farmnport.com.`
+    : `${clientName} ${categoryName.toLowerCase()} livestock price history in Zimbabwe. Browse all upload dates and grade-by-grade pricing on farmnport.com.`
   return {
-    title: `${clientName} ${categoryName} Prices${dateLabel} | farmnport.com`,
-    description: `View ${clientName}'s ${categoryName.toLowerCase()} price history on farmnport.com.`,
+    title,
+    description,
     alternates: { canonical: `/prices/${sheet}/${category}` },
     openGraph: {
-      title: `${clientName} ${categoryName} Prices Zimbabwe`,
-      description: `View ${clientName}'s ${categoryName.toLowerCase()} price history on farmnport.com.`,
+      title,
+      description,
       url: `/prices/${sheet}/${category}`,
       siteName: "farmnport",
       type: "website",
@@ -39,7 +45,6 @@ export default async function BuyerCategoryPage({ params }: SheetCategoryPagePro
 
   return (
     <>
-      <h1 className="sr-only">{clientName} {capitalizeFirstLetter(category)} Prices Zimbabwe</h1>
       <BuyerProducePriceHistory
         clientSlug={clientSlug}
         clientName={clientName}

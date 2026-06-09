@@ -1,6 +1,7 @@
 import { Client } from "@/components/layouts/client"
 import { retrieveUser } from "@/lib/actions"
 import { AppURL } from "@/lib/schemas"
+import { fetchLatestBuyerPrices } from "@/lib/serverFetch"
 
 import type { Metadata, ResolvingMetadata } from 'next'
 
@@ -40,12 +41,13 @@ type BuyerPageProps ={
 
     const user = await retrieveUser()
     const { slug } = await params
+    const latestPrices = await fetchLatestBuyerPrices(slug)
 
     return(
     <main className="min-h-[70lvh]">
     <div className="mx-auto max-w-7xl min-h-[70lvh]">
         <div className="lg:flex lg:space-x-10">
-          <Client slug={slug} user={user}/>
+          <Client slug={slug} user={user} latestPrices={latestPrices}/>
         </div>
     </div>
 </main>

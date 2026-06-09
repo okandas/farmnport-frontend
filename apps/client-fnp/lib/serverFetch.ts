@@ -22,3 +22,19 @@ export async function serverFetch<T = any>(path: string, options?: RequestInit):
   if (!res.ok) throw new Error(`serverFetch ${path} → ${res.status}`)
   return res.json()
 }
+
+export async function fetchLatestBuyerPrices(clientSlug: string) {
+  try {
+    const dates = await serverFetch(`/prices/series/client/dates?client_slug=${clientSlug}&p=1&limit=1`)
+    const latest = dates?.data?.[0]
+    if (!latest) return null
+
+    const category = latest.categories?.[0]?.toLowerCase()
+    if (!category) return null
+
+    const grades = await serverFetch(`/prices/series/client?client_slug=${clientSlug}&category=${category}&date=${latest.date}`)
+    return { date: latest.date, category, entries: grades?.data ?? [] }
+  } catch {
+    return null
+  }
+}

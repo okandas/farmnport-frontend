@@ -50,12 +50,7 @@ export function slug(name?: string): string {
 }
 
 export function unSlug(slug: string): string {
-
-  const split = slug.split('-')
-
-  const words = split.map(word => capitalizeFirstLetter(word))
-
-  return words.join(" ")
+  return slug.split('-').map(w => w.length <= 2 ? w.toUpperCase() : capitalizeFirstLetter(w)).join(" ")
 }
 
 export function plural(word: string, count?: number): string {
@@ -85,7 +80,7 @@ export function centsToDollars(cents: number): string {
 
 export function titleCase(str?: string): string {
   if (!str) return ""
-  return str.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+  return str.split(' ').map(w => w.length <= 2 ? w.toUpperCase() : w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
 }
 
 export function ucFirst(str: string): string {
