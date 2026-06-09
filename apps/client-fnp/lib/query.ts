@@ -195,6 +195,34 @@ export function queryAllFarmProduce() {
   return api.get(url)
 }
 
+export function queryFarmProduceStates({ p, search }: { p: number; search: string }) {
+  const url = `${BaseURL}/farm-produce-states?p=${p}&q=${encodeURIComponent(search)}`
+  return api.get(url)
+}
+
+export function queryLotsEnabledFarmProduce({ p, search }: { p: number; search: string }) {
+  const url = `${BaseURL}/farmproduce/lots-enabled?p=${p}&q=${encodeURIComponent(search)}`
+  return api.get(url)
+}
+
+export function queryBreedsByFarmProduce({ farmProduceId, p, search }: { farmProduceId: string; p: number; search: string }) {
+  const url = `${BaseURL}/breeds/by-produce?farm_produce_id=${farmProduceId}&p=${p}&q=${encodeURIComponent(search)}`
+  return api.get(url)
+}
+
+export function postLot(data: {
+  type: string
+  farm_produce_id: string
+  breed_id?: string
+  form: string
+  quantity_kg: number
+  price_per_kg_cents: number
+  notes?: string
+  expires_at: string
+}) {
+  return api.post(`${BaseURL}/lots`, data)
+}
+
 export function queryAllFarmProduceUnpaginated() {
   const url = `${BaseURL}/farmproduce/all`
   return api.get(url)

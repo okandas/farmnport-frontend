@@ -435,6 +435,18 @@ export function queryAllFarmProduce() {
   return api.get(url)
 }
 
+export function queryFarmProduceBySlug(slug: string) {
+  return api.get(`${baseUrl}/farmproduce/${slug}`)
+}
+
+export function addFarmProduce(data: { name: string; description: string; category_id: string; category_slug: string; lots_enabled: boolean }) {
+  return api.post(`${baseUrl}/farmproduce`, data)
+}
+
+export function updateFarmProduce(data: { slug: string; name: string; description: string; category_id: string; category_slug: string; lots_enabled: boolean }) {
+  return api.put(`${baseUrl}/farmproduce/${data.slug}`, data)
+}
+
 export function queryFarmProduceByCategory(categorySlug: string) {
   const url = `${baseUrl}/farmproduce/category/${categorySlug}`
   return api.get(url)

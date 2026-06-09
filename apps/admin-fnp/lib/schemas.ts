@@ -658,6 +658,16 @@ export const FormFarmProduceCategorySchema = z.object({
 
 export type FormFarmProduceCategoryModel = z.infer<typeof FormFarmProduceCategorySchema>
 
+export const FormFarmProduceSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  description: z.string().max(500).optional().default(""),
+  category_id: z.string().min(1, "Category is required"),
+  category_slug: z.string().min(1, "Category is required"),
+  lots_enabled: z.boolean().default(false),
+})
+
+export type FormFarmProduceModel = z.infer<typeof FormFarmProduceSchema>
+
 export const FarmProduceSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -665,6 +675,7 @@ export const FarmProduceSchema = z.object({
   description: z.string(),
   category_id: z.string(),
   category_slug: z.string(),
+  lots_enabled: z.boolean().optional().default(false),
 })
 
 export type FarmProduce = z.infer<typeof FarmProduceSchema>
