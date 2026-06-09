@@ -11,7 +11,7 @@ function parseSheetSlug(sheet: string): { clientSlug: string; clientName: string
   const effectiveDate = dateMatch ? dateMatch[1] : null
   const nameSlug = effectiveDate ? sheet.slice(0, sheet.length - effectiveDate.length - 1) : sheet
   const clientName = nameSlug.split("-").map(w => w.length <= 2 ? w.toUpperCase() : capitalizeFirstLetter(w)).join(" ")
-  return { clientSlug: sheet, clientName, effectiveDate }
+  return { clientSlug: nameSlug, clientName, effectiveDate }
 }
 
 export async function generateMetadata({ params }: SheetCategoryPageProps): Promise<Metadata> {

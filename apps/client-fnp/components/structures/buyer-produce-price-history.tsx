@@ -81,6 +81,7 @@ function GradePanel({ clientSlug, produce, date }: { clientSlug: string; produce
   const entries: SeriesEntry[] = data?.data?.data ?? []
   const isHeadPriced = entries.some(e => (e.avg_amount_head ?? 0) > 0)
   const isLwt = !isHeadPriced && entries[0]?.template_type === "lwt"
+  const lwtHasKg = isLwt && entries.some(e => (e.price_per_kg ?? 0) > 0 || (e.avg_weight_grams ?? 0) > 0)
 
   return (
     <div className="flex flex-col h-full">
@@ -112,13 +113,18 @@ function GradePanel({ clientSlug, produce, date }: { clientSlug: string; produce
                     <th className="px-4 py-2 text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground hidden sm:table-cell">Max/Head</th>
                     <th className="px-4 py-2 text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground hidden sm:table-cell">Min/Head</th>
                   </>
-                ) : isLwt ? (
+                ) : isLwt && lwtHasKg ? (
                   <>
                     <th className="px-4 py-2 text-left text-[11px] font-medium uppercase tracking-wider text-muted-foreground hidden sm:table-cell">Avg Weight</th>
                     <th className="px-4 py-2 text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Per kg</th>
                     <th className="px-4 py-2 text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Avg/Head</th>
                     <th className="px-4 py-2 text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Max/Head</th>
                     <th className="px-4 py-2 text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Min/Head</th>
+                  </>
+                ) : isLwt ? (
+                  <>
+                    <th className="px-4 py-2 text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Delivered</th>
+                    <th className="px-4 py-2 text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Collected</th>
                   </>
                 ) : (
                   <>
@@ -144,13 +150,18 @@ function GradePanel({ clientSlug, produce, date }: { clientSlug: string; produce
                       <td className="px-4 py-2.5 text-right text-sm text-muted-foreground tabular-nums hidden sm:table-cell">{centsToDisplay(entry.max_amount_head)}</td>
                       <td className="px-4 py-2.5 text-right text-sm text-muted-foreground tabular-nums hidden sm:table-cell">{centsToDisplay(entry.min_amount_head)}</td>
                     </>
-                  ) : isLwt ? (
+                  ) : isLwt && lwtHasKg ? (
                     <>
                       <td className="px-4 py-2.5 text-xs text-muted-foreground hidden sm:table-cell whitespace-nowrap">{gramsToKg(entry.avg_weight_grams)}</td>
                       <td className="px-4 py-2.5 text-right text-xs font-semibold text-foreground tabular-nums whitespace-nowrap">{centsToDisplay(entry.price_per_kg)}</td>
                       <td className="px-4 py-2.5 text-right text-sm font-semibold text-foreground tabular-nums">{centsToDisplay(entry.avg_amount_head)}</td>
                       <td className="px-4 py-2.5 text-right text-sm text-muted-foreground tabular-nums">{centsToDisplay(entry.max_amount_head)}</td>
                       <td className="px-4 py-2.5 text-right text-sm text-muted-foreground tabular-nums">{centsToDisplay(entry.min_amount_head)}</td>
+                    </>
+                  ) : isLwt ? (
+                    <>
+                      <td className="px-4 py-2.5 text-right text-sm font-semibold text-foreground tabular-nums">{centsToDisplay(entry.pricing?.delivered)}</td>
+                      <td className="px-4 py-2.5 text-right text-sm text-muted-foreground tabular-nums">{centsToDisplay(entry.pricing?.collected)}</td>
                     </>
                   ) : (
                     <>
@@ -249,14 +260,14 @@ export function BuyerProducePriceHistory({
           <Link href="/prices" className="hover:text-foreground">Prices</Link>
           <span>/</span>
           <Link href={`/buyer/${nameSlug}`} className="hover:text-foreground">{clientName}</Link>
-          <span>/</span>
-          <span className="text-foreground font-semibold">{produceName}</span>
           {resolvedDate && (
             <>
               <span>/</span>
               <span className="text-foreground">{new Date(resolvedDate).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}</span>
             </>
           )}
+          <span>/</span>
+          <span className="text-foreground font-semibold">{produceName}</span>
         </p>
 
         <div>
