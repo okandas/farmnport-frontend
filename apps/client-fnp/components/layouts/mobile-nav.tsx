@@ -167,6 +167,17 @@ export function MobileNav({ user }: MobileNavProps) {
 
                  {/* Account Section */}
                  <div className="pt-6 mt-6 border-t space-y-3">
+                   <Link
+                     href={user ? "/lots/new" : "/login?next=/lots/new"}
+                     onClick={() => {
+                       sendGTMEvent({ event: 'link', value: 'PostLotNavigation' })
+                       setIsOpen(false)
+                     }}
+                     className="flex items-center gap-3 px-3 py-2 text-base font-semibold rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                   >
+                     <Icons.tag className="h-5 w-5" />
+                     <span>Post Lot</span>
+                   </Link>
                    { user ? (
                      <>
                        <Link
