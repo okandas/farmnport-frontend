@@ -206,7 +206,7 @@ export function queryLotsEnabledFarmProduce({ p, search }: { p: number; search: 
 }
 
 export function queryBreedsByFarmProduce({ farmProduceId, p, search }: { farmProduceId: string; p: number; search: string }) {
-  const url = `${BaseURL}/breeds/by-produce?farm_produce_id=${farmProduceId}&p=${p}&q=${encodeURIComponent(search)}`
+  const url = `${BaseURL}/breeds/?farm_produce_id=${farmProduceId}&p=${p}&search=${encodeURIComponent(search)}`
   return api.get(url)
 }
 
