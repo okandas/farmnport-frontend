@@ -11,6 +11,7 @@ import {Contacts} from "@/components/layouts/contacts"
 import {queryClients, queryClientsByProduct} from "@/lib/query"
 import {ApplicationUser, AuthenticatedUser} from "@/lib/schemas"
 import {slug, capitalizeFirstLetter, plural} from "@/lib/utilities"
+import {ArrowRight} from "lucide-react"
 
 interface FarmersPageProps {
   user: AuthenticatedUser | null
@@ -71,6 +72,22 @@ export function Farmers({user, queryBy}: FarmersPageProps) {
 
   return (
     <section className="space-y-8">
+      {/* Post a request lot CTA */}
+      <Link
+        href="/sell"
+        className="flex items-center justify-between gap-4 rounded-xl border border-primary/20 bg-primary/5 px-5 py-4 hover:bg-primary/10 transition-colors group"
+      >
+        <div>
+          <p className="text-sm font-semibold text-foreground">
+            {queryBy ? `Looking to buy ${capitalizeFirstLetter(plural(queryBy))}?` : "Looking to buy produce?"}
+          </p>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Post a request lot and let farmers come to you with their available stock.
+          </p>
+        </div>
+        <ArrowRight className="h-4 w-4 text-primary flex-shrink-0 group-hover:translate-x-0.5 transition-transform" />
+      </Link>
+
       {
         queryBy == undefined ?
           <div>

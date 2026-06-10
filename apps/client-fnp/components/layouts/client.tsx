@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { ArrowLeft } from "lucide-react"
 import { useQuery } from "@tanstack/react-query"
 import { sendGTMEvent } from "@next/third-parties/google"
 import Link from "next/link"
@@ -62,6 +63,17 @@ export function Client({ slug, user, latestPrices }: ClientPageProps) {
 
   return (
     <div className="w-full bg-gradient-to-br from-background via-background to-muted/20 min-h-screen pb-12">
+      {/* Back */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-3">
+        <button
+          onClick={() => router.back()}
+          className="text-sm font-semibold text-muted-foreground hover:text-foreground flex items-center gap-1"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back
+        </button>
+      </div>
+
       {/* Breadcrumb */}
       <div className="border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
