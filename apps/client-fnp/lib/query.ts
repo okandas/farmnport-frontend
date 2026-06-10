@@ -220,7 +220,7 @@ export function postLot(data: {
   notes?: string
   expires_at: string
 }) {
-  return api.post(`${BaseURL}/lots`, data)
+  return api.post(`${BaseURL}/lots/`, data)
 }
 
 export function queryAllFarmProduceUnpaginated() {
