@@ -447,6 +447,16 @@ export function updateFarmProduce(data: { slug: string; name: string; descriptio
   return api.put(`${baseUrl}/farmproduce/${data.slug}`, data)
 }
 
+export function queryAdminLots({ p, pending }: { p: number; pending?: boolean }) {
+  const qs = new URLSearchParams({ p: String(p) })
+  if (pending) qs.set("pending", "true")
+  return api.get(`${baseUrl}/lots/?${qs}`)
+}
+
+export function approveLot(slug: string) {
+  return api.post(`${baseUrl}/lots/${slug}/approve`, {})
+}
+
 export function queryFarmProduceByCategory(categorySlug: string) {
   const url = `${baseUrl}/farmproduce/category/${categorySlug}`
   return api.get(url)

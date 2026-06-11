@@ -9,7 +9,7 @@ import { Package } from "lucide-react"
 import { Pagination } from "@/components/generic/pagination"
 import { Badge } from "@/components/ui/badge"
 import { queryLots } from "@/lib/query"
-import { capitalizeFirstLetter } from "@/lib/utilities"
+import { capitalizeFirstLetter, formatDate } from "@/lib/utilities"
 
 interface FarmLot {
   _id: string
@@ -167,7 +167,7 @@ export function Lots({ mode }: LotsProps) {
                   </div>
                 </div>
                 <p className="text-xs text-muted-foreground flex-shrink-0">
-                  {new Date(lot.created).toLocaleDateString("en-GB")}
+                  {formatDate(lot.created)}
                 </p>
               </div>
             </div>
@@ -189,7 +189,6 @@ export function Lots({ mode }: LotsProps) {
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-base font-semibold text-foreground">
                       {lot.farm_produce?.name ?? "Produce"}
-                      {lot.breed ? ` — ${lot.breed.name}` : ""}
                     </span>
                     <Badge variant={lot.type === "sell" ? "default" : "secondary"} className="text-xs capitalize">
                       {lot.type === "sell" ? "Selling" : "Buying"}
@@ -197,13 +196,17 @@ export function Lots({ mode }: LotsProps) {
                   </div>
 
                   <div className="flex items-center gap-3 flex-wrap text-sm text-muted-foreground">
+                    {lot.breed && <span>Variety: {lot.breed.name}</span>}
+                    {lot.breed && lot.form && <span>·</span>}
+                    {lot.form && <span>State: {capitalizeFirstLetter(lot.form)}</span>}
+                  </div>
+
+                  <div className="flex items-center gap-3 flex-wrap text-sm text-muted-foreground">
                     <span className="font-medium text-foreground">
-                      ${(lot.price_per_kg_cents / 100).toFixed(2)}/kg
+                      {lot.price_per_kg_cents ? `$${(lot.price_per_kg_cents / 100).toFixed(2)}/kg` : "Negotiable"}
                     </span>
                     <span>·</span>
                     <span>{lot.quantity_kg.toLocaleString()} kg</span>
-                    <span>·</span>
-                    <span className="capitalize">{capitalizeFirstLetter(lot.form)}</span>
                     {lot.province && (
                       <>
                         <span>·</span>
@@ -219,7 +222,7 @@ export function Lots({ mode }: LotsProps) {
 
                 <div className="text-right flex-shrink-0">
                   <p className="text-xs text-muted-foreground">
-                    {new Date(lot.created).toLocaleDateString("en-GB")}
+                    {formatDate(lot.created)}
                   </p>
                 </div>
               </div>
