@@ -1,6 +1,7 @@
 import { Client } from "@/components/layouts/client"
 import { retrieveUser } from "@/lib/actions"
 import { AppURL } from "@/lib/schemas"
+import { QuickLinks } from "@/components/generic/quick-links"
 
 import type { Metadata, ResolvingMetadata } from 'next'
 
@@ -49,6 +50,9 @@ export default async function BuyerPage({ params }:  BuyerPageProps) {
       <div className="mx-auto max-w-7xl min-h-[70lvh]">
         <div className="lg:flex lg:space-x-10">
           <Client slug={slug} user={user}/>
+          <div className="hidden lg:block lg:w-44 shrink-0 px-6 pt-6">
+            <QuickLinks />
+          </div>
         </div>
       </div>
     </main>

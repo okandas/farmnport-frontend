@@ -1,6 +1,7 @@
 import { Buyers } from "@/components/layouts/buyers"
 import { retrieveUser } from "@/lib/actions"
 import { FilterSidebar } from "@/components/generic/filterSidebar"
+import { QuickLinks } from "@/components/generic/quick-links"
 
 
 export const metadata = {
@@ -47,8 +48,11 @@ export default async function BuyersPage() {
                         <FilterSidebar clientType="buyers" />
                     </div>
 
-                    <div className="lg:w-2/3">
+                    <div className="flex-1 min-w-0">
                         <Buyers user={user} />
+                    </div>
+                    <div className="hidden lg:block lg:w-44 shrink-0">
+                        <QuickLinks />
                     </div>
                 </div>
             </div>

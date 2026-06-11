@@ -2,6 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query"
 import { queryAllFeedProducts } from "@/lib/query"
+import { QuickLinks } from "@/components/generic/quick-links"
 import { Button } from "@/components/ui/button"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
 import { FeedFilterSidebar } from "@/components/generic/feedFilterSidebar"
@@ -143,6 +144,9 @@ export function FeedListingClient({ initialData, initialTotal }: FeedListingClie
                         )}
                     </>
                 )}
+            </div>
+            <div className="hidden lg:block lg:w-44 shrink-0">
+                <QuickLinks />
             </div>
         </div>
     )

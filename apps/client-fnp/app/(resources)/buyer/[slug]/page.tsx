@@ -2,6 +2,7 @@ import { Client } from "@/components/layouts/client"
 import { retrieveUser } from "@/lib/actions"
 import { AppURL } from "@/lib/schemas"
 import { fetchLatestBuyerPrices } from "@/lib/serverFetch"
+import { QuickLinks } from "@/components/generic/quick-links"
 
 import type { Metadata, ResolvingMetadata } from 'next'
 
@@ -48,6 +49,9 @@ type BuyerPageProps ={
     <div className="mx-auto max-w-7xl min-h-[70lvh]">
         <div className="lg:flex lg:space-x-10">
           <Client slug={slug} user={user} latestPrices={latestPrices}/>
+          <div className="hidden lg:block lg:w-44 shrink-0 px-6 pt-6">
+            <QuickLinks />
+          </div>
         </div>
     </div>
 </main>

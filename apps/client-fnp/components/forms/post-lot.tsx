@@ -1,6 +1,5 @@
 "use client"
 
-import { useState } from "react"
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -34,7 +33,6 @@ export function PostLotForm() {
   const router = useRouter()
   const { data: session } = useSession()
   const user = session?.user as any
-  const [selectedProduceName, setSelectedProduceName] = useState("")
 
   const { data: profileData } = useQuery({
     queryKey: ["my-profile", user?.username],
@@ -155,7 +153,6 @@ export function PostLotForm() {
                       getItems={(page) => page?.data?.data ?? []}
                       value={field.value ?? ""}
                       onValueChange={field.onChange}
-                      onItemSelect={(item) => setSelectedProduceName(item.name ?? "")}
                       getLabel={(p) => capitalizeFirstLetter(p.name ?? "")}
                       getValue={(p) => p.id}
                       placeholder="Select produce"
@@ -220,7 +217,7 @@ export function PostLotForm() {
                       value={field.value ?? ""}
                       onValueChange={field.onChange}
                       getLabel={(f) => capitalizeFirstLetter(f.name ?? "")}
-                      getValue={(f) => f.id}
+                      getValue={(f) => f.name}
                       placeholder="Select form..."
                       searchPlaceholder="Search forms..."
                       clearable

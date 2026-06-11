@@ -223,6 +223,16 @@ export function postLot(data: {
   return api.post(`${BaseURL}/lots/`, data)
 }
 
+export function queryLots({ p, type, farm_produce_id, pending }: { p: number; type?: string; farm_produce_id?: string; pending?: boolean }) {
+  const params = new URLSearchParams()
+  if (p > 1) params.set("p", String(p))
+  if (type) params.set("type", type)
+  if (farm_produce_id) params.set("farm_produce_id", farm_produce_id)
+  if (pending) params.set("pending", "true")
+  const qs = params.toString()
+  return api.get(`${BaseURL}/lots/${qs ? `?${qs}` : ""}`)
+}
+
 export function queryAllFarmProduceUnpaginated() {
   const url = `${BaseURL}/farmproduce/all`
   return api.get(url)

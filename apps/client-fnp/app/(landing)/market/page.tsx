@@ -8,6 +8,11 @@ const sections = [
         href: "/prices",
     },
     {
+        title: "Lots",
+        description: "Browse active lots posted by farmers selling produce — buy directly at listed prices across Zimbabwe.",
+        href: "/lots",
+    },
+    {
         title: "Buyers",
         description: "Browse verified commodity buyers looking to purchase crops and livestock across Zimbabwe.",
         href: "/buyers",
@@ -42,17 +47,17 @@ export default function MarketPage() {
 
             <section className="py-10 lg:py-14">
                 <div className="mx-auto max-w-4xl px-6 lg:px-8">
-                    <div className="grid gap-6 sm:grid-cols-3">
+                    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
                         {sections.map(({ title, description, href }) => (
                             <Link
                                 key={href}
                                 href={href}
                                 className="flex flex-col gap-3 p-6 rounded-xl bg-card border border-border hover:border-primary hover:shadow-md transition-all group"
                             >
-                                <h2 className="text-base font-semibold text-foreground group-hover:text-primary transition-colors">
+                                <h2 className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">
                                     {title}
                                 </h2>
-                                <p className="text-sm text-muted-foreground leading-relaxed">
+                                <p className="text-xs text-muted-foreground leading-relaxed">
                                     {description}
                                 </p>
                             </Link>

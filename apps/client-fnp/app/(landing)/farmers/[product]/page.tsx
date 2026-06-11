@@ -1,6 +1,7 @@
 import { capitalizeFirstLetter, plural } from "@/lib/utilities"
 import { Farmers } from "@/components/layouts/farmers"
 import { retrieveUser } from "@/lib/actions"
+import { QuickLinks } from "@/components/generic/quick-links"
 import type { Metadata, ResolvingMetadata } from "next";
 import {AppURL, FarmerSeo} from "@/lib/schemas";
 import { FilterSidebar } from "@/components/generic/filterSidebar"
@@ -43,7 +44,7 @@ export default async function FarmersProductPage({ params }: FarmerProductPagePr
             <FilterSidebar />
           </div>
 
-          <div className="lg:w-2/3">
+          <div className="flex-1 min-w-0">
             <div className="space-y-8 mt-[21px]">
               <div>
                 <h1 className="text-2xl font-semibold">{capitalizeFirstLetter(plural(product))} Farmers in Zimbabwe</h1>
@@ -51,6 +52,9 @@ export default async function FarmersProductPage({ params }: FarmerProductPagePr
               </div>
             </div>
             <Farmers user={user} queryBy={product} />
+          </div>
+          <div className="hidden lg:block lg:w-44 shrink-0">
+            <QuickLinks />
           </div>
         </div>
       </div>

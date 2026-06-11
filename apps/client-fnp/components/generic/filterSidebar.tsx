@@ -13,6 +13,7 @@ import { useMediaQuery } from "@/hooks/use-media-query"
 import { useQuery } from "@tanstack/react-query"
 import { queryPriceFilterAggregates, queryClientFilterAggregates } from "@/lib/query"
 import { useState, useMemo } from "react"
+import { QuickLinks } from "@/components/generic/quick-links"
 
 interface FilterItem {
   _id: string
@@ -290,7 +291,12 @@ export function FilterSidebar({ hideProduce, clientType }: { hideProduce?: boole
 
   // Desktop: Sticky sidebar
   if (isDesktop) {
-    return <div>{content}</div>
+    return (
+      <div className="space-y-6">
+        {content}
+        <QuickLinks />
+      </div>
+    )
   }
 
   // Mobile: Sheet with trigger button
