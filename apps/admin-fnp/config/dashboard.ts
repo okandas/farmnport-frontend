@@ -71,6 +71,7 @@ export const dashboardConfig: DashboardConfig = {
     },
     {
       label: "Sales",
+      alwaysOpen: true,
       items: [
         {
           title: "Overview",
@@ -101,6 +102,17 @@ export const dashboardConfig: DashboardConfig = {
           title: "Client Locations",
           href: "/dashboard/farmnport/orders/client-locations",
           icon: "mapPin",
+        },
+      ],
+    },
+    {
+      label: "Lots",
+      alwaysOpen: true,
+      items: [
+        {
+          title: "Lots",
+          href: "/dashboard/farmnport/lots",
+          icon: "box",
         },
       ],
     },
