@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { MapPin, Scale, Calendar, Leaf } from "lucide-react"
+import { Scale, Calendar, Leaf } from "lucide-react"
 import { LotsSidebar } from "@/components/layouts/lots-sidebar"
 import { QuickLinks } from "@/components/generic/quick-links"
 import { fetchLot } from "@/lib/serverFetch"
@@ -77,7 +77,7 @@ export default async function LotDetailPage({ params }: Props) {
 
                         {/* Hero */}
                         <div>
-                            <div className="flex items-center justify-between gap-2 mb-2">
+                            <div className="flex items-center justify-between mb-2">
                                 <div className="flex items-center gap-2">
                                     <span className={`inline-flex items-center rounded-md px-2.5 py-0.5 text-xs font-semibold ${isSelling ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"}`}>
                                         {isSelling ? "Selling" : "Buying"}
@@ -88,19 +88,17 @@ export default async function LotDetailPage({ params }: Props) {
                                         </span>
                                     )}
                                 </div>
-                                <p className="text-xs text-muted-foreground shrink-0">Listed {formatDate(lot.created)}</p>
+                                <p className="text-xs text-muted-foreground">Listed {formatDate(lot.created)}</p>
                             </div>
-                            <h1 className="text-3xl font-bold tracking-tight">
-                                {produce}{breed ? ` — ${breed}` : ""}
-                            </h1>
+                            <h1 className="text-3xl font-bold tracking-tight">{produce}</h1>
+                            {breed && (
+                                <p className="text-sm text-muted-foreground mt-1">Variety — {breed}</p>
+                            )}
                             {(lot.city || lot.province) && (
-                                <div className="flex items-center gap-1.5 mt-2 text-sm text-muted-foreground">
-                                    <MapPin className="h-3.5 w-3.5" />
-                                    <span className="capitalize">
-                                        {lot.city ? `${capitalizeFirstLetter(lot.city)}, ` : ""}
-                                        {capitalizeFirstLetter(lot.province)}
-                                    </span>
-                                </div>
+                                <p className="text-sm text-muted-foreground mt-0.5 capitalize">
+                                    {lot.city ? `${capitalizeFirstLetter(lot.city)}, ` : ""}
+                                    {capitalizeFirstLetter(lot.province)}
+                                </p>
                             )}
                         </div>
 
