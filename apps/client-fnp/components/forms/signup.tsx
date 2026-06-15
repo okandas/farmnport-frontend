@@ -20,7 +20,7 @@ import { toast } from "sonner"
 import { AuthSignUpSchema, SignUpFormData, LoginFormData, FarmProduceCategoriesResponse, FarmProduceResponse, FarmProduce } from "@/lib/schemas"
 import { cn, capitalizeFirstLetter } from "@/lib/utilities"
 import { clientSignup, queryFarmProduceCategories, queryFarmProduceByCategory } from "@/lib/query"
-import { signIn} from "@/auth"
+import { signIn } from "next-auth/react"
 
 
 
