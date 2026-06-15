@@ -457,6 +457,21 @@ export function approveLot(slug: string) {
   return api.post(`${baseUrl}/lots/${slug}/approve`, {})
 }
 
+export function queryAdminLot(slug: string) {
+  return api.get(`${baseUrl}/lots/${slug}/admin`)
+}
+
+export function updateLot(slug: string, data: {
+  type: string
+  form: string
+  quantity_kg: number
+  price_per_kg_cents: number
+  notes: string
+  expires_at: string
+}) {
+  return api.put(`${baseUrl}/lots/${slug}`, data)
+}
+
 export function queryFarmProduceByCategory(categorySlug: string) {
   const url = `${baseUrl}/farmproduce/category/${categorySlug}`
   return api.get(url)

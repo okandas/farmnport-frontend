@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import { MoreHorizontal } from "lucide-react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "@/components/ui/use-toast"
@@ -44,6 +45,9 @@ export function LotDropDown({ lot }: LotDropDownProps) {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>Actions</DropdownMenuLabel>
+        <DropdownMenuItem asChild>
+          <Link href={`/dashboard/farmnport/lots/${lot?.slug}/edit`}>Edit</Link>
+        </DropdownMenuItem>
         {!lot?.moderated && (
           <DropdownMenuItem
             disabled={isPending}
