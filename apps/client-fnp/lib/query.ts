@@ -119,6 +119,10 @@ export function clientReset(data: ResetFormData) {
     return api.post(url, data)
 }
 
+export function clientResetPassword(token: string, password: string) {
+    return api.post(`${BaseURL}/client/password/${token}`, { password })
+}
+
 export async function clientSignup(data: SignUpFormData) {
     let url = `${BaseURL}/client/signup`
     return api.post(url, data)
