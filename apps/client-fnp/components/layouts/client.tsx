@@ -34,6 +34,7 @@ interface ClientPageProps {
 export function Client({ slug, user, latestPrices }: ClientPageProps) {
   const router = useRouter()
   const [showPhone, setShowPhone] = useState(false)
+  const [showWhatsapp, setShowWhatsapp] = useState(false)
   const [showEmail, setShowEmail] = useState(false)
 
   const paywallEnabled = process.env.NEXT_PUBLIC_ENABLE_PAYWALL === "true"
@@ -205,6 +206,30 @@ export function Client({ slug, user, latestPrices }: ClientPageProps) {
                 ) : (
                   <button onClick={() => { sendGTMEvent({ event: 'action', value: 'LoggedInViewPhone' }); if (user?.id) recordContactView(user.id, client.id, "phone").catch(() => {}); setShowPhone(true) }} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
                     Show Number →
+                  </button>
+                )}
+              </div>
+
+              <div className="flex-1 bg-card border rounded-xl p-4 space-y-3">
+                <div>
+                  <p className="font-semibold text-sm">WhatsApp</p>
+                  <p className="text-xs text-muted-foreground mt-1 leading-relaxed">Message on WhatsApp.</p>
+                </div>
+                {!user ? (
+                  <button onClick={() => { sendGTMEvent({ event: 'action', value: 'LoggedOutViewWhatsapp' }); router.push(`/login?entity=${client.type}&wantToSee=${slug}`) }} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
+                    See WhatsApp →
+                  </button>
+                ) : !isSubscribed ? (
+                  <button onClick={() => { sendGTMEvent({ event: 'action', value: 'SubscribeToViewWhatsapp' }); router.push('/pricing') }} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
+                    Unlock →
+                  </button>
+                ) : showWhatsapp ? (
+                  <a href={`https://wa.me/263${client.phone.replace(/^0/, '')}`} target="_blank" rel="noopener noreferrer" className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
+                    Open WhatsApp →
+                  </a>
+                ) : (
+                  <button onClick={() => { sendGTMEvent({ event: 'action', value: 'LoggedInViewWhatsapp' }); if (user?.id) recordContactView(user.id, client.id, "whatsapp").catch(() => {}); setShowWhatsapp(true) }} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
+                    Show WhatsApp →
                   </button>
                 )}
               </div>

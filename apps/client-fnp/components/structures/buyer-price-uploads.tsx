@@ -56,6 +56,35 @@ const typeLabel = (t: string) => {
   return t.toUpperCase()
 }
 
+function LwtDeliveredGradeTable({ entries }: { entries: SeriesEntry[] }) {
+  return (
+    <table className="min-w-full">
+      <thead>
+        <tr className="border-b">
+          <th className="px-4 py-2 text-left text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Code</th>
+          <th className="px-4 py-2 text-left text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Grade</th>
+          <th className="px-4 py-2 text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Delivered</th>
+          <th className="px-4 py-2 text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Collected</th>
+        </tr>
+      </thead>
+      <tbody className="divide-y divide-border/50">
+        {entries.map((entry, i) => (
+          <tr key={`${entry.code}-${i}`} className="hover:bg-muted/40 transition-colors">
+            <td className="px-4 py-2.5">
+              <span className={`inline-flex items-center justify-center rounded-md px-2 py-0.5 text-xs font-bold ring-1 ring-inset min-w-[36px] ${codeColor(entry.code)}`}>
+                {entry.code}
+              </span>
+            </td>
+            <td className="px-4 py-2.5 text-sm font-medium text-foreground">{entry.name}</td>
+            <td className="px-4 py-2.5 text-right text-sm font-semibold text-foreground tabular-nums">{cents(entry.pricing?.delivered)}</td>
+            <td className="px-4 py-2.5 text-right text-sm text-muted-foreground tabular-nums">{cents(entry.pricing?.collected)}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  )
+}
+
 function GradePanel({
   clientSlug,
   date,
@@ -85,6 +114,7 @@ function GradePanel({
   const entries: SeriesEntry[] = data?.data?.data ?? (initialEntries && initialCategory === activeCategory ? initialEntries : [])
   const isHeadPriced = entries.some(e => (e.avg_amount_head ?? 0) > 0)
   const isLwt = !isHeadPriced && entries[0]?.template_type === "lwt"
+  const isLwtDelivered = isLwt && entries.some(e => (e.pricing?.delivered ?? 0) > 0 || (e.pricing?.collected ?? 0) > 0)
 
   return (
     <div className="flex flex-col h-full">
@@ -126,6 +156,8 @@ function GradePanel({
           </div>
         ) : entries.length === 0 ? (
           <p className="p-6 text-sm text-muted-foreground text-center">No data</p>
+        ) : isLwtDelivered ? (
+          <LwtDeliveredGradeTable entries={entries} />
         ) : (
           <table className="min-w-full">
             <thead>

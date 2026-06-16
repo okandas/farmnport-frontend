@@ -42,6 +42,8 @@ export default function LotsPage() {
                     <nav className="flex text-sm text-muted-foreground">
                         <Link href="/" className="hover:text-foreground">Home</Link>
                         <span className="mx-2">/</span>
+                        <Link href="/market" className="hover:text-foreground">Market</Link>
+                        <span className="mx-2">/</span>
                         <span className="text-foreground">Lots</span>
                     </nav>
                 </div>

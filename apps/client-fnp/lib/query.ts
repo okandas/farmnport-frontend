@@ -299,7 +299,7 @@ export function queryBuyerContacts(clientId: string) {
   return api.get(url)
 }
 
-export function recordContactView(userId: string, viewedId: string, type: "phone" | "email") {
+export function recordContactView(userId: string, viewedId: string, type: "phone" | "email" | "whatsapp") {
   const url = `${BaseURL}/views/viewed`
   return api.post(url, { user_id: userId, viewed_id: viewedId, type })
 }

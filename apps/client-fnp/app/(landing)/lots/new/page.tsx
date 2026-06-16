@@ -22,6 +22,8 @@ export default async function PostLotPage() {
           <nav className="flex text-sm text-muted-foreground">
             <Link href="/" className="hover:text-foreground">Home</Link>
             <span className="mx-2">/</span>
+            <Link href="/market" className="hover:text-foreground">Market</Link>
+            <span className="mx-2">/</span>
             <Link href="/lots" className="hover:text-foreground">Lots</Link>
             <span className="mx-2">/</span>
             <span className="text-foreground">Post a Lot</span>

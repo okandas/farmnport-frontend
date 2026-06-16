@@ -15,6 +15,11 @@ const resend = new Resend(process.env.RESEND_API_KEY)
 const FROM = "farmnport <noreply@farmnport.com>"
 
 export async function POST(req: NextRequest) {
+  const secret = req.headers.get("x-email-secret")
+  if (secret !== process.env.EMAIL_SECRET) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
   const body = await req.json()
   const { template, to, ...props } = body as { template: string; to: string; [key: string]: unknown }
 

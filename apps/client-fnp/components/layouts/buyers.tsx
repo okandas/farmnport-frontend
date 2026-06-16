@@ -14,7 +14,7 @@ import {ArrowRight} from "lucide-react"
 import {queryClients, queryClientsByProduct} from "@/lib/query"
 import {AdSenseInFeed} from "@/components/ads/AdSenseInFeed"
 import {ApplicationUser, AuthenticatedUser} from "@/lib/schemas"
-import {slug, capitalizeFirstLetter, plural} from "@/lib/utilities"
+import {slug, capitalizeFirstLetter, titleCase, plural} from "@/lib/utilities"
 
 interface BuyersPageProps {
   user: AuthenticatedUser | null
@@ -178,7 +178,7 @@ export function Buyers({user, queryBy}: BuyersPageProps) {
               <div className="flex-1 min-w-0 space-y-1.5">
                 <div className="flex items-center gap-2 flex-wrap">
                   <h4 className="text-lg font-semibold leading-snug group-hover:text-primary transition-colors truncate">
-                    {capitalizeFirstLetter(buyer.name)}
+                    {titleCase(buyer.name)}
                   </h4>
                   {buyer.verified && (
                     <Icons.verified className="h-5 w-5 flex-shrink-0" aria-hidden="true" color="#228B22" />
