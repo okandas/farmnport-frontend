@@ -1010,3 +1010,7 @@ export function queryTumiraRates(payload: {
 }) {
   return api.post(`${BaseURL}/v1/tumira/delivery-rates`, payload)
 }
+
+export function queryMarketNews(page: number = 1, limit: number = 20) {
+  return api.get(`${BaseURL}/market-news/?page=${page}&limit=${limit}`)
+}

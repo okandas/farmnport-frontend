@@ -1,9 +1,11 @@
 "use client"
 
 import Link from "next/link"
+import { useState, useEffect, useRef } from "react"
 import { useQuery } from "@tanstack/react-query"
-import { queryProducerPriceLists, queryCdmPrices, querySeriesSummary, queryHeadSummary } from "@/lib/query"
+import { queryProducerPriceLists, queryCdmPrices, querySeriesSummary, queryHeadSummary, queryMarketNews } from "@/lib/query"
 import { PricesTabNav } from "@/components/structures/prices-tab-nav"
+import { Sheet, SheetContent, SheetClose } from "@/components/ui/sheet"
 
 type Mode = "kg" | "head"
 
@@ -92,6 +94,185 @@ const seriesTrendPct = (trend: number[]) => {
   const p = filtered[filtered.length - 2]
   const c = filtered[filtered.length - 1]
   return ((c - p) / p) * 100
+}
+
+// ── Market News ───────────────────────────────────────────────────────────────
+
+interface MarketNewsItem {
+  id: string
+  guid: string
+  title: string
+  link: string
+  description: string
+  published_at: string
+  source: string
+  source_url: string
+}
+
+function addUTM(url: string): string {
+  try {
+    const u = new URL(url)
+    u.searchParams.set("utm_source", "farmnport")
+    u.searchParams.set("utm_medium", "prices_board")
+    u.searchParams.set("utm_campaign", "market_news")
+    return u.toString()
+  } catch {
+    return url
+  }
+}
+
+function timeAgo(dateStr: string): string {
+  const diff = Date.now() - new Date(dateStr).getTime()
+  const mins = Math.floor(diff / 60000)
+  if (mins < 60) return `${mins}m ago`
+  const hrs = Math.floor(mins / 60)
+  if (hrs < 24) return `${hrs}h ago`
+  const days = Math.floor(hrs / 24)
+  return `${days}d ago`
+}
+
+function NewsSheet({ item, open, onClose }: { item: MarketNewsItem | null; open: boolean; onClose: () => void }) {
+  return (
+    <Sheet open={open} onOpenChange={v => { if (!v) onClose() }}>
+      <SheetContent side="right" className="w-full sm:max-w-md p-0 flex flex-col">
+        <div className="flex items-center gap-3 px-5 py-4 border-b">
+          <SheetClose asChild>
+            <button className="text-muted-foreground hover:text-foreground transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+            </button>
+          </SheetClose>
+        </div>
+
+        {item && (
+          <div className="flex-1 overflow-y-auto">
+            <div className="px-5 py-5 border-b">
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-3">TLDR</p>
+              <p className="text-base font-bold text-foreground leading-snug mb-3">{item.title}</p>
+              <p className="text-sm text-muted-foreground leading-relaxed">{item.description}</p>
+            </div>
+
+            <div className="px-5 py-5">
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-3">Sources</p>
+              <div className="rounded-xl border bg-muted/20 p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="w-7 h-7 rounded-full bg-muted flex items-center justify-center text-[11px] font-bold text-muted-foreground">{item.source[0]}</span>
+                    <span className="text-sm font-semibold text-foreground">{item.source}</span>
+                  </div>
+                  <a href={addUTM(item.link)} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                  </a>
+                </div>
+                <p className="text-xs text-muted-foreground leading-relaxed mb-3">{item.description}</p>
+                <p className="text-[11px] text-muted-foreground/60">{timeAgo(item.published_at)}</p>
+              </div>
+            </div>
+          </div>
+        )}
+      </SheetContent>
+    </Sheet>
+  )
+}
+
+// ── Insights timeline ─────────────────────────────────────────────────────────
+
+const PAGE_SIZE = 20
+
+function InsightsTimeline() {
+  const [selected, setSelected] = useState<MarketNewsItem | null>(null)
+  const [page, setPage] = useState(1)
+  const [allItems, setAllItems] = useState<MarketNewsItem[]>([])
+  const [total, setTotal] = useState(0)
+  const sentinelRef = useRef<HTMLDivElement>(null)
+
+  const { data, isFetching } = useQuery({
+    queryKey: ["market-news", page],
+    queryFn: () => queryMarketNews(page, PAGE_SIZE),
+    refetchOnWindowFocus: false,
+  })
+
+  useEffect(() => {
+    const incoming: MarketNewsItem[] = data?.data?.data ?? []
+    const t: number = data?.data?.total ?? 0
+    if (incoming.length === 0) return
+    setTotal(t)
+    setAllItems(prev => {
+      const existingGuids = new Set(prev.map(i => i.guid))
+      const fresh = incoming.filter(i => !existingGuids.has(i.guid))
+      return [...prev, ...fresh]
+    })
+  }, [data])
+
+  const hasMore = allItems.length < total
+
+  useEffect(() => {
+    const el = sentinelRef.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting && !isFetching && hasMore) setPage(p => p + 1) },
+      { threshold: 0.1 }
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [isFetching, hasMore])
+
+  return (
+    <>
+      <NewsSheet item={selected} open={!!selected} onClose={() => setSelected(null)} />
+
+      <div>
+        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-4">Latest News</p>
+
+        {allItems.map((item, i) => (
+          <div key={item.guid} className="relative pb-6 last:pb-0">
+            {i < allItems.length - 1 && (
+              <span className="absolute left-[4px] top-[18px] bottom-0 w-px bg-border" />
+            )}
+
+            <div className="flex gap-3">
+              <div className="mt-[9px] shrink-0 w-2 flex justify-center">
+                <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40 block" />
+              </div>
+
+              <button
+                onClick={() => setSelected(item)}
+                className="min-w-0 flex-1 text-left"
+              >
+                <p className="text-[11px] text-muted-foreground mb-1">{timeAgo(item.published_at)}</p>
+                <p className="text-xs font-semibold text-foreground leading-snug mb-2">{item.title}</p>
+                <div className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <span className="w-4 h-4 rounded-full bg-muted flex items-center justify-center text-[9px] font-bold leading-none text-muted-foreground">{item.source[0]}</span>
+                  1 source
+                </div>
+              </button>
+            </div>
+          </div>
+        ))}
+
+        <div ref={sentinelRef} className="h-4" />
+        {isFetching && (
+          <div className="space-y-4 pt-2">
+            {Array.from({ length: 2 }).map((_, i) => (
+              <div key={i} className="flex gap-3">
+                <div className="mt-[9px] shrink-0 w-2 flex justify-center">
+                  <span className="w-1.5 h-1.5 rounded-full bg-muted/60 block" />
+                </div>
+                <div className="flex-1 space-y-1.5">
+                  <div className="h-2.5 w-16 bg-muted/60 rounded animate-pulse" />
+                  <div className="h-3 w-full bg-muted/60 rounded animate-pulse" />
+                  <div className="h-3 w-3/4 bg-muted/60 rounded animate-pulse" />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {allItems.length === 0 && !isFetching && (
+          <p className="text-xs text-muted-foreground">No news available</p>
+        )}
+      </div>
+    </>
+  )
 }
 
 // ── Main board ────────────────────────────────────────────────────────────────
@@ -365,9 +546,15 @@ export function PricesBoard({ mode = "kg" }: { mode?: Mode }) {
 
       {/* ── sticky insights sidebar ── */}
       <aside className="hidden lg:block w-72 xl:w-80 shrink-0 border-l">
-        <div className="sticky top-6 pl-5 pt-6">
-          <p className="text-sm mb-3"><span className="font-bold text-foreground">Market</span> <span className="font-normal text-muted-foreground">Insights</span></p>
-          <p className="text-sm text-muted-foreground">Headlines coming soon</p>
+        <div className="sticky top-6 pt-6 overflow-y-auto max-h-screen">
+          <div className="px-5 mb-5 flex items-center justify-between">
+            <p className="text-sm"><span className="font-bold text-foreground">Market</span> <span className="font-normal text-muted-foreground">Insights</span></p>
+          </div>
+
+          {/* Timeline */}
+          <div className="px-5 pb-8">
+            <InsightsTimeline />
+          </div>
         </div>
       </aside>
 
