@@ -17,6 +17,7 @@ type SeriesEntry = {
   low: number
   buyer_count: number
   trend: number[]
+  latest_date?: string
 }
 
 type HeadEntry = SeriesEntry & {
@@ -219,15 +220,17 @@ export function PricesBoard({ mode = "kg" }: { mode?: Mode }) {
                             </div>
                           </div>
                         ) : (
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-baseline justify-between gap-2">
-                              <p className="text-sm font-semibold text-foreground leading-tight">{item.name}</p>
-                              <p className="text-sm font-semibold tabular-nums shrink-0">
-                                ${toDollars(item.avg)}<span className="text-xs font-normal text-muted-foreground">/kg</span>
-                                {pct !== null && <span className={`ml-1.5 text-xs font-medium ${pct >= 0 ? "text-green-600" : "text-red-500"}`}>{pct >= 0 ? "▲" : "▼"} {pct >= 0 ? "+" : ""}{pct.toFixed(1)}%</span>}
+                          <div className="flex-1 min-w-0 flex items-center justify-between gap-2">
+                            <div className="min-w-0">
+                              <p className="text-sm font-semibold text-foreground truncate">{item.name}</p>
+                              <p className="text-[11px] text-muted-foreground leading-tight truncate">{categoryToDisplay(item.category)}</p>
+                            </div>
+                            <div className="shrink-0 text-right">
+                              <p className="text-sm font-semibold tabular-nums">${toDollars(item.avg)}<span className="text-xs font-normal text-muted-foreground">/kg</span></p>
+                              <p className={`text-xs font-medium tabular-nums ${pct === null ? "text-muted-foreground" : pct >= 0 ? "text-green-600" : "text-red-500"}`}>
+                                {pct === null ? "—" : `${pct >= 0 ? "▲ +" : "▼ "}${pct.toFixed(1)}%`}
                               </p>
                             </div>
-                            <p className="text-[11px] text-muted-foreground leading-tight">{categoryToDisplay(item.category)}</p>
                           </div>
                         )}
                       </li>
@@ -259,15 +262,15 @@ export function PricesBoard({ mode = "kg" }: { mode?: Mode }) {
                             </div>
                           </div>
                         ) : (
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-baseline justify-between gap-2">
-                              <p className="text-sm font-semibold text-foreground leading-tight">{item.name}</p>
-                              <p className="text-sm font-semibold tabular-nums shrink-0">
-                                ${toDollars(item.avg)}<span className="text-xs font-normal text-muted-foreground">/kg</span>
-                                <span className={`ml-1.5 text-xs font-medium ${item.pct! >= 0 ? "text-green-600" : "text-red-500"}`}>{item.pct! >= 0 ? "▲ +" : "▼ "}{item.pct!.toFixed(1)}%</span>
-                              </p>
+                          <div className="flex-1 min-w-0 flex items-center justify-between gap-2">
+                            <div className="min-w-0">
+                              <p className="text-sm font-semibold text-foreground truncate">{item.name}</p>
+                              <p className="text-[11px] text-muted-foreground leading-tight truncate">{categoryToDisplay(item.category)}</p>
                             </div>
-                            <p className="text-[11px] text-muted-foreground leading-tight">{categoryToDisplay(item.category)}</p>
+                            <div className="shrink-0 text-right">
+                              <p className="text-sm font-semibold tabular-nums">${toDollars(item.avg)}<span className="text-xs font-normal text-muted-foreground">/kg</span></p>
+                              <p className={`text-xs font-medium tabular-nums ${item.pct! >= 0 ? "text-green-600" : "text-red-500"}`}>{item.pct! >= 0 ? "▲ +" : "▼ "}{item.pct!.toFixed(1)}%</p>
+                            </div>
                           </div>
                         )}
                       </li>
@@ -301,7 +304,7 @@ export function PricesBoard({ mode = "kg" }: { mode?: Mode }) {
                   </thead>
                   <tbody>
                     {[...rawEntries]
-                      .sort((a, b) => b.avg - a.avg)
+                      .sort((a, b) => (b.latest_date ?? "").localeCompare(a.latest_date ?? ""))
                       .map((entry, idx) => {
                         const color = gradeColor((entry.category ?? "").toLowerCase())
                         const produce = categoryToDisplay(entry.category)
