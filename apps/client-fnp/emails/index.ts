@@ -10,3 +10,8 @@ export { default as BlastEmail } from "./templates/blast"
 export { default as OrderConfirmationEmail } from "./templates/orders/order-confirmation"
 export { default as OrderDispatchEmail } from "./templates/orders/order-dispatch"
 export { default as OrderStatusEmail } from "./templates/orders/order-status"
+
+// Booking templates
+export { default as BookingConfirmedEmail } from "./templates/bookings/booking-confirmed"
+export { default as BookingStatusEmail } from "./templates/bookings/booking-status"
+export { default as BookingAdminAlertEmail } from "./templates/bookings/booking-admin-alert"

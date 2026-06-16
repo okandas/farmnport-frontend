@@ -9,6 +9,9 @@ import {
   OrderDispatchEmail,
   OrderStatusEmail,
   BlastEmail,
+  BookingConfirmedEmail,
+  BookingStatusEmail,
+  BookingAdminAlertEmail,
 } from "@/emails"
 
 const resend = new Resend(process.env.RESEND_API_KEY)
@@ -67,6 +70,21 @@ export async function POST(req: NextRequest) {
       html = await render(BlastEmail(p))
       break
     }
+
+    case "booking-confirmed":
+      subject = `Booking ${(props as { bookingRef?: string }).bookingRef ?? ""} confirmed`
+      html = await render(BookingConfirmedEmail(props as Parameters<typeof BookingConfirmedEmail>[0]))
+      break
+
+    case "booking-status":
+      subject = `Booking ${(props as { bookingRef?: string }).bookingRef ?? ""} update`
+      html = await render(BookingStatusEmail(props as Parameters<typeof BookingStatusEmail>[0]))
+      break
+
+    case "booking-admin-alert":
+      subject = `New booking ${(props as { bookingRef?: string }).bookingRef ?? ""} — action required`
+      html = await render(BookingAdminAlertEmail(props as Parameters<typeof BookingAdminAlertEmail>[0]))
+      break
 
     default:
       return NextResponse.json({ error: `Unknown template: ${template}` }, { status: 400 })
