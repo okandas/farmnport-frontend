@@ -195,7 +195,7 @@ export function Contacts({ user, client, quickOverview }: ContactPageProps) {
                         </dt>
                         <dd className="text-sm font-medium leading-6">{client.city?.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}, {client.province?.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}</dd>
                     </div>
-                    <div className="flex gap-x-4 py-1">
+                    {client.email && <div className="flex gap-x-4 py-1 items-center self-start">
                         <dt className="flex items-center gap-1 text-xs text-muted-foreground w-24 shrink-0">
                             <Icons.mail className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                             Email
@@ -206,7 +206,7 @@ export function Contacts({ user, client, quickOverview }: ContactPageProps) {
                             : !isSubscribed ? (<SubscribeToView type="email" />)
                             : (<ShowEmail email={client.email} />)
                         }
-                    </div>
+                    </div>}
 
                     {quickOverview && (client.main_produce || (client.other_produce && client.other_produce.length > 0)) && (
                         <div className="flex gap-x-4 py-1">

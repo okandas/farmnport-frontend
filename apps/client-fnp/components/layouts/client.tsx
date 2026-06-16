@@ -234,7 +234,7 @@ export function Client({ slug, user, latestPrices }: ClientPageProps) {
                 )}
               </div>
 
-              <div className="flex-1 bg-card border rounded-xl p-4 space-y-3">
+              {client.email && <div className="flex-1 bg-card border rounded-xl p-4 space-y-3">
                 <div>
                   <p className="font-semibold text-sm">Email</p>
                   <p className="text-xs text-muted-foreground mt-1 leading-relaxed">Send an email.</p>
@@ -256,7 +256,7 @@ export function Client({ slug, user, latestPrices }: ClientPageProps) {
                     Show Email →
                   </button>
                 )}
-              </div>
+              </div>}
 
             {(client.has_booking || client.has_pickup) && client.type === 'buyer' && (
               <div className="flex-1 bg-blue-50 border border-blue-200 rounded-xl p-4 space-y-3">
