@@ -157,11 +157,11 @@ export function Client({ slug, user, latestPrices }: ClientPageProps) {
                       {client.address
                         ? client.address.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
                         : client.city && client.province
-                        ? `${capitalizeFirstLetter(client.city)}, ${capitalizeFirstLetter(client.province)}`
+                        ? client.city.toLowerCase() === client.province.toLowerCase() ? capitalizeFirstLetter(client.city) : `${capitalizeFirstLetter(client.city)}, ${capitalizeFirstLetter(client.province)}`
                         : 'Location N/A'}
                     </p>
                     {client.address && client.city && client.province && (
-                      <p className="text-xs text-muted-foreground">{capitalizeFirstLetter(client.city)}, {capitalizeFirstLetter(client.province)}</p>
+                      <p className="text-xs text-muted-foreground">{client.city?.toLowerCase() === client.province?.toLowerCase() ? capitalizeFirstLetter(client.city) : `${capitalizeFirstLetter(client.city)}, ${capitalizeFirstLetter(client.province)}`}</p>
                     )}
                     <p className="text-xs text-muted-foreground">Location</p>
                   </div>

@@ -193,7 +193,11 @@ export function Contacts({ user, client, quickOverview }: ContactPageProps) {
                             <Icons.landmark className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                             City, Province
                         </dt>
-                        <dd className="text-sm font-medium leading-6">{client.city?.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}, {client.province?.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}</dd>
+                        <dd className="text-sm font-medium leading-6">{(() => {
+                          const city = client.city?.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+                          const province = client.province?.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+                          return city?.toLowerCase() === province?.toLowerCase() ? city : `${city}, ${province}`
+                        })()}</dd>
                     </div>
                     {client.email && <div className="flex gap-x-4 py-1 items-center self-start">
                         <dt className="flex items-center gap-1 text-xs text-muted-foreground w-24 shrink-0">

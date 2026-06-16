@@ -67,7 +67,11 @@ export function BuyerContactsCard({ buyer }: BuyerContactsCardProps) {
             Location
           </dt>
           <dd className="text-sm font-medium leading-6">
-            {buyer.city?.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}, {buyer.province?.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+            {(() => {
+              const city = buyer.city?.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+              const province = buyer.province?.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+              return city?.toLowerCase() === province?.toLowerCase() ? city : `${city}, ${province}`
+            })()}
           </dd>
         </div>
 
