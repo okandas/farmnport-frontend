@@ -3,11 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { Checkbox } from "@/components/ui/checkbox"
 import { LotDropDown } from "@/components/structures/dropdowns/lot-dropdown"
-
-function formatCents(cents: number) {
-  if (!cents) return "Negotiable"
-  return `$${(cents / 100).toFixed(2)}/kg`
-}
+import { centsToDollars } from "@/lib/utilities"
 
 function capitalizeFirst(s?: string) {
   if (!s) return "—"
@@ -37,10 +33,10 @@ export const lotColumns: ColumnDef<any>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "farm_produce",
-    header: "Produce",
+    accessorKey: "client_name",
+    header: "Client",
     cell: ({ row }) => (
-      <span className="capitalize font-medium">{row.original.farm_produce?.name ?? "—"}</span>
+      <span className="capitalize font-medium">{row.original.client_name ?? "—"}</span>
     ),
   },
   {
@@ -70,7 +66,7 @@ export const lotColumns: ColumnDef<any>[] = [
   {
     accessorKey: "price_per_unit_cents",
     header: "Price",
-    cell: ({ row }) => <span>{formatCents(row.original.price_per_unit_cents)}/{row.original.unit}</span>,
+    cell: ({ row }) => <span>{row.original.price_per_unit_cents ? `${centsToDollars(row.original.price_per_unit_cents)}/${row.original.unit}` : "Negotiable"}</span>,
   },
   {
     accessorKey: "province",

@@ -10,7 +10,7 @@ import { queryAdminLot, updateLot, approveLot, queryUsers } from "@/lib/query"
 import { SearchSelect } from "@/components/ui/search-select"
 import { toast } from "@/components/ui/use-toast"
 import { handleApiError } from "@/lib/error-handler"
-import { cn } from "@/lib/utilities"
+import { cn, capitalizeWords } from "@/lib/utilities"
 import { buttonVariants } from "@/components/ui/button"
 import { Icons } from "@/components/icons/lucide"
 import {
@@ -27,7 +27,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 const LOT_UNITS = ["kg", "head", "unit", "tonne", "bag", "dozen", "litre"]
 
 const inputClass = "block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500"
-const readonlyClass = "block w-full rounded-md bg-gray-50 px-3 py-1.5 text-sm text-gray-700 outline outline-1 -outline-offset-1 outline-gray-200 dark:bg-white/5 dark:text-gray-300 dark:outline-white/10"
+const readonlyClass = "block w-full py-1.5 text-sm text-gray-900 dark:text-white"
 
 interface EditLotForm {
   client_id: string
@@ -75,7 +75,7 @@ function ClientLotDetails({ lot }: { lot: any }) {
   )
 }
 
-function AdminLotDetails({ lot, form }: { lot: any; form: any }) {
+function AdminLotDetails({ form }: { lot: any; form: any }) {
   return (
     <div className="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
       <div className="sm:col-span-3">
@@ -281,26 +281,30 @@ function EditForm({ lot, slug }: { lot: any; slug: string }) {
                     <div className="sm:col-span-3">
                       <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Client</label>
                       <div className="mt-2">
-                        <FormField control={form.control} name="client_id" render={({ field }) => (
-                          <FormItem>
-                            <FormControl>
-                              <SearchSelect
-                                queryKey={["users-select", lot.client_id]}
-                                queryFn={(params) => queryUsers({ ...params, id: lot.client_id })}
-                                getItems={(page) => page?.data?.data ?? []}
-                                value={field.value || ""}
-                                onValueChange={field.onChange}
-                                getValue={(u) => u.id}
-                                getLabel={(u) => u.name}
-                                placeholder="—"
-                                searchPlaceholder="Search clients..."
-                                clearable
-                                capitalize
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )} />
+                        {lot.created_by === "admin" ? (
+                          <FormField control={form.control} name="client_id" render={({ field }) => (
+                            <FormItem>
+                              <FormControl>
+                                <SearchSelect
+                                  queryKey={["users-select", lot.client_id]}
+                                  queryFn={(params) => queryUsers({ ...params, id: lot.client_id })}
+                                  getItems={(page) => page?.data?.data ?? []}
+                                  value={field.value || ""}
+                                  onValueChange={field.onChange}
+                                  getValue={(u) => u.id}
+                                  getLabel={(u) => u.name}
+                                  placeholder="—"
+                                  searchPlaceholder="Search clients..."
+                                  clearable
+                                  capitalize
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )} />
+                        ) : (
+                          <div className={readonlyClass}>{lot.client_name ? capitalizeWords(lot.client_name) : "—"}</div>
+                        )}
                       </div>
                     </div>
 
