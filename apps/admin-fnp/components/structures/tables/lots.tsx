@@ -64,6 +64,7 @@ export function LotsTable() {
     <DataTable
       columns={lotColumns}
       data={lots}
+      newUrl="/dashboard/farmnport/lots/new"
       tableName="Lot"
       total={total}
       pagination={pagination}

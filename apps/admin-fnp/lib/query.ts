@@ -493,6 +493,10 @@ export function updateLot(slug: string, data: {
   return api.put(`${baseUrl}/lots/${slug}`, data)
 }
 
+export function queryFarmProduceStates({ p, search }: { p: number; search: string }) {
+  return api.get(`${baseUrl}/farm-produce-states?p=${p}&q=${encodeURIComponent(search)}`)
+}
+
 export function queryFarmProduceByCategory(categorySlug: string) {
   const url = `${baseUrl}/farmproduce/category/${categorySlug}`
   return api.get(url)

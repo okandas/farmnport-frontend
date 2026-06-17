@@ -6,7 +6,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useForm } from "react-hook-form"
 import { useRouter } from "next/navigation"
 
-import { queryAdminLot, updateLot, approveLot, queryUsers } from "@/lib/query"
+import { queryAdminLot, updateLot, approveLot, queryUsers, queryFarmProduceStates } from "@/lib/query"
 import { SearchSelect } from "@/components/ui/search-select"
 import { toast } from "@/components/ui/use-toast"
 import { handleApiError } from "@/lib/error-handler"
@@ -116,7 +116,21 @@ function AdminLotDetails({ form }: { lot: any; form: any }) {
         <div className="mt-2">
           <FormField control={form.control} name="form" render={({ field }: any) => (
             <FormItem>
-              <FormControl><Input placeholder="e.g. Fresh, Feeder Steer" className={inputClass} {...field} /></FormControl>
+              <FormControl>
+                <SearchSelect
+                  queryKey="farm-produce-states"
+                  queryFn={(params) => queryFarmProduceStates(params)}
+                  getItems={(page) => page?.data?.data ?? []}
+                  value={field.value ?? ""}
+                  onValueChange={field.onChange}
+                  getLabel={(f: any) => f.name ?? ""}
+                  getValue={(f: any) => f.name}
+                  placeholder="Select state..."
+                  searchPlaceholder="Search states..."
+                  clearable
+                  capitalize
+                />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )} />
