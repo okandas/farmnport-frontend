@@ -53,6 +53,7 @@ type pagination = {
   category?: string[]
   produce?: string[]
   sort?: string
+  id?: string
 }
 
 export function queryUsers(pagination?: pagination) {
@@ -80,6 +81,10 @@ export function queryUsers(pagination?: pagination) {
 
   if (pagination?.sort !== undefined && pagination.sort.length > 0) {
     params.append('sort', pagination.sort)
+  }
+
+  if (pagination?.id !== undefined && pagination.id.length > 0) {
+    params.append('id', pagination.id)
   }
 
   const queryString = params.toString()
@@ -447,10 +452,9 @@ export function updateFarmProduce(data: { slug: string; name: string; descriptio
   return api.put(`${baseUrl}/farmproduce/${data.slug}`, data)
 }
 
-export function queryAdminLots({ p, pending }: { p: number; pending?: boolean }) {
+export function queryAdminLots({ p }: { p: number }) {
   const qs = new URLSearchParams({ p: String(p) })
-  if (pending) qs.set("pending", "true")
-  return api.get(`${baseUrl}/lots/?${qs}`)
+  return api.get(`${baseUrl}/lots/admin/list?${qs}`)
 }
 
 export function approveLot(slug: string) {
@@ -461,7 +465,23 @@ export function queryAdminLot(slug: string) {
   return api.get(`${baseUrl}/lots/${slug}/admin`)
 }
 
+export function adminCreateLot(data: {
+  client_id: string
+  type: string
+  farm_produce_id: string
+  breed_id?: string
+  form: string
+  quantity: number
+  unit: string
+  price_per_unit_cents: number
+  notes?: string
+  expires_at: string
+}) {
+  return api.post(`${baseUrl}/lots/admin/create`, data)
+}
+
 export function updateLot(slug: string, data: {
+  client_id?: string
   type: string
   form: string
   quantity: number
