@@ -546,7 +546,7 @@ export function PricesBoard({ mode = "kg" }: { mode?: Mode }) {
 
       {/* ── sticky insights sidebar ── */}
       <aside className="hidden lg:block w-72 xl:w-80 shrink-0 border-l">
-        <div className="sticky top-6 pt-6 overflow-y-auto max-h-screen">
+        <div className="sticky top-6 pt-6 overflow-y-auto max-h-screen [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           <div className="px-5 mb-5 flex items-center justify-between">
             <p className="text-sm"><span className="font-bold text-foreground">Market</span> <span className="font-normal text-muted-foreground">Insights</span></p>
           </div>
