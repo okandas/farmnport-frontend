@@ -40,6 +40,136 @@ interface EditLotForm {
   expires_at: string
 }
 
+function ClientLotDetails({ lot }: { lot: any }) {
+  return (
+    <div className="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
+      <div className="sm:col-span-3">
+        <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Type</label>
+        <div className="mt-2"><div className={readonlyClass}>{lot.type === "sell" ? "Selling" : lot.type === "request" ? "Buying" : "—"}</div></div>
+      </div>
+      <div className="sm:col-span-3">
+        <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Unit</label>
+        <div className="mt-2"><div className={readonlyClass}>{lot.unit || "—"}</div></div>
+      </div>
+      <div className="sm:col-span-3">
+        <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">State</label>
+        <div className="mt-2"><div className={readonlyClass}>{lot.form || "—"}</div></div>
+      </div>
+      <div className="sm:col-span-3">
+        <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Quantity</label>
+        <div className="mt-2"><div className={readonlyClass}>{lot.quantity ?? "—"}</div></div>
+      </div>
+      <div className="sm:col-span-3">
+        <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Price per unit</label>
+        <div className="mt-2"><div className={readonlyClass}>{lot.price_per_unit_cents ? `$${(lot.price_per_unit_cents / 100).toFixed(2)}` : "—"}</div></div>
+      </div>
+      <div className="sm:col-span-3">
+        <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Expires</label>
+        <div className="mt-2"><div className={readonlyClass}>{lot.expires_at ? new Date(lot.expires_at).toLocaleDateString("en-GB") : "—"}</div></div>
+      </div>
+      <div className="sm:col-span-6">
+        <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Notes</label>
+        <div className="mt-2"><div className={readonlyClass}>{lot.notes || "—"}</div></div>
+      </div>
+    </div>
+  )
+}
+
+function AdminLotDetails({ lot, form }: { lot: any; form: any }) {
+  return (
+    <div className="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
+      <div className="sm:col-span-3">
+        <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Type</label>
+        <div className="mt-2">
+          <FormField control={form.control} name="type" render={({ field }: any) => (
+            <FormItem>
+              <Select onValueChange={field.onChange} value={field.value}>
+                <FormControl><SelectTrigger><SelectValue placeholder="Select type" /></SelectTrigger></FormControl>
+                <SelectContent>
+                  <SelectItem value="sell">Selling</SelectItem>
+                  <SelectItem value="request">Buying</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )} />
+        </div>
+      </div>
+      <div className="sm:col-span-3">
+        <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Unit</label>
+        <div className="mt-2">
+          <FormField control={form.control} name="unit" render={({ field }: any) => (
+            <FormItem>
+              <Select onValueChange={field.onChange} value={field.value}>
+                <FormControl><SelectTrigger><SelectValue placeholder="Select unit" /></SelectTrigger></FormControl>
+                <SelectContent>
+                  {LOT_UNITS.map((u) => <SelectItem key={u} value={u}>{u}</SelectItem>)}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )} />
+        </div>
+      </div>
+      <div className="sm:col-span-3">
+        <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">State</label>
+        <div className="mt-2">
+          <FormField control={form.control} name="form" render={({ field }: any) => (
+            <FormItem>
+              <FormControl><Input placeholder="e.g. Fresh, Feeder Steer" className={inputClass} {...field} /></FormControl>
+              <FormMessage />
+            </FormItem>
+          )} />
+        </div>
+      </div>
+      <div className="sm:col-span-3">
+        <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Quantity</label>
+        <div className="mt-2">
+          <FormField control={form.control} name="quantity" render={({ field }: any) => (
+            <FormItem>
+              <FormControl><Input type="number" step="0.01" min="0" placeholder="e.g. 500" className={inputClass} {...field} /></FormControl>
+              <FormMessage />
+            </FormItem>
+          )} />
+        </div>
+      </div>
+      <div className="sm:col-span-3">
+        <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Price per unit ($)</label>
+        <div className="mt-2">
+          <FormField control={form.control} name="price_per_unit" render={({ field }: any) => (
+            <FormItem>
+              <FormControl><Input type="number" step="0.01" min="0.01" placeholder="0.00" className={inputClass} {...field} /></FormControl>
+              <FormMessage />
+            </FormItem>
+          )} />
+        </div>
+      </div>
+      <div className="sm:col-span-3">
+        <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Expires</label>
+        <div className="mt-2">
+          <FormField control={form.control} name="expires_at" render={({ field }: any) => (
+            <FormItem>
+              <FormControl><Input type="date" className={inputClass} {...field} /></FormControl>
+              <FormMessage />
+            </FormItem>
+          )} />
+        </div>
+      </div>
+      <div className="sm:col-span-6">
+        <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Notes <span className="text-gray-400 font-normal">(optional)</span></label>
+        <div className="mt-2">
+          <FormField control={form.control} name="notes" render={({ field }: any) => (
+            <FormItem>
+              <FormControl><Textarea rows={3} placeholder="Optional notes for buyers..." className={inputClass} {...field} /></FormControl>
+              <FormMessage />
+            </FormItem>
+          )} />
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function capitalizeFirst(s?: string) {
   if (!s) return "—"
   return s.charAt(0).toUpperCase() + s.slice(1)
@@ -219,115 +349,19 @@ function EditForm({ lot, slug }: { lot: any; slug: string }) {
               </div>
             </div>
 
-            {/* Editable fields */}
+            {/* Lot Details */}
             <div className="border-b border-gray-900/10 pb-12 dark:border-white/10">
               <div className="grid grid-cols-1 gap-x-8 gap-y-10 md:grid-cols-3">
                 <div>
                   <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">Lot Details</h2>
-                  <p className="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">Update the listing details.</p>
+                  <p className="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">
+                    {lot.created_by === "admin" ? "Update the listing details." : "Submitted by client — read only."}
+                  </p>
                 </div>
-
                 <div className="md:col-span-2">
-                  <div className="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
-
-                    <div className="sm:col-span-3">
-                      <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Type</label>
-                      <div className="mt-2">
-                        <FormField control={form.control} name="type" render={({ field }) => (
-                          <FormItem>
-                            <Select onValueChange={field.onChange} value={field.value}>
-                              <FormControl><SelectTrigger><SelectValue placeholder="Select type" /></SelectTrigger></FormControl>
-                              <SelectContent>
-                                <SelectItem value="sell">Selling</SelectItem>
-                                <SelectItem value="request">Buying</SelectItem>
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )} />
-                      </div>
-                    </div>
-
-                    <div className="sm:col-span-3">
-                      <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Unit</label>
-                      <div className="mt-2">
-                        <FormField control={form.control} name="unit" render={({ field }) => (
-                          <FormItem>
-                            <Select onValueChange={field.onChange} value={field.value}>
-                              <FormControl><SelectTrigger><SelectValue placeholder="Select unit" /></SelectTrigger></FormControl>
-                              <SelectContent>
-                                {LOT_UNITS.map((u) => (
-                                  <SelectItem key={u} value={u}>{u}</SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )} />
-                      </div>
-                    </div>
-
-                    <div className="sm:col-span-3">
-                      <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">State</label>
-                      <div className="mt-2">
-                        <FormField control={form.control} name="form" render={({ field }) => (
-                          <FormItem>
-                            <FormControl><Input placeholder="e.g. Fresh, Feeder Steer" className={inputClass} {...field} /></FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )} />
-                      </div>
-                    </div>
-
-                    <div className="sm:col-span-3">
-                      <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Quantity</label>
-                      <div className="mt-2">
-                        <FormField control={form.control} name="quantity" render={({ field }) => (
-                          <FormItem>
-                            <FormControl><Input type="number" step="0.01" min="0" placeholder="e.g. 500" className={inputClass} {...field} /></FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )} />
-                      </div>
-                    </div>
-
-                    <div className="sm:col-span-3">
-                      <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Price per unit ($)</label>
-                      <div className="mt-2">
-                        <FormField control={form.control} name="price_per_unit" render={({ field }) => (
-                          <FormItem>
-                            <FormControl><Input type="number" step="0.01" min="0.01" placeholder="0.00" className={inputClass} {...field} /></FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )} />
-                      </div>
-                    </div>
-
-                    <div className="sm:col-span-3">
-                      <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Expires</label>
-                      <div className="mt-2">
-                        <FormField control={form.control} name="expires_at" render={({ field }) => (
-                          <FormItem>
-                            <FormControl><Input type="date" className={inputClass} {...field} /></FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )} />
-                      </div>
-                    </div>
-
-                    <div className="sm:col-span-6">
-                      <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Notes <span className="text-gray-400 font-normal">(optional)</span></label>
-                      <div className="mt-2">
-                        <FormField control={form.control} name="notes" render={({ field }) => (
-                          <FormItem>
-                            <FormControl><Textarea rows={3} placeholder="Optional notes for buyers..." className={inputClass} {...field} /></FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )} />
-                      </div>
-                    </div>
-
-                  </div>
+                  {lot.created_by === "admin"
+                    ? <AdminLotDetails lot={lot} form={form} />
+                    : <ClientLotDetails lot={lot} />}
                 </div>
               </div>
             </div>
