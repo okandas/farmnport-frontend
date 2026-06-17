@@ -32,8 +32,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/animal-health-guides/all`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.8 },
     { url: `${BASE_URL}/pricing`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
     { url: `${BASE_URL}/prices`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.7 },
-    { url: `${BASE_URL}/waiting-list-paying`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.4 },
-    { url: `${BASE_URL}/waiting-list-shop`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.4 },
     { url: `${BASE_URL}/about`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.5 },
     { url: `${BASE_URL}/contact`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.5 },
     { url: `${BASE_URL}/privacy`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.3 },

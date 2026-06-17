@@ -11,6 +11,8 @@ const nextConfig = {
       { source: '/prices/cdm', destination: '/prices', permanent: true },
       { source: '/prices/cdm/:path*', destination: '/prices', permanent: true },
       { source: '/prices/produce/:slug', destination: '/prices/:slug', permanent: true },
+      { source: '/waiting-list-shop', destination: '/buy', permanent: true },
+      { source: '/waiting-list-paying', destination: '/lots', permanent: true },
     ]
   },
   images: {
