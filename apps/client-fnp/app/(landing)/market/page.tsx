@@ -8,6 +8,11 @@ const sections = [
         href: "/prices",
     },
     {
+        title: "Bookings",
+        description: "Browse open booking slots from buyers and suppliers — reserve a delivery drop-off or collection slot near you.",
+        href: "/bookings",
+    },
+    {
         title: "Lots",
         description: "Browse active lots posted by farmers selling produce — buy directly at listed prices across Zimbabwe.",
         href: "/lots",
@@ -46,8 +51,8 @@ export default function MarketPage() {
             </section>
 
             <section className="py-10 lg:py-14">
-                <div className="mx-auto max-w-4xl px-6 lg:px-8">
-                    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="mx-auto max-w-5xl px-6 lg:px-8">
+                    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
                         {sections.map(({ title, description, href }) => (
                             <Link
                                 key={href}

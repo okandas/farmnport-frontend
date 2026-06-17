@@ -63,14 +63,14 @@ export const lotColumns: ColumnDef<any>[] = [
     cell: ({ row }) => <span className="capitalize">{capitalizeFirst(row.original.form)}</span>,
   },
   {
-    accessorKey: "quantity_kg",
+    accessorKey: "quantity",
     header: "Quantity",
-    cell: ({ row }) => <span>{row.original.quantity_kg?.toLocaleString()} kg</span>,
+    cell: ({ row }) => <span>{row.original.quantity?.toLocaleString()} {row.original.unit}</span>,
   },
   {
-    accessorKey: "price_per_kg_cents",
+    accessorKey: "price_per_unit_cents",
     header: "Price",
-    cell: ({ row }) => <span>{formatCents(row.original.price_per_kg_cents)}</span>,
+    cell: ({ row }) => <span>{formatCents(row.original.price_per_unit_cents)}/{row.original.unit}</span>,
   },
   {
     accessorKey: "province",

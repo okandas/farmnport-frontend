@@ -176,7 +176,7 @@ export function MobileNav({ user }: MobileNavProps) {
                      className="flex items-center gap-3 px-3 py-2 text-base font-semibold rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
                    >
                      <Icons.tag className="h-5 w-5" />
-                     <span>Post Lot</span>
+                     <span>List a Lot</span>
                    </Link>
                    { user ? (
                      <>

@@ -1,4 +1,5 @@
 import { BuyerProducePriceHistory } from "@/components/structures/buyer-produce-price-history"
+import { QuickLinks } from "@/components/generic/quick-links"
 import type { Metadata } from "next"
 import { capitalizeFirstLetter } from "@/lib/utilities"
 
@@ -44,13 +45,18 @@ export default async function BuyerCategoryPage({ params }: SheetCategoryPagePro
   const { clientSlug, clientName, effectiveDate } = parseSheetSlug(sheet)
 
   return (
-    <>
-      <BuyerProducePriceHistory
-        clientSlug={clientSlug}
-        clientName={clientName}
-        produce={category}
-        effectiveDate={effectiveDate}
-      />
-    </>
+    <div className="mx-auto max-w-7xl">
+      <div className="lg:flex lg:space-x-10">
+        <BuyerProducePriceHistory
+          clientSlug={clientSlug}
+          clientName={clientName}
+          produce={category}
+          effectiveDate={effectiveDate}
+        />
+        <div className="hidden lg:block lg:w-44 shrink-0 px-6 pt-6">
+          <QuickLinks />
+        </div>
+      </div>
+    </div>
   )
 }

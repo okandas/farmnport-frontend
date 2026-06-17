@@ -9,15 +9,16 @@ import { Package } from "lucide-react"
 import { Pagination } from "@/components/generic/pagination"
 import { Badge } from "@/components/ui/badge"
 import { queryLots } from "@/lib/query"
-import { capitalizeFirstLetter, formatDate } from "@/lib/utilities"
+import { capitalizeFirstLetter, formatDate, centsToDollars } from "@/lib/utilities"
 
 interface FarmLot {
   _id: string
   slug: string
   type: string
   form: string
-  quantity_kg: number
-  price_per_kg_cents: number
+  quantity: number
+  unit: string
+  price_per_unit_cents: number
   province: string
   city: string
   notes: string
@@ -157,7 +158,7 @@ export function Lots({ mode }: LotsProps) {
                     {lot.form && <span>State: {capitalizeFirstLetter(lot.form)}</span>}
                   </div>
                   <div className="flex items-center gap-3 flex-wrap text-sm text-muted-foreground">
-                    <span>{lot.quantity_kg.toLocaleString()} kg</span>
+                    <span>{lot.quantity.toLocaleString()} {lot.unit}</span>
                     {lot.province && (
                       <>
                         <span>·</span>
@@ -203,10 +204,10 @@ export function Lots({ mode }: LotsProps) {
 
                   <div className="flex items-center gap-3 flex-wrap text-sm text-muted-foreground">
                     <span className="font-medium text-foreground">
-                      {lot.price_per_kg_cents ? `$${(lot.price_per_kg_cents / 100).toFixed(2)}/kg` : "Negotiable"}
+                      {centsToDollars(lot.price_per_unit_cents)}/{lot.unit}
                     </span>
                     <span>·</span>
-                    <span>{lot.quantity_kg.toLocaleString()} kg</span>
+                    <span>{lot.quantity.toLocaleString()} {lot.unit}</span>
                     {lot.province && (
                       <>
                         <span>·</span>

@@ -7,7 +7,7 @@ import Link from "next/link"
 import { toast } from "sonner"
 import { use } from "react"
 
-import { getBooking, cancelBooking } from "@/lib/query"
+import { getBooking, cancelBooking, checkout } from "@/lib/query"
 
 const STATUS_STYLES: Record<string, string> = {
   pending:   "bg-yellow-100 text-yellow-800",
@@ -59,6 +59,26 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
     },
     onError: () => {
       toast.error("Failed to cancel booking. Please try again.")
+    },
+  })
+
+  const depositMutation = useMutation({
+    mutationFn: (booking: any) =>
+      checkout({
+        order_type: "booking_deposit",
+        booking_id: booking.id,
+        provider: "paynow",
+        method: "",
+        phone: (session?.user as any)?.phone ?? "",
+        email: session?.user?.email ?? "",
+        fulfillment: "",
+      }),
+    onSuccess: (res) => {
+      const url = res.data?.redirect_url
+      if (url) window.location.href = url
+    },
+    onError: () => {
+      toast.error("Failed to initiate payment. Please try again.")
     },
   })
 
@@ -139,6 +159,16 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
                   <p className="text-muted-foreground text-xs mb-0.5">Deposit</p>
                   <p className="font-bold text-orange-700">${(booking.pre_order.deposit_amount / 100).toFixed(2)}</p>
                   <p className="text-xs text-muted-foreground">{booking.pre_order.deposit_paid ? "Paid" : "Not yet paid"}</p>
+                  {!booking.pre_order.deposit_paid && booking.status !== "cancelled" && (
+                    <button
+                      onClick={() => depositMutation.mutate(booking)}
+                      disabled={depositMutation.isPending}
+                      className="mt-2 inline-flex items-center gap-1.5 bg-orange-600 hover:bg-orange-700 text-white text-xs font-medium px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
+                    >
+                      {depositMutation.isPending ? <Loader2 className="w-3 h-3 animate-spin" /> : null}
+                      Pay Deposit
+                    </button>
+                  )}
                 </div>
                 <div>
                   <p className="text-muted-foreground text-xs mb-0.5">Balance Due</p>

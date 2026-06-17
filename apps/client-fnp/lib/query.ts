@@ -219,8 +219,9 @@ export function postLot(data: {
   farm_produce_id: string
   breed_id?: string
   form: string
-  quantity_kg: number
-  price_per_kg_cents: number
+  quantity: number
+  unit: string
+  price_per_unit_cents: number
   notes?: string
   expires_at: string
 }) {
@@ -804,6 +805,7 @@ export function checkout(data: {
   collection_location_id?: string
   fulfillment_fee?: number
   order_type?: string
+  booking_id?: string
 }) {
   return api.post(`${BaseURL}/order/checkout`, data)
 }

@@ -5,7 +5,7 @@ import { LotsSidebar } from "@/components/layouts/lots-sidebar"
 import { QuickLinks } from "@/components/generic/quick-links"
 import { fetchLot } from "@/lib/serverFetch"
 import { retrieveUser } from "@/lib/actions"
-import { capitalizeFirstLetter, formatDate } from "@/lib/utilities"
+import { capitalizeFirstLetter, formatDate, centsToDollars } from "@/lib/utilities"
 import { AppURL } from "@/lib/schemas"
 
 import type { Metadata } from "next"
@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const province = lot.province ? `, ${capitalizeFirstLetter(lot.province)}` : ""
 
     const title = `${typeLabel}: ${produce}${breed}${province} | farmnport.com`
-    const description = `${typeLabel} ${produce}${breed} in Zimbabwe. ${lot.quantity_kg.toLocaleString()} kg available${lot.price_per_kg_cents ? ` at $${(lot.price_per_kg_cents / 100).toFixed(2)}/kg` : " — price negotiable"}. ${lot.notes ?? ""}`
+    const description = `${typeLabel} ${produce}${breed} in Zimbabwe. ${lot.quantity.toLocaleString()} ${lot.unit} available at ${centsToDollars(lot.price_per_unit_cents)}/${lot.unit}. ${lot.notes ?? ""}`
 
     return {
         title,
@@ -49,7 +49,6 @@ export default async function LotDetailPage({ params }: Props) {
 
     const produce = lot.farm_produce?.name ?? "Farm Produce"
     const breed = lot.breed?.name ?? null
-    const isNegotiable = !lot.price_per_kg_cents || lot.price_per_kg_cents === 0
     const isSelling = lot.type === "sell"
 
     return (
@@ -107,14 +106,14 @@ export default async function LotDetailPage({ params }: Props) {
                             <div className="rounded-xl border bg-card p-4">
                                 <p className="text-xs text-muted-foreground mb-1">Price</p>
                                 <p className="text-2xl font-bold">
-                                    {isNegotiable ? "Negotiable" : `$${(lot.price_per_kg_cents / 100).toFixed(2)}`}
+                                    {centsToDollars(lot.price_per_unit_cents)}
                                 </p>
-                                {!isNegotiable && <p className="text-xs text-muted-foreground mt-0.5">per kg</p>}
+                                <p className="text-xs text-muted-foreground mt-0.5">per {lot.unit}</p>
                             </div>
 
                             <div className="rounded-xl border bg-card p-4">
                                 <p className="text-xs text-muted-foreground mb-1">Quantity</p>
-                                <p className="text-2xl font-bold">{lot.quantity_kg.toLocaleString()}</p>
+                                <p className="text-2xl font-bold">{lot.quantity.toLocaleString()}</p>
                                 <p className="text-xs text-muted-foreground mt-0.5">kilograms</p>
                             </div>
 
@@ -128,7 +127,7 @@ export default async function LotDetailPage({ params }: Props) {
                         <div className="flex items-center gap-5 text-sm flex-wrap">
                             <div className="flex items-center gap-1.5 text-muted-foreground">
                                 <Scale className="h-3.5 w-3.5" />
-                                <span>{lot.quantity_kg.toLocaleString()} kg available</span>
+                                <span>{lot.quantity.toLocaleString()} {lot.unit} available</span>
                             </div>
                             <div className="flex items-center gap-1.5 text-muted-foreground">
                                 <Leaf className="h-3.5 w-3.5" />

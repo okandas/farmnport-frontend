@@ -109,15 +109,13 @@ export function Navigation({ user }: NavigationProps) {
         >
           Buy
         </Link>
-        {!user && (
-          <Link
-            href="/login?next=/lots/new"
-            onClick={() => sendGTMEvent({ event: 'link', value: 'PostLotNavigation' })}
-            className={`${buttonVariants({ size: "sm" })} mr-2`}
-          >
-            Post Lot
-          </Link>
-        )}
+        <Link
+          href={user ? "/lots/new" : "/login?next=/lots/new"}
+          onClick={() => sendGTMEvent({ event: 'link', value: 'ListLotNavigation' })}
+          className={`${buttonVariants({ size: "sm" })} mr-2`}
+        >
+          List a Lot
+        </Link>
         {user ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

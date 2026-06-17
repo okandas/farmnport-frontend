@@ -23,11 +23,14 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
+const LOT_UNITS = ["kg", "head", "unit", "tonne", "bag", "dozen", "litre"]
+
 interface EditLotForm {
   type: string
   form: string
-  quantity_kg: number
-  price_per_kg: number
+  quantity: number
+  unit: string
+  price_per_unit: number
   notes: string
   expires_at: string
 }
@@ -47,8 +50,9 @@ export default function EditLotPage({ params }: { params: Promise<{ slug: string
     values: lot ? {
       type: lot.type,
       form: lot.form,
-      quantity_kg: lot.quantity_kg,
-      price_per_kg: lot.price_per_kg_cents ? lot.price_per_kg_cents / 100 : 0,
+      quantity: lot.quantity,
+      unit: lot.unit ?? "kg",
+      price_per_unit: lot.price_per_unit_cents ? lot.price_per_unit_cents / 100 : 0,
       notes: lot.notes ?? "",
       expires_at: lot.expires_at ? lot.expires_at.slice(0, 10) : "",
     } : undefined,
@@ -58,8 +62,9 @@ export default function EditLotPage({ params }: { params: Promise<{ slug: string
     mutationFn: (data: EditLotForm) => updateLot(slug, {
       type: data.type,
       form: data.form,
-      quantity_kg: Number(data.quantity_kg),
-      price_per_kg_cents: Math.round(Number(data.price_per_kg) * 100),
+      quantity: Number(data.quantity),
+      unit: data.unit,
+      price_per_unit_cents: Math.round(Number(data.price_per_unit) * 100),
       notes: data.notes,
       expires_at: new Date(data.expires_at).toISOString(),
     }),
@@ -160,13 +165,41 @@ export default function EditLotPage({ params }: { params: Promise<{ slug: string
                   </div>
                 </div>
 
-                {/* Quantity */}
+                {/* Unit */}
                 <div className="px-1">
-                  <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Quantity (kg)</label>
+                  <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Unit</label>
                   <div className="mt-2">
                     <FormField
                       control={form.control}
-                      name="quantity_kg"
+                      name="unit"
+                      render={({ field }) => (
+                        <FormItem>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select unit" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {LOT_UNITS.map((u) => (
+                                <SelectItem key={u} value={u}>{u}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+
+                {/* Quantity */}
+                <div className="px-1">
+                  <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Quantity</label>
+                  <div className="mt-2">
+                    <FormField
+                      control={form.control}
+                      name="quantity"
                       render={({ field }) => (
                         <FormItem>
                           <FormControl>
@@ -181,22 +214,21 @@ export default function EditLotPage({ params }: { params: Promise<{ slug: string
 
                 {/* Price */}
                 <div className="px-1">
-                  <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Price per kg ($)</label>
+                  <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Price per unit ($)</label>
                   <div className="mt-2">
                     <FormField
                       control={form.control}
-                      name="price_per_kg"
+                      name="price_per_unit"
                       render={({ field }) => (
                         <FormItem>
                           <FormControl>
-                            <Input type="number" step="0.01" min="0" placeholder="Leave 0 for negotiable" {...field} />
+                            <Input type="number" step="0.01" min="0.01" placeholder="0.00" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
                   </div>
-                  <p className="mt-3 text-sm/6 text-gray-600 dark:text-gray-400">Leave 0 for negotiable.</p>
                 </div>
 
                 {/* Expires At */}

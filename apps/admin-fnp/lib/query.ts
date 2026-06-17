@@ -464,8 +464,9 @@ export function queryAdminLot(slug: string) {
 export function updateLot(slug: string, data: {
   type: string
   form: string
-  quantity_kg: number
-  price_per_kg_cents: number
+  quantity: number
+  unit: string
+  price_per_unit_cents: number
   notes: string
   expires_at: string
 }) {

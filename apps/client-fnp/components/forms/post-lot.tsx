@@ -13,16 +13,20 @@ import { SearchSelect } from "@/components/ui/search-select"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { queryClient as queryUserProfile, queryLotsEnabledFarmProduce, queryBreedsByFarmProduce, queryFarmProduceStates, postLot } from "@/lib/query"
 import { capitalizeFirstLetter } from "@/lib/utilities"
+
+const LOT_UNITS = ["kg", "head", "unit", "tonne", "bag", "dozen", "litre"]
 
 const Schema = z.object({
   type: z.enum(["sell", "request"], { required_error: "Select a lot type" }),
   farm_produce_id: z.string().min(1, "Select a produce"),
   breed_id: z.string().optional(),
   form: z.string().min(1, "Select a form"),
-  quantity_kg: z.coerce.number().positive("Enter a valid quantity"),
-  price_per_kg: z.coerce.number().min(0).optional(),
+  quantity: z.coerce.number().positive("Enter a valid quantity"),
+  unit: z.string().min(1, "Select a unit"),
+  price_per_unit: z.coerce.number().min(0.01, "Price is required"),
   notes: z.string().optional(),
   expires_days: z.coerce.number().min(1).max(180).default(30),
 })
@@ -50,10 +54,11 @@ export function PostLotForm() {
     formState: { errors },
   } = useForm<FormModel>({
     resolver: zodResolver(Schema),
-    defaultValues: { type: "sell", expires_days: 30 },
+    defaultValues: { type: "sell", expires_days: 30, unit: "kg" },
   })
 
   const farmProduceId = watch("farm_produce_id")
+  const unit = watch("unit")
 
   const { mutate, isPending } = useMutation({
     mutationFn: (data: FormModel) => {
@@ -64,8 +69,9 @@ export function PostLotForm() {
         farm_produce_id: data.farm_produce_id,
         breed_id: data.breed_id || undefined,
         form: data.form,
-        quantity_kg: data.quantity_kg,
-        price_per_kg_cents: Math.round((data.price_per_kg ?? 0) * 100),
+        quantity: data.quantity,
+        unit: data.unit,
+        price_per_unit_cents: Math.round(data.price_per_unit * 100),
         notes: data.notes || undefined,
         expires_at: expiresAt.toISOString(),
       })
@@ -189,7 +195,7 @@ export function PostLotForm() {
                     />
                   )}
                 />
-                <p className="mt-1.5 text-xs text-muted-foreground">Optional — buyers search by variety. The more specific you are, the faster you sell.</p>
+                <p className="mt-1.5 text-xs text-muted-foreground">Optional — buyers search by variety.</p>
               </div>
             </div>
           </div>
@@ -230,35 +236,59 @@ export function PostLotForm() {
             </div>
 
             <div className="sm:col-span-3">
-              <Label htmlFor="quantity_kg" className="text-sm font-medium">Quantity (kg)</Label>
+              <Label className="text-sm font-medium">Unit *</Label>
               <div className="mt-2">
-                <Input
-                  id="quantity_kg"
-                  type="number"
-                  step="0.1"
-                  min="0"
-                  placeholder="e.g. 500"
-                  {...register("quantity_kg")}
+                <Controller
+                  name="unit"
+                  control={control}
+                  render={({ field }) => (
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select unit" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {LOT_UNITS.map((u) => (
+                          <SelectItem key={u} value={u}>{capitalizeFirstLetter(u)}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
                 />
-                {errors.quantity_kg && <p className="mt-1.5 text-xs text-destructive">{errors.quantity_kg.message}</p>}
+                {errors.unit && <p className="mt-1.5 text-xs text-destructive">{errors.unit.message}</p>}
               </div>
             </div>
 
             <div className="sm:col-span-3">
-              <Label htmlFor="price_per_kg" className="text-sm font-medium">
-                Price per kg <span className="text-muted-foreground font-normal">(leave blank if negotiable)</span>
+              <Label htmlFor="quantity" className="text-sm font-medium">Quantity ({unit || "unit"}) *</Label>
+              <div className="mt-2">
+                <Input
+                  id="quantity"
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  placeholder="e.g. 500"
+                  {...register("quantity")}
+                />
+                {errors.quantity && <p className="mt-1.5 text-xs text-destructive">{errors.quantity.message}</p>}
+              </div>
+            </div>
+
+            <div className="sm:col-span-3">
+              <Label htmlFor="price_per_unit" className="text-sm font-medium">
+                Price per {unit || "unit"} *
               </Label>
               <div className="mt-2 relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">$</span>
                 <Input
-                  id="price_per_kg"
+                  id="price_per_unit"
                   type="number"
                   step="0.01"
-                  min="0"
+                  min="0.01"
                   placeholder="0.00"
                   className="pl-7"
-                  {...register("price_per_kg")}
+                  {...register("price_per_unit")}
                 />
+                {errors.price_per_unit && <p className="mt-1.5 text-xs text-destructive">{errors.price_per_unit.message}</p>}
               </div>
             </div>
 
