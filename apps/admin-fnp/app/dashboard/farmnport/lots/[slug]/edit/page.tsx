@@ -284,7 +284,7 @@ function EditForm({ lot, slug }: { lot: any; slug: string }) {
 
             {/* Read-only info */}
             <div className="border-b border-gray-900/10 pb-12 dark:border-white/10">
-              <div className="grid grid-cols-1 gap-x-8 gap-y-10 md:grid-cols-3">
+              <div className="grid grid-cols-1 gap-x-8 gap-y-10 md:grid-cols-3 pr-4 md:pr-8">
                 <div>
                   <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">Lot Info</h2>
                   <p className="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">Submitted details.</p>
@@ -369,7 +369,7 @@ function EditForm({ lot, slug }: { lot: any; slug: string }) {
 
             {/* Lot Details */}
             <div className="border-b border-gray-900/10 pb-12 dark:border-white/10">
-              <div className="grid grid-cols-1 gap-x-8 gap-y-10 md:grid-cols-3">
+              <div className="grid grid-cols-1 gap-x-8 gap-y-10 md:grid-cols-3 pr-4 md:pr-8">
                 <div>
                   <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">Lot Details</h2>
                   <p className="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">

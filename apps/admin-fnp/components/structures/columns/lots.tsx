@@ -50,7 +50,10 @@ export const lotColumns: ColumnDef<any>[] = [
     accessorKey: "type",
     header: "Type",
     cell: ({ row }) => (
-      <span className="capitalize">{row.original.type === "sell" ? "Selling" : "Buying"}</span>
+      <span>{row.original.type === "sell"
+        ? <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">Selling</span>
+        : <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400">Buying</span>
+      }</span>
     ),
   },
   {

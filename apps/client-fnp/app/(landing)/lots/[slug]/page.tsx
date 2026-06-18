@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { Scale, Calendar, Leaf } from "lucide-react"
+import { Calendar } from "lucide-react"
 import { LotsSidebar } from "@/components/layouts/lots-sidebar"
 import { QuickLinks } from "@/components/generic/quick-links"
 import { fetchLot } from "@/lib/serverFetch"
@@ -119,20 +119,19 @@ export default async function LotDetailPage({ params }: Props) {
 
                         {/* Meta row */}
                         <div className="flex items-center gap-5 text-sm flex-wrap">
-                            <div className="flex items-center gap-1.5 text-muted-foreground">
-                                <Scale className="h-3.5 w-3.5" />
-                                <span>{lot.quantity.toLocaleString()} {lot.unit} available</span>
-                            </div>
-                            <div className="flex items-center gap-1.5 text-muted-foreground">
-                                <Leaf className="h-3.5 w-3.5" />
-                                <span className="capitalize">{lot.form}</span>
-                            </div>
-                            {lot.expires_at && (
-                                <div className="flex items-center gap-1.5 text-muted-foreground">
-                                    <Calendar className="h-3.5 w-3.5" />
-                                    <span>Expires {formatDate(lot.expires_at)}</span>
-                                </div>
-                            )}
+                            {lot.expires_at && (() => {
+                                const days = Math.ceil((new Date(lot.expires_at).getTime() - Date.now()) / 86400000)
+                                const expired = days <= 0
+                                const urgent = days <= 5 && days > 0
+                                const color = expired ? "text-red-600" : urgent ? "text-red-500" : "text-green-600"
+                                const label = expired ? "Expired" : days === 1 ? "Expires in 1 day" : `Expires in ${days} days`
+                                return (
+                                    <div className={`flex items-center gap-1.5 ${color}`}>
+                                        <Calendar className="h-3.5 w-3.5" />
+                                        <span>{label} · {formatDate(lot.expires_at)}</span>
+                                    </div>
+                                )
+                            })()}
                         </div>
 
                         {/* Notes */}

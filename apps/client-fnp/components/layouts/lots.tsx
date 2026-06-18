@@ -145,9 +145,10 @@ export function Lots({ mode }: LotsProps) {
                     <span className="text-base font-semibold text-foreground">
                       {lot.farm_produce?.name ?? "Produce"}
                     </span>
-                    <Badge variant={lot.type === "sell" ? "default" : "secondary"} className="text-xs capitalize">
-                      {lot.type === "sell" ? "Selling" : "Buying"}
-                    </Badge>
+                    {lot.type === "sell"
+                      ? <Badge className="text-xs capitalize rounded-md bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-100 hover:text-orange-700">Selling</Badge>
+                      : <Badge className="text-xs capitalize rounded-md bg-green-50 text-green-700 border-green-200 hover:bg-green-100 hover:text-green-700">Buying</Badge>
+                    }
                     <Badge variant="outline" className="text-xs text-amber-700 border-amber-300 bg-amber-50">
                       Pending
                     </Badge>
@@ -191,9 +192,10 @@ export function Lots({ mode }: LotsProps) {
                     <span className="text-base font-semibold text-foreground">
                       {lot.farm_produce?.name ?? "Produce"}
                     </span>
-                    <Badge variant={lot.type === "sell" ? "default" : "secondary"} className="text-xs capitalize">
-                      {lot.type === "sell" ? "Selling" : "Buying"}
-                    </Badge>
+                    {lot.type === "sell"
+                      ? <Badge className="text-xs capitalize rounded-md bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-100 hover:text-orange-700">Selling</Badge>
+                      : <Badge className="text-xs capitalize rounded-md bg-green-50 text-green-700 border-green-200 hover:bg-green-100 hover:text-green-700">Buying</Badge>
+                    }
                   </div>
 
                   <div className="flex items-center gap-3 flex-wrap text-sm text-muted-foreground">
