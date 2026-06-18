@@ -81,17 +81,12 @@ export default async function LotDetailPage({ params }: Props) {
                                     <span className={`inline-flex items-center rounded-md px-2.5 py-0.5 text-xs font-semibold ${isSelling ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"}`}>
                                         {isSelling ? "Selling" : "Buying"}
                                     </span>
-                                    {breed && (
-                                        <span className="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
-                                            {breed}
-                                        </span>
-                                    )}
                                 </div>
                                 <p className="text-xs text-muted-foreground">Listed {formatDate(lot.created)}</p>
                             </div>
-                            <h1 className="text-3xl font-bold tracking-tight">{produce}</h1>
+                            <h1 className="text-3xl font-bold tracking-tight">{breed ?? produce}</h1>
                             {breed && (
-                                <p className="text-sm text-muted-foreground mt-1">Variety — {breed}</p>
+                                <p className="text-sm text-muted-foreground mt-1">{produce}</p>
                             )}
                             {(lot.city || lot.province) && (
                                 <p className="text-sm text-muted-foreground mt-0.5 capitalize">
@@ -105,16 +100,15 @@ export default async function LotDetailPage({ params }: Props) {
                         <div className="grid grid-cols-3 gap-3">
                             <div className="rounded-xl border bg-card p-4">
                                 <p className="text-xs text-muted-foreground mb-1">Price</p>
-                                <p className="text-2xl font-bold">
+                                <p className="text-5xl font-bold">
                                     {centsToDollars(lot.price_per_unit_cents)}
                                 </p>
-                                <p className="text-xs text-muted-foreground mt-0.5">per {lot.unit}</p>
                             </div>
 
                             <div className="rounded-xl border bg-card p-4">
                                 <p className="text-xs text-muted-foreground mb-1">Quantity</p>
                                 <p className="text-2xl font-bold">{lot.quantity.toLocaleString()}</p>
-                                <p className="text-xs text-muted-foreground mt-0.5">kilograms</p>
+                                <p className="text-xs text-muted-foreground mt-0.5">{capitalizeFirstLetter(lot.unit)}</p>
                             </div>
 
                             <div className="rounded-xl border bg-card p-4">
