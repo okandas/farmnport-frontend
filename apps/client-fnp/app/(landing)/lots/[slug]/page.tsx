@@ -1,9 +1,10 @@
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { Calendar } from "lucide-react"
-import { LotsSidebar } from "@/components/layouts/lots-sidebar"
 import { QuickLinks } from "@/components/generic/quick-links"
-import { fetchLot } from "@/lib/serverFetch"
+import { PlaceBidForm } from "@/components/forms/place-bid"
+import { LotBidsPanel } from "@/components/layouts/lot-bids-panel"
+import { fetchLot, fetchLotBids } from "@/lib/serverFetch"
 import { retrieveUser } from "@/lib/actions"
 import { capitalizeFirstLetter, formatDate, centsToDollars } from "@/lib/utilities"
 import { AppURL } from "@/lib/schemas"
@@ -43,7 +44,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function LotDetailPage({ params }: Props) {
     const { slug } = await params
-    const [lot, user] = await Promise.all([fetchLot(slug), retrieveUser()])
+    const [lot, user, bidsData] = await Promise.all([fetchLot(slug), retrieveUser(), fetchLotBids(slug)])
 
     if (!lot) notFound()
 
@@ -68,90 +69,120 @@ export default async function LotDetailPage({ params }: Props) {
             <div className="mx-auto max-w-7xl px-6 lg:px-8 min-h-[70lvh] py-8">
                 <div className="lg:flex lg:space-x-10">
 
-                    <div className="hidden lg:block lg:w-44 relative">
-                        <LotsSidebar />
-                    </div>
+                    {/* Main — two column split */}
+                    <div className="flex-1 min-w-0">
+                        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
 
-                    <div className="flex-1 min-w-0 space-y-5">
+                            {/* LEFT — lot details */}
+                            <div className="lg:col-span-3 space-y-5">
 
-                        {/* Hero */}
-                        <div>
-                            <div className="flex items-center justify-between mb-2">
-                                <div className="flex items-center gap-2">
-                                    <span className={`inline-flex items-center rounded-md px-2.5 py-0.5 text-xs font-semibold ${isSelling ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"}`}>
-                                        {isSelling ? "Selling" : "Buying"}
-                                    </span>
-                                </div>
-                                <p className="text-xs text-muted-foreground">Listed {formatDate(lot.created)}</p>
-                            </div>
-                            <h1 className="text-3xl font-bold tracking-tight">{breed ?? produce}</h1>
-                            {breed && (
-                                <p className="text-sm text-muted-foreground mt-1">{produce}</p>
-                            )}
-                            {(lot.city || lot.province) && (
-                                <p className="text-sm text-muted-foreground mt-0.5 capitalize">
-                                    {lot.city ? `${capitalizeFirstLetter(lot.city)}, ` : ""}
-                                    {capitalizeFirstLetter(lot.province)}
-                                </p>
-                            )}
-                        </div>
-
-                        {/* Key stats */}
-                        <div className="grid grid-cols-3 gap-3">
-                            <div className="rounded-xl border bg-card p-4">
-                                <p className="text-xs text-muted-foreground mb-1">Price</p>
-                                <p className="text-5xl font-bold">
-                                    {centsToDollars(lot.price_per_unit_cents)}
-                                </p>
-                            </div>
-
-                            <div className="rounded-xl border bg-card p-4">
-                                <p className="text-xs text-muted-foreground mb-1">Quantity</p>
-                                <p className="text-2xl font-bold">{lot.quantity.toLocaleString()}</p>
-                                <p className="text-xs text-muted-foreground mt-0.5">{capitalizeFirstLetter(lot.unit)}</p>
-                            </div>
-
-                            <div className="rounded-xl border bg-card p-4">
-                                <p className="text-xs text-muted-foreground mb-1">State</p>
-                                <p className="text-2xl font-bold">{capitalizeFirstLetter(lot.form)}</p>
-                            </div>
-                        </div>
-
-                        {/* Meta row */}
-                        <div className="flex items-center gap-5 text-sm flex-wrap">
-                            {lot.expires_at && (() => {
-                                const days = Math.ceil((new Date(lot.expires_at).getTime() - Date.now()) / 86400000)
-                                const expired = days <= 0
-                                const urgent = days <= 5 && days > 0
-                                const color = expired ? "text-red-600" : urgent ? "text-red-500" : "text-green-600"
-                                const label = expired ? "Expired" : days === 1 ? "Expires in 1 day" : `Expires in ${days} days`
-                                return (
-                                    <div className={`flex items-center gap-1.5 ${color}`}>
-                                        <Calendar className="h-3.5 w-3.5" />
-                                        <span>{label} · {formatDate(lot.expires_at)}</span>
+                                <div>
+                                    <div className="flex items-center justify-between mb-2">
+                                        <span className={`inline-flex items-center rounded-md px-2.5 py-0.5 text-xs font-semibold border ${isSelling ? "bg-orange-50 text-orange-700 border-orange-200" : "bg-green-50 text-green-700 border-green-200"}`}>
+                                            {isSelling ? "Selling" : "Buying"}
+                                        </span>
+                                        <p className="text-xs text-muted-foreground">Listed {formatDate(lot.created)}</p>
                                     </div>
-                                )
-                            })()}
-                        </div>
+                                    <div className="flex items-start justify-between gap-4">
+                                        <h1 className="text-3xl font-bold tracking-tight">{breed ?? produce}</h1>
+                                        <div className="text-right shrink-0">
+                                            <p className="text-xs font-mono font-semibold text-foreground">Lot #{slug.split("-").pop()}</p>
+                                            <p className="text-xs text-muted-foreground mt-0.5">{produce}{breed ? ` — ${breed}` : ""}</p>
+                                        </div>
+                                    </div>
+                                    {(lot.city || lot.province) && (
+                                        <p className="text-sm text-muted-foreground mt-0.5 capitalize">
+                                            {lot.city ? `${capitalizeFirstLetter(lot.city)}, ` : ""}
+                                            {capitalizeFirstLetter(lot.province)}
+                                        </p>
+                                    )}
+                                </div>
 
-                        {/* Notes */}
-                        {lot.notes && (
-                            <div className="rounded-xl border bg-card p-5">
-                                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">Notes from seller</p>
-                                <p className="text-sm leading-relaxed">{lot.notes}</p>
+                                <div className="grid grid-cols-3 gap-3">
+                                    <div className="rounded-xl border bg-card p-4">
+                                        <p className="text-xs text-muted-foreground mb-1">Listed price</p>
+                                        <p className="text-2xl font-bold">{centsToDollars(lot.price_per_unit_cents)}</p>
+                                        <p className="text-xs text-muted-foreground mt-0.5">per {lot.unit}</p>
+                                    </div>
+                                    <div className="rounded-xl border bg-card p-4">
+                                        <p className="text-xs text-muted-foreground mb-1">Quantity</p>
+                                        <p className="text-2xl font-bold">{lot.quantity.toLocaleString()}</p>
+                                        <p className="text-xs text-muted-foreground mt-0.5">{capitalizeFirstLetter(lot.unit)}</p>
+                                    </div>
+                                    <div className="rounded-xl border bg-card p-4">
+                                        <p className="text-xs text-muted-foreground mb-1">State</p>
+                                        <p className="text-2xl font-bold">{capitalizeFirstLetter(lot.form)}</p>
+                                    </div>
+                                </div>
+
+                                {lot.expires_at && (() => {
+                                    const days = Math.ceil((new Date(lot.expires_at).getTime() - Date.now()) / 86400000)
+                                    const expired = days <= 0
+                                    const urgent = days <= 5 && days > 0
+                                    const color = expired ? "text-red-600" : urgent ? "text-red-500" : "text-green-600"
+                                    const label = expired ? "Expired" : days === 1 ? "Expires in 1 day" : `Expires in ${days} days`
+                                    return (
+                                        <div className={`flex items-center gap-1.5 text-sm ${color}`}>
+                                            <Calendar className="h-3.5 w-3.5" />
+                                            <span>{label} · {formatDate(lot.expires_at)}</span>
+                                        </div>
+                                    )
+                                })()}
+
+                                {lot.notes && (
+                                    <div className="rounded-xl border bg-card p-5">
+                                        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
+                                            Notes from {isSelling ? "seller" : "buyer"}
+                                        </p>
+                                        <p className="text-sm leading-relaxed">{lot.notes}</p>
+                                    </div>
+                                )}
+
+                                {/* Bid activity */}
+                                <div>
+                                    <p className="text-sm font-semibold mb-3">Offers</p>
+                                    <LotBidsPanel
+                                        total={bidsData?.total ?? 0}
+                                        bids={bidsData?.bids ?? []}
+                                        top_bid={bidsData?.top_bid ?? null}
+                                        accepted={bidsData?.accepted ?? null}
+                                        lotUnit={lot.unit}
+                                    />
+                                </div>
+
                             </div>
-                        )}
 
-                        {/* CTA */}
-                        {!user && (
-                            <Link
-                                href={`/login?next=/lots/${slug}`}
-                                className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors"
-                            >
-                                Enquire about this lot →
-                            </Link>
-                        )}
+                            {/* RIGHT — bid panel */}
+                            <div className="lg:col-span-2">
+                                <div className="lg:sticky lg:top-24 rounded-xl border bg-card p-6">
+                                    {user ? (
+                                        <PlaceBidForm lot={lot} />
+                                    ) : (
+                                        <div className="text-center space-y-4">
+                                            <div className="space-y-1">
+                                                <p className="text-base font-semibold">Interested in this lot?</p>
+                                                <p className="text-sm text-muted-foreground">
+                                                    Sign in to place an offer directly with the {isSelling ? "seller" : "buyer"}.
+                                                </p>
+                                            </div>
+                                            <Link
+                                                href={`/login?next=/lots/${slug}`}
+                                                className="inline-flex items-center justify-center w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
+                                            >
+                                                Sign in to place an offer
+                                            </Link>
+                                            <Link
+                                                href={`/signup?next=/lots/${slug}`}
+                                                className="inline-flex items-center justify-center w-full rounded-lg border px-4 py-2.5 text-sm font-semibold hover:bg-muted transition-colors"
+                                            >
+                                                Create a free account
+                                            </Link>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
 
+                        </div>
                     </div>
 
                     <div className="hidden lg:block lg:w-44 shrink-0">

@@ -31,6 +31,14 @@ export async function fetchLot(slug: string) {
   }
 }
 
+export async function fetchLotBids(slug: string) {
+  try {
+    return await serverFetch(`/lots/${slug}/bids`)
+  } catch {
+    return null
+  }
+}
+
 export async function fetchLatestBuyerPrices(clientSlug: string) {
   try {
     const dates = await serverFetch(`/prices/series/client/dates?client_slug=${clientSlug}&p=1&limit=1`)

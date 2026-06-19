@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -16,6 +17,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { queryClient as queryUserProfile, queryLotsEnabledFarmProduce, queryBreedsByFarmProduce, queryFarmProduceStates, postLot } from "@/lib/query"
 import { capitalizeFirstLetter } from "@/lib/utilities"
+import { LotImageUpload } from "@/components/forms/lot-image-upload"
 
 const LOT_UNITS = ["kg", "head", "unit", "tonne", "bag", "dozen", "litre"]
 
@@ -35,6 +37,7 @@ type FormModel = z.infer<typeof Schema>
 
 export function PostLotForm() {
   const router = useRouter()
+  const [createdLotId, setCreatedLotId] = useState<string | null>(null)
   const { data: session } = useSession()
   const user = session?.user as any
 
@@ -76,9 +79,14 @@ export function PostLotForm() {
         expires_at: expiresAt.toISOString(),
       })
     },
-    onSuccess: () => {
+    onSuccess: (res: any) => {
       toast.success("Lot submitted for review. We'll notify you once it's approved.")
-      router.push("/lots")
+      const lotId = res?.data?.id
+      if (lotId) {
+        setCreatedLotId(lotId)
+      } else {
+        router.push("/lots")
+      }
     },
     onError: () => {
       toast.error("Failed to submit lot. Please try again.")
@@ -88,6 +96,30 @@ export function PostLotForm() {
   const locationDisplay = profile
     ? [profile.city, profile.province].filter(Boolean).map(capitalizeFirstLetter).join(", ")
     : null
+
+  if (createdLotId) {
+    return (
+      <div className="space-y-8">
+        <div>
+          <h2 className="text-base font-semibold text-foreground">Add Photos</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Add photos to help buyers see your lot. You can skip this and add photos later.
+          </p>
+        </div>
+        <LotImageUpload lotId={createdLotId} />
+        <div className="flex items-center justify-end gap-4 pt-4 border-t border-border">
+          <button
+            type="button"
+            onClick={() => router.push("/lots")}
+            className="text-sm font-semibold text-muted-foreground hover:text-foreground"
+          >
+            Skip
+          </button>
+          <Button onClick={() => router.push("/lots")}>Done</Button>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <form onSubmit={handleSubmit((d) => mutate(d))}>
@@ -366,3 +398,4 @@ export function PostLotForm() {
     </form>
   )
 }
+

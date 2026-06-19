@@ -238,6 +238,31 @@ export function queryLots({ p, type, farm_produce_id, pending }: { p: number; ty
   return api.get(`${BaseURL}/lots/${qs ? `?${qs}` : ""}`)
 }
 
+export function placeBid(lotSlug: string, data: {
+  quantity: number
+  offered_price_per_unit_cents: number
+  notes?: string
+  delivery_location?: string
+}) {
+  return api.post(`${BaseURL}/lots/${lotSlug}/bids`, data)
+}
+
+export function queryMyBids({ p }: { p: number }) {
+  return api.get(`${BaseURL}/bids/mine?p=${p}`)
+}
+
+export function respondToBid(bidId: string, data: { action: "accept" | "reject"; notes?: string }) {
+  return api.patch(`${BaseURL}/bids/${bidId}/respond`, data)
+}
+
+export function uploadImages(data: FormData) {
+  return api.post(`${BaseURL}/user/image/uploads`, data)
+}
+
+export function removeImage(data: { img: { id: string; src: string; entity_id: string } }) {
+  return api.post(`${BaseURL}/user/image/remove`, data)
+}
+
 export function queryAllFarmProduceUnpaginated() {
   const url = `${BaseURL}/farmproduce/all`
   return api.get(url)
