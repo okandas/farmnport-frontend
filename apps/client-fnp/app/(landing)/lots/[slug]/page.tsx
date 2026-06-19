@@ -4,7 +4,7 @@ import { Calendar } from "lucide-react"
 import { QuickLinks } from "@/components/generic/quick-links"
 import { PlaceBidForm } from "@/components/forms/place-bid"
 import { LotBidsPanel } from "@/components/layouts/lot-bids-panel"
-import { fetchLot, fetchLotBids } from "@/lib/serverFetch"
+import { fetchLot, fetchLotBids, fetchMyBidOnLot } from "@/lib/serverFetch"
 import { retrieveUser } from "@/lib/actions"
 import { capitalizeFirstLetter, formatDate, centsToDollars } from "@/lib/utilities"
 import { AppURL } from "@/lib/schemas"
@@ -44,7 +44,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function LotDetailPage({ params }: Props) {
     const { slug } = await params
-    const [lot, user, bidsData] = await Promise.all([fetchLot(slug), retrieveUser(), fetchLotBids(slug)])
+    const [lot, user, bidsData, myBidData] = await Promise.all([fetchLot(slug), retrieveUser(), fetchLotBids(slug), fetchMyBidOnLot(slug)])
 
     if (!lot) notFound()
 
@@ -140,13 +140,12 @@ export default async function LotDetailPage({ params }: Props) {
 
                                 {/* Bid activity */}
                                 <div>
-                                    <p className="text-sm font-semibold mb-3">Offers</p>
                                     <LotBidsPanel
                                         total={bidsData?.total ?? 0}
                                         bids={bidsData?.bids ?? []}
                                         top_bid={bidsData?.top_bid ?? null}
                                         accepted={bidsData?.accepted ?? null}
-                                        lotUnit={lot.unit}
+                                        myBidId={(myBidData as any)?.id}
                                     />
                                 </div>
 
@@ -155,8 +154,13 @@ export default async function LotDetailPage({ params }: Props) {
                             {/* RIGHT — bid panel */}
                             <div className="lg:col-span-2">
                                 <div className="lg:sticky lg:top-24 rounded-xl border bg-card p-6">
-                                    {user ? (
-                                        <PlaceBidForm lot={lot} />
+                                    {user && (user as any).id === lot.client_id ? (
+                                        <div className="text-center space-y-2 py-2">
+                                            <p className="text-sm font-semibold text-foreground">This is your lot</p>
+                                            <p className="text-xs text-muted-foreground">You cannot place an offer on your own listing.</p>
+                                        </div>
+                                    ) : user ? (
+                                        <PlaceBidForm lot={lot} topBidCents={bidsData?.top_bid?.offered_price_per_unit_cents} />
                                     ) : (
                                         <div className="text-center space-y-4">
                                             <div className="space-y-1">

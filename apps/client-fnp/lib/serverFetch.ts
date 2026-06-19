@@ -33,7 +33,15 @@ export async function fetchLot(slug: string) {
 
 export async function fetchLotBids(slug: string) {
   try {
-    return await serverFetch(`/lots/${slug}/bids`)
+    return await serverFetch(`/bids/${slug}`)
+  } catch {
+    return null
+  }
+}
+
+export async function fetchMyBidOnLot(slug: string) {
+  try {
+    return await serverFetch(`/bids/mine/lot/${slug}`)
   } catch {
     return null
   }

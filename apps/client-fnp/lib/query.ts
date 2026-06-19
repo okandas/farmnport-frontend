@@ -244,11 +244,15 @@ export function placeBid(lotSlug: string, data: {
   notes?: string
   delivery_location?: string
 }) {
-  return api.post(`${BaseURL}/lots/${lotSlug}/bids`, data)
+  return api.post(`${BaseURL}/bids/${lotSlug}`, data)
 }
 
 export function queryMyBids({ p }: { p: number }) {
   return api.get(`${BaseURL}/bids/mine?p=${p}`)
+}
+
+export function queryMyBidOnLot(slug: string) {
+  return api.get(`${BaseURL}/bids/mine/lot/${slug}`)
 }
 
 export function respondToBid(bidId: string, data: { action: "accept" | "reject"; notes?: string }) {
