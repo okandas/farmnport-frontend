@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { Calendar } from "lucide-react"
 import { LotImageGallery } from "@/components/ui/lot-image-gallery"
+import { LotCountdown } from "@/components/ui/lot-countdown"
 import { QuickLinks } from "@/components/generic/quick-links"
 import { PlaceBidForm } from "@/components/forms/place-bid"
 import { LotBidsPanel } from "@/components/layouts/lot-bids-panel"
@@ -118,19 +118,9 @@ export default async function LotDetailPage({ params }: Props) {
                                     </div>
                                 </div>
 
-                                {lot.expires_at && (() => {
-                                    const days = Math.ceil((new Date(lot.expires_at).getTime() - Date.now()) / 86400000)
-                                    const expired = days <= 0
-                                    const urgent = days <= 5 && days > 0
-                                    const color = expired ? "text-red-600" : urgent ? "text-red-500" : "text-green-600"
-                                    const label = expired ? "Expired" : days === 1 ? "Expires in 1 day" : `Expires in ${days} days`
-                                    return (
-                                        <div className={`flex items-center gap-1.5 text-sm ${color}`}>
-                                            <Calendar className="h-3.5 w-3.5" />
-                                            <span>{label} · {formatDate(lot.expires_at)}</span>
-                                        </div>
-                                    )
-                                })()}
+                                {lot.expires_at && (
+                                    <LotCountdown expiresAt={lot.expires_at} formattedDate={formatDate(lot.expires_at)} />
+                                )}
 
                                 {lot.notes && (
                                     <div className="rounded-xl border bg-card p-5">
