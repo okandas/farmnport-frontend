@@ -13,7 +13,9 @@ import { cn } from "@/lib/utilities"
 import { buttonVariants } from "@/components/ui/button"
 import { Icons } from "@/components/icons/lucide"
 import { toast } from "@/components/ui/use-toast"
-import { handleApiError } from "@/lib/error-handler"
+import { handleApiError ,
+  handleFormErrors
+} from "@/lib/error-handler"
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -115,7 +117,7 @@ export default function EditBreedPage() {
             </div>
 
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)}>
+                <form onSubmit={form.handleSubmit(onSubmit, handleFormErrors)}>
                     <div className="space-y-12">
                         <div className="border-b border-gray-900/10 pb-12 dark:border-white/10">
                             <div className="grid grid-cols-1 gap-x-8 gap-y-10 md:grid-cols-3">

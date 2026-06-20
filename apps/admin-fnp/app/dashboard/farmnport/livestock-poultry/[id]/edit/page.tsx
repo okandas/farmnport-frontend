@@ -13,7 +13,9 @@ import { cn } from "@/lib/utilities"
 import { buttonVariants } from "@/components/ui/button"
 import { Icons } from "@/components/icons/lucide"
 import { toast } from "@/components/ui/use-toast"
-import { handleApiError } from "@/lib/error-handler"
+import { handleApiError ,
+  handleFormErrors
+} from "@/lib/error-handler"
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -214,7 +216,7 @@ function EditForm({ product }: { product: any }) {
             </div>
 
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(handleSubmit)}>
+                <form onSubmit={form.handleSubmit(handleSubmit, handleFormErrors)}>
                     <input type="hidden" {...form.register("id")} />
                     <div className="space-y-12">
 
