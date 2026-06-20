@@ -23,6 +23,8 @@ import {
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { FileInput } from "@/components/structures/controls/file-input"
+import { ImageModel } from "@/lib/schemas"
 
 const LOT_UNITS = ["kg", "head", "unit", "tonne", "bag", "dozen", "litre"]
 
@@ -282,6 +284,36 @@ function EditForm({ lot, slug }: { lot: any; slug: string }) {
         <form onSubmit={form.handleSubmit((data) => save(data))}>
           <div className="space-y-12">
 
+            {/* Photos */}
+            <div className="border-b border-gray-900/10 pb-12 dark:border-white/10">
+              <div className="grid grid-cols-1 gap-x-8 gap-y-10 md:grid-cols-3 pr-4 md:pr-8">
+                <div>
+                  <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">Photos</h2>
+                  <p className="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">Main photo and up to 5 additional images.</p>
+                </div>
+                <div className="md:col-span-2 space-y-6">
+                  <div>
+                    <label className="block text-sm/6 font-medium text-gray-900 dark:text-white mb-2">Main photo</label>
+                    <FileInput id={lot.id} fieldName="main_image" entityType="lot" value={lot.main_image ? [lot.main_image as ImageModel] : []} onChange={() => {}} maxImages={1} />
+                  </div>
+                  <div>
+                    <label className="block text-sm/6 font-medium text-gray-900 dark:text-white mb-2">Additional photos <span className="text-gray-400 font-normal">(up to 5)</span></label>
+                    <FileInput
+                      id={lot.id}
+                      fieldName="images"
+                      entityType="lot"
+                      value={(lot.images as ImageModel[]) ?? []}
+                      onChange={() => {}}
+                      maxImages={5}
+                      showPlaceholders
+                      thumbnailClassName="inline-flex flex-col overflow-hidden border border-gray-200 rounded-lg mt-2 me-2 relative bg-white shadow-sm"
+                      imageClassName="flex items-center justify-center w-32 h-32 overflow-hidden bg-gray-50"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Read-only info */}
             <div className="border-b border-gray-900/10 pb-12 dark:border-white/10">
               <div className="grid grid-cols-1 gap-x-8 gap-y-10 md:grid-cols-3 pr-4 md:pr-8">
@@ -306,7 +338,7 @@ function EditForm({ lot, slug }: { lot: any; slug: string }) {
                                   value={field.value || ""}
                                   onValueChange={field.onChange}
                                   getValue={(u) => u.id}
-                                  getLabel={(u) => u.name}
+                                  getLabel={(u) => u.username}
                                   placeholder="—"
                                   searchPlaceholder="Search clients..."
                                   clearable

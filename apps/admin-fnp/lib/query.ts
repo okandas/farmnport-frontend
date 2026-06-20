@@ -476,6 +476,8 @@ export function adminCreateLot(data: {
   price_per_unit_cents: number
   notes?: string
   expires_at: string
+  main_image?: ImageModel
+  images?: ImageModel[]
 }) {
   return api.post(`${baseUrl}/lots/admin/create`, data)
 }

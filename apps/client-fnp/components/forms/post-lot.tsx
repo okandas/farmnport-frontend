@@ -17,7 +17,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { queryClient as queryUserProfile, queryLotsEnabledFarmProduce, queryBreedsByFarmProduce, queryFarmProduceStates, postLot } from "@/lib/query"
 import { capitalizeFirstLetter } from "@/lib/utilities"
-import { LotImageUpload } from "@/components/forms/lot-image-upload"
+import { ImageUpload } from "@/components/ui/image-upload"
 
 const LOT_UNITS = ["kg", "head", "unit", "tonne", "bag", "dozen", "litre"]
 
@@ -37,9 +37,11 @@ type FormModel = z.infer<typeof Schema>
 
 export function PostLotForm() {
   const router = useRouter()
-  const [createdLotId, setCreatedLotId] = useState<string | null>(null)
   const { data: session } = useSession()
   const user = session?.user as any
+
+  const [mainImage, setMainImage] = useState<{ img: { id: string; src: string } } | null>(null)
+  const [extraImages, setExtraImages] = useState<{ img: { id: string; src: string } }[]>([])
 
   const { data: profileData } = useQuery({
     queryKey: ["my-profile", user?.username],
@@ -77,16 +79,13 @@ export function PostLotForm() {
         price_per_unit_cents: Math.round(data.price_per_unit * 100),
         notes: data.notes || undefined,
         expires_at: expiresAt.toISOString(),
+        main_image: mainImage ?? undefined,
+        images: extraImages.length > 0 ? extraImages : undefined,
       })
     },
-    onSuccess: (res: any) => {
+    onSuccess: () => {
       toast.success("Lot submitted for review. We'll notify you once it's approved.")
-      const lotId = res?.data?.id
-      if (lotId) {
-        setCreatedLotId(lotId)
-      } else {
-        router.push("/lots")
-      }
+      router.push("/lots")
     },
     onError: () => {
       toast.error("Failed to submit lot. Please try again.")
@@ -97,35 +96,27 @@ export function PostLotForm() {
     ? [profile.city, profile.province].filter(Boolean).map(capitalizeFirstLetter).join(", ")
     : null
 
-  if (createdLotId) {
-    return (
-      <div className="space-y-8">
-        <div>
-          <h2 className="text-base font-semibold text-foreground">Add Photos</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Add photos to help buyers see your lot. You can skip this and add photos later.
-          </p>
-        </div>
-        <LotImageUpload lotId={createdLotId} />
-        <div className="flex items-center justify-end gap-4 pt-4 border-t border-border">
-          <button
-            type="button"
-            onClick={() => router.push("/lots")}
-            className="text-sm font-semibold text-muted-foreground hover:text-foreground"
-          >
-            Skip
-          </button>
-          <Button onClick={() => router.push("/lots")}>Done</Button>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <form onSubmit={handleSubmit((d) => mutate(d))}>
       <div className="space-y-12">
 
-        {/* Section 1: Lot Type */}
+        {/* Section 1: Photos */}
+        <div className="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-border pb-12 md:grid-cols-3">
+          <div>
+            <h2 className="text-base font-semibold text-foreground">Photos</h2>
+            <p className="mt-1 text-sm text-muted-foreground">Main photo and up to 5 additional images.</p>
+          </div>
+          <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 md:col-span-2">
+            <div className="col-span-full">
+              <ImageUpload
+                onMainImageChange={setMainImage}
+                onImagesChange={setExtraImages}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Section 2: Lot Type */}
         <div className="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-border pb-12 md:grid-cols-3">
           <div>
             <h2 className="text-base font-semibold text-foreground">Lot Type</h2>
@@ -171,7 +162,7 @@ export function PostLotForm() {
           </div>
         </div>
 
-        {/* Section 2: Produce */}
+        {/* Section 3: Produce */}
         <div className="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-border pb-12 md:grid-cols-3">
           <div>
             <h2 className="text-base font-semibold text-foreground">Produce</h2>
@@ -233,7 +224,7 @@ export function PostLotForm() {
           </div>
         </div>
 
-        {/* Section 3: Lot Details */}
+        {/* Section 4: Lot Details */}
         <div className="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-border pb-12 md:grid-cols-3">
           <div>
             <h2 className="text-base font-semibold text-foreground">Lot Details</h2>
@@ -355,7 +346,7 @@ export function PostLotForm() {
           </div>
         </div>
 
-        {/* Section 4: Location */}
+        {/* Section 5: Location */}
         <div className="grid grid-cols-1 gap-x-8 gap-y-10 pb-4 md:grid-cols-3">
           <div>
             <h2 className="text-base font-semibold text-foreground">Your Location</h2>
@@ -398,4 +389,3 @@ export function PostLotForm() {
     </form>
   )
 }
-

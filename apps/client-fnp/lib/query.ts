@@ -224,6 +224,8 @@ export function postLot(data: {
   price_per_unit_cents: number
   notes?: string
   expires_at: string
+  main_image?: { img: { id: string; src: string } }
+  images?: { img: { id: string; src: string } }[]
 }) {
   return api.post(`${BaseURL}/lots/`, data)
 }

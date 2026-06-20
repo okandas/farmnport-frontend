@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { Calendar } from "lucide-react"
+import { LotImageGallery } from "@/components/ui/lot-image-gallery"
 import { QuickLinks } from "@/components/generic/quick-links"
 import { PlaceBidForm } from "@/components/forms/place-bid"
 import { LotBidsPanel } from "@/components/layouts/lot-bids-panel"
@@ -75,6 +76,8 @@ export default async function LotDetailPage({ params }: Props) {
 
                             {/* LEFT — lot details */}
                             <div className="lg:col-span-3 space-y-5">
+
+                                <LotImageGallery mainImage={lot.main_image} images={lot.images} />
 
                                 <div>
                                     <div className="flex items-center justify-between mb-2">

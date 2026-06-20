@@ -7,6 +7,8 @@ import { useForm } from "react-hook-form"
 import { useRouter } from "next/navigation"
 
 import { adminCreateLot, queryUsers, queryFarmProduce, queryBreeds, queryFarmProduceStates } from "@/lib/query"
+import { FileInput } from "@/components/structures/controls/file-input"
+import { ImageModel } from "@/lib/schemas"
 import { toast } from "@/components/ui/use-toast"
 import { handleApiError } from "@/lib/error-handler"
 import { cn } from "@/lib/utilities"
@@ -39,6 +41,8 @@ interface NewLotForm {
   price_per_unit: number
   notes: string
   expires_at: string
+  main_image: ImageModel[]
+  images: ImageModel[]
 }
 
 export default function NewAdminLotPage() {
@@ -57,6 +61,8 @@ export default function NewAdminLotPage() {
       price_per_unit: 0,
       notes: "",
       expires_at: "",
+      main_image: [],
+      images: [],
     },
   })
 
@@ -72,6 +78,8 @@ export default function NewAdminLotPage() {
       price_per_unit_cents: Math.round(Number(data.price_per_unit) * 100),
       notes: data.notes || undefined,
       expires_at: new Date(data.expires_at).toISOString(),
+      main_image: data.main_image?.[0] ?? undefined,
+      images: data.images ?? [],
     }),
     onSuccess: () => {
       toast({ description: "Lot created successfully" })
@@ -98,6 +106,56 @@ export default function NewAdminLotPage() {
         <form onSubmit={form.handleSubmit((data) => mutate(data))}>
           <div className="space-y-12">
 
+            {/* Photos */}
+            <div className="border-b border-gray-900/10 pb-12 dark:border-white/10">
+              <div className="grid grid-cols-1 gap-x-8 gap-y-10 md:grid-cols-3">
+                <div>
+                  <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">Photos</h2>
+                  <p className="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">Main photo and up to 5 additional images.</p>
+                </div>
+                <div className="md:col-span-2 space-y-6">
+                  <div>
+                    <label className="block text-sm/6 font-medium text-gray-900 dark:text-white mb-2">Main photo</label>
+                    <FormField control={form.control} name="main_image" render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <FileInput
+                            id=""
+                            fieldName="main_image"
+                            value={field.value || []}
+                            onChange={field.onChange}
+                            maxImages={1}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                  </div>
+                  <div>
+                    <label className="block text-sm/6 font-medium text-gray-900 dark:text-white mb-2">Additional photos <span className="text-gray-400 font-normal">(up to 5)</span></label>
+                    <FormField control={form.control} name="images" render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <FileInput
+                            id=""
+                            fieldName="images"
+                            value={field.value || []}
+                            onChange={field.onChange}
+                            maxImages={5}
+                            showPlaceholders
+                            thumbnailClassName="inline-flex flex-col overflow-hidden border border-gray-200 rounded-lg mt-2 me-2 relative bg-white shadow-sm"
+                            imageClassName="flex items-center justify-center w-32 h-32 overflow-hidden bg-gray-50"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Lot Details */}
             <div className="border-b border-gray-900/10 pb-12 dark:border-white/10">
               <div className="grid grid-cols-1 gap-x-8 gap-y-10 md:grid-cols-3">
                 <div>
@@ -121,7 +179,7 @@ export default function NewAdminLotPage() {
                                 value={field.value}
                                 onValueChange={field.onChange}
                                 getValue={(u) => u.id}
-                                getLabel={(u) => u.name}
+                                getLabel={(u) => u.username}
                                 placeholder="Select client"
                                 searchPlaceholder="Search clients..."
                                 clearable
