@@ -133,6 +133,7 @@ export function PlaceBidForm({ lot, topBidCents, onSuccess }: Props) {
   const confirmQty = pendingData ? Number(pendingData.quantity) : 0
   const confirmPrice = pendingData ? Number(pendingData.offered_price_per_unit) : 0
   const confirmTotal = confirmQty * confirmPrice
+  const isTopBidder = !!existingBid && topBidCents !== undefined && existingBid.offered_price_per_unit_cents >= topBidCents
 
   return (
     <>
@@ -142,6 +143,14 @@ export function PlaceBidForm({ lot, topBidCents, onSuccess }: Props) {
           <DialogTitle>Confirm your offer</DialogTitle>
         </DialogHeader>
         <div className="space-y-3 py-1">
+          {isTopBidder && existingBid && (
+            <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
+              <p className="text-xs text-amber-800 font-medium">Are you sure you want to place a bid again?</p>
+              <p className="text-xs text-amber-700 mt-0.5">
+                You are currently the top bidder at <span className="font-semibold">{centsToDollars(existingBid.offered_price_per_unit_cents)}/{lot.unit}</span>.
+              </p>
+            </div>
+          )}
           <div className="rounded-lg bg-muted/50 px-4 py-3 space-y-2 text-sm">
             <div className="flex justify-between">
               <span className="text-muted-foreground">Price per {lot.unit}</span>
@@ -179,13 +188,13 @@ export function PlaceBidForm({ lot, topBidCents, onSuccess }: Props) {
         return isTopBidder ? (
           <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3">
             <p className="text-xs text-green-800">
-              You currently have the highest bid — <span className="font-semibold">${(existingBid.offered_price_per_unit_cents / 100).toFixed(2)}/{lot.unit}</span>.
+              You currently have the highest bid — <span className="font-semibold">{centsToDollars(existingBid.offered_price_per_unit_cents)}</span>.
             </p>
           </div>
         ) : (
           <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
             <p className="text-xs text-amber-800">
-              Your current offer: <span className="font-semibold">${(existingBid.offered_price_per_unit_cents / 100).toFixed(2)}/{lot.unit}</span>. A suggested raise has been pre-filled below.
+              Your current offer: <span className="font-semibold">{centsToDollars(existingBid.offered_price_per_unit_cents)}</span>. A suggested raise has been pre-filled below.
             </p>
           </div>
         )

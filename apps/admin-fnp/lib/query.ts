@@ -490,7 +490,8 @@ export function updateLot(slug: string, data: {
   unit: string
   price_per_unit_cents: number
   notes: string
-  expires_at: string
+  expires_date: string
+  expires_time: string
 }) {
   return api.put(`${baseUrl}/lots/${slug}`, data)
 }

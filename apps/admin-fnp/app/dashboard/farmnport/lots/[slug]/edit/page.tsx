@@ -2,14 +2,16 @@
 
 import { use } from "react"
 import Link from "next/link"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useForm } from "react-hook-form"
 import { useRouter } from "next/navigation"
 
 import { queryAdminLot, updateLot, approveLot, queryUsers, queryFarmProduceStates } from "@/lib/query"
+import { EditLotSchema, EditLotModel } from "@/lib/schemas"
 import { SearchSelect } from "@/components/ui/search-select"
 import { toast } from "@/components/ui/use-toast"
-import { handleApiError } from "@/lib/error-handler"
+import { handleApiError, handleFormErrors } from "@/lib/error-handler"
 import { cn, capitalizeWords } from "@/lib/utilities"
 import { buttonVariants } from "@/components/ui/button"
 import { Icons } from "@/components/icons/lucide"
@@ -24,6 +26,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { FileInput } from "@/components/structures/controls/file-input"
+import { TimePicker } from "@/components/ui/time-picker"
 import { ImageModel } from "@/lib/schemas"
 
 const LOT_UNITS = ["kg", "head", "unit", "tonne", "bag", "dozen", "litre"]
@@ -31,16 +34,6 @@ const LOT_UNITS = ["kg", "head", "unit", "tonne", "bag", "dozen", "litre"]
 const inputClass = "block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500"
 const readonlyClass = "block w-full py-1.5 text-sm text-gray-900 dark:text-white"
 
-interface EditLotForm {
-  client_id: string
-  type: string
-  form: string
-  quantity: number
-  unit: string
-  price_per_unit: number
-  notes: string
-  expires_at: string
-}
 
 function ClientLotDetails({ lot }: { lot: any }) {
   return (
@@ -162,10 +155,18 @@ function AdminLotDetails({ form }: { lot: any; form: any }) {
       </div>
       <div className="sm:col-span-3">
         <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Expires</label>
-        <div className="mt-2">
-          <FormField control={form.control} name="expires_at" render={({ field }: any) => (
-            <FormItem>
+        <div className="mt-2 flex gap-2">
+          <FormField control={form.control} name="expires_date" render={({ field }: any) => (
+            <FormItem className="flex-1">
               <FormControl><Input type="date" className={inputClass} {...field} /></FormControl>
+              <FormMessage />
+            </FormItem>
+          )} />
+          <FormField control={form.control} name="expires_time" render={({ field }: any) => (
+            <FormItem>
+              <FormControl>
+                <TimePicker value={field.value} onChange={field.onChange} />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )} />
@@ -218,14 +219,15 @@ export default function EditLotPage({ params }: { params: Promise<{ slug: string
     )
   }
 
-  return <EditForm lot={lot} slug={slug} />
+  return <EditForm key={String(lot.updated)} lot={lot} slug={slug} />
 }
 
 function EditForm({ lot, slug }: { lot: any; slug: string }) {
   const router = useRouter()
   const queryClient = useQueryClient()
 
-  const form = useForm<EditLotForm>({
+  const form = useForm<EditLotModel>({
+    resolver: zodResolver(EditLotSchema),
     defaultValues: {
       client_id: lot.client_id ?? "",
       type: lot.type ?? "",
@@ -234,20 +236,22 @@ function EditForm({ lot, slug }: { lot: any; slug: string }) {
       unit: lot.unit ?? "kg",
       price_per_unit: lot.price_per_unit_cents ? lot.price_per_unit_cents / 100 : 0,
       notes: lot.notes ?? "",
-      expires_at: lot.expires_at ? lot.expires_at.slice(0, 10) : "",
+      expires_date: "",
+      expires_time: "",
     },
   })
 
   const { mutate: save, isPending: isSaving } = useMutation({
-    mutationFn: (data: EditLotForm) => updateLot(slug, {
+    mutationFn: (data: EditLotModel) => updateLot(slug, {
       client_id: data.client_id,
       type: data.type,
       form: data.form,
       quantity: Number(data.quantity),
       unit: data.unit,
       price_per_unit_cents: Math.round(Number(data.price_per_unit) * 100),
-      notes: data.notes,
-      expires_at: new Date(data.expires_at).toISOString(),
+      notes: data.notes ?? "",
+      expires_date: data.expires_date,
+      expires_time: data.expires_time,
     }),
     onSuccess: () => {
       toast({ description: "Lot updated" })
@@ -281,7 +285,7 @@ function EditForm({ lot, slug }: { lot: any; slug: string }) {
       </div>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit((data) => save(data))}>
+        <form onSubmit={form.handleSubmit((data) => save(data), handleFormErrors)}>
           <div className="space-y-12">
 
             {/* Photos */}
@@ -338,7 +342,7 @@ function EditForm({ lot, slug }: { lot: any; slug: string }) {
                                   value={field.value || ""}
                                   onValueChange={field.onChange}
                                   getValue={(u) => u.id}
-                                  getLabel={(u) => u.username}
+                                  getLabel={(u) => u.name}
                                   placeholder="—"
                                   searchPlaceholder="Search clients..."
                                   clearable

@@ -10,7 +10,9 @@ import { adminCreateLot, queryUsers, queryFarmProduce, queryBreeds, queryFarmPro
 import { FileInput } from "@/components/structures/controls/file-input"
 import { ImageModel } from "@/lib/schemas"
 import { toast } from "@/components/ui/use-toast"
-import { handleApiError } from "@/lib/error-handler"
+import { handleApiError ,
+  handleFormErrors
+} from "@/lib/error-handler"
 import { cn } from "@/lib/utilities"
 import { buttonVariants } from "@/components/ui/button"
 import { Icons } from "@/components/icons/lucide"
@@ -103,7 +105,7 @@ export default function NewAdminLotPage() {
       </div>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit((data) => mutate(data))}>
+        <form onSubmit={form.handleSubmit((data) => mutate(data), handleFormErrors)}>
           <div className="space-y-12">
 
             {/* Photos */}
@@ -179,7 +181,7 @@ export default function NewAdminLotPage() {
                                 value={field.value}
                                 onValueChange={field.onChange}
                                 getValue={(u) => u.id}
-                                getLabel={(u) => u.username}
+                                getLabel={(u) => u.name}
                                 placeholder="Select client"
                                 searchPlaceholder="Search clients..."
                                 clearable

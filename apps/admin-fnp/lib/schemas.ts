@@ -1607,3 +1607,17 @@ export const RestaurantLocationPaymentSchema = z.object({
 })
 
 export type RestaurantLocationPayment = z.infer<typeof RestaurantLocationPaymentSchema>
+
+export const EditLotSchema = z.object({
+  client_id: z.string().min(1, "Client is required"),
+  type: z.string().min(1, "Type is required"),
+  form: z.string().min(1, "State is required"),
+  quantity: z.coerce.number().positive("Quantity must be greater than 0"),
+  unit: z.string().min(1, "Unit is required"),
+  price_per_unit: z.coerce.number().positive("Price must be greater than 0"),
+  notes: z.string().optional(),
+  expires_date: z.string().min(1, "Expiry date is required"),
+  expires_time: z.string().min(1, "Expiry time is required"),
+})
+
+export type EditLotModel = z.infer<typeof EditLotSchema>
