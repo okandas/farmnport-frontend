@@ -106,13 +106,18 @@ export const dashboardConfig: DashboardConfig = {
       ],
     },
     {
-      label: "Lots",
+      label: "Lots & Bids",
       alwaysOpen: true,
       items: [
         {
           title: "Lots",
           href: "/dashboard/farmnport/lots",
           icon: "box",
+        },
+        {
+          title: "Bids",
+          href: "/dashboard/farmnport/bids",
+          icon: "gavel",
         },
       ],
     },
