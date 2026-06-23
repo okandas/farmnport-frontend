@@ -7,6 +7,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react"
 
 const NAV_ITEMS = [
     { label: "Orders", href: "/account/orders" },
+    { label: "Bids", href: "/account/bids" },
     { label: "Bookings", href: "/account/bookings" },
     { label: "Incoming Bookings", href: "/account/incoming-bookings" },
     { label: "Notifications", href: "/account/notifications" },

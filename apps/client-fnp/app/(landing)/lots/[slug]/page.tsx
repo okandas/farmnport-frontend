@@ -126,7 +126,7 @@ export default async function LotDetailPage({ params }: Props) {
                                 )}
 
                                 {lot.notes && (
-                                    <div className="rounded-xl border bg-card p-5">
+                                    <div className="py-2">
                                         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
                                             Notes from {isSelling ? "seller" : "buyer"}
                                         </p>
@@ -148,39 +148,78 @@ export default async function LotDetailPage({ params }: Props) {
                             </div>
 
                             {/* RIGHT — bid panel */}
-                            <div className="lg:col-span-2">
-                                <div className="lg:sticky lg:top-24 rounded-xl border bg-card p-6">
-                                    {isExpired ? (
-                                        <div className="text-center space-y-2 py-2">
-                                            <p className="text-sm font-semibold text-foreground">This lot has expired</p>
-                                            <p className="text-xs text-muted-foreground">Bidding is closed for this listing.</p>
+                            <div className="lg:col-span-2" id="bid-panel">
+                                <div className="lg:sticky lg:top-24 space-y-4">
+                                    {bidsData?.accepted && (
+                                        <div>
+                                            <p className="text-xs font-semibold uppercase tracking-wide text-foreground mb-3">Deal agreed</p>
+                                            <p className="text-3xl font-bold text-green-700 dark:text-green-400">
+                                                {centsToDollars(bidsData.accepted.offered_price_per_unit_cents)}
+                                            </p>
                                         </div>
-                                    ) : user && (user as any).id === lot.client_id ? (
-                                        <div className="text-center space-y-2 py-2">
-                                            <p className="text-sm font-semibold text-foreground">This is your lot</p>
-                                            <p className="text-xs text-muted-foreground">You cannot place an offer on your own listing.</p>
-                                        </div>
-                                    ) : user ? (
-                                        <PlaceBidForm lot={lot} topBidCents={bidsData?.top_bid?.offered_price_per_unit_cents} />
-                                    ) : (
-                                        <div className="text-center space-y-4">
+                                    )}
+                                    <div className={isExpired ? "" : "rounded-xl border bg-card p-6"}>
+                                        {isExpired && bidsData?.accepted && (myBidData as any)?.status !== "accepted" ? (
                                             <div className="space-y-1">
-                                                <p className="text-base font-semibold">Interested in this lot?</p>
-                                                <p className="text-sm text-muted-foreground">
-                                                    Sign in to place an offer directly with the {isSelling ? "seller" : "buyer"}.
+                                                <p className="text-sm font-semibold text-amber-700 dark:text-amber-400">Awaiting payment</p>
+                                                <p className="text-xs text-muted-foreground">
+                                                    A bid has been accepted and is pending payment. This lot could reopen if payment is not completed within 24 hours.
+                                                </p>
+                                            </div>
+                                        ) : isExpired ? (
+                                            <div className="space-y-1">
+                                                <p className="text-sm font-semibold text-foreground">Bidding has closed</p>
+                                                <p className="text-xs text-muted-foreground">This lot is no longer accepting offers.</p>
+                                            </div>
+                                        ) : !lot.moderated ? (
+                                            <div className="space-y-1">
+                                                <p className="text-sm font-semibold text-foreground">Coming soon</p>
+                                                <p className="text-xs text-muted-foreground">This lot is not yet open for bidding — check back shortly.</p>
+                                            </div>
+                                        ) : user && (user as any).id === lot.client_id ? (
+                                            <div className="space-y-1">
+                                                <p className="text-sm font-semibold text-foreground">This is your lot</p>
+                                                <p className="text-xs text-muted-foreground">You cannot place an offer on your own listing.</p>
+                                            </div>
+                                        ) : user ? (
+                                            <PlaceBidForm lot={lot} topBidCents={bidsData?.top_bid?.offered_price_per_unit_cents} />
+                                        ) : (
+                                            <div className="text-center space-y-4">
+                                                <div className="space-y-1">
+                                                    <p className="text-base font-semibold">Interested in this lot?</p>
+                                                    <p className="text-sm text-muted-foreground">
+                                                        Sign in to place an offer directly with the {isSelling ? "seller" : "buyer"}.
+                                                    </p>
+                                                </div>
+                                                <Link
+                                                    href={`/login?next=/lots/${slug}`}
+                                                    className="inline-flex items-center justify-center w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
+                                                >
+                                                    Sign in to place an offer
+                                                </Link>
+                                                <Link
+                                                    href={`/signup?next=/lots/${slug}`}
+                                                    className="inline-flex items-center justify-center w-full rounded-lg border px-4 py-2.5 text-sm font-semibold hover:bg-muted transition-colors"
+                                                >
+                                                    Create a free account
+                                                </Link>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {isExpired && (myBidData as any)?.status === "accepted" && (
+                                        <div className="space-y-3">
+                                            <div className="space-y-1">
+                                                <p className="text-sm font-semibold text-foreground">Your bid was accepted!</p>
+                                                <p className="text-xs text-muted-foreground">
+                                                    Complete payment within 24 hours to secure this lot.
                                                 </p>
                                             </div>
                                             <Link
-                                                href={`/login?next=/lots/${slug}`}
-                                                className="inline-flex items-center justify-center w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
+                                                href={`/account/bids/${(myBidData as any)?.id}`}
+                                                className="inline-flex items-center justify-center w-full rounded-md bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
                                             >
-                                                Sign in to place an offer
-                                            </Link>
-                                            <Link
-                                                href={`/signup?next=/lots/${slug}`}
-                                                className="inline-flex items-center justify-center w-full rounded-lg border px-4 py-2.5 text-sm font-semibold hover:bg-muted transition-colors"
-                                            >
-                                                Create a free account
+                                                Pay Now
                                             </Link>
                                         </div>
                                     )}

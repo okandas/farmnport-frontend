@@ -23,7 +23,7 @@ interface Props {
 export function LotBidsPanel({ total, bids, top_bid, accepted, myBidId }: Props) {
   if (total === 0) {
     return (
-      <div className="rounded-xl border border-dashed bg-muted/30 p-5 text-center space-y-1">
+      <div className="py-4 text-center space-y-1">
         <p className="text-sm font-medium text-foreground">No offers yet</p>
         <p className="text-xs text-muted-foreground">Be the first to place an offer on this lot.</p>
       </div>
@@ -33,32 +33,22 @@ export function LotBidsPanel({ total, bids, top_bid, accepted, myBidId }: Props)
   return (
     <div className="space-y-3">
 
-      {/* Accepted deal banner */}
-      {accepted && (
-        <div className="rounded-xl border border-green-200 bg-green-50 p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-green-700 mb-1">Deal agreed</p>
-          <p className="text-sm text-green-800">
-            {accepted.quantity.toLocaleString()} {accepted.unit} @ {centsToDollars(accepted.offered_price_per_unit_cents)}/{accepted.unit}
-          </p>
-        </div>
-      )}
-
       {/* Header row */}
-      <div className="flex items-center justify-between border-b border-border pb-2">
+      <div className="flex items-center justify-between pb-1">
         <span className="text-sm font-semibold text-foreground">Offers</span>
-        {top_bid && (
+        {top_bid && !accepted && (
           <span className="text-sm text-muted-foreground">
-            Best offer: <span className="font-semibold text-foreground">{centsToDollars(top_bid.offered_price_per_unit_cents)}</span>
+            Best: <span className="font-semibold text-foreground">{centsToDollars(top_bid.offered_price_per_unit_cents)}</span>
           </span>
         )}
       </div>
 
       {/* Bid list */}
-      <div className="divide-y divide-border">
+      <div className="space-y-0">
         {bids.map((bid) => {
           const isMe = myBidId === bid.id
           return (
-            <div key={bid.id} className="flex items-center justify-between py-2.5 text-sm">
+            <div key={bid.id} className="flex items-center justify-between py-2 text-sm">
               <span className={`${isMe ? "text-green-600" : "text-foreground"}`}>
                 <span className="font-medium">{isMe ? "Your bid" : bid.bidder_role === "buyer" ? "Buyer" : "Seller"}</span>
                 <span className="text-muted-foreground"> · {bid.quantity.toLocaleString()} {bid.unit}</span>

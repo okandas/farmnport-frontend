@@ -2,10 +2,11 @@
 
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
-import { ShoppingBag, CalendarDays, Inbox, Bell, FileText, User, Shield, Palette } from "lucide-react"
+import { ShoppingBag, CalendarDays, Inbox, Bell, FileText, User, Shield, Palette, Gavel } from "lucide-react"
 
 const ACCOUNT_OPTIONS = [
     { label: "Orders", href: "/account/orders", icon: ShoppingBag, protected: true },
+    { label: "Bids", href: "/account/bids", icon: Gavel, protected: true },
     { label: "Bookings", href: "/account/bookings", icon: CalendarDays, protected: true },
     { label: "Incoming Bookings", href: "/account/incoming-bookings", icon: Inbox, protected: true },
     { label: "Notifications", href: "/account/notifications", icon: Bell, protected: true },

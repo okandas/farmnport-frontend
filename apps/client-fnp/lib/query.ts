@@ -879,6 +879,20 @@ export function retryOrderPayment(id: string) {
   return api.post(`${BaseURL}/order/${id}/pay`, {})
 }
 
+// Bids
+export function myBids(page?: number) {
+  const p = page && page >= 2 ? `?p=${page}` : ""
+  return api.get(`${BaseURL}/bids/mine${p}`)
+}
+
+export function myBidByID(id: string) {
+  return api.get(`${BaseURL}/bids/mine/${id}`)
+}
+
+export function initiateBidPayment(id: string, body: { method?: string; phone?: string }) {
+  return api.post(`${BaseURL}/bids/mine/${id}/pay`, body)
+}
+
 // Bookings
 export function listBookingEvents(options?: { product_id?: string; status?: string }) {
   const params = new URLSearchParams()
