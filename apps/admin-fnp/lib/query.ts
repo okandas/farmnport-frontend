@@ -482,9 +482,8 @@ export function adminCreateLot(data: {
   return api.post(`${baseUrl}/lots/admin/create`, data)
 }
 
-export function queryAdminBids({ p }: { p: number }) {
-  const qs = new URLSearchParams({ p: String(p) })
-  return api.get(`${baseUrl}/bids/admin/list?${qs}`)
+export function queryLotBids(slug: string, p: number) {
+  return api.get(`${baseUrl}/lots/${slug}/bids?p=${p}`)
 }
 
 export function adminAcceptBid(id: string) {

@@ -8,6 +8,7 @@ import { queryRestaurants } from "@/lib/query"
 import { Restaurant } from "@/lib/schemas"
 import { handleFetchError } from "@/lib/error-handler"
 import { Placeholder } from "@/components/state/placeholder"
+import { TableSkeleton } from "@/components/state/skeleton-table"
 import { DataTable } from "@/components/structures/data-table"
 import { restaurantColumns } from "@/components/structures/columns/restaurants"
 
@@ -62,11 +63,7 @@ export function RestaurantsTable() {
   }
 
   if (isLoading || isFetching) {
-    return (
-      <Placeholder>
-        <Placeholder.Title>Fetching Restaurants</Placeholder.Title>
-      </Placeholder>
-    )
+    return <TableSkeleton />
   }
 
   return (

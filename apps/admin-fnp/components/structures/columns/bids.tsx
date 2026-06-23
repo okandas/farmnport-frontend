@@ -1,11 +1,20 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
+import { useState } from "react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { Button } from "@/components/ui/button"
+import { CheckCircle2, Loader2 } from "lucide-react"
+import { Input } from "@/components/ui/input"
 import { centsToDollars } from "@/lib/utilities"
 import { adminAcceptBid } from "@/lib/query"
 import { toast } from "@/components/ui/use-toast"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog"
 
 function StatusBadge({ status }: { status: string }) {
   const map: Record<string, string> = {
@@ -25,11 +34,17 @@ function StatusBadge({ status }: { status: string }) {
 
 function AcceptButton({ bid }: { bid: any }) {
   const queryClient = useQueryClient()
+  const [open, setOpen] = useState(false)
+  const [confirm, setConfirm] = useState("")
+  const slug = bid.lot_slug
+
   const { mutate, isPending } = useMutation({
     mutationFn: () => adminAcceptBid(bid.id),
     onSuccess: () => {
-      toast({ title: "Bid accepted", description: `Winner notified. All other bids on this lot have been rejected.` })
-      queryClient.invalidateQueries({ queryKey: ["admin-bids"] })
+      setOpen(false)
+      setConfirm("")
+      toast({ title: "Bid accepted", description: "Winner notified. All other bids on this lot have been rejected." })
+      queryClient.invalidateQueries({ queryKey: ["lot-bids"] })
     },
     onError: () => {
       toast({ title: "Failed to accept bid", variant: "destructive" })
@@ -39,9 +54,51 @@ function AcceptButton({ bid }: { bid: any }) {
   if (bid.status !== "pending") return null
 
   return (
-    <Button size="sm" variant="outline" className="text-green-700 border-green-300 hover:bg-green-50" onClick={() => mutate()} disabled={isPending}>
-      {isPending ? "Accepting…" : "Accept"}
-    </Button>
+    <>
+      <button
+        onClick={() => setOpen(true)}
+        className="flex items-center gap-1.5 text-sm font-medium text-green-700 hover:text-green-800 transition-colors"
+      >
+        <CheckCircle2 className="w-4 h-4" />
+        Accept
+      </button>
+
+      <Dialog open={open} onOpenChange={(v) => { setOpen(v); setConfirm("") }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Accept Bid</DialogTitle>
+            <DialogDescription>
+              This will accept <span className="font-semibold text-foreground capitalize">{bid.bidder_name}</span>'s bid of{" "}
+              <span className="font-semibold text-foreground">{centsToDollars(bid.offered_price_per_unit_cents)}/{bid.unit}</span> and auto-reject all other pending bids on this lot.
+              <br /><br />
+              Type the lot number <span className="font-mono font-semibold text-foreground">{slug}</span> to confirm.
+            </DialogDescription>
+          </DialogHeader>
+          <Input
+            placeholder={slug}
+            value={confirm}
+            onChange={(e) => setConfirm(e.target.value)}
+            className="mt-2"
+          />
+          <div className="flex justify-end gap-2 mt-2">
+            <button
+              onClick={() => { setOpen(false); setConfirm("") }}
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={() => mutate()}
+              disabled={confirm !== slug || isPending}
+              className="flex items-center gap-1.5 text-sm font-semibold text-white bg-green-700 hover:bg-green-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors px-4 py-1.5 rounded-md"
+            >
+              {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
+              Confirm Accept
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }
 

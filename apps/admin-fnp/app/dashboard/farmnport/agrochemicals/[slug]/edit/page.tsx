@@ -10,6 +10,7 @@ import { cn } from "@/lib/utilities"
 import { buttonVariants } from "@/components/ui/button"
 import { Icons } from "@/components/icons/lucide"
 import { Placeholder } from "@/components/state/placeholder"
+import { FormSkeleton } from "@/components/state/skeleton-table"
 import { AgroChemicalForm } from "@/components/structures/forms/agroChemicalForm"
 import { handleFetchError } from "@/lib/error-handler"
 
@@ -65,17 +66,7 @@ export default function EditAgroChemicalPage({ params }: EditProductPageProps) {
   }
 
   if (isLoading || isFetching) {
-    return (
-      <div className="mt-20">
-        <Placeholder>
-          <Placeholder.Icon name="search" />
-          <Placeholder.Title>Fetching AgroChemical</Placeholder.Title>
-          <Placeholder.Description>
-            Fetching agrochemical from the database
-          </Placeholder.Description>
-        </Placeholder>
-      </div>
-    )
+    return <FormSkeleton />
   }
 
   return (

@@ -7,6 +7,7 @@ import { PaginationState } from "@tanstack/react-table"
 import { queryBreeds } from "@/lib/query"
 import { handleFetchError } from "@/lib/error-handler"
 import { Placeholder } from "@/components/state/placeholder"
+import { TableSkeleton } from "@/components/state/skeleton-table"
 import { DataTable } from "@/components/structures/data-table"
 import { breedColumns } from "@/components/structures/columns/breeds"
 
@@ -54,11 +55,7 @@ export function BreedsTable() {
   }
 
   if (isLoading || isFetching) {
-    return (
-      <Placeholder>
-        <Placeholder.Title>Fetching Breeds</Placeholder.Title>
-      </Placeholder>
-    )
+    return <TableSkeleton />
   }
 
   return (

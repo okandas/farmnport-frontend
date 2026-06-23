@@ -7,6 +7,7 @@ import { PaginationState } from "@tanstack/react-table"
 import { queryAdminLots } from "@/lib/query"
 import { handleFetchError } from "@/lib/error-handler"
 import { Placeholder } from "@/components/state/placeholder"
+import { TableSkeleton } from "@/components/state/skeleton-table"
 import { DataTable } from "@/components/structures/data-table"
 import { lotColumns } from "@/components/structures/columns/lots"
 
@@ -53,11 +54,7 @@ export function LotsTable() {
   }
 
   if (isLoading || isFetching) {
-    return (
-      <Placeholder>
-        <Placeholder.Title>Fetching Lots</Placeholder.Title>
-      </Placeholder>
-    )
+    return <TableSkeleton />
   }
 
   return (

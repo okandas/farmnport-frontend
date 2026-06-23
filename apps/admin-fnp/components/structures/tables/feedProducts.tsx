@@ -8,6 +8,7 @@ import { queryFeedProducts } from "@/lib/query"
 import { FeedProduct } from "@/lib/schemas"
 import { handleFetchError } from "@/lib/error-handler"
 import { Placeholder } from "@/components/state/placeholder"
+import { TableSkeleton } from "@/components/state/skeleton-table"
 import { DataTable } from "@/components/structures/data-table"
 import { feedProductColumns } from "@/components/structures/columns/feedProducts"
 
@@ -62,11 +63,7 @@ export function FeedProductsTable() {
   }
 
   if (isLoading || isFetching) {
-    return (
-      <Placeholder>
-        <Placeholder.Title>Fetching Feed Products</Placeholder.Title>
-      </Placeholder>
-    )
+    return <TableSkeleton />
   }
 
   return (

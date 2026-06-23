@@ -7,6 +7,7 @@ import { PaginationState } from "@tanstack/react-table"
 import { queryTumiraGeocodedAddresses } from "@/lib/query"
 import { handleFetchError } from "@/lib/error-handler"
 import { Placeholder } from "@/components/state/placeholder"
+import { TableSkeleton } from "@/components/state/skeleton-table"
 import { DataTable } from "@/components/structures/data-table"
 import { tumiraGeocodedAddressColumns, TumiraGeocodedAddress } from "@/components/structures/columns/tumira-geocoded-addresses"
 
@@ -52,11 +53,7 @@ export function TumiraGeocodedAddressesTable() {
   }
 
   if (isLoading || isFetching) {
-    return (
-      <Placeholder>
-        <Placeholder.Title>Fetching Geocoded Addresses</Placeholder.Title>
-      </Placeholder>
-    )
+    return <TableSkeleton />
   }
 
   return (

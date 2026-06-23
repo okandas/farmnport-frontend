@@ -8,6 +8,7 @@ import { queryCropGroups } from "@/lib/query"
 import { CropGroup } from "@/lib/schemas"
 import { handleFetchError } from "@/lib/error-handler"
 import { Placeholder } from "@/components/state/placeholder"
+import { TableSkeleton } from "@/components/state/skeleton-table"
 import { DataTable } from "@/components/structures/data-table"
 import { cropGroupColumns } from "@/components/structures/columns/cropGroups"
 
@@ -63,11 +64,7 @@ export function CropGroupsTable() {
   }
 
   if (isLoading || isFetching) {
-    return (
-      <Placeholder>
-        <Placeholder.Title>Fetching Crop Groups</Placeholder.Title>
-      </Placeholder>
-    )
+    return <TableSkeleton />
   }
 
   return (

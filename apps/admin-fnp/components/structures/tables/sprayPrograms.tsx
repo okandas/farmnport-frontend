@@ -8,6 +8,7 @@ import { querySprayPrograms } from "@/lib/query"
 import { SprayProgram } from "@/lib/schemas"
 import { handleFetchError } from "@/lib/error-handler"
 import { Placeholder } from "@/components/state/placeholder"
+import { TableSkeleton } from "@/components/state/skeleton-table"
 import { DataTable } from "@/components/structures/data-table"
 import { sprayProgramColumns } from "@/components/structures/columns/sprayPrograms"
 
@@ -62,11 +63,7 @@ export function SprayProgramsTable() {
   }
 
   if (isLoading || isFetching) {
-    return (
-      <Placeholder>
-        <Placeholder.Title>Fetching Spray Programs</Placeholder.Title>
-      </Placeholder>
-    )
+    return <TableSkeleton />
   }
 
   return (

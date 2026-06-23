@@ -7,6 +7,7 @@ import { PaginationState } from "@tanstack/react-table"
 import { queryLivestockPoultryProducts } from "@/lib/query"
 import { handleFetchError } from "@/lib/error-handler"
 import { Placeholder } from "@/components/state/placeholder"
+import { TableSkeleton } from "@/components/state/skeleton-table"
 import { DataTable } from "@/components/structures/data-table"
 import { livestockPoultryColumns } from "@/components/structures/columns/livestockPoultry"
 
@@ -54,11 +55,7 @@ export function LivestockPoultryTable() {
   }
 
   if (isLoading || isFetching) {
-    return (
-      <Placeholder>
-        <Placeholder.Title>Fetching Products</Placeholder.Title>
-      </Placeholder>
-    )
+    return <TableSkeleton />
   }
 
   return (

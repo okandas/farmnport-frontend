@@ -7,6 +7,7 @@ import { PaginationState } from "@tanstack/react-table"
 import { queryTumiraCourierRates } from "@/lib/query"
 import { handleFetchError } from "@/lib/error-handler"
 import { Placeholder } from "@/components/state/placeholder"
+import { TableSkeleton } from "@/components/state/skeleton-table"
 import { DataTable } from "@/components/structures/data-table"
 import { tumiraCourierRateColumns, TumiraCourierRate } from "@/components/structures/columns/tumira-courier-rates"
 
@@ -52,11 +53,7 @@ export function TumiraCourierRatesTable() {
   }
 
   if (isLoading || isFetching) {
-    return (
-      <Placeholder>
-        <Placeholder.Title>Fetching Courier Rates</Placeholder.Title>
-      </Placeholder>
-    )
+    return <TableSkeleton />
   }
 
   return (

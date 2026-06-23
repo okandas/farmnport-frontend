@@ -7,6 +7,7 @@ import { PaginationState } from "@tanstack/react-table"
 import { queryTumiraDeliveryPoints } from "@/lib/query"
 import { handleFetchError } from "@/lib/error-handler"
 import { Placeholder } from "@/components/state/placeholder"
+import { TableSkeleton } from "@/components/state/skeleton-table"
 import { DataTable } from "@/components/structures/data-table"
 import { tumiraDeliveryPointColumns, TumiraDeliveryPoint } from "@/components/structures/columns/tumira-delivery-points"
 
@@ -52,11 +53,7 @@ export function TumiraDeliveryPointsTable() {
   }
 
   if (isLoading || isFetching) {
-    return (
-      <Placeholder>
-        <Placeholder.Title>Fetching Delivery Points</Placeholder.Title>
-      </Placeholder>
-    )
+    return <TableSkeleton />
   }
 
   return (

@@ -7,6 +7,7 @@ import { PaginationState } from "@tanstack/react-table"
 import { queryTumiraCouriers } from "@/lib/query"
 import { handleFetchError } from "@/lib/error-handler"
 import { Placeholder } from "@/components/state/placeholder"
+import { TableSkeleton } from "@/components/state/skeleton-table"
 import { DataTable } from "@/components/structures/data-table"
 import { tumiraCourierColumns, TumiraCourier } from "@/components/structures/columns/tumira-couriers"
 
@@ -52,11 +53,7 @@ export function TumiraCouriersTable() {
   }
 
   if (isLoading || isFetching) {
-    return (
-      <Placeholder>
-        <Placeholder.Title>Fetching Couriers</Placeholder.Title>
-      </Placeholder>
-    )
+    return <TableSkeleton />
   }
 
   return (

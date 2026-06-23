@@ -8,6 +8,7 @@ import { queryAnimalHealthActiveIngredients } from "@/lib/query"
 import { AnimalHealthActiveIngredient } from "@/lib/schemas"
 import { handleFetchError } from "@/lib/error-handler"
 import { Placeholder } from "@/components/state/placeholder"
+import { TableSkeleton } from "@/components/state/skeleton-table"
 import { DataTable } from "@/components/structures/data-table"
 import { animalHealthActiveIngredientColumns } from "@/components/structures/columns/animalHealthActiveIngredients"
 
@@ -63,11 +64,7 @@ export function AnimalHealthActiveIngredientsTable() {
   }
 
   if (isLoading || isFetching) {
-    return (
-      <Placeholder>
-        <Placeholder.Title>Fetching Active Ingredients</Placeholder.Title>
-      </Placeholder>
-    )
+    return <TableSkeleton />
   }
 
   return (

@@ -12,6 +12,7 @@ import { capitalizeWords } from "@/lib/utilities"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "@/components/ui/use-toast"
 import { DashboardHeader } from "@/components/state/dashboardHeader"
+import { FormSkeleton } from "@/components/state/skeleton-table"
 import { DashboardShell } from "@/components/state/dashboardShell"
 import { Placeholder } from "@/components/state/placeholder"
 import { SearchSelect } from "@/components/ui/search-select"
@@ -156,7 +157,7 @@ export default function EditBookingEventPage({ params }: { params: Promise<{ id:
   if (isLoading) {
     return (
       <DashboardShell>
-        <Placeholder><Placeholder.Title>Loading</Placeholder.Title></Placeholder>
+        <FormSkeleton />
       </DashboardShell>
     )
   }

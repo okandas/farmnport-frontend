@@ -8,6 +8,7 @@ import { queryCuisineCategories } from "@/lib/query"
 import { CuisineCategory } from "@/lib/schemas"
 import { handleFetchError } from "@/lib/error-handler"
 import { Placeholder } from "@/components/state/placeholder"
+import { TableSkeleton } from "@/components/state/skeleton-table"
 import { DataTable } from "@/components/structures/data-table"
 import { cuisineCategoryColumns } from "@/components/structures/columns/cuisine-categories"
 
@@ -62,11 +63,7 @@ export function CuisineCategoriesTable() {
   }
 
   if (isLoading || isFetching) {
-    return (
-      <Placeholder>
-        <Placeholder.Title>Fetching Categories</Placeholder.Title>
-      </Placeholder>
-    )
+    return <TableSkeleton />
   }
 
   return (

@@ -13,6 +13,7 @@ import { ToastAction } from "@/components/ui/toast"
 import { toast } from "@/components/ui/use-toast"
 import { Icons } from "@/components/icons/lucide"
 import { Placeholder } from "@/components/state/placeholder"
+import { FormSkeleton } from "@/components/state/skeleton-table"
 import { EditForm } from "@/components/structures/forms/clientEdit"
 
 interface EditClientPageProps {
@@ -71,17 +72,7 @@ export default function EditClientPage({ params }: EditClientPageProps) {
   }
 
   if (isLoading || isFetching) {
-    return (
-      <div className="mt-20">
-        <Placeholder>
-          <Placeholder.Icon name="search" />
-          <Placeholder.Title>Is Fetching User</Placeholder.Title>
-          <Placeholder.Description>
-            Fetching user from the database
-          </Placeholder.Description>
-        </Placeholder>
-      </div>
-    )
+    return <FormSkeleton />
   }
 
   return (

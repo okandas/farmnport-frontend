@@ -18,6 +18,7 @@ import { handleApiError ,
   handleFormErrors
 } from "@/lib/error-handler"
 import { Placeholder } from "@/components/state/placeholder"
+import { FormSkeleton } from "@/components/state/skeleton-table"
 import {
     Form,
     FormControl,
@@ -140,12 +141,8 @@ export default function EditMenuPage() {
     }
 
     if (isLoading) {
-        return (
-            <Placeholder>
-                <Placeholder.Title>Loading Menu</Placeholder.Title>
-            </Placeholder>
-        )
-    }
+    return <FormSkeleton />
+  }
 
     if (isError) {
         return (

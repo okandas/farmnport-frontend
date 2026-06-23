@@ -7,6 +7,7 @@ import { PaginationState } from "@tanstack/react-table"
 import { queryTumiraVanityCodes } from "@/lib/query"
 import { handleFetchError } from "@/lib/error-handler"
 import { Placeholder } from "@/components/state/placeholder"
+import { TableSkeleton } from "@/components/state/skeleton-table"
 import { DataTable } from "@/components/structures/data-table"
 import { tumiraVanityCodeColumns, TumiraVanityCode } from "@/components/structures/columns/tumira-vanity-codes"
 
@@ -52,11 +53,7 @@ export function TumiraVanityCodesTable() {
   }
 
   if (isLoading || isFetching) {
-    return (
-      <Placeholder>
-        <Placeholder.Title>Fetching Vanity Codes</Placeholder.Title>
-      </Placeholder>
-    )
+    return <TableSkeleton />
   }
 
   return (

@@ -8,6 +8,7 @@ import { queryAgroChemicalTargets } from "@/lib/query"
 import { AgroChemicalTarget } from "@/lib/schemas"
 import { handleFetchError } from "@/lib/error-handler"
 import { Placeholder } from "@/components/state/placeholder"
+import { TableSkeleton } from "@/components/state/skeleton-table"
 import { DataTable } from "@/components/structures/data-table"
 import { agroChemicalTargetColumns } from "@/components/structures/columns/agroChemicalTargets"
 
@@ -63,11 +64,7 @@ export function AgroChemicalTargetsTable() {
   }
 
   if (isLoading || isFetching) {
-    return (
-      <Placeholder>
-        <Placeholder.Title>Fetching Targets</Placeholder.Title>
-      </Placeholder>
-    )
+    return <TableSkeleton />
   }
 
   return (

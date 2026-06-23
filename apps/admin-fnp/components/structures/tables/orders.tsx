@@ -7,6 +7,7 @@ import { PaginationState } from "@tanstack/react-table"
 import { queryOrders } from "@/lib/query"
 import { handleFetchError } from "@/lib/error-handler"
 import { Placeholder } from "@/components/state/placeholder"
+import { TableSkeleton } from "@/components/state/skeleton-table"
 import { DataTable } from "@/components/structures/data-table"
 import { orderColumns, OrderRow } from "@/components/structures/columns/orders"
 import { DataTableFacetedFilter } from "@/components/structures/filters/data-table-faceted-filter"
@@ -87,11 +88,7 @@ export function OrdersTable() {
   }
 
   if (isLoading || isFetching) {
-    return (
-      <Placeholder>
-        <Placeholder.Title>Fetching Orders</Placeholder.Title>
-      </Placeholder>
-    )
+    return <TableSkeleton />
   }
 
   return (

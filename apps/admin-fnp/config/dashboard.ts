@@ -114,11 +114,6 @@ export const dashboardConfig: DashboardConfig = {
           href: "/dashboard/farmnport/lots",
           icon: "box",
         },
-        {
-          title: "Bids",
-          href: "/dashboard/farmnport/bids",
-          icon: "gavel",
-        },
       ],
     },
     {

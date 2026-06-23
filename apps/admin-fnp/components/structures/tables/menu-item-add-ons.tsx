@@ -9,6 +9,7 @@ import { queryMenuItemAddOns } from "@/lib/query"
 import { MenuItemAddOn } from "@/lib/schemas"
 import { handleFetchError } from "@/lib/error-handler"
 import { Placeholder } from "@/components/state/placeholder"
+import { TableSkeleton } from "@/components/state/skeleton-table"
 import { DataTable } from "@/components/structures/data-table"
 import { menuItemAddOnColumns } from "@/components/structures/columns/menu-item-add-ons"
 
@@ -64,11 +65,7 @@ export function MenuItemAddOnsTable() {
   }
 
   if (isLoading || isFetching) {
-    return (
-      <Placeholder>
-        <Placeholder.Title>Fetching Add-Ons</Placeholder.Title>
-      </Placeholder>
-    )
+    return <TableSkeleton />
   }
 
   return (

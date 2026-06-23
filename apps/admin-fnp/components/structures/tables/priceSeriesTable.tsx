@@ -7,6 +7,7 @@ import { PaginationState } from "@tanstack/react-table"
 import { queryPriceSeries } from "@/lib/query"
 import { handleFetchError } from "@/lib/error-handler"
 import { Placeholder } from "@/components/state/placeholder"
+import { TableSkeleton } from "@/components/state/skeleton-table"
 import { DataTable } from "@/components/structures/data-table"
 import { priceSeriesColumns, PriceSeriesEntry } from "@/components/structures/columns/priceSeries"
 import { DataTableFacetedFilter } from "@/components/structures/filters/data-table-faceted-filter"
@@ -96,11 +97,7 @@ export function PriceSeriesTable({ refreshKey }: Props) {
   }
 
   if (isLoading || isFetching) {
-    return (
-      <Placeholder>
-        <Placeholder.Title>Loading price series...</Placeholder.Title>
-      </Placeholder>
-    )
+    return <TableSkeleton />
   }
 
   return (

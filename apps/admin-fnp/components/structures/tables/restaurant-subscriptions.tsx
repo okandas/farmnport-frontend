@@ -8,6 +8,7 @@ import { queryRestaurantSubscriptions } from "@/lib/query"
 import { RestaurantSubscription } from "@/lib/schemas"
 import { handleFetchError } from "@/lib/error-handler"
 import { Placeholder } from "@/components/state/placeholder"
+import { TableSkeleton } from "@/components/state/skeleton-table"
 import { DataTable } from "@/components/structures/data-table"
 import { restaurantSubscriptionColumns } from "@/components/structures/columns/restaurant-subscriptions"
 
@@ -50,11 +51,7 @@ export function RestaurantSubscriptionsTable() {
   }
 
   if (isLoading || isFetching) {
-    return (
-      <Placeholder>
-        <Placeholder.Title>Fetching Subscriptions</Placeholder.Title>
-      </Placeholder>
-    )
+    return <TableSkeleton />
   }
 
   return (

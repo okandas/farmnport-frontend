@@ -15,6 +15,7 @@ import { Icons } from "@/components/icons/lucide"
 import { toast } from "@/components/ui/use-toast"
 import { handleApiError, handleFetchError } from "@/lib/error-handler"
 import { Placeholder } from "@/components/state/placeholder"
+import { FormSkeleton } from "@/components/state/skeleton-table"
 import { Input } from "@/components/ui/input"
 import {
     Select,
@@ -178,12 +179,8 @@ export default function EditMenuItemAddOnPage() {
     }
 
     if (isLoading) {
-        return (
-            <Placeholder>
-                <Placeholder.Title>Loading Add-On</Placeholder.Title>
-            </Placeholder>
-        )
-    }
+    return <FormSkeleton />
+  }
 
     if (isError) {
         return (

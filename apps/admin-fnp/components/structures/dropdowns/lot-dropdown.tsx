@@ -46,6 +46,9 @@ export function LotDropDown({ lot }: LotDropDownProps) {
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>Actions</DropdownMenuLabel>
         <DropdownMenuItem asChild>
+          <Link href={`/dashboard/farmnport/lots/${lot?.slug}`}>View Bids</Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
           <Link href={`/dashboard/farmnport/lots/${lot?.slug}/edit`}>Edit</Link>
         </DropdownMenuItem>
         {!lot?.moderated && (

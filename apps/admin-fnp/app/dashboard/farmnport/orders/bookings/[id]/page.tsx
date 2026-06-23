@@ -8,6 +8,7 @@ import Link from "next/link"
 import { queryAdminBooking, updateBookingStatus } from "@/lib/query"
 import { centsToDollars } from "@/lib/utilities"
 import { toast } from "@/components/ui/use-toast"
+import { FormSkeleton } from "@/components/state/skeleton-table"
 import { DashboardShell } from "@/components/state/dashboardShell"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 
@@ -126,9 +127,7 @@ export default function AdminBookingDetailPage({ params }: { params: Promise<{ i
   if (isLoading) {
     return (
       <DashboardShell>
-        <div className="flex justify-center py-16">
-          <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-        </div>
+        <FormSkeleton />
       </DashboardShell>
     )
   }

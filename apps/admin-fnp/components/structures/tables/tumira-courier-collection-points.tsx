@@ -7,6 +7,7 @@ import { PaginationState } from "@tanstack/react-table"
 import { queryTumiraCourierCollectionPoints, queryTumiraCouriers } from "@/lib/query"
 import { handleFetchError } from "@/lib/error-handler"
 import { Placeholder } from "@/components/state/placeholder"
+import { TableSkeleton } from "@/components/state/skeleton-table"
 import { DataTable } from "@/components/structures/data-table"
 import { DataTableFacetedFilter } from "@/components/structures/filters/data-table-faceted-filter"
 import { tumiraCourierCollectionPointColumns, TumiraCourierCollectionPoint } from "@/components/structures/columns/tumira-courier-collection-points"
@@ -68,11 +69,7 @@ export function TumiraCourierCollectionPointsTable() {
   }
 
   if (isLoading || isFetching) {
-    return (
-      <Placeholder>
-        <Placeholder.Title>Fetching Courier Collection Points</Placeholder.Title>
-      </Placeholder>
-    )
+    return <TableSkeleton />
   }
 
   return (
