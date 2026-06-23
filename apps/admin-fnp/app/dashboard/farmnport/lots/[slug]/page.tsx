@@ -66,7 +66,7 @@ function TopBidPanel({ slug, unit }: { slug: string; unit: string }) {
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">Top Bid Currently</p>
           <p className="text-lg font-bold text-green-700 dark:text-green-400">
-            {centsToDollars(topBid.offered_price_per_unit_cents)}/{unit}
+            {centsToDollars(topBid.offered_price_per_unit_cents)}
           </p>
           <p className="text-xs text-muted-foreground capitalize">{topBid.bidder_name}</p>
         </div>
