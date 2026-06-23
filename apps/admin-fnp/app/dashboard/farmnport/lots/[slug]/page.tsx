@@ -165,17 +165,17 @@ export default function LotDetailPage({ params }: { params: Promise<{ slug: stri
 
       <div className="flex gap-6 mb-6">
         {(lot.main_image || lot.images?.length > 0) && (
-          <div className="flex-1 max-w-lg">
+          <div className="w-2/3 shrink-0">
             <LotImageGallery mainImage={lot.main_image} images={lot.images} />
           </div>
         )}
-        <div className="flex flex-col gap-3 flex-1">
-          <div className="grid grid-cols-2 gap-3">
-            <div className="rounded-lg border p-4">
+        <div className="flex-1 flex flex-col justify-between gap-4">
+          <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+            <div>
               <p className="text-xs text-muted-foreground mb-1">Starting Price</p>
               <p className="font-semibold">{lot.price_per_unit_cents ? centsToDollars(lot.price_per_unit_cents) : "—"}</p>
             </div>
-            <div className="rounded-lg border p-4">
+            <div>
               <p className="text-xs text-muted-foreground mb-1">Status</p>
               {(() => {
                 const expired = lot.expires_at && new Date(lot.expires_at) < new Date()
@@ -184,11 +184,11 @@ export default function LotDetailPage({ params }: { params: Promise<{ slug: stri
                 return <p className="font-semibold text-green-600">Live</p>
               })()}
             </div>
-            <div className="rounded-lg border p-4">
+            <div>
               <p className="text-xs text-muted-foreground mb-1">Client</p>
               <p className="font-semibold capitalize">{lot.client_name ?? "—"}</p>
             </div>
-            <div className="rounded-lg border p-4">
+            <div>
               <p className="text-xs text-muted-foreground mb-1">Expires</p>
               <p className="font-semibold">{lot.expires_at ? new Date(lot.expires_at).toLocaleDateString("en-GB") : "—"}</p>
             </div>
