@@ -83,11 +83,12 @@ export const lotColumns: ColumnDef<any>[] = [
   {
     accessorKey: "moderated",
     header: "Status",
-    cell: ({ row }) => (
-      <span className={row.original.moderated ? "text-green-600 font-medium" : "text-amber-600 font-medium"}>
-        {row.original.moderated ? "Live" : "Pending"}
-      </span>
-    ),
+    cell: ({ row }) => {
+      const expired = row.original.expires_at && new Date(row.original.expires_at) < new Date()
+      if (expired) return <span className="text-red-600 font-medium">Expired</span>
+      if (!row.original.moderated) return <span className="text-amber-600 font-medium">Pending</span>
+      return <span className="text-green-600 font-medium">Live</span>
+    },
   },
   {
     id: "actions",

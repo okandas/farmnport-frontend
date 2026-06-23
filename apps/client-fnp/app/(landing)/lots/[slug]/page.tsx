@@ -52,6 +52,9 @@ export default async function LotDetailPage({ params }: Props) {
     const produce = lot.farm_produce?.name ?? "Farm Produce"
     const breed = lot.breed?.name ?? null
     const isSelling = lot.type === "sell"
+    const isExpired = lot.expires_date && lot.expires_time
+        ? new Date(`${lot.expires_date}T${lot.expires_time}:00Z`).getTime() < Date.now()
+        : false
 
     return (
         <main>
@@ -147,7 +150,12 @@ export default async function LotDetailPage({ params }: Props) {
                             {/* RIGHT — bid panel */}
                             <div className="lg:col-span-2">
                                 <div className="lg:sticky lg:top-24 rounded-xl border bg-card p-6">
-                                    {user && (user as any).id === lot.client_id ? (
+                                    {isExpired ? (
+                                        <div className="text-center space-y-2 py-2">
+                                            <p className="text-sm font-semibold text-foreground">This lot has expired</p>
+                                            <p className="text-xs text-muted-foreground">Bidding is closed for this listing.</p>
+                                        </div>
+                                    ) : user && (user as any).id === lot.client_id ? (
                                         <div className="text-center space-y-2 py-2">
                                             <p className="text-sm font-semibold text-foreground">This is your lot</p>
                                             <p className="text-xs text-muted-foreground">You cannot place an offer on your own listing.</p>

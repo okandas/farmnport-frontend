@@ -173,11 +173,16 @@ export default function LotDetailPage({ params }: { params: Promise<{ slug: stri
           <div className="grid grid-cols-2 gap-3">
             <div className="rounded-lg border p-4">
               <p className="text-xs text-muted-foreground mb-1">Starting Price</p>
-              <p className="font-semibold">{lot.price_per_unit_cents ? `${centsToDollars(lot.price_per_unit_cents)}/${lot.unit}` : "Negotiable"}</p>
+              <p className="font-semibold">{lot.price_per_unit_cents ? centsToDollars(lot.price_per_unit_cents) : "—"}</p>
             </div>
             <div className="rounded-lg border p-4">
               <p className="text-xs text-muted-foreground mb-1">Status</p>
-              <p className={`font-semibold ${lot.moderated ? "text-green-600" : "text-amber-600"}`}>{lot.moderated ? "Live" : "Pending Approval"}</p>
+              {(() => {
+                const expired = lot.expires_at && new Date(lot.expires_at) < new Date()
+                if (expired) return <p className="font-semibold text-red-600">Expired</p>
+                if (!lot.moderated) return <p className="font-semibold text-amber-600">Pending Approval</p>
+                return <p className="font-semibold text-green-600">Live</p>
+              })()}
             </div>
             <div className="rounded-lg border p-4">
               <p className="text-xs text-muted-foreground mb-1">Client</p>
