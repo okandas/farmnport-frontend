@@ -2,18 +2,18 @@ import { growthbookAdapter } from "@flags-sdk/growthbook"
 import { flag } from "flags/next"
 import { identify } from "@/lib/identify"
 
-// Enables real SMS + WhatsApp sends in dev (off = logrus only)
-export const sendDevAlertsEnabled = flag<boolean>({
-  key: "send_dev_alerts_enabled",
+// SMS alerts — dev: flip ON to send real SMS; production: flip OFF to pause
+export const smsAlertsEnabled = flag<boolean>({
+  key: "sms_alerts_enabled",
   adapter: growthbookAdapter.feature<boolean>(),
   defaultValue: false,
   identify,
 })
 
-// Controls whether SMS/WhatsApp alerts fire in production (off = no sends)
-export const sendSmsAlertsEnabled = flag<boolean>({
-  key: "send_sms_alerts_enabled",
+// Email alerts — dev: flip ON to send real emails; production: flip OFF to pause
+export const emailAlertsEnabled = flag<boolean>({
+  key: "email_alerts_enabled",
   adapter: growthbookAdapter.feature<boolean>(),
-  defaultValue: true,
+  defaultValue: false,
   identify,
 })
