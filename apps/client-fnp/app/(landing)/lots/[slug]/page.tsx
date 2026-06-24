@@ -8,6 +8,7 @@ import { LotBidsPanel } from "@/components/layouts/lot-bids-panel"
 import { fetchLot, fetchLotBids, fetchMyBidOnLot } from "@/lib/serverFetch"
 import { retrieveUser } from "@/lib/actions"
 import { capitalizeFirstLetter, formatDate, centsToDollars } from "@/lib/utilities"
+import { PayBidButton } from "@/components/ui/pay-bid-button"
 import { AppURL } from "@/lib/schemas"
 
 import type { Metadata } from "next"
@@ -121,34 +122,11 @@ export default async function LotDetailPage({ params }: Props) {
                                     </div>
                                 </div>
 
-                                {lot.expires_at && (
-                                    <LotCountdown expiresAt={lot.expires_at} formattedDate={formatDate(lot.expires_at)} />
-                                )}
-
-                                {lot.notes && (
-                                    <div className="py-2">
-                                        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
-                                            Notes from {isSelling ? "seller" : "buyer"}
-                                        </p>
-                                        <p className="text-sm leading-relaxed">{lot.notes}</p>
-                                    </div>
-                                )}
-
-                                {/* Bid activity */}
-                                <div>
-                                    <LotBidsPanel
-                                        total={bidsData?.total ?? 0}
-                                        bids={bidsData?.bids ?? []}
-                                        top_bid={bidsData?.top_bid ?? null}
-                                        accepted={bidsData?.accepted ?? null}
-                                        myBidId={(myBidData as any)?.id}
-                                    />
-                                </div>
 
                             </div>
 
                             {/* RIGHT — bid panel */}
-                            <div className="lg:col-span-2" id="bid-panel">
+                            <div className="lg:col-span-2">
                                 <div className="lg:sticky lg:top-24 space-y-4">
                                     {bidsData?.accepted && (
                                         <div>
@@ -169,7 +147,11 @@ export default async function LotDetailPage({ params }: Props) {
                                         ) : isExpired ? (
                                             <div className="space-y-1">
                                                 <p className="text-sm font-semibold text-foreground">Bidding has closed</p>
-                                                <p className="text-xs text-muted-foreground">This lot is no longer accepting offers.</p>
+                                                <p className="text-xs text-muted-foreground">
+                                                    {bidsData?.accepted?.status === "paid" || bidsData?.accepted?.status === "completed"
+                                                        ? "This lot has a fulfilled order."
+                                                        : "This lot is no longer accepting offers."}
+                                                </p>
                                             </div>
                                         ) : !lot.moderated ? (
                                             <div className="space-y-1">
@@ -207,6 +189,24 @@ export default async function LotDetailPage({ params }: Props) {
                                         )}
                                     </div>
 
+                                    {lot.expires_at && (
+                                        <LotCountdown expiresAt={lot.expires_at} formattedDate={formatDate(lot.expires_at)} />
+                                    )}
+
+                                    {lot.notes && (
+                                        <div className="py-2">
+                                            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
+                                                Notes from {isSelling ? "seller" : "buyer"}
+                                            </p>
+                                            <p className="text-sm leading-relaxed">{lot.notes}</p>
+                                        </div>
+                                    )}
+
+                                    <LotBidsPanel
+                                        slug={slug}
+                                        myBidId={(myBidData as any)?.id}
+                                    />
+
                                     {isExpired && (myBidData as any)?.status === "accepted" && (
                                         <div className="space-y-3">
                                             <div className="space-y-1">
@@ -215,12 +215,7 @@ export default async function LotDetailPage({ params }: Props) {
                                                     Complete payment within 24 hours to secure this lot.
                                                 </p>
                                             </div>
-                                            <Link
-                                                href={`/account/bids/${(myBidData as any)?.id}`}
-                                                className="inline-flex items-center justify-center w-full rounded-md bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
-                                            >
-                                                Pay Now
-                                            </Link>
+                                            <PayBidButton bidId={(myBidData as any)?.id} />
                                         </div>
                                     )}
                                 </div>

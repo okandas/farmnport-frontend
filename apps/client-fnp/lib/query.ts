@@ -897,6 +897,10 @@ export function pollBidPayment(id: string) {
   return api.get(`${BaseURL}/bids/mine/${id}/poll`)
 }
 
+export function getLotBids(slug: string) {
+  return api.get(`${BaseURL}/bids/${slug}`)
+}
+
 // Bookings
 export function listBookingEvents(options?: { product_id?: string; status?: string }) {
   const params = new URLSearchParams()

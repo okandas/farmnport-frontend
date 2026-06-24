@@ -69,14 +69,14 @@ export function LotImageGallery({ mainImage, images = [] }: Props) {
               onClick={prev}
               className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 border border-border shadow-md flex items-center justify-center hover:bg-white transition-colors z-10"
             >
-              <ChevronLeft className="w-5 h-5 text-foreground" />
+              <ChevronLeft className="w-5 h-5 text-zinc-800" />
             </button>
             <button
               type="button"
               onClick={next}
               className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 border border-border shadow-md flex items-center justify-center hover:bg-white transition-colors z-10"
             >
-              <ChevronRight className="w-5 h-5 text-foreground" />
+              <ChevronRight className="w-5 h-5 text-zinc-800" />
             </button>
           </>
         )}
