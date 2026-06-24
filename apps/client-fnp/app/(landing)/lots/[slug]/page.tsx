@@ -204,6 +204,7 @@ export default async function LotDetailPage({ params }: Props) {
 
                                     <LotBidsPanel
                                         slug={slug}
+                                        lotType={lot.type}
                                         myBidId={(myBidData as any)?.id}
                                         myBidMainImage={(myBidData as any)?.supply_images?.main_image ?? null}
                                         myBidImages={(myBidData as any)?.supply_images?.images ?? []}

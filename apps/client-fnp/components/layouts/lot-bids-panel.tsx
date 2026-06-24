@@ -23,12 +23,13 @@ interface PublicBid {
 
 interface Props {
   slug: string
+  lotType?: string
   myBidId?: string
   myBidMainImage?: { img: { id: string; src: string } } | null
   myBidImages?: { img: { id: string; src: string } }[]
 }
 
-export function LotBidsPanel({ slug, myBidId, myBidMainImage, myBidImages }: Props) {
+export function LotBidsPanel({ slug, lotType, myBidId, myBidMainImage, myBidImages }: Props) {
   const [galleryOpen, setGalleryOpen] = useState(false)
   const [visible, setVisible] = useState(PAGE_SIZE)
   const sentinelRef = useRef<HTMLDivElement>(null)
@@ -86,7 +87,7 @@ export function LotBidsPanel({ slug, myBidId, myBidMainImage, myBidImages }: Pro
         <span className="text-sm font-semibold text-foreground">Offers</span>
         {top_bid && !accepted && (
           <div className="text-right">
-            <p className="text-xs text-muted-foreground">Top Bid</p>
+            <p className="text-xs text-muted-foreground">{lotType === "request" ? "Best Offer" : "Top Bid"}</p>
             <p className="text-2xl font-bold text-foreground">{centsToDollars(top_bid.offered_price_per_unit_cents)}</p>
           </div>
         )}

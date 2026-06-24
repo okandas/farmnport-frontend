@@ -29,10 +29,11 @@ function capitalizeFirst(s?: string) {
   return s.charAt(0).toUpperCase() + s.slice(1)
 }
 
-function TopBidPanel({ slug, unit }: { slug: string; unit: string }) {
+function TopBidPanel({ slug, unit, lotType }: { slug: string; unit: string; lotType: string }) {
   const queryClient = useQueryClient()
   const [open, setOpen] = useState(false)
   const [confirm, setConfirm] = useState("")
+  const isRequest = lotType === "request"
 
   const { data } = useQuery({
     queryKey: ["lot-bids", slug, { p: 1 }],
@@ -43,7 +44,10 @@ function TopBidPanel({ slug, unit }: { slug: string; unit: string }) {
   const bids: any[] = data?.data?.data ?? []
   const topBid = bids
     .filter((b) => b.status === "pending")
-    .sort((a, b) => b.offered_price_per_unit_cents - a.offered_price_per_unit_cents)[0] ?? null
+    .sort((a, b) => isRequest
+      ? a.offered_price_per_unit_cents - b.offered_price_per_unit_cents
+      : b.offered_price_per_unit_cents - a.offered_price_per_unit_cents
+    )[0] ?? null
 
   const { mutate, isPending } = useMutation({
     mutationFn: () => adminAcceptBid(topBid.id),
@@ -64,7 +68,7 @@ function TopBidPanel({ slug, unit }: { slug: string; unit: string }) {
     <>
       <div className="rounded-lg border border-green-200 bg-green-50/50 dark:bg-green-900/10 dark:border-green-800 p-4 flex items-center justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">Top Bid Currently</p>
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">{isRequest ? "Best Offer" : "Top Bid"}</p>
           <p className="text-lg font-bold text-green-700 dark:text-green-400">
             {centsToDollars(topBid.offered_price_per_unit_cents)}
           </p>
@@ -192,7 +196,7 @@ export default function LotDetailPage({ params }: { params: Promise<{ slug: stri
               <p className="text-sm font-semibold">{lot.expires_at ? new Date(lot.expires_at).toLocaleDateString("en-GB") : "—"}</p>
             </div>
           </div>
-          <TopBidPanel slug={slug} unit={lot.unit} />
+          <TopBidPanel slug={slug} unit={lot.unit} lotType={lot.type} />
         </div>
 
         {/* Right: bids table */}
