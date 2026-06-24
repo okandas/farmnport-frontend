@@ -85,9 +85,10 @@ export function LotBidsPanel({ slug, myBidId, myBidMainImage, myBidImages }: Pro
       <div className="flex items-center justify-between pb-1">
         <span className="text-sm font-semibold text-foreground">Offers</span>
         {top_bid && !accepted && (
-          <span className="text-sm text-muted-foreground">
-            Best: <span className="font-semibold text-foreground">{centsToDollars(top_bid.offered_price_per_unit_cents)}</span>
-          </span>
+          <div className="text-right">
+            <p className="text-xs text-muted-foreground">Top Bid</p>
+            <p className="text-2xl font-bold text-foreground">{centsToDollars(top_bid.offered_price_per_unit_cents)}</p>
+          </div>
         )}
       </div>
 
