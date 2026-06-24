@@ -131,7 +131,7 @@ export default async function LotDetailPage({ params }: Props) {
                                         </p>
                                     </div>
                                 )}
-                                <div className={isExpired ? "" : "rounded-xl bg-card p-6"}>
+                                <div className={isExpired ? "" : "rounded-xl bg-card"}>
                                     {isExpired && bidsData?.accepted && (myBidData as any)?.status !== "accepted" ? (
                                         <div className="space-y-1">
                                             <p className="text-sm font-semibold text-amber-700 dark:text-amber-400">Awaiting payment</p>
@@ -157,6 +157,11 @@ export default async function LotDetailPage({ params }: Props) {
                                         <div className="space-y-1">
                                             <p className="text-sm font-semibold text-foreground">This is your lot</p>
                                             <p className="text-xs text-muted-foreground">You cannot place an offer on your own listing.</p>
+                                        </div>
+                                    ) : bidsData?.accepted ? (
+                                        <div className="space-y-1">
+                                            <p className="text-sm font-semibold text-foreground">Offer accepted</p>
+                                            <p className="text-xs text-muted-foreground">This lot has an accepted offer and is no longer accepting new bids.</p>
                                         </div>
                                     ) : user ? (
                                         <PlaceBidForm lot={lot} topBidCents={bidsData?.top_bid?.offered_price_per_unit_cents} />
