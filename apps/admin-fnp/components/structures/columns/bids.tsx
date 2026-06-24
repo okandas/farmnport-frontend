@@ -115,7 +115,7 @@ export const bidColumns: ColumnDef<any>[] = [
     accessorKey: "offered_price_per_unit_cents",
     header: "Bid Price",
     cell: ({ row }) => (
-      <span>{row.original.offered_price_per_unit_cents ? `${centsToDollars(row.original.offered_price_per_unit_cents)}/${row.original.unit}` : "—"}</span>
+      <span>{row.original.offered_price_per_unit_cents ? centsToDollars(row.original.offered_price_per_unit_cents) : "—"}</span>
     ),
   },
   {
@@ -128,7 +128,7 @@ export const bidColumns: ColumnDef<any>[] = [
     header: "Placed",
     cell: ({ row }) => (
       <span className="text-sm text-muted-foreground">
-        {new Date(row.original.created).toLocaleDateString("en-GB")}
+        {new Date(row.original.created).toLocaleDateString("en-GB")}{" "}{new Date(row.original.created).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}
       </span>
     ),
   },
