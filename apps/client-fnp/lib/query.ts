@@ -891,6 +891,16 @@ export function retryOrderPayment(id: string) {
   return api.post(`${BaseURL}/order/${id}/pay`, {})
 }
 
+// Lots
+export function myLots(page?: number) {
+  const p = page && page >= 2 ? `?p=${page}` : ""
+  return api.get(`${BaseURL}/lots/mine${p}`)
+}
+
+export function myLotBids(slug: string) {
+  return api.get(`${BaseURL}/bids/lot/${slug}`)
+}
+
 // Bids
 export function myBids(page?: number) {
   const p = page && page >= 2 ? `?p=${page}` : ""

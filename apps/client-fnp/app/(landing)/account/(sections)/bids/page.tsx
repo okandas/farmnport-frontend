@@ -105,7 +105,12 @@ export default function MyBidsPage() {
                   <span className={`text-xs px-2 py-0.5 rounded-md font-medium ${STATUS_STYLES[bid.status] ?? "bg-muted text-muted-foreground"}`}>
                     {capitalize(bid.status)}
                   </span>
-                  {bid.status === "accepted" && bid.payment_deadline && (
+                  {bid.status === "accepted" && bid.lot_type === "request" && (
+                    <span className="text-xs text-green-700 dark:text-green-400 font-medium">
+                      You have been selected to supply
+                    </span>
+                  )}
+                  {bid.status === "accepted" && bid.lot_type !== "request" && bid.payment_deadline && (
                     <span className="text-xs text-amber-700 dark:text-amber-400 font-medium">
                       Pay by {formatDate(bid.payment_deadline)}
                     </span>

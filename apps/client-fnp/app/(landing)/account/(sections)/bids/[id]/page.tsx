@@ -182,7 +182,19 @@ export default function BidDetailPage({ params }: { params: Promise<{ id: string
             </div>
           )}
 
-          {isAccepted && bid.payment_deadline && (
+          {isAccepted && bid.lot_type === "request" && (
+            <div className="rounded-lg bg-green-50 dark:bg-green-900/20 p-4 space-y-1">
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4 text-green-700 dark:text-green-400 shrink-0" />
+                <p className="font-semibold text-sm text-green-900 dark:text-green-300">Your supply offer was accepted</p>
+              </div>
+              <p className="text-xs text-green-800 dark:text-green-400">
+                The buyer has selected your offer and will arrange payment and logistics shortly.
+              </p>
+            </div>
+          )}
+
+          {isAccepted && bid.lot_type !== "request" && bid.payment_deadline && (
             <div className="rounded-lg bg-amber-50 dark:bg-amber-900/20 p-4 space-y-2">
               <div className="flex items-center gap-2">
                 <Clock className="w-4 h-4 text-amber-700 dark:text-amber-400 shrink-0" />

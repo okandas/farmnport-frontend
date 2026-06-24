@@ -4,6 +4,7 @@ import AccountSectionsNav, { NavItem } from "./AccountSectionsNav"
 const ALL_NAV: (NavItem & { flag?: () => Promise<boolean> })[] = [
   { label: "Orders",            href: "/account/orders" },
   { label: "Bids",              href: "/account/bids" },
+  { label: "Lots",              href: "/account/lots" },
   { label: "Bookings",          href: "/account/bookings",          flag: bookingsEnabled },
   { label: "Incoming Bookings", href: "/account/incoming-bookings", flag: bookingsEnabled },
   { label: "Notifications",     href: "/account/notifications",     flag: notificationsEnabled },
