@@ -132,14 +132,6 @@ export default function BidDetailPage({ params }: { params: Promise<{ id: string
         </Link>
       </div>
 
-      {/* Paid / completed banner */}
-      {isPaid && (
-        <div className="rounded-xl bg-green-50 dark:bg-green-900/20 p-5 mb-6">
-          <p className="font-semibold text-sm text-green-800 dark:text-green-300">Payment received — lot secured</p>
-          <p className="text-sm text-green-700 dark:text-green-400 mt-1">The seller will be in touch to arrange delivery.</p>
-        </div>
-      )}
-
       <div className="flex gap-6">
         {/* Image */}
         {(bid.lot_main_image || bid.lot_images?.length > 0) && (
@@ -153,19 +145,21 @@ export default function BidDetailPage({ params }: { params: Promise<{ id: string
           <div className="grid grid-cols-2 gap-x-6 gap-y-4">
             <div>
               <p className="text-xs text-muted-foreground mb-1">Your Bid</p>
-              <p className="font-semibold">{centsToDollars(bid.offered_price_per_unit_cents)}/{bid.unit}</p>
+              <p className="font-semibold">{centsToDollars(bid.offered_price_per_unit_cents)}</p>
             </div>
-            <div>
-              <p className="text-xs text-muted-foreground mb-1">Total</p>
-              <p className="font-semibold">{centsToDollars(bid.total_cents)}</p>
-            </div>
+            {bid.reviewed_at && (
+              <div>
+                <p className="text-xs text-muted-foreground mb-1">Accepted</p>
+                <p className="font-semibold text-sm">{formatDate(bid.reviewed_at)}</p>
+              </div>
+            )}
             <div>
               <p className="text-xs text-muted-foreground mb-1">Quantity</p>
               <p className="font-semibold">{bid.quantity} {bid.unit}</p>
             </div>
             <div>
               <p className="text-xs text-muted-foreground mb-1">Placed</p>
-              <p className="font-semibold">{formatDate(bid.created)}</p>
+              <p className="font-semibold text-sm">{formatDate(bid.created)}</p>
             </div>
             {bid.notes && (
               <div className="col-span-2">
@@ -180,6 +174,13 @@ export default function BidDetailPage({ params }: { params: Promise<{ id: string
               </div>
             )}
           </div>
+
+          {isPaid && (
+            <div className="rounded-xl bg-green-50 dark:bg-green-900/20 p-5">
+              <p className="font-semibold text-sm text-green-800 dark:text-green-300">Payment received — lot secured</p>
+              <p className="text-sm text-green-700 dark:text-green-400 mt-1">We will be in touch to arrange delivery.</p>
+            </div>
+          )}
 
           {isAccepted && bid.payment_deadline && (
             <div className="rounded-lg bg-amber-50 dark:bg-amber-900/20 p-4 space-y-2">
