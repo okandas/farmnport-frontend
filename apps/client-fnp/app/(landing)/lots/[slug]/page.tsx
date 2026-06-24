@@ -110,6 +110,15 @@ export default async function LotDetailPage({ params }: Props) {
                                     />
                                 )}
 
+                                {bidsData?.accepted && (
+                                    <div className="text-center">
+                                        <p className="text-xs font-semibold uppercase tracking-wide text-foreground mb-1">Deal agreed</p>
+                                        <p className="text-3xl font-bold text-green-700 dark:text-green-400">
+                                            {centsToDollars(bidsData.accepted.offered_price_per_unit_cents)}
+                                        </p>
+                                    </div>
+                                )}
+
                                 <div className="grid grid-cols-3 gap-3">
                                     <div className="rounded-xl border bg-card p-4">
                                         <p className="text-xs text-muted-foreground mb-1">Listed price</p>
@@ -126,16 +135,6 @@ export default async function LotDetailPage({ params }: Props) {
                                         <p className="text-2xl font-bold">{capitalizeFirstLetter(lot.form)}</p>
                                     </div>
                                 </div>
-
-                                {/* Bid card — below stats */}
-                                {bidsData?.accepted && (
-                                    <div>
-                                        <p className="text-xs font-semibold uppercase tracking-wide text-foreground mb-1">Deal agreed</p>
-                                        <p className="text-3xl font-bold text-green-700 dark:text-green-400">
-                                            {centsToDollars(bidsData.accepted.offered_price_per_unit_cents)}
-                                        </p>
-                                    </div>
-                                )}
                                 <div className={isExpired ? "" : "rounded-xl bg-card"}>
                                     {isExpired && bidsData?.accepted && (myBidData as any)?.status !== "accepted" ? (
                                         <div className="space-y-1">
