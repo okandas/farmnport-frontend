@@ -163,42 +163,44 @@ export default function LotDetailPage({ params }: { params: Promise<{ slug: stri
         </Link>
       </DashboardHeader>
 
-      <div className="flex gap-6 mb-6">
-        {(lot.main_image || lot.images?.length > 0) && (
-          <div className="w-2/3 shrink-0">
+      <div className="flex gap-6">
+        {/* Left: images + stats */}
+        <div className="w-80 shrink-0 flex flex-col gap-3">
+          {(lot.main_image || lot.images?.length > 0) && (
             <LotImageGallery mainImage={lot.main_image} images={lot.images} />
-          </div>
-        )}
-        <div className="flex-1 flex flex-col justify-between gap-4">
-          <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+          )}
+          <div className="grid grid-cols-2 gap-x-4 gap-y-2 rounded-lg border bg-muted/30 px-4 py-3">
             <div>
-              <p className="text-xs text-muted-foreground mb-1">Starting Price</p>
-              <p className="font-semibold">{lot.price_per_unit_cents ? centsToDollars(lot.price_per_unit_cents) : "—"}</p>
+              <p className="text-xs text-muted-foreground">Starting Price</p>
+              <p className="text-sm font-semibold">{lot.price_per_unit_cents ? centsToDollars(lot.price_per_unit_cents) : "—"}</p>
             </div>
             <div>
-              <p className="text-xs text-muted-foreground mb-1">Status</p>
+              <p className="text-xs text-muted-foreground">Status</p>
               {(() => {
                 const expired = lot.expires_at && new Date(lot.expires_at) < new Date()
-                if (expired) return <p className="font-semibold text-red-600">Expired</p>
-                if (!lot.moderated) return <p className="font-semibold text-amber-600">Pending Approval</p>
-                return <p className="font-semibold text-green-600">Live</p>
+                if (expired) return <p className="text-sm font-semibold text-red-600">Expired</p>
+                if (!lot.moderated) return <p className="text-sm font-semibold text-amber-600">Pending Approval</p>
+                return <p className="text-sm font-semibold text-green-600">Live</p>
               })()}
             </div>
             <div>
-              <p className="text-xs text-muted-foreground mb-1">Client</p>
-              <p className="font-semibold capitalize">{lot.client_name ?? "—"}</p>
+              <p className="text-xs text-muted-foreground">Client</p>
+              <p className="text-sm font-semibold capitalize">{lot.client_name ?? "—"}</p>
             </div>
             <div>
-              <p className="text-xs text-muted-foreground mb-1">Expires</p>
-              <p className="font-semibold">{lot.expires_at ? new Date(lot.expires_at).toLocaleDateString("en-GB") : "—"}</p>
+              <p className="text-xs text-muted-foreground">Expires</p>
+              <p className="text-sm font-semibold">{lot.expires_at ? new Date(lot.expires_at).toLocaleDateString("en-GB") : "—"}</p>
             </div>
           </div>
           <TopBidPanel slug={slug} unit={lot.unit} />
         </div>
-      </div>
 
-      <h2 className="text-base font-semibold mb-3">Bids</h2>
-      <BidsTable slug={slug} />
+        {/* Right: bids table */}
+        <div className="flex-1 min-w-0">
+          <h2 className="text-base font-semibold mb-3">Bids</h2>
+          <BidsTable slug={slug} />
+        </div>
+      </div>
     </DashboardShell>
   )
 }

@@ -24,6 +24,7 @@ function StatusBadge({ status }: { status: string }) {
     paid: "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
     completed: "bg-purple-50 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
     expired: "bg-gray-50 text-gray-600 dark:bg-gray-800/30 dark:text-gray-400",
+    closed: "bg-gray-50 text-gray-500 dark:bg-gray-800/30 dark:text-gray-500",
   }
   return (
     <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium capitalize ${map[status] ?? "bg-gray-50 text-gray-600"}`}>
@@ -107,45 +108,14 @@ export const bidColumns: ColumnDef<any>[] = [
     accessorKey: "bidder_name",
     header: "Bidder",
     cell: ({ row }) => (
-      <div>
-        <p className="font-medium capitalize">{row.original.bidder_name ?? "—"}</p>
-        <p className="text-xs text-muted-foreground">{row.original.bidder_email}</p>
-      </div>
+      <span className="font-medium capitalize text-sm">{row.original.bidder_name}</span>
     ),
-  },
-  {
-    accessorKey: "lot_slug",
-    header: "Lot",
-    cell: ({ row }) => (
-      <span className="text-sm font-mono text-muted-foreground">{row.original.lot_slug ?? "—"}</span>
-    ),
-  },
-  {
-    accessorKey: "lot_type",
-    header: "Type",
-    cell: ({ row }) => (
-      row.original.lot_type === "sell"
-        ? <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">Sell</span>
-        : <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400">Request</span>
-    ),
-  },
-  {
-    accessorKey: "quantity",
-    header: "Qty",
-    cell: ({ row }) => <span>{row.original.quantity?.toLocaleString()} {row.original.unit}</span>,
   },
   {
     accessorKey: "offered_price_per_unit_cents",
     header: "Bid Price",
     cell: ({ row }) => (
       <span>{row.original.offered_price_per_unit_cents ? `${centsToDollars(row.original.offered_price_per_unit_cents)}/${row.original.unit}` : "—"}</span>
-    ),
-  },
-  {
-    accessorKey: "total_cents",
-    header: "Total",
-    cell: ({ row }) => (
-      <span className="font-medium">{row.original.total_cents ? centsToDollars(row.original.total_cents) : "—"}</span>
     ),
   },
   {
