@@ -110,6 +110,7 @@ export function BuyPlantNutritionClient({ initialProducts, initialTotal }: BuyPl
                                     hasVariants={product.variants?.length > 0}
                                     variantPriceRange={product.variant_price_range}
                                     pickupOnly={product.pickup_location_ids?.length > 0 && !product.delivery_available && !(product.delivery_location_ids?.length > 0)}
+                                    isTest={product.is_test}
                                 />
                             ))}
                         </div>

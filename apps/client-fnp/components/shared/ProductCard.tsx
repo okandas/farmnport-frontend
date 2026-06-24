@@ -28,12 +28,13 @@ interface ProductCardProps {
   hasVariants?: boolean
   variantPriceRange?: { min: number; max: number }
   pickupOnly?: boolean
+  isTest?: boolean
 }
 
 export function ProductCard({
   href, imageSrc, name, brand, meta, mode, buttonLabel = "View Guide",
   salePrice, wasPrice, showWasPrice, availableForSale,
-  productId, productType, productSlug, loginRedirect, preorderHref, stockLevel, hasVariants, variantPriceRange, pickupOnly,
+  productId, productType, productSlug, loginRedirect, preorderHref, stockLevel, hasVariants, variantPriceRange, pickupOnly, isTest,
 }: ProductCardProps) {
   const inStock = availableForSale && (stockLevel === undefined || stockLevel > 0)
 
@@ -61,6 +62,11 @@ export function ProductCard({
           {pickupOnly && (
             <span className="absolute top-2 left-2 bg-background/90 text-foreground text-[10px] font-medium px-2 py-0.5 rounded-full border border-border">
               Pickup only
+            </span>
+          )}
+          {isTest && (
+            <span className="absolute top-2 right-2 bg-amber-500 text-white text-[10px] font-semibold px-2 py-0.5 rounded-md">
+              Test Item
             </span>
           )}
         </div>

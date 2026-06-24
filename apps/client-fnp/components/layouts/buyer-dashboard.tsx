@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { Tag, ArrowRight } from "lucide-react"
+import { Tag, ArrowRight, Gavel, ShoppingBag } from "lucide-react"
 import { sendGTMEvent } from "@next/third-parties/google"
 import { AuthenticatedUser } from "@/lib/schemas"
 
@@ -36,6 +36,36 @@ export function BuyerDashboard({ user }: BuyerDashboardProps) {
                 <div>
                   <p className="text-sm font-semibold">Post New Lot</p>
                   <p className="text-xs text-muted-foreground mt-0.5">Post a lot to sell or request produce</p>
+                </div>
+              </div>
+              <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors shrink-0" />
+            </Link>
+            <Link
+              href="/account/bids"
+              className="flex items-center justify-between gap-4 rounded-xl border bg-card p-5 hover:bg-muted/50 transition-colors group"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                  <Gavel className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold">Your Bids</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">View and manage your lot bids</p>
+                </div>
+              </div>
+              <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors shrink-0" />
+            </Link>
+            <Link
+              href="/account/orders"
+              className="flex items-center justify-between gap-4 rounded-xl border bg-card p-5 hover:bg-muted/50 transition-colors group"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                  <ShoppingBag className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold">Your Orders</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">Track your shop orders</p>
                 </div>
               </div>
               <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors shrink-0" />

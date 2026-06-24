@@ -184,7 +184,7 @@ export function BuyPageClient({
           {agrochemicalTotal > 0 && (
             <Section label="Agrochemicals" href="/buy-agrochemicals" count={agrochemicalTotal}>
               {agrochemicals.slice(0, 4).map((p) => (
-                <ProductCard key={p.id} mode="buy" href={`/buy-agrochemicals/${p.slug}`} imageSrc={p.images?.[0]?.img?.src} name={p.name} brand={p.brand?.name} meta={p.agrochemical_category?.name} productId={p.id} productType="agrochemical" productSlug={p.slug} salePrice={p.sale_price} wasPrice={p.was_price} showWasPrice={p.show_was_price} availableForSale={p.available_for_sale} stockLevel={p.stock_level} hasVariants={p.variants?.length > 0} variantPriceRange={p.variant_price_range} pickupOnly={p.pickup_location_ids?.length > 0 && !p.delivery_available && !(p.delivery_location_ids?.length > 0)} />
+                <ProductCard key={p.id} mode="buy" href={`/buy-agrochemicals/${p.slug}`} imageSrc={p.images?.[0]?.img?.src} name={p.name} brand={p.brand?.name} meta={p.agrochemical_category?.name} productId={p.id} productType="agrochemical" productSlug={p.slug} salePrice={p.sale_price} wasPrice={p.was_price} showWasPrice={p.show_was_price} availableForSale={p.available_for_sale} stockLevel={p.stock_level} hasVariants={p.variants?.length > 0} variantPriceRange={p.variant_price_range} pickupOnly={p.pickup_location_ids?.length > 0 && !p.delivery_available && !(p.delivery_location_ids?.length > 0)} isTest={p.is_test} />
               ))}
             </Section>
           )}
@@ -192,7 +192,7 @@ export function BuyPageClient({
           {animalHealthTotal > 0 && (
             <Section label="Animal Health" href="/buy-animal-health" count={animalHealthTotal}>
               {animalHealth.slice(0, 4).map((p) => (
-                <ProductCard key={p.id} mode="buy" href={`/buy-animal-health/${p.slug}`} imageSrc={p.images?.[0]?.img?.src} name={p.name} brand={p.brand?.name} meta={p.animal_health_category?.name} productId={p.id} productType="animal_health" productSlug={p.slug} salePrice={p.sale_price} wasPrice={p.was_price} showWasPrice={p.show_was_price} availableForSale={p.available_for_sale} stockLevel={p.stock_level} hasVariants={p.variants?.length > 0} variantPriceRange={p.variant_price_range} pickupOnly={p.pickup_location_ids?.length > 0 && !p.delivery_available && !(p.delivery_location_ids?.length > 0)} />
+                <ProductCard key={p.id} mode="buy" href={`/buy-animal-health/${p.slug}`} imageSrc={p.images?.[0]?.img?.src} name={p.name} brand={p.brand?.name} meta={p.animal_health_category?.name} productId={p.id} productType="animal_health" productSlug={p.slug} salePrice={p.sale_price} wasPrice={p.was_price} showWasPrice={p.show_was_price} availableForSale={p.available_for_sale} stockLevel={p.stock_level} hasVariants={p.variants?.length > 0} variantPriceRange={p.variant_price_range} pickupOnly={p.pickup_location_ids?.length > 0 && !p.delivery_available && !(p.delivery_location_ids?.length > 0)} isTest={p.is_test} />
               ))}
             </Section>
           )}
@@ -200,7 +200,7 @@ export function BuyPageClient({
           {feedsTotal > 0 && (
             <Section label="Animal Feed" href="/buy-feeds" count={feedsTotal}>
               {feeds.slice(0, 4).map((p) => (
-                <ProductCard key={p.id} mode="buy" href={`/buy-feeds/${p.slug}`} imageSrc={p.images?.[0]?.img?.src} name={p.name} brand={p.brand?.name} meta={p.animal ? `${p.animal}${p.phase ? ` · ${p.phase}` : ""}` : undefined} productId={p.id} productType="feed" productSlug={p.slug} salePrice={p.sale_price} wasPrice={p.was_price} showWasPrice={p.show_was_price} availableForSale={p.available_for_sale} stockLevel={p.stock_level} hasVariants={p.variants?.length > 0} variantPriceRange={p.variant_price_range} pickupOnly={p.pickup_location_ids?.length > 0 && !p.delivery_available && !(p.delivery_location_ids?.length > 0)} />
+                <ProductCard key={p.id} mode="buy" href={`/buy-feeds/${p.slug}`} imageSrc={p.images?.[0]?.img?.src} name={p.name} brand={p.brand?.name} meta={p.animal ? `${p.animal}${p.phase ? ` · ${p.phase}` : ""}` : undefined} productId={p.id} productType="feed" productSlug={p.slug} salePrice={p.sale_price} wasPrice={p.was_price} showWasPrice={p.show_was_price} availableForSale={p.available_for_sale} stockLevel={p.stock_level} hasVariants={p.variants?.length > 0} variantPriceRange={p.variant_price_range} pickupOnly={p.pickup_location_ids?.length > 0 && !p.delivery_available && !(p.delivery_location_ids?.length > 0)} isTest={p.is_test} />
               ))}
             </Section>
           )}
@@ -208,7 +208,7 @@ export function BuyPageClient({
           {plantNutritionTotal > 0 && (
             <Section label="Plant Nutrition" href="/buy-plant-nutrition" count={plantNutritionTotal}>
               {plantNutrition.slice(0, 4).map((p) => (
-                <ProductCard key={p.id} mode="buy" href={`/buy-plant-nutrition/${p.slug}`} imageSrc={p.images?.[0]?.img?.src} name={p.name} brand={p.brand?.name} meta={p.plant_nutrition_category?.name} productId={p.id} productType="plant_nutrition" productSlug={p.slug} salePrice={p.sale_price} wasPrice={p.was_price} showWasPrice={p.show_was_price} availableForSale={p.available_for_sale} stockLevel={p.stock_level} hasVariants={p.variants?.length > 0} variantPriceRange={p.variant_price_range} pickupOnly={p.pickup_location_ids?.length > 0 && !p.delivery_available && !(p.delivery_location_ids?.length > 0)} />
+                <ProductCard key={p.id} mode="buy" href={`/buy-plant-nutrition/${p.slug}`} imageSrc={p.images?.[0]?.img?.src} name={p.name} brand={p.brand?.name} meta={p.plant_nutrition_category?.name} productId={p.id} productType="plant_nutrition" productSlug={p.slug} salePrice={p.sale_price} wasPrice={p.was_price} showWasPrice={p.show_was_price} availableForSale={p.available_for_sale} stockLevel={p.stock_level} hasVariants={p.variants?.length > 0} variantPriceRange={p.variant_price_range} pickupOnly={p.pickup_location_ids?.length > 0 && !p.delivery_available && !(p.delivery_location_ids?.length > 0)} isTest={p.is_test} />
               ))}
             </Section>
           )}
@@ -218,7 +218,7 @@ export function BuyPageClient({
               {seeds.slice(0, 4).map((p) => {
                 const bookingEvent = bookingEvents.find((e: any) => e.product_id === p.id)
                 return (
-                  <ProductCard key={p.id} mode="buy" href={`/buy-seed-products/${p.slug}`} imageSrc={p.images?.[0]?.img?.src} name={p.name} brand={p.brand?.name} meta={p.variety ? `${p.variety}${p.type ? ` · ${p.type.replace("_", " ")}` : ""}` : undefined} productId={p.id} productType="seed_product" productSlug={p.slug} salePrice={p.sale_price} wasPrice={p.was_price} showWasPrice={p.show_was_price} availableForSale={p.available_for_sale} stockLevel={p.stock_level} hasVariants={p.variants && p.variants.length > 0} variantPriceRange={p.variant_price_range} preorderHref={bookingEvent ? `/bookings/${bookingEvent.slug}` : undefined} />
+                  <ProductCard key={p.id} mode="buy" href={`/buy-seed-products/${p.slug}`} imageSrc={p.images?.[0]?.img?.src} name={p.name} brand={p.brand?.name} meta={p.variety ? `${p.variety}${p.type ? ` · ${p.type.replace("_", " ")}` : ""}` : undefined} productId={p.id} productType="seed_product" productSlug={p.slug} salePrice={p.sale_price} wasPrice={p.was_price} showWasPrice={p.show_was_price} availableForSale={p.available_for_sale} stockLevel={p.stock_level} hasVariants={p.variants && p.variants.length > 0} variantPriceRange={p.variant_price_range} preorderHref={bookingEvent ? `/bookings/${bookingEvent.slug}` : undefined} isTest={p.is_test} />
                 )
               })}
             </Section>

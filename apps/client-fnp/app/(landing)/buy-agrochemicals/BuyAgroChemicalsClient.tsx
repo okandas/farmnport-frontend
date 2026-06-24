@@ -118,6 +118,7 @@ export function BuyAgroChemicalsClient({ initialChemicals, initialTotal }: BuyAg
                                     hasVariants={chemical.variants?.length > 0}
                                     variantPriceRange={chemical.variant_price_range}
                                     pickupOnly={chemical.pickup_location_ids?.length > 0 && !chemical.delivery_available && !(chemical.delivery_location_ids?.length > 0)}
+                                    isTest={chemical.is_test}
                                 />
                             ))}
                         </div>
