@@ -136,7 +136,7 @@ export default async function LotDetailPage({ params }: Props) {
                                             </p>
                                         </div>
                                     )}
-                                    <div className={isExpired ? "" : "rounded-xl border bg-card p-6"}>
+                                    <div className={isExpired ? "" : "rounded-xl bg-card p-6"}>
                                         {isExpired && bidsData?.accepted && (myBidData as any)?.status !== "accepted" ? (
                                             <div className="space-y-1">
                                                 <p className="text-sm font-semibold text-amber-700 dark:text-amber-400">Awaiting payment</p>

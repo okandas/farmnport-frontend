@@ -151,7 +151,9 @@ export function PlaceBidForm({ lot, topBidCents, onSuccess }: Props) {
     }),
     onSuccess: () => {
       setPendingData(null)
+      setShowForm(false)
       qc.invalidateQueries({ queryKey: ["my-bid-on-lot", lot.slug, username] })
+      qc.invalidateQueries({ queryKey: ["bid-images", lot.slug, username] })
       toast.success("Bid placed successfully! The lot owner will be notified.")
       setTimeout(() => router.refresh(), 300)
       onSuccess?.()
@@ -163,6 +165,10 @@ export function PlaceBidForm({ lot, topBidCents, onSuccess }: Props) {
   })
 
   const [pendingData, setPendingData] = useState<FormModel | null>(null)
+  const [showForm, setShowForm] = useState(false)
+
+  const hasSupplyImages = isSupplyLot && !!(existingBidImages?.main_image || existingBidImages?.images?.length)
+  const showSummary = isSupplyLot && !!existingBid && hasSupplyImages && !showForm
 
   const location = [profile?.address, profile?.city, profile?.province]
     .filter(Boolean)
@@ -221,28 +227,101 @@ export function PlaceBidForm({ lot, topBidCents, onSuccess }: Props) {
       </DialogContent>
     </Dialog>
     <div className="space-y-5">
-      <h3 className="text-base font-semibold">
-        {isSelling ? "Place an Offer to Buy" : "Submit a Supply Offer"}
-      </h3>
+      <div className="flex items-center justify-between">
+        <h3 className="text-base font-semibold">
+          {isSelling ? "Place an Offer to Buy" : "Submit a Supply Offer"}
+        </h3>
+        {showSummary && (
+          <button type="button" onClick={() => setShowForm(true)} className="text-xs text-primary underline hover:no-underline">
+            Update offer
+          </button>
+        )}
+        {isSupplyLot && showForm && hasSupplyImages && (
+          <button type="button" onClick={() => setShowForm(false)} className="text-xs text-muted-foreground underline hover:no-underline">
+            Cancel
+          </button>
+        )}
+      </div>
 
-      {existingBid && (() => {
-        const isTopBidder = topBidCents !== undefined && existingBid.offered_price_per_unit_cents >= topBidCents
-        return isTopBidder ? (
-          <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3">
-            <p className="text-xs text-green-800">
-              You currently have the highest bid — <span className="font-semibold">{centsToDollars(existingBid.offered_price_per_unit_cents)}</span>.
-            </p>
+      {showSummary ? (
+        <div className="space-y-3">
+          <div className="flex flex-wrap gap-2">
+            {existingBidImages?.main_image && (
+              <div className="w-24 h-24 rounded-lg overflow-hidden shrink-0">
+                <img src={existingBidImages.main_image.img.src} alt="Main supply photo" className="w-full h-full object-cover" />
+              </div>
+            )}
+            {existingBidImages?.images?.map((i: any) => (
+              <div key={i.img.id} className="w-24 h-24 rounded-lg overflow-hidden shrink-0">
+                <img src={i.img.src} alt="Supply photo" className="w-full h-full object-cover" />
+              </div>
+            ))}
           </div>
-        ) : (
-          <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
-            <p className="text-xs text-amber-800">
-              Your current offer: <span className="font-semibold">{centsToDollars(existingBid.offered_price_per_unit_cents)}</span>. A suggested raise has been pre-filled below.
-            </p>
+          <div className="space-y-1 text-sm">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Your offer</span>
+              <span className="font-semibold">{centsToDollars(existingBid.offered_price_per_unit_cents)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Quantity</span>
+              <span className="font-semibold">{existingBid.quantity} {lot.unit}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Total</span>
+              <span className="font-bold">{centsToDollars(existingBid.total_cents)}</span>
+            </div>
           </div>
-        )
-      })()}
+        </div>
+      ) : (
+        <>
+        {/* Refresh button — reload preview after adding new images */}
+        {isSupplyLot && showForm && (
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={() => {
+                qc.invalidateQueries({ queryKey: ["bid-images", lot.slug, username] })
+                setShowForm(false)
+              }}
+              className="text-xs text-muted-foreground underline hover:no-underline"
+            >
+              Save photos
+            </button>
+          </div>
+        )}
+        {existingBid && (() => {
+          const isTopBidder = topBidCents !== undefined && existingBid.offered_price_per_unit_cents >= topBidCents
+          return isTopBidder ? (
+            <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3">
+              <p className="text-xs text-green-800">
+                You currently have the highest bid — <span className="font-semibold">{centsToDollars(existingBid.offered_price_per_unit_cents)}</span>.
+              </p>
+            </div>
+          ) : (
+            <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
+              <p className="text-xs text-amber-800">
+                Your current offer: <span className="font-semibold">{centsToDollars(existingBid.offered_price_per_unit_cents)}</span>. A suggested raise has been pre-filled below.
+              </p>
+            </div>
+          )
+        })()}
 
       <form onSubmit={handleSubmit((d) => setPendingData(d))} className="space-y-4">
+
+        {isSupplyLot && (
+          <div className="space-y-1.5">
+            <Label>Supply photos</Label>
+            <p className="text-xs text-muted-foreground">Upload photos of what you will be supplying. These are saved to your offer and do not need to be re-uploaded when you update your price.</p>
+            <ImageUpload
+              entityId={bidImageEntityId ?? undefined}
+              entityType="lot_bid_image"
+              maxImages={4}
+              initialMainImage={existingBidImages?.main_image ?? null}
+              initialImages={existingBidImages?.images ?? []}
+              onDelete={() => removeBidImages()}
+            />
+          </div>
+        )}
 
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
@@ -293,26 +372,13 @@ export function PlaceBidForm({ lot, topBidCents, onSuccess }: Props) {
           </div>
         )}
 
-        {isSupplyLot && (
-          <div className="space-y-1.5 pt-1">
-            <Label>Supply photos</Label>
-            <p className="text-xs text-muted-foreground">Upload photos of what you will be supplying. These are saved to your offer and do not need to be re-uploaded when you update your price.</p>
-            <ImageUpload
-              entityId={bidImageEntityId ?? undefined}
-              entityType="lot_bid_image"
-              maxImages={4}
-              initialMainImage={existingBidImages?.main_image ?? null}
-              initialImages={existingBidImages?.images ?? []}
-              onDelete={() => removeBidImages()}
-            />
-          </div>
-        )}
-
         <Button type="submit" disabled={isPending} className="w-full">
           {isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
           {isSelling ? "Submit Offer to Buy" : "Submit Supply Offer"}
         </Button>
       </form>
+      </>
+      )}
     </div>
     </>
   )
