@@ -168,8 +168,15 @@ export function PlaceBidForm({ lot, topBidCents, onSuccess }: Props) {
   const [pendingData, setPendingData] = useState<FormModel | null>(null)
   const [showForm, setShowForm] = useState(false)
   const [galleryOpen, setGalleryOpen] = useState(false)
+  const [localMainImage, setLocalMainImage] = useState<{ img: { id: string; src: string } } | null>(null)
+  const [localImages, setLocalImages] = useState<{ img: { id: string; src: string } }[]>([])
+  const [uploaderTouched, setUploaderTouched] = useState(false)
 
-  const hasSupplyImages = isSupplyLot && !!(existingBidImages?.main_image || existingBidImages?.images?.length)
+  const hasSupplyImages = isSupplyLot && (
+    uploaderTouched
+      ? !!(localMainImage || localImages.length)
+      : !!(existingBidImages?.main_image || existingBidImages?.images?.length)
+  )
   const showSummary = isSupplyLot && !!existingBid && hasSupplyImages && !showForm
 
   const location = [profile?.address, profile?.city, profile?.province]
@@ -308,13 +315,15 @@ export function PlaceBidForm({ lot, topBidCents, onSuccess }: Props) {
           return isTopBidder ? (
             <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3">
               <p className="text-xs text-green-800">
-                You currently have the highest bid — <span className="font-semibold">{centsToDollars(existingBid.offered_price_per_unit_cents)}</span>.
+                You currently have the top bid — <span className="font-semibold">{centsToDollars(existingBid.offered_price_per_unit_cents)}</span>.
+                {isSupplyLot && !hasSupplyImages && " Your bid will not appear in offers without at least one supply photo."}
               </p>
             </div>
           ) : (
             <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
               <p className="text-xs text-amber-800">
-                Your current offer: <span className="font-semibold">{centsToDollars(existingBid.offered_price_per_unit_cents)}</span>. A suggested raise has been pre-filled below.
+                Your current bid is — <span className="font-semibold">{centsToDollars(existingBid.offered_price_per_unit_cents)}</span>.
+                {isSupplyLot && !hasSupplyImages && " Your bid will not appear in offers without at least one supply photo."}
               </p>
             </div>
           )
@@ -332,6 +341,8 @@ export function PlaceBidForm({ lot, topBidCents, onSuccess }: Props) {
               maxImages={4}
               initialMainImage={existingBidImages?.main_image ?? null}
               initialImages={existingBidImages?.images ?? []}
+              onMainImageChange={(img) => { setUploaderTouched(true); setLocalMainImage(img) }}
+              onImagesChange={(imgs) => { setUploaderTouched(true); setLocalImages(imgs) }}
               onDelete={() => removeBidImages()}
             />
           </div>
@@ -386,7 +397,10 @@ export function PlaceBidForm({ lot, topBidCents, onSuccess }: Props) {
           </div>
         )}
 
-        <Button type="submit" disabled={isPending} className="w-full">
+        {isSupplyLot && !hasSupplyImages && (
+          <p className="text-xs text-red-500">Please upload at least one supply photo before submitting.</p>
+        )}
+        <Button type="submit" disabled={isPending || (isSupplyLot && !hasSupplyImages)} className="w-full">
           {isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
           {isSelling ? "Submit Offer to Buy" : "Submit Supply Offer"}
         </Button>
