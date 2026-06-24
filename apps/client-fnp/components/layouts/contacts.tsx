@@ -188,7 +188,7 @@ export function Contacts({ user, client, quickOverview }: ContactPageProps) {
                         }
 
                     </div>
-                    <div className="flex gap-x-4 py-1">
+                    <div className="flex gap-x-4 py-1 self-center">
                         <dt className="flex items-center gap-1 text-xs text-muted-foreground w-24 shrink-0">
                             <Icons.landmark className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                             City, Province
