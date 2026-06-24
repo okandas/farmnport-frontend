@@ -159,12 +159,21 @@ export default function LotDetailPage({ params }: { params: Promise<{ slug: stri
         text={`${capitalizeFirst(lot.type === "sell" ? "Selling" : "Buying")} · ${capitalizeFirst(lot.form)} · ${lot.quantity?.toLocaleString()} ${lot.unit}`}
       >
         <Link
-          href={`/dashboard/farmnport/lots/${slug}/edit`}
-          className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
+          href="/dashboard/farmnport/lots"
+          className={cn(buttonVariants({ variant: "ghost", size: "sm" }))}
         >
-          <Icons.edit className="w-4 h-4 mr-2" />
-          Edit Lot
+          <Icons.chevronLeft className="w-4 h-4 mr-1" />
+          Back
         </Link>
+        {!lot.has_accepted_bid && (
+          <Link
+            href={`/dashboard/farmnport/lots/${slug}/edit`}
+            className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
+          >
+            <Icons.edit className="w-4 h-4 mr-2" />
+            Edit Lot
+          </Link>
+        )}
       </DashboardHeader>
 
       <div className="flex gap-6">
@@ -182,6 +191,7 @@ export default function LotDetailPage({ params }: { params: Promise<{ slug: stri
               <p className="text-xs text-muted-foreground">Status</p>
               {(() => {
                 const expired = lot.expires_at && new Date(lot.expires_at) < new Date()
+                if (lot.has_accepted_bid) return <p className="text-sm font-semibold text-green-600">Fulfilled</p>
                 if (expired) return <p className="text-sm font-semibold text-red-600">Expired</p>
                 if (!lot.moderated) return <p className="text-sm font-semibold text-amber-600">Pending Approval</p>
                 return <p className="text-sm font-semibold text-green-600">Live</p>

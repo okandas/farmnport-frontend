@@ -72,19 +72,11 @@ export const lotColumns: ColumnDef<any>[] = [
     cell: ({ row }) => <span>{row.original.price_per_unit_cents ? `${centsToDollars(row.original.price_per_unit_cents)}/${row.original.unit}` : "Negotiable"}</span>,
   },
   {
-    accessorKey: "province",
-    header: "Location",
-    cell: ({ row }) => (
-      <span className="capitalize text-muted-foreground">
-        {capitalizeFirst(row.original.province)}{row.original.city ? `, ${capitalizeFirst(row.original.city)}` : ""}
-      </span>
-    ),
-  },
-  {
     accessorKey: "moderated",
     header: "Status",
     cell: ({ row }) => {
       const expired = row.original.expires_at && new Date(row.original.expires_at) < new Date()
+      if (row.original.has_accepted_bid) return <span className="text-green-600 font-medium">Fulfilled</span>
       if (expired) return <span className="text-red-600 font-medium">Expired</span>
       if (!row.original.moderated) return <span className="text-amber-600 font-medium">Pending</span>
       return <span className="text-green-600 font-medium">Live</span>
