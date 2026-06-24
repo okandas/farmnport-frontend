@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useMutation } from "@tanstack/react-query"
 import { toast } from "sonner"
 import { ImagePlus, Loader2, X } from "lucide-react"
@@ -17,13 +17,28 @@ interface Props {
   entityId?: string
   entityType?: string
   maxImages?: number
+  initialMainImage?: { img: { id: string; src: string } } | null
+  initialImages?: { img: { id: string; src: string } }[]
   onMainImageChange?: (img: { img: { id: string; src: string } } | null) => void
   onImagesChange?: (imgs: { img: { id: string; src: string } }[]) => void
+  onDelete?: () => void
 }
 
-export function ImageUpload({ entityId, entityType, maxImages = 5, onMainImageChange, onImagesChange }: Props) {
-  const [mainImage, setMainImage] = useState<UploadedImage | null>(null)
-  const [images, setImages] = useState<UploadedImage[]>([])
+export function ImageUpload({ entityId, entityType, maxImages = 5, initialMainImage, initialImages, onMainImageChange, onImagesChange, onDelete }: Props) {
+  const [mainImage, setMainImage] = useState<UploadedImage | null>(
+    initialMainImage ? { id: initialMainImage.img.id, src: initialMainImage.img.src } : null
+  )
+  const [images, setImages] = useState<UploadedImage[]>(
+    initialImages ? initialImages.map((i) => ({ id: i.img.id, src: i.img.src })) : []
+  )
+
+  useEffect(() => {
+    if (initialMainImage) setMainImage({ id: initialMainImage.img.id, src: initialMainImage.img.src })
+  }, [initialMainImage?.img?.id])
+
+  useEffect(() => {
+    if (initialImages?.length) setImages(initialImages.map((i) => ({ id: i.img.id, src: i.img.src })))
+  }, [initialImages?.length])
 
   const uploadMutation = useMutation({
     mutationFn: (data: FormData) => uploadImages(data),
@@ -82,6 +97,7 @@ export function ImageUpload({ entityId, entityType, maxImages = 5, onMainImageCh
     removeMutation.mutate(mainImage)
     setMainImage(null)
     onMainImageChange?.(null)
+    if (!images.length) onDelete?.()
   }
 
   const removeExtra = (img: UploadedImage) => {
@@ -89,6 +105,7 @@ export function ImageUpload({ entityId, entityType, maxImages = 5, onMainImageCh
     const next = images.filter((i) => i.id !== img.id)
     setImages(next)
     onImagesChange?.(next.map((i) => ({ img: { id: i.id, src: i.src } })))
+    if (!mainImage && next.length === 0) onDelete?.()
   }
 
   const isUploading = uploadMutation.isPending

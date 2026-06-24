@@ -261,6 +261,18 @@ export function respondToBid(bidId: string, data: { action: "accept" | "reject";
   return api.patch(`${BaseURL}/bids/${bidId}/respond`, data)
 }
 
+export function getBidImages(lotSlug: string) {
+  return api.get(`${BaseURL}/bids/images/${lotSlug}`)
+}
+
+export function upsertBidImages(lotSlug: string) {
+  return api.post(`${BaseURL}/bids/images/${lotSlug}`)
+}
+
+export function deleteBidImages(lotSlug: string) {
+  return api.delete(`${BaseURL}/bids/images/${lotSlug}`)
+}
+
 export function uploadImages(data: FormData) {
   return api.post(`${BaseURL}/user/image/uploads`, data)
 }

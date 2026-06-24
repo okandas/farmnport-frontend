@@ -9,13 +9,14 @@ import { toast } from "sonner"
 import { Loader2 } from "lucide-react"
 import { useSession } from "next-auth/react"
 
-import { placeBid, queryClient, queryMyBidOnLot } from "@/lib/query"
+import { placeBid, queryClient, queryMyBidOnLot, getBidImages, upsertBidImages, deleteBidImages } from "@/lib/query"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { centsToDollars, titleCase } from "@/lib/utilities"
+import { ImageUpload } from "@/components/ui/image-upload"
 
 const BID_SUPPORT_PHONE = process.env.NEXT_PUBLIC_BID_SUPPORT_PHONE!
 const BID_SUPPORT_EMAIL = process.env.NEXT_PUBLIC_BID_SUPPORT_EMAIL!
@@ -75,6 +76,43 @@ export function PlaceBidForm({ lot, topBidCents, onSuccess }: Props) {
   })
   const existingBid = (existingBidData as any)?.data
 
+  // Supply image record — only for request lots (buyer posting, supplier responding)
+  const isSupplyLot = lot.type === "request"
+  const [bidImageEntityId, setBidImageEntityId] = useState<string | null>(null)
+
+  const { data: bidImagesData } = useQuery({
+    queryKey: ["bid-images", lot.slug, username],
+    queryFn: () => getBidImages(lot.slug),
+    enabled: !!username && isSupplyLot,
+    retry: false,
+  })
+  const existingBidImages = (bidImagesData as any)?.data
+
+  // Eagerly upsert the LotBidImage doc when the form loads so entityId is always ready
+  const { mutate: initBidImages } = useMutation({
+    mutationFn: () => upsertBidImages(lot.slug),
+    onSuccess: (res) => {
+      const id = (res as any)?.data?.id
+      if (id) setBidImageEntityId(id)
+    },
+  })
+
+  useEffect(() => {
+    if (isSupplyLot && username && !bidImageEntityId) {
+      if (existingBidImages?.id) {
+        setBidImageEntityId(existingBidImages.id)
+      } else if (bidImagesData !== undefined) {
+        // Query has resolved with no record — create one
+        initBidImages()
+      }
+    }
+  }, [isSupplyLot, username, existingBidImages?.id, bidImagesData])
+
+  const { mutate: removeBidImages } = useMutation({
+    mutationFn: () => deleteBidImages(lot.slug),
+    onSuccess: () => setBidImageEntityId(null),
+  })
+
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<FormModel>({
     resolver: zodResolver(Schema),
     defaultValues: {
@@ -82,6 +120,10 @@ export function PlaceBidForm({ lot, topBidCents, onSuccess }: Props) {
       offered_price_per_unit: lot.price_per_unit_cents / 100,
     },
   })
+
+  useEffect(() => {
+    if (existingBidImages?.id) setBidImageEntityId(existingBidImages.id)
+  }, [existingBidImages])
 
   useEffect(() => {
     if (!existingBid && !topBidCents) return
@@ -248,6 +290,21 @@ export function PlaceBidForm({ lot, topBidCents, onSuccess }: Props) {
               {" "}or{" "}
               <a href={`mailto:${BID_SUPPORT_EMAIL}`} className="underline hover:text-foreground">{BID_SUPPORT_EMAIL}</a>
             </p>
+          </div>
+        )}
+
+        {isSupplyLot && (
+          <div className="space-y-1.5 pt-1">
+            <Label>Supply photos</Label>
+            <p className="text-xs text-muted-foreground">Upload photos of what you will be supplying. These are saved to your offer and do not need to be re-uploaded when you update your price.</p>
+            <ImageUpload
+              entityId={bidImageEntityId ?? undefined}
+              entityType="lot_bid_image"
+              maxImages={4}
+              initialMainImage={existingBidImages?.main_image ?? null}
+              initialImages={existingBidImages?.images ?? []}
+              onDelete={() => removeBidImages()}
+            />
           </div>
         )}
 
