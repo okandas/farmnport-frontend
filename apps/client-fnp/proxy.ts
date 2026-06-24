@@ -30,6 +30,8 @@ const FLAG_GATES: { pattern: RegExp; flag: string }[] = [
   { pattern: /^\/account\/incoming-bookings(\/|$)/, flag: "bookings_enabled" },
   { pattern: /^\/account\/profile(\/|$)/, flag: "profile_enabled" },
   { pattern: /^\/account\/security(\/|$)/, flag: "security_enabled" },
+  { pattern: /^\/account\/notifications(\/|$)/, flag: "notifications_enabled" },
+  { pattern: /^\/account\/documents(\/|$)/, flag: "documents_enabled" },
 ]
 
 // ── Middleware ─────────────────────────────────────────────────────────────────
