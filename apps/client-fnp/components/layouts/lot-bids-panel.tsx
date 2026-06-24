@@ -5,6 +5,8 @@ import { useQuery } from "@tanstack/react-query"
 import { formatDistanceToNow } from "date-fns"
 import { centsToDollars } from "@/lib/utilities"
 import { getLotBids } from "@/lib/query"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { LotImageGallery } from "@/components/ui/lot-image-gallery"
 
 const PAGE_SIZE = 20
 
@@ -22,9 +24,12 @@ interface PublicBid {
 interface Props {
   slug: string
   myBidId?: string
+  myBidMainImage?: { img: { id: string; src: string } } | null
+  myBidImages?: { img: { id: string; src: string } }[]
 }
 
-export function LotBidsPanel({ slug, myBidId }: Props) {
+export function LotBidsPanel({ slug, myBidId, myBidMainImage, myBidImages }: Props) {
+  const [galleryOpen, setGalleryOpen] = useState(false)
   const [visible, setVisible] = useState(PAGE_SIZE)
   const sentinelRef = useRef<HTMLDivElement>(null)
   const listRef = useRef<HTMLDivElement>(null)
@@ -69,6 +74,14 @@ export function LotBidsPanel({ slug, myBidId }: Props) {
 
   return (
     <div className="space-y-3">
+      <Dialog open={galleryOpen} onOpenChange={setGalleryOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Your supply photos</DialogTitle>
+          </DialogHeader>
+          <LotImageGallery mainImage={myBidMainImage ?? null} images={myBidImages ?? []} />
+        </DialogContent>
+      </Dialog>
       <div className="flex items-center justify-between pb-1">
         <span className="text-sm font-semibold text-foreground">Offers</span>
         {top_bid && !accepted && (
@@ -82,8 +95,13 @@ export function LotBidsPanel({ slug, myBidId }: Props) {
         {bids.slice(0, visible).map((bid) => {
           const isMe = myBidId === bid.id
           return (
-            <div key={bid.id} className="flex items-center justify-between py-2 text-sm">
-              <span className={isMe ? "text-green-600" : "text-foreground"}>
+            <div key={bid.id} className="flex items-center justify-between py-2 text-sm gap-3">
+              {isMe && myBidMainImage && (
+                <button type="button" onClick={() => setGalleryOpen(true)} className="shrink-0">
+                  <img src={myBidMainImage.img.src} alt="Your supply photo" className="w-8 h-8 rounded object-cover hover:opacity-80 transition-opacity" />
+                </button>
+              )}
+              <span className={`flex-1 min-w-0 ${isMe ? "text-green-600" : "text-foreground"}`}>
                 <span className="font-medium">{isMe ? "Your bid" : bid.bidder_role === "buyer" ? "Buyer" : "Seller"}</span>
                 <span className="text-muted-foreground"> · {bid.quantity.toLocaleString()} {bid.unit}</span>
                 {bid.status === "accepted" && <span className="text-green-600 font-medium"> · Accepted</span>}

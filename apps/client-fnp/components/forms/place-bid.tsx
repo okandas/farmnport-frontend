@@ -10,6 +10,7 @@ import { Loader2 } from "lucide-react"
 import { useSession } from "next-auth/react"
 
 import { placeBid, queryClient, queryMyBidOnLot, getBidImages, upsertBidImages, deleteBidImages } from "@/lib/query"
+import { LotImageGallery } from "@/components/ui/lot-image-gallery"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -166,6 +167,7 @@ export function PlaceBidForm({ lot, topBidCents, onSuccess }: Props) {
 
   const [pendingData, setPendingData] = useState<FormModel | null>(null)
   const [showForm, setShowForm] = useState(false)
+  const [galleryOpen, setGalleryOpen] = useState(false)
 
   const hasSupplyImages = isSupplyLot && !!(existingBidImages?.main_image || existingBidImages?.images?.length)
   const showSummary = isSupplyLot && !!existingBid && hasSupplyImages && !showForm
@@ -245,16 +247,27 @@ export function PlaceBidForm({ lot, topBidCents, onSuccess }: Props) {
 
       {showSummary ? (
         <div className="space-y-3">
+          <Dialog open={galleryOpen} onOpenChange={setGalleryOpen}>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>Supply photos</DialogTitle>
+              </DialogHeader>
+              <LotImageGallery
+                mainImage={existingBidImages?.main_image ?? null}
+                images={existingBidImages?.images ?? []}
+              />
+            </DialogContent>
+          </Dialog>
           <div className="flex flex-wrap gap-2">
             {existingBidImages?.main_image && (
-              <div className="w-24 h-24 rounded-lg overflow-hidden shrink-0">
+              <button type="button" onClick={() => setGalleryOpen(true)} className="w-24 h-24 rounded-lg overflow-hidden shrink-0 hover:opacity-80 transition-opacity">
                 <img src={existingBidImages.main_image.img.src} alt="Main supply photo" className="w-full h-full object-cover" />
-              </div>
+              </button>
             )}
             {existingBidImages?.images?.map((i: any) => (
-              <div key={i.img.id} className="w-24 h-24 rounded-lg overflow-hidden shrink-0">
+              <button key={i.img.id} type="button" onClick={() => setGalleryOpen(true)} className="w-24 h-24 rounded-lg overflow-hidden shrink-0 hover:opacity-80 transition-opacity">
                 <img src={i.img.src} alt="Supply photo" className="w-full h-full object-cover" />
-              </div>
+              </button>
             ))}
           </div>
           <div className="space-y-1 text-sm">
@@ -282,6 +295,7 @@ export function PlaceBidForm({ lot, topBidCents, onSuccess }: Props) {
               onClick={() => {
                 qc.invalidateQueries({ queryKey: ["bid-images", lot.slug, username] })
                 setShowForm(false)
+                setTimeout(() => router.refresh(), 300)
               }}
               className="text-xs text-muted-foreground underline hover:no-underline"
             >
