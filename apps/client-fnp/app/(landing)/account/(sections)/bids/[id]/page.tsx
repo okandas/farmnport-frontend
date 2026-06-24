@@ -85,7 +85,7 @@ export default function BidDetailPage({ params }: { params: Promise<{ id: string
           <p className="font-semibold">Sign in to view this bid</p>
           <Link
             href={`/login?next=/account/bids/${id}`}
-            className="inline-flex items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-semibold px-6 py-2.5 hover:bg-primary/90 transition-colors"
+            className="inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground text-sm font-semibold px-6 py-2.5 hover:bg-primary/90 transition-colors"
           >
             Sign In
           </Link>
