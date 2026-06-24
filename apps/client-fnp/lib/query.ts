@@ -893,6 +893,10 @@ export function initiateBidPayment(id: string, body: { method?: string; phone?: 
   return api.post(`${BaseURL}/bids/mine/${id}/pay`, body)
 }
 
+export function pollBidPayment(id: string) {
+  return api.get(`${BaseURL}/bids/mine/${id}/poll`)
+}
+
 // Bookings
 export function listBookingEvents(options?: { product_id?: string; status?: string }) {
   const params = new URLSearchParams()

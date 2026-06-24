@@ -19,6 +19,20 @@ export const emailAlertsEnabled = flag<boolean>({
 })
 
 // Account section gates
+export const notificationsEnabled = flag<boolean>({
+  key: "notifications_enabled",
+  adapter: growthbookAdapter.feature<boolean>(),
+  defaultValue: false,
+  identify,
+})
+
+export const documentsEnabled = flag<boolean>({
+  key: "documents_enabled",
+  adapter: growthbookAdapter.feature<boolean>(),
+  defaultValue: false,
+  identify,
+})
+
 export const bookingsEnabled = flag<boolean>({
   key: "bookings_enabled",
   adapter: growthbookAdapter.feature<boolean>(),

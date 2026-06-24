@@ -1,92 +1,26 @@
-"use client"
+import { bookingsEnabled, notificationsEnabled, documentsEnabled, profileEnabled, securityEnabled } from "@/flags"
+import AccountSectionsNav, { NavItem } from "./AccountSectionsNav"
 
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { useRef } from "react"
-import { ChevronLeft, ChevronRight } from "lucide-react"
-
-const NAV_ITEMS = [
-    { label: "Orders", href: "/account/orders" },
-    { label: "Bids", href: "/account/bids" },
-    { label: "Bookings", href: "/account/bookings" },
-    { label: "Incoming Bookings", href: "/account/incoming-bookings" },
-    { label: "Notifications", href: "/account/notifications" },
-    { label: "Profile", href: "/account/profile" },
-    { label: "Security", href: "/account/security" },
-    { label: "Theme", href: "/account/theme" },
+const ALL_NAV: (NavItem & { flag?: () => Promise<boolean> })[] = [
+  { label: "Orders",            href: "/account/orders" },
+  { label: "Bids",              href: "/account/bids" },
+  { label: "Bookings",          href: "/account/bookings",          flag: bookingsEnabled },
+  { label: "Incoming Bookings", href: "/account/incoming-bookings", flag: bookingsEnabled },
+  { label: "Notifications",     href: "/account/notifications",     flag: notificationsEnabled },
+  { label: "Documents",         href: "/account/documents",         flag: documentsEnabled },
+  { label: "Profile",           href: "/account/profile",           flag: profileEnabled },
+  { label: "Security",          href: "/account/security",          flag: securityEnabled },
+  { label: "Theme",             href: "/account/theme" },
 ]
 
-export default function AccountSectionsLayout({ children }: { children: React.ReactNode }) {
-    const pathname = usePathname()
-    const scrollRef = useRef<HTMLDivElement>(null)
+export default async function AccountSectionsLayout({ children }: { children: React.ReactNode }) {
+  const flagResults = await Promise.all(
+    ALL_NAV.map(({ flag }) => (flag ? flag() : Promise.resolve(true)))
+  )
 
-    function scroll(dir: "left" | "right") {
-        scrollRef.current?.scrollBy({ left: dir === "left" ? -160 : 160, behavior: "smooth" })
-    }
+  const items: NavItem[] = ALL_NAV
+    .filter((_, i) => flagResults[i])
+    .map(({ label, href }) => ({ label, href }))
 
-    return (
-        <div className="flex flex-col lg:flex-row gap-8">
-            {/* Mobile nav — scrollable pills */}
-            <div className="lg:hidden border-b -mx-4 px-4 sm:-mx-6 sm:px-6">
-                <div className="relative flex items-center">
-                    <button
-                        onClick={() => scroll("left")}
-                        className="absolute -left-1 z-10 flex items-center justify-center h-8 w-8 rounded-full border bg-background shadow-sm hover:bg-muted transition-colors"
-                    >
-                        <ChevronLeft className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
-                    </button>
-                    <div ref={scrollRef} className="flex items-center gap-1 overflow-x-auto scrollbar-hide py-3 px-8">
-                        {NAV_ITEMS.map(({ label, href }) => {
-                            const active = pathname === href || pathname.startsWith(href + "/")
-                            return (
-                                <Link
-                                    key={href}
-                                    href={href}
-                                    className={`shrink-0 px-4 py-2 rounded-lg border text-sm font-medium transition-colors whitespace-nowrap ${
-                                        active
-                                            ? "bg-primary text-primary-foreground border-primary"
-                                            : "text-muted-foreground border-border hover:bg-primary hover:text-primary-foreground hover:border-primary"
-                                    }`}
-                                >
-                                    {label}
-                                </Link>
-                            )
-                        })}
-                    </div>
-                    <button
-                        onClick={() => scroll("right")}
-                        className="absolute -right-1 z-10 flex items-center justify-center h-8 w-8 rounded-full border bg-background shadow-sm hover:bg-muted transition-colors"
-                    >
-                        <ChevronRight className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
-                    </button>
-                </div>
-            </div>
-
-            {/* Desktop sidebar */}
-            <aside className="hidden lg:block w-56 shrink-0">
-                <nav className="flex flex-col">
-                    {NAV_ITEMS.map(({ label, href }) => {
-                        const active = pathname === href || pathname.startsWith(href + "/")
-                        return (
-                            <Link
-                                key={href}
-                                href={href}
-                                className={`w-full text-left px-3 py-2.5 text-sm font-medium transition-colors whitespace-nowrap ${
-                                    active
-                                        ? "text-primary"
-                                        : "text-muted-foreground hover:text-foreground"
-                                }`}
-                            >
-                                {label}
-                            </Link>
-                        )
-                    })}
-                </nav>
-            </aside>
-
-            <main className="flex-1 min-w-0">
-                {children}
-            </main>
-        </div>
-    )
+  return <AccountSectionsNav items={items}>{children}</AccountSectionsNav>
 }

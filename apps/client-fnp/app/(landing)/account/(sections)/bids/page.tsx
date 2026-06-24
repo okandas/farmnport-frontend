@@ -44,6 +44,7 @@ export default function MyBidsPage() {
     queryKey: ["my-bids"],
     queryFn: () => myBids().then((r) => r.data),
     enabled: !!session,
+    refetchOnMount: "always",
   })
 
   if (status === "loading" || isLoading) {
@@ -95,30 +96,31 @@ export default function MyBidsPage() {
           </Link>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="divide-y">
           {bids.map((bid) => (
-            <Link key={bid.id} href={`/account/bids/${bid.id}`} className="block rounded-xl p-4 hover:bg-muted/30 transition-colors">
-              <div className="flex items-start justify-between gap-3">
-                <div className="space-y-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-bold text-sm font-mono">{bid.lot_slug}</span>
-                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_STYLES[bid.status] ?? "bg-muted text-muted-foreground"}`}>
-                      {capitalize(bid.status)}
+            <Link key={bid.id} href={`/account/bids/${bid.id}`} className="flex items-start justify-between gap-3 py-4 hover:bg-muted/50 transition-colors px-1">
+              <div className="space-y-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="font-semibold text-sm font-mono">{bid.lot_slug}</span>
+                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_STYLES[bid.status] ?? "bg-muted text-muted-foreground"}`}>
+                    {capitalize(bid.status)}
+                  </span>
+                  {bid.status === "accepted" && bid.payment_deadline && (
+                    <span className="text-xs text-amber-700 dark:text-amber-400 font-medium">
+                      Pay by {formatDate(bid.payment_deadline)}
                     </span>
-                    {bid.status === "accepted" && bid.payment_deadline && (
-                      <span className="text-xs text-amber-700 dark:text-amber-400 font-medium">
-                        Pay by {formatDate(bid.payment_deadline)}
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    {bid.quantity} {bid.unit} · {centsToDollars(bid.offered_price_per_unit_cents)}/{bid.unit} · Placed {formatDate(bid.created)}
-                  </p>
+                  )}
                 </div>
-                <div className="text-right shrink-0">
-                  <p className="font-bold text-sm">{centsToDollars(bid.total_cents)}</p>
-                  <p className="text-xs text-muted-foreground capitalize">{bid.lot_type === "sell" ? "Buying" : "Selling"}</p>
-                </div>
+                <p className="text-xs text-muted-foreground">
+                  {formatDate(bid.created)} · {bid.quantity} {bid.unit}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {centsToDollars(bid.offered_price_per_unit_cents)}/{bid.unit}
+                </p>
+              </div>
+              <div className="text-right shrink-0">
+                <p className="font-semibold text-sm">{centsToDollars(bid.total_cents)}</p>
+                <p className="text-xs text-muted-foreground capitalize">{bid.lot_type === "sell" ? "Buying" : "Selling"}</p>
               </div>
             </Link>
           ))}

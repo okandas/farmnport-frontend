@@ -94,32 +94,30 @@ export default function OrdersPage() {
             </Link>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="divide-y">
             {orders.map((order) => (
-              <Link key={order.id} href={`/account/orders/${order.order_number}`} className="block border rounded-xl p-4 hover:bg-muted/30 transition-colors">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="space-y-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-bold text-sm">{order.order_number}</span>
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_STYLES[order.status] ?? "bg-muted text-muted-foreground"}`}>
-                        {capitalize(order.status)}
-                      </span>
-                      <span className="text-xs text-muted-foreground capitalize">
-                        {order.fulfillment === "click_collect" ? "Pickup" : "Delivery"}
-                      </span>
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      {formatDate(order.created)} · {order.items.length} {order.items.length === 1 ? "item" : "items"}
-                    </p>
-                    <p className="text-xs text-muted-foreground truncate">
-                      {order.items.slice(0, 2).map(i => i.product_name).join(", ")}
-                      {order.items.length > 2 ? ` +${order.items.length - 2} more` : ""}
-                    </p>
+              <Link key={order.id} href={`/account/orders/${order.order_number}`} className="flex items-start justify-between gap-3 py-4 hover:bg-muted/50 transition-colors px-1">
+                <div className="space-y-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-semibold text-sm">{order.order_number}</span>
+                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_STYLES[order.status] ?? "bg-muted text-muted-foreground"}`}>
+                      {capitalize(order.status)}
+                    </span>
+                    <span className="text-xs text-muted-foreground capitalize">
+                      {order.fulfillment === "click_collect" ? "Pickup" : "Delivery"}
+                    </span>
                   </div>
-                  <div className="text-right shrink-0">
-                    <p className="font-bold">${(order.total / 100).toFixed(2)}</p>
-                    <p className="text-xs text-muted-foreground">{order.currency}</p>
-                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {formatDate(order.created)} · {order.items.length} {order.items.length === 1 ? "item" : "items"}
+                  </p>
+                  <p className="text-xs text-muted-foreground truncate">
+                    {order.items.slice(0, 2).map(i => i.product_name).join(", ")}
+                    {order.items.length > 2 ? ` +${order.items.length - 2} more` : ""}
+                  </p>
+                </div>
+                <div className="text-right shrink-0">
+                  <p className="font-semibold">${(order.total / 100).toFixed(2)}</p>
+                  <p className="text-xs text-muted-foreground">{order.currency}</p>
                 </div>
               </Link>
             ))}

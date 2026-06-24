@@ -1,11 +1,11 @@
 "use client"
 
-import { use, useState } from "react"
+import { use, useState, useEffect } from "react"
 import { useSession } from "next-auth/react"
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { Loader2, Gavel, Clock, ChevronLeft } from "lucide-react"
 import Link from "next/link"
-import { myBidByID, initiateBidPayment } from "@/lib/query"
+import { myBidByID, initiateBidPayment, pollBidPayment } from "@/lib/query"
 import { centsToDollars } from "@/lib/utilities"
 import { LotImageGallery } from "@/components/ui/lot-image-gallery"
 
@@ -42,12 +42,32 @@ export default function BidDetailPage({ params }: { params: Promise<{ id: string
   const { id } = use(params)
   const { data: session, status } = useSession()
   const [paying, setPaying] = useState(false)
+  const [checking, setChecking] = useState(false)
 
-  const { data: bid, isLoading } = useQuery({
+  const qc = useQueryClient()
+
+  const { data: bid, isLoading, refetch } = useQuery({
     queryKey: ["my-bid", id],
     queryFn: () => myBidByID(id).then((r) => r.data),
     enabled: !!session && !!id,
+    refetchOnMount: "always",
   })
+
+  // Poll Paynow every 4s while bid is accepted and awaiting payment
+  useEffect(() => {
+    if (!bid || bid.status !== "accepted") return
+    const interval = setInterval(async () => {
+      try {
+        const res = await pollBidPayment(id)
+        await refetch()
+        if (res.data?.paid || ["Cancelled", "Disputed", "Refunded"].includes(res.data?.status)) {
+          qc.invalidateQueries({ queryKey: ["my-bids"] })
+          clearInterval(interval)
+        }
+      } catch {}
+    }, 4000)
+    return () => clearInterval(interval)
+  }, [bid?.status, id])
 
   if (status === "loading" || isLoading) {
     return (
@@ -170,25 +190,45 @@ export default function BidDetailPage({ params }: { params: Promise<{ id: string
               <p className="text-xs text-amber-800 dark:text-amber-400">
                 Pay within 24 hours to secure this lot. <Countdown deadline={bid.payment_deadline} />
               </p>
-              <button
-                disabled={paying}
-                onClick={async () => {
-                  setPaying(true)
-                  try {
-                    const res = await initiateBidPayment(bid.id, {})
-                    const redirectUrl = res.data?.redirect_url
-                    if (redirectUrl) window.open(redirectUrl, "_blank")
-                  } catch {
-                    // silent
-                  } finally {
-                    setPaying(false)
-                  }
-                }}
-                className="inline-flex items-center gap-2 rounded-md bg-primary text-primary-foreground text-sm font-semibold px-4 py-1.5 hover:bg-primary/90 transition-colors disabled:opacity-50"
-              >
-                {paying ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-                Pay Now
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  disabled={paying}
+                  onClick={async () => {
+                    setPaying(true)
+                    try {
+                      const res = await initiateBidPayment(bid.id, {})
+                      const redirectUrl = res.data?.redirect_url
+                      if (redirectUrl) window.open(redirectUrl, "_blank")
+                    } catch {
+                      // silent
+                    } finally {
+                      setPaying(false)
+                    }
+                  }}
+                  className="inline-flex items-center gap-2 rounded-md bg-primary text-primary-foreground text-sm font-semibold px-4 py-1.5 hover:bg-primary/90 transition-colors disabled:opacity-50"
+                >
+                  {paying ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                  Pay Now
+                </button>
+                <button
+                  disabled={checking}
+                  onClick={async () => {
+                    setChecking(true)
+                    try {
+                      await pollBidPayment(id)
+                      await refetch()
+                    } catch {
+                      // silent
+                    } finally {
+                      setChecking(false)
+                    }
+                  }}
+                  className="inline-flex items-center gap-2 rounded-md border border-amber-400 text-amber-800 dark:text-amber-300 text-sm font-semibold px-4 py-1.5 hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-colors disabled:opacity-50"
+                >
+                  {checking ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                  I have paid
+                </button>
+              </div>
             </div>
           )}
         </div>
