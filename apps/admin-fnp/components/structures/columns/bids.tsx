@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { centsToDollars } from "@/lib/utilities"
 import { adminAcceptBid } from "@/lib/query"
 import { toast } from "@/components/ui/use-toast"
+import { LotImageGallery } from "@/components/ui/lot-image-gallery"
 import {
   Dialog,
   DialogContent,
@@ -15,6 +16,28 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog"
+
+function SupplyPhotoCell({ supplyImages }: { supplyImages?: any }) {
+  const [open, setOpen] = useState(false)
+  const mainImage = supplyImages?.main_image ?? null
+  const images = supplyImages?.images ?? []
+  if (!mainImage && images.length === 0) return <span className="text-xs text-muted-foreground">—</span>
+  return (
+    <>
+      <button type="button" onClick={() => setOpen(true)} className="shrink-0">
+        <img src={mainImage.img.src} alt="Supply photo" className="w-10 h-10 rounded object-cover hover:opacity-80 transition-opacity" />
+      </button>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Supply photos</DialogTitle>
+          </DialogHeader>
+          <LotImageGallery mainImage={mainImage} images={images} />
+        </DialogContent>
+      </Dialog>
+    </>
+  )
+}
 
 function StatusBadge({ status }: { status: string }) {
   const map: Record<string, string> = {
@@ -104,6 +127,11 @@ function AcceptButton({ bid }: { bid: any }) {
 }
 
 export const bidColumns: ColumnDef<any>[] = [
+  {
+    id: "supply_photo",
+    header: "Photos",
+    cell: ({ row }) => <SupplyPhotoCell supplyImages={row.original.supply_images} />,
+  },
   {
     accessorKey: "bidder_name",
     header: "Bidder",
