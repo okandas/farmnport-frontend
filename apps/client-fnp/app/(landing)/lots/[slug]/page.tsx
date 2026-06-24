@@ -81,8 +81,6 @@ export default async function LotDetailPage({ params }: Props) {
                             {/* LEFT — lot details */}
                             <div className="lg:col-span-3 space-y-5">
 
-                                <LotImageGallery mainImage={lot.main_image} images={lot.images} />
-
                                 <div>
                                     <div className="flex items-center justify-between mb-2">
                                         <span className={`inline-flex items-center rounded-md px-2.5 py-0.5 text-xs font-semibold border ${isSelling ? "bg-orange-50 text-orange-700 border-orange-200" : "bg-green-50 text-green-700 border-green-200"}`}>
@@ -104,6 +102,13 @@ export default async function LotDetailPage({ params }: Props) {
                                         </p>
                                     )}
                                 </div>
+
+                                {(lot.main_image || lot.images?.length > 0 || bidsData?.accepted?.supply_images) && (
+                                    <LotImageGallery
+                                        mainImage={(bidsData?.accepted as any)?.supply_images?.main_image ?? lot.main_image}
+                                        images={(bidsData?.accepted as any)?.supply_images?.images ?? lot.images ?? []}
+                                    />
+                                )}
 
                                 <div className="grid grid-cols-3 gap-3">
                                     <div className="rounded-xl border bg-card p-4">
