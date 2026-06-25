@@ -6,7 +6,7 @@ import { useQuery } from "@tanstack/react-query"
 import { Loader2, ChevronLeft } from "lucide-react"
 import Link from "next/link"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
-import { myLotBids, initiateLotOwnerBidPayment, pollBidPayment, respondToBid } from "@/lib/query"
+import { myLotBids, initiateLotOwnerBidPayment, pollLotOwnerBidPayment, respondToBid } from "@/lib/query"
 import { centsToDollars } from "@/lib/utilities"
 import { LotImageGallery } from "@/components/ui/lot-image-gallery"
 import { formatDistanceToNow } from "date-fns"
@@ -50,7 +50,7 @@ export default function MyLotDetailPage({ params }: { params: Promise<{ slug: st
 
   const bids: any[] = data?.data ?? []
   const total: number = data?.total ?? 0
-  const accepted = bids.find((b) => b.status === "accepted")
+  const accepted = bids.find((b) => ["accepted", "paid", "completed"].includes(b.status))
 
   if (isLoading) {
     return (
@@ -98,11 +98,21 @@ export default function MyLotDetailPage({ params }: { params: Promise<{ slug: st
               <p className="text-xs text-muted-foreground mb-1">Quantity</p>
               <p className="font-semibold">{accepted.quantity} {accepted.unit}</p>
             </div>
-            <div className="rounded-lg bg-muted/50 p-3 space-y-1">
-              <p className="text-xs font-semibold">Ready to confirm?</p>
-              <p className="text-xs text-muted-foreground">Your payment is held securely by Farmnport and only released to the supplier once delivery is confirmed.</p>
-            </div>
-            <div className="flex items-center gap-2 mt-auto">
+            {["paid", "completed"].includes(accepted.status) ? (
+              <div className="rounded-lg bg-green-50 dark:bg-green-900/20 p-3 space-y-1">
+                <p className="text-xs font-semibold text-green-800 dark:text-green-300">Payment confirmed</p>
+                <p className="text-xs text-green-700 dark:text-green-400">Held securely — released to supplier on delivery.</p>
+                {accepted.payment_ref && (
+                  <p className="text-xs font-mono text-green-800 dark:text-green-300">Ref: {accepted.payment_ref}</p>
+                )}
+              </div>
+            ) : (
+              <div className="rounded-lg bg-muted/50 p-3 space-y-1">
+                <p className="text-xs font-semibold">Ready to confirm?</p>
+                <p className="text-xs text-muted-foreground">Your payment is held securely by Farmnport and only released to the supplier once delivery is confirmed.</p>
+              </div>
+            )}
+            {!["paid", "completed"].includes(accepted.status) && <div className="flex items-center gap-2 mt-auto">
               <button
                 disabled={paying}
                 onClick={async () => {
@@ -127,7 +137,7 @@ export default function MyLotDetailPage({ params }: { params: Promise<{ slug: st
                 onClick={async () => {
                   setChecking(true)
                   try {
-                    await pollBidPayment(accepted.id)
+                    await pollLotOwnerBidPayment(accepted.id)
                     await refetch()
                   } catch {
                     // silent
@@ -140,7 +150,7 @@ export default function MyLotDetailPage({ params }: { params: Promise<{ slug: st
                 {checking ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
                 I have paid
               </button>
-            </div>
+            </div>}
           </div>
         </div>
       )}

@@ -65,7 +65,7 @@ export default function BidDetailPage({ params }: { params: Promise<{ id: string
           clearInterval(interval)
         }
       } catch {}
-    }, 4000)
+    }, 60000)
     return () => clearInterval(interval)
   }, [bid?.status, id])
 
@@ -132,48 +132,47 @@ export default function BidDetailPage({ params }: { params: Promise<{ id: string
         </Link>
       </div>
 
-      <div className="flex gap-6">
-        {/* Image */}
-        {(bid.lot_main_image || bid.lot_images?.length > 0) && (
-          <div className="w-2/3 shrink-0">
-            <LotImageGallery mainImage={bid.lot_main_image} images={bid.lot_images} />
-          </div>
-        )}
+      {/* Image */}
+      {(bid.lot_main_image || bid.lot_images?.length > 0) && (
+        <div className="mb-6">
+          <LotImageGallery mainImage={bid.lot_main_image} images={bid.lot_images} />
+        </div>
+      )}
 
-        {/* Bid details */}
-        <div className="flex-1 flex flex-col justify-between gap-4">
-          <div className="grid grid-cols-2 gap-x-6 gap-y-4">
-            <div>
-              <p className="text-xs text-muted-foreground mb-1">Your Bid</p>
-              <p className="font-semibold">{centsToDollars(bid.offered_price_per_unit_cents)}</p>
-            </div>
-            {bid.reviewed_at && (
-              <div>
-                <p className="text-xs text-muted-foreground mb-1">Accepted</p>
-                <p className="font-semibold text-sm">{formatDate(bid.reviewed_at)}</p>
-              </div>
-            )}
-            <div>
-              <p className="text-xs text-muted-foreground mb-1">Quantity</p>
-              <p className="font-semibold">{bid.quantity} {bid.unit}</p>
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground mb-1">Placed</p>
-              <p className="font-semibold text-sm">{formatDate(bid.created)}</p>
-            </div>
-            {bid.notes && (
-              <div className="col-span-2">
-                <p className="text-xs text-muted-foreground mb-1">Your Notes</p>
-                <p className="text-sm">{bid.notes}</p>
-              </div>
-            )}
-            {bid.delivery_location && (
-              <div className="col-span-2">
-                <p className="text-xs text-muted-foreground mb-1">Delivery Location</p>
-                <p className="text-sm">{bid.delivery_location}</p>
-              </div>
-            )}
+      {/* Bid details */}
+      <div className="flex flex-col gap-6">
+        <div className="flex gap-8 flex-wrap">
+          <div>
+            <p className="text-xs text-muted-foreground mb-1">Your Bid</p>
+            <p className="font-semibold text-lg">{centsToDollars(bid.offered_price_per_unit_cents)}</p>
           </div>
+          <div>
+            <p className="text-xs text-muted-foreground mb-1">Quantity</p>
+            <p className="font-semibold">{bid.quantity} {bid.unit}</p>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground mb-1">Placed</p>
+            <p className="font-semibold text-sm">{formatDate(bid.created)}</p>
+          </div>
+          {bid.reviewed_at && (
+            <div>
+              <p className="text-xs text-muted-foreground mb-1">Accepted</p>
+              <p className="font-semibold text-sm">{formatDate(bid.reviewed_at)}</p>
+            </div>
+          )}
+          {bid.notes && (
+            <div>
+              <p className="text-xs text-muted-foreground mb-1">Notes</p>
+              <p className="text-sm">{bid.notes}</p>
+            </div>
+          )}
+          {bid.delivery_location && (
+            <div>
+              <p className="text-xs text-muted-foreground mb-1">Delivery Location</p>
+              <p className="text-sm">{bid.delivery_location}</p>
+            </div>
+          )}
+        </div>
 
           {isPaid && (
             <div className="rounded-xl bg-green-50 dark:bg-green-900/20 p-5">
@@ -244,7 +243,6 @@ export default function BidDetailPage({ params }: { params: Promise<{ id: string
               </div>
             </div>
           )}
-        </div>
       </div>
     </div>
   )

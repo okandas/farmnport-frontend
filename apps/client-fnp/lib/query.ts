@@ -919,6 +919,10 @@ export function initiateLotOwnerBidPayment(id: string, body: { method?: string; 
   return api.post(`${BaseURL}/bids/lot/${id}/pay`, body)
 }
 
+export function pollLotOwnerBidPayment(id: string) {
+  return api.get(`${BaseURL}/bids/lot/${id}/poll`)
+}
+
 export function pollBidPayment(id: string) {
   return api.get(`${BaseURL}/bids/mine/${id}/poll`)
 }
