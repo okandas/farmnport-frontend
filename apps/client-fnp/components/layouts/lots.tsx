@@ -26,6 +26,7 @@ interface FarmLot {
   created: string
   farm_produce?: { name: string; slug: string }
   breed?: { name: string }
+  main_image?: { img?: { src?: string } }
 }
 
 interface LotsResponse {
@@ -102,9 +103,9 @@ export function Lots({ mode }: LotsProps) {
 
       {/* Loading */}
       {isFetching && (
-        <div className="space-y-3">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-24 rounded-lg bg-muted/30 animate-pulse" />
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="rounded-lg bg-muted/30 animate-pulse aspect-square" />
           ))}
         </div>
       )}
@@ -179,55 +180,40 @@ export function Lots({ mode }: LotsProps) {
 
       {/* Active lot cards */}
       {!isFetching && !isPendingView && lots.length > 0 && (
-        <div className="space-y-3">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {lots.map((lot) => (
             <Link
               key={lot._id}
               href={`/lots/${lot.slug}`}
-              className="block bg-card border rounded-lg p-5 hover:shadow-md hover:border-primary/40 transition-all group"
+              className="bg-card border border-border rounded-lg overflow-hidden transition-all duration-200 hover:shadow-lg hover:border-primary/50 group"
             >
-              <div className="flex items-start justify-between gap-4">
-                <div className="space-y-2 flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-base font-semibold text-foreground">
-                      {lot.farm_produce?.name ?? "Produce"}
-                    </span>
-                    {lot.type === "sell"
-                      ? <Badge className="text-xs capitalize rounded-md bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-100 hover:text-orange-700">Selling</Badge>
-                      : <Badge className="text-xs capitalize rounded-md bg-green-50 text-green-700 border-green-200 hover:bg-green-100 hover:text-green-700">Buying</Badge>
-                    }
-                  </div>
-
-                  <div className="flex items-center gap-3 flex-wrap text-sm text-muted-foreground">
-                    {lot.breed && <span>Variety: {lot.breed.name}</span>}
-                    {lot.breed && lot.form && <span>·</span>}
-                    {lot.form && <span>State: {capitalizeFirstLetter(lot.form)}</span>}
-                  </div>
-
-                  <div className="flex items-center gap-3 flex-wrap text-sm text-muted-foreground">
-                    <span className="font-medium text-foreground">
-                      {centsToDollars(lot.price_per_unit_cents)}/{lot.unit}
-                    </span>
-                    <span>·</span>
-                    <span>{lot.quantity.toLocaleString()} {lot.unit}</span>
-                    {lot.province && (
-                      <>
-                        <span>·</span>
-                        <span className="capitalize">{capitalizeFirstLetter(lot.province)}{lot.city ? `, ${capitalizeFirstLetter(lot.city)}` : ""}</span>
-                      </>
-                    )}
-                  </div>
-
-                  {lot.notes && (
-                    <p className="text-sm text-muted-foreground line-clamp-1">{lot.notes}</p>
-                  )}
-                </div>
-
-                <div className="text-right flex-shrink-0">
-                  <p className="text-xs text-muted-foreground">
-                    {formatDate(lot.created)}
-                  </p>
-                </div>
+              <div className="relative aspect-square bg-muted/30">
+                {lot.main_image?.img?.src ? (
+                  <img
+                    src={lot.main_image.img.src}
+                    alt={lot.farm_produce?.name ?? "Lot"}
+                    className="object-cover w-full h-full transition-transform duration-200 group-hover:scale-105"
+                  />
+                ) : (
+                  <div className="absolute inset-0 bg-muted/30" />
+                )}
+                <span className={`absolute top-2 left-2 text-[10px] font-semibold px-2 py-0.5 rounded-full border ${lot.type === "sell" ? "bg-orange-50 text-orange-700 border-orange-200" : "bg-green-50 text-green-700 border-green-200"}`}>
+                  {lot.type === "sell" ? "Selling" : "Buying"}
+                </span>
+              </div>
+              <div className="p-3 space-y-1.5 border-t">
+                <h3 className="font-semibold text-sm leading-tight group-hover:text-primary transition-colors">
+                  {lot.farm_produce?.name ?? lot.breed?.name ?? "Produce"}
+                </h3>
+                {lot.breed && (
+                  <p className="text-xs text-muted-foreground">{lot.breed.name}</p>
+                )}
+                <p className="text-xs text-muted-foreground capitalize">
+                  {lot.quantity.toLocaleString()} {lot.unit}{lot.province ? ` · ${capitalizeFirstLetter(lot.province)}` : ""}
+                </p>
+                <p className="text-base font-bold">
+                  {centsToDollars(lot.price_per_unit_cents)}<span className="text-xs font-normal text-muted-foreground">/{lot.unit}</span>
+                </p>
               </div>
             </Link>
           ))}
