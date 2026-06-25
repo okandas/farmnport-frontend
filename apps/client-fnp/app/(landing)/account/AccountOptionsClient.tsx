@@ -2,10 +2,10 @@
 
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
-import { ShoppingBag, CalendarDays, Inbox, Bell, FileText, User, Shield, Palette, Gavel, LucideIcon } from "lucide-react"
+import { ShoppingBag, CalendarDays, Inbox, Bell, FileText, User, Shield, Palette, Gavel, Warehouse, LucideIcon } from "lucide-react"
 
 const ICONS: Record<string, LucideIcon> = {
-  ShoppingBag, CalendarDays, Inbox, Bell, FileText, User, Shield, Palette, Gavel,
+  ShoppingBag, CalendarDays, Inbox, Bell, FileText, User, Shield, Palette, Gavel, Warehouse,
 }
 
 export type AccountOption = {

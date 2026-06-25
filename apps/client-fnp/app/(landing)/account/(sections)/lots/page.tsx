@@ -8,13 +8,15 @@ import { myLots } from "@/lib/query"
 import { centsToDollars } from "@/lib/utilities"
 
 const STATUS_STYLES: Record<string, string> = {
-  live:      "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
-  fulfilled: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
-  pending:   "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400",
-  expired:   "bg-muted text-muted-foreground",
+  live:             "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
+  fulfilled:        "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
+  awaitingPayment:  "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400",
+  pending:          "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400",
+  expired:          "bg-muted text-muted-foreground",
 }
 
 function lotStatus(lot: any): { label: string; style: string } {
+  if (lot.has_accepted_bid && lot.type === "request") return { label: "Awaiting Payment", style: STATUS_STYLES.awaitingPayment }
   if (lot.has_accepted_bid) return { label: "Fulfilled", style: STATUS_STYLES.fulfilled }
   const expired = lot.expires_at && new Date(lot.expires_at) < new Date()
   if (expired) return { label: "Expired", style: STATUS_STYLES.expired }
@@ -83,23 +85,29 @@ export default function MyLotsPage() {
           {lots.map((lot) => {
             const { label, style } = lotStatus(lot)
             return (
-              <Link key={lot.id} href={`/account/lots/${lot.slug}`} className="flex items-start justify-between gap-3 py-4 hover:bg-muted/50 transition-colors px-1">
+              <Link key={lot.id} href={`/account/lots/${lot.slug}`} className="flex items-start justify-between gap-3 py-4 group transition-colors px-1">
                 <div className="space-y-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-semibold text-sm font-mono">{lot.slug}</span>
+                    <span className="font-semibold text-sm font-mono group-hover:text-primary transition-colors">{lot.slug}</span>
                     <span className={`text-xs px-2 py-0.5 rounded-md font-medium ${style}`}>{label}</span>
                     <span className={`text-xs px-2 py-0.5 rounded-md font-medium ${lot.type === "sell" ? "bg-blue-50 text-blue-700" : "bg-green-50 text-green-700"}`}>
                       {lot.type === "sell" ? "Selling" : "Buying"}
                     </span>
                   </div>
-                  <p className="text-xs text-muted-foreground capitalize">
-                    {lot.breed?.name ?? lot.farm_produce?.name ?? "—"} · {lot.quantity?.toLocaleString()} {lot.unit}
-                  </p>
+                  {lot.type !== "request" && (
+                    <p className="text-xs text-muted-foreground capitalize">
+                      {lot.breed?.name ?? lot.farm_produce?.name ?? "—"} · {lot.quantity?.toLocaleString()} {lot.unit}
+                    </p>
+                  )}
+                  {lot.has_accepted_bid && lot.type === "request" && (
+                    <p className="text-xs text-amber-700 dark:text-amber-400 font-medium">You have selected a supplier — pay to confirm</p>
+                  )}
                   <p className="text-xs text-muted-foreground">Listed {formatDate(lot.created)}</p>
                 </div>
-                <div className="text-right shrink-0">
-                  <p className="font-semibold text-sm">{centsToDollars(lot.price_per_unit_cents)}</p>
-                  <p className="text-xs text-muted-foreground">per {lot.unit}</p>
+                <div className="text-right shrink-0 space-y-0.5">
+                  <p className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">{lot.type === "request" ? "Your request lot was for" : "Your listing"}</p>
+                  <p className="font-semibold text-sm capitalize group-hover:text-primary transition-colors">{lot.breed?.name ?? lot.farm_produce?.name ?? "—"} · {lot.quantity?.toLocaleString()} {lot.unit}</p>
+                  <p className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">@ {centsToDollars(lot.price_per_unit_cents)} / {lot.unit}</p>
                 </div>
               </Link>
             )

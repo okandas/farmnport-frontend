@@ -198,7 +198,7 @@ export default async function LotDetailPage({ params }: Props) {
                             {/* RIGHT — countdown, notes, offers */}
                             <div className="lg:col-span-2">
                                 <div className="lg:sticky lg:top-24 space-y-4">
-                                    {lot.expires_at && (
+                                    {lot.expires_at && !lot.has_accepted_bid && (
                                         <LotCountdown expiresAt={lot.expires_at} formattedDate={formatDate(lot.expires_at)} />
                                     )}
 

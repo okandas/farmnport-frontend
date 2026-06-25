@@ -4,6 +4,7 @@ import AccountOptionsClient, { AccountOption } from "./AccountOptionsClient"
 const ALL_OPTIONS: (AccountOption & { flag?: () => Promise<boolean> })[] = [
   { label: "Orders",            href: "/account/orders",            icon: "ShoppingBag", protected: true },
   { label: "Bids",              href: "/account/bids",              icon: "Gavel",       protected: true },
+  { label: "Lots",              href: "/account/lots",              icon: "Warehouse",   protected: true },
   { label: "Bookings",          href: "/account/bookings",          icon: "CalendarDays",protected: true, flag: bookingsEnabled },
   { label: "Incoming Bookings", href: "/account/incoming-bookings", icon: "Inbox",       protected: true, flag: bookingsEnabled },
   { label: "Notifications",     href: "/account/notifications",     icon: "Bell",        protected: true, flag: notificationsEnabled },
