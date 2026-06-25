@@ -294,7 +294,6 @@ export function FilterSidebar({ hideProduce, clientType }: { hideProduce?: boole
     return (
       <div className="space-y-6">
         {content}
-        <QuickLinks />
       </div>
     )
   }
