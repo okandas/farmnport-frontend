@@ -104,8 +104,8 @@ export function LotBidsPanel({ slug, lotType, myBidId, myBidMainImage, myBidImag
                 </button>
               )}
               <span className={`flex-1 min-w-0 ${isMe ? "text-green-600" : "text-foreground"}`}>
-                <span className="font-medium">{isMe ? "Your bid" : bid.bidder_role === "buyer" ? "Buyer" : "Seller"}</span>
-                <span className="text-muted-foreground"> · {bid.quantity.toLocaleString()} {bid.unit}</span>
+                {isMe && <span className="font-medium text-green-600">Your bid · </span>}
+                <span className="text-muted-foreground">{bid.quantity.toLocaleString()} {bid.unit}</span>
                 {bid.status === "accepted" && <span className="text-green-600 font-medium"> · Accepted</span>}
                 {bid.status === "rejected" && <span className="text-red-400"> · Declined</span>}
                 <span className="text-muted-foreground"> · {formatDistanceToNow(new Date(bid.created), { addSuffix: true })}</span>

@@ -53,6 +53,8 @@ export default async function LotDetailPage({ params }: Props) {
     const produce = lot.farm_produce?.name ?? "Farm Produce"
     const breed = lot.breed?.name ?? null
     const isSelling = lot.type === "sell"
+    const isOwner = user && (user as any).id === lot.client_id
+    const myBid = isOwner ? null : myBidData
     const isExpired = lot.expires_date && lot.expires_time
         ? new Date(`${lot.expires_date}T${lot.expires_time}:00Z`).getTime() < Date.now()
         : false
@@ -92,13 +94,21 @@ export default async function LotDetailPage({ params }: Props) {
                                         <h1 className="text-3xl font-bold tracking-tight">{breed ?? produce}</h1>
                                         <div className="text-right shrink-0">
                                             <p className="text-xs font-mono font-semibold text-foreground">Lot #{slug.split("-").pop()}</p>
-                                            <p className="text-xs text-muted-foreground mt-0.5">{produce}{breed ? ` — ${breed}` : ""}</p>
                                         </div>
                                     </div>
-                                    {(lot.city || lot.province) && (
-                                        <p className="text-sm text-muted-foreground mt-0.5 capitalize">
-                                            {lot.city ? `${capitalizeFirstLetter(lot.city)}, ` : ""}
-                                            {capitalizeFirstLetter(lot.province)}
+                                    {isSelling ? (
+                                        (lot.city || lot.province) && (
+                                            <p className="text-sm text-muted-foreground mt-0.5 capitalize">
+                                                {lot.city ? `${capitalizeFirstLetter(lot.city)}, ` : ""}
+                                                {capitalizeFirstLetter(lot.province)}
+                                            </p>
+                                        )
+                                    ) : (
+                                        <p className="text-sm text-muted-foreground mt-1">
+                                            Lot for buyer looking for {produce}{breed ? ` ${breed}` : ""}
+                                            {(lot.city || lot.province) && (
+                                                <span className="capitalize"> in {lot.city ? `${capitalizeFirstLetter(lot.city)}, ` : ""}{capitalizeFirstLetter(lot.province)}</span>
+                                            )}
                                         </p>
                                     )}
                                 </div>
@@ -136,7 +146,7 @@ export default async function LotDetailPage({ params }: Props) {
                                     </div>
                                 </div>
                                 <div className={isExpired ? "" : "rounded-xl bg-card"}>
-                                    {isExpired && bidsData?.accepted && (myBidData as any)?.status !== "accepted" ? (
+                                    {isExpired && bidsData?.accepted && (myBid as any)?.status !== "accepted" ? (
                                         <div className="space-y-1">
                                             <p className="text-sm font-semibold text-amber-700 dark:text-amber-400">Awaiting payment</p>
                                             <p className="text-xs text-muted-foreground">
@@ -163,13 +173,31 @@ export default async function LotDetailPage({ params }: Props) {
                                             <p className="text-xs text-muted-foreground">You cannot place an offer on your own listing.</p>
                                         </div>
                                     ) : bidsData?.accepted ? (
-                                        <div className="space-y-1">
+                                        <div className="space-y-2">
                                             <p className="text-sm font-semibold text-foreground">Offer accepted</p>
                                             <p className="text-xs text-muted-foreground">This lot has an accepted offer and is no longer accepting new bids.</p>
+                                            {["accepted", "paid", "completed"].includes((myBid as any)?.status) && (myBid as any)?.id && (
+                                                <Link
+                                                    href={`/account/bids/${(myBid as any).id}`}
+                                                    className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline"
+                                                >
+                                                    Manage your bid →
+                                                </Link>
+                                            )}
                                         </div>
-                                    ) : user ? (
+                                    ) : user && !lot.has_accepted_bid ? (
                                         <PlaceBidForm lot={lot} topBidCents={bidsData?.top_bid?.offered_price_per_unit_cents} />
-                                    ) : (
+                                    ) : user && lot.has_accepted_bid && ["accepted", "paid", "completed"].includes((myBid as any)?.status) && (myBid as any)?.id ? (
+                                        <div className="space-y-2">
+                                            <p className="text-sm font-semibold text-green-700 dark:text-green-400">Your bid won</p>
+                                            <Link
+                                                href={`/account/bids/${(myBid as any).id}`}
+                                                className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline"
+                                            >
+                                                Manage your bid →
+                                            </Link>
+                                        </div>
+                                    ) : !user ? (
                                         <div className="text-center space-y-4">
                                             <div className="space-y-1">
                                                 <p className="text-base font-semibold">Interested in this lot?</p>
@@ -190,7 +218,7 @@ export default async function LotDetailPage({ params }: Props) {
                                                 Create a free account
                                             </Link>
                                         </div>
-                                    )}
+                                    ) : null}
                                 </div>
 
                             </div>
@@ -214,12 +242,12 @@ export default async function LotDetailPage({ params }: Props) {
                                     <LotBidsPanel
                                         slug={slug}
                                         lotType={lot.type}
-                                        myBidId={(myBidData as any)?.id}
-                                        myBidMainImage={(myBidData as any)?.supply_images?.main_image ?? null}
-                                        myBidImages={(myBidData as any)?.supply_images?.images ?? []}
+                                        myBidId={(myBid as any)?.id}
+                                        myBidMainImage={(myBid as any)?.supply_images?.main_image ?? null}
+                                        myBidImages={(myBid as any)?.supply_images?.images ?? []}
                                     />
 
-                                    {isExpired && (myBidData as any)?.status === "accepted" && (
+                                    {isExpired && (myBid as any)?.status === "accepted" && (
                                         <div className="space-y-3">
                                             <div className="space-y-1">
                                                 <p className="text-sm font-semibold text-foreground">Your bid was accepted!</p>
@@ -227,7 +255,7 @@ export default async function LotDetailPage({ params }: Props) {
                                                     Complete payment within 24 hours to secure this lot.
                                                 </p>
                                             </div>
-                                            <PayBidButton bidId={(myBidData as any)?.id} />
+                                            <PayBidButton bidId={(myBid as any)?.id} />
                                         </div>
                                     )}
                                 </div>
