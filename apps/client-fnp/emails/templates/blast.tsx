@@ -1,4 +1,4 @@
-import { Body, Container, Head, Hr, Html, Link, Preview, Section, Text } from "@react-email/components"
+import { Body, Container, Head, Html, Link, Preview, Section, Text } from "@react-email/components"
 
 interface BlastEmailProps {
   name?: string
@@ -16,7 +16,6 @@ export default function BlastEmail({ name = "Member", message = "" }: BlastEmail
             <Text style={brand}>farmnport</Text>
             <Text style={greeting}>Hi {name},</Text>
             <Text style={paragraph}>{message}</Text>
-            <Hr style={divider} />
             <Text style={signoff}>the farmnport team</Text>
           </Section>
           <Section style={footer}>
@@ -34,8 +33,7 @@ const content: React.CSSProperties = { padding: "32px 40px 24px" }
 const brand: React.CSSProperties = { fontSize: "20px", fontWeight: "600", color: "#0f172a", margin: "0 0 20px" }
 const greeting: React.CSSProperties = { fontSize: "18px", fontWeight: "600", color: "#0f172a", margin: "0 0 12px" }
 const paragraph: React.CSSProperties = { fontSize: "15px", lineHeight: "1.7", color: "#475569", margin: "0 0 16px", whiteSpace: "pre-wrap" }
-const divider: React.CSSProperties = { borderColor: "#e2e8f0", margin: "20px 0" }
 const signoff: React.CSSProperties = { fontSize: "14px", color: "#64748b", margin: 0 }
-const footer: React.CSSProperties = { backgroundColor: "#f8fafc", borderTop: "1px solid #e2e8f0", padding: "16px 40px" }
+const footer: React.CSSProperties = { padding: "0 40px 32px" }
 const footerText: React.CSSProperties = { fontSize: "12px", color: "#94a3b8", margin: 0, textAlign: "center" }
 const footerLink: React.CSSProperties = { color: "#94a3b8", textDecoration: "underline" }
