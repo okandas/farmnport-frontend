@@ -1,6 +1,7 @@
 "use client"
 
-import { useState, useEffect, ReactNode } from "react"
+import { useState, useEffect, useRef, ReactNode } from "react"
+import { trackViewItem } from "@/lib/analytics"
 import { createPortal } from "react-dom"
 import Image from "next/image"
 import Link from "next/link"
@@ -44,7 +45,19 @@ export function BuyProductInteractive({
   const [selectedVariant, setSelectedVariant] = useState<any>(hasVariants ? product.variants[0] : null)
   const [selectedImage, setSelectedImage] = useState(0)
 const [mounted, setMounted] = useState(false)
-  useEffect(() => { setMounted(true) }, [])
+  const viewTracked = useRef(false)
+  useEffect(() => {
+    setMounted(true)
+    if (!viewTracked.current && displayPrice !== null) {
+      trackViewItem({
+        item_id: product.id,
+        item_name: product.name,
+        item_category: categoryName ?? productType,
+        price: displayPrice,
+      })
+      viewTracked.current = true
+    }
+  }, [])
 
   const displayPrice = selectedVariant?.sale_price
     ? selectedVariant.sale_price / 100

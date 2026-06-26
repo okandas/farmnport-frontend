@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { addToCart, clearCart, getCart, updateCartItem, removeFromCart } from "@/lib/query"
+import { trackAddToCart } from "@/lib/analytics"
 import { useCart } from "@/contexts/cart-context"
 
 export type CartProductType = "agrochemical" | "feed" | "animal_health" | "plant_nutrition" | "document" | "livestock_poultry" | "seed_product"
@@ -52,9 +53,18 @@ export function AddToCartButton({
 
   const addMutation = useMutation({
     mutationFn: addToCart,
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       qc.invalidateQueries({ queryKey: ["cart"] })
       openCart()
+      if (variables.unit_price) {
+        trackAddToCart({
+          item_id: variables.product_id,
+          item_name: variables.product_name,
+          item_category: variables.product_type,
+          price: variables.unit_price / 100,
+          quantity: variables.quantity,
+        })
+      }
     },
     onError: (err: any, variables) => {
       if (err?.response?.status === 409) {

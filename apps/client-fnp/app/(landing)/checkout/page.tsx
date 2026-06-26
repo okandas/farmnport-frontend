@@ -11,7 +11,7 @@ import Image from "next/image"
 import Link from "next/link"
 
 import { getCart, checkout, pollOrderStatus, queryClient as fetchClient, updateCartItem, removeFromCart, queryTumira, queryTumiraDeliveryRates, queryTumiraCheckAddress, queryTumiraConfirmPin } from "@/lib/query"
-import { trackPurchase } from "@/lib/analytics"
+import { trackPurchase, trackBeginCheckout } from "@/lib/analytics"
 import { AuthenticatedUser } from "@/lib/schemas"
 import { centsToDollars } from "@/lib/utilities"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -164,6 +164,24 @@ export default function CheckoutPage() {
 
   const items: CartItem[] = cartData?.items ?? []
   const totalWeightGrams = items.reduce((sum, item) => sum + item.quantity * (item.weight_grams || 5000), 0)
+
+  const checkoutTracked = useRef(false)
+  useEffect(() => {
+    if (!checkoutTracked.current && items.length > 0) {
+      const subtotal = items.reduce((s, i) => s + i.unit_price * i.quantity, 0)
+      trackBeginCheckout({
+        value: subtotal / 100,
+        items: items.map((i) => ({
+          item_id: i.product_id,
+          item_name: i.product_name,
+          item_category: i.product_type,
+          price: i.unit_price / 100,
+          quantity: i.quantity,
+        })),
+      })
+      checkoutTracked.current = true
+    }
+  }, [items])
 
   // reset confirmation + pin when address changes
   useEffect(() => {
