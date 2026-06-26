@@ -1,4 +1,4 @@
-import { Body, Container, Head, Hr, Html, Preview, Section, Text } from "@react-email/components"
+import { Body, Container, Head, Hr, Html, Link, Preview, Section, Text } from "@react-email/components"
 
 interface BlastEmailProps {
   name?: string
@@ -20,7 +20,7 @@ export default function BlastEmail({ name = "Member", message = "" }: BlastEmail
             <Text style={signoff}>the farmnport team</Text>
           </Section>
           <Section style={footer}>
-            <Text style={footerText}>farmnport · Zimbabwe's Agricultural Marketplace</Text>
+            <Text style={footerText}>Copyright © <Link href="https://farmnport.com" style={footerLink}>farmnport.com</Link>  All rights reserved.</Text>
           </Section>
         </Container>
       </Body>
@@ -28,8 +28,8 @@ export default function BlastEmail({ name = "Member", message = "" }: BlastEmail
   )
 }
 
-const body: React.CSSProperties = { backgroundColor: "#f8fafc", fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", margin: 0, padding: "40px 0" }
-const container: React.CSSProperties = { backgroundColor: "#ffffff", margin: "0 auto", maxWidth: "580px", borderRadius: "8px", overflow: "hidden", boxShadow: "0 1px 3px rgba(0,0,0,0.08)" }
+const body: React.CSSProperties = { backgroundColor: "#ffffff", fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", margin: 0, padding: "40px 0" }
+const container: React.CSSProperties = { backgroundColor: "#ffffff", margin: "0 auto", maxWidth: "580px" }
 const content: React.CSSProperties = { padding: "32px 40px 24px" }
 const brand: React.CSSProperties = { fontSize: "20px", fontWeight: "600", color: "#0f172a", margin: "0 0 20px" }
 const greeting: React.CSSProperties = { fontSize: "18px", fontWeight: "600", color: "#0f172a", margin: "0 0 12px" }
@@ -38,3 +38,4 @@ const divider: React.CSSProperties = { borderColor: "#e2e8f0", margin: "20px 0" 
 const signoff: React.CSSProperties = { fontSize: "14px", color: "#64748b", margin: 0 }
 const footer: React.CSSProperties = { backgroundColor: "#f8fafc", borderTop: "1px solid #e2e8f0", padding: "16px 40px" }
 const footerText: React.CSSProperties = { fontSize: "12px", color: "#94a3b8", margin: 0, textAlign: "center" }
+const footerLink: React.CSSProperties = { color: "#94a3b8", textDecoration: "underline" }
