@@ -15,11 +15,9 @@ import {
 } from "lucide-react"
 
 import { queryTableReservation, updateTableReservationStatus } from "@/lib/query"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/components/ui/use-toast"
 import {
   Dialog,
@@ -143,10 +141,7 @@ export default function ReservationDetailPage() {
     return (
       <div className="flex flex-col gap-6">
         <Skeleton className="h-8 w-64" />
-        <div className="grid gap-4 md:grid-cols-2">
-          <Skeleton className="h-48" />
-          <Skeleton className="h-48" />
-        </div>
+        <Skeleton className="h-64 w-full" />
       </div>
     )
   }
@@ -185,9 +180,30 @@ export default function ReservationDetailPage() {
         </div>
       </div>
 
-      {/* Status Stepper */}
-      <Card>
-        <CardContent className="pt-6">
+      {/* Single panel: guest + booking top, stepper + actions bottom */}
+      <div className="border-b border-t border-border bg-background shadow-sm sm:rounded-lg sm:border">
+        <div className="px-4 py-6 sm:px-6 lg:grid lg:grid-cols-2 lg:gap-x-8 lg:p-8">
+          <div>
+            <h3 className="font-medium text-sm">Guest</h3>
+            <dl className="mt-3 space-y-2 text-sm text-muted-foreground">
+              <p className="font-medium text-foreground">{reservation.full_name}</p>
+              <p>{reservation.contact}</p>
+              {reservation.client_email && <p>{reservation.client_email}</p>}
+            </dl>
+          </div>
+          <div className="mt-6 lg:mt-0">
+            <h3 className="font-medium text-sm">Booking</h3>
+            <dl className="mt-3 space-y-2 text-sm text-muted-foreground">
+              <p className="capitalize">{reservation.restaurant_name}</p>
+              <p className="capitalize">{reservation.location_name}</p>
+              <p>{reservation.date} &middot; {reservation.preferred_time}</p>
+              <p>{reservation.number_of_guests} {reservation.number_of_guests === 1 ? "guest" : "guests"}</p>
+              {reservation.notes && <p className="italic">{reservation.notes}</p>}
+            </dl>
+          </div>
+        </div>
+
+        <div className="border-t border-border px-4 py-6 sm:px-6 lg:p-8">
           <div className="flex items-center justify-between">
             {STATUS_STEPS.map((step, i) => {
               const isCompleted = i <= currentStepIndex
@@ -209,97 +225,54 @@ export default function ReservationDetailPage() {
               )
             })}
           </div>
-        </CardContent>
-      </Card>
 
-      {/* Actions */}
-      {actions.length > 0 && (
-        <div className="flex gap-2">
-          {actions.map((action) => (
-            <Button
-              key={action.status}
-              variant={action.variant}
-              onClick={() => handleAction(action.status)}
-              disabled={statusMutation.isPending}
-            >
-              {action.label}
-            </Button>
-          ))}
+          {actions.length > 0 && (
+            <div className="mt-6 flex gap-2">
+              {actions.map((action) => (
+                <Button
+                  key={action.status}
+                  variant={action.variant}
+                  onClick={() => handleAction(action.status)}
+                  disabled={statusMutation.isPending}
+                >
+                  {action.label}
+                </Button>
+              ))}
+            </div>
+          )}
         </div>
-      )}
-
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Guest</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2 text-sm">
-            <p><span className="text-muted-foreground">Name:</span> {reservation.full_name}</p>
-            <p><span className="text-muted-foreground">Phone:</span> {reservation.contact}</p>
-            {reservation.client_email && (
-              <p><span className="text-muted-foreground">Email:</span> {reservation.client_email}</p>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Booking</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2 text-sm">
-            <p><span className="text-muted-foreground">Restaurant:</span> <span className="capitalize">{reservation.restaurant_name}</span></p>
-            <p><span className="text-muted-foreground">Location:</span> <span className="capitalize">{reservation.location_name}</span></p>
-            <p><span className="text-muted-foreground">Date:</span> {reservation.date}</p>
-            <p><span className="text-muted-foreground">Time:</span> {reservation.preferred_time}</p>
-            <p><span className="text-muted-foreground">Guests:</span> {reservation.number_of_guests}</p>
-            {reservation.notes && (
-              <>
-                <Separator className="my-2" />
-                <p><span className="text-muted-foreground">Guest Notes:</span> <span className="italic">{reservation.notes}</span></p>
-              </>
-            )}
-          </CardContent>
-        </Card>
       </div>
 
       {/* Admin Notes */}
       {reservation.admin_notes && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Admin Notes</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground italic">{reservation.admin_notes}</p>
-          </CardContent>
-        </Card>
+        <div className="px-1 space-y-1">
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Admin Notes</p>
+          <p className="text-sm text-muted-foreground italic">{reservation.admin_notes}</p>
+        </div>
       )}
 
       {/* Timeline */}
       {reservation.status_history && reservation.status_history.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Timeline</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {reservation.status_history.map((change, i) => (
-                <div key={i} className="flex gap-3">
-                  <div className="flex flex-col items-center">
-                    <div className="h-2 w-2 rounded-full bg-primary mt-2" />
-                    {i < reservation.status_history!.length - 1 && <div className="w-px flex-1 bg-border" />}
-                  </div>
-                  <div className="pb-4">
-                    <p className="text-sm font-medium capitalize">{change.to.replace("_", " ")}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {change.changed_by} &middot; {format(new Date(change.timestamp), "PPp")}
-                    </p>
-                    {change.note && <p className="text-xs text-muted-foreground mt-1 italic">{change.note}</p>}
-                  </div>
+        <div className="px-1">
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-4">Timeline</p>
+          <div className="space-y-4">
+            {reservation.status_history.map((change, i) => (
+              <div key={i} className="flex gap-3">
+                <div className="flex flex-col items-center">
+                  <div className="h-2 w-2 rounded-full bg-primary mt-2" />
+                  {i < reservation.status_history!.length - 1 && <div className="w-px flex-1 bg-border" />}
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+                <div className="pb-4">
+                  <p className="text-sm font-medium capitalize">{change.to.replace("_", " ")}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {change.changed_by} &middot; {format(new Date(change.timestamp), "PPp")}
+                  </p>
+                  {change.note && <p className="text-xs text-muted-foreground mt-1 italic">{change.note}</p>}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       )}
 
       {/* Status action dialog */}
