@@ -1788,3 +1788,21 @@ export function queryPriceSeries(params?: { client_id?: string; category?: strin
   const q = qs.toString()
   return api.get(`${baseUrl}/prices/series/all${q ? `?${q}` : ""}`)
 }
+
+export function queryTableReservations(params?: { status?: string; restaurant_id?: string; location_id?: string; p?: number }) {
+  const qs = new URLSearchParams()
+  if (params?.status) qs.set("status", params.status)
+  if (params?.restaurant_id) qs.set("restaurant_id", params.restaurant_id)
+  if (params?.location_id) qs.set("location_id", params.location_id)
+  if (params?.p && params.p > 1) qs.set("p", params.p.toString())
+  const q = qs.toString()
+  return api.get(`${baseUrl}/table-reservations/admin/list${q ? `?${q}` : ""}`)
+}
+
+export function queryTableReservation(id: string) {
+  return api.get(`${baseUrl}/table-reservations/admin/${id}`)
+}
+
+export function updateTableReservationStatus(id: string, status: string, admin_notes?: string) {
+  return api.put(`${baseUrl}/table-reservations/admin/${id}/status`, { status, admin_notes: admin_notes ?? "" })
+}
