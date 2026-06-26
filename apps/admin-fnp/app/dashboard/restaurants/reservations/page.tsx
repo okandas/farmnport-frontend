@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { PaginationState } from "@tanstack/react-table"
 
@@ -11,17 +11,31 @@ import { FormSkeleton } from "@/components/state/skeleton-table"
 import { DashboardShell } from "@/components/state/dashboardShell"
 import { DataTable } from "@/components/structures/data-table"
 import { reservationColumns, ReservationRow } from "@/components/structures/columns/reservations"
-import { Button } from "@/components/ui/button"
+import { DataTableFacetedFilter } from "@/components/structures/filters/data-table-faceted-filter"
 
-const STATUSES = ["all", "pending", "confirmed", "seated", "completed", "cancelled", "no_show"]
+const statusOptions = [
+  { label: "Pending",   value: "pending" },
+  { label: "Confirmed", value: "confirmed" },
+  { label: "Seated",    value: "seated" },
+  { label: "Completed", value: "completed" },
+  { label: "Cancelled", value: "cancelled" },
+  { label: "No Show",   value: "no_show" },
+]
 
 export default function ReservationsPage() {
-  const [status, setStatus] = useState("pending")
+  const [statusFilter, setStatusFilter] = useState<Set<string>>(new Set(["pending"]))
   const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: 20 })
 
+  useEffect(() => {
+    setPagination((p) => ({ ...p, pageIndex: 0 }))
+  }, [statusFilter])
+
   const { isError, isLoading, isFetching, data } = useQuery({
-    queryKey: ["admin-reservations", { status, p: pagination.pageIndex + 1 }],
-    queryFn: () => queryTableReservations({ status: status === "all" ? undefined : status, p: pagination.pageIndex + 1 }),
+    queryKey: ["admin-reservations", { status: Array.from(statusFilter)[0], p: pagination.pageIndex + 1 }],
+    queryFn: () => queryTableReservations({
+      status: Array.from(statusFilter)[0],
+      p: pagination.pageIndex + 1,
+    }),
     refetchOnWindowFocus: false,
   })
 
@@ -52,21 +66,6 @@ export default function ReservationsPage() {
   return (
     <DashboardShell>
       <DashboardHeader heading="Reservations" text="Manage table reservations." />
-
-      <div className="flex gap-2 flex-wrap mb-4">
-        {STATUSES.map((s) => (
-          <Button
-            key={s}
-            variant={status === s ? "default" : "outline"}
-            size="sm"
-            className="capitalize"
-            onClick={() => { setStatus(s); setPagination((p) => ({ ...p, pageIndex: 0 })) }}
-          >
-            {s.replace("_", " ")}
-          </Button>
-        ))}
-      </div>
-
       <DataTable
         columns={reservationColumns}
         data={reservations}
@@ -77,7 +76,14 @@ export default function ReservationsPage() {
         setPagination={setPagination}
         search=""
         setSearch={() => {}}
-        searchPlaceholder=""
+        filters={
+          <DataTableFacetedFilter
+            title="Status"
+            options={statusOptions}
+            selectedValues={statusFilter}
+            onValueChange={setStatusFilter}
+          />
+        }
       />
     </DashboardShell>
   )
