@@ -1,17 +1,3 @@
-declare global {
-  interface Window {
-    dataLayer: object[]
-  }
-}
-
-interface PurchaseItem {
-  item_id: string
-  item_name: string
-  item_category: string
-  price: number
-  quantity: number
-}
-
 interface EcomItem {
   item_id: string
   item_name: string
@@ -20,11 +6,14 @@ interface EcomItem {
   quantity: number
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const dl = () => { (window as any).dataLayer = (window as any).dataLayer || []; return (window as any).dataLayer as any[] }
+
 function pushEcom(event: string, payload: Record<string, unknown>) {
   if (typeof window === "undefined") return
-  window.dataLayer = window.dataLayer || []
-  window.dataLayer.push({ ecommerce: null })
-  window.dataLayer.push({ event, ecommerce: payload })
+  const dataLayer = dl()
+  dataLayer.push({ ecommerce: null })
+  dataLayer.push({ event, ecommerce: payload })
 }
 
 export function trackViewItem(params: {
@@ -54,6 +43,28 @@ export function trackAddToCart(params: {
   })
 }
 
+export function trackAddShippingInfo(params: {
+  shipping_tier: string
+  value: number
+}) {
+  pushEcom("add_shipping_info", {
+    currency: "USD",
+    value: params.value,
+    shipping_tier: params.shipping_tier,
+  })
+}
+
+export function trackAddPaymentInfo(params: {
+  payment_type: string
+  value: number
+}) {
+  pushEcom("add_payment_info", {
+    currency: "USD",
+    value: params.value,
+    payment_type: params.payment_type,
+  })
+}
+
 export function trackBeginCheckout(params: {
   value: number        // in dollars
   items: EcomItem[]
@@ -69,18 +80,13 @@ export function trackPurchase(params: {
   transaction_id: string
   value: number       // in dollars (not cents)
   currency?: string
-  items: PurchaseItem[]
+  items: EcomItem[]
 }) {
   if (typeof window === "undefined") return
-  window.dataLayer = window.dataLayer || []
-  window.dataLayer.push({ ecommerce: null }) // clear previous ecommerce data
-  window.dataLayer.push({
-    event: "purchase",
-    ecommerce: {
-      transaction_id: params.transaction_id,
-      value: params.value,
-      currency: params.currency ?? "USD",
-      items: params.items,
-    },
+  pushEcom("purchase", {
+    transaction_id: params.transaction_id,
+    value: params.value,
+    currency: params.currency ?? "USD",
+    items: params.items,
   })
 }

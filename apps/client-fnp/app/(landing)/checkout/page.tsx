@@ -11,7 +11,7 @@ import Image from "next/image"
 import Link from "next/link"
 
 import { getCart, checkout, pollOrderStatus, queryClient as fetchClient, updateCartItem, removeFromCart, queryTumira, queryTumiraDeliveryRates, queryTumiraCheckAddress, queryTumiraConfirmPin } from "@/lib/query"
-import { trackPurchase, trackBeginCheckout } from "@/lib/analytics"
+import { trackPurchase, trackBeginCheckout, trackAddShippingInfo, trackAddPaymentInfo } from "@/lib/analytics"
 import { AuthenticatedUser } from "@/lib/schemas"
 import { centsToDollars } from "@/lib/utilities"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -265,6 +265,18 @@ export default function CheckoutPage() {
     .filter((loc, idx, arr) => arr.findIndex((l) => l.id === loc.id) === idx)
   const deliveryAvailable = items.every((i) => i.fulfillment?.delivery_available)
   const subtotalCents = items.reduce((s, i) => s + (i.unit_price * i.quantity), 0)
+
+  useEffect(() => {
+    if (selectedLocationId || selectedCourierId) {
+      trackAddShippingInfo({ shipping_tier: selectedLocationId ? "click_collect" : "delivery", value: subtotalCents / 100 })
+    }
+  }, [selectedLocationId, selectedCourierId])
+
+  useEffect(() => {
+    if (method) {
+      trackAddPaymentInfo({ payment_type: method || "paynow_web", value: subtotalCents / 100 })
+    }
+  }, [method])
 
   const needsTumira = fulfillment === "click_collect" || items.some((i) => i.fulfillment?.pickup_available)
 
