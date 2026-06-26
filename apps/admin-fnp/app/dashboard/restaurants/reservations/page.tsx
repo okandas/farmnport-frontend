@@ -23,7 +23,7 @@ const statusOptions = [
 ]
 
 export default function ReservationsPage() {
-  const [statusFilter, setStatusFilter] = useState<Set<string>>(new Set(["pending"]))
+  const [statusFilter, setStatusFilter] = useState<Set<string>>(new Set())
   const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: 20 })
 
   useEffect(() => {

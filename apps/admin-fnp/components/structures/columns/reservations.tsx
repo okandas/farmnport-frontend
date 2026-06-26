@@ -2,8 +2,16 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 import Link from "next/link"
+import { MoreHorizontal } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { format } from "date-fns"
 
 const STATUS_COLORS: Record<string, string> = {
@@ -94,11 +102,22 @@ export const reservationColumns: ColumnDef<ReservationRow>[] = [
   {
     id: "actions",
     cell: ({ row }) => (
-      <Button asChild size="sm" variant="outline">
-        <Link href={`/dashboard/restaurants/reservations/${row.original.id}`}>
-          Manage
-        </Link>
-      </Button>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="w-8 h-8 p-0">
+            <span className="sr-only">Open menu</span>
+            <MoreHorizontal className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+          <DropdownMenuItem asChild>
+            <Link href={`/dashboard/restaurants/reservations/${row.original.id}`}>
+              Manage
+            </Link>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     ),
   },
 ]
