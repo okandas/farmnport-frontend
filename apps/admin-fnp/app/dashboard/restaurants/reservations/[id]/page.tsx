@@ -186,33 +186,31 @@ export default function ReservationDetailPage() {
       </div>
 
       {/* Status Stepper */}
-      {!["cancelled", "no_show"].includes(reservation.status) && (
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              {STATUS_STEPS.map((step, i) => {
-                const isCompleted = i <= currentStepIndex
-                const isCurrent = i === currentStepIndex
-                return (
-                  <div key={step} className="flex flex-1 items-center">
-                    <div className="flex flex-col items-center gap-1">
-                      <div className={`flex h-8 w-8 items-center justify-center rounded-full border-2 ${isCompleted ? "border-primary bg-primary text-primary-foreground" : "border-muted-foreground/30 text-muted-foreground/30"} ${isCurrent ? "ring-2 ring-primary/20" : ""}`}>
-                        {STATUS_ICONS[step]}
-                      </div>
-                      <span className={`text-xs capitalize ${isCompleted ? "font-medium text-foreground" : "text-muted-foreground/50"}`}>
-                        {step}
-                      </span>
+      <Card>
+        <CardContent className="pt-6">
+          <div className="flex items-center justify-between">
+            {STATUS_STEPS.map((step, i) => {
+              const isCompleted = i <= currentStepIndex
+              const isCurrent = i === currentStepIndex
+              return (
+                <div key={step} className="flex flex-1 items-center">
+                  <div className="flex flex-col items-center gap-1">
+                    <div className={`flex h-8 w-8 items-center justify-center rounded-full border-2 ${isCompleted ? "border-primary bg-primary text-primary-foreground" : "border-muted-foreground/30 text-muted-foreground/30"} ${isCurrent ? "ring-2 ring-primary/20" : ""}`}>
+                      {STATUS_ICONS[step]}
                     </div>
-                    {i < STATUS_STEPS.length - 1 && (
-                      <div className={`mx-2 h-0.5 flex-1 ${i < currentStepIndex ? "bg-primary" : "bg-muted"}`} />
-                    )}
+                    <span className={`text-xs capitalize ${isCompleted ? "font-medium text-foreground" : "text-muted-foreground/50"}`}>
+                      {step}
+                    </span>
                   </div>
-                )
-              })}
-            </div>
-          </CardContent>
-        </Card>
-      )}
+                  {i < STATUS_STEPS.length - 1 && (
+                    <div className={`mx-2 h-0.5 flex-1 ${i < currentStepIndex ? "bg-primary" : "bg-muted"}`} />
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Actions */}
       {actions.length > 0 && (
