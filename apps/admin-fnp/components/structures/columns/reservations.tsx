@@ -3,6 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table"
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { format } from "date-fns"
 
 const STATUS_COLORS: Record<string, string> = {
@@ -88,6 +89,16 @@ export const reservationColumns: ColumnDef<ReservationRow>[] = [
       <span className="text-xs text-muted-foreground">
         {format(new Date(row.original.created), "d MMM yyyy, HH:mm")}
       </span>
+    ),
+  },
+  {
+    id: "actions",
+    cell: ({ row }) => (
+      <Button asChild size="sm" variant="outline">
+        <Link href={`/dashboard/restaurants/reservations/${row.original.id}`}>
+          Manage
+        </Link>
+      </Button>
     ),
   },
 ]
