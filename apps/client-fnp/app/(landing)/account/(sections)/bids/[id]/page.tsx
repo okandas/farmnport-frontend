@@ -6,6 +6,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { Loader2, Gavel, ChevronLeft } from "lucide-react"
 import Link from "next/link"
 import { myBidByID, initiateBidPayment, pollBidPayment } from "@/lib/query"
+import { trackPurchase } from "@/lib/analytics"
 import { centsToDollars } from "@/lib/utilities"
 import { LotImageGallery } from "@/components/ui/lot-image-gallery"
 
@@ -60,7 +61,21 @@ export default function BidDetailPage({ params }: { params: Promise<{ id: string
       try {
         const res = await pollBidPayment(id)
         await refetch()
-        if (res.data?.paid || ["Cancelled", "Disputed", "Refunded"].includes(res.data?.status)) {
+        if (res.data?.paid) {
+          trackPurchase({
+            transaction_id: bid.id,
+            value: (bid.offered_price_per_unit_cents * bid.quantity) / 100,
+            items: [{
+              item_id: bid.lot_slug,
+              item_name: `Lot ${bid.lot_slug} — ${bid.quantity} ${bid.unit}`,
+              item_category: "lot",
+              price: bid.offered_price_per_unit_cents / 100,
+              quantity: bid.quantity,
+            }],
+          })
+          qc.invalidateQueries({ queryKey: ["my-bids"] })
+          clearInterval(interval)
+        } else if (["Cancelled", "Disputed", "Refunded"].includes(res.data?.status)) {
           qc.invalidateQueries({ queryKey: ["my-bids"] })
           clearInterval(interval)
         }

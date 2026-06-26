@@ -11,6 +11,7 @@ import Image from "next/image"
 import Link from "next/link"
 
 import { getCart, checkout, pollOrderStatus, queryClient as fetchClient, updateCartItem, removeFromCart, queryTumira, queryTumiraDeliveryRates, queryTumiraCheckAddress, queryTumiraConfirmPin } from "@/lib/query"
+import { trackPurchase } from "@/lib/analytics"
 import { AuthenticatedUser } from "@/lib/schemas"
 import { centsToDollars } from "@/lib/utilities"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -320,6 +321,18 @@ export default function CheckoutPage() {
         const res = await pollOrderStatus(pollRef)
         if (res.data?.paid) {
           setPolling(false)
+          const totalCents = subtotalCents + (needsTumira ? tumiraFee : 0) + (fulfillment === "delivery" ? deliveryFee : 0)
+          trackPurchase({
+            transaction_id: orderNumber,
+            value: totalCents / 100,
+            items: items.map((item) => ({
+              item_id: item.product_id,
+              item_name: item.product_name,
+              item_category: item.product_type,
+              price: item.unit_price / 100,
+              quantity: item.quantity,
+            })),
+          })
           setStep("success")
         } else if (["Cancelled", "Disputed", "Refunded"].includes(res.data?.status)) {
           setPolling(false)
