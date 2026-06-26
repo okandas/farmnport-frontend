@@ -20,7 +20,7 @@ import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useToast } from "@/components/ui/use-toast"
 
-const STATUS_STEPS = ["pending", "confirmed", "seated", "completed"]
+const STATUS_STEPS = ["pending", "confirmed", "completed"]
 
 const STATUS_COLORS: Record<string, string> = {
   pending:   "bg-yellow-100 text-yellow-800",
@@ -76,7 +76,6 @@ function getActions(status: string): { label: string; status: string; variant: "
       ]
     case "confirmed":
       return [
-        { label: "Mark Seated", status: "seated", variant: "default" },
         { label: "No Show", status: "no_show", variant: "default" },
         { label: "Cancel", status: "cancelled", variant: "destructive" },
       ]
@@ -162,9 +161,8 @@ export default function ReservationDetailPage() {
 
       {/* Status Stepper */}
       {!["cancelled", "no_show"].includes(reservation.status) && (
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
+        <div className="py-2">
+          <div className="flex items-center justify-center">
               {STATUS_STEPS.map((step, i) => {
                 const isCompleted = i <= currentStepIndex
                 const isCurrent = i === currentStepIndex
@@ -185,8 +183,7 @@ export default function ReservationDetailPage() {
                 )
               })}
             </div>
-          </CardContent>
-        </Card>
+          </div>
       )}
 
       {/* Actions */}
