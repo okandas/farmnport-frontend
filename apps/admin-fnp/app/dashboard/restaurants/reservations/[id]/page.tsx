@@ -76,6 +76,7 @@ function getActions(status: string): { label: string; status: string; variant: "
       ]
     case "confirmed":
       return [
+        { label: "Complete", status: "completed", variant: "default" },
         { label: "No Show", status: "no_show", variant: "default" },
         { label: "Cancel", status: "cancelled", variant: "destructive" },
       ]
