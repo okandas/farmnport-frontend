@@ -42,7 +42,7 @@
     "jspdf": "^4.2.1",
     "jwt-decode": "^4.0.0",
     "lucide-react": "^1.0.1",
-    "next": "^16.2.6",
+    "next": "16.2.9",
     "nuqs": "^2.8.9",
     "qrcode": "^1.5.4",
     "qrcode.react": "^4.2.0",
