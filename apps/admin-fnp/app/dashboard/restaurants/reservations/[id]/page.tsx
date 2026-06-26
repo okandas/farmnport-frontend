@@ -15,7 +15,6 @@ import {
 } from "lucide-react"
 
 import { queryTableReservation, updateTableReservationStatus } from "@/lib/query"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -90,6 +89,16 @@ function getActions(status: string): { label: string; status: string; variant: "
   }
 }
 
+function InfoRow({ label, value }: { label: string; value?: React.ReactNode }) {
+  if (!value) return null
+  return (
+    <div className="flex flex-col gap-0.5">
+      <span className="text-xs text-muted-foreground">{label}</span>
+      <span className="text-sm">{value}</span>
+    </div>
+  )
+}
+
 export default function ReservationDetailPage() {
   const params = useParams()
   const router = useRouter()
@@ -131,12 +140,11 @@ export default function ReservationDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-6 max-w-2xl">
         <Skeleton className="h-8 w-64" />
-        <div className="grid gap-4 md:grid-cols-2">
-          <Skeleton className="h-40" />
-          <Skeleton className="h-40" />
-        </div>
+        <Skeleton className="h-4 w-40" />
+        <Skeleton className="h-16 w-full" />
+        <Skeleton className="h-40 w-full" />
       </div>
     )
   }
@@ -155,10 +163,10 @@ export default function ReservationDetailPage() {
   const actions = getActions(reservation.status)
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-8 max-w-2xl">
       {/* Header */}
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={() => router.back()}>
+      <div className="flex items-start gap-3">
+        <Button variant="ghost" size="icon" className="-ml-2 mt-0.5" onClick={() => router.back()}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <div className="flex-1">
@@ -169,7 +177,7 @@ export default function ReservationDetailPage() {
               <span className="ml-1 capitalize">{reservation.status.replace("_", " ")}</span>
             </Badge>
           </div>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground mt-0.5">
             Submitted {format(new Date(reservation.created), "d MMM yyyy, HH:mm")}
           </p>
         </div>
@@ -177,31 +185,27 @@ export default function ReservationDetailPage() {
 
       {/* Status Stepper */}
       {!["cancelled", "no_show"].includes(reservation.status) && (
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              {STATUS_STEPS.map((step, i) => {
-                const isCompleted = i <= currentStepIndex
-                const isCurrent = i === currentStepIndex
-                return (
-                  <div key={step} className="flex flex-1 items-center">
-                    <div className="flex flex-col items-center gap-1">
-                      <div className={`flex h-8 w-8 items-center justify-center rounded-full border-2 ${isCompleted ? "border-primary bg-primary text-primary-foreground" : "border-muted-foreground/30 text-muted-foreground/30"} ${isCurrent ? "ring-2 ring-primary/20" : ""}`}>
-                        {STATUS_ICONS[step]}
-                      </div>
-                      <span className={`text-xs capitalize ${isCompleted ? "font-medium text-foreground" : "text-muted-foreground/50"}`}>
-                        {step}
-                      </span>
-                    </div>
-                    {i < STATUS_STEPS.length - 1 && (
-                      <div className={`mx-2 h-0.5 flex-1 ${i < currentStepIndex ? "bg-primary" : "bg-muted"}`} />
-                    )}
+        <div className="flex items-center">
+          {STATUS_STEPS.map((step, i) => {
+            const isCompleted = i <= currentStepIndex
+            const isCurrent = i === currentStepIndex
+            return (
+              <div key={step} className="flex flex-1 items-center">
+                <div className="flex flex-col items-center gap-1">
+                  <div className={`flex h-8 w-8 items-center justify-center rounded-full border-2 ${isCompleted ? "border-primary bg-primary text-primary-foreground" : "border-muted-foreground/30 text-muted-foreground/30"} ${isCurrent ? "ring-2 ring-primary/20" : ""}`}>
+                    {STATUS_ICONS[step]}
                   </div>
-                )
-              })}
-            </div>
-          </CardContent>
-        </Card>
+                  <span className={`text-xs capitalize ${isCompleted ? "font-medium text-foreground" : "text-muted-foreground/50"}`}>
+                    {step}
+                  </span>
+                </div>
+                {i < STATUS_STEPS.length - 1 && (
+                  <div className={`mx-2 h-0.5 flex-1 ${i < currentStepIndex ? "bg-primary" : "bg-muted"}`} />
+                )}
+              </div>
+            )
+          })}
+        </div>
       )}
 
       {/* Actions */}
@@ -220,43 +224,46 @@ export default function ReservationDetailPage() {
         </div>
       )}
 
-      <div className="grid gap-6 md:grid-cols-2">
-        {/* Guest */}
-        <Card>
-          <CardHeader><CardTitle className="text-base">Guest</CardTitle></CardHeader>
-          <CardContent className="space-y-2 text-sm">
-            <p><span className="text-muted-foreground">Name:</span> {reservation.full_name}</p>
-            <p><span className="text-muted-foreground">Phone:</span> {reservation.contact}</p>
-            {reservation.client_email && (
-              <p><span className="text-muted-foreground">Email:</span> {reservation.client_email}</p>
-            )}
-          </CardContent>
-        </Card>
+      {/* Guest */}
+      <div>
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">Guest</p>
+        <div className="grid grid-cols-2 gap-4">
+          <InfoRow label="Name" value={reservation.full_name} />
+          <InfoRow label="Phone" value={reservation.contact} />
+          {reservation.client_email && (
+            <InfoRow label="Email" value={reservation.client_email} />
+          )}
+        </div>
+      </div>
 
-        {/* Booking */}
-        <Card>
-          <CardHeader><CardTitle className="text-base">Booking</CardTitle></CardHeader>
-          <CardContent className="space-y-2 text-sm">
-            <p><span className="text-muted-foreground">Restaurant:</span> <span className="capitalize">{reservation.restaurant_name}</span></p>
-            <p><span className="text-muted-foreground">Location:</span> <span className="capitalize">{reservation.location_name}</span></p>
-            <p><span className="text-muted-foreground">Date:</span> {reservation.date}</p>
-            <p><span className="text-muted-foreground">Time:</span> {reservation.preferred_time}</p>
-            <p><span className="text-muted-foreground">Guests:</span> {reservation.number_of_guests}</p>
-            {reservation.notes && (
-              <p><span className="text-muted-foreground">Notes:</span> <span className="italic">{reservation.notes}</span></p>
-            )}
-          </CardContent>
-        </Card>
+      <div className="border-t" />
+
+      {/* Booking */}
+      <div>
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">Booking</p>
+        <div className="grid grid-cols-2 gap-4">
+          <InfoRow label="Restaurant" value={<span className="capitalize">{reservation.restaurant_name}</span>} />
+          <InfoRow label="Location" value={<span className="capitalize">{reservation.location_name}</span>} />
+          <InfoRow label="Date" value={reservation.date} />
+          <InfoRow label="Time" value={reservation.preferred_time} />
+          <InfoRow label="Guests" value={String(reservation.number_of_guests)} />
+          {reservation.notes && (
+            <div className="col-span-2">
+              <InfoRow label="Guest Notes" value={<span className="italic">{reservation.notes}</span>} />
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Admin notes */}
       {reservation.admin_notes && (
-        <Card>
-          <CardHeader><CardTitle className="text-base">Admin Notes</CardTitle></CardHeader>
-          <CardContent>
+        <>
+          <div className="border-t" />
+          <div>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">Admin Notes</p>
             <p className="text-sm text-muted-foreground italic">{reservation.admin_notes}</p>
-          </CardContent>
-        </Card>
+          </div>
+        </>
       )}
 
       {/* Status action dialog */}
