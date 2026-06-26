@@ -4,12 +4,22 @@ import { useParams, useRouter } from "next/navigation"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
 import { format } from "date-fns"
-import { ArrowLeft } from "lucide-react"
+import {
+  ArrowLeft,
+  CalendarCheck,
+  Clock,
+  CheckCircle2,
+  XCircle,
+  UserX,
+  Armchair,
+} from "lucide-react"
 
 import { queryTableReservation, updateTableReservationStatus } from "@/lib/query"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/components/ui/use-toast"
 import {
   Dialog,
@@ -21,7 +31,7 @@ import {
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 
-const STATUS_STEPS = ["pending", "confirmed", "seated", "completed"] as const
+const STATUS_STEPS = ["pending", "confirmed", "seated", "completed"]
 
 const STATUS_COLORS: Record<string, string> = {
   pending:   "bg-yellow-100 text-yellow-800",
@@ -32,13 +42,13 @@ const STATUS_COLORS: Record<string, string> = {
   no_show:   "bg-orange-100 text-orange-800",
 }
 
-const STATUS_LABEL: Record<string, string> = {
-  pending:   "Awaiting confirmation",
-  confirmed: "Confirmed — awaiting arrival",
-  seated:    "Guest is seated",
-  completed: "Reservation completed",
-  cancelled: "Cancelled",
-  no_show:   "Guest did not show",
+const STATUS_ICONS: Record<string, React.ReactNode> = {
+  pending:   <Clock className="h-4 w-4" />,
+  confirmed: <CalendarCheck className="h-4 w-4" />,
+  seated:    <Armchair className="h-4 w-4" />,
+  completed: <CheckCircle2 className="h-4 w-4" />,
+  cancelled: <XCircle className="h-4 w-4" />,
+  no_show:   <UserX className="h-4 w-4" />,
 }
 
 interface StatusChange {
@@ -72,18 +82,18 @@ function getActions(status: string): { label: string; status: string; variant: "
   switch (status) {
     case "pending":
       return [
-        { label: "Confirm reservation", status: "confirmed", variant: "default" },
+        { label: "Confirm Reservation", status: "confirmed", variant: "default" },
         { label: "Cancel", status: "cancelled", variant: "destructive" },
       ]
     case "confirmed":
       return [
-        { label: "Mark as seated", status: "seated", variant: "default" },
-        { label: "No show", status: "no_show", variant: "outline" },
+        { label: "Mark Seated", status: "seated", variant: "default" },
+        { label: "No Show", status: "no_show", variant: "outline" },
         { label: "Cancel", status: "cancelled", variant: "destructive" },
       ]
     case "seated":
       return [
-        { label: "Mark complete", status: "completed", variant: "default" },
+        { label: "Mark Complete", status: "completed", variant: "default" },
       ]
     default:
       return []
@@ -131,9 +141,12 @@ export default function ReservationDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="space-y-4 max-w-3xl">
-        <Skeleton className="h-8 w-48" />
-        <Skeleton className="h-72 w-full rounded-lg" />
+      <div className="flex flex-col gap-6">
+        <Skeleton className="h-8 w-64" />
+        <div className="grid gap-4 md:grid-cols-2">
+          <Skeleton className="h-48" />
+          <Skeleton className="h-48" />
+        </div>
       </div>
     )
   }
@@ -148,173 +161,147 @@ export default function ReservationDetailPage() {
     )
   }
 
-  const currentStepIndex = STATUS_STEPS.indexOf(reservation.status as typeof STATUS_STEPS[number])
-  const isTerminal = ["cancelled", "no_show"].includes(reservation.status)
+  const currentStepIndex = STATUS_STEPS.indexOf(reservation.status)
   const actions = getActions(reservation.status)
-  const progressPct = currentStepIndex >= 0
-    ? Math.round((currentStepIndex / (STATUS_STEPS.length - 1)) * 100)
-    : 0
 
   return (
-    <div className="space-y-6 max-w-3xl">
-      {/* Page header */}
-      <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" className="-ml-2" onClick={() => router.back()}>
+    <div className="flex flex-col gap-6">
+      {/* Header */}
+      <div className="flex items-center gap-4">
+        <Button variant="ghost" size="icon" onClick={() => router.back()}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold font-mono tracking-tight">{reservation.reservation_ref}</h1>
+        <div className="flex-1">
+          <div className="flex items-center gap-3">
+            <h2 className="text-2xl font-bold font-mono">{reservation.reservation_ref}</h2>
             <Badge className={STATUS_COLORS[reservation.status] ?? ""}>
-              <span className="capitalize">{reservation.status.replace("_", " ")}</span>
+              {STATUS_ICONS[reservation.status]}
+              <span className="ml-1 capitalize">{reservation.status.replace("_", " ")}</span>
             </Badge>
           </div>
           <p className="text-sm text-muted-foreground">
-            Submitted {format(new Date(reservation.created), "d MMM yyyy, HH:mm")}
+            {format(new Date(reservation.created), "PPp")}
           </p>
         </div>
       </div>
 
-      {/* Main panel — info top, progress + actions bottom */}
-      <div className="border border-border rounded-lg bg-card shadow-sm overflow-hidden">
-        <div className="px-6 py-6 grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2">
-          {/* Guest */}
-          <div>
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">Guest</p>
-            <dl className="space-y-3 text-sm">
-              <div>
-                <dt className="text-xs text-muted-foreground">Name</dt>
-                <dd className="font-medium">{reservation.full_name}</dd>
-              </div>
-              <div>
-                <dt className="text-xs text-muted-foreground">Phone</dt>
-                <dd>{reservation.contact}</dd>
-              </div>
-              {reservation.client_email && (
-                <div>
-                  <dt className="text-xs text-muted-foreground">Email</dt>
-                  <dd>{reservation.client_email}</dd>
-                </div>
-              )}
-            </dl>
-          </div>
-
-          {/* Booking */}
-          <div>
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">Booking</p>
-            <dl className="space-y-3 text-sm">
-              <div>
-                <dt className="text-xs text-muted-foreground">Restaurant</dt>
-                <dd className="capitalize">{reservation.restaurant_name}</dd>
-              </div>
-              <div>
-                <dt className="text-xs text-muted-foreground">Location</dt>
-                <dd className="capitalize">{reservation.location_name}</dd>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <dt className="text-xs text-muted-foreground">Date</dt>
-                  <dd>{reservation.date}</dd>
-                </div>
-                <div>
-                  <dt className="text-xs text-muted-foreground">Time</dt>
-                  <dd>{reservation.preferred_time}</dd>
-                </div>
-              </div>
-              <div>
-                <dt className="text-xs text-muted-foreground">Guests</dt>
-                <dd>{reservation.number_of_guests}</dd>
-              </div>
-              {reservation.notes && (
-                <div>
-                  <dt className="text-xs text-muted-foreground">Guest notes</dt>
-                  <dd className="italic text-muted-foreground">{reservation.notes}</dd>
-                </div>
-              )}
-            </dl>
-          </div>
-        </div>
-
-        {/* Status + progress bar + actions */}
-        <div className="border-t border-border px-6 py-6">
-          <p className="text-sm font-medium">{STATUS_LABEL[reservation.status] ?? reservation.status}</p>
-
-          {!isTerminal && (
-            <div className="mt-4">
-              <div className="overflow-hidden rounded-full bg-muted h-2">
-                <div
-                  className="h-2 rounded-full bg-primary transition-all duration-500"
-                  style={{ width: `${progressPct}%` }}
-                />
-              </div>
-              <div
-                className="mt-3 grid text-xs font-medium text-muted-foreground"
-                style={{ gridTemplateColumns: `repeat(${STATUS_STEPS.length}, minmax(0, 1fr))` }}
-              >
-                {STATUS_STEPS.map((step, i) => (
-                  <span
-                    key={step}
-                    className={`capitalize ${i === 0 ? "text-left" : i === STATUS_STEPS.length - 1 ? "text-right" : "text-center"} ${i <= currentStepIndex ? "text-foreground" : ""}`}
-                  >
-                    {step}
-                  </span>
-                ))}
-              </div>
+      {/* Status Stepper */}
+      {!["cancelled", "no_show"].includes(reservation.status) && (
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              {STATUS_STEPS.map((step, i) => {
+                const isCompleted = i <= currentStepIndex
+                const isCurrent = i === currentStepIndex
+                return (
+                  <div key={step} className="flex flex-1 items-center">
+                    <div className="flex flex-col items-center gap-1">
+                      <div className={`flex h-8 w-8 items-center justify-center rounded-full border-2 ${isCompleted ? "border-primary bg-primary text-primary-foreground" : "border-muted-foreground/30 text-muted-foreground/30"} ${isCurrent ? "ring-2 ring-primary/20" : ""}`}>
+                        {STATUS_ICONS[step]}
+                      </div>
+                      <span className={`text-xs capitalize ${isCompleted ? "font-medium text-foreground" : "text-muted-foreground/50"}`}>
+                        {step}
+                      </span>
+                    </div>
+                    {i < STATUS_STEPS.length - 1 && (
+                      <div className={`mx-2 h-0.5 flex-1 ${i < currentStepIndex ? "bg-primary" : "bg-muted"}`} />
+                    )}
+                  </div>
+                )
+              })}
             </div>
-          )}
+          </CardContent>
+        </Card>
+      )}
 
-          {actions.length > 0 && (
-            <div className="mt-5 flex gap-2 flex-wrap">
-              {actions.map((action) => (
-                <Button
-                  key={action.status}
-                  variant={action.variant}
-                  size="sm"
-                  onClick={() => handleAction(action.status)}
-                  disabled={statusMutation.isPending}
-                >
-                  {action.label}
-                </Button>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Admin notes */}
-      {reservation.admin_notes && (
-        <div className="text-sm">
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Admin notes</p>
-          <p className="text-muted-foreground italic">{reservation.admin_notes}</p>
+      {/* Actions */}
+      {actions.length > 0 && (
+        <div className="flex gap-2">
+          {actions.map((action) => (
+            <Button
+              key={action.status}
+              variant={action.variant}
+              onClick={() => handleAction(action.status)}
+              disabled={statusMutation.isPending}
+            >
+              {action.label}
+            </Button>
+          ))}
         </div>
       )}
 
-      {/* Status Timeline */}
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Guest</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2 text-sm">
+            <p><span className="text-muted-foreground">Name:</span> {reservation.full_name}</p>
+            <p><span className="text-muted-foreground">Phone:</span> {reservation.contact}</p>
+            {reservation.client_email && (
+              <p><span className="text-muted-foreground">Email:</span> {reservation.client_email}</p>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Booking</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2 text-sm">
+            <p><span className="text-muted-foreground">Restaurant:</span> <span className="capitalize">{reservation.restaurant_name}</span></p>
+            <p><span className="text-muted-foreground">Location:</span> <span className="capitalize">{reservation.location_name}</span></p>
+            <p><span className="text-muted-foreground">Date:</span> {reservation.date}</p>
+            <p><span className="text-muted-foreground">Time:</span> {reservation.preferred_time}</p>
+            <p><span className="text-muted-foreground">Guests:</span> {reservation.number_of_guests}</p>
+            {reservation.notes && (
+              <>
+                <Separator className="my-2" />
+                <p><span className="text-muted-foreground">Guest Notes:</span> <span className="italic">{reservation.notes}</span></p>
+              </>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Admin Notes */}
+      {reservation.admin_notes && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Admin Notes</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground italic">{reservation.admin_notes}</p>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Timeline */}
       {reservation.status_history && reservation.status_history.length > 0 && (
-        <div>
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">Timeline</p>
-          <div className="space-y-4">
-            {reservation.status_history.map((change, i) => (
-              <div key={i} className="flex gap-3">
-                <div className="flex flex-col items-center">
-                  <div className="h-2 w-2 rounded-full bg-primary mt-1.5" />
-                  {i < reservation.status_history!.length - 1 && (
-                    <div className="w-px flex-1 bg-border mt-1" />
-                  )}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Timeline</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {reservation.status_history.map((change, i) => (
+                <div key={i} className="flex gap-3">
+                  <div className="flex flex-col items-center">
+                    <div className="h-2 w-2 rounded-full bg-primary mt-2" />
+                    {i < reservation.status_history!.length - 1 && <div className="w-px flex-1 bg-border" />}
+                  </div>
+                  <div className="pb-4">
+                    <p className="text-sm font-medium capitalize">{change.to.replace("_", " ")}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {change.changed_by} &middot; {format(new Date(change.timestamp), "PPp")}
+                    </p>
+                    {change.note && <p className="text-xs text-muted-foreground mt-1 italic">{change.note}</p>}
+                  </div>
                 </div>
-                <div className="pb-4 text-sm">
-                  <p className="font-medium capitalize">{change.to.replace("_", " ")}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {change.changed_by} &middot; {format(new Date(change.timestamp), "d MMM yyyy, HH:mm")}
-                  </p>
-                  {change.note && (
-                    <p className="text-xs text-muted-foreground mt-0.5 italic">{change.note}</p>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       )}
 
       {/* Status action dialog */}
@@ -322,7 +309,7 @@ export default function ReservationDetailPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle className="capitalize">
-              {pendingStatus.replace("_", " ")} reservation
+              {pendingStatus.replace("_", " ")} Reservation
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
