@@ -21,18 +21,19 @@ interface Notification {
 
 interface NotificationDrawerProps {
   onClose: () => void
+  source?: string
 }
 
 const PAGE_SIZE = 20
 
-export function NotificationDrawer({ onClose }: NotificationDrawerProps) {
+export function NotificationDrawer({ onClose, source }: NotificationDrawerProps) {
   const router = useRouter()
   const queryClient = useQueryClient()
   const observerRef = useRef<IntersectionObserver | null>(null)
 
   const { data, isLoading, isFetchingNextPage, fetchNextPage, hasNextPage } = useInfiniteQuery({
-    queryKey: ["notifications", "list"],
-    queryFn: ({ pageParam = 1 }) => queryNotificationsList(pageParam as number).then((r) => r.data),
+    queryKey: ["notifications", "list", source],
+    queryFn: ({ pageParam = 1 }) => queryNotificationsList(pageParam as number, source).then((r) => r.data),
     getNextPageParam: (lastPage: any, allPages) => {
       const total = lastPage?.total ?? 0
       const fetched = allPages.length * PAGE_SIZE
@@ -42,7 +43,7 @@ export function NotificationDrawer({ onClose }: NotificationDrawerProps) {
   })
 
   const markReadMutation = useMutation({
-    mutationFn: (data: { ids?: string[]; all?: boolean }) => markNotificationsRead(data),
+    mutationFn: (data: { ids?: string[]; all?: boolean }) => markNotificationsRead(data, source),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notifications"] })
     },

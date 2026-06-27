@@ -24,7 +24,7 @@ export default async function DashboardLayout({
             Manage Apps
           </Link>
           <div className="flex items-center gap-2">
-            <NotificationBell />
+            <NotificationBell source="farmnport" />
             <AccountNavigation />
           </div>
         </div>
