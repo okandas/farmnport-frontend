@@ -210,7 +210,7 @@ export default function EditAnimalHealthProductPage({ params }: { params: Promis
             </div>
 
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit, handleFormErrors)}>
+                <form onSubmit={form.handleSubmit(onSubmit, (errors) => handleFormErrors(errors))}>
                     <div className="space-y-12">
                         <div className="border-b border-gray-900/10 pb-12 dark:border-white/10">
                             <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">

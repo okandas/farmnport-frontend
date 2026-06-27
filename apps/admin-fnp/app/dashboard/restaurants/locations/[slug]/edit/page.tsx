@@ -189,7 +189,7 @@ function EditLocationForm({ location, restaurants }: { location: RestaurantLocat
             </div>
 
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit, handleFormErrors)}>
+                <form onSubmit={form.handleSubmit(onSubmit, (errors) => handleFormErrors(errors))}>
                     <div className="space-y-12">
 
                         {/* Section 1: Location Details */}

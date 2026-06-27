@@ -119,7 +119,7 @@ export default function NewLivestockPoultryPage() {
             </div>
 
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit, handleFormErrors)}>
+                <form onSubmit={form.handleSubmit(onSubmit, (errors) => handleFormErrors(errors))}>
                     <div className="space-y-12">
 
                         {/* Product Information */}
