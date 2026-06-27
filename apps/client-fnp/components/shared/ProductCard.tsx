@@ -3,7 +3,7 @@
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { formatProductName } from "@/lib/utilities"
+import { formatProductName, centsToDollars } from "@/lib/utilities"
 import { AddToCartButton, CartProductType } from "@/components/cart/AddToCartButton"
 
 interface ProductCardProps {
@@ -91,9 +91,9 @@ export function ProductCard({
           <div className="space-y-2">
             {!hasVariants && (salePrice ?? 0) > 0 && (
               <div className="flex items-baseline gap-2">
-                <span className="text-lg font-bold">${(salePrice / 100).toFixed(2)}</span>
-                {showWasPrice && wasPrice && wasPrice > 0 && wasPrice > salePrice && (
-                  <span className="text-xs text-muted-foreground line-through">${(wasPrice / 100).toFixed(2)}</span>
+                <span className="text-lg font-bold">{centsToDollars(salePrice ?? 0)}</span>
+                {showWasPrice && wasPrice && wasPrice > 0 && wasPrice > (salePrice ?? 0) && (
+                  <span className="text-xs text-muted-foreground line-through">{centsToDollars(wasPrice)}</span>
                 )}
               </div>
             )}

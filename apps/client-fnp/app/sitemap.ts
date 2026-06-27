@@ -63,15 +63,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     fetchLivestockPoultry(),
   ])
 
-  // Price list routes
-  const priceRoutes: MetadataRoute.Sitemap = priceLists.map((pl) => ({
-    url: `${BASE_URL}/prices/${pl.slug}`,
-    lastModified: safeDate(pl.effectiveDate),
-    changeFrequency: 'weekly' as const,
-    priority: 0.7,
-  }))
-
-
   // Farm produce → /buyers/{slug} and /farmers/{slug}
   const farmProduceRoutes: MetadataRoute.Sitemap = farmProduce.flatMap((fp: any) => [
     { url: `${BASE_URL}/buyers/${fp.slug}`, lastModified: safeDate(fp.updated || fp.created), changeFrequency: 'weekly' as const, priority: 0.7 },
@@ -105,15 +96,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     changeFrequency: 'weekly' as const,
     priority: 0.7,
   }))
-
-  // CDM price routes
-  const cdmPriceRoutes: MetadataRoute.Sitemap = cdmPrices.map((cp: any) => ({
-    url: `${BASE_URL}/prices/cdm/${cp.slug}`,
-    lastModified: safeDate(cp.effectiveDate),
-    changeFrequency: 'weekly' as const,
-    priority: 0.6,
-  }))
-
 
   // Produce price category routes
   const producePriceCategories = ['beef', 'lamb', 'mutton', 'goat', 'chicken', 'pork']
@@ -197,14 +179,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...livestockPoultryRoutes,
     ...clientRoutes,
   ]
-}
-
-// --- Helpers ---
-
-function safeDate(value: any): Date {
-  if (!value) return new Date()
-  const d = new Date(value)
-  return isNaN(d.getTime()) ? new Date() : d
 }
 
 // --- Fetchers ---
