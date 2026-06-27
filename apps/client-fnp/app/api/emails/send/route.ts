@@ -14,10 +14,10 @@ import {
   BookingAdminAlertEmail,
 } from "@/emails"
 
-const resend = new Resend(process.env.RESEND_API_KEY)
 const FROM = "farmnport <noreply@farmnport.com>"
 
 export async function POST(req: NextRequest) {
+  const resend = new Resend(process.env.RESEND_API_KEY)
   const secret = req.headers.get("x-email-secret")
   if (secret !== process.env.EMAIL_SECRET) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
