@@ -8,6 +8,7 @@ import { queryAgroChemicalActiveIngredients } from "@/lib/query"
 import { AgroChemicalActiveIngredient } from "@/lib/schemas"
 import { handleFetchError } from "@/lib/error-handler"
 import { Placeholder } from "@/components/state/placeholder"
+import { TableSkeleton } from "@/components/state/skeleton-table"
 import { DataTable } from "@/components/structures/data-table"
 import { agroChemicalActiveIngredientColumns } from "@/components/structures/columns/agroChemicalActiveIngredients"
 
@@ -63,11 +64,7 @@ export function AgroChemicalActiveIngredientsTable() {
   }
 
   if (isLoading || isFetching) {
-    return (
-      <Placeholder>
-        <Placeholder.Title>Fetching Active Ingredients</Placeholder.Title>
-      </Placeholder>
-    )
+    return <TableSkeleton />
   }
 
   return (

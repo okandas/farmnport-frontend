@@ -1,23 +1,23 @@
 import type { Metadata } from 'next'
-import { queryAgroChemical } from "@/lib/query"
+import { serverFetch } from "@/lib/serverFetch"
 import { ActiveIngredientsList } from "@/components/shared/ActiveIngredientUnitsKey"
 import Image from "next/image"
 import { Beaker, AlertTriangle } from "lucide-react"
 import Link from "next/link"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
-import { capitalizeFirstLetter } from "@/lib/utilities"
+import { capitalizeFirstLetter, buildGuideMetadata } from "@/lib/utilities"
 import { SprayProgramBackLink } from "./SprayProgramBackLink"
 import { FertilizerApplicationRates } from "@/components/agrochemical/FertilizerApplicationRates"
 import { AgrochemicalDosageTable } from "@/components/agrochemical/AgrochemicalDosageTable"
 import { ProductTargets } from "@/components/agrochemical/ProductTargets"
 import { WantToBuyCTA } from "@/components/shared/WantToBuyCTA"
+import { GuideProductTitle } from "@/components/shared/GuideProductTitle"
 
 type Props = { params: Promise<{ category: string; slug: string }> }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { category, slug } = await params
-  const response = await queryAgroChemical(slug).catch(() => null)
-  const chemical = response?.data
+  const chemical = await serverFetch(`/agrochemical/${slug}`).catch(() => null)
 
   if (!chemical) {
     return { title: 'Agrochemical Guide | farmnport.com' }
@@ -38,17 +38,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     'View dosage rates, label information, and application guidelines on farmnport.com.',
   ].filter(Boolean).join('. ')
 
-  return {
-    title: `${chemical.name} – ${categorySingularTitle} Dosage, Label & Guide | farmnport.com`,
-    description,
-    alternates: { canonical: `/agrochemical-guides/${category}/${slug}` },
-    openGraph: {
-      title: `${chemical.name} – ${categorySingularTitle} Guide`,
-      description,
-      siteName: 'farmnport',
-      type: 'website',
-    },
-  }
+  return buildGuideMetadata(chemical, categorySingularTitle, 'Dosage, Label & Guide', description, `/agrochemical-guides/${category}/${slug}`)
 }
 
 interface GuidePageProps {
@@ -61,8 +51,7 @@ interface GuidePageProps {
 export default async function AgroChemicalGuidePage({ params }: GuidePageProps) {
     const { category, slug } = await params
 
-    const response = await queryAgroChemical(slug)
-    const chemical = response?.data
+    const chemical = await serverFetch(`/agrochemical/${slug}`)
 
     const categorySlug = chemical?.agrochemical_category?.slug || ""
     const targetLabel: Record<string, string> = {
@@ -230,7 +219,7 @@ export default async function AgroChemicalGuidePage({ params }: GuidePageProps) 
                         )}
 
                         {/* Want to Buy CTA */}
-                        <WantToBuyCTA available_for_sale={chemical.available_for_sale} name={chemical.name} href={`/buy-agrochemicals/${slug}`} />
+                        <WantToBuyCTA available_for_sale={chemical.available_for_sale} name={chemical.name} brand={chemical.brand?.name} href={`/buy-agrochemicals/${slug}`} />
 
                         {/* Precautions */}
                         {chemical.precautions && chemical.precautions.length > 0 && (
@@ -254,9 +243,7 @@ export default async function AgroChemicalGuidePage({ params }: GuidePageProps) 
                     {/* Right - Product Info */}
                     <div className="space-y-6">
                         {/* Product Name */}
-                        <h1 className="text-3xl lg:text-4xl font-bold capitalize leading-tight">
-                            {chemical.name}
-                        </h1>
+                        <GuideProductTitle name={chemical.name} brand={chemical.brand?.name} />
 
                         {/* Category Badge & Buy Link */}
                         <div className="flex items-center gap-3 flex-wrap">

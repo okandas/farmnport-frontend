@@ -8,6 +8,7 @@ import { queryAdminBookings } from "@/lib/query"
 import { handleFetchError } from "@/lib/error-handler"
 import { Placeholder } from "@/components/state/placeholder"
 import { DashboardHeader } from "@/components/state/dashboardHeader"
+import { FormSkeleton } from "@/components/state/skeleton-table"
 import { DashboardShell } from "@/components/state/dashboardShell"
 import { BookingsTable } from "@/components/structures/tables/bookings"
 
@@ -37,10 +38,7 @@ export default function AdminBookingsPage() {
   if (isLoading || isFetching) {
     return (
       <DashboardShell>
-        <DashboardHeader heading="Bookings" text="Manage livestock and delivery bookings." />
-        <Placeholder>
-          <Placeholder.Title>Fetching Bookings</Placeholder.Title>
-        </Placeholder>
+        <FormSkeleton />
       </DashboardShell>
     )
   }

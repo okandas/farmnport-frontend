@@ -10,8 +10,11 @@ import { queryCuisineCategory, updateCuisineCategory } from "@/lib/query"
 import { CuisineCategory } from "@/lib/schemas"
 import { Icons } from "@/components/icons/lucide"
 import { toast } from "@/components/ui/use-toast"
-import { handleApiError } from "@/lib/error-handler"
+import { handleApiError ,
+  handleFormErrors
+} from "@/lib/error-handler"
 import { Placeholder } from "@/components/state/placeholder"
+import { FormSkeleton } from "@/components/state/skeleton-table"
 import {
     Form,
     FormControl,
@@ -84,12 +87,8 @@ export default function EditCuisineCategoryPage() {
     }
 
     if (isLoading) {
-        return (
-            <Placeholder>
-                <Placeholder.Title>Loading Category</Placeholder.Title>
-            </Placeholder>
-        )
-    }
+    return <FormSkeleton />
+  }
 
     if (isError) {
         return (
@@ -114,7 +113,7 @@ export default function EditCuisineCategoryPage() {
             </div>
 
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)}>
+                <form onSubmit={form.handleSubmit(onSubmit, (errors) => handleFormErrors(errors))}>
                     <div className="space-y-12">
                         <div className="border-b border-gray-900/10 pb-12 dark:border-white/10">
                             <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">

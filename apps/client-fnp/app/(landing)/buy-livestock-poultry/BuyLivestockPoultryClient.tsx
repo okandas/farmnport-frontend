@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query"
 import { Egg } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { queryAllLivestockPoultryProducts } from "@/lib/query"
+import { queryBuyLivestockPoultryProducts } from "@/lib/query"
 import { LivestockPoultryCard } from "@/components/livestock/LivestockPoultryCard"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
 
@@ -22,7 +22,7 @@ export function BuyLivestockPoultryClient({ initialProducts, initialTotal }: Buy
 
   const { data: productsData, isLoading } = useQuery({
     queryKey: ["livestock-poultry-shop", queryState.p, queryState.brand],
-    queryFn: () => queryAllLivestockPoultryProducts({
+    queryFn: () => queryBuyLivestockPoultryProducts({
       p: queryState.p,
       brand: queryState.brand || [],
     }),

@@ -67,7 +67,6 @@ export function CartDrawer() {
       <SheetContent side="right" className="flex flex-col w-[calc(100%-3rem)] sm:max-w-md p-0">
         <SheetHeader className="px-6 py-4 border-b">
           <SheetTitle className="flex items-center gap-2">
-            <ShoppingCart className="w-5 h-5" />
             Cart
             {items.length > 0 && (
               <span className="ml-auto mr-6 text-sm font-normal text-muted-foreground">
@@ -75,6 +74,9 @@ export function CartDrawer() {
               </span>
             )}
           </SheetTitle>
+          <Link href="/buy" onClick={closeCart} className="text-xs text-orange-600 hover:text-orange-700 transition-colors w-fit">
+            Continue Shopping
+          </Link>
         </SheetHeader>
 
         {/* Body */}

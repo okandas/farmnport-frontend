@@ -103,7 +103,10 @@ export function DataTable<TData, TValue>({
               <Input
                 placeholder={searchPlaceholder || `Search for ${tableName.toLowerCase()}...`}
                 value={inputValue}
-                onChange={(event) => setInputValue(event.target.value)}
+                onChange={(event) => {
+                  setInputValue(event.target.value)
+                  if (event.target.value === "") setSearch("")
+                }}
                 onKeyDown={(event) => { if (event.key === "Enter") setSearch(inputValue) }}
                 className="h-8 w-[150px] lg:w-[250px]"
               />
@@ -129,6 +132,15 @@ export function DataTable<TData, TValue>({
           </div>
         </div>
       </div>
+      {table.getSelectedRowModel().rows.length > 0 && (
+        <div className="flex items-center justify-between rounded-md border border-primary/20 bg-primary/5 px-4 py-2 text-sm">
+          <span className="text-muted-foreground">{table.getSelectedRowModel().rows.length} selected</span>
+          <Button variant="ghost" size="sm" className="h-7 px-2" onClick={() => table.resetRowSelection()}>
+            Clear selection
+            <Icons.close className="w-3.5 h-3.5 ml-1" />
+          </Button>
+        </div>
+      )}
       <div className="sticky top-0 overflow-x-auto border rounded-md shadow-sm bg-background">
         <Table>
           <TableHeader>

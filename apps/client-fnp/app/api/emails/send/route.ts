@@ -8,12 +8,21 @@ import {
   OrderConfirmationEmail,
   OrderDispatchEmail,
   OrderStatusEmail,
+  BlastEmail,
+  BookingConfirmedEmail,
+  BookingStatusEmail,
+  BookingAdminAlertEmail,
 } from "@/emails"
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 const FROM = "farmnport <noreply@farmnport.com>"
 
 export async function POST(req: NextRequest) {
+  const secret = req.headers.get("x-email-secret")
+  if (secret !== process.env.EMAIL_SECRET) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
   const body = await req.json()
   const { template, to, ...props } = body as { template: string; to: string; [key: string]: unknown }
 
@@ -53,6 +62,28 @@ export async function POST(req: NextRequest) {
     case "order-status":
       subject = `Order ${(props as { orderNumber?: string }).orderNumber ?? ""} update`
       html = await render(OrderStatusEmail(props as Parameters<typeof OrderStatusEmail>[0]))
+      break
+
+    case "blast": {
+      const p = props as Parameters<typeof BlastEmail>[0]
+      subject = (props as { subject?: string }).subject ?? "Message from farmnport"
+      html = await render(BlastEmail(p))
+      break
+    }
+
+    case "booking-confirmed":
+      subject = `Booking ${(props as { bookingRef?: string }).bookingRef ?? ""} confirmed`
+      html = await render(BookingConfirmedEmail(props as Parameters<typeof BookingConfirmedEmail>[0]))
+      break
+
+    case "booking-status":
+      subject = `Booking ${(props as { bookingRef?: string }).bookingRef ?? ""} update`
+      html = await render(BookingStatusEmail(props as Parameters<typeof BookingStatusEmail>[0]))
+      break
+
+    case "booking-admin-alert":
+      subject = `New booking ${(props as { bookingRef?: string }).bookingRef ?? ""} — action required`
+      html = await render(BookingAdminAlertEmail(props as Parameters<typeof BookingAdminAlertEmail>[0]))
       break
 
     default:

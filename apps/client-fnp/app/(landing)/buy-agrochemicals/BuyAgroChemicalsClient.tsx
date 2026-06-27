@@ -1,10 +1,10 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
-import { queryAllAgroChemicals } from "@/lib/query"
+import { queryBuyAgroChemicals } from "@/lib/query"
 import { Button } from "@/components/ui/button"
 import { AgroChemicalFilterSidebar } from "@/components/generic/agroChemicalFilterSidebar"
-import { AgroChemicalCard } from "@/components/agrochemical/AgroChemicalCard"
+import { ProductCard } from "@/components/shared/ProductCard"
 import { BuyCategoriesNav } from "@/components/generic/BuyCategoriesNav"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
 import { Beaker } from "lucide-react"
@@ -30,7 +30,7 @@ export function BuyAgroChemicalsClient({ initialChemicals, initialTotal }: BuyAg
 
     const { data: chemicalsData, isLoading: chemicalsLoading } = useQuery({
         queryKey: ["agrochemicals-shop", queryState.p, queryState.brand, queryState.target, queryState.active_ingredient],
-        queryFn: () => queryAllAgroChemicals({
+        queryFn: () => queryBuyAgroChemicals({
             p: queryState.p,
             brand: queryState.brand || [],
             target: queryState.target || [],
@@ -42,6 +42,9 @@ export function BuyAgroChemicalsClient({ initialChemicals, initialTotal }: BuyAg
 
     const chemicals = chemicalsData?.data?.data || []
     const totalPages = Math.ceil((chemicalsData?.data?.total || 0) / 20)
+    const activeBrandName = queryState.brand?.length === 1 && chemicals[0]?.brand?.name
+      ? chemicals[0].brand.name
+      : null
 
     const handlePageChange = (newPage: number) => {
         setQueryState({ p: newPage })
@@ -58,6 +61,9 @@ export function BuyAgroChemicalsClient({ initialChemicals, initialTotal }: BuyAg
 
             {/* Main Content */}
             <main className="flex-1">
+                {activeBrandName && (
+                    <h2 className="text-lg font-semibold mb-4 capitalize">{activeBrandName}</h2>
+                )}
                 {chemicalsLoading ? (
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
                         {[...Array(6)].map((_, i) => (
@@ -80,7 +86,7 @@ export function BuyAgroChemicalsClient({ initialChemicals, initialTotal }: BuyAg
                     </div>
                 ) : chemicals.length === 0 ? (
                     <div className="text-center py-12">
-                        <Beaker className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
+                        
                         <p className="text-muted-foreground">No agrochemicals found matching your filters.</p>
                     </div>
                 ) : (
@@ -92,10 +98,27 @@ export function BuyAgroChemicalsClient({ initialChemicals, initialTotal }: BuyAg
 
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
                             {chemicals.map((chemical: any) => (
-                                <AgroChemicalCard
+                                <ProductCard
                                     key={chemical.id}
-                                    chemical={chemical}
-                                    mode="shop"
+                                    href={`/buy-agrochemicals/${chemical.slug}`}
+                                    imageSrc={chemical.images?.[0]?.img?.src}
+                                    name={chemical.name}
+                                    brand={chemical.brand?.name}
+                                    meta={chemical.agrochemical_category?.name}
+                                    mode="buy"
+                                    productId={chemical.id}
+                                    productType="agrochemical"
+                                    productSlug={chemical.slug}
+                                   
+                                    salePrice={chemical.sale_price}
+                                    wasPrice={chemical.was_price}
+                                    showWasPrice={chemical.show_was_price}
+                                    availableForSale={chemical.available_for_sale}
+                                    stockLevel={chemical.stock_level}
+                                    hasVariants={chemical.variants?.length > 0}
+                                    variantPriceRange={chemical.variant_price_range}
+                                    pickupOnly={chemical.pickup_location_ids?.length > 0 && !chemical.delivery_available && !(chemical.delivery_location_ids?.length > 0)}
+                                    isTest={chemical.is_test}
                                 />
                             ))}
                         </div>
@@ -103,14 +126,6 @@ export function BuyAgroChemicalsClient({ initialChemicals, initialTotal }: BuyAg
                         {/* Pagination */}
                         {totalPages > 1 && (
                             <div className="mt-8 flex justify-center gap-1">
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => handlePageChange(Math.max(1, queryState.p - 1))}
-                                    disabled={queryState.p === 1}
-                                >
-                                    Previous
-                                </Button>
                                 {Array.from({ length: totalPages }, (_, i) => i + 1)
                                     .filter(pageNum => {
                                         return (
@@ -139,14 +154,6 @@ export function BuyAgroChemicalsClient({ initialChemicals, initialTotal }: BuyAg
                                             </div>
                                         )
                                     })}
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => handlePageChange(queryState.p + 1)}
-                                    disabled={queryState.p >= totalPages}
-                                >
-                                    Next
-                                </Button>
                             </div>
                         )}
                     </>

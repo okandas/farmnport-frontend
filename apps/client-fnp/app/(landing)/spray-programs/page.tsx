@@ -1,13 +1,13 @@
 import Link from "next/link"
-import { queryPublishedSprayPrograms } from "@/lib/query"
+import { serverFetch } from "@/lib/serverFetch"
 import { SprayProgramsClient } from "./SprayProgramsClient"
 
 export default async function SprayProgramsPage() {
     let programs: any[] = []
 
     try {
-        const data = await queryPublishedSprayPrograms()
-        programs = data?.data?.data || []
+        const data = await serverFetch("/sprayprograms/")
+        programs = data?.data || []
     } catch (error) {
         console.error("Error fetching spray programs:", error)
     }

@@ -3,12 +3,13 @@ import Image from "next/image"
 import { Beaker, AlertTriangle } from "lucide-react"
 import Link from "next/link"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
-import { capitalizeFirstLetter } from "@/lib/utilities"
+import { capitalizeFirstLetter, buildGuideMetadata } from "@/lib/utilities"
 import { BaseURL } from "@/lib/schemas"
 import { FertilizerApplicationRates } from "@/components/agrochemical/FertilizerApplicationRates"
 import { AgrochemicalDosageTable } from "@/components/agrochemical/AgrochemicalDosageTable"
 import { ActiveIngredientsList } from "@/components/shared/ActiveIngredientUnitsKey"
 import { WantToBuyCTA } from "@/components/shared/WantToBuyCTA"
+import { GuideProductTitle } from "@/components/shared/GuideProductTitle"
 
 type Props = { params: Promise<{ category: string; slug: string }> }
 
@@ -36,17 +37,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     'View application rates and usage guidelines on farmnport.com.',
   ].filter(Boolean).join('. ')
 
-  return {
-    title: `${product.name} – ${categorySingularTitle} Application Rates & Guide | farmnport.com`,
-    description,
-    alternates: { canonical: `/plant-nutrition-guides/${category}/${slug}` },
-    openGraph: {
-      title: `${product.name} – ${categorySingularTitle} Guide`,
-      description,
-      siteName: 'farmnport',
-      type: 'website',
-    },
-  }
+  return buildGuideMetadata(product, categorySingularTitle, 'Application Rates & Guide', description, `/plant-nutrition-guides/${category}/${slug}`)
 }
 
 interface GuidePageProps {
@@ -159,9 +150,7 @@ export default async function PlantNutritionGuidePage({ params }: GuidePageProps
                                     priority
                                 />
                             ) : (
-                                <div className="absolute inset-0 flex items-center justify-center">
-                                    <Beaker className="w-24 h-24 text-muted-foreground/30" />
-                                </div>
+                                <div className="absolute inset-0 bg-muted/30" />
                             )}
                         </div>
 
@@ -185,7 +174,7 @@ export default async function PlantNutritionGuidePage({ params }: GuidePageProps
                         )}
 
                         {/* Want to Buy CTA */}
-                        <WantToBuyCTA available_for_sale={product.available_for_sale} name={product.name} href={`/buy-plant-nutrition/${slug}`} />
+                        <WantToBuyCTA available_for_sale={product.available_for_sale} name={product.name} brand={product.brand?.name} href={`/buy-plant-nutrition/${slug}`} />
 
                         {/* Precautions */}
                         {product.precautions && product.precautions.length > 0 && (
@@ -208,9 +197,7 @@ export default async function PlantNutritionGuidePage({ params }: GuidePageProps
 
                     {/* Right - Product Info */}
                     <div className="space-y-6">
-                        <h1 className="text-3xl lg:text-4xl font-bold capitalize leading-tight">
-                            {product.name}
-                        </h1>
+                        <GuideProductTitle name={product.name} brand={product.brand?.name} />
 
                         {/* Category Badge */}
                         <div className="flex items-center gap-3 flex-wrap">

@@ -10,6 +10,7 @@ import { cn } from "@/lib/utilities"
 import { buttonVariants } from "@/components/ui/button"
 import { Icons } from "@/components/icons/lucide"
 import { Placeholder } from "@/components/state/placeholder"
+import { FormSkeleton } from "@/components/state/skeleton-table"
 import { SprayProgramForm } from "@/components/structures/forms/sprayProgramForm"
 import { handleFetchError } from "@/lib/error-handler"
 
@@ -64,17 +65,7 @@ export default function EditSprayProgramPage({ params }: EditSprayProgramPagePro
   }
 
   if (isLoading || isFetching) {
-    return (
-      <div className="mt-20">
-        <Placeholder>
-          <Placeholder.Icon name="search" />
-          <Placeholder.Title>Fetching Spray Program</Placeholder.Title>
-          <Placeholder.Description>
-            Fetching spray program from the database
-          </Placeholder.Description>
-        </Placeholder>
-      </div>
-    )
+    return <FormSkeleton />
   }
 
   return (

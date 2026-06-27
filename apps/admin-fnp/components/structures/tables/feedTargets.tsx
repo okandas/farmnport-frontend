@@ -8,6 +8,7 @@ import { queryFeedTargets } from "@/lib/query"
 import { FeedTarget } from "@/lib/schemas"
 import { handleFetchError } from "@/lib/error-handler"
 import { Placeholder } from "@/components/state/placeholder"
+import { TableSkeleton } from "@/components/state/skeleton-table"
 import { DataTable } from "@/components/structures/data-table"
 import { feedTargetColumns } from "@/components/structures/columns/feedTargets"
 
@@ -63,11 +64,7 @@ export function FeedTargetsTable() {
   }
 
   if (isLoading || isFetching) {
-    return (
-      <Placeholder>
-        <Placeholder.Title>Fetching Targets</Placeholder.Title>
-      </Placeholder>
-    )
+    return <TableSkeleton />
   }
 
   return (

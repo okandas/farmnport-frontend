@@ -8,6 +8,7 @@ import { queryMenuItemComponents } from "@/lib/query"
 import { MenuItemComponent } from "@/lib/schemas"
 import { handleFetchError } from "@/lib/error-handler"
 import { Placeholder } from "@/components/state/placeholder"
+import { TableSkeleton } from "@/components/state/skeleton-table"
 import { DataTable } from "@/components/structures/data-table"
 import { menuItemComponentColumns } from "@/components/structures/columns/menu-item-components"
 
@@ -62,11 +63,7 @@ export function MenuItemComponentsTable() {
   }
 
   if (isLoading || isFetching) {
-    return (
-      <Placeholder>
-        <Placeholder.Title>Fetching Components</Placeholder.Title>
-      </Placeholder>
-    )
+    return <TableSkeleton />
   }
 
   return (

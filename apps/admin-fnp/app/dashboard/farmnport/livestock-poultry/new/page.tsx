@@ -14,11 +14,13 @@ import { cn } from "@/lib/utilities"
 import { buttonVariants } from "@/components/ui/button"
 import { Icons } from "@/components/icons/lucide"
 import { toast } from "@/components/ui/use-toast"
-import { handleApiError } from "@/lib/error-handler"
+import { handleApiError ,
+  handleFormErrors
+} from "@/lib/error-handler"
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Checkbox } from "@/components/ui/checkbox"
+import { ProductPricingSection } from "@/components/structures/forms/product-pricing-section"
 
 const inputClass = "block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
 
@@ -57,9 +59,10 @@ const Schema = z.object({
     })).default([]),
     stock_level: z.coerce.number().int().nonnegative().default(0),
     available_for_sale: z.boolean().default(false),
-    show_price: z.boolean().default(false),
     sale_price: z.coerce.number().default(0),
     was_price: z.coerce.number().default(0),
+    weight_grams: z.coerce.number().int().nonnegative().default(0),
+    is_test: z.boolean().default(false),
 })
 
 type FormModel = z.infer<typeof Schema>
@@ -74,7 +77,6 @@ export default function NewLivestockPoultryPage() {
             farm_produce_id: "", description: "", product_overview: "",
             performance_metrics: "", housing_requirements: "", management_tips: "",
             precautions: [], feeding_stages: [], vaccination_schedule: [], variants: [],
-            stock_level: 0, available_for_sale: false, show_price: false, sale_price: 0, was_price: 0,
         },
         resolver: zodResolver(Schema),
     })
@@ -117,7 +119,7 @@ export default function NewLivestockPoultryPage() {
             </div>
 
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)}>
+                <form onSubmit={form.handleSubmit(onSubmit, (errors) => handleFormErrors(errors))}>
                     <div className="space-y-12">
 
                         {/* Product Information */}
@@ -454,56 +456,7 @@ export default function NewLivestockPoultryPage() {
                             )}
                         </div>
 
-                        {/* Pricing & Stock */}
-                        <div className="border-b border-gray-900/10 dark:border-white/10 pb-12">
-                            <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">Pricing & Stock</h2>
-                            <p className="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">Commerce settings for this listing.</p>
-                            <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6">
-                                <div className="sm:col-span-3 flex items-center gap-4">
-                                    <FormField control={form.control} name="show_price" render={({ field }) => (
-                                        <FormItem className="flex items-center gap-2">
-                                            <FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl>
-                                            <label className="text-sm font-medium text-gray-900 dark:text-white cursor-pointer" onClick={() => field.onChange(!field.value)}>Show Price</label>
-                                        </FormItem>
-                                    )} />
-                                </div>
-                                <div className="sm:col-span-3 flex items-center gap-4">
-                                    <FormField control={form.control} name="available_for_sale" render={({ field }) => (
-                                        <FormItem className="flex items-center gap-2">
-                                            <FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl>
-                                            <label className="text-sm font-medium text-gray-900 dark:text-white cursor-pointer" onClick={() => field.onChange(!field.value)}>Available for Sale</label>
-                                        </FormItem>
-                                    )} />
-                                </div>
-                                <div className="sm:col-span-2">
-                                    <FormField control={form.control} name="sale_price" render={({ field }) => (
-                                        <FormItem>
-                                            <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Sale Price (USD)</label>
-                                            <FormControl><Input type="number" step="0.01" min="0" placeholder="0.00" {...field} /></FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )} />
-                                </div>
-                                <div className="sm:col-span-2">
-                                    <FormField control={form.control} name="was_price" render={({ field }) => (
-                                        <FormItem>
-                                            <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Was Price (USD)</label>
-                                            <FormControl><Input type="number" step="0.01" min="0" placeholder="0.00" {...field} /></FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )} />
-                                </div>
-                                <div className="sm:col-span-2">
-                                    <FormField control={form.control} name="stock_level" render={({ field }) => (
-                                        <FormItem>
-                                            <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Stock Level</label>
-                                            <FormControl><Input type="number" min="0" placeholder="0" {...field} /></FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )} />
-                                </div>
-                            </div>
-                        </div>
+                        <ProductPricingSection />
 
                     </div>
 

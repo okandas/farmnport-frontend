@@ -8,6 +8,7 @@ import { queryWeedGroups } from "@/lib/query"
 import { WeedGroup } from "@/lib/schemas"
 import { handleFetchError } from "@/lib/error-handler"
 import { Placeholder } from "@/components/state/placeholder"
+import { TableSkeleton } from "@/components/state/skeleton-table"
 import { DataTable } from "@/components/structures/data-table"
 import { weedGroupColumns } from "@/components/structures/columns/weedGroups"
 
@@ -63,11 +64,7 @@ export function WeedGroupsTable() {
   }
 
   if (isLoading || isFetching) {
-    return (
-      <Placeholder>
-        <Placeholder.Title>Fetching Weed Groups</Placeholder.Title>
-      </Placeholder>
-    )
+    return <TableSkeleton />
   }
 
   return (

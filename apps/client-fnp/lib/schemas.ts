@@ -726,7 +726,6 @@ export type FeedProduct = {
   }[]
   stock_level?: number
   available_for_sale?: boolean
-  show_price?: boolean
   sale_price?: number
   was_price?: number
   created: string

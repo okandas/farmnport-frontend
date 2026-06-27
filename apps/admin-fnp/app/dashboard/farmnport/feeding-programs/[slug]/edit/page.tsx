@@ -10,6 +10,7 @@ import { cn } from "@/lib/utilities"
 import { buttonVariants } from "@/components/ui/button"
 import { Icons } from "@/components/icons/lucide"
 import { Placeholder } from "@/components/state/placeholder"
+import { FormSkeleton } from "@/components/state/skeleton-table"
 import { FeedingProgramForm } from "@/components/structures/forms/feedingProgramForm"
 import { handleFetchError } from "@/lib/error-handler"
 
@@ -64,17 +65,7 @@ export default function EditFeedingProgramPage({ params }: EditFeedingProgramPag
   }
 
   if (isLoading || isFetching) {
-    return (
-      <div className="mt-20">
-        <Placeholder>
-          <Placeholder.Icon name="search" />
-          <Placeholder.Title>Fetching Feeding Program</Placeholder.Title>
-          <Placeholder.Description>
-            Fetching feeding program from the database
-          </Placeholder.Description>
-        </Placeholder>
-      </div>
-    )
+    return <FormSkeleton />
   }
 
   return (

@@ -35,7 +35,7 @@ export function AuthForm({ className, ...props }: AuthFormProps) {
 
     const { errors } = formState
 
-    const { mutate, isPending, isSuccess } = useMutation({
+    const { mutate, isPending, isSuccess, isError } = useMutation({
         mutationFn: loginUser,
         onSuccess: (data) => {
             toast("Success", {
@@ -57,7 +57,7 @@ export function AuthForm({ className, ...props }: AuthFormProps) {
         onError: async (error) => {
 
             toast("Failed to login", {
-                description: "System Failure or Network Failure Please Try Again"
+                description: "Incorrect email or password."
             })
 
             await logtail.error(error)
@@ -124,6 +124,16 @@ export function AuthForm({ className, ...props }: AuthFormProps) {
                         )}
                         Login
                     </button>
+
+                    {isError && (
+                        <div className="rounded-md bg-orange-50 border border-orange-200 p-3 text-sm text-center">
+                            <p className="text-orange-800">Forgot your password?{" "}
+                                <Link href="/reset" className="font-semibold underline text-orange-600 hover:text-orange-500">
+                                    Reset it here
+                                </Link>
+                            </p>
+                        </div>
+                    )}
                 </div>
             </form>
 

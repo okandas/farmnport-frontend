@@ -5,7 +5,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
-import { addToCart, getCart, updateCartItem, removeFromCart } from "@/lib/query"
+import { addToCart, clearCart, getCart, updateCartItem, removeFromCart } from "@/lib/query"
+import { trackAddToCart } from "@/lib/analytics"
 import { useCart } from "@/contexts/cart-context"
 
 export type CartProductType = "agrochemical" | "feed" | "animal_health" | "plant_nutrition" | "document" | "livestock_poultry" | "seed_product"
@@ -52,11 +53,46 @@ export function AddToCartButton({
 
   const addMutation = useMutation({
     mutationFn: addToCart,
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       qc.invalidateQueries({ queryKey: ["cart"] })
       openCart()
+      if (variables.unit_price) {
+        trackAddToCart({
+          item_id: variables.product_id,
+          item_name: variables.product_name,
+          item_category: variables.product_type,
+          price: variables.unit_price / 100,
+          quantity: variables.quantity,
+        })
+      }
     },
-    onError: () => toast.error("Failed to add to cart"),
+    onError: (err: any, variables) => {
+      if (err?.response?.status === 409) {
+        const isTestConflict = err?.response?.data?.message === "test_conflict"
+        toast.warning(
+          isTestConflict
+            ? "Test products cannot be mixed with real products."
+            : "This item has a different pickup method.",
+          {
+            description: "Complete and pay for your current cart first, then add this item.",
+            duration: Infinity,
+            action: {
+              label: "Go to checkout",
+              onClick: () => router.push("/checkout"),
+            },
+            cancel: {
+              label: "Start new cart",
+              onClick: async () => {
+                await clearCart()
+                addMutation.mutate(variables)
+              },
+            },
+          }
+        )
+        return
+      }
+      toast.error("Failed to add to cart")
+    },
   })
 
   const updateMutation = useMutation({
@@ -84,7 +120,7 @@ export function AddToCartButton({
       product_name: productName,
       product_slug: productSlug,
       image_src: imageSrc ?? "",
-      unit_price: Math.round((unitPrice ?? 0) * 100),
+      unit_price: Math.round(unitPrice ?? 0),
       quantity: 1,
     })
   }
@@ -117,7 +153,7 @@ export function AddToCartButton({
     <button
       onClick={handleAdd}
       disabled={addMutation.isPending || !available}
-      className="flex items-center justify-center gap-2 w-full bg-primary hover:bg-primary/90 disabled:opacity-60 text-primary-foreground font-medium text-sm h-9 px-3 rounded-md transition-colors mt-3"
+      className="flex items-center justify-center gap-2 w-full border border-border hover:bg-muted disabled:opacity-60 text-foreground font-medium text-sm h-9 px-3 rounded-md transition-colors mt-3"
     >
       {addMutation.isPending && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
       {available ? "Add to Cart" : "Out of Stock"}

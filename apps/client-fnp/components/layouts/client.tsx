@@ -1,27 +1,45 @@
 "use client"
 
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { ArrowLeft } from "lucide-react"
 import { useQuery } from "@tanstack/react-query"
 import { sendGTMEvent } from "@next/third-parties/google"
 import Link from "next/link"
 
-import { queryClient } from "@/lib/query"
+import { queryClient, recordContactView } from "@/lib/query"
 import { ApplicationUser, AuthenticatedUser } from "@/lib/schemas"
-import { capitalizeFirstLetter, makeAbbveriation, titleCase, plural } from "@/lib/utilities"
+import { capitalizeFirstLetter, makeAbbveriation, titleCase, plural, formatDate } from "@/lib/utilities"
 import { Icons } from "@/components/icons/lucide"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { Contacts } from "@/components/layouts/contacts"
 import { BuyerContacts } from "@/components/structures/buyer-contacts"
 import { ProductResources } from "@/components/monetization/product-resources"
+import { BuyerPriceUploads } from "@/components/structures/buyer-price-uploads"
 
+
+interface LatestPrices {
+  date: string
+  category: string
+  entries: any[]
+}
 
 interface ClientPageProps {
   slug: string
   user: AuthenticatedUser | null
+  latestPrices?: LatestPrices | null
 }
 
-export function Client({ slug, user }: ClientPageProps) {
+export function Client({ slug, user, latestPrices }: ClientPageProps) {
+  const router = useRouter()
+  const [showPhone, setShowPhone] = useState(false)
+  const [showWhatsapp, setShowWhatsapp] = useState(false)
+  const [showEmail, setShowEmail] = useState(false)
+
+  const paywallEnabled = process.env.NEXT_PUBLIC_ENABLE_PAYWALL === "true"
+  const isSubscribed = !paywallEnabled || user?.subscription_active === true
+
   const { data, isError, isFetching } = useQuery({
     queryKey: [`result-client-${slug}`, slug],
     queryFn: () => queryClient(slug),
@@ -46,6 +64,30 @@ export function Client({ slug, user }: ClientPageProps) {
 
   return (
     <div className="w-full bg-gradient-to-br from-background via-background to-muted/20 min-h-screen pb-12">
+      {/* Back */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-3">
+        <button
+          onClick={() => router.back()}
+          className="text-sm font-semibold text-muted-foreground hover:text-foreground flex items-center gap-1"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back
+        </button>
+      </div>
+
+      {/* Breadcrumb */}
+      <div className="border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+          <nav className="flex text-sm text-muted-foreground">
+            <Link href="/" className="hover:text-foreground">Home</Link>
+            <span className="mx-2">/</span>
+            <Link href={`/${client.type}s`} className="hover:text-foreground capitalize">{client.type}s</Link>
+            <span className="mx-2">/</span>
+            <span className="text-foreground capitalize">{name}</span>
+          </nav>
+        </div>
+      </div>
+
       {/* Hero Header Section */}
       <div className="relative bg-gradient-to-r from-primary/10 via-primary/5 to-background border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -61,7 +103,7 @@ export function Client({ slug, user }: ClientPageProps) {
             <div className="flex-1 min-w-0">
               <div className="flex flex-wrap items-center gap-3 mb-2">
                 <h1 className="text-3xl font-bold tracking-tight">
-                  {capitalizeFirstLetter(client.name)}
+                  {titleCase(client.name)}
                 </h1>
                 {client.verified ? (
                   <Badge className="bg-green-100 text-green-800 hover:bg-green-100 border-green-200">
@@ -84,18 +126,21 @@ export function Client({ slug, user }: ClientPageProps) {
                 )}
               </div>
 
-              <p className="text-muted-foreground text-base max-w-3xl">
-                {client.short_description
-                  ? capitalizeFirstLetter(client.short_description)
-                  : `${capitalizeFirstLetter(client.scale)} scale ${client.type} in the ${
-                      client.primary_category?.name || 'agriculture'
-                    } industry mainly procuring ${
-                      client.main_produce?.name ? plural(client.main_produce.name) : 'various products'
-                    }.`}
-              </p>
+              {client.short_description && (
+                <p className="text-muted-foreground text-base max-w-3xl">
+                  {capitalizeFirstLetter(client.short_description)}
+                </p>
+              )}
 
               {/* Stats Row */}
               <div className="flex flex-wrap gap-6 mt-4">
+                <div className="flex items-center gap-2">
+                  <Icons.calender className="h-4 w-4 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm font-semibold">{formatDate(client.created)}</p>
+                    <p className="text-xs text-muted-foreground">Date Joined</p>
+                  </div>
+                </div>
                 {client.type === 'buyer' && (
                   <div className="flex items-center gap-2">
                     <Icons.building className="h-4 w-4 text-muted-foreground" />
@@ -109,10 +154,15 @@ export function Client({ slug, user }: ClientPageProps) {
                   <Icons.mapPin className="h-4 w-4 text-muted-foreground" />
                   <div>
                     <p className="text-sm font-semibold">
-                      {client.city && client.province
-                        ? `${capitalizeFirstLetter(client.city)}, ${capitalizeFirstLetter(client.province)}`
+                      {client.address
+                        ? client.address.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+                        : client.city && client.province
+                        ? client.city.toLowerCase() === client.province.toLowerCase() ? capitalizeFirstLetter(client.city) : `${capitalizeFirstLetter(client.city)}, ${capitalizeFirstLetter(client.province)}`
                         : 'Location N/A'}
                     </p>
+                    {client.address && client.city && client.province && (
+                      <p className="text-xs text-muted-foreground">{client.city?.toLowerCase() === client.province?.toLowerCase() ? capitalizeFirstLetter(client.city) : `${capitalizeFirstLetter(client.city)}, ${capitalizeFirstLetter(client.province)}`}</p>
+                    )}
                     <p className="text-xs text-muted-foreground">Location</p>
                   </div>
                 </div>
@@ -133,68 +183,108 @@ export function Client({ slug, user }: ClientPageProps) {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 space-y-6">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column - Main Details (2/3 width) */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Buyer Contacts (buyers only) */}
-            {client.type === 'buyer' && (
-              <BuyerContacts clientId={client.id} clientName={client.name} user={user} />
-            )}
+        <div className="flex flex-col sm:flex-row gap-4">
 
-
-
-          </div>
-
-          {/* Right Sidebar - Contact (1/3 width) */}
-          <div className="space-y-6">
-            {client.has_booking && client.type === 'buyer' && (
-              <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 space-y-3">
+            {/* Phone + Email CTAs */}
+              <div className="flex-1 bg-card border rounded-xl p-4 space-y-3">
                 <div>
-                  <p className="font-semibold text-sm text-blue-900">Sell to {capitalizeFirstLetter(client.name)}</p>
+                  <p className="font-semibold text-sm">Phone</p>
+                  <p className="text-xs text-muted-foreground mt-1 leading-relaxed">Call directly.</p>
+                </div>
+                {!user ? (
+                  <button onClick={() => { sendGTMEvent({ event: 'action', value: 'LoggedOutViewNumber' }); router.push(`/login?entity=${client.type}&wantToSee=${slug}`) }} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
+                    See Number →
+                  </button>
+                ) : !isSubscribed ? (
+                  <button onClick={() => { sendGTMEvent({ event: 'action', value: 'SubscribeToViewPhone' }); router.push('/pricing') }} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
+                    Unlock →
+                  </button>
+                ) : showPhone ? (
+                  <a href={`tel:${client.phone}`} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
+                    {client.phone}
+                  </a>
+                ) : (
+                  <button onClick={() => { sendGTMEvent({ event: 'action', value: 'LoggedInViewPhone' }); if (user?.id) recordContactView(user.id, client.id, "phone").catch(() => {}); setShowPhone(true) }} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
+                    Show Number →
+                  </button>
+                )}
+              </div>
+
+              <div className="flex-1 bg-card border rounded-xl p-4 space-y-3">
+                <div>
+                  <p className="font-semibold text-sm">WhatsApp</p>
+                  <p className="text-xs text-muted-foreground mt-1 leading-relaxed">Message on WhatsApp.</p>
+                </div>
+                {!user ? (
+                  <button onClick={() => { sendGTMEvent({ event: 'action', value: 'LoggedOutViewWhatsapp' }); router.push(`/login?entity=${client.type}&wantToSee=${slug}`) }} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
+                    See WhatsApp →
+                  </button>
+                ) : !isSubscribed ? (
+                  <button onClick={() => { sendGTMEvent({ event: 'action', value: 'SubscribeToViewWhatsapp' }); router.push('/pricing') }} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
+                    Unlock →
+                  </button>
+                ) : showWhatsapp ? (
+                  <a href={`https://wa.me/263${client.phone.replace(/^0/, '')}`} target="_blank" rel="noopener noreferrer" className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
+                    Open WhatsApp →
+                  </a>
+                ) : (
+                  <button onClick={() => { sendGTMEvent({ event: 'action', value: 'LoggedInViewWhatsapp' }); if (user?.id) recordContactView(user.id, client.id, "whatsapp").catch(() => {}); setShowWhatsapp(true) }} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
+                    Show WhatsApp →
+                  </button>
+                )}
+              </div>
+
+              {client.email && <div className="flex-1 bg-card border rounded-xl p-4 space-y-3">
+                <div>
+                  <p className="font-semibold text-sm">Email</p>
+                  <p className="text-xs text-muted-foreground mt-1 leading-relaxed">Send an email.</p>
+                </div>
+                {!user ? (
+                  <button onClick={() => { sendGTMEvent({ event: 'action', value: 'LoggedOutViewEmail' }); router.push(`/login?entity=${client.type}&wantToSee=${slug}`) }} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
+                    See Email →
+                  </button>
+                ) : !isSubscribed ? (
+                  <button onClick={() => { sendGTMEvent({ event: 'action', value: 'SubscribeToViewEmail' }); router.push('/pricing') }} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
+                    Unlock →
+                  </button>
+                ) : showEmail ? (
+                  <a href={`mailto:${client.email}`} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
+                    {client.email}
+                  </a>
+                ) : (
+                  <button onClick={() => { sendGTMEvent({ event: 'action', value: 'LoggedInViewEmail' }); if (user?.id) recordContactView(user.id, client.id, "email").catch(() => {}); setShowEmail(true) }} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
+                    Show Email →
+                  </button>
+                )}
+              </div>}
+
+            {(client.has_booking || client.has_pickup) && client.type === 'buyer' && (
+              <div className="flex-1 bg-blue-50 border border-blue-200 rounded-xl p-4 space-y-3">
+                <div>
+                  <p className="font-semibold text-sm text-blue-900">Sell to {titleCase(client.name)}</p>
                   <p className="text-xs text-blue-700 mt-1 leading-relaxed">
-                    This buyer accepts online delivery bookings. Reserve your drop-off slot directly from the platform.
+                    {client.has_booking && client.has_pickup
+                      ? "Select a drop-off location or request pickup, and pick a date to reserve your slot."
+                      : client.has_booking
+                      ? "Reserve a drop-off slot directly from the platform."
+                      : "Request this buyer to collect goods directly from your farm."}
                   </p>
                 </div>
                 <Link
-                  href={`/book-delivery/${client.name.toLowerCase().replace(/\s+/g, '-')}`}
+                  href={`/book/${slug}`}
                   className="block w-full text-center bg-blue-700 text-white text-sm font-semibold px-4 py-2.5 rounded-lg hover:bg-blue-800 transition-colors"
                 >
                   Book a Sale →
                 </Link>
               </div>
             )}
-            {client.has_pickup && client.type === 'buyer' && (
-              <div className="bg-green-50 border border-green-200 rounded-xl p-6 space-y-3">
-                <div>
-                  <p className="font-semibold text-sm text-green-900">Request Pickup from {capitalizeFirstLetter(client.name)}</p>
-                  <p className="text-xs text-green-700 mt-1 leading-relaxed">
-                    This buyer offers on-farm pickups. Request them to collect goods directly from your farm.
-                  </p>
-                </div>
-                <Link
-                  href={`/request-pickup/${client.name.toLowerCase().replace(/\s+/g, '-')}`}
-                  className="block w-full text-center bg-green-700 text-white text-sm font-semibold px-4 py-2.5 rounded-lg hover:bg-green-800 transition-colors"
-                >
-                  Request Pickup →
-                </Link>
-              </div>
-            )}
-
-            <div className="bg-card border rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
-              <h2 className="text-lg font-semibold mb-4">
-                Contact Details
-              </h2>
-              {(client.contact_views || 0) > 0 && (
-                <p className="text-orange-600 text-xs font-medium mb-4 flex items-center gap-1">
-                  <Icons.eye className="h-3.5 w-3.5" />
-                  {client.contact_views} {client.contact_views === 1 ? 'person viewed' : 'people viewed'} this contact recently
-                </p>
-              )}
-              <Contacts user={user} client={client} />
-            </div>
-
-          </div>
         </div>
+
+        {client.type === 'buyer' && (
+          <div id="price-history">
+            <BuyerPriceUploads clientName={client.name} latestPrices={latestPrices} />
+          </div>
+        )}
       </div>
     </div>
   )

@@ -9,7 +9,7 @@ const BUY_CATEGORIES = [
   { label: "Animal Health", href: "/buy-animal-health" },
   { label: "Animal Feed", href: "/buy-feeds" },
   { label: "Plant Nutrition", href: "/buy-plant-nutrition" },
-  { label: "Plans & Documents", href: "/buy-documents" },
+  { label: "Seeds", href: "/buy-seed-products" },
 ]
 
 export function BuyCategoriesNav() {
@@ -17,9 +17,6 @@ export function BuyCategoriesNav() {
 
   return (
     <div className="mb-6">
-      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-1">
-        Buy Categories
-      </p>
       <nav className="flex flex-col gap-0.5">
         {BUY_CATEGORIES.map(({ label, href }) => {
           const isActive = pathname.startsWith(href)

@@ -5,7 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
-import { addToCart, getCart, updateCartItem, removeFromCart } from "@/lib/query"
+import { addToCart, clearCart, getCart, updateCartItem, removeFromCart } from "@/lib/query"
 import { useCart } from "@/contexts/cart-context"
 
 interface BuyFeedActionsProps {
@@ -13,7 +13,6 @@ interface BuyFeedActionsProps {
         id: string
         name: string
         slug: string
-        show_price?: boolean
         sale_price?: number
         available_for_sale?: boolean
         images?: { img?: { src?: string } }[]
@@ -36,7 +35,7 @@ export function BuyFeedActions({ product }: BuyFeedActionsProps) {
     const cartItem = (cartData as any)?.items?.find((i: any) => i.product_id === product.id)
     const cartQty: number = cartItem?.quantity ?? 0
 
-    const displayPrice = product.show_price && product.sale_price && product.sale_price > 0
+    const displayPrice = product.sale_price && product.sale_price > 0
         ? product.sale_price / 100
         : null
 
@@ -46,7 +45,24 @@ export function BuyFeedActions({ product }: BuyFeedActionsProps) {
             qc.invalidateQueries({ queryKey: ["cart"] })
             openCart()
         },
-        onError: () => toast.error("Failed to add to cart"),
+        onError: (err: any, variables) => {
+            if (err?.response?.status === 409) {
+                const isTestConflict = err?.response?.data?.message === "test_conflict"
+                toast.warning(
+                    isTestConflict
+                        ? "Test products cannot be mixed with real products."
+                        : "This item has a different pickup method.",
+                    {
+                        description: "Complete and pay for your current cart first, then add this item.",
+                        duration: Infinity,
+                        action: { label: "Go to checkout", onClick: () => router.push("/checkout") },
+                        cancel: { label: "Start new cart", onClick: async () => { await clearCart(); addMutation.mutate(variables) } },
+                    }
+                )
+                return
+            }
+            toast.error("Failed to add to cart")
+        },
     })
 
     const updateMutation = useMutation({

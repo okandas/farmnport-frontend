@@ -2,6 +2,7 @@ import {
   AlertTriangle,
   ArrowRight,
   BadgeCheck,
+  CalendarCheck,
   CalendarIcon,
   Check,
   ChevronDown,
@@ -60,6 +61,11 @@ import {
   BarChart3,
   Eye,
   MapPin,
+  MessageSquare,
+  Send,
+  Mail,
+  Box,
+  Gavel,
 } from "lucide-react"
 
 export type Icon = LucideIcon
@@ -95,6 +101,7 @@ export const Icons = {
   badgeCheck: BadgeCheck,
   search: Search,
   calender: CalendarIcon,
+  calendarCheck: CalendarCheck,
   productSearch: PackageSearch,
   bin: Trash2,
   image: ImagePlus,
@@ -128,4 +135,9 @@ export const Icons = {
   barChart: BarChart3,
   eye: Eye,
   mapPin: MapPin,
+  messageSquare: MessageSquare,
+  send: Send,
+  mail: Mail,
+  box: Box,
+  gavel: Gavel,
 }

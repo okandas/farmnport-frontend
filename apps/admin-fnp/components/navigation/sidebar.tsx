@@ -25,7 +25,7 @@ export function SidebarNavigation({ navigationGroups }: SidebarNavigationProps) 
       const hasActiveItem = group.items.some(
         (item) => item.href && isActive(item.href)
       )
-      acc[index] = hasActiveItem || group.items.length <= 1 || !!group.alwaysOpen
+      acc[index] = hasActiveItem || !!group.alwaysOpen
       return acc
     },
     {}
@@ -40,7 +40,7 @@ export function SidebarNavigation({ navigationGroups }: SidebarNavigationProps) 
       const hasActiveItem = group.items.some(
         (item) => item.href && isActive(item.href)
       )
-      next[index] = hasActiveItem || group.items.length <= 1 || !!group.alwaysOpen
+      next[index] = hasActiveItem || !!group.alwaysOpen
     })
     setOpenGroups(next)
   }, [path])
@@ -52,30 +52,23 @@ export function SidebarNavigation({ navigationGroups }: SidebarNavigationProps) 
   return (
     <nav className="flex flex-col gap-1 py-2">
       {navigationGroups.map((group, groupIndex) => {
-        const isSingleItem = group.items.length <= 1
         const isOpen = openGroups[groupIndex] ?? false
 
         return (
           <div key={groupIndex}>
-            {isSingleItem ? (
-              <h4 className="mb-1 mt-3 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                {group.label}
-              </h4>
-            ) : (
-              <button
-                onClick={() => toggleGroup(groupIndex)}
-                className="flex w-full items-center justify-between mt-3 mb-1 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors"
-              >
-                {group.label}
-                <ChevronDown
-                  className={cn(
-                    "h-3.5 w-3.5 transition-transform",
-                    !isOpen && "-rotate-90"
-                  )}
-                />
-              </button>
-            )}
-            {(isSingleItem || isOpen) && (
+            <button
+              onClick={() => toggleGroup(groupIndex)}
+              className="flex w-full items-center justify-between mt-3 mb-1 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors"
+            >
+              {group.label}
+              <ChevronDown
+                className={cn(
+                  "h-3.5 w-3.5 transition-transform",
+                  !isOpen && "-rotate-90"
+                )}
+              />
+            </button>
+            {isOpen && (
               <div className="grid items-start gap-0.5">
                 {group.items.map((navLink, index) => {
                   const Icon = Icons[navLink.icon ?? "arrowRight"]

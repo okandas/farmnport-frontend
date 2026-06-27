@@ -29,6 +29,12 @@ export interface OrderRow {
   created: string
 }
 
+export function orderDetailHref(order: { order_type: string; order_number: string }) {
+  return order.order_type === "restaurant"
+    ? `/dashboard/restaurants/sales/orders/${order.order_number}`
+    : `/dashboard/farmnport/sales/orders/${order.order_number}`
+}
+
 export const orderColumns: ColumnDef<OrderRow>[] = [
   {
     id: "select",
@@ -58,7 +64,7 @@ export const orderColumns: ColumnDef<OrderRow>[] = [
       const order = row.original
       return (
         <Link
-          href={`/dashboard/farmnport/sales/orders/${order.id}`}
+          href={orderDetailHref(order)}
           className="font-medium text-primary hover:underline"
         >
           {order.order_number}
@@ -100,14 +106,6 @@ export const orderColumns: ColumnDef<OrderRow>[] = [
     },
   },
   {
-    accessorKey: "order_type",
-    header: "Channel",
-    cell: ({ row }) => {
-      const type = row.getValue("order_type") as string
-      return <span className="text-sm capitalize">{type.replace("_", " ")}</span>
-    },
-  },
-  {
     accessorKey: "fulfillment",
     header: "Fulfillment",
     cell: ({ row }) => {
@@ -123,7 +121,13 @@ export const orderColumns: ColumnDef<OrderRow>[] = [
     accessorKey: "created",
     header: "Date",
     cell: ({ row }) => {
-      return <span className="text-sm">{formatDate(row.original.created)}</span>
+      const d = new Date(row.original.created)
+      return (
+        <div>
+          <span className="text-sm">{formatDate(row.original.created)}</span>
+          <p className="text-xs text-muted-foreground">{d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}</p>
+        </div>
+      )
     },
   },
   {
@@ -133,7 +137,7 @@ export const orderColumns: ColumnDef<OrderRow>[] = [
       const order = row.original
       return (
         <Link
-          href={`/dashboard/restaurants/sales/orders/${order.id}`}
+          href={orderDetailHref(order)}
           className="text-sm font-medium text-blue-600 hover:text-blue-800"
         >
           View

@@ -2,13 +2,15 @@ import axios, { InternalAxiosRequestConfig } from "axios"
 import { toast } from "sonner"
 
 import { PaginationModel, ResetFormData, LoginFormData, SignUpFormData, BaseURL, FeatureFlags } from "@/lib/schemas"
-import { retrieveToken, logoutUser } from "@/lib/actions"
+import { getSession } from "next-auth/react"
+import { logoutUser } from "@/lib/actions"
 
 let api = axios.create({})
 
 api.interceptors.request.use(async(config: InternalAxiosRequestConfig) => {
 
-    const token = await retrieveToken()
+    const session = await getSession()
+    const token = (session as any)?.access_token
 
     if (token) {
         config.headers["Authorization"] = `Bearer ${token}`
@@ -117,6 +119,10 @@ export function clientReset(data: ResetFormData) {
     return api.post(url, data)
 }
 
+export function clientResetPassword(token: string, password: string) {
+    return api.post(`${BaseURL}/client/password/${token}`, { password })
+}
+
 export async function clientSignup(data: SignUpFormData) {
     let url = `${BaseURL}/client/signup`
     return api.post(url, data)
@@ -128,6 +134,36 @@ export function queryMarketStats() {
 
 export function queryGradeSummary() {
   return api.get(`${BaseURL}/prices/grade-summary`)
+}
+
+export function querySeriesSummary() {
+  return api.get(`${BaseURL}/prices/series/summary`)
+}
+
+export function queryHeadSummary() {
+  return api.get(`${BaseURL}/prices/series/head-summary`)
+}
+
+export function querySeriesChart(category: string, code: string, templateType: string) {
+  return api.get(`${BaseURL}/prices/series/chart?category=${encodeURIComponent(category)}&code=${encodeURIComponent(code)}&template_type=${encodeURIComponent(templateType)}`)
+}
+
+export function querySeriesHeadChart(category: string, code: string, templateType: string) {
+  return api.get(`${BaseURL}/prices/series/head-chart?category=${encodeURIComponent(category)}&code=${encodeURIComponent(code)}&template_type=${encodeURIComponent(templateType)}`)
+}
+
+export function querySeriesBuyers(category: string, code: string, templateType: string) {
+  return api.get(`${BaseURL}/prices/series/buyers?category=${encodeURIComponent(category)}&code=${encodeURIComponent(code)}&template_type=${encodeURIComponent(templateType)}`)
+}
+
+export function querySeriesClientHistory(clientSlug: string, category: string, date: string) {
+  return api.get(`${BaseURL}/prices/series/client?client_slug=${encodeURIComponent(clientSlug)}&category=${encodeURIComponent(category)}&date=${encodeURIComponent(date)}`)
+}
+
+export function querySeriesClientDates(clientSlug: string, category: string, p: number, limit = 10) {
+  const params = new URLSearchParams({ client_slug: clientSlug, p: String(p), limit: String(limit) })
+  if (category) params.set("category", category)
+  return api.get(`${BaseURL}/prices/series/client/dates?${params.toString()}`)
 }
 
 export function queryGradeChart(produce: string, code: string) {
@@ -161,6 +197,88 @@ export function queryFarmProduceByCategory(categorySlug: string) {
 export function queryAllFarmProduce() {
   const url = `${BaseURL}/farmproduce/`
   return api.get(url)
+}
+
+export function queryFarmProduceStates({ p, search }: { p: number; search: string }) {
+  const url = `${BaseURL}/farm-produce-states?p=${p}&q=${encodeURIComponent(search)}`
+  return api.get(url)
+}
+
+export function queryLotsEnabledFarmProduce({ p, search }: { p: number; search: string }) {
+  const url = `${BaseURL}/farmproduce/lots-enabled?p=${p}&q=${encodeURIComponent(search)}`
+  return api.get(url)
+}
+
+export function queryBreedsByFarmProduce({ farmProduceId, p, search }: { farmProduceId: string; p: number; search: string }) {
+  const url = `${BaseURL}/breeds/?farm_produce_id=${farmProduceId}&p=${p}&search=${encodeURIComponent(search)}`
+  return api.get(url)
+}
+
+export function postLot(data: {
+  type: string
+  farm_produce_id: string
+  breed_id?: string
+  form: string
+  quantity: number
+  unit: string
+  price_per_unit_cents: number
+  notes?: string
+  expires_at: string
+  main_image?: { img: { id: string; src: string } }
+  images?: { img: { id: string; src: string } }[]
+}) {
+  return api.post(`${BaseURL}/lots/`, data)
+}
+
+export function queryLots({ p, type, farm_produce_id, pending }: { p: number; type?: string; farm_produce_id?: string; pending?: boolean }) {
+  const params = new URLSearchParams()
+  if (p > 1) params.set("p", String(p))
+  if (type) params.set("type", type)
+  if (farm_produce_id) params.set("farm_produce_id", farm_produce_id)
+  if (pending) params.set("pending", "true")
+  const qs = params.toString()
+  return api.get(`${BaseURL}/lots/${qs ? `?${qs}` : ""}`)
+}
+
+export function placeBid(lotSlug: string, data: {
+  quantity: number
+  offered_price_per_unit_cents: number
+  notes?: string
+  delivery_location?: string
+}) {
+  return api.post(`${BaseURL}/bids/${lotSlug}`, data)
+}
+
+export function queryMyBids({ p }: { p: number }) {
+  return api.get(`${BaseURL}/bids/mine?p=${p}`)
+}
+
+export function queryMyBidOnLot(slug: string) {
+  return api.get(`${BaseURL}/bids/mine/lot/${slug}`)
+}
+
+export function respondToBid(bidId: string, data: { action: "accept" | "reject"; notes?: string }) {
+  return api.patch(`${BaseURL}/bids/${bidId}/respond`, data)
+}
+
+export function getBidImages(lotSlug: string) {
+  return api.get(`${BaseURL}/bids/images/${lotSlug}`)
+}
+
+export function upsertBidImages(lotSlug: string) {
+  return api.post(`${BaseURL}/bids/images/${lotSlug}`)
+}
+
+export function deleteBidImages(lotSlug: string) {
+  return api.delete(`${BaseURL}/bids/images/${lotSlug}`)
+}
+
+export function uploadImages(data: FormData) {
+  return api.post(`${BaseURL}/user/image/uploads`, data)
+}
+
+export function removeImage(data: { img: { id: string; src: string; entity_id: string } }) {
+  return api.post(`${BaseURL}/user/image/remove`, data)
 }
 
 export function queryAllFarmProduceUnpaginated() {
@@ -225,7 +343,7 @@ export function queryBuyerContacts(clientId: string) {
   return api.get(url)
 }
 
-export function recordContactView(userId: string, viewedId: string, type: "phone" | "email") {
+export function recordContactView(userId: string, viewedId: string, type: "phone" | "email" | "whatsapp") {
   const url = `${BaseURL}/views/viewed`
   return api.post(url, { user_id: userId, viewed_id: viewedId, type })
 }
@@ -276,6 +394,18 @@ export function queryAllAgroChemicals(pagination?: PaginationModel & { search?: 
   const url = queryString ? `${BaseURL}/agrochemical/all?${queryString}` : `${BaseURL}/agrochemical/all`
 
   return api.get(url)
+}
+
+export function queryBuyAgroChemicals(pagination?: PaginationModel & { search?: string, brand?: string[], target?: string[], active_ingredient?: string[], used_on?: string[] }) {
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) params.set('p', pagination.p.toString())
+  if (pagination?.search && pagination.search.length >= 2) params.set('search', pagination.search)
+  pagination?.brand?.forEach(b => params.append('brand', b))
+  pagination?.target?.forEach(t => params.append('target', t))
+  pagination?.active_ingredient?.forEach(ai => params.append('active_ingredient', ai))
+  pagination?.used_on?.forEach(uo => params.append('used_on', uo))
+  const qs = params.toString()
+  return api.get(qs ? `${BaseURL}/agrochemical/buy?${qs}` : `${BaseURL}/agrochemical/buy`)
 }
 
 export function queryAgroChemicalsByCategory(options: { category: string } & PaginationModel & { brand?: string[], target?: string[], active_ingredient?: string[] }) {
@@ -408,6 +538,17 @@ export function queryAllAnimalHealthProducts(pagination?: PaginationModel & { br
   return api.get(url)
 }
 
+export function queryBuyAnimalHealthProducts(pagination?: PaginationModel & { brand?: string[], target?: string[], active_ingredient?: string[], used_on?: string[] }) {
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) params.set('p', pagination.p.toString())
+  pagination?.brand?.forEach(b => params.append('brand', b))
+  pagination?.target?.forEach(t => params.append('target', t))
+  pagination?.active_ingredient?.forEach(ai => params.append('active_ingredient', ai))
+  pagination?.used_on?.forEach(uo => params.append('used_on', uo))
+  const qs = params.toString()
+  return api.get(qs ? `${BaseURL}/animalhealth/buy?${qs}` : `${BaseURL}/animalhealth/buy`)
+}
+
 export function queryAnimalHealthProductsByCategory(options: { category: string } & PaginationModel & { brand?: string[], target?: string[], active_ingredient?: string[], used_on?: string[] }) {
   const params = new URLSearchParams()
 
@@ -442,7 +583,18 @@ export function queryAnimalHealthFilterAggregates(filters?: { brand?: string[], 
   filters?.active_ingredient?.forEach(v => params.append('active_ingredient', v))
   filters?.used_on?.forEach(v => params.append('used_on', v))
   const qs = params.toString()
-  return api.get(`${BaseURL}/animalhealth/aggregates/filters${qs ? `?${qs}` : ''}`)
+  return api.get(`${BaseURL}/animalhealth/all/aggregates/filters${qs ? `?${qs}` : ''}`)
+}
+
+export function queryAnimalHealthBuyFilterAggregates(filters?: { brand?: string[], category?: string[], target?: string[], active_ingredient?: string[], used_on?: string[] }) {
+  const params = new URLSearchParams()
+  filters?.brand?.forEach(v => params.append('brand', v))
+  filters?.category?.forEach(v => params.append('category', v))
+  filters?.target?.forEach(v => params.append('target', v))
+  filters?.active_ingredient?.forEach(v => params.append('active_ingredient', v))
+  filters?.used_on?.forEach(v => params.append('used_on', v))
+  const qs = params.toString()
+  return api.get(`${BaseURL}/animalhealth/buy/aggregates/filters${qs ? `?${qs}` : ''}`)
 }
 
 export function queryAnimalHealthProduct(slug: string) {
@@ -488,6 +640,19 @@ export function queryAllFeedProducts(pagination?: PaginationModel & { search?: s
   return api.get(url)
 }
 
+export function queryBuyFeedProducts(pagination?: PaginationModel & { search?: string, category?: string[], brand?: string[], animal?: string[], phase?: string[], sub_type?: string[] }) {
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) params.set('p', pagination.p.toString())
+  if (pagination?.search && pagination.search.length >= 2) params.set('search', pagination.search)
+  pagination?.category?.forEach(c => params.append('category', c))
+  pagination?.brand?.forEach(b => params.append('brand', b))
+  pagination?.animal?.forEach(a => params.append('animal', a))
+  pagination?.phase?.forEach(ph => params.append('phase', ph))
+  pagination?.sub_type?.forEach(st => params.append('sub_type', st))
+  const qs = params.toString()
+  return api.get(qs ? `${BaseURL}/feed/buy?${qs}` : `${BaseURL}/feed/buy`)
+}
+
 export function queryFeedProduct(slug: string) {
   const url = `${BaseURL}/feed/${slug}`
   return api.get(url)
@@ -505,7 +670,17 @@ export function queryFeedFilterAggregates(filters?: { brand?: string[], animal?:
   filters?.phase?.forEach(v => params.append('phase', v))
   filters?.sub_type?.forEach(v => params.append('sub_type', v))
   const qs = params.toString()
-  return api.get(`${BaseURL}/feed/aggregates/filters${qs ? `?${qs}` : ''}`)
+  return api.get(`${BaseURL}/feed/all/aggregates/filters${qs ? `?${qs}` : ''}`)
+}
+
+export function queryFeedBuyFilterAggregates(filters?: { brand?: string[], animal?: string[], phase?: string[], sub_type?: string[] }) {
+  const params = new URLSearchParams()
+  filters?.brand?.forEach(v => params.append('brand', v))
+  filters?.animal?.forEach(v => params.append('animal', v))
+  filters?.phase?.forEach(v => params.append('phase', v))
+  filters?.sub_type?.forEach(v => params.append('sub_type', v))
+  const qs = params.toString()
+  return api.get(`${BaseURL}/feed/buy/aggregates/filters${qs ? `?${qs}` : ''}`)
 }
 
 // Feeding Programs
@@ -578,6 +753,17 @@ export function queryAllPlantNutritionProducts(pagination?: PaginationModel & { 
   return api.get(qs ? `${BaseURL}/plantnutrition/all?${qs}` : `${BaseURL}/plantnutrition/all`)
 }
 
+export function queryBuyPlantNutritionProducts(pagination?: PaginationModel & { brand?: string[], category?: string[], active_ingredient?: string[], used_on?: string[] }) {
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) params.set('p', pagination.p.toString())
+  pagination?.brand?.forEach(b => params.append('brand', b))
+  pagination?.category?.forEach(c => params.append('category', c))
+  pagination?.active_ingredient?.forEach(ai => params.append('active_ingredient', ai))
+  pagination?.used_on?.forEach(u => params.append('used_on', u))
+  const qs = params.toString()
+  return api.get(qs ? `${BaseURL}/plantnutrition/buy?${qs}` : `${BaseURL}/plantnutrition/buy`)
+}
+
 export function queryPlantNutritionProductsByCategory(options: { category: string } & PaginationModel & { brand?: string[] }) {
   const params = new URLSearchParams()
   if (options.p !== undefined && options.p >= 2) {
@@ -601,7 +787,17 @@ export function queryPlantNutritionFilterAggregates(filters?: { brand?: string[]
   filters?.active_ingredient?.forEach(v => params.append('active_ingredient', v))
   filters?.used_on?.forEach(v => params.append('used_on', v))
   const qs = params.toString()
-  return api.get(`${BaseURL}/plantnutrition/aggregates/filters${qs ? `?${qs}` : ''}`)
+  return api.get(`${BaseURL}/plantnutrition/all/aggregates/filters${qs ? `?${qs}` : ''}`)
+}
+
+export function queryPlantNutritionBuyFilterAggregates(filters?: { brand?: string[], category?: string[], active_ingredient?: string[], used_on?: string[] }) {
+  const params = new URLSearchParams()
+  filters?.brand?.forEach(v => params.append('brand', v))
+  filters?.category?.forEach(v => params.append('category', v))
+  filters?.active_ingredient?.forEach(v => params.append('active_ingredient', v))
+  filters?.used_on?.forEach(v => params.append('used_on', v))
+  const qs = params.toString()
+  return api.get(`${BaseURL}/plantnutrition/buy/aggregates/filters${qs ? `?${qs}` : ''}`)
 }
 
 // Cart
@@ -649,13 +845,37 @@ export function checkout(data: {
     city: string
     province: string
   }
+  collection_location_id?: string
+  fulfillment_fee?: number
   order_type?: string
+  booking_id?: string
 }) {
   return api.post(`${BaseURL}/order/checkout`, data)
 }
 
 export function pollOrderStatus(reference: string) {
   return api.post(`${BaseURL}/order/poll`, { reference })
+}
+
+export function queryTumira(search?: string) {
+  const qs = search ? `?search=${encodeURIComponent(search)}` : ""
+  return api.get(`${BaseURL}/tumira/${qs}`)
+}
+
+export function queryTumiraDeliveryRates(payload: {
+  from: { name: string; address: string; city: string; province: string }
+  to: { name: string; address: string; city: string; province: string; lat?: number; lng?: number }
+  parcel: { weight_grams: number }
+}) {
+  return api.post(`${BaseURL}/tumira/delivery-rates`, payload)
+}
+
+export function queryTumiraCheckAddress(address: string, city: string) {
+  return api.get(`${BaseURL}/tumira/geocode/check?address=${encodeURIComponent(address)}&city=${encodeURIComponent(city)}`)
+}
+
+export function queryTumiraConfirmPin(payload: { address: string; city: string; lat: number; lng: number }) {
+  return api.post(`${BaseURL}/tumira/geocode/confirm-pin`, payload)
 }
 
 export function myOrders(page?: number) {
@@ -669,6 +889,46 @@ export function getOrder(id: string) {
 
 export function retryOrderPayment(id: string) {
   return api.post(`${BaseURL}/order/${id}/pay`, {})
+}
+
+// Lots
+export function myLots(page?: number) {
+  const p = page && page >= 2 ? `?p=${page}` : ""
+  return api.get(`${BaseURL}/lots/mine${p}`)
+}
+
+export function myLotBids(slug: string) {
+  return api.get(`${BaseURL}/bids/lot/${slug}`)
+}
+
+// Bids
+export function myBids(page?: number) {
+  const p = page && page >= 2 ? `?p=${page}` : ""
+  return api.get(`${BaseURL}/bids/mine${p}`)
+}
+
+export function myBidByID(id: string) {
+  return api.get(`${BaseURL}/bids/mine/${id}`)
+}
+
+export function initiateBidPayment(id: string, body: { method?: string; phone?: string }) {
+  return api.post(`${BaseURL}/bids/mine/${id}/pay`, body)
+}
+
+export function initiateLotOwnerBidPayment(id: string, body: { method?: string; phone?: string }) {
+  return api.post(`${BaseURL}/bids/lot/${id}/pay`, body)
+}
+
+export function pollLotOwnerBidPayment(id: string) {
+  return api.get(`${BaseURL}/bids/lot/${id}/poll`)
+}
+
+export function pollBidPayment(id: string) {
+  return api.get(`${BaseURL}/bids/mine/${id}/poll`)
+}
+
+export function getLotBids(slug: string) {
+  return api.get(`${BaseURL}/bids/${slug}`)
 }
 
 // Bookings
@@ -767,7 +1027,7 @@ export function queryAllDocuments(pagination?: { p?: number; category?: string }
   if (pagination?.p && pagination.p >= 2) params.set('p', pagination.p.toString())
   if (pagination?.category) params.set('category', pagination.category)
   const qs = params.toString()
-  return api.get(qs ? `${BaseURL}/documents?${qs}` : `${BaseURL}/documents`)
+  return api.get(qs ? `${BaseURL}/documents/all?${qs}` : `${BaseURL}/documents/all`)
 }
 
 export function queryDocument(slug: string) {
@@ -784,6 +1044,14 @@ export function queryAllLivestockPoultryProducts(pagination?: { p?: number; bran
   return api.get(qs ? `${BaseURL}/livestock-poultry/all?${qs}` : `${BaseURL}/livestock-poultry/all`)
 }
 
+export function queryBuyLivestockPoultryProducts(pagination?: { p?: number; brand?: string[] }) {
+  const params = new URLSearchParams()
+  if (pagination?.p && pagination.p >= 2) params.set('p', pagination.p.toString())
+  pagination?.brand?.forEach(b => params.append('brand', b))
+  const qs = params.toString()
+  return api.get(qs ? `${BaseURL}/livestock-poultry/buy?${qs}` : `${BaseURL}/livestock-poultry/buy`)
+}
+
 export function queryLivestockPoultryProduct(slug: string) {
   return api.get(`${BaseURL}/livestock-poultry/${slug}`)
 }
@@ -798,6 +1066,36 @@ export function queryAllSeedProducts(pagination?: { p?: number; brand?: string[]
   return api.get(qs ? `${BaseURL}/seed-products/all?${qs}` : `${BaseURL}/seed-products/all`)
 }
 
+export function queryBuySeedProducts(pagination?: { p?: number; brand?: string[] }) {
+  const params = new URLSearchParams()
+  if (pagination?.p && pagination.p >= 2) params.set('p', pagination.p.toString())
+  pagination?.brand?.forEach(b => params.append('brand', b))
+  const qs = params.toString()
+  return api.get(qs ? `${BaseURL}/seed-products/buy?${qs}` : `${BaseURL}/seed-products/buy`)
+}
+
 export function querySeedProduct(slug: string) {
   return api.get(`${BaseURL}/seed-products/${slug}`)
+}
+
+export function querySeedProductFilterAggregates() {
+  return api.get(`${BaseURL}/seed-products/all/aggregates/filters`)
+}
+
+export function querySeedProductBuyFilterAggregates() {
+  return api.get(`${BaseURL}/seed-products/buy/aggregates/filters`)
+}
+
+// ── Tumira Shipping Rates ──────────────────────────────────────────────────────
+
+export function queryTumiraRates(payload: {
+  from: { name: string; address: string; city: string; province: string }
+  to: { name: string; address: string; city: string; province: string }
+  parcel: { weight_grams: number; length_cm?: number; width_cm?: number; height_cm?: number }
+}) {
+  return api.post(`${BaseURL}/v1/tumira/delivery-rates`, payload)
+}
+
+export function queryMarketNews(page: number = 1, limit: number = 20) {
+  return api.get(`${BaseURL}/market-news/?page=${page}&limit=${limit}`)
 }

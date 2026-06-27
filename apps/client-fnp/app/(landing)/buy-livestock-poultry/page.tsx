@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { queryAllLivestockPoultryProducts } from "@/lib/query"
+import { serverFetch } from "@/lib/serverFetch"
 import { BuyLivestockPoultryClient } from "./BuyLivestockPoultryClient"
 
 export default async function BuyLivestockPoultryPage() {
@@ -7,16 +7,16 @@ export default async function BuyLivestockPoultryPage() {
     let initialTotal = 0
 
     try {
-        const response = await queryAllLivestockPoultryProducts({ p: 1, brand: [] })
-        initialProducts = response?.data?.data || []
-        initialTotal = response?.data?.total || 0
+        const result = await serverFetch("/livestock-poultry/buy")
+        initialProducts = result?.data || []
+        initialTotal = result?.total || 0
     } catch (error) {
         console.error("Error fetching livestock & poultry products:", error)
     }
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
-            <div className="mx-auto max-w-7xl px-6 lg:px-8 py-12">
+            <div className="mx-auto max-w-7xl px-6 lg:px-8 py-6">
                 <nav className="flex items-center gap-1.5 text-xs text-muted-foreground mb-6">
                     <Link href="/" className="hover:text-foreground transition-colors">Home</Link>
                     <span>/</span>

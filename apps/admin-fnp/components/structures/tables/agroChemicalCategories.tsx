@@ -8,6 +8,7 @@ import { queryAgroChemicalCategories } from "@/lib/query"
 import { AgroChemicalCategory } from "@/lib/schemas"
 import { handleFetchError } from "@/lib/error-handler"
 import { Placeholder } from "@/components/state/placeholder"
+import { TableSkeleton } from "@/components/state/skeleton-table"
 import { DataTable } from "@/components/structures/data-table"
 import { agroChemicalCategoryColumns } from "@/components/structures/columns/agroChemicalCategories"
 
@@ -63,11 +64,7 @@ export function AgroChemicalCategoriesTable() {
   }
 
   if (isLoading || isFetching) {
-    return (
-      <Placeholder>
-        <Placeholder.Title>Fetching Categories</Placeholder.Title>
-      </Placeholder>
-    )
+    return <TableSkeleton />
   }
 
   return (

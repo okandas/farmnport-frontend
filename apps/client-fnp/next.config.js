@@ -4,11 +4,15 @@ const nextConfig = {
   output: "standalone",
   async redirects() {
     return [
+      { source: '/feeds', destination: '/feed-guides', permanent: true },
+      { source: '/feeds/:slug', destination: '/feed-guides/:slug', permanent: true },
       { source: '/prices/lwt', destination: '/prices', permanent: true },
       { source: '/prices/lwt/:path*', destination: '/prices', permanent: true },
       { source: '/prices/cdm', destination: '/prices', permanent: true },
       { source: '/prices/cdm/:path*', destination: '/prices', permanent: true },
       { source: '/prices/produce/:slug', destination: '/prices/:slug', permanent: true },
+      { source: '/waiting-list-shop', destination: '/buy', permanent: true },
+      { source: '/waiting-list-paying', destination: '/lots', permanent: true },
     ]
   },
   images: {

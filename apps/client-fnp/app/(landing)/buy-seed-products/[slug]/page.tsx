@@ -1,4 +1,7 @@
-import { querySeedProduct } from "@/lib/query"
+import type { Metadata } from 'next'
+import { notFound } from "next/navigation"
+import { serverFetch } from "@/lib/serverFetch"
+import { formatProductName } from "@/lib/utilities"
 import Link from "next/link"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { BuyProductInteractive } from "@/components/shop/BuyProductInteractive"
@@ -7,11 +10,39 @@ interface Props {
     params: Promise<{ slug: string }>
 }
 
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+    const { slug } = await params
+    const product = await serverFetch(`/seed-products/${slug}`).catch(() => null)
+    if (!product) return { title: 'Seed Product | farmnport.com', robots: { index: false } }
+    const variety = product.variety ? ` — ${product.variety}` : ""
+    const name = formatProductName(product.name)
+    const brand = formatProductName(product.brand.name)
+    return {
+        title: `${name} ${brand}${variety} – Buy Seeds | farmnport.com`,
+        description: product.description || `Buy ${name} ${brand}${variety} seeds. Certified seed variety. View planting guide, yield potential, and order online.`,
+        alternates: { canonical: `/buy-seed-products/${slug}` },
+        openGraph: {
+            title: `${name} ${brand} – Buy Seeds`,
+            description: product.description || `${name} ${brand}${variety} certified seed variety.`,
+            siteName: 'farmnport',
+            type: 'website',
+        },
+    }
+}
+
 export default async function BuySeedProductPage({ params }: Props) {
     const { slug } = await params
-    const response = await querySeedProduct(slug)
-    const product = response?.data
+    const [product, bookingRes] = await Promise.all([
+        serverFetch(`/seed-products/${slug}`).catch(() => null),
+        serverFetch(`/booking/events?status=open`).catch(() => null),
+    ])
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://farmnport.com'
+
+    const openEvent = (bookingRes?.events ?? []).find(
+        (e: any) => e.product_id && product?.id && e.product_id === product.id
+    )
+
+    if (!product) notFound()
 
     if (!product) {
         return (
@@ -36,7 +67,7 @@ export default async function BuySeedProductPage({ params }: Props) {
             "@type": "Offer",
             "url": `${baseUrl}/buy-seed-products/${slug}`,
             "priceCurrency": "USD",
-            "price": product.show_price && product.sale_price > 0 ? (product.sale_price / 100).toFixed(2) : "0.00",
+            "price": product.sale_price > 0 ? (product.sale_price / 100).toFixed(2) : "0.00",
             "availability": product.available_for_sale ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
             "seller": { "@type": "Organization", "name": "farmnport" }
         }
@@ -139,9 +170,9 @@ export default async function BuySeedProductPage({ params }: Props) {
             <div className="border-b">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
                     <nav className="flex text-sm text-muted-foreground">
-                        <Link href="/" className="hover:text-foreground">Home</Link>
+                        <Link href="/buy" className="hover:text-foreground">Shop</Link>
                         <span className="mx-2">/</span>
-                        <Link href="/buy-seed-products" className="hover:text-foreground">Seed Products</Link>
+                        <Link href="/buy-seed-products" className="hover:text-foreground">Buy Seed Products</Link>
                         <span className="mx-2">/</span>
                         <span className="text-foreground capitalize">{product.name}</span>
                     </nav>
@@ -156,8 +187,20 @@ export default async function BuySeedProductPage({ params }: Props) {
                     categoryName={[product.variety, product.type?.replace("_", " ")].filter(Boolean).join(" · ")}
                     brandHref={product.brand ? `/buy-seed-products?brand=${product.brand.id}` : undefined}
                     shopHref="/buy-seed-products"
+                    guideHref={`/seed-guides/${slug}`}
+                    guideLabel="View Seed Guide & Growing Information →"
                     loginRedirect={`/buy-seed-products/${slug}`}
                     tabsContent={tabsContent}
+                    ctaSlot={
+                        (!product.available_for_sale || product.stock_level === 0) && openEvent ? (
+                            <Link
+                                href={`/bookings/${openEvent.slug}`}
+                                className="mt-3 flex w-full items-center justify-center gap-2 bg-primary text-primary-foreground font-semibold py-2.5 rounded-xl hover:bg-primary/90 transition-colors text-sm"
+                            >
+                                Pre-order Now
+                            </Link>
+                        ) : undefined
+                    }
                 />
             </div>
         </div>

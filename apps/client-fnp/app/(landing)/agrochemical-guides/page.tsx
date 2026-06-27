@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { AllAgroChemicalsClient } from "./AllAgroChemicalsClient"
-import { queryAllAgroChemicals } from "@/lib/query"
+import { serverFetch } from "@/lib/serverFetch"
 import { OtherGuidesLinks } from "@/components/shared/OtherGuidesLinks"
 
 export const metadata = {
@@ -16,15 +16,15 @@ export const metadata = {
 }
 
 export default async function AgrochemicalGuidesPage() {
-    const chemicalsRes = await queryAllAgroChemicals({ p: 1, search: "", brand: [], target: [], active_ingredient: [], used_on: [] }).catch(() => null)
+    const chemicalsRes = await serverFetch("/agrochemical/all").catch(() => null)
 
-    const initialChemicals = chemicalsRes?.data?.data || []
-    const initialTotal = chemicalsRes?.data?.total || 0
+    const initialChemicals = chemicalsRes?.data || []
+    const initialTotal = chemicalsRes?.total || 0
 
     return (
         <main className="bg-gradient-to-b from-background to-muted/20">
             {/* Products Section */}
-            <section className="py-14 lg:py-20 bg-muted/30">
+            <section className="py-6 lg:py-8 bg-muted/30">
                 <div className="mx-auto max-w-7xl px-6 lg:px-8">
                     <nav className="flex text-sm text-muted-foreground mb-6">
                         <Link href="/guides" className="hover:text-foreground transition-colors">Guides</Link>

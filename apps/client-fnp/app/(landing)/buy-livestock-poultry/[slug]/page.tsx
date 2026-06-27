@@ -1,4 +1,7 @@
-import { queryLivestockPoultryProduct } from "@/lib/query"
+import type { Metadata } from 'next'
+import { notFound } from "next/navigation"
+import { serverFetch } from "@/lib/serverFetch"
+import { buildBuyMetadata } from "@/lib/utilities"
 import Link from "next/link"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { BuyProductInteractive } from "@/components/shop/BuyProductInteractive"
@@ -7,10 +10,18 @@ interface Props {
     params: Promise<{ slug: string }>
 }
 
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+    const { slug } = await params
+    const product = await serverFetch(`/livestock-poultry/${slug}`).catch(() => null)
+    if (!product) return { title: 'Livestock & Poultry | farmnport.com', robots: { index: false } }
+    const category = [product.species, product.type].filter(Boolean).join(' ') || 'Livestock & Poultry'
+    return buildBuyMetadata(product, category, `/buy-livestock-poultry/${slug}`)
+}
+
 export default async function BuyLivestockPoultryProductPage({ params }: Props) {
     const { slug } = await params
-    const response = await queryLivestockPoultryProduct(slug)
-    const product = response?.data
+    const product = await serverFetch(`/livestock-poultry/${slug}`).catch(() => null)
+    if (!product) notFound()
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://farmnport.com'
 
     if (!product) {
@@ -36,7 +47,7 @@ export default async function BuyLivestockPoultryProductPage({ params }: Props) 
             "@type": "Offer",
             "url": `${baseUrl}/buy-livestock-poultry/${slug}`,
             "priceCurrency": "USD",
-            "price": product.show_price && product.sale_price > 0 ? (product.sale_price / 100).toFixed(2) : "0.00",
+            "price": product.sale_price > 0 ? (product.sale_price / 100).toFixed(2) : "0.00",
             "availability": product.available_for_sale ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
             "seller": { "@type": "Organization", "name": "farmnport" }
         }
@@ -136,9 +147,9 @@ export default async function BuyLivestockPoultryProductPage({ params }: Props) 
             <div className="border-b">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
                     <nav className="flex text-sm text-muted-foreground">
-                        <Link href="/" className="hover:text-foreground">Home</Link>
+                        <Link href="/buy" className="hover:text-foreground">Shop</Link>
                         <span className="mx-2">/</span>
-                        <Link href="/buy-livestock-poultry" className="hover:text-foreground">Livestock & Poultry</Link>
+                        <Link href="/buy-livestock-poultry" className="hover:text-foreground">Buy Livestock & Poultry</Link>
                         <span className="mx-2">/</span>
                         <span className="text-foreground capitalize">{product.name}</span>
                     </nav>

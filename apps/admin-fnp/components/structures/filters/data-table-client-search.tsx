@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query"
 import { useDebounce } from "use-debounce"
 import { Check, ChevronsUpDown, X } from "lucide-react"
 import { queryUsers } from "@/lib/query"
-import { cn } from "@/lib/utilities"
+import { cn, capitalizeWords } from "@/lib/utilities"
 import { Button } from "@/components/ui/button"
 import {
   Command,
@@ -54,7 +54,7 @@ export function DataTableClientSearch({
             className="w-[200px] justify-between"
           >
             {selectedClient
-              ? selectedClient.name
+              ? capitalizeWords(selectedClient.name)
               : "Select client..."}
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
@@ -85,7 +85,7 @@ export function DataTableClientSearch({
                       selectedClientId === client.id ? "opacity-100" : "opacity-0"
                     )}
                   />
-                  {client.name}
+                  {capitalizeWords(client.name)}
                 </CommandItem>
               ))}
             </CommandGroup>

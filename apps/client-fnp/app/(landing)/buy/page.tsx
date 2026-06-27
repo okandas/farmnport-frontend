@@ -1,35 +1,32 @@
 import Link from "next/link"
-import {
-  queryAllAgroChemicals,
-  queryAllAnimalHealthProducts,
-  queryAllFeedProducts,
-  queryAllPlantNutritionProducts,
-  queryAllDocuments,
-} from "@/lib/query"
 import { BuyPageClient } from "./BuyPageClient"
+import { serverFetch } from "@/lib/serverFetch"
 
-async function fetchSection(fn: () => Promise<any>) {
+async function fetchSection(path: string) {
   try {
-    const res = await fn()
-    return { data: res?.data?.data || [], total: res?.data?.total || 0 }
+    const json = await serverFetch(path)
+    return { data: json.data || [], total: json.total || 0 }
   } catch {
     return { data: [], total: 0 }
   }
 }
 
 export default async function BuyPage() {
-  const [agro, animalHealth, feeds, plantNutrition, documents] = await Promise.all([
-    fetchSection(() => queryAllAgroChemicals({ p: 1, brand: [], target: [], active_ingredient: [] })),
-    fetchSection(() => queryAllAnimalHealthProducts({ p: 1, brand: [], target: [], active_ingredient: [], used_on: [] })),
-    fetchSection(() => queryAllFeedProducts({ p: 1 })),
-    fetchSection(() => queryAllPlantNutritionProducts({ p: 1, brand: [], category: [], active_ingredient: [], used_on: [] })),
-    fetchSection(() => queryAllDocuments({ p: 1 })),
+  const [agro, animalHealth, feeds, plantNutrition, seeds, documents, bookingsRes] = await Promise.all([
+    fetchSection("/agrochemical/buy"),
+    fetchSection("/animalhealth/buy"),
+    fetchSection("/feed/buy"),
+    fetchSection("/plantnutrition/buy"),
+    fetchSection("/seed-products/buy"),
+    fetchSection("/documents/all"),
+    serverFetch("/booking/events?status=open").catch(() => null),
   ])
+  const bookingEvents: any[] = bookingsRes?.events ?? []
 
   return (
     <main className="bg-gradient-to-b from-background to-muted/20 min-h-screen">
       {/* Hero */}
-      <section className="py-6 lg:py-8 border-b border-border">
+      <section className="py-6 lg:py-8">
         <div className="mx-auto max-w-7xl px-4 lg:px-8">
           <nav className="flex items-center gap-1.5 text-xs text-muted-foreground mb-3">
             <Link href="/" className="hover:text-foreground transition-colors">Home</Link>
@@ -56,8 +53,11 @@ export default async function BuyPage() {
         feedsTotal={feeds.total}
         plantNutrition={plantNutrition.data}
         plantNutritionTotal={plantNutrition.total}
+        seeds={seeds.data}
+        seedsTotal={seeds.total}
         documents={documents.data}
         documentsTotal={documents.total}
+        bookingEvents={bookingEvents}
       />
     </main>
   )

@@ -38,7 +38,7 @@ const STATUS_MESSAGES: Record<string, string> = {
   processing: "We've received your payment and your order is now being prepared.",
   dispatched:  "Your order has left our warehouse and is on its way to you.",
   ready:       "Your order is packed and ready for collection at our store.",
-  delivered:   "Your order has been delivered. Thank you for sourcing with farm&port.",
+  delivered:   "Your order has been delivered. Thank you for sourcing with farmnport.",
   cancelled:   "Your order has been cancelled. Contact us if you have any questions.",
 }
 
@@ -62,7 +62,7 @@ export default function OrderStatusEmail({
 
           {/* Header */}
           <Section style={header}>
-            <Text style={brandName}>farm<span style={amp}>&amp;</span>port</Text>
+            <Text style={brandName}>farmnport</Text>
             <Text style={brandTagline}>getting you to market</Text>
           </Section>
 
@@ -96,16 +96,16 @@ export default function OrderStatusEmail({
             <Text style={helpText}>
               Questions? Reply to this email and quote <strong>{orderNumber}</strong>.
             </Text>
-            <Text style={signoff}>the farm&amp;port team</Text>
+            <Text style={signoff}>the farmnport team</Text>
           </Section>
 
           {/* Footer */}
           <Section style={footer}>
             <Text style={footerText}>
-              farm&amp;port &nbsp;·&nbsp; 13 Grace Rd, Winston Park, Marondera, Zimbabwe
+              farmnport &nbsp;·&nbsp; 13 Grace Rd, Winston Park, Marondera, Zimbabwe
             </Text>
             <Text style={footerText}>
-              © {new Date().getFullYear()} farm&amp;port. All rights reserved.
+              © {new Date().getFullYear()} farmnport. All rights reserved.
             </Text>
           </Section>
 
@@ -138,7 +138,7 @@ const header: React.CSSProperties = {
 
 const brandName: React.CSSProperties = {
   fontSize: "22px",
-  fontWeight: "700",
+  fontWeight: "600",
   color: "#0f172a",
   margin: "0 0 2px",
   letterSpacing: "-0.3px",
@@ -183,7 +183,7 @@ const pill: React.CSSProperties = {
 
 const greeting: React.CSSProperties = {
   fontSize: "22px",
-  fontWeight: "700",
+  fontWeight: "600",
   color: "#0f172a",
   margin: "0 0 12px",
 }
@@ -212,7 +212,7 @@ const orderCardLabel: React.CSSProperties = {
 
 const orderCardNumber: React.CSSProperties = {
   fontSize: "17px",
-  fontWeight: "700",
+  fontWeight: "600",
   color: "#0f172a",
   margin: 0,
 }

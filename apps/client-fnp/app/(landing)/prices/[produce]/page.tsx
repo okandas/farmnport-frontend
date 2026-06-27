@@ -1,4 +1,4 @@
-import { ProduceGradeBoard } from "@/components/structures/produce-grade-board"
+import { ProduceBoardRouter } from "@/components/structures/produce-board-router"
 import type { Metadata } from "next"
 import { capitalizeFirstLetter } from "@/lib/utilities"
 
@@ -31,7 +31,7 @@ export default async function ProducePricePage({ params, searchParams }: Produce
   return (
     <>
       <h1 className="sr-only">{capitalizeFirstLetter(produce)} Prices Zimbabwe</h1>
-      <ProduceGradeBoard produce={produce} code={code ?? ""} priceType={type ?? ""} />
+      <ProduceBoardRouter produce={produce} code={code ?? ""} priceType={type ?? ""} />
     </>
   )
 }

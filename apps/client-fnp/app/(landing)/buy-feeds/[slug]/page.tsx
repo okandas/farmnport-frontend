@@ -1,9 +1,12 @@
+import type { Metadata } from 'next'
+import { notFound } from "next/navigation"
 import Image from "next/image"
 import { Egg, AlertTriangle } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
 import { BaseURL } from "@/lib/schemas"
+import { buildBuyMetadata } from "@/lib/utilities"
 import { BuyProductInteractive } from "@/components/shop/BuyProductInteractive"
 import { BackToProgram } from "./BackToProgram"
 import Link from "next/link"
@@ -26,20 +29,18 @@ async function getFeedProduct(slug: string) {
     }
 }
 
+export async function generateMetadata({ params }: BuyFeedPageProps): Promise<Metadata> {
+    const { slug } = await params
+    const product = await getFeedProduct(slug)
+    if (!product) return { title: 'Livestock Feed | farmnport.com', robots: { index: false } }
+    return buildBuyMetadata(product, product.feed_category?.name || 'Livestock Feed', `/buy-feeds/${slug}`)
+}
+
 export default async function BuyFeedPage({ params }: BuyFeedPageProps) {
     const { slug } = await params
     const product = await getFeedProduct(slug)
 
-    if (!product) {
-        return (
-            <div className="min-h-screen bg-background flex items-center justify-center">
-                <div className="text-center">
-                    <h2 className="text-2xl font-bold mb-2">Product Not Found</h2>
-                    <p className="text-muted-foreground">The product you&apos;re looking for doesn&apos;t exist.</p>
-                </div>
-            </div>
-        )
-    }
+    if (!product) notFound()
 
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://farmnport.com'
 
@@ -56,7 +57,7 @@ export default async function BuyFeedPage({ params }: BuyFeedPageProps) {
             "@type": "Offer",
             "url": `${baseUrl}/buy-feeds/${slug}`,
             "priceCurrency": "USD",
-            "price": product.show_price && product.sale_price > 0 ? (product.sale_price / 100).toFixed(2) : "0.00",
+            "price": product.sale_price > 0 ? (product.sale_price / 100).toFixed(2) : "0.00",
             "availability": product.available_for_sale ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
             "seller": { "@type": "Organization", "name": "farmnport" }
         }
@@ -316,9 +317,9 @@ export default async function BuyFeedPage({ params }: BuyFeedPageProps) {
             <div className="border-b">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
                     <nav className="flex text-sm text-muted-foreground">
-                        <Link href="/" className="hover:text-foreground">Home</Link>
+                        <Link href="/buy" className="hover:text-foreground">Shop</Link>
                         <span className="mx-2">/</span>
-                        <Link href="/buy-feeds" className="hover:text-foreground">Feeds</Link>
+                        <Link href="/buy-feeds" className="hover:text-foreground">Buy Feeds</Link>
                         <span className="mx-2">/</span>
                         <span className="text-foreground capitalize">{product.name}</span>
                     </nav>
@@ -334,7 +335,7 @@ export default async function BuyFeedPage({ params }: BuyFeedPageProps) {
                     categoryName={product.feed_category?.name}
                     brandHref={product.brand ? `/buy-feeds?brand=${product.brand.name}` : undefined}
                     shopHref="/buy-feeds"
-                    guideHref={`/feeds/${slug}`}
+                    guideHref={`/feed-guides/${slug}`}
                     guideLabel="View Feed Guide →"
                     loginRedirect={`/buy-feeds/${slug}`}
                     fallbackIcon={<Egg className="w-28 h-28 text-muted-foreground/20" />}

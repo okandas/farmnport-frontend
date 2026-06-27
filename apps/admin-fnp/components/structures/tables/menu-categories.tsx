@@ -8,6 +8,7 @@ import { queryMenuCategories } from "@/lib/query"
 import { MenuCategory } from "@/lib/schemas"
 import { handleFetchError } from "@/lib/error-handler"
 import { Placeholder } from "@/components/state/placeholder"
+import { TableSkeleton } from "@/components/state/skeleton-table"
 import { DataTable } from "@/components/structures/data-table"
 import { menuCategoryColumns } from "@/components/structures/columns/menu-categories"
 
@@ -62,11 +63,7 @@ export function MenuCategoriesTable() {
   }
 
   if (isLoading || isFetching) {
-    return (
-      <Placeholder>
-        <Placeholder.Title>Fetching Categories</Placeholder.Title>
-      </Placeholder>
-    )
+    return <TableSkeleton />
   }
 
   return (
@@ -74,7 +71,7 @@ export function MenuCategoriesTable() {
       columns={menuCategoryColumns}
       data={categories}
       newUrl="/dashboard/restaurants/menu-categories/new"
-      tableName="Category"
+      tableName="Menu Category"
       total={total}
       pagination={pagination}
       setPagination={setPagination}

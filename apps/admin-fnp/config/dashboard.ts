@@ -19,22 +19,59 @@ export const dashboardConfig: DashboardConfig = {
       ],
     },
     {
+      label: "User Management",
+      alwaysOpen: true,
+      items: [
+        {
+          title: "Users",
+          href: "/dashboard/farmnport/users",
+          icon: "user",
+        },
+        {
+          title: "Administrators",
+          href: "/dashboard/farmnport/admins",
+          icon: "construction",
+        },
+        {
+          title: "Buyer Contacts",
+          href: "/dashboard/farmnport/buyer-contacts",
+          icon: "badgeCheck",
+        },
+      ],
+    },
+    {
+      label: "Analytics",
+      items: [
+        {
+          title: "Analytics",
+          href: "/dashboard/farmnport/analytics",
+          icon: "eye",
+        },
+      ],
+    },
+    {
       label: "Pricing",
       items: [
         {
-          title: "LWT Prices",
-          href: "/dashboard/farmnport/prices",
-          icon: "billing",
-        },
-        {
-          title: "CDM Prices",
-          href: "/dashboard/farmnport/cdm-prices",
+          title: "Price Series",
+          href: "/dashboard/farmnport/prices/series",
           icon: "billing",
         },
       ],
     },
     {
+      label: "Communications",
+      items: [
+        {
+          title: "Blast",
+          href: "/dashboard/farmnport/blast",
+          icon: "send",
+        },
+      ],
+    },
+    {
       label: "Sales",
+      alwaysOpen: true,
       items: [
         {
           title: "Overview",
@@ -49,8 +86,7 @@ export const dashboardConfig: DashboardConfig = {
       ],
     },
     {
-      label: "Orders",
-      alwaysOpen: true,
+      label: "Pre Orders",
       items: [
         {
           title: "Bookings",
@@ -70,47 +106,13 @@ export const dashboardConfig: DashboardConfig = {
       ],
     },
     {
-      label: "Analytics",
+      label: "Lots & Bids",
+      alwaysOpen: true,
       items: [
         {
-          title: "Most Viewed Contacts",
-          href: "/dashboard/farmnport/contact-views/most-viewed",
-          icon: "eye",
-        },
-        {
-          title: "Recent Views",
-          href: "/dashboard/farmnport/analytics/recent-views",
-          icon: "calender",
-        },
-        {
-          title: "User Views",
-          href: "/dashboard/farmnport/analytics/user-views",
-          icon: "user",
-        },
-        {
-          title: "Recent User Views",
-          href: "/dashboard/farmnport/analytics/recent-user-views",
-          icon: "calender",
-        },
-      ],
-    },
-    {
-      label: "Management",
-      items: [
-        {
-          title: "Users",
-          href: "/dashboard/farmnport/users",
-          icon: "user",
-        },
-        {
-          title: "Administrators",
-          href: "/dashboard/farmnport/admins",
-          icon: "construction",
-        },
-        {
-          title: "Buyer Contacts",
-          href: "/dashboard/farmnport/buyer-contacts",
-          icon: "badgeCheck",
+          title: "Lots",
+          href: "/dashboard/farmnport/lots",
+          icon: "box",
         },
       ],
     },
@@ -173,9 +175,24 @@ export const dashboardConfig: DashboardConfig = {
           icon: "tractor",
         },
         {
-          title: "Products",
+          title: "Produce",
           href: "/dashboard/farmnport/farmproduce",
           icon: "package",
+        },
+        {
+          title: "Livestock & Poultry",
+          href: "/dashboard/farmnport/livestock-poultry",
+          icon: "productSearch",
+        },
+        {
+          title: "Seed Products",
+          href: "/dashboard/farmnport/seed-products",
+          icon: "productSearch",
+        },
+        {
+          title: "Breeds",
+          href: "/dashboard/farmnport/breeds",
+          icon: "tag",
         },
         {
           title: "Crop Groups",
@@ -221,26 +238,6 @@ export const dashboardConfig: DashboardConfig = {
           title: "Targets",
           href: "/dashboard/farmnport/feed-targets",
           icon: "bug",
-        },
-      ],
-    },
-    {
-      label: "Livestock & Poultry",
-      items: [
-        {
-          title: "Products",
-          href: "/dashboard/farmnport/livestock-poultry",
-          icon: "productSearch",
-        },
-      ],
-    },
-    {
-      label: "Seed Products",
-      items: [
-        {
-          title: "Products",
-          href: "/dashboard/farmnport/seed-products",
-          icon: "productSearch",
         },
       ],
     },

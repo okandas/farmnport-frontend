@@ -16,12 +16,17 @@ const sections = [
     {
         title: "Animal Nutrition",
         description: "Livestock feed products across all categories and animal types — browse feeds by animal, phase, and form.",
-        href: "/feeds",
+        href: "/feed-guides",
     },
     {
         title: "Plant Nutrition Guides",
         description: "Fertilizers, foliar feeds, biostimulants, and plant growth regulators — active ingredients and application rates.",
         href: "/plant-nutrition-guides",
+    },
+    {
+        title: "Seed Guides",
+        description: "Certified seed varieties — potatoes, maize, tomatoes, chillies, vegetables and more from trusted suppliers.",
+        href: "/seed-guides",
     },
 ]
 
@@ -33,7 +38,7 @@ export default function GuidesPage() {
                 <div className="absolute inset-0 bg-gradient-to-br from-green-50/60 via-transparent to-emerald-50/40 dark:from-green-950/20 dark:to-emerald-950/10" />
                 <div className="mx-auto max-w-7xl px-6 lg:px-8 relative">
                     <div className="text-center max-w-3xl mx-auto">
-                        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 text-sm font-medium mb-3">
+                        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-md bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 text-sm font-medium mb-3">
                             <FlaskConical className="h-4 w-4" />
                             Your Farming Knowledge Hub
                         </div>
@@ -50,8 +55,8 @@ export default function GuidesPage() {
 
             {/* Guide Sections */}
             <section className="py-10 lg:py-14">
-                <div className="mx-auto max-w-4xl px-6 lg:px-8">
-                    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="mx-auto max-w-7xl px-6 lg:px-8">
+                    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
                         {sections.map(({ title, description, href }) => (
                             <Link
                                 key={href}

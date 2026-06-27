@@ -6,14 +6,13 @@ import {
   Users,
   Package,
   Tag,
-  CreditCard,
-  ArrowRight,
   Eye,
   BookOpen,
   TrendingUp,
+  ShoppingCart,
 } from "lucide-react"
 
-import { queryDashboardStats, queryContactViewsStats } from "@/lib/query"
+import { queryDashboardStats, queryContactViewsStats, querySalesStats } from "@/lib/query"
 import { Skeleton } from "@/components/ui/skeleton"
 
 interface DashboardStats {
@@ -44,8 +43,15 @@ export default function DashboardPage() {
     refetchOnWindowFocus: false,
   })
 
+  const { data: salesData } = useQuery({
+    queryKey: ["admin-sales-stats"],
+    queryFn: () => querySalesStats(),
+    refetchOnWindowFocus: false,
+  })
+
   const stats: DashboardStats | undefined = data?.data
   const viewsSummary = viewsData?.data?.summary
+  const salesStats = salesData?.data
 
   if (isLoading) {
     return (
@@ -173,6 +179,116 @@ export default function DashboardPage() {
 
       </div>
 
+      {/* Orders */}
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Orders</p>
+          <Link href="/dashboard/farmnport/orders/sales" className="text-xs text-muted-foreground hover:text-foreground transition-colors">
+            View all →
+          </Link>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+
+          {/* Total Orders */}
+          <div className="rounded-xl border bg-card p-5">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-sm font-medium text-muted-foreground">Total Orders</span>
+              <div className="h-8 w-8 rounded-lg bg-violet-100 dark:bg-violet-900/40 flex items-center justify-center">
+                <ShoppingCart className="h-4 w-4 text-violet-600 dark:text-violet-400" />
+              </div>
+            </div>
+            <div className="text-3xl font-bold">{salesStats?.orders?.total ?? "—"}</div>
+            <p className="text-xs text-muted-foreground mt-1">Excluding cancelled</p>
+          </div>
+
+          {/* Revenue */}
+          <div className="rounded-xl border bg-card p-5">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-sm font-medium text-muted-foreground">Revenue</span>
+              <div className="h-8 w-8 rounded-lg bg-green-100 dark:bg-green-900/40 flex items-center justify-center">
+                <TrendingUp className="h-4 w-4 text-green-600 dark:text-green-400" />
+              </div>
+            </div>
+            <div className="text-3xl font-bold">
+              {salesStats?.revenue?.all_time != null
+                ? `$${(salesStats.revenue.all_time / 100).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                : "—"}
+            </div>
+            <div className="mt-3 grid grid-cols-3 gap-2">
+              <div className="rounded-lg bg-muted/50 px-2 py-1.5">
+                <p className="text-[10px] text-muted-foreground">Today</p>
+                <p className="text-xs font-semibold">
+                  {salesStats?.revenue?.today != null ? `$${(salesStats.revenue.today / 100).toFixed(2)}` : "—"}
+                </p>
+              </div>
+              <div className="rounded-lg bg-muted/50 px-2 py-1.5">
+                <p className="text-[10px] text-muted-foreground">This week</p>
+                <p className="text-xs font-semibold">
+                  {salesStats?.revenue?.week != null ? `$${(salesStats.revenue.week / 100).toFixed(2)}` : "—"}
+                </p>
+              </div>
+              <div className="rounded-lg bg-muted/50 px-2 py-1.5">
+                <p className="text-[10px] text-muted-foreground">This month</p>
+                <p className="text-xs font-semibold">
+                  {salesStats?.revenue?.month != null ? `$${(salesStats.revenue.month / 100).toFixed(2)}` : "—"}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Pending & Paid */}
+          <div className="rounded-xl border bg-card p-5">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-sm font-medium text-muted-foreground">Needs Attention</span>
+              <div className="h-8 w-8 rounded-lg bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center">
+                <ShoppingCart className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+              </div>
+            </div>
+            <div className="text-3xl font-bold">
+              {salesStats?.orders != null
+                ? (salesStats.orders.pending ?? 0) + (salesStats.orders.paid ?? 0)
+                : "—"}
+            </div>
+            <div className="mt-3 space-y-1.5">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-muted-foreground">Pending</span>
+                <span className="font-medium">{salesStats?.orders?.pending ?? "—"}</span>
+              </div>
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-muted-foreground">Paid</span>
+                <span className="font-medium">{salesStats?.orders?.paid ?? "—"}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Delivered & Collected */}
+          <div className="rounded-xl border bg-card p-5">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-sm font-medium text-muted-foreground">Fulfilled</span>
+              <div className="h-8 w-8 rounded-lg bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center">
+                <Package className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+              </div>
+            </div>
+            <div className="text-3xl font-bold">
+              {salesStats?.orders != null
+                ? (salesStats.orders.delivered ?? 0) + (salesStats.orders.collected ?? 0)
+                : "—"}
+            </div>
+            <div className="mt-3 space-y-1.5">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-muted-foreground">Delivered</span>
+                <span className="font-medium">{salesStats?.orders?.delivered ?? "—"}</span>
+              </div>
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-muted-foreground">Collected</span>
+                <span className="font-medium">{salesStats?.orders?.collected ?? "—"}</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
       {/* Secondary metrics */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
 
@@ -218,29 +334,6 @@ export default function DashboardPage() {
           </div>
         </div>
 
-      </div>
-
-      {/* Quick Actions */}
-      <div>
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">Quick Actions</p>
-        <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-4">
-          {[
-            { href: "/dashboard/farmnport/users", icon: Users, label: "View Users" },
-            { href: "/dashboard/farmnport/agrochemicals", icon: Package, label: "Agrochemicals" },
-            { href: "/dashboard/farmnport/feed-products", icon: Package, label: "Feed Products" },
-            { href: "/dashboard/farmnport/prices", icon: CreditCard, label: "Manage Prices" },
-          ].map(({ href, icon: Icon, label }) => (
-            <Link
-              key={href}
-              href={href}
-              className="flex items-center gap-3 rounded-lg border bg-card p-3 text-card-foreground hover:bg-accent transition-colors"
-            >
-              <Icon className="h-4 w-4 text-muted-foreground shrink-0" />
-              <span className="text-sm font-medium flex-1">{label}</span>
-              <ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />
-            </Link>
-          ))}
-        </div>
       </div>
 
     </div>

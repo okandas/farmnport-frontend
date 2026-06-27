@@ -1,4 +1,7 @@
-import { queryAgroChemical } from "@/lib/query"
+import type { Metadata } from 'next'
+import { notFound } from "next/navigation"
+import { serverFetch } from "@/lib/serverFetch"
+import { buildBuyMetadata } from "@/lib/utilities"
 import Link from "next/link"
 import { Beaker } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -8,11 +11,18 @@ interface BuyAgroChemicalPageProps {
     params: Promise<{ slug: string }>
 }
 
+export async function generateMetadata({ params }: BuyAgroChemicalPageProps): Promise<Metadata> {
+    const { slug } = await params
+    const chemical = await serverFetch(`/agrochemical/${slug}`).catch(() => null)
+    if (!chemical) return { title: 'Agrochemical | farmnport.com', robots: { index: false } }
+    return buildBuyMetadata(chemical, chemical.agrochemical_category?.name || 'Agrochemical', `/buy-agrochemicals/${slug}`)
+}
+
 export default async function BuyAgroChemicalPage({ params }: BuyAgroChemicalPageProps) {
     const { slug } = await params
 
-    const response = await queryAgroChemical(slug)
-    const chemical = response?.data
+    const chemical = await serverFetch(`/agrochemical/${slug}`).catch(() => null)
+    if (!chemical) notFound()
 
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://farmnport.com'
 
@@ -31,7 +41,7 @@ export default async function BuyAgroChemicalPage({ params }: BuyAgroChemicalPag
             "@type": "Offer",
             "url": `${baseUrl}/buy-agrochemicals/${slug}`,
             "priceCurrency": "USD",
-            "price": chemical.show_price && chemical.sale_price > 0 ? (chemical.sale_price / 100).toFixed(2) : "0.00",
+            "price": chemical.sale_price > 0 ? (chemical.sale_price / 100).toFixed(2) : "0.00",
             "availability": chemical.available_for_sale ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
             "seller": { "@type": "Organization", "name": "farmnport" }
         }
@@ -110,9 +120,9 @@ export default async function BuyAgroChemicalPage({ params }: BuyAgroChemicalPag
             <div className="border-b">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
                     <nav className="flex text-sm text-muted-foreground">
-                        <Link href="/" className="hover:text-foreground">Home</Link>
+                        <Link href="/buy" className="hover:text-foreground">Shop</Link>
                         <span className="mx-2">/</span>
-                        <Link href="/buy-agrochemicals" className="hover:text-foreground">Shop</Link>
+                        <Link href="/buy-agrochemicals" className="hover:text-foreground">Buy Agrochemicals</Link>
                         <span className="mx-2">/</span>
                         <span className="text-foreground capitalize">{chemical.name}</span>
                     </nav>

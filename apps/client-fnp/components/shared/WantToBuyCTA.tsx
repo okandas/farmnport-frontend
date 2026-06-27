@@ -4,11 +4,14 @@ import { ShoppingCart } from "lucide-react"
 interface WantToBuyCTAProps {
     available_for_sale: boolean
     name: string
+    brand?: string
     href: string
 }
 
-export function WantToBuyCTA({ available_for_sale, name, href }: WantToBuyCTAProps) {
+export function WantToBuyCTA({ available_for_sale, name, brand, href }: WantToBuyCTAProps) {
     if (!available_for_sale) return null
+
+    const label = brand ? `${name} ${brand}` : name
 
     return (
         <Link
@@ -19,8 +22,8 @@ export function WantToBuyCTA({ available_for_sale, name, href }: WantToBuyCTAPro
                 <ShoppingCart className="w-4 h-4 text-primary" />
             </div>
             <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-foreground">Want to buy {name}?</p>
-                <p className="text-xs text-muted-foreground">Find sellers &amp; compare prices</p>
+                <p className="text-sm font-semibold text-foreground">Buy {label} online</p>
+                <p className="text-xs text-muted-foreground">Only at Farmnport · shop now</p>
             </div>
             <span className="text-xs font-medium text-primary shrink-0">View →</span>
         </Link>

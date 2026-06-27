@@ -8,6 +8,7 @@ import { queryFeedCategories } from "@/lib/query"
 import { FeedCategory } from "@/lib/schemas"
 import { handleFetchError } from "@/lib/error-handler"
 import { Placeholder } from "@/components/state/placeholder"
+import { TableSkeleton } from "@/components/state/skeleton-table"
 import { DataTable } from "@/components/structures/data-table"
 import { feedCategoryColumns } from "@/components/structures/columns/feedCategories"
 
@@ -63,11 +64,7 @@ export function FeedCategoriesTable() {
   }
 
   if (isLoading || isFetching) {
-    return (
-      <Placeholder>
-        <Placeholder.Title>Fetching Categories</Placeholder.Title>
-      </Placeholder>
-    )
+    return <TableSkeleton />
   }
 
   return (

@@ -15,7 +15,9 @@ import { cn } from "@/lib/utilities"
 import { buttonVariants } from "@/components/ui/button"
 import { Icons } from "@/components/icons/lucide"
 import { toast } from "@/components/ui/use-toast"
-import { handleApiError } from "@/lib/error-handler"
+import { handleApiError ,
+  handleFormErrors
+} from "@/lib/error-handler"
 import {
     Form,
     FormControl,
@@ -57,6 +59,8 @@ const EditFormSchema = RestaurantLocationSchema.pick({
     is_main: true,
     whatsapp_available: true,
     show_number: true,
+    pre_orders_enabled: true,
+    drive_through: true,
 }).extend({
     city: z.string().min(1, "City is required"),
 })
@@ -133,6 +137,8 @@ function EditLocationForm({ location, restaurants }: { location: RestaurantLocat
             is_main: location.is_main || false,
             whatsapp_available: location.whatsapp_available || false,
             show_number: location.show_number || false,
+            pre_orders_enabled: location.pre_orders_enabled || false,
+            drive_through: location.drive_through ?? false,
             operating_hours: location.operating_hours?.length ? location.operating_hours : defaultHours,
         },
         resolver: zodResolver(EditFormSchema),
@@ -183,7 +189,7 @@ function EditLocationForm({ location, restaurants }: { location: RestaurantLocat
             </div>
 
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)}>
+                <form onSubmit={form.handleSubmit(onSubmit, (errors) => handleFormErrors(errors))}>
                     <div className="space-y-12">
 
                         {/* Section 1: Location Details */}
@@ -569,6 +575,57 @@ function EditLocationForm({ location, restaurants }: { location: RestaurantLocat
                                             )}
                                         />
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Online Ordering */}
+                        <div className="border-b border-gray-900/10 pb-12 dark:border-white/10">
+                            <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">
+                                Online Ordering
+                            </h2>
+                            <p className="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">
+                                Enable pre-orders for this location. Customers will be able to browse the menu and place pre-orders on menus.co.zw.
+                            </p>
+
+                            <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
+                                <div className="sm:col-span-3">
+                                    <FormField
+                                        control={form.control}
+                                        name="pre_orders_enabled"
+                                        render={({ field }) => (
+                                            <FormItem className="flex items-center space-x-2 space-y-0">
+                                                <FormControl>
+                                                    <Checkbox
+                                                        checked={field.value}
+                                                        onCheckedChange={field.onChange}
+                                                    />
+                                                </FormControl>
+                                                <FormLabel className="text-sm font-medium cursor-pointer text-gray-900 dark:text-white">
+                                                    Pre-orders enabled
+                                                </FormLabel>
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                                <div className="sm:col-span-3">
+                                    <FormField
+                                        control={form.control}
+                                        name="drive_through"
+                                        render={({ field }) => (
+                                            <FormItem className="flex items-center space-x-2 space-y-0">
+                                                <FormControl>
+                                                    <Checkbox
+                                                        checked={field.value}
+                                                        onCheckedChange={field.onChange}
+                                                    />
+                                                </FormControl>
+                                                <FormLabel className="text-sm font-medium cursor-pointer text-gray-900 dark:text-white">
+                                                    Drive-through
+                                                </FormLabel>
+                                            </FormItem>
+                                        )}
+                                    />
                                 </div>
                             </div>
                         </div>

@@ -4,7 +4,7 @@ import { ColumnDef } from "@tanstack/react-table"
 import { AnimalHealthProduct } from "@/lib/schemas"
 import { Checkbox } from "@/components/ui/checkbox"
 import { AnimalHealthProductControlDropDown } from "@/components/structures/dropdowns/animalHealthProduct-dropdown"
-import { formatDate } from "@/lib/utilities"
+import { formatDate, centsToDollars } from "@/lib/utilities"
 
 export const animalHealthProductColumns: ColumnDef<AnimalHealthProduct>[] = [
   {
@@ -44,8 +44,21 @@ export const animalHealthProductColumns: ColumnDef<AnimalHealthProduct>[] = [
     accessorKey: "sale_price",
     header: "Price",
     cell: ({ row }) => {
-        const price = row.getValue("sale_price") as number
-        return price > 0 ? `$${price.toFixed(2)}` : "—"
+      const variants = (row.original as any).variants as { name: string; sale_price: number }[] | undefined
+      if (variants && variants.length > 0) {
+        return (
+          <div className="space-y-0.5">
+            {variants.map((v, i) => (
+              <div key={i} className="text-xs">
+                <span className="text-muted-foreground">{v.name}:</span>{" "}
+                {v.sale_price > 0 ? centsToDollars(v.sale_price) : "—"}
+              </div>
+            ))}
+          </div>
+        )
+      }
+      const price = row.getValue("sale_price") as number
+      return price > 0 ? centsToDollars(price) : "—"
     },
   },
   {

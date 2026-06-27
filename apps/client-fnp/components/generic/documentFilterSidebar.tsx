@@ -38,7 +38,7 @@ function FilterContent({ onClearAll }: { onClearAll: () => void }) {
         </div>
       )}
 
-      <Accordion type="multiple" className="w-full flex-1" defaultValue={["Category"]}>
+      <Accordion type="multiple" className="w-full flex-1" defaultValue={[]}>
         <AccordionItem value="Category">
           <AccordionTrigger>
             <div className="flex items-center justify-between w-full pr-2">
@@ -87,7 +87,7 @@ export function DocumentFilterSidebar() {
 
   if (isDesktop) {
     return (
-      <div className="sticky top-20 mt-[20px] max-h-[calc(100vh-5rem)] overflow-y-auto overflow-x-hidden">
+      <div>
         <FilterContent onClearAll={handleClearAll} />
       </div>
     )

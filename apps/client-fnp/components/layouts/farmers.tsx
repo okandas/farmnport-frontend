@@ -4,15 +4,14 @@ import {useCallback} from "react"
 import {usePathname, useRouter, useSearchParams} from "next/navigation"
 import {useQuery} from "@tanstack/react-query"
 import Link from "next/link"
-import {Search, Users} from "lucide-react"
 
 import {Pagination} from "@/components/generic/pagination"
-import {Icons} from "@/components/icons/lucide"
+import {Contacts} from "@/components/layouts/contacts"
 
 import {queryClients, queryClientsByProduct} from "@/lib/query"
-import {AdSenseInFeed} from "@/components/ads/AdSenseInFeed"
 import {ApplicationUser, AuthenticatedUser} from "@/lib/schemas"
 import {slug, capitalizeFirstLetter, plural} from "@/lib/utilities"
+import {ArrowRight} from "lucide-react"
 
 interface FarmersPageProps {
   user: AuthenticatedUser | null
@@ -44,15 +43,12 @@ export function Farmers({user, queryBy}: FarmersPageProps) {
 
   // Search params
   const page = Number(searchParams?.get("page")) ?? 1
-  const provinceFilters = searchParams?.getAll("province") ?? []
-  const produceFilters = searchParams?.getAll("produce") ?? []
-  const categoryFilters = searchParams?.getAll("category") ?? []
-  const paymentTermsFilters = searchParams?.getAll("payment_terms") ?? []
-  const pricingFilters = searchParams?.getAll("pricing") ?? []
+  const produceFilter = searchParams?.get("produce") ?? ""
+  const categoryFilter = searchParams?.get("category") ?? ""
 
   const {data, isError, isFetching} = useQuery({
-    queryKey: ["results-farmers", {p: page, province: provinceFilters, produce: produceFilters, category: categoryFilters, payment_terms: paymentTermsFilters, pricing: pricingFilters, queryBy}],
-    queryFn: () => queryBy != undefined ? queryClientsByProduct('farmer', queryBy, {p: page, province: provinceFilters}) : queryClients('farmer', {p: page, province: provinceFilters, produce: produceFilters, category: categoryFilters, payment_terms: paymentTermsFilters, pricing: pricingFilters}),
+    queryKey: ["results-farmers", {p: page, produce: produceFilter, category: categoryFilter}],
+    queryFn: () => queryBy != undefined ? queryClientsByProduct('farmer', queryBy, {p: page}) : queryClients('farmer', {p: page, produce: produceFilter ? [produceFilter] : [], category: categoryFilter ? [categoryFilter] : []}),
     refetchOnWindowFocus: false
   })
 
@@ -60,132 +56,74 @@ export function Farmers({user, queryBy}: FarmersPageProps) {
     return null
   }
 
+  if (isFetching) {
+    return null
+  }
+
   const farmers = data?.data?.data as ApplicationUser[]
   const total = data?.data?.total as number
 
-  const pageCount = Math.ceil((total || 0) / 10)
+  const pageCount = Math.ceil(total / 10)
 
-  const produceName = queryBy ? capitalizeFirstLetter(plural(queryBy)) : "Produce"
+  if (farmers == undefined || farmers == null) {
+    return null
+  }
+
 
   return (
-    <section className="space-y-8 mt-[21px]">
-      {isFetching ? (
-        <div className="h-6 w-48 bg-muted rounded animate-pulse" />
-      ) : queryBy == undefined ? (
+    <section className="space-y-8">
+      {/* Post a request lot CTA */}
+      <Link
+        href="/sell"
+        className="flex items-center justify-between gap-4 rounded-xl border border-primary/20 bg-primary/5 px-5 py-4 hover:bg-primary/10 transition-colors group"
+      >
         <div>
-          <h1 className="text-lg font-medium">{total} Farm Produce Sellers.</h1>
-          <p className="text-base text-muted-foreground pt-1">Connect with reliable produce sellers near you.</p>
-        </div>
-      ) : (
-        <div>
-          <h1 className="text-lg font-medium">{total} {capitalizeFirstLetter(plural(queryBy))} Produce Sellers.</h1>
-          <p className="text-base text-muted-foreground pt-1">Buy your {plural(queryBy)} produce from {plural('farmer', total)} across Zimbabwe.</p>
-        </div>
-      )}
-
-      {/* Search Bar - Commented out until we have enough users, using sidebar filter for now */}
-      {/* <div className="relative">
-        <form className="relative flex items-center">
-          <div className="relative w-full">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-            <input
-              type="text"
-              placeholder="Search farmers by name, produce, or location..."
-              className="w-full pl-12 pr-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-            />
-          </div>
-        </form>
-      </div> */}
-
-      {isFetching ? (
-        <div className="space-y-3">
-          {[...Array(10)].map((_, i) => (
-            <div key={i} className="bg-card border rounded-lg p-6 animate-pulse">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-lg bg-muted flex-shrink-0" />
-                <div className="flex-1 space-y-2">
-                  <div className="h-5 bg-muted rounded w-1/3" />
-                  <div className="h-4 bg-muted rounded w-1/2" />
-                  <div className="h-4 bg-muted rounded w-2/3" />
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : !farmers || farmers.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 px-6 text-center border rounded-lg bg-muted/30">
-          <Users className="h-12 w-12 text-muted-foreground/40 mb-4" />
-          <h3 className="text-lg font-semibold mb-1">No {produceName} Farmers Yet</h3>
-          <p className="text-sm text-muted-foreground max-w-md">
-            There are currently no registered {queryBy ? plural(queryBy) : ""} farmers on the platform.
-            Check back soon as new farmers join regularly.
+          <p className="text-sm font-semibold text-foreground">
+            {queryBy ? `Looking to buy ${capitalizeFirstLetter(plural(queryBy))}?` : "Looking to buy produce?"}
           </p>
-          <Link href="/farmers" className="mt-4 text-sm text-primary hover:underline">
-            Browse all farmers
-          </Link>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Post a request lot and let farmers come to you with their available stock.
+          </p>
         </div>
-      ) : (
-        <div className="space-y-3">
-          {farmers.map((farmer, farmerIndex) => (
-            <div key={farmerIndex}>
-            {farmerIndex > 0 && farmerIndex % 3 === 0 && <AdSenseInFeed />}
-            <Link href={`/farmer/${slug(farmer.name)}`} className="block bg-card border rounded-lg p-6 hover:shadow-md hover:border-primary/40 transition-all group">
-              <div className="flex items-start gap-4">
-                <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-muted flex items-center justify-center text-muted-foreground">
-                  <span className="text-lg font-bold">{farmer.name.charAt(0).toUpperCase()}</span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <h4 className="text-lg font-semibold group-hover:text-primary transition-colors truncate">
-                      {capitalizeFirstLetter(farmer.name)}
-                    </h4>
-                  </div>
-                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-sm text-muted-foreground">
-                    <span className="flex items-center gap-1">
-                      <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
-                      {farmer.city?.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}, {farmer.province?.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
-                    </span>
-                    <span className="hidden sm:inline">•</span>
-                    <span>Selling {farmer.main_produce?.name ? capitalizeFirstLetter(plural(farmer.main_produce.name)) : 'Various Products'}</span>
-                    {farmer.primary_category && (
-                      <>
-                        <span className="hidden sm:inline">•</span>
-                        <span className="font-medium text-foreground">{capitalizeFirstLetter(farmer.primary_category.name)}</span>
-                      </>
-                    )}
-                  </div>
-                  {farmer.short_description.length > 0 && (
-                    <p className="text-muted-foreground text-sm mt-2 line-clamp-2">
-                      {capitalizeFirstLetter(farmer.short_description)}
-                    </p>
-                  )}
-                  {(farmer.contact_views || 0) > 0 && (
-                    <p className="text-orange-600 text-xs font-medium mt-2 flex items-center gap-1">
-                      <Icons.eye className="h-3.5 w-3.5" />
-                      {farmer.contact_views} {farmer.contact_views === 1 ? 'person viewed' : 'people viewed'} this contact recently
-                    </p>
-                  )}
-                </div>
-              </div>
-            </Link>
-            </div>
-          ))}
-        </div>
-      )}
+        <ArrowRight className="h-4 w-4 text-primary flex-shrink-0 group-hover:translate-x-0.5 transition-transform" />
+      </Link>
 
-      {pageCount > 1 && (
-        <div>
-          <Pagination
-            pageCount={pageCount}
-            page={page}
-            createQueryString={createQueryString}
-          />
-        </div>
-      )}
+      {
+        queryBy == undefined ?
+          <div>
+            <h1 className="text-2xl font-semibold">{total} Farm Produce Sellers.</h1>
+            <p className="text-base text-muted-foreground pt-1">Connect with reliable produce sellers near you.</p>
+          </div>
+          :
+          <div>
+            <h2 className="text-lg font-medium">{total} { capitalizeFirstLetter(plural(queryBy)) } Produce Sellers.</h2>
+          </div>
+      }
+      <ul role="list" className="divide-y">
+        {farmers.map((farmer, farmerIndex) => (
+          <li key={farmerIndex} className="py-4 first:pt-2">
+
+            <div>
+              <h4 className="text-lg hover:underline hover:decoration-2">
+                <Link href={`/farmer/${slug(farmer.name)}`}>{capitalizeFirstLetter(farmer.name)}</Link>
+              </h4>
+              {farmer.short_description.length > 0 ? <h4
+                className="text-muted-foreground text-sm">{capitalizeFirstLetter(farmer.short_description)}</h4> : null}
+              <Contacts user={user} client={farmer} quickOverview={true}/>
+            </div>
+          </li>
+        ))}
+      </ul>
+
+      <div>
+        <Pagination
+          pageCount={pageCount}
+          page={page}
+          createQueryString={createQueryString}
+        />
+      </div>
     </section>
+
   )
 }
 

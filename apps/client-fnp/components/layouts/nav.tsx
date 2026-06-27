@@ -15,8 +15,7 @@ import {Avatar, AvatarFallback} from "@/components/ui/avatar";
 import {capitalizeFirstLetter, makeAbbveriation, centsToDollars} from "@/lib/utilities";
 import {signOut} from "next-auth/react";
 import {AppURL, AuthenticatedUser} from "@/lib/schemas";
-import { ShoppingCart, Sun, Moon, Monitor } from "lucide-react";
-import { useTheme } from "next-themes";
+import { ShoppingCart } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useCart } from "@/contexts/cart-context";
 import { getCart, countBookingNotifications } from "@/lib/query";
@@ -88,7 +87,6 @@ function BellIcon({ user }: { user: AuthenticatedUser | null }) {
 }
 
 export function Navigation({ user }: NavigationProps) {
-  const { setTheme } = useTheme()
   return (
       <nav className="lg:flex lg:space-x-2">
         <Link href="/guides" onClick={() => sendGTMEvent({ event: 'link', value: 'GuidesTopNavigation' })}
@@ -110,6 +108,13 @@ export function Navigation({ user }: NavigationProps) {
               className={buttonVariants({ size: "sm", variant: "link" })}
         >
           Buy
+        </Link>
+        <Link
+          href={user ? "/lots/new" : "/login?next=/lots/new"}
+          onClick={() => sendGTMEvent({ event: 'link', value: 'ListLotNavigation' })}
+          className={`${buttonVariants({ size: "sm" })} mr-2`}
+        >
+          List a Lot
         </Link>
         {user ? (
           <DropdownMenu>
@@ -150,22 +155,8 @@ export function Navigation({ user }: NavigationProps) {
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
-                <DropdownMenuItem onClick={() => setTheme("light")}>
-                  <Sun className="mr-2 h-4 w-4" /> Light
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme("dark")}>
-                  <Moon className="mr-2 h-4 w-4" /> Dark
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme("system")}>
-                  <Monitor className="mr-2 h-4 w-4" /> System
-                </DropdownMenuItem>
-              </DropdownMenuGroup>
-              <DropdownMenuSeparator />
-              <DropdownMenuGroup>
-                <DropdownMenuItem asChild>
-                  <Link href="#" onClick={() => signOut({ redirectTo: AppURL })}>
-                    Logout
-                  </Link>
+                <DropdownMenuItem onClick={() => signOut({ redirectTo: AppURL })}>
+                  Logout
                 </DropdownMenuItem>
               </DropdownMenuGroup>
 

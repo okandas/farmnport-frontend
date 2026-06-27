@@ -1,42 +1,27 @@
-"use client"
+import { bookingsEnabled, profileEnabled, securityEnabled, notificationsEnabled, documentsEnabled } from "@/flags"
+import AccountOptionsClient, { AccountOption } from "./AccountOptionsClient"
 
-import Link from "next/link"
-import { useSession } from "next-auth/react"
-import { useRouter } from "next/navigation"
-import { useEffect } from "react"
-
-const SECTIONS = [
-    { label: "Orders", description: "Track your product orders and view order history.", href: "/account/orders" },
-    { label: "Bookings", description: "Manage your livestock and delivery bookings.", href: "/account/bookings" },
-    { label: "Documents", description: "Download your purchased plans and documents.", href: "/account/documents" },
-    { label: "Profile", description: "Update your name, phone number, and address.", href: "/account/profile" },
-    { label: "Security", description: "Change your password and manage account security.", href: "/account/security" },
+const ALL_OPTIONS: (AccountOption & { flag?: () => Promise<boolean> })[] = [
+  { label: "Orders",            href: "/account/orders",            icon: "ShoppingBag", protected: true },
+  { label: "Bids",              href: "/account/bids",              icon: "Gavel",       protected: true },
+  { label: "Lots",              href: "/account/lots",              icon: "Warehouse",   protected: true },
+  { label: "Bookings",          href: "/account/bookings",          icon: "CalendarDays",protected: true, flag: bookingsEnabled },
+  { label: "Incoming Bookings", href: "/account/incoming-bookings", icon: "Inbox",       protected: true, flag: bookingsEnabled },
+  { label: "Notifications",     href: "/account/notifications",     icon: "Bell",        protected: true, flag: notificationsEnabled },
+  { label: "Documents",         href: "/account/documents",         icon: "FileText",    protected: true, flag: documentsEnabled },
+  { label: "Profile",           href: "/account/profile",           icon: "User",        protected: true, flag: profileEnabled },
+  { label: "Security",          href: "/account/security",          icon: "Shield",      protected: true, flag: securityEnabled },
+  { label: "Theme",             href: "/account/theme",             icon: "Palette",     protected: false },
 ]
 
-export default function AccountPage() {
-    const { status } = useSession()
-    const router = useRouter()
+export default async function AccountPage() {
+  const flagResults = await Promise.all(
+    ALL_OPTIONS.map(({ flag }) => (flag ? flag() : Promise.resolve(true)))
+  )
 
-    useEffect(() => {
-        if (status === "unauthenticated") {
-            router.push("/login?next=/account")
-        }
-    }, [status, router])
+  const options: AccountOption[] = ALL_OPTIONS
+    .filter((_, i) => flagResults[i])
+    .map(({ label, href, icon, protected: p }) => ({ label, href, icon, protected: p }))
 
-    if (status === "loading") return null
-
-    return (
-        <div className="grid sm:grid-cols-2 gap-4">
-            {SECTIONS.map(({ label, description, href }) => (
-                <Link
-                    key={href}
-                    href={href}
-                    className="flex flex-col gap-1 p-5 rounded-xl border border-border bg-card hover:border-primary hover:shadow-sm transition-all group"
-                >
-                    <p className="font-semibold text-sm group-hover:text-primary transition-colors">{label}</p>
-                    <p className="text-xs text-muted-foreground leading-relaxed">{description}</p>
-                </Link>
-            ))}
-        </div>
-    )
+  return <AccountOptionsClient options={options} />
 }

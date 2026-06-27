@@ -11,7 +11,7 @@ import { Filter, X, Search } from "lucide-react"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { useQuery } from "@tanstack/react-query"
 import { useState, useMemo } from "react"
-import { queryAnimalHealthFilterAggregates } from "@/lib/query"
+import { queryAnimalHealthFilterAggregates, queryAnimalHealthBuyFilterAggregates } from "@/lib/query"
 import { sendGTMEvent } from "@next/third-parties/google"
 
 interface FilterItem {
@@ -110,9 +110,11 @@ function SearchableCheckboxList({
 function FilterContent({
   onClearAll,
   categorySlug,
+  fetchAggregates,
 }: {
   onClearAll: () => void
   categorySlug?: string
+  fetchAggregates: typeof queryAnimalHealthFilterAggregates
 }) {
   const [queryState, setQueryState] = useQueryStates({
     brand: parseAsArrayOf(parseAsString),
@@ -123,9 +125,9 @@ function FilterContent({
 
   // Fetch aggregate data for animal health — cascade by active filters
   const { data: aggregateData, isLoading: isLoadingAggregates } = useQuery({
-    queryKey: ["animal-health-filter-aggregates", categorySlug, queryState.brand, queryState.target, queryState.active_ingredient, queryState.used_on],
+    queryKey: ["animal-health-filter-aggregates", fetchAggregates.name, categorySlug, queryState.brand, queryState.target, queryState.active_ingredient, queryState.used_on],
     queryFn: async () => {
-      const response = await queryAnimalHealthFilterAggregates({
+      const response = await fetchAggregates({
         brand: queryState.brand ?? [],
         category: categorySlug ? [categorySlug] : [],
         target: queryState.target ?? [],
@@ -191,7 +193,7 @@ function FilterContent({
         </div>
       )}
 
-      <Accordion type="multiple" className="w-full flex-1" defaultValue={filterSections.filter(s => { const raw = (queryState as any)[s.key]; return Array.isArray(raw) ? raw.length > 0 : !!raw }).map(s => s.name).concat(["Used On"]).filter((v, i, a) => a.indexOf(v) === i)}>
+      <Accordion type="multiple" className="w-full flex-1" defaultValue={[]}>
         {filterSections.map((section) => {
           const raw = (queryState as any)[section.key]
           const selectedFilters: string[] = Array.isArray(raw) ? raw : (raw ? [raw] : [])
@@ -225,7 +227,7 @@ function FilterContent({
   )
 }
 
-export function AnimalHealthFilterSidebar({ categorySlug }: { categorySlug?: string } = {}) {
+function AnimalHealthFilterSidebarBase({ categorySlug, fetchAggregates }: { categorySlug?: string; fetchAggregates: typeof queryAnimalHealthFilterAggregates }) {
   const isDesktop = useMediaQuery("(min-width: 1024px)")
   const [, setQueryState] = useQueryStates({
     brand: parseAsArrayOf(parseAsString),
@@ -245,8 +247,8 @@ export function AnimalHealthFilterSidebar({ categorySlug }: { categorySlug?: str
 
   if (isDesktop) {
     return (
-      <div className="sticky top-20 mt-[20px] max-h-[calc(100vh-5rem)] overflow-y-auto overflow-x-hidden">
-        <FilterContent onClearAll={handleClearAll} categorySlug={categorySlug} />
+      <div>
+        <FilterContent onClearAll={handleClearAll} categorySlug={categorySlug} fetchAggregates={fetchAggregates} />
       </div>
     )
   }
@@ -263,8 +265,16 @@ export function AnimalHealthFilterSidebar({ categorySlug }: { categorySlug?: str
         <SheetHeader className="mb-4">
           <SheetTitle>Filter Animal Health Products</SheetTitle>
         </SheetHeader>
-        <FilterContent onClearAll={handleClearAll} categorySlug={categorySlug} />
+        <FilterContent onClearAll={handleClearAll} categorySlug={categorySlug} fetchAggregates={fetchAggregates} />
       </SheetContent>
     </Sheet>
   )
+}
+
+export function AnimalHealthFilterSidebar({ categorySlug }: { categorySlug?: string } = {}) {
+  return <AnimalHealthFilterSidebarBase categorySlug={categorySlug} fetchAggregates={queryAnimalHealthFilterAggregates} />
+}
+
+export function AnimalHealthBuyFilterSidebar({ categorySlug }: { categorySlug?: string } = {}) {
+  return <AnimalHealthFilterSidebarBase categorySlug={categorySlug} fetchAggregates={queryAnimalHealthBuyFilterAggregates} />
 }

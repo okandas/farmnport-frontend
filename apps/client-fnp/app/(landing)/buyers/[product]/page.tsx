@@ -1,13 +1,10 @@
-import { Suspense } from "react"
 import {capitalizeFirstLetter, plural} from "@/lib/utilities"
 import { Buyers } from "@/components/layouts/buyers"
 import { retrieveUser } from "@/lib/actions"
+import { QuickLinks } from "@/components/generic/quick-links"
 import type { Metadata, ResolvingMetadata } from "next";
-import { AppURL, getBuyerSeo } from "@/lib/schemas";
-import { ClientFilterSidebar } from "@/components/generic/clientFilterSidebar"
-import { ActionsSidebar } from "@/components/generic/actions-sidebar"
-import { CrossSellBanner } from "@/components/monetization/cross-sell-banner"
-import { ProductResources } from "@/components/monetization/product-resources"
+import { AppURL, BuyerSeo } from "@/lib/schemas";
+import { FilterSidebar } from "@/components/generic/filterSidebar"
 
 
 type Props = {
@@ -18,40 +15,14 @@ type Props = {
 export async function generateMetadata({ params }: Props,  parent: ResolvingMetadata): Promise<Metadata> {
   const { product } = await params
   const name = capitalizeFirstLetter(plural(product))
-  const description = getBuyerSeo(product)
+  const description = BuyerSeo[product]
 
   return {
     alternates: {
       canonical: `${AppURL}/buyers/${product.toLowerCase()}`,
     },
-    title: `${name} Buyers in Zimbabwe | farmnport`,
+    title: `${name} Buyers in Zimbabwe | farmnport.com`,
     description,
-    keywords: `${name} buyers, buy ${product}, ${product} market, Zimbabwe buyers, agricultural buyers, farm produce buyers`,
-    authors: [{ name: 'farmnport' }],
-    openGraph: {
-      title: `${name} Buyers in Zimbabwe`,
-      description,
-      url: `${AppURL}/buyers/${product.toLowerCase()}`,
-      siteName: 'farmnport',
-      locale: 'en_US',
-      type: 'website',
-    },
-    twitter: {
-      card: 'summary',
-      title: `${name} Buyers in Zimbabwe`,
-      description,
-    },
-    robots: {
-      index: true,
-      follow: true,
-      googleBot: {
-        index: true,
-        follow: true,
-        'max-video-preview': -1,
-        'max-image-preview': 'large',
-        'max-snippet': -1,
-      },
-    },
   }
 }
 
@@ -63,38 +34,29 @@ export default async function BuyersProductPage({ params }: BuyerProductPageProp
 
   const user = await retrieveUser()
   const { product } = await params
-  const name = capitalizeFirstLetter(plural(product))
 
   return (
     <main>
       <div className="mx-auto max-w-7xl px-6 lg:px-8 min-h-[70lvh]">
-        <h1 className="text-3xl font-bold font-heading pt-8 pb-4">
-          {name} Buyers in Zimbabwe
-        </h1>
-        <p className="text-muted-foreground mb-6">
-          Find verified {product} buyers across Zimbabwe. Sell your {product} directly at competitive market prices.
-        </p>
-
-        <CrossSellBanner product={product} context="buyer" />
-        <ProductResources product={product} />
-
         <div className="lg:flex lg:space-x-10">
-          <div className="hidden lg:block lg:w-64 relative">
-            <ClientFilterSidebar type="buyers" hideProduce hideCategory product={product} />
+
+          <div className="hidden lg:block lg:w-44 relative">
+            <FilterSidebar />
           </div>
 
-          <div className="lg:flex-1">
-            <div className="lg:hidden mb-4">
-              <ClientFilterSidebar type="buyers" hideProduce hideCategory product={product} />
+          <div className="flex-1 min-w-0">
+            <div className="space-y-8 mt-[21px]">
+              <div>
+                <h1 className="text-2xl font-semibold">{capitalizeFirstLetter(plural(product))} Produce Buyers in Zimbabwe</h1>
+                <p className="text-base text-muted-foreground pt-1">Sell your {plural(product)} produce directly to buyers across Zimbabwe.</p>
+              </div>
             </div>
-            <Suspense><Buyers user={user} queryBy={product} /></Suspense>
+            <Buyers user={user} queryBy={product} />
           </div>
-
-          <div className="hidden lg:block lg:w-80 relative">
-            <ActionsSidebar type="buyers" product={product} showPremiumCTA={false} />
+          <div className="hidden lg:block lg:w-44 shrink-0">
+            <QuickLinks />
           </div>
         </div>
-
       </div>
     </main>
   )

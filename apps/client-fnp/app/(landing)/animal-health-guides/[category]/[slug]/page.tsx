@@ -1,10 +1,11 @@
 import type { Metadata } from 'next'
 import { ActiveIngredientsList } from "@/components/shared/ActiveIngredientUnitsKey"
 import Image from "next/image"
-import { Beaker, AlertTriangle } from "lucide-react"
+import { AlertTriangle } from "lucide-react"
 import Link from "next/link"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
-import { capitalizeFirstLetter, formatUnit } from "@/lib/utilities"
+import { capitalizeFirstLetter, formatUnit, buildGuideMetadata } from "@/lib/utilities"
+import { GuideProductTitle } from "@/components/shared/GuideProductTitle"
 import { BaseURL } from "@/lib/schemas"
 import { WantToBuyCTA } from "@/components/shared/WantToBuyCTA"
 
@@ -34,17 +35,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     'View dosage rates and usage guidelines on farmnport.com.',
   ].filter(Boolean).join('. ')
 
-  return {
-    title: `${product.name} – ${categorySingularTitle} Dosage & Guide | farmnport.com`,
-    description,
-    alternates: { canonical: `/animal-health-guides/${category}/${slug}` },
-    openGraph: {
-      title: `${product.name} – ${categorySingularTitle} Guide`,
-      description,
-      siteName: 'farmnport',
-      type: 'website',
-    },
-  }
+  return buildGuideMetadata(product, categorySingularTitle, 'Dosage & Guide', description, `/animal-health-guides/${category}/${slug}`)
 }
 
 interface GuidePageProps {
@@ -76,9 +67,7 @@ export default async function AnimalHealthGuidePage({ params }: GuidePageProps) 
             <div className="min-h-screen bg-background flex items-center justify-center px-4 pb-4">
                 <div className="text-center max-w-md">
                     <div className="mb-6">
-                        <div className="mx-auto w-20 h-20 bg-muted rounded-full flex items-center justify-center">
-                            <Beaker className="w-10 h-10 text-muted-foreground" />
-                        </div>
+                        <div className="mx-auto w-20 h-20 bg-muted rounded-full" />
                     </div>
                     <h2 className="text-2xl font-semibold mb-2">Guide Not Found</h2>
                     <p className="text-muted-foreground mb-6">
@@ -284,9 +273,7 @@ export default async function AnimalHealthGuidePage({ params }: GuidePageProps) 
                                     priority
                                 />
                             ) : (
-                                <div className="absolute inset-0 flex items-center justify-center">
-                                    <Beaker className="w-24 h-24 text-muted-foreground/30" />
-                                </div>
+                                <div className="absolute inset-0 bg-muted/30" />
                             )}
                         </div>
 
@@ -313,7 +300,7 @@ export default async function AnimalHealthGuidePage({ params }: GuidePageProps) 
                         )}
 
                         {/* Want to Buy CTA */}
-                        <WantToBuyCTA available_for_sale={product.available_for_sale} name={product.name} href={`/buy-animal-health/${slug}`} />
+                        <WantToBuyCTA available_for_sale={product.available_for_sale} name={product.name} brand={product.brand?.name} href={`/buy-animal-health/${slug}`} />
 
                         {/* Precautions */}
                         {product.precautions && product.precautions.length > 0 && (
@@ -337,9 +324,7 @@ export default async function AnimalHealthGuidePage({ params }: GuidePageProps) 
                     {/* Right - Product Info */}
                     <div className="space-y-6">
                         {/* Product Name */}
-                        <h1 className="text-3xl lg:text-4xl font-bold capitalize leading-tight">
-                            {product.name}
-                        </h1>
+                        <GuideProductTitle name={product.name} brand={product.brand?.name} />
 
                         {/* Category Badge */}
                         <div className="flex items-center gap-3 flex-wrap">

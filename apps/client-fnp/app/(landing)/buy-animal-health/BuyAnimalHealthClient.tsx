@@ -1,10 +1,10 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
-import { queryAllAnimalHealthProducts } from "@/lib/query"
+import { queryBuyAnimalHealthProducts } from "@/lib/query"
 import { Button } from "@/components/ui/button"
-import { AnimalHealthFilterSidebar } from "@/components/generic/animalHealthFilterSidebar"
-import { AnimalHealthCard } from "@/components/animalhealth/AnimalHealthCard"
+import { AnimalHealthBuyFilterSidebar } from "@/components/generic/animalHealthFilterSidebar"
+import { ProductCard } from "@/components/shared/ProductCard"
 import { BuyCategoriesNav } from "@/components/generic/BuyCategoriesNav"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
 import { Beaker } from "lucide-react"
@@ -30,7 +30,7 @@ export function BuyAnimalHealthClient({ initialProducts, initialTotal }: BuyAnim
 
     const { data: productsData, isLoading: productsLoading } = useQuery({
         queryKey: ["animal-health-shop", queryState.p, queryState.brand, queryState.target, queryState.active_ingredient],
-        queryFn: () => queryAllAnimalHealthProducts({
+        queryFn: () => queryBuyAnimalHealthProducts({
             p: queryState.p,
             brand: queryState.brand || [],
             target: queryState.target || [],
@@ -53,7 +53,7 @@ export function BuyAnimalHealthClient({ initialProducts, initialTotal }: BuyAnim
             {/* Sidebar Filters */}
             <aside className="w-full lg:w-64 flex-shrink-0">
                 <BuyCategoriesNav />
-                <AnimalHealthFilterSidebar />
+                <AnimalHealthBuyFilterSidebar />
             </aside>
 
             {/* Main Content */}
@@ -80,7 +80,7 @@ export function BuyAnimalHealthClient({ initialProducts, initialTotal }: BuyAnim
                     </div>
                 ) : products.length === 0 ? (
                     <div className="text-center py-12">
-                        <Beaker className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
+                        
                         <p className="text-muted-foreground">No animal health products found matching your filters.</p>
                     </div>
                 ) : (
@@ -92,10 +92,27 @@ export function BuyAnimalHealthClient({ initialProducts, initialTotal }: BuyAnim
 
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
                             {products.map((product: any) => (
-                                <AnimalHealthCard
+                                <ProductCard
                                     key={product.id}
-                                    product={product}
-                                    mode="shop"
+                                    href={`/buy-animal-health/${product.slug}`}
+                                    imageSrc={product.images?.[0]?.img?.src}
+                                    name={product.name}
+                                    brand={product.brand?.name}
+                                    meta={product.animal_health_category?.name}
+                                    mode="buy"
+                                    productId={product.id}
+                                    productType="animal_health"
+                                    productSlug={product.slug}
+                                   
+                                    salePrice={product.sale_price}
+                                    wasPrice={product.was_price}
+                                    showWasPrice={product.show_was_price}
+                                    availableForSale={product.available_for_sale}
+                                    stockLevel={product.stock_level}
+                                    hasVariants={product.variants?.length > 0}
+                                    variantPriceRange={product.variant_price_range}
+                                    pickupOnly={product.pickup_location_ids?.length > 0 && !product.delivery_available && !(product.delivery_location_ids?.length > 0)}
+                                    isTest={product.is_test}
                                 />
                             ))}
                         </div>
@@ -103,14 +120,6 @@ export function BuyAnimalHealthClient({ initialProducts, initialTotal }: BuyAnim
                         {/* Pagination */}
                         {totalPages > 1 && (
                             <div className="mt-8 flex justify-center gap-1">
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => handlePageChange(Math.max(1, queryState.p - 1))}
-                                    disabled={queryState.p === 1}
-                                >
-                                    Previous
-                                </Button>
                                 {Array.from({ length: totalPages }, (_, i) => i + 1)
                                     .filter(pageNum => {
                                         return (
@@ -139,14 +148,6 @@ export function BuyAnimalHealthClient({ initialProducts, initialTotal }: BuyAnim
                                             </div>
                                         )
                                     })}
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => handlePageChange(queryState.p + 1)}
-                                    disabled={queryState.p >= totalPages}
-                                >
-                                    Next
-                                </Button>
                             </div>
                         )}
                     </>

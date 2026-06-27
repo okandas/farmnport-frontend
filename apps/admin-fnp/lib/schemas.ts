@@ -517,17 +517,26 @@ export const AgroChemicalSchema = z.object({
     was_price: z.coerce.number().nonnegative().default(0),
     wholesale_price: z.coerce.number().nonnegative().default(0),
     stock_level: z.coerce.number().int().nonnegative().default(0),
+    weight_grams: z.coerce.number().int().nonnegative().default(0),
   })).optional().default([]),
   precautions: z.array(z.string()).optional().default([]),
   product_overview: z.string().optional().default(""),
   stock_level: z.coerce.number().int().nonnegative().default(0),
   available_for_sale: z.boolean().default(false),
-  show_price: z.boolean().default(true),
   sale_price: z.coerce.number().nonnegative().default(0),
   show_was_price: z.boolean().default(false),
   was_price: z.coerce.number().nonnegative().default(0),
+  weight_grams: z.coerce.number().int().nonnegative().default(0),
+  is_test: z.boolean().default(false),
+  delivery_available: z.boolean().default(false),
+  pickup_available: z.boolean().default(false),
+  pickup_location_ids: z.array(z.string()).optional().default([]),
+  delivery_location_ids: z.array(z.string()).optional().default([]),
   created: z.string().optional(),
   updated: z.string().optional(),
+}).refine(data => !data.available_for_sale || data.weight_grams > 0, {
+  message: "Weight is required before enabling available for sale",
+  path: ["weight_grams"],
 })
 
 export const ActiveIngredientRelationSchema = z.object({
@@ -649,6 +658,16 @@ export const FormFarmProduceCategorySchema = z.object({
 
 export type FormFarmProduceCategoryModel = z.infer<typeof FormFarmProduceCategorySchema>
 
+export const FormFarmProduceSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  description: z.string().max(500).optional().default(""),
+  category_id: z.string().min(1, "Category is required"),
+  category_slug: z.string().min(1, "Category is required"),
+  lots_enabled: z.boolean().default(false),
+})
+
+export type FormFarmProduceModel = z.infer<typeof FormFarmProduceSchema>
+
 export const FarmProduceSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -656,6 +675,7 @@ export const FarmProduceSchema = z.object({
   description: z.string(),
   category_id: z.string(),
   category_slug: z.string(),
+  lots_enabled: z.boolean().optional().default(false),
 })
 
 export type FarmProduce = z.infer<typeof FarmProduceSchema>
@@ -776,7 +796,6 @@ export const AnimalHealthProductSchema = z.object({
   })),
   stock_level: z.coerce.number().int().nonnegative().default(0),
   available_for_sale: z.boolean().default(false),
-  show_price: z.boolean().default(true),
   sale_price: z.coerce.number().nonnegative().default(0),
   was_price: z.coerce.number().nonnegative().default(0),
   variants: z.array(z.object({
@@ -786,11 +805,21 @@ export const AnimalHealthProductSchema = z.object({
     sale_price: z.coerce.number().nonnegative().default(0),
     was_price: z.coerce.number().nonnegative().default(0),
     wholesale_price: z.coerce.number().nonnegative().default(0),
+    weight_grams: z.coerce.number().int().nonnegative().default(0),
   })).default([]),
   precautions: z.array(z.string()).default([]),
   status: z.enum(["active", "inactive"]).default("active"),
+  weight_grams: z.coerce.number().int().nonnegative().default(0),
+  is_test: z.boolean().default(false),
+  delivery_available: z.boolean().default(false),
+  pickup_available: z.boolean().default(false),
+  pickup_location_ids: z.array(z.string()).optional().default([]),
+  delivery_location_ids: z.array(z.string()).optional().default([]),
   created: z.string().optional(),
   updated: z.string().optional(),
+}).refine(data => !data.available_for_sale || data.weight_grams > 0, {
+  message: "Weight is required before enabling available for sale",
+  path: ["weight_grams"],
 })
 
 export const FormAnimalHealthProductSchema = AnimalHealthProductSchema
@@ -991,11 +1020,15 @@ export const FeedProductSchema = z.object({
   })).optional().default([]),
   stock_level: z.coerce.number().int().nonnegative().default(0),
   available_for_sale: z.boolean().default(false),
-  show_price: z.boolean().default(true),
   sale_price: z.coerce.number().nonnegative().default(0),
   was_price: z.coerce.number().nonnegative().default(0),
+  weight_grams: z.coerce.number().int().nonnegative().default(0),
+  is_test: z.boolean().default(false),
   created: z.string().optional(),
   updated: z.string().optional(),
+}).refine(data => !data.available_for_sale || data.weight_grams > 0, {
+  message: "Weight is required before enabling available for sale",
+  path: ["weight_grams"],
 })
 
 export const FormFeedProductSchema = FeedProductSchema
@@ -1165,6 +1198,8 @@ export const RestaurantLocationSchema = z.object({
   operating_hours: z.array(OperatingHourSchema).default([]),
   status: z.enum(["active", "inactive", "closed"]).default("active"),
   accessible: z.boolean().optional(),
+  pre_orders_enabled: z.boolean().default(false),
+  drive_through: z.boolean().default(false),
   created: z.string().optional(),
   updated: z.string().optional(),
 })
@@ -1204,6 +1239,8 @@ export const MenuLocationEntrySchema = z.object({
 export const MenuSchema = z.object({
   id: z.string(),
   locations: z.array(MenuLocationEntrySchema).default([]),
+  menu_category_id: z.string().min(1, "Menu category is required"),
+  menu_category_name: z.string().default(""),
   name: z.string().min(1, "Menu name is required").max(120, "Name cannot exceed 120 characters"),
   note: z.string().optional().default(""),
   slug: z.string().optional(),
@@ -1219,6 +1256,8 @@ export const FormMenuSchema = MenuSchema.pick({
   status: true,
 }).extend({
   locations: z.array(MenuLocationEntrySchema).default([]),
+  menu_category_id: z.string().min(1, "Menu category is required"),
+  menu_category_name: z.string().default(""),
   category_notes: z.record(z.string(), z.string()).optional().default({}),
 })
 
@@ -1230,6 +1269,29 @@ export type FormMenuModel = z.infer<typeof FormMenuSchema>
 export type MenuResponse = {
   total: number
   data: Menu[]
+}
+
+// Menu Category (top-level category for menus e.g. Breakfast, Drinks)
+export const MenuCategorySchema = z.object({
+  id: z.string(),
+  name: z.string().min(1, "Name is required").max(120, "Name cannot exceed 120 characters"),
+  description: z.string().default(""),
+  slug: z.string().optional(),
+  created: z.string().optional(),
+  updated: z.string().optional(),
+})
+
+export const FormMenuCategorySchema = MenuCategorySchema.pick({
+  name: true,
+  description: true,
+})
+
+export type MenuCategory = z.infer<typeof MenuCategorySchema>
+export type FormMenuCategoryModel = z.infer<typeof FormMenuCategorySchema>
+
+export type MenuCategoryResponse = {
+  total: number
+  data: MenuCategory[]
 }
 
 // Menu Item Category
@@ -1252,29 +1314,6 @@ export type FormMenuItemCategoryModel = z.infer<typeof FormMenuItemCategorySchem
 export type MenuItemCategoryResponse = {
   total: number
   data: MenuItemCategory[]
-}
-
-// Menu Category
-export const MenuCategorySchema = z.object({
-  id: z.string(),
-  name: z.string().min(1, "Name is required").max(120, "Name cannot exceed 120 characters"),
-  description: z.string().default(""),
-  slug: z.string().optional(),
-  created: z.string().optional(),
-  updated: z.string().optional(),
-})
-
-export const FormMenuCategorySchema = MenuCategorySchema.pick({
-  name: true,
-  description: true,
-})
-
-export type MenuCategory = z.infer<typeof MenuCategorySchema>
-export type FormMenuCategoryModel = z.infer<typeof FormMenuCategorySchema>
-
-export type MenuCategoryResponse = {
-  total: number
-  data: MenuCategory[]
 }
 
 // Cuisine Category
@@ -1568,3 +1607,17 @@ export const RestaurantLocationPaymentSchema = z.object({
 })
 
 export type RestaurantLocationPayment = z.infer<typeof RestaurantLocationPaymentSchema>
+
+export const EditLotSchema = z.object({
+  client_id: z.string().min(1, "Client is required"),
+  type: z.string().min(1, "Type is required"),
+  form: z.string().min(1, "State is required"),
+  quantity: z.coerce.number().positive("Quantity must be greater than 0"),
+  unit: z.string().min(1, "Unit is required"),
+  price_per_unit: z.coerce.number().positive("Price must be greater than 0"),
+  notes: z.string().optional(),
+  expires_date: z.string().min(1, "Expiry date is required"),
+  expires_time: z.string().min(1, "Expiry time is required"),
+})
+
+export type EditLotModel = z.infer<typeof EditLotSchema>

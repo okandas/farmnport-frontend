@@ -13,7 +13,9 @@ import { cn } from "@/lib/utilities"
 import { buttonVariants } from "@/components/ui/button"
 import { Icons } from "@/components/icons/lucide"
 import { toast } from "@/components/ui/use-toast"
-import { handleApiError } from "@/lib/error-handler"
+import { handleApiError ,
+  handleFormErrors
+} from "@/lib/error-handler"
 import {
     Form,
     FormControl,
@@ -23,7 +25,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Checkbox } from "@/components/ui/checkbox"
+import { ProductPricingSection } from "@/components/structures/forms/product-pricing-section"
 import * as z from "zod"
 
 const NewFeedProductSchema = z.object({
@@ -71,9 +73,13 @@ const NewFeedProductSchema = z.object({
     })).default([]),
     stock_level: z.coerce.number().int().nonnegative().default(0),
     available_for_sale: z.boolean().default(false),
-    show_price: z.boolean().default(true),
     sale_price: z.coerce.number().nonnegative().default(0),
     was_price: z.coerce.number().nonnegative().default(0),
+    weight_grams: z.coerce.number().int().nonnegative().default(0),
+    is_test: z.boolean().default(false),
+}).refine(data => !data.available_for_sale || data.weight_grams > 0, {
+    message: "Weight is required before enabling available for sale",
+    path: ["weight_grams"],
 })
 
 type NewFeedProductModel = z.infer<typeof NewFeedProductSchema>
@@ -103,9 +109,9 @@ export default function NewFeedProductPage() {
             adaptation_schedule: [],
             stock_level: 0,
             available_for_sale: false,
-            show_price: true,
             sale_price: 0,
             was_price: 0,
+            weight_grams: 0,
         },
         resolver: zodResolver(NewFeedProductSchema),
     })
@@ -192,7 +198,7 @@ export default function NewFeedProductPage() {
             </div>
 
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)}>
+                <form onSubmit={form.handleSubmit(onSubmit, (errors) => handleFormErrors(errors))}>
                     <div className="space-y-12">
                         <div className="border-b border-gray-900/10 pb-12 dark:border-white/10">
                             <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">
@@ -857,97 +863,7 @@ export default function NewFeedProductPage() {
                     )}
                 </div>
 
-                {/* Pricing & Stock */}
-                <div className="border-b border-gray-900/10 dark:border-gray-100/10 pb-12">
-                    <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">Pricing & Stock</h2>
-                    <p className="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">Guide pricing and inventory information.</p>
-
-                    <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6">
-                        <div className="sm:col-span-3 flex items-center gap-4">
-                            <FormField
-                                control={form.control}
-                                name="show_price"
-                                render={({ field }) => (
-                                    <FormItem className="flex items-center gap-2">
-                                        <FormControl>
-                                            <Checkbox
-                                                checked={field.value}
-                                                onCheckedChange={field.onChange}
-                                            />
-                                        </FormControl>
-                                        <label className="text-sm font-medium text-gray-900 dark:text-white cursor-pointer" onClick={() => field.onChange(!field.value)}>
-                                            Show Price on Guides
-                                        </label>
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
-                        <div className="sm:col-span-3 flex items-center gap-4">
-                            <FormField
-                                control={form.control}
-                                name="available_for_sale"
-                                render={({ field }) => (
-                                    <FormItem className="flex items-center gap-2">
-                                        <FormControl>
-                                            <Checkbox
-                                                checked={field.value}
-                                                onCheckedChange={field.onChange}
-                                            />
-                                        </FormControl>
-                                        <label className="text-sm font-medium text-gray-900 dark:text-white cursor-pointer" onClick={() => field.onChange(!field.value)}>
-                                            Available for Sale
-                                        </label>
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
-                        <div className="sm:col-span-2">
-                            <FormField
-                                control={form.control}
-                                name="sale_price"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Sale Price (USD)</label>
-                                        <FormControl>
-                                            <Input type="number" step="0.01" min="0" placeholder="0.00" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
-                        <div className="sm:col-span-2">
-                            <FormField
-                                control={form.control}
-                                name="was_price"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Was Price (USD)</label>
-                                        <FormControl>
-                                            <Input type="number" step="0.01" min="0" placeholder="0.00" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
-                        <div className="sm:col-span-2">
-                            <FormField
-                                control={form.control}
-                                name="stock_level"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Stock Level</label>
-                                        <FormControl>
-                                            <Input type="number" min="0" placeholder="0" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
-                    </div>
-                </div>
+                <ProductPricingSection />
 
                     <div className="mt-6 flex items-center justify-end gap-x-6">
                         <button

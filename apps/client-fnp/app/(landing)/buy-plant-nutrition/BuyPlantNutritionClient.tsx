@@ -1,110 +1,16 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
-import { queryAllPlantNutritionProducts } from "@/lib/query"
+import { queryBuyPlantNutritionProducts } from "@/lib/query"
 import { Button } from "@/components/ui/button"
-import { PlantNutritionFilterSidebar } from "@/components/generic/plantNutritionFilterSidebar"
+import { PlantNutritionBuyFilterSidebar } from "@/components/generic/plantNutritionFilterSidebar"
 import { BuyCategoriesNav } from "@/components/generic/BuyCategoriesNav"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
-import { Leaf } from "lucide-react"
-import Image from "next/image"
-import Link from "next/link"
-import { AddToCartButton } from "@/components/cart/AddToCartButton"
+import { ProductCard } from "@/components/shared/ProductCard"
 
 interface BuyPlantNutritionClientProps {
     initialProducts: any[]
     initialTotal: number
-}
-
-function PlantNutritionShopCard({ product }: { product: any }) {
-    const href = `/buy-plant-nutrition/${product.slug}`
-    return (
-        <div className="bg-card border border-border rounded-lg overflow-hidden transition-all duration-200 hover:shadow-lg hover:border-primary/50 group">
-            <Link href={href} className="block">
-                <div className="relative aspect-square bg-white">
-                    {product.images && product.images[0] && product.images[0].img?.src ? (
-                        <Image
-                            src={product.images[0].img.src}
-                            alt={product.name}
-                            fill
-                            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                            className="object-contain transition-transform duration-200 group-hover:scale-105"
-                        />
-                    ) : (
-                        <div className="absolute inset-0 bg-muted/30" />
-                    )}
-                </div>
-            </Link>
-
-            <div className="p-4 space-y-3 border-t">
-                {product.brand && (
-                    <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">
-                        {product.brand.name}
-                    </p>
-                )}
-
-                <Link href={href}>
-                    <h3 className="font-semibold text-sm leading-tight capitalize line-clamp-2 min-h-[2.5rem] group-hover:text-primary transition-colors">
-                        {product.name}
-                    </h3>
-                </Link>
-
-                <div className="flex items-center gap-4 text-xs text-muted-foreground pt-2 border-t">
-                    <div className="flex items-center gap-1.5">
-                        <Leaf className="w-3.5 h-3.5" />
-                        <span>{product.plant_nutrition_category?.name || 'Plant Nutrition'}</span>
-                    </div>
-                </div>
-
-                <div>
-                    {(() => {
-                        const hasVariants = product.variants?.length > 0
-                        const variantPrices = hasVariants
-                            ? product.variants.filter((v: any) => v.sale_price > 0).map((v: any) => v.sale_price)
-                            : []
-                        const lowestVariant = variantPrices.length > 0 ? Math.min(...variantPrices) : null
-                        const highestVariant = variantPrices.length > 0 ? Math.max(...variantPrices) : null
-                        if (product.show_price && product.sale_price > 0) {
-                            return (
-                                <div className="flex items-baseline gap-2">
-                                    <span className="text-lg font-bold">${(product.sale_price / 100).toFixed(2)}</span>
-                                    {product.was_price > 0 && product.was_price > product.sale_price && (
-                                        <span className="text-xs text-muted-foreground line-through">${(product.was_price / 100).toFixed(2)}</span>
-                                    )}
-                                </div>
-                            )
-                        }
-                        if (lowestVariant) {
-                            return (
-                                <div className="flex flex-col gap-0.5">
-                                    <span className="text-lg font-bold">${(lowestVariant / 100).toFixed(2)}</span>
-                                    <span className="text-xs text-muted-foreground">
-                                        Options · From ${(lowestVariant / 100).toFixed(2)}{highestVariant && highestVariant !== lowestVariant ? ` – $${(highestVariant / 100).toFixed(2)}` : ""}
-                                    </span>
-                                </div>
-                            )
-                        }
-                        return <span className="text-sm text-muted-foreground">Price on request</span>
-                    })()}
-                </div>
-                {product.variants?.length > 0 ? (
-                    <Link href={href} className="flex items-center justify-center w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium text-sm h-9 px-3 rounded-md transition-colors mt-3">
-                        Options
-                    </Link>
-                ) : (
-                    <AddToCartButton
-                        productId={product.id}
-                        productType="plant_nutrition"
-                        productName={product.name}
-                        productSlug={product.slug}
-                        imageSrc={product.images?.[0]?.img?.src}
-                        unitPrice={product.show_price && product.sale_price > 0 ? product.sale_price : null}
-                        loginRedirect={href}
-                    />
-                )}
-            </div>
-        </div>
-    )
 }
 
 export function BuyPlantNutritionClient({ initialProducts, initialTotal }: BuyPlantNutritionClientProps) {
@@ -125,7 +31,7 @@ export function BuyPlantNutritionClient({ initialProducts, initialTotal }: BuyPl
 
     const { data: productsData, isLoading: productsLoading } = useQuery({
         queryKey: ["plant-nutrition-shop", queryState.p, queryState.brand, queryState.category, queryState.active_ingredient, queryState.used_on],
-        queryFn: () => queryAllPlantNutritionProducts({
+        queryFn: () => queryBuyPlantNutritionProducts({
             p: queryState.p,
             brand: queryState.brand || [],
             category: queryState.category || [],
@@ -148,7 +54,7 @@ export function BuyPlantNutritionClient({ initialProducts, initialTotal }: BuyPl
         <div className="flex flex-col lg:flex-row gap-8">
             <aside className="w-full lg:w-64 flex-shrink-0">
                 <BuyCategoriesNav />
-                <PlantNutritionFilterSidebar />
+                <PlantNutritionBuyFilterSidebar />
             </aside>
 
             <main className="flex-1">
@@ -174,7 +80,6 @@ export function BuyPlantNutritionClient({ initialProducts, initialTotal }: BuyPl
                     </div>
                 ) : products.length === 0 ? (
                     <div className="text-center py-12">
-                        <div className="w-16 h-16 mx-auto bg-muted/30 rounded-full mb-4" />
                         <p className="text-muted-foreground">No plant nutrition products found matching your filters.</p>
                     </div>
                 ) : (
@@ -185,20 +90,33 @@ export function BuyPlantNutritionClient({ initialProducts, initialTotal }: BuyPl
 
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
                             {products.map((product: any) => (
-                                <PlantNutritionShopCard key={product.id} product={product} />
+                                <ProductCard
+                                    key={product.id}
+                                    href={`/buy-plant-nutrition/${product.slug}`}
+                                    imageSrc={product.images?.[0]?.img?.src}
+                                    name={product.name}
+                                    brand={product.brand?.name}
+                                    meta={product.plant_nutrition_category?.name}
+                                    mode="buy"
+                                    productId={product.id}
+                                    productType="plant_nutrition"
+                                    productSlug={product.slug}
+                                   
+                                    salePrice={product.sale_price}
+                                    wasPrice={product.was_price}
+                                    showWasPrice={product.show_was_price}
+                                    availableForSale={product.available_for_sale}
+                                    stockLevel={product.stock_level}
+                                    hasVariants={product.variants?.length > 0}
+                                    variantPriceRange={product.variant_price_range}
+                                    pickupOnly={product.pickup_location_ids?.length > 0 && !product.delivery_available && !(product.delivery_location_ids?.length > 0)}
+                                    isTest={product.is_test}
+                                />
                             ))}
                         </div>
 
                         {totalPages > 1 && (
                             <div className="mt-8 flex justify-center gap-1">
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => handlePageChange(Math.max(1, queryState.p - 1))}
-                                    disabled={queryState.p === 1}
-                                >
-                                    Previous
-                                </Button>
                                 {Array.from({ length: totalPages }, (_, i) => i + 1)
                                     .filter(pageNum =>
                                         pageNum === 1 ||
@@ -224,14 +142,6 @@ export function BuyPlantNutritionClient({ initialProducts, initialTotal }: BuyPl
                                             </div>
                                         )
                                     })}
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => handlePageChange(queryState.p + 1)}
-                                    disabled={queryState.p >= totalPages}
-                                >
-                                    Next
-                                </Button>
                             </div>
                         )}
                     </>

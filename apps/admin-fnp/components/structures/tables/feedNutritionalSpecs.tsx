@@ -8,6 +8,7 @@ import { queryFeedNutritionalSpecs } from "@/lib/query"
 import { FeedNutritionalSpec } from "@/lib/schemas"
 import { handleFetchError } from "@/lib/error-handler"
 import { Placeholder } from "@/components/state/placeholder"
+import { TableSkeleton } from "@/components/state/skeleton-table"
 import { DataTable } from "@/components/structures/data-table"
 import { feedNutritionalSpecColumns } from "@/components/structures/columns/feedNutritionalSpecs"
 
@@ -63,11 +64,7 @@ export function FeedNutritionalSpecsTable() {
   }
 
   if (isLoading || isFetching) {
-    return (
-      <Placeholder>
-        <Placeholder.Title>Fetching Nutritional Specs</Placeholder.Title>
-      </Placeholder>
-    )
+    return <TableSkeleton />
   }
 
   return (

@@ -8,6 +8,7 @@ import { queryAnimalHealthCategories } from "@/lib/query"
 import { AnimalHealthCategory } from "@/lib/schemas"
 import { handleFetchError } from "@/lib/error-handler"
 import { Placeholder } from "@/components/state/placeholder"
+import { TableSkeleton } from "@/components/state/skeleton-table"
 import { DataTable } from "@/components/structures/data-table"
 import { animalHealthCategoryColumns } from "@/components/structures/columns/animalHealthCategories"
 
@@ -63,11 +64,7 @@ export function AnimalHealthCategoriesTable() {
   }
 
   if (isLoading || isFetching) {
-    return (
-      <Placeholder>
-        <Placeholder.Title>Fetching Categories</Placeholder.Title>
-      </Placeholder>
-    )
+    return <TableSkeleton />
   }
 
   return (

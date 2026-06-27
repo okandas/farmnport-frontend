@@ -24,6 +24,17 @@ export const restaurantsDashboardConfig: DashboardConfig = {
       ],
     },
     {
+      label: "Reservations",
+      alwaysOpen: true,
+      items: [
+        {
+          title: "Reservations",
+          href: "/dashboard/restaurants/reservations",
+          icon: "calendarCheck",
+        },
+      ],
+    },
+    {
       label: "Analytics",
       alwaysOpen: true,
       items: [

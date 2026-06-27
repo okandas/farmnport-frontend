@@ -1,22 +1,27 @@
 import Link from "next/link"
-import { queryAllSeedProducts } from "@/lib/query"
+import { serverFetch } from "@/lib/serverFetch"
 import { BuySeedProductsClient } from "./BuySeedProductsClient"
 
 export default async function BuySeedProductsPage() {
     let initialProducts: any[] = []
     let initialTotal = 0
+    let bookingEvents: any[] = []
 
     try {
-        const response = await queryAllSeedProducts({ p: 1, brand: [] })
-        initialProducts = response?.data?.data || []
-        initialTotal = response?.data?.total || 0
+        const [productsRes, bookingsRes] = await Promise.all([
+            serverFetch("/seed-products/buy"),
+            serverFetch("/booking/events?status=open"),
+        ])
+        initialProducts = productsRes?.data || []
+        initialTotal = productsRes?.total || 0
+        bookingEvents = bookingsRes?.events || []
     } catch (error) {
         console.error("Error fetching seed products:", error)
     }
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
-            <div className="mx-auto max-w-7xl px-6 lg:px-8 py-12">
+            <div className="mx-auto max-w-7xl px-6 lg:px-8 py-6">
                 <nav className="flex items-center gap-1.5 text-xs text-muted-foreground mb-6">
                     <Link href="/" className="hover:text-foreground transition-colors">Home</Link>
                     <span>/</span>
@@ -35,6 +40,7 @@ export default async function BuySeedProductsPage() {
                 <BuySeedProductsClient
                     initialProducts={initialProducts}
                     initialTotal={initialTotal}
+                    bookingEvents={bookingEvents}
                 />
             </div>
         </div>

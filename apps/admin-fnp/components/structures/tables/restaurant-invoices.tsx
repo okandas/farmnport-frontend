@@ -8,6 +8,7 @@ import { queryRestaurantInvoices } from "@/lib/query"
 import { RestaurantInvoice } from "@/lib/schemas"
 import { handleFetchError } from "@/lib/error-handler"
 import { Placeholder } from "@/components/state/placeholder"
+import { TableSkeleton } from "@/components/state/skeleton-table"
 import { DataTable } from "@/components/structures/data-table"
 import { restaurantInvoiceColumns } from "@/components/structures/columns/restaurant-invoices"
 
@@ -50,11 +51,7 @@ export function RestaurantInvoicesTable() {
   }
 
   if (isLoading || isFetching) {
-    return (
-      <Placeholder>
-        <Placeholder.Title>Fetching Invoices</Placeholder.Title>
-      </Placeholder>
-    )
+    return <TableSkeleton />
   }
 
   return (

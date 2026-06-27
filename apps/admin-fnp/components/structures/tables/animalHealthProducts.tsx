@@ -8,6 +8,7 @@ import { queryAnimalHealthProducts } from "@/lib/query"
 import { AnimalHealthProduct } from "@/lib/schemas"
 import { handleFetchError } from "@/lib/error-handler"
 import { Placeholder } from "@/components/state/placeholder"
+import { TableSkeleton } from "@/components/state/skeleton-table"
 import { DataTable } from "@/components/structures/data-table"
 import { animalHealthProductColumns } from "@/components/structures/columns/animalHealthProducts"
 
@@ -63,11 +64,7 @@ export function AnimalHealthProductsTable() {
   }
 
   if (isLoading || isFetching) {
-    return (
-      <Placeholder>
-        <Placeholder.Title>Fetching Animal Health Products</Placeholder.Title>
-      </Placeholder>
-    )
+    return <TableSkeleton />
   }
 
   return (

@@ -1,4 +1,7 @@
-import { queryPlantNutritionProduct } from "@/lib/query"
+import type { Metadata } from 'next'
+import { notFound } from "next/navigation"
+import { serverFetch } from "@/lib/serverFetch"
+import { buildBuyMetadata } from "@/lib/utilities"
 import Link from "next/link"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { BuyProductInteractive } from "@/components/shop/BuyProductInteractive"
@@ -7,11 +10,18 @@ interface BuyPlantNutritionProductPageProps {
     params: Promise<{ slug: string }>
 }
 
+export async function generateMetadata({ params }: BuyPlantNutritionProductPageProps): Promise<Metadata> {
+    const { slug } = await params
+    const product = await serverFetch(`/plantnutrition/${slug}`).catch(() => null)
+    if (!product) return { title: 'Plant Nutrition Product | farmnport.com', robots: { index: false } }
+    return buildBuyMetadata(product, product.plant_nutrition_category?.name || 'Plant Nutrition', `/buy-plant-nutrition/${slug}`, 'Zimbabwe crops')
+}
+
 export default async function BuyPlantNutritionProductPage({ params }: BuyPlantNutritionProductPageProps) {
     const { slug } = await params
 
-    const response = await queryPlantNutritionProduct(slug)
-    const product = response?.data
+    const product = await serverFetch(`/plantnutrition/${slug}`).catch(() => null)
+    if (!product) notFound()
 
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://farmnport.com'
 
@@ -30,7 +40,7 @@ export default async function BuyPlantNutritionProductPage({ params }: BuyPlantN
             "@type": "Offer",
             "url": `${baseUrl}/buy-plant-nutrition/${slug}`,
             "priceCurrency": "USD",
-            "price": product.show_price && product.sale_price > 0 ? (product.sale_price / 100).toFixed(2) : "0.00",
+            "price": product.sale_price > 0 ? (product.sale_price / 100).toFixed(2) : "0.00",
             "availability": product.available_for_sale ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
             "seller": { "@type": "Organization", "name": "farmnport" }
         }
@@ -110,9 +120,9 @@ export default async function BuyPlantNutritionProductPage({ params }: BuyPlantN
             <div className="border-b">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
                     <nav className="flex text-sm text-muted-foreground">
-                        <Link href="/" className="hover:text-foreground">Home</Link>
+                        <Link href="/buy" className="hover:text-foreground">Shop</Link>
                         <span className="mx-2">/</span>
-                        <Link href="/buy-plant-nutrition" className="hover:text-foreground">Shop</Link>
+                        <Link href="/buy-plant-nutrition" className="hover:text-foreground">Buy Plant Nutrition</Link>
                         <span className="mx-2">/</span>
                         <span className="text-foreground capitalize">{product.name}</span>
                     </nav>

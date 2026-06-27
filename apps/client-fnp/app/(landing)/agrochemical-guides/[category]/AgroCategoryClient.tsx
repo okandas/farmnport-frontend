@@ -3,9 +3,8 @@
 import { useQuery } from "@tanstack/react-query"
 import { queryAgroChemicalsByCategory } from "@/lib/query"
 import { Button } from "@/components/ui/button"
-import { Beaker } from "lucide-react"
 import { AgroChemicalFilterSidebar } from "@/components/generic/agroChemicalFilterSidebar"
-import { AgroChemicalCard } from "@/components/agrochemical/AgroChemicalCard"
+import { ProductCard } from "@/components/shared/ProductCard"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
 import Link from "next/link"
 
@@ -80,7 +79,7 @@ export function AgroCategoryClient({ category, categoryName, initialChemicals, i
                     </div>
                 ) : chemicals.length === 0 ? (
                     <div className="text-center py-12">
-                        <Beaker className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
+                        
                         <p className="text-muted-foreground mb-4">No {categoryName.toLowerCase()} found matching your filters.</p>
                         <Link href="/agrochemical-guides">
                             <Button variant="outline">View All Agrochemicals</Button>
@@ -90,9 +89,13 @@ export function AgroCategoryClient({ category, categoryName, initialChemicals, i
                     <>
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
                             {chemicals.map((chemical: any) => (
-                                <AgroChemicalCard
+                                <ProductCard
                                     key={chemical.id}
-                                    chemical={chemical}
+                                    href={`/agrochemical-guides/${chemical.agrochemical_category?.slug || "all"}/${chemical.slug}`}
+                                    imageSrc={chemical.images?.[0]?.img?.src}
+                                    name={chemical.name}
+                                    brand={chemical.brand?.name}
+                                    meta={chemical.agrochemical_category?.name}
                                     mode="guide"
                                 />
                             ))}

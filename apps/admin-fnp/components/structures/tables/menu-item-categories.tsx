@@ -8,6 +8,7 @@ import { queryMenuItemCategories } from "@/lib/query"
 import { MenuItemCategory } from "@/lib/schemas"
 import { handleFetchError } from "@/lib/error-handler"
 import { Placeholder } from "@/components/state/placeholder"
+import { TableSkeleton } from "@/components/state/skeleton-table"
 import { DataTable } from "@/components/structures/data-table"
 import { menuItemCategoryColumns } from "@/components/structures/columns/menu-item-categories"
 
@@ -62,11 +63,7 @@ export function MenuItemCategoriesTable() {
   }
 
   if (isLoading || isFetching) {
-    return (
-      <Placeholder>
-        <Placeholder.Title>Fetching Categories</Placeholder.Title>
-      </Placeholder>
-    )
+    return <TableSkeleton />
   }
 
   return (

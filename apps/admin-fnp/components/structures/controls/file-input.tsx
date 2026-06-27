@@ -220,10 +220,8 @@ export function FileInput({ id, value, fieldName = "images", entityType, onChang
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
                             src={localPreviews[file.img.id]}
-                            width={192}
-                            height={192}
                             alt="product preview image"
-                            className="object-contain"
+                            className="object-cover w-full h-full"
                         />
                     ) : (
                         <Image
@@ -231,7 +229,7 @@ export function FileInput({ id, value, fieldName = "images", entityType, onChang
                             width={192}
                             height={192}
                             alt="product preview image"
-                            className="object-contain"
+                            className="object-cover w-full h-full"
                         />
                     )}
                 </div>

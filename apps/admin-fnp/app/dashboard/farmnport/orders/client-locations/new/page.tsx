@@ -2,21 +2,20 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { useMutation, useQuery } from "@tanstack/react-query"
+import { useMutation } from "@tanstack/react-query"
 import { Plus, X, Loader2 } from "lucide-react"
 import Link from "next/link"
 import { toast } from "@/components/ui/use-toast"
 
-import { createDeliveryLocation, queryUsers } from "@/lib/query"
+import { createDeliveryLocation } from "@/lib/query"
 import { LocationPicker } from "@/components/ui/location-picker"
 import { DashboardHeader } from "@/components/state/dashboardHeader"
 import { DashboardShell } from "@/components/state/dashboardShell"
-
 const inputCls = "block w-full rounded-md bg-background px-3 py-1.5 text-sm text-foreground outline outline-1 -outline-offset-1 outline-border placeholder:text-muted-foreground focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-ring"
 const labelCls = "block text-sm/6 font-medium text-foreground"
 
 const EMPTY_FORM = {
-  client_id: "",
+  types: ["delivery", "pickup"] as string[],
   name: "",
   address: "",
   city: "",
@@ -81,17 +80,10 @@ export default function NewDeliveryLocationPage() {
     setForm((f) => ({ ...f, [field]: value }))
   }
 
-  const { data: buyersData } = useQuery({
-    queryKey: ["admin-buyers-list"],
-    queryFn: () => queryUsers({ type: ["buyer"], limit: 200 }).then((r) => r.data),
-    refetchOnWindowFocus: false,
-  })
-  const buyers: any[] = buyersData?.data ?? []
-
   const mutation = useMutation({
     mutationFn: () =>
       createDeliveryLocation({
-        client_id: form.client_id,
+        types: form.types,
         name: form.name,
         address: form.address,
         city: form.city,
@@ -110,32 +102,9 @@ export default function NewDeliveryLocationPage() {
 
   return (
     <DashboardShell>
-      <DashboardHeader heading="New Delivery Location" text="Add a collection hub for customer orders." />
+      <DashboardHeader heading="New Delivery And Pickup Location" text="Add a collection hub for customer orders." />
 
       <div className="mt-4 space-y-0 divide-y divide-border">
-
-        {/* Buyer */}
-        <div className="grid grid-cols-1 gap-x-8 gap-y-10 py-10 md:grid-cols-3">
-          <div>
-            <h2 className="text-base/7 font-semibold text-foreground">Buyer</h2>
-            <p className="mt-1 text-sm/6 text-muted-foreground">Which buyer does this receiving location belong to?</p>
-          </div>
-          <div className="max-w-2xl md:col-span-2">
-            <label className={labelCls}>Buyer *</label>
-            <div className="mt-2">
-              <select
-                value={form.client_id}
-                onChange={(e) => set("client_id", e.target.value)}
-                className={inputCls}
-              >
-                <option value="">Select a buyer...</option>
-                {buyers.map((b: any) => (
-                  <option key={b.id} value={b.id}>{b.name}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-        </div>
 
         {/* Location Details */}
         <div className="grid grid-cols-1 gap-x-8 gap-y-10 py-10 md:grid-cols-3">
@@ -150,7 +119,7 @@ export default function NewDeliveryLocationPage() {
                 <input
                   value={form.name}
                   onChange={(e) => set("name", e.target.value)}
-                  placeholder="Fivet Poultry & Livestock Centre Marondera"
+                  placeholder="Urban Fresh"
                   className={inputCls}
                 />
               </div>
@@ -161,7 +130,7 @@ export default function NewDeliveryLocationPage() {
                 <input
                   value={form.address}
                   onChange={(e) => set("address", e.target.value)}
-                  placeholder="Stand No 5202, Marondera Township"
+                  placeholder="13 Grace Road Winston Park"
                   className={inputCls}
                 />
               </div>
@@ -269,7 +238,7 @@ export default function NewDeliveryLocationPage() {
         </Link>
         <button
           onClick={() => mutation.mutate()}
-          disabled={mutation.isPending || !form.client_id || !form.name || !form.address || !form.city}
+          disabled={mutation.isPending || !form.name || !form.address || !form.city}
           className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 disabled:opacity-50 transition-colors"
         >
           {mutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}

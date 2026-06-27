@@ -8,6 +8,7 @@ import { queryProducerPriceLists } from "@/lib/query"
 import { ProducerPriceList } from "@/lib/schemas"
 import { handleFetchError } from "@/lib/error-handler"
 import { Placeholder } from "@/components/state/placeholder"
+import { TableSkeleton } from "@/components/state/skeleton-table"
 import { DataTable } from "@/components/structures/data-table"
 import { producerPriceListColumns } from "@/components/structures/columns/producerLists"
 
@@ -62,11 +63,7 @@ export function ProducePriceLists() {
   }
 
   if (isLoading || isFetching) {
-    return (
-      <Placeholder>
-        <Placeholder.Title>Fetching Producer Price Lists</Placeholder.Title>
-      </Placeholder>
-    )
+    return <TableSkeleton />
   }
 
   return (

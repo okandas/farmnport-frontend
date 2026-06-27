@@ -1,6 +1,7 @@
 "use client"
 
-import { useState, useEffect, ReactNode } from "react"
+import { useState, useEffect, useRef, ReactNode } from "react"
+import { trackViewItem } from "@/lib/analytics"
 import { createPortal } from "react-dom"
 import Image from "next/image"
 import Link from "next/link"
@@ -21,6 +22,7 @@ interface BuyProductInteractiveProps {
   loginRedirect: string
   fallbackIcon?: ReactNode
   tabsContent: ReactNode
+  ctaSlot?: ReactNode
 }
 
 export function BuyProductInteractive({
@@ -36,16 +38,30 @@ export function BuyProductInteractive({
   loginRedirect,
   fallbackIcon,
   tabsContent,
+  ctaSlot,
 }: BuyProductInteractiveProps) {
   const hasVariants = product.variants && product.variants.length > 0
+  const inStock = product.available_for_sale && (product.stock_level === undefined || product.stock_level > 0)
   const [selectedVariant, setSelectedVariant] = useState<any>(hasVariants ? product.variants[0] : null)
   const [selectedImage, setSelectedImage] = useState(0)
 const [mounted, setMounted] = useState(false)
-  useEffect(() => { setMounted(true) }, [])
+  const viewTracked = useRef(false)
+  useEffect(() => {
+    setMounted(true)
+    if (!viewTracked.current && displayPrice !== null) {
+      trackViewItem({
+        item_id: product.id,
+        item_name: product.name,
+        item_category: categoryName ?? productType,
+        price: displayPrice,
+      })
+      viewTracked.current = true
+    }
+  }, [])
 
   const displayPrice = selectedVariant?.sale_price
     ? selectedVariant.sale_price / 100
-    : product.show_price && product.sale_price > 0
+    : product.sale_price > 0
     ? product.sale_price / 100
     : null
 
@@ -104,9 +120,7 @@ const [mounted, setMounted] = useState(false)
                 priority
               />
             ) : (
-              <div className="absolute inset-0 flex items-center justify-center">
-                {fallbackIcon}
-              </div>
+              <div className="absolute inset-0 bg-muted/30" />
             )}
           </div>
         </div>
@@ -144,7 +158,7 @@ const [mounted, setMounted] = useState(false)
                     <button
                       key={idx}
                       onClick={() => setSelectedVariant(v)}
-                      className={`relative px-4 py-2.5 rounded-lg border-2 text-sm transition-colors text-left ${
+                      className={`relative px-4 py-2.5 pr-5 rounded-lg border-2 text-sm transition-colors text-left ${
                         isSelected ? "border-primary bg-primary/5" : "border-border hover:border-primary/40"
                       }`}
                     >
@@ -197,23 +211,25 @@ const [mounted, setMounted] = useState(false)
               ) : (
                 <p className="text-sm text-muted-foreground">Price on request</p>
               )}
-              {!product.available_for_sale && (
+              {!inStock && (
                 <div className="flex items-center gap-1.5 mt-1">
                   <div className="h-1.5 w-1.5 rounded-full bg-red-500" />
                   <span className="text-xs font-medium text-red-700 dark:text-red-400">Out of stock</span>
                 </div>
               )}
-              <AddToCartButton
-                productId={product.id}
-                sku={selectedVariant?.sku}
-                productType={productType}
-                productName={selectedVariant ? `${product.name} - ${selectedVariant.name}` : product.name}
-                productSlug={slug}
-                imageSrc={product.images?.[0]?.img?.src}
-                unitPrice={displayPrice}
-                available={product.available_for_sale}
-                loginRedirect={loginRedirect}
-              />
+              {ctaSlot ?? (
+                <AddToCartButton
+                  productId={product.id}
+                  sku={selectedVariant?.sku}
+                  productType={productType}
+                  productName={selectedVariant ? `${product.name} - ${selectedVariant.name}` : product.name}
+                  productSlug={slug}
+                  imageSrc={product.images?.[0]?.img?.src}
+                  unitPrice={selectedVariant?.sale_price || product.sale_price || 0}
+                  available={inStock}
+                  loginRedirect={loginRedirect}
+                />
+              )}
             </div>
 
 <div className="px-5 pb-5 space-y-2.5 text-xs text-muted-foreground border-t pt-4">

@@ -13,7 +13,9 @@ import { cn, centsToDollarsFormInputs, dollarsToCents } from "@/lib/utilities"
 import { buttonVariants } from "@/components/ui/button"
 import { Icons } from "@/components/icons/lucide"
 import { toast } from "@/components/ui/use-toast"
-import { handleApiError } from "@/lib/error-handler"
+import { handleApiError ,
+  handleFormErrors
+} from "@/lib/error-handler"
 import {
   Form,
   FormControl,
@@ -30,6 +32,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Placeholder } from "@/components/state/placeholder"
+import { FormSkeleton } from "@/components/state/skeleton-table"
 
 const inputClass = "block w-full rounded-md bg-white px-3.5 py-2.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
 
@@ -76,11 +79,7 @@ export default function EditSubscriptionPlanPage({ params }: { params: Promise<{
   }
 
   if (isLoading) {
-    return (
-      <Placeholder>
-        <Placeholder.Title>Loading Plan</Placeholder.Title>
-      </Placeholder>
-    )
+    return <FormSkeleton />
   }
 
   return (
@@ -104,7 +103,7 @@ export default function EditSubscriptionPlanPage({ params }: { params: Promise<{
       </div>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
+        <form onSubmit={form.handleSubmit(onSubmit, (errors) => handleFormErrors(errors))}>
           <div className="border-b border-gray-900/10 pb-12 dark:border-white/10">
             <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">
               Plan Details

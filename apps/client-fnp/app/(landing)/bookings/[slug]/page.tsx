@@ -24,7 +24,6 @@ export default function BookingEventDetailPage() {
   const queryClient = useQueryClient()
 
   const [quantity, setQuantity] = useState("")
-  const [notes, setNotes] = useState("")
 
   const { data, isLoading } = useQuery({
     queryKey: ["booking-event", slug],
@@ -48,7 +47,6 @@ export default function BookingEventDetailPage() {
         event_id: event?.id,
         quantity: parseInt(quantity),
         phone,
-        notes: notes || undefined,
       }),
     onSuccess: () => {
       toast.success("Booking placed successfully")
@@ -72,8 +70,8 @@ export default function BookingEventDetailPage() {
     return (
       <div className="min-h-screen flex items-center justify-center text-center">
         <div>
-          <p className="font-semibold text-lg mb-2">Pre-order not found</p>
-          <Link href="/bookings" className="text-sm text-primary underline">Back to pre-orders</Link>
+          <p className="font-semibold text-lg mb-2">Forward booking not found</p>
+          <Link href="/bookings" className="text-sm text-primary underline">Back to forward bookings</Link>
         </div>
       </div>
     )
@@ -103,7 +101,7 @@ export default function BookingEventDetailPage() {
             <span className="mx-2">/</span>
             <Link href="/buy" className="hover:text-foreground">Buy</Link>
             <span className="mx-2">/</span>
-            <Link href="/bookings" className="hover:text-foreground">Pre-Orders</Link>
+            <Link href="/bookings" className="hover:text-foreground">Forward Bookings</Link>
             <span className="mx-2">/</span>
             <span className="text-foreground line-clamp-1">{event.title}</span>
           </nav>
@@ -120,15 +118,13 @@ export default function BookingEventDetailPage() {
                 <Image src={event.image_src} alt={event.title} fill className="object-cover" />
               </div>
             ) : (
-              <div className="aspect-square w-full rounded-2xl border bg-muted/40 flex items-center justify-center">
-                <CalendarDays className="w-24 h-24 text-muted-foreground/20" />
-              </div>
+              <div className="aspect-square w-full rounded-2xl border bg-muted/40" />
             )}
 
             <div className="mt-4 flex gap-3 flex-wrap">
               <span className="text-xs px-3 py-1 rounded-full bg-green-100 text-green-800 font-medium">Open for bookings</span>
               <span className="text-xs px-3 py-1 rounded-full bg-muted text-muted-foreground font-medium">
-                {available.toLocaleString()} of {event.total_available.toLocaleString()} left
+                {available.toLocaleString()} of {event.total_available.toLocaleString()} {event.unit} left
               </span>
             </div>
           </div>
@@ -173,13 +169,13 @@ export default function BookingEventDetailPage() {
               <div className="rounded-xl border bg-muted/30 p-4">
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Available</p>
                 <p className="text-lg font-bold">{available.toLocaleString()}</p>
-                <p className="text-xs text-muted-foreground mt-1">of {event.total_available.toLocaleString()} total</p>
+                <p className="text-xs text-muted-foreground mt-1">of {event.total_available.toLocaleString()} {event.unit} total</p>
               </div>
               <div className="rounded-xl border bg-muted/30 p-4">
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Min Order</p>
                 <p className="text-lg font-bold">{minQty.toLocaleString()}</p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  {event.max_quantity > 0 ? `max ${event.max_quantity.toLocaleString()} units` : "units minimum"}
+                  {event.max_quantity > 0 ? `max ${event.max_quantity.toLocaleString()} ${event.unit}` : `${event.unit} minimum`}
                 </p>
               </div>
               <div className="rounded-xl border bg-muted/30 p-4">
@@ -193,7 +189,7 @@ export default function BookingEventDetailPage() {
 
             {/* How it works */}
             <div className="bg-muted/40 rounded-xl p-5 space-y-3">
-              <h3 className="font-semibold text-sm">How Pre-Orders Work</h3>
+              <h3 className="font-semibold text-sm">How Forward Bookings Work</h3>
               <ol className="space-y-2 text-sm text-muted-foreground list-decimal list-inside">
                 <li>Enter your desired quantity and collection date</li>
                 <li>Pay the deposit to secure your reservation</li>
@@ -237,7 +233,7 @@ export default function BookingEventDetailPage() {
                     value={quantity}
                     onChange={(e) => setQuantity(e.target.value)}
                     placeholder={`e.g. ${minQty}`}
-                    className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                    className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                 </div>
 
@@ -251,16 +247,6 @@ export default function BookingEventDetailPage() {
                   />
                 </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-muted-foreground">Notes</label>
-                  <textarea
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    rows={2}
-                    placeholder="Any special requirements..."
-                    className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
-                  />
-                </div>
 
                 {qty >= minQty && (
                   <div className="bg-muted/50 rounded-lg p-3 text-sm space-y-1.5">

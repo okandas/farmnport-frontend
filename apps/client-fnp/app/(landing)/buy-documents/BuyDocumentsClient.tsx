@@ -57,7 +57,7 @@ function DocumentCard({ doc }: { doc: any }) {
                         <Download className="w-3.5 h-3.5" />
                         <span className="uppercase">{doc.file_type || "pdf"}</span>
                     </div>
-                    {doc.show_price && doc.price_cents > 0 ? (
+                    {doc.price_cents > 0 ? (
                         <span className="text-sm font-bold text-primary">{price}</span>
                     ) : (
                         <span className="text-sm font-bold text-primary">Free</span>

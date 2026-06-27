@@ -8,6 +8,7 @@ import { queryFeedActiveIngredients } from "@/lib/query"
 import { FeedActiveIngredient } from "@/lib/schemas"
 import { handleFetchError } from "@/lib/error-handler"
 import { Placeholder } from "@/components/state/placeholder"
+import { TableSkeleton } from "@/components/state/skeleton-table"
 import { DataTable } from "@/components/structures/data-table"
 import { feedActiveIngredientColumns } from "@/components/structures/columns/feedActiveIngredients"
 
@@ -63,11 +64,7 @@ export function FeedActiveIngredientsTable() {
   }
 
   if (isLoading || isFetching) {
-    return (
-      <Placeholder>
-        <Placeholder.Title>Fetching Active Ingredients</Placeholder.Title>
-      </Placeholder>
-    )
+    return <TableSkeleton />
   }
 
   return (

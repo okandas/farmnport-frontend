@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react"
 import Link from "next/link"
 import { Layers, ChevronRight, Search, X, Filter } from "lucide-react"
-import { capitalizeFirstLetter } from "@/lib/utilities"
+import { capitalizeFirstLetter, titleCase } from "@/lib/utilities"
 import { useQueryState, parseAsString } from "nuqs"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
@@ -162,7 +162,7 @@ export function SprayProgramsClient({ programs }: SprayProgramsClientProps) {
                                     >
                                         <div className="p-4">
                                             <h2 className="text-sm font-bold font-heading mb-1 group-hover:text-primary transition-colors">
-                                                {capitalizeFirstLetter(program.name)}
+                                                {titleCase(program.name)}
                                             </h2>
 
                                             {program.farm_produce_name && (

@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { AllPlantNutritionClient } from "./AllPlantNutritionClient"
-import { queryAllPlantNutritionProducts } from "@/lib/query"
+import { serverFetch } from "@/lib/serverFetch"
 import { OtherGuidesLinks } from "@/components/shared/OtherGuidesLinks"
 
 export const metadata = {
@@ -16,14 +16,14 @@ export const metadata = {
 }
 
 export default async function PlantNutritionGuidesPage() {
-    const productsRes = await queryAllPlantNutritionProducts({ p: 1, brand: [] }).catch(() => null)
+    const productsRes = await serverFetch("/plantnutrition/all").catch(() => null)
 
-    const initialProducts = productsRes?.data?.data || []
-    const initialTotal = productsRes?.data?.total || 0
+    const initialProducts = productsRes?.data || []
+    const initialTotal = productsRes?.total || 0
 
     return (
         <main className="bg-gradient-to-b from-background to-muted/20">
-            <section className="py-14 lg:py-20 bg-muted/30">
+            <section className="py-6 lg:py-8 bg-muted/30">
                 <div className="mx-auto max-w-7xl px-6 lg:px-8">
                     <nav className="flex text-sm text-muted-foreground mb-6">
                         <Link href="/guides" className="hover:text-foreground transition-colors">Guides</Link>

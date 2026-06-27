@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { queryAllDocuments } from "@/lib/query"
+import { serverFetch } from "@/lib/serverFetch"
 import { BuyDocumentsClient } from "./BuyDocumentsClient"
 
 export const metadata = {
@@ -12,16 +12,16 @@ export default async function BuyDocumentsPage() {
     let initialTotal = 0
 
     try {
-        const response = await queryAllDocuments({ p: 1 })
-        initialDocuments = response?.data?.documents || []
-        initialTotal = response?.data?.total || 0
+        const result = await serverFetch("/documents")
+        initialDocuments = result?.documents || []
+        initialTotal = result?.total || 0
     } catch (error) {
         console.error("Error fetching documents:", error)
     }
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
-            <div className="mx-auto max-w-7xl px-6 lg:px-8 py-12">
+            <div className="mx-auto max-w-7xl px-6 lg:px-8 py-6">
                 <nav className="flex items-center gap-1.5 text-xs text-muted-foreground mb-6">
                     <Link href="/" className="hover:text-foreground transition-colors">Home</Link>
                     <span>/</span>

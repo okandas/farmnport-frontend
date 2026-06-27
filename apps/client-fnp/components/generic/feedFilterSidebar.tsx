@@ -10,7 +10,7 @@ import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "n
 import { Filter, X, Search } from "lucide-react"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { useQuery } from "@tanstack/react-query"
-import { queryFeedCategories, queryFeedFilterAggregates } from "@/lib/query"
+import { queryFeedCategories, queryFeedFilterAggregates, queryFeedBuyFilterAggregates } from "@/lib/query"
 import { useState, useMemo } from "react"
 
 interface FilterItem {
@@ -99,7 +99,7 @@ function SearchableCheckboxList({
   )
 }
 
-function FeedFilterContent({ onClearAll }: { onClearAll: () => void }) {
+function FeedFilterContent({ onClearAll, fetchAggregates }: { onClearAll: () => void; fetchAggregates: typeof queryFeedFilterAggregates }) {
   const [queryState, setQueryState] = useQueryStates({
     category: parseAsArrayOf(parseAsString),
     brand: parseAsArrayOf(parseAsString),
@@ -116,8 +116,8 @@ function FeedFilterContent({ onClearAll }: { onClearAll: () => void }) {
   })
 
   const { data: filtersData, isLoading: filtersLoading } = useQuery({
-    queryKey: ["feed-filter-aggregates", queryState.brand, queryState.animal, queryState.phase, queryState.sub_type],
-    queryFn: () => queryFeedFilterAggregates({
+    queryKey: ["feed-filter-aggregates", fetchAggregates.name, queryState.brand, queryState.animal, queryState.phase, queryState.sub_type],
+    queryFn: () => fetchAggregates({
       brand: queryState.brand ?? [],
       animal: queryState.animal ?? [],
       phase: queryState.phase ?? [],
@@ -246,7 +246,7 @@ function FeedFilterContent({ onClearAll }: { onClearAll: () => void }) {
         </div>
       )}
 
-      <Accordion type="multiple" className="w-full flex-1" defaultValue={filterSections.filter(s => { const v = queryState[s.key as keyof typeof queryState]; return Array.isArray(v) ? v.length > 0 : false }).map(s => s.name).concat(["Feeding Stage", "Livestock Type"]).filter((v, i, a) => a.indexOf(v) === i)}>
+      <Accordion type="multiple" className="w-full flex-1" defaultValue={[]}>
         {filterSections.map((section) => {
           const selectedFilters = queryState[section.key as keyof typeof queryState] as string[] || []
 
@@ -281,7 +281,7 @@ function FeedFilterContent({ onClearAll }: { onClearAll: () => void }) {
   )
 }
 
-export function FeedFilterSidebar() {
+function FeedFilterSidebarBase({ fetchAggregates }: { fetchAggregates: typeof queryFeedFilterAggregates }) {
   const isDesktop = useMediaQuery("(min-width: 1024px)")
   const [, setQueryState] = useQueryStates({
     category: parseAsArrayOf(parseAsString),
@@ -305,8 +305,8 @@ export function FeedFilterSidebar() {
 
   if (isDesktop) {
     return (
-      <div className="sticky top-20 mt-[20px] max-h-[calc(100vh-5rem)] overflow-y-auto overflow-x-hidden">
-        <FeedFilterContent onClearAll={handleClearAll} />
+      <div>
+        <FeedFilterContent onClearAll={handleClearAll} fetchAggregates={fetchAggregates} />
       </div>
     )
   }
@@ -323,8 +323,16 @@ export function FeedFilterSidebar() {
         <SheetHeader className="mb-4">
           <SheetTitle>Filter Feed Products</SheetTitle>
         </SheetHeader>
-        <FeedFilterContent onClearAll={handleClearAll} />
+        <FeedFilterContent onClearAll={handleClearAll} fetchAggregates={fetchAggregates} />
       </SheetContent>
     </Sheet>
   )
+}
+
+export function FeedFilterSidebar() {
+  return <FeedFilterSidebarBase fetchAggregates={queryFeedFilterAggregates} />
+}
+
+export function FeedBuyFilterSidebar() {
+  return <FeedFilterSidebarBase fetchAggregates={queryFeedBuyFilterAggregates} />
 }

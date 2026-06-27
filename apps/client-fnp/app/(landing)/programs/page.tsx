@@ -12,6 +12,11 @@ const sections = [
         description: "Complete livestock feeding programs by animal type and production phase — formulations, schedules, and nutritional targets.",
         href: "/feeding-programs",
     },
+    {
+        title: "Rearing Programs",
+        description: "Structured rearing guides for livestock and poultry — brooding, housing, nutrition, biosecurity, and management from arrival to maturity.",
+        href: "/rearing-programs",
+    },
 ]
 
 export default function ProgramsPage() {
@@ -36,8 +41,8 @@ export default function ProgramsPage() {
             </section>
 
             <section className="py-10 lg:py-14">
-                <div className="mx-auto max-w-4xl px-6 lg:px-8">
-                    <div className="grid gap-6 sm:grid-cols-2">
+                <div className="mx-auto max-w-7xl px-6 lg:px-8">
+                    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                         {sections.map(({ title, description, href }) => (
                             <Link
                                 key={href}

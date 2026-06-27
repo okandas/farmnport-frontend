@@ -5,7 +5,7 @@ import { queryAllAgroChemicals } from "@/lib/query"
 import { Button } from "@/components/ui/button"
 import { Beaker } from "lucide-react"
 import { AgroChemicalFilterSidebar } from "@/components/generic/agroChemicalFilterSidebar"
-import { AgroChemicalCard } from "@/components/agrochemical/AgroChemicalCard"
+import { ProductCard } from "@/components/shared/ProductCard"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
 
 interface AllAgroChemicalsClientProps {
@@ -79,16 +79,20 @@ export function AllAgroChemicalsClient({ initialChemicals, initialTotal }: AllAg
                     </div>
                 ) : chemicals.length === 0 ? (
                     <div className="text-center py-12">
-                        <Beaker className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
+                        
                         <p className="text-muted-foreground">No agrochemicals found matching your filters.</p>
                     </div>
                 ) : (
                     <>
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
                             {chemicals.map((chemical: any) => (
-                                <AgroChemicalCard
+                                <ProductCard
                                     key={chemical.id}
-                                    chemical={chemical}
+                                    href={`/agrochemical-guides/${chemical.agrochemical_category?.slug || "all"}/${chemical.slug}`}
+                                    imageSrc={chemical.images?.[0]?.img?.src}
+                                    name={chemical.name}
+                                    brand={chemical.brand?.name}
+                                    meta={chemical.agrochemical_category?.name}
                                     mode="guide"
                                 />
                             ))}
@@ -96,14 +100,6 @@ export function AllAgroChemicalsClient({ initialChemicals, initialTotal }: AllAg
 
                         {totalPages > 1 && (
                             <div className="mt-8 flex justify-center gap-1">
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => handlePageChange(Math.max(1, queryState.p - 1))}
-                                    disabled={queryState.p === 1}
-                                >
-                                    Previous
-                                </Button>
                                 {Array.from({ length: totalPages }, (_, i) => i + 1)
                                     .filter(pageNum =>
                                         pageNum === 1 ||
@@ -127,14 +123,6 @@ export function AllAgroChemicalsClient({ initialChemicals, initialTotal }: AllAg
                                             </div>
                                         )
                                     })}
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => handlePageChange(queryState.p + 1)}
-                                    disabled={queryState.p >= totalPages}
-                                >
-                                    Next
-                                </Button>
                             </div>
                         )}
                     </>

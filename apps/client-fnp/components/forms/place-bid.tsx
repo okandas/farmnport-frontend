@@ -1,0 +1,413 @@
+"use client"
+
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { z } from "zod"
+import { useEffect, useState } from "react"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { toast } from "sonner"
+import { Loader2 } from "lucide-react"
+import { useSession } from "next-auth/react"
+
+import { placeBid, queryClient, queryMyBidOnLot, getBidImages, upsertBidImages, deleteBidImages } from "@/lib/query"
+import { LotImageGallery } from "@/components/ui/lot-image-gallery"
+import { useRouter } from "next/navigation"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+import { centsToDollars, titleCase } from "@/lib/utilities"
+import { ImageUpload } from "@/components/ui/image-upload"
+
+const BID_SUPPORT_PHONE = process.env.NEXT_PUBLIC_BID_SUPPORT_PHONE!
+const BID_SUPPORT_EMAIL = process.env.NEXT_PUBLIC_BID_SUPPORT_EMAIL!
+
+interface Props {
+  lot: {
+    slug: string
+    type: string
+    quantity: number
+    unit: string
+    price_per_unit_cents: number
+    address?: string
+    city?: string
+    province?: string
+    farm_produce?: { name: string }
+    breed?: { name: string }
+  }
+  topBidCents?: number
+  onSuccess?: () => void
+}
+
+const Schema = z.object({
+  quantity: z.coerce.number().positive("Enter a valid quantity"),
+  offered_price_per_unit: z.coerce.number().min(0.01, "Enter your offered price"),
+  notes: z.string().optional(),
+  delivery_location: z.string().optional(),
+})
+
+type FormModel = z.infer<typeof Schema>
+
+function calcSuggestedCents(baseCents: number): number {
+  const inc = Math.round(baseCents * 0.02)
+  const floored = Math.max(inc, 50)
+  const capped = Math.min(floored, 2000)
+  return baseCents + capped
+}
+
+export function PlaceBidForm({ lot, topBidCents, onSuccess }: Props) {
+  const isSelling = lot.type === "sell"
+  const router = useRouter()
+  const qc = useQueryClient()
+  const { data: session } = useSession()
+  const username = (session?.user as any)?.username
+
+  const { data: profileData } = useQuery({
+    queryKey: ["my-profile", username],
+    queryFn: () => queryClient(username),
+    enabled: !!username,
+  })
+  const profile = (profileData as any)?.data
+
+  const { data: existingBidData } = useQuery({
+    queryKey: ["my-bid-on-lot", lot.slug, username],
+    queryFn: () => queryMyBidOnLot(lot.slug),
+    enabled: !!username,
+    retry: false,
+  })
+  const existingBid = (existingBidData as any)?.data
+
+  // Supply image record — only for request lots (buyer posting, supplier responding)
+  const isSupplyLot = lot.type === "request"
+  const [bidImageEntityId, setBidImageEntityId] = useState<string | null>(null)
+
+  const { data: bidImagesData } = useQuery({
+    queryKey: ["bid-images", lot.slug, username],
+    queryFn: () => getBidImages(lot.slug),
+    enabled: !!username && isSupplyLot,
+    retry: false,
+  })
+  const existingBidImages = (bidImagesData as any)?.data
+
+  // Eagerly upsert the LotBidImage doc when the form loads so entityId is always ready
+  const { mutate: initBidImages } = useMutation({
+    mutationFn: () => upsertBidImages(lot.slug),
+    onSuccess: (res) => {
+      const id = (res as any)?.data?.id
+      if (id) setBidImageEntityId(id)
+    },
+  })
+
+  useEffect(() => {
+    if (isSupplyLot && username && !bidImageEntityId) {
+      if (existingBidImages?.id) {
+        setBidImageEntityId(existingBidImages.id)
+      } else if (bidImagesData !== undefined) {
+        // Query has resolved with no record — create one
+        initBidImages()
+      }
+    }
+  }, [isSupplyLot, username, existingBidImages?.id, bidImagesData])
+
+  const { mutate: removeBidImages } = useMutation({
+    mutationFn: () => deleteBidImages(lot.slug),
+    onSuccess: () => setBidImageEntityId(null),
+  })
+
+  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<FormModel>({
+    resolver: zodResolver(Schema),
+    defaultValues: {
+      quantity: lot.quantity,
+      offered_price_per_unit: lot.price_per_unit_cents / 100,
+    },
+  })
+
+  useEffect(() => {
+    if (existingBidImages?.id) setBidImageEntityId(existingBidImages.id)
+  }, [existingBidImages])
+
+  useEffect(() => {
+    if (!existingBid && !topBidCents) return
+    let suggestedCents: number | undefined
+    if (topBidCents && existingBid && topBidCents > existingBid.offered_price_per_unit_cents) {
+      suggestedCents = topBidCents + 1000
+    } else if (existingBid) {
+      suggestedCents = calcSuggestedCents(existingBid.offered_price_per_unit_cents)
+    } else if (topBidCents) {
+      suggestedCents = calcSuggestedCents(topBidCents)
+    }
+    if (suggestedCents !== undefined) setValue("offered_price_per_unit", suggestedCents / 100)
+  }, [existingBid, topBidCents])
+
+  const qty = watch("quantity") || 0
+  const price = watch("offered_price_per_unit") || 0
+  const total = qty * price
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: (data: FormModel) => placeBid(lot.slug, {
+      quantity: Number(data.quantity),
+      offered_price_per_unit_cents: Math.round(Number(data.offered_price_per_unit) * 100),
+      notes: data.notes || undefined,
+      delivery_location: data.delivery_location || undefined,
+    }),
+    onSuccess: () => {
+      setPendingData(null)
+      setShowForm(false)
+      qc.invalidateQueries({ queryKey: ["my-bid-on-lot", lot.slug, username] })
+      qc.invalidateQueries({ queryKey: ["bid-images", lot.slug, username] })
+      toast.success("Bid placed successfully! The lot owner will be notified.")
+      setTimeout(() => router.refresh(), 300)
+      onSuccess?.()
+    },
+    onError: (err: any) => {
+      const msg = err?.response?.data?.message ?? "Failed to place bid"
+      toast.error(msg)
+    },
+  })
+
+  const [pendingData, setPendingData] = useState<FormModel | null>(null)
+  const [showForm, setShowForm] = useState(false)
+  const [galleryOpen, setGalleryOpen] = useState(false)
+  const [localMainImage, setLocalMainImage] = useState<{ img: { id: string; src: string } } | null>(null)
+  const [localImages, setLocalImages] = useState<{ img: { id: string; src: string } }[]>([])
+  const [uploaderTouched, setUploaderTouched] = useState(false)
+
+  const hasSupplyImages = isSupplyLot && (
+    uploaderTouched
+      ? !!(localMainImage || localImages.length)
+      : !!(existingBidImages?.main_image || existingBidImages?.images?.length)
+  )
+  const showSummary = isSupplyLot && !!existingBid && hasSupplyImages && !showForm
+
+  const location = [profile?.address, profile?.city, profile?.province]
+    .filter(Boolean)
+    .map((s: string) => titleCase(s))
+    .join(", ")
+
+  const whatsappLink = `https://wa.me/263${BID_SUPPORT_PHONE.replace(/^0/, "")}`
+  const qtyStep = ["head", "unit", "dozen"].includes(lot.unit) ? "1" : "0.01"
+
+  const confirmQty = pendingData ? Number(pendingData.quantity) : 0
+  const confirmPrice = pendingData ? Number(pendingData.offered_price_per_unit) : 0
+  const confirmTotal = confirmQty * confirmPrice
+  const isTopBidder = !!existingBid && topBidCents !== undefined && existingBid.offered_price_per_unit_cents >= topBidCents
+
+  return (
+    <>
+    <Dialog open={!!pendingData} onOpenChange={(open) => { if (!open) setPendingData(null) }}>
+      <DialogContent className="max-w-sm">
+        <DialogHeader>
+          <DialogTitle>Confirm your offer</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-3 py-1">
+          {isTopBidder && existingBid && (
+            <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
+              <p className="text-xs text-amber-800 font-medium">Are you sure you want to place a bid again?</p>
+              <p className="text-xs text-amber-700 mt-0.5">
+                You are currently the top bidder at <span className="font-semibold">{centsToDollars(existingBid.offered_price_per_unit_cents)}/{lot.unit}</span>.
+              </p>
+            </div>
+          )}
+          <div className="rounded-lg bg-muted/50 px-4 py-3 space-y-2 text-sm">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Price per {lot.unit}</span>
+              <span className="font-semibold">${confirmPrice.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Quantity</span>
+              <span className="font-semibold">{confirmQty} {lot.unit}</span>
+            </div>
+            <div className="flex justify-between border-t border-border pt-2">
+              <span className="text-muted-foreground">Estimated total</span>
+              <span className="font-bold text-foreground">${confirmTotal.toFixed(2)}</span>
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            By confirming, your offer will be sent to the {isSelling ? "seller" : "buyer"} for review.
+          </p>
+        </div>
+        <DialogFooter className="gap-2">
+          <Button variant="outline" onClick={() => setPendingData(null)} disabled={isPending}>Cancel</Button>
+          <Button onClick={() => { if (pendingData) mutate(pendingData) }} disabled={isPending}>
+            {isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+            Confirm offer
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+    <div className="space-y-5">
+      <div className="flex items-center justify-between">
+        <h3 className="text-base font-semibold">
+          {isSelling ? "Place an Offer to Buy" : "Submit a Supply Offer"}
+        </h3>
+        {showSummary && (
+          <button type="button" onClick={() => setShowForm(true)} className="text-xs text-primary underline hover:no-underline">
+            Update offer
+          </button>
+        )}
+        {isSupplyLot && showForm && hasSupplyImages && (
+          <button type="button" onClick={() => setShowForm(false)} className="text-xs text-muted-foreground underline hover:no-underline">
+            Cancel
+          </button>
+        )}
+      </div>
+
+      {showSummary ? (
+        <div className="space-y-3">
+          <Dialog open={galleryOpen} onOpenChange={setGalleryOpen}>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>Supply photos</DialogTitle>
+              </DialogHeader>
+              <LotImageGallery
+                mainImage={existingBidImages?.main_image ?? null}
+                images={existingBidImages?.images ?? []}
+              />
+            </DialogContent>
+          </Dialog>
+          <div className="flex flex-wrap gap-2">
+            {existingBidImages?.main_image && (
+              <button type="button" onClick={() => setGalleryOpen(true)} className="w-24 h-24 rounded-lg overflow-hidden shrink-0 hover:opacity-80 transition-opacity">
+                <img src={existingBidImages.main_image.img.src} alt="Main supply photo" className="w-full h-full object-cover" />
+              </button>
+            )}
+            {existingBidImages?.images?.map((i: any) => (
+              <button key={i.img.id} type="button" onClick={() => setGalleryOpen(true)} className="w-24 h-24 rounded-lg overflow-hidden shrink-0 hover:opacity-80 transition-opacity">
+                <img src={i.img.src} alt="Supply photo" className="w-full h-full object-cover" />
+              </button>
+            ))}
+          </div>
+          <div className="space-y-1 text-sm">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Your offer</span>
+              <span className="font-semibold">{centsToDollars(existingBid.offered_price_per_unit_cents)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Quantity</span>
+              <span className="font-semibold">{existingBid.quantity} {lot.unit}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Total</span>
+              <span className="font-bold">{centsToDollars(existingBid.total_cents)}</span>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <>
+        {/* Refresh button — reload preview after adding new images */}
+        {isSupplyLot && showForm && (
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={() => {
+                qc.invalidateQueries({ queryKey: ["bid-images", lot.slug, username] })
+                setShowForm(false)
+                setTimeout(() => router.refresh(), 300)
+              }}
+              className="text-xs text-muted-foreground underline hover:no-underline"
+            >
+              Save photos
+            </button>
+          </div>
+        )}
+        {existingBid && (() => {
+          const isTopBidder = topBidCents !== undefined && existingBid.offered_price_per_unit_cents >= topBidCents
+          return isTopBidder ? (
+            <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3">
+              <p className="text-xs text-green-800">
+                You currently have the top bid — <span className="font-semibold">{centsToDollars(existingBid.offered_price_per_unit_cents)}</span>.
+                {isSupplyLot && !hasSupplyImages && " Your bid will not appear in offers without at least one supply photo."}
+              </p>
+            </div>
+          ) : (
+            <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
+              <p className="text-xs text-amber-800">
+                Your current bid is — <span className="font-semibold">{centsToDollars(existingBid.offered_price_per_unit_cents)}</span>.
+                {isSupplyLot && !hasSupplyImages && " Your bid will not appear in offers without at least one supply photo."}
+              </p>
+            </div>
+          )
+        })()}
+
+      <form onSubmit={handleSubmit((d) => setPendingData(d))} className="space-y-4">
+
+        {isSupplyLot && (
+          <div className="space-y-1.5">
+            <Label>Supply photos</Label>
+            <p className="text-xs text-muted-foreground">Upload photos of what you will be supplying. These are saved to your offer and do not need to be re-uploaded when you update your price.</p>
+            <ImageUpload
+              entityId={bidImageEntityId ?? undefined}
+              entityType="lot_bid_image"
+              maxImages={4}
+              initialMainImage={existingBidImages?.main_image ?? null}
+              initialImages={existingBidImages?.images ?? []}
+              onMainImageChange={(img) => { setUploaderTouched(true); setLocalMainImage(img) }}
+              onImagesChange={(imgs) => { setUploaderTouched(true); setLocalImages(imgs) }}
+              onDelete={() => removeBidImages()}
+            />
+          </div>
+        )}
+
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1.5">
+            <Label>Quantity ({lot.unit})</Label>
+            <Input
+              type="number"
+              step={qtyStep}
+              min={qtyStep}
+              max={lot.quantity}
+              placeholder={`Max ${lot.quantity}`}
+              {...register("quantity")}
+            />
+            {errors.quantity && <p className="text-xs text-red-500">{errors.quantity.message}</p>}
+          </div>
+
+          <div className="space-y-1.5">
+            <Label>Your price per {lot.unit} ($)</Label>
+            <Input
+              type="number"
+              step="0.01"
+              min="0.01"
+              placeholder={`Listed: ${centsToDollars(lot.price_per_unit_cents)}`}
+              {...register("offered_price_per_unit")}
+            />
+            {errors.offered_price_per_unit && <p className="text-xs text-red-500">{errors.offered_price_per_unit.message}</p>}
+          </div>
+        </div>
+
+        {total > 0 && (
+          <div className="rounded-lg bg-muted/50 px-4 py-3 flex items-center justify-between text-sm">
+            <span className="text-muted-foreground">Estimated total</span>
+            <span className="font-semibold text-foreground">${total.toFixed(2)}</span>
+          </div>
+        )}
+
+        {/* Location — read only, from logged-in user's own profile */}
+        {location && (
+          <div className="space-y-1">
+            <Label>Your location</Label>
+            <p className="text-sm font-medium text-foreground">{location}</p>
+            <p className="text-xs text-muted-foreground">
+              This is the address from your profile that will be shared with the {isSelling ? "buyer" : "seller"}.
+              If it is incorrect, contact us on{" "}
+              <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="underline hover:text-foreground">WhatsApp</a>
+              {" "}or{" "}
+              <a href={`mailto:${BID_SUPPORT_EMAIL}`} className="underline hover:text-foreground">{BID_SUPPORT_EMAIL}</a>
+            </p>
+          </div>
+        )}
+
+        {isSupplyLot && !hasSupplyImages && (
+          <p className="text-xs text-red-500">Please upload at least one supply photo before submitting.</p>
+        )}
+        <Button type="submit" disabled={isPending || (isSupplyLot && !hasSupplyImages)} className="w-full">
+          {isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+          {isSelling ? "Submit Offer to Buy" : "Submit Supply Offer"}
+        </Button>
+      </form>
+      </>
+      )}
+    </div>
+    </>
+  )
+}

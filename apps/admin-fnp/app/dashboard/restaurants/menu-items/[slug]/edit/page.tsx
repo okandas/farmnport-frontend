@@ -16,6 +16,7 @@ import { Icons } from "@/components/icons/lucide"
 import { toast } from "@/components/ui/use-toast"
 import { handleApiError, handleFetchError } from "@/lib/error-handler"
 import { Placeholder } from "@/components/state/placeholder"
+import { FormSkeleton } from "@/components/state/skeleton-table"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import {
@@ -250,12 +251,8 @@ export default function EditMenuItemPage() {
     }
 
     if (isLoading) {
-        return (
-            <Placeholder>
-                <Placeholder.Title>Loading Menu Item</Placeholder.Title>
-            </Placeholder>
-        )
-    }
+    return <FormSkeleton />
+  }
 
     if (isError) {
         return (

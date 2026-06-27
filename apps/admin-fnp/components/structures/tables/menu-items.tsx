@@ -9,6 +9,7 @@ import { queryMenuItems, queryMenus } from "@/lib/query"
 import { MenuItem, Menu } from "@/lib/schemas"
 import { handleFetchError } from "@/lib/error-handler"
 import { Placeholder } from "@/components/state/placeholder"
+import { TableSkeleton } from "@/components/state/skeleton-table"
 import { DataTable } from "@/components/structures/data-table"
 import { menuItemColumns } from "@/components/structures/columns/menu-items"
 
@@ -78,11 +79,7 @@ export function MenuItemsTable() {
   }
 
   if (isLoading || isFetching) {
-    return (
-      <Placeholder>
-        <Placeholder.Title>Fetching Menu Items</Placeholder.Title>
-      </Placeholder>
-    )
+    return <TableSkeleton />
   }
 
   return (

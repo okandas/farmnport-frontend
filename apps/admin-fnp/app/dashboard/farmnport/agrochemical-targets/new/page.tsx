@@ -12,7 +12,9 @@ import { cn } from "@/lib/utilities"
 import { buttonVariants } from "@/components/ui/button"
 import { Icons } from "@/components/icons/lucide"
 import { toast } from "@/components/ui/use-toast"
-import { handleApiError } from "@/lib/error-handler"
+import { handleApiError ,
+  handleFormErrors
+} from "@/lib/error-handler"
 import {
     Form,
     FormControl,
@@ -78,7 +80,7 @@ export default function NewAgroChemicalTargetPage() {
             </div>
 
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)}>
+                <form onSubmit={form.handleSubmit(onSubmit, (errors) => handleFormErrors(errors))}>
                     <div className="space-y-12">
                         <div className="border-b border-gray-900/10 pb-12 dark:border-white/10">
                             <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">

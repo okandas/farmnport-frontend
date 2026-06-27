@@ -1,5 +1,5 @@
 import { Metadata } from 'next'
-import { queryFeedingProgramBySlug } from '@/lib/query'
+import { serverFetch } from '@/lib/serverFetch'
 
 interface LayoutProps {
   children: React.ReactNode
@@ -12,8 +12,7 @@ export async function generateMetadata({ params }: LayoutProps): Promise<Metadat
   const { slug } = await params
 
   try {
-    const response = await queryFeedingProgramBySlug(slug)
-    const program = response?.data
+    const program = await serverFetch(`/feedingprograms/${slug}`)
 
     if (!program) {
       return {

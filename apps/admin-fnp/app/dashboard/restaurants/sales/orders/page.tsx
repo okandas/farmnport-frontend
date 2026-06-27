@@ -8,6 +8,7 @@ import { queryOrders } from "@/lib/query"
 import { handleFetchError } from "@/lib/error-handler"
 import { Placeholder } from "@/components/state/placeholder"
 import { DashboardHeader } from "@/components/state/dashboardHeader"
+import { FormSkeleton } from "@/components/state/skeleton-table"
 import { DashboardShell } from "@/components/state/dashboardShell"
 import { DataTable } from "@/components/structures/data-table"
 import { orderColumns, OrderRow } from "@/components/structures/columns/orders"
@@ -74,10 +75,7 @@ export default function RestaurantOrdersPage() {
   if (isLoading || isFetching) {
     return (
       <DashboardShell>
-        <DashboardHeader heading="Restaurant Orders" text="Manage restaurant orders." />
-        <Placeholder>
-          <Placeholder.Title>Fetching Orders</Placeholder.Title>
-        </Placeholder>
+        <FormSkeleton />
       </DashboardShell>
     )
   }

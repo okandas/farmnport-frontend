@@ -293,7 +293,7 @@ function FilterContent({
         </div>
       )}
 
-      <Accordion type="multiple" className="w-full flex-1" defaultValue={filterSections.filter(s => (queryState[s.key as keyof typeof queryState] ?? []).length > 0).map(s => s.name)}>
+      <Accordion type="multiple" className="w-full flex-1" defaultValue={[]}>
         {filterSections.map((section) => {
           const selectedFilters = queryState[section.key as keyof typeof queryState] || []
 
@@ -379,7 +379,7 @@ export function ClientFilterSidebar({ type, hideProduce, hideCategory, product }
   // Desktop: Sticky sidebar
   if (isDesktop) {
     return (
-      <div className="sticky top-20 mt-[20px] max-h-[calc(100vh-5rem)] overflow-y-auto overflow-x-hidden">
+      <div>
         <FilterContent onClearAll={handleClearAll} type={type} hideProduce={hideProduce} hideCategory={hideCategory} product={product} />
       </div>
     )

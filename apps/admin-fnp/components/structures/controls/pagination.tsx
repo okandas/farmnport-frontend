@@ -1,11 +1,4 @@
-import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  DoubleArrowLeftIcon,
-  DoubleArrowRightIcon,
-} from "@radix-ui/react-icons"
 import { Table } from "@tanstack/react-table"
-
 import { Button } from "@/components/ui/button"
 
 interface PaginationProps<TData> {
@@ -13,55 +6,45 @@ interface PaginationProps<TData> {
 }
 
 export function Pagination<TData>({ table }: PaginationProps<TData>) {
+  const pageCount = Math.max(table.getPageCount(), 1)
+  const current = table.getState().pagination.pageIndex
+
+  const goTo = (i: number) => {
+    table.setPageIndex(i)
+    window.scrollTo({ top: 0 })
+  }
+
+  // Build page numbers: always show first, last, current ±2, with ellipsis
+  const pages: (number | "…")[] = []
+  const delta = 2
+  const range: number[] = []
+  for (let i = Math.max(0, current - delta); i <= Math.min(pageCount - 1, current + delta); i++) {
+    range.push(i)
+  }
+  if (range[0] > 1) pages.push(0, "…")
+  else if (range[0] === 1) pages.push(0)
+  pages.push(...range)
+  if (range[range.length - 1] < pageCount - 2) pages.push("…", pageCount - 1)
+  else if (range[range.length - 1] === pageCount - 2) pages.push(pageCount - 1)
+
+  if (pageCount <= 1) return null
+
   return (
-    <div className="flex items-center justify-between px-2">
-      <div className="flex-1 text-sm text-muted-foreground">
-        {table.getFilteredSelectedRowModel().rows.length} of{" "}
-        {table.getFilteredRowModel().rows.length} row(s) selected.
-      </div>
-      <div className="flex items-center space-x-6 lg:space-x-8">
-        <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-          Page {Math.min(table.getState().pagination.pageIndex + 1, Math.max(table.getPageCount(), 1))} of {Math.max(table.getPageCount(), 1)}
-        </div>
-        <div className="flex items-center space-x-2">
+    <div className="flex justify-center items-center gap-1 pt-2">
+      {pages.map((p, i) =>
+        p === "…" ? (
+          <span key={`ellipsis-${i}`} className="px-1 text-sm text-muted-foreground select-none">…</span>
+        ) : (
           <Button
-            variant="outline"
-            className="hidden h-8 w-8 p-0 lg:flex"
-            onClick={() => table.setPageIndex(0)}
-            disabled={!table.getCanPreviousPage()}
+            key={p}
+            variant={p === current ? "default" : "outline"}
+            className="h-8 w-8 p-0 text-sm"
+            onClick={() => goTo(p as number)}
           >
-            <span className="sr-only">Go to first page</span>
-            <DoubleArrowLeftIcon className="h-4 w-4" />
+            {(p as number) + 1}
           </Button>
-          <Button
-            variant="outline"
-            className="h-8 w-8 p-0"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            <span className="sr-only">Go to previous page</span>
-            <ChevronLeftIcon className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="outline"
-            className="h-8 w-8 p-0"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            <span className="sr-only">Go to next page</span>
-            <ChevronRightIcon className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="outline"
-            className="hidden h-8 w-8 p-0 lg:flex"
-            onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-            disabled={!table.getCanNextPage()}
-          >
-            <span className="sr-only">Go to last page</span>
-            <DoubleArrowRightIcon className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
+        )
+      )}
     </div>
   )
 }

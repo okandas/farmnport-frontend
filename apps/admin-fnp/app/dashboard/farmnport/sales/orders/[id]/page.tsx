@@ -73,6 +73,8 @@ interface DeliveryAddress {
   address: string
   city: string
   province: string
+  courier_id?: string
+  courier_name?: string
 }
 
 interface Order {
@@ -92,10 +94,12 @@ interface Order {
   total: number
   currency: string
   fulfillment: string
+  collection_location?: { id: string; name: string; address: string; city: string; courier_name?: string }
   delivery_address?: DeliveryAddress
   payment_provider: string
   payment_method: string
   payment_ref: string
+  provider_reference?: string
   paid_at?: string
   verify_token: string
   status_history: StatusChange[]
@@ -317,6 +321,12 @@ export default function OrderDetailPage() {
               <span className="text-muted-foreground">Reference:</span>{" "}
               {order.payment_ref}
             </p>
+            {order.provider_reference && (
+              <p>
+                <span className="text-muted-foreground capitalize">{order.payment_provider} Ref:</span>{" "}
+                {order.provider_reference}
+              </p>
+            )}
             {order.paid_at && (
               <p>
                 <span className="text-muted-foreground">Paid at:</span>{" "}
@@ -338,8 +348,24 @@ export default function OrderDetailPage() {
                 ? "Click & Collect"
                 : "Delivery"}
             </p>
+            {order.collection_location && (
+              <>
+                <p>
+                  <span className="text-muted-foreground">Hub:</span>{" "}
+                  Tumira Hub{order.collection_location.courier_name ? ` by ${order.collection_location.courier_name}` : ""}
+                </p>
+                <p>
+                  <span className="text-muted-foreground">Location:</span>{" "}
+                  {order.collection_location.name}
+                </p>
+              </>
+            )}
             {order.delivery_address && (
               <>
+                <p>
+                  <span className="text-muted-foreground">Recipient:</span>{" "}
+                  {order.delivery_address.name}
+                </p>
                 <p>
                   <span className="text-muted-foreground">Address:</span>{" "}
                   {order.delivery_address.address}
@@ -349,6 +375,12 @@ export default function OrderDetailPage() {
                   {order.delivery_address.city},{" "}
                   {order.delivery_address.province}
                 </p>
+                {order.delivery_address.courier_name && (
+                  <p>
+                    <span className="text-muted-foreground">Courier:</span>{" "}
+                    {order.delivery_address.courier_name}
+                  </p>
+                )}
               </>
             )}
             {order.delivered_at && (
@@ -417,7 +449,17 @@ export default function OrderDetailPage() {
           <Separator className="my-4" />
 
           <div className="space-y-1 text-sm">
-            <div className="flex justify-between font-medium text-base">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Subtotal</span>
+              <span>{centsToDollars(order.subtotal)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">
+                {order.delivery_address?.courier_name ? order.delivery_address.courier_name : "Shipping"}
+              </span>
+              <span>{order.delivery_fee > 0 ? centsToDollars(order.delivery_fee) : "Free"}</span>
+            </div>
+            <div className="flex justify-between font-medium text-base pt-1 border-t">
               <span>Total</span>
               <span>{centsToDollars(order.total)}</span>
             </div>
