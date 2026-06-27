@@ -9,12 +9,16 @@ import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { NotificationDrawer } from "./notification-dropdown"
 
-export function NotificationBell() {
+interface NotificationBellProps {
+  source?: string
+}
+
+export function NotificationBell({ source }: NotificationBellProps) {
   const [open, setOpen] = useState(false)
 
   const { data } = useQuery({
-    queryKey: ["notifications", "unread-count"],
-    queryFn: () => queryUnreadNotificationCount(),
+    queryKey: ["notifications", "unread-count", source],
+    queryFn: () => queryUnreadNotificationCount(source),
     refetchInterval: 15000,
   })
 
@@ -39,7 +43,7 @@ export function NotificationBell() {
               Notifications
             </SheetTitle>
           </SheetHeader>
-          <NotificationDrawer onClose={() => setOpen(false)} />
+          <NotificationDrawer onClose={() => setOpen(false)} source={source} />
         </SheetContent>
       </Sheet>
     </>

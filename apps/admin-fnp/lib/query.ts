@@ -991,23 +991,27 @@ export function querySalesStats(orderType?: string) {
 }
 
 // Notifications
-export function queryUnreadNotificationCount() {
-  const url = `${baseUrl}/user/notifications/unread-count`
+export function queryUnreadNotificationCount(source?: string) {
+  const params = source ? `?source=${source}` : ""
+  const url = `${baseUrl}/admin-notifications/count${params}`
   return api.get(url)
 }
 
-export function queryRecentNotifications() {
-  const url = `${baseUrl}/user/notifications/recent`
+export function queryRecentNotifications(source?: string) {
+  const params = source ? `?source=${source}` : ""
+  const url = `${baseUrl}/admin-notifications/recent${params}`
   return api.get(url)
 }
 
-export function queryNotificationsList(page: number) {
-  const url = `${baseUrl}/admin-notifications/list?p=${page}`
+export function queryNotificationsList(page: number, source?: string) {
+  const params = source ? `&source=${source}` : ""
+  const url = `${baseUrl}/admin-notifications/list?p=${page}${params}`
   return api.get(url)
 }
 
-export function markNotificationsRead(data: { ids?: string[]; all?: boolean }) {
-  const url = `${baseUrl}/user/notifications/mark-read`
+export function markNotificationsRead(data: { ids?: string[]; all?: boolean }, source?: string) {
+  const params = source ? `?source=${source}` : ""
+  const url = `${baseUrl}/admin-notifications/mark-read${params}`
   return api.post(url, data)
 }
 
