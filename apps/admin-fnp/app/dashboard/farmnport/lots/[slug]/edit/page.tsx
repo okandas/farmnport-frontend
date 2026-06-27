@@ -285,7 +285,7 @@ function EditForm({ lot, slug }: { lot: any; slug: string }) {
       </div>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit((data) => save(data), handleFormErrors)}>
+        <form onSubmit={form.handleSubmit((data) => save(data), (errors) => handleFormErrors(errors))}>
           <div className="space-y-12">
 
             {/* Photos */}

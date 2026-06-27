@@ -105,7 +105,7 @@ export default function NewAdminLotPage() {
       </div>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit((data) => mutate(data), handleFormErrors)}>
+        <form onSubmit={form.handleSubmit((data) => mutate(data), (errors) => handleFormErrors(errors))}>
           <div className="space-y-12">
 
             {/* Photos */}

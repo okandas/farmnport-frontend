@@ -16,9 +16,10 @@ export function LotsTable() {
     pageIndex: 0,
     pageSize: 20,
   })
+  const [search, setSearch] = useState("")
 
   const { isError, isLoading, isFetching, refetch, data, error } = useQuery({
-    queryKey: ["admin-lots", { p: pagination.pageIndex + 1 }],
+    queryKey: ["admin-lots", { p: pagination.pageIndex + 1, search }],
     queryFn: () => queryAdminLots({ p: pagination.pageIndex + 1 }),
     refetchOnWindowFocus: false,
   })
@@ -66,6 +67,8 @@ export function LotsTable() {
       total={total}
       pagination={pagination}
       setPagination={setPagination}
+      search={search}
+      setSearch={setSearch}
     />
   )
 }

@@ -216,7 +216,7 @@ function EditForm({ product }: { product: any }) {
             </div>
 
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(handleSubmit, handleFormErrors)}>
+                <form onSubmit={form.handleSubmit(handleSubmit, (errors) => handleFormErrors(errors))}>
                     <input type="hidden" {...form.register("id")} />
                     <div className="space-y-12">
 
