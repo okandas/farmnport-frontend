@@ -1,5 +1,6 @@
 import { Inter as FontSans } from "next/font/google"
 import Script from "next/script"
+import NextTopLoader from "nextjs-toploader"
 
 import { cn } from "@/lib/utilities"
 import QueryProvider from "@/components/providers/QueryProvider"
@@ -52,6 +53,7 @@ export default function RootLayout({ children, modal }: RootLayoutProps) {
             __html: `<iframe src="https://www.googletagmanager.com/ns.html?id=${GTM_ID}" height="0" width="0" style="display: none; visibility: hidden;"></iframe>`,
           }}
         />
+        <NextTopLoader color="#16a34a" showSpinner={false} easing="ease-out" />
         <QueryProvider>
           {children}
           {modal}
