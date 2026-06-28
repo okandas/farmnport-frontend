@@ -11,6 +11,8 @@ import { Toaster } from "@/components/ui/sonner"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { NuqsAdapter } from "nuqs/adapters/next/app"
 
+import NextTopLoader from "nextjs-toploader"
+
 import { cn } from "@/lib/utilities"
 import { AuthSessionProvider } from "@/components/providers/AuthSessionProvider"
 import { CartProvider } from "@/contexts/cart-context"
@@ -70,6 +72,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
             fontHeading.variable
           )}
         >
+          <NextTopLoader color="#f97316" showSpinner={false} easing="ease-out" />
           <AuthSessionProvider>
           <ThemeProvider
             attribute="class"
