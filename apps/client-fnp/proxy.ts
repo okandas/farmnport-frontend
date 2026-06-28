@@ -26,6 +26,7 @@ async function isFeatureOn(key: string): Promise<boolean> {
 
 // ── Route → flag map ──────────────────────────────────────────────────────────
 const FLAG_GATES: { pattern: RegExp; flag: string }[] = [
+  { pattern: /^\/bookings(\/|$)/, flag: "bookings_enabled" },
   { pattern: /^\/account\/bookings(\/|$)/, flag: "bookings_enabled" },
   { pattern: /^\/account\/incoming-bookings(\/|$)/, flag: "bookings_enabled" },
   { pattern: /^\/account\/profile(\/|$)/, flag: "profile_enabled" },
