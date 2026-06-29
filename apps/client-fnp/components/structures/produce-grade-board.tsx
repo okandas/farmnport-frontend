@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useLayoutEffect, useRef } from "react"
 import Link from "next/link"
 import { useQuery } from "@tanstack/react-query"
 import { useQueryState } from "nuqs"
@@ -313,7 +313,7 @@ export function ProduceGradeBoard({
   const buyerRelations: BuyerEntry[] = buyersData?.data?.data ?? []
   const buyersTotal: number = buyersData?.data?.total ?? 0
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (gradeEntries.length === 0) return
     setSelectedKey(null)
     let match: GradeEntry | undefined
@@ -333,7 +333,7 @@ export function ProduceGradeBoard({
   const peerGrades = gradeEntries.filter(e => e.price_type === activeType)
   const chartTemplateType = best?.template_type ?? activeTemplateType
 
-  const { data: chartData } = useQuery({
+  const { data: chartData, isLoading: isChartLoading } = useQuery({
     queryKey: ["series-chart", activeCategory, best?.code, chartTemplateType],
     queryFn: () => querySeriesChart(activeCategory, best?.code ?? "", chartTemplateType),
     enabled: !!activeKey && !!best,
@@ -436,13 +436,15 @@ export function ProduceGradeBoard({
                 </div>
               </div>
               <div style={{ height: 300 }}>
-                {chartValues.length > 0 && (
+                {isChartLoading ? (
+                  <div className="w-full h-full rounded-lg bg-muted/30 animate-pulse" />
+                ) : chartValues.length > 0 ? (
                   <PriceChart
                     values={chartValues.length === 1 ? [chartValues[0], chartValues[0]] : chartValues}
                     dates={chartDates.length === 1 ? [chartDates[0], chartDates[0]] : chartDates}
                     animKey={chartKey}
                   />
-                )}
+                ) : null}
               </div>
               {best && (
                 <div className="md:hidden mt-6 pt-4 border-t">
