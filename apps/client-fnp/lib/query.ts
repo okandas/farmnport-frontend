@@ -892,6 +892,10 @@ export function retryOrderPayment(id: string) {
 }
 
 // Documents
+export function listDocumentCategories() {
+  return api.get(`${BaseURL}/documents/categories`)
+}
+
 export function listDocuments(category?: string) {
   const q = category ? `?category=${category}` : ""
   return api.get(`${BaseURL}/documents/all${q}`)

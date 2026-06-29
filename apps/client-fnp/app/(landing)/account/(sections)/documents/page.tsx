@@ -66,7 +66,7 @@ export default function AccountDocumentsPage() {
                     <p className="font-semibold">Sign in to view your downloads</p>
                     <Link
                         href="/login?next=/account/documents"
-                        className="inline-flex items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-semibold px-6 py-2.5 hover:bg-primary/90 transition-colors"
+                        className="inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground text-sm font-semibold px-6 py-2.5 hover:bg-primary/90 transition-colors"
                     >
                         Sign In
                     </Link>
@@ -93,7 +93,7 @@ export default function AccountDocumentsPage() {
                     <p className="text-sm text-muted-foreground">Purchased documents will appear here.</p>
                     <Link
                         href="/documents"
-                        className="inline-flex items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-semibold px-6 py-2.5 hover:bg-primary/90 transition-colors"
+                        className="inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground text-sm font-semibold px-6 py-2.5 hover:bg-primary/90 transition-colors"
                     >
                         Browse Documents
                     </Link>

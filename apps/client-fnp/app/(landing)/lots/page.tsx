@@ -35,8 +35,18 @@ export const metadata = {
 }
 
 export default function LotsPage() {
+    const breadcrumbJsonLd = {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://farmnport.com" },
+            { "@type": "ListItem", "position": 2, "name": "Market", "item": "https://farmnport.com/market" },
+            { "@type": "ListItem", "position": 3, "name": "Lots", "item": "https://farmnport.com/lots" },
+        ],
+    }
     return (
         <main>
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
             <div className="border-b">
                 <div className="mx-auto max-w-7xl px-6 lg:px-8 py-3">
                     <nav className="flex text-sm text-muted-foreground">

@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { Buyers } from "@/components/layouts/buyers"
 import { retrieveUser } from "@/lib/actions"
 import { FilterSidebar } from "@/components/generic/filterSidebar"
@@ -36,11 +37,30 @@ export const metadata = {
 }
 
 export default async function BuyersPage() {
-
     const user = await retrieveUser()
+
+    const breadcrumbJsonLd = {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://farmnport.com" },
+            { "@type": "ListItem", "position": 2, "name": "Market", "item": "https://farmnport.com/market" },
+            { "@type": "ListItem", "position": 3, "name": "Buyers", "item": "https://farmnport.com/buyers" },
+        ],
+    }
 
     return (
         <main>
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+            <div className="mx-auto max-w-7xl px-6 lg:px-8 pt-4">
+                <nav className="flex items-center gap-1.5 text-xs text-muted-foreground mb-4">
+                    <Link href="/" className="hover:text-foreground transition-colors">Home</Link>
+                    <span>/</span>
+                    <Link href="/market" className="hover:text-foreground transition-colors">Market</Link>
+                    <span>/</span>
+                    <span className="text-foreground font-medium">Buyers</span>
+                </nav>
+            </div>
             <div className="mx-auto max-w-7xl px-6 lg:px-8 min-h-[70lvh] py-8">
                 <div className="lg:flex lg:space-x-10">
 

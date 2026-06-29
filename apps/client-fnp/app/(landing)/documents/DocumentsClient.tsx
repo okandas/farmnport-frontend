@@ -5,15 +5,7 @@ import { parseAsInteger, parseAsString, useQueryStates } from "nuqs"
 import { FileText } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ProductCard } from "@/components/shared/ProductCard"
-import { listDocuments } from "@/lib/query"
-
-const CATEGORIES = [
-    { value: "", label: "All" },
-    { value: "spray-program", label: "Spray Programs" },
-    { value: "guide", label: "Guides" },
-    { value: "datasheet", label: "Datasheets" },
-    { value: "catalogue", label: "Catalogues" },
-]
+import { listDocuments, listDocumentCategories } from "@/lib/query"
 
 interface DocumentsClientProps {
     initialDocs: any[]
@@ -35,6 +27,13 @@ export function DocumentsClient({ initialDocs, initialTotal }: DocumentsClientPr
         refetchOnWindowFocus: false,
     })
 
+    const { data: categoriesData } = useQuery({
+        queryKey: ["document-categories"],
+        queryFn: () => listDocumentCategories().then(r => r.data),
+        refetchOnWindowFocus: false,
+    })
+    const categories: string[] = categoriesData?.categories ?? []
+
     const docs: any[] = data?.documents ?? []
     const total: number = data?.total ?? 0
     const totalPages = Math.ceil(total / 24)
@@ -50,17 +49,27 @@ export function DocumentsClient({ initialDocs, initialTotal }: DocumentsClientPr
             <aside className="w-full lg:w-64 flex-shrink-0">
                 <div className="space-y-1">
                     <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-3">Category</p>
-                    {CATEGORIES.map(c => (
+                    <button
+                        onClick={() => setQs({ category: "", p: 1 })}
+                        className={`w-full text-left text-sm px-3 py-2 rounded-md transition-colors ${
+                            qs.category === ""
+                                ? "bg-primary text-primary-foreground font-medium"
+                                : "hover:bg-muted text-foreground"
+                        }`}
+                    >
+                        All
+                    </button>
+                    {categories.map(cat => (
                         <button
-                            key={c.value}
-                            onClick={() => setQs({ category: c.value, p: 1 })}
-                            className={`w-full text-left text-sm px-3 py-2 rounded-md transition-colors ${
-                                qs.category === c.value
+                            key={cat}
+                            onClick={() => setQs({ category: cat, p: 1 })}
+                            className={`w-full text-left text-sm px-3 py-2 rounded-md transition-colors capitalize ${
+                                qs.category === cat
                                     ? "bg-primary text-primary-foreground font-medium"
                                     : "hover:bg-muted text-foreground"
                             }`}
                         >
-                            {c.label}
+                            {cat}
                         </button>
                     ))}
                 </div>
