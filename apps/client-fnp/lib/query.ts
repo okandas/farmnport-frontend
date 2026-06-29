@@ -891,6 +891,24 @@ export function retryOrderPayment(id: string) {
   return api.post(`${BaseURL}/order/${id}/pay`, {})
 }
 
+// Documents
+export function listDocuments(category?: string) {
+  const q = category ? `?category=${category}` : ""
+  return api.get(`${BaseURL}/documents/all${q}`)
+}
+
+export function getDocument(slug: string) {
+  return api.get(`${BaseURL}/documents/${slug}`)
+}
+
+export function myDownloads() {
+  return api.get(`${BaseURL}/documents/my-downloads`)
+}
+
+export function downloadDocument(token: string) {
+  return api.get(`${BaseURL}/documents/download/${token}`)
+}
+
 // Lots
 export function myLots(page?: number) {
   const p = page && page >= 2 ? `?p=${page}` : ""

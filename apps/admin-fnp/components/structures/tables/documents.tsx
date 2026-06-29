@@ -1,0 +1,70 @@
+"use client"
+
+import { useState, useEffect, useRef } from "react"
+import { useQuery } from "@tanstack/react-query"
+import { PaginationState } from "@tanstack/react-table"
+
+import { adminListDocuments } from "@/lib/query"
+import { handleFetchError } from "@/lib/error-handler"
+import { Placeholder } from "@/components/state/placeholder"
+import { TableSkeleton } from "@/components/state/skeleton-table"
+import { DataTable } from "@/components/structures/data-table"
+import { documentColumns } from "@/components/structures/columns/documents"
+
+export function DocumentsTable() {
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 20,
+  })
+  const [search, setSearch] = useState("")
+
+  const { isError, isLoading, isFetching, refetch, data, error } = useQuery({
+    queryKey: ["admin-documents", { p: pagination.pageIndex + 1 }],
+    queryFn: () => adminListDocuments({ p: pagination.pageIndex + 1 }),
+    refetchOnWindowFocus: false,
+  })
+
+  const documents = data?.data?.documents || []
+  const total = data?.data?.total as number
+
+  const hasShownError = useRef(false)
+  useEffect(() => {
+    if (isError && !hasShownError.current) {
+      hasShownError.current = true
+      handleFetchError(error, {
+        onRetry: () => {
+          hasShownError.current = false
+          refetch()
+        },
+        context: "documents",
+      })
+    }
+    if (!isError) hasShownError.current = false
+  }, [isError, error, refetch])
+
+  if (isError) {
+    return (
+      <Placeholder>
+        <Placeholder.Icon name="close" />
+        <Placeholder.Title>Error Fetching Documents</Placeholder.Title>
+        <Placeholder.Description>Error fetching documents from the database</Placeholder.Description>
+      </Placeholder>
+    )
+  }
+
+  if (isLoading || isFetching) return <TableSkeleton />
+
+  return (
+    <DataTable
+      columns={documentColumns}
+      data={documents}
+      newUrl="/dashboard/farmnport/documents/new"
+      tableName="Document"
+      total={total}
+      pagination={pagination}
+      setPagination={setPagination}
+      search={search}
+      setSearch={setSearch}
+    />
+  )
+}
