@@ -2,9 +2,9 @@
 
 import { useQuery } from "@tanstack/react-query"
 import { parseAsInteger, parseAsString, useQueryStates } from "nuqs"
-import { FileText, Loader2 } from "lucide-react"
-import Link from "next/link"
+import { FileText } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { ProductCard } from "@/components/shared/ProductCard"
 import { listDocuments } from "@/lib/query"
 
 const CATEGORIES = [
@@ -39,92 +39,103 @@ export function DocumentsClient({ initialDocs, initialTotal }: DocumentsClientPr
     const total: number = data?.total ?? 0
     const totalPages = Math.ceil(total / 24)
 
-    return (
-        <div>
-            {/* Category filter */}
-            <div className="flex flex-wrap gap-2 mb-6">
-                {CATEGORIES.map(c => (
-                    <button
-                        key={c.value}
-                        onClick={() => setQs({ category: c.value, p: 1 })}
-                        className={`text-sm px-4 py-1.5 rounded-full border font-medium transition-colors ${
-                            qs.category === c.value
-                                ? "bg-primary text-primary-foreground border-primary"
-                                : "border-border hover:bg-muted"
-                        }`}
-                    >
-                        {c.label}
-                    </button>
-                ))}
-            </div>
+    const handlePageChange = (newPage: number) => {
+        setQs({ p: newPage })
+        window.scrollTo({ top: 0, behavior: "smooth" })
+    }
 
-            {isLoading ? (
-                <div className="flex items-center justify-center py-24">
-                    <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+    return (
+        <div className="flex flex-col lg:flex-row gap-8">
+            {/* Sidebar */}
+            <aside className="w-full lg:w-64 flex-shrink-0">
+                <div className="space-y-1">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-3">Category</p>
+                    {CATEGORIES.map(c => (
+                        <button
+                            key={c.value}
+                            onClick={() => setQs({ category: c.value, p: 1 })}
+                            className={`w-full text-left text-sm px-3 py-2 rounded-md transition-colors ${
+                                qs.category === c.value
+                                    ? "bg-primary text-primary-foreground font-medium"
+                                    : "hover:bg-muted text-foreground"
+                            }`}
+                        >
+                            {c.label}
+                        </button>
+                    ))}
                 </div>
-            ) : docs.length === 0 ? (
-                <div className="text-center py-20 space-y-3">
-                    <FileText className="w-12 h-12 mx-auto text-muted-foreground/40" />
-                    <p className="font-semibold">No documents found</p>
-                    <p className="text-sm text-muted-foreground">Try a different category.</p>
-                </div>
-            ) : (
-                <>
-                    <p className="text-sm text-muted-foreground mb-4">Showing {docs.length} of {total}</p>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
-                        {docs.map((doc: any) => (
-                            <DocumentCard key={doc.id} doc={doc} />
+            </aside>
+
+            {/* Main */}
+            <main className="flex-1">
+                {isLoading ? (
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+                        {[...Array(8)].map((_, i) => (
+                            <div key={i} className="animate-pulse">
+                                <div className="bg-card border border-border rounded-lg overflow-hidden">
+                                    <div className="aspect-[3/4] bg-muted" />
+                                    <div className="p-4 space-y-3 border-t">
+                                        <div className="h-3 bg-muted rounded w-1/3" />
+                                        <div className="h-4 bg-muted rounded w-4/5" />
+                                        <div className="h-10 bg-muted rounded mt-4" />
+                                    </div>
+                                </div>
+                            </div>
                         ))}
                     </div>
-
-                    {totalPages > 1 && (
-                        <div className="mt-8 flex justify-center gap-1">
-                            {Array.from({ length: totalPages }, (_, i) => i + 1)
-                                .filter(n => n === 1 || n === totalPages || (n >= qs.p - 2 && n <= qs.p + 2))
-                                .map((n, idx, arr) => {
-                                    const prev = arr[idx - 1]
-                                    return (
-                                        <div key={n} className="flex items-center gap-1">
-                                            {prev && n - prev > 1 && <span className="px-2 text-muted-foreground">...</span>}
-                                            <Button
-                                                variant={qs.p === n ? "default" : "outline"}
-                                                size="sm"
-                                                className="min-w-[40px]"
-                                                onClick={() => { setQs({ p: n }); window.scrollTo({ top: 0, behavior: "smooth" }) }}
-                                            >
-                                                {n}
-                                            </Button>
-                                        </div>
-                                    )
-                                })}
+                ) : docs.length === 0 ? (
+                    <div className="text-center py-12">
+                        <FileText className="w-12 h-12 mx-auto text-muted-foreground/40 mb-3" />
+                        <p className="text-muted-foreground">No documents found.</p>
+                    </div>
+                ) : (
+                    <>
+                        <div className="mb-4 text-sm text-muted-foreground">
+                            Showing {docs.length} of {total} documents
                         </div>
-                    )}
-                </>
-            )}
-        </div>
-    )
-}
-
-function DocumentCard({ doc }: { doc: any }) {
-    const price = doc.price_cents ? `$${(doc.price_cents / 100).toFixed(2)}` : "Free"
-
-    return (
-        <Link href={`/documents/${doc.slug}`} className="group flex flex-col rounded-lg border border-border bg-card hover:shadow-md transition-shadow overflow-hidden">
-            {/* Cover */}
-            {doc.preview_images?.[0] ? (
-                <img src={doc.preview_images[0]} alt={doc.title} className="w-full aspect-[3/4] object-cover" />
-            ) : (
-                <div className="w-full aspect-[3/4] bg-muted/30 flex items-center justify-center">
-                    <FileText className="w-10 h-10 text-muted-foreground/40" />
-                </div>
-            )}
-            <div className="p-3 flex flex-col gap-1.5">
-                {doc.category && (
-                    <span className="text-[10px] uppercase tracking-wide font-semibold text-muted-foreground">{doc.category.replace("-", " ")}</span>
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+                            {docs.map((doc: any) => (
+                                <ProductCard
+                                    key={doc.id}
+                                    href={`/documents/${doc.slug}`}
+                                    imageSrc={doc.preview_images?.[0]}
+                                    name={doc.title}
+                                    meta={doc.category?.replace("-", " ")}
+                                    mode="buy"
+                                    productId={doc.id}
+                                    productType="document"
+                                    productSlug={doc.slug}
+                                    salePrice={doc.price_cents}
+                                    availableForSale={doc.active}
+                                    loginRedirect={`/documents/${doc.slug}`}
+                                />
+                            ))}
+                        </div>
+                        {totalPages > 1 && (
+                            <div className="mt-8 flex justify-center gap-1">
+                                {Array.from({ length: totalPages }, (_, i) => i + 1)
+                                    .filter(n => n === 1 || n === totalPages || (n >= qs.p - 2 && n <= qs.p + 2))
+                                    .map((n, idx, arr) => {
+                                        const prev = arr[idx - 1]
+                                        return (
+                                            <div key={n} className="flex items-center gap-1">
+                                                {prev && n - prev > 1 && <span className="px-2 text-muted-foreground">...</span>}
+                                                <Button
+                                                    variant={qs.p === n ? "default" : "outline"}
+                                                    size="sm"
+                                                    className="min-w-[40px]"
+                                                    onClick={() => handlePageChange(n)}
+                                                >
+                                                    {n}
+                                                </Button>
+                                            </div>
+                                        )
+                                    })}
+                            </div>
+                        )}
+                    </>
                 )}
-                <p className="text-sm font-semibold leading-snug line-clamp-2 group-hover:text-primary transition-colors">{doc.title}</p>
-                <p className="text-sm font-bold text-primary mt-auto">{price}</p>
-            </div>
-        </Link>
+            </main>
+        </div>
     )
 }
