@@ -117,6 +117,17 @@ export const dashboardConfig: DashboardConfig = {
       ],
     },
     {
+      label: "Documents",
+      alwaysOpen: true,
+      items: [
+        {
+          title: "Documents",
+          href: "/dashboard/farmnport/documents",
+          icon: "fileText",
+        },
+      ],
+    },
+    {
       label: "AgroChemicals",
       items: [
         {
