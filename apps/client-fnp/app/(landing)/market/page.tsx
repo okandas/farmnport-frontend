@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { TrendingUp } from "lucide-react"
-import { bookingsEnabled } from "@/flags"
+import { bookingsEnabled, documentsEnabled } from "@/flags"
 
 const allSections = [
     {
@@ -33,11 +33,22 @@ const allSections = [
         href: "/farmers",
         flag: null,
     },
+    {
+        title: "Documents",
+        description: "Download premium spray programs, agrochemical datasheets, rearing guides and farm management resources.",
+        href: "/documents",
+        flag: "documents",
+    },
 ]
 
 export default async function MarketPage() {
     const showBookings = await bookingsEnabled()
-    const sections = allSections.filter(s => s.flag !== "bookings_enabled" || showBookings)
+    const showDocuments = await documentsEnabled()
+    const sections = allSections.filter(s => {
+        if (s.flag === "bookings_enabled") return showBookings
+        if (s.flag === "documents") return showDocuments
+        return true
+    })
 
     return (
         <main className="bg-gradient-to-b from-background to-muted/20">
