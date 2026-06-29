@@ -80,7 +80,7 @@ function SectionCard({
                     <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
                         <span className="text-[11px] font-bold text-primary-foreground">{index}</span>
                     </div>
-                    <h2 className="text-lg font-heading tracking-tight">{title}</h2>
+                    <h2 className="text-base font-medium tracking-tight">{title}</h2>
                 </div>
             </div>
             <div className="px-5 py-5">{children}</div>
@@ -143,7 +143,7 @@ export function Brooding101Client() {
                             7 Sections
                         </span>
                     </div>
-                    <h1 className="text-3xl sm:text-4xl font-heading tracking-tight">Brooding 101</h1>
+                    <h1 className="text-3xl sm:text-4xl font-light tracking-tight text-foreground">Brooding 101</h1>
                     <p className="text-sm text-muted-foreground mt-1">
                         by <span className="font-medium text-foreground">Charles Stewart</span>
                     </p>
