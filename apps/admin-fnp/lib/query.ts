@@ -1810,3 +1810,61 @@ export function queryTableReservation(id: string) {
 export function updateTableReservationStatus(id: string, status: string, admin_notes?: string) {
   return api.put(`${baseUrl}/table-reservations/admin/${id}/status`, { status, admin_notes: admin_notes ?? "" })
 }
+
+// ── Documents ──────────────────────────────────────────────────────────────────
+
+export function adminListDocuments(params?: { category?: string; p?: number }) {
+  const qs = new URLSearchParams()
+  if (params?.category) qs.set("category", params.category)
+  if (params?.p && params.p > 1) qs.set("p", params.p.toString())
+  const q = qs.toString()
+  return api.get(`${baseUrl}/documents/admin/list${q ? `?${q}` : ""}`)
+}
+
+export function adminGetDocument(id: string) {
+  return api.get(`${baseUrl}/documents/admin/${id}`)
+}
+
+export function adminUploadPDF(file: File) {
+  const form = new FormData()
+  form.append("pdf", file)
+  return api.post(`${baseUrl}/documents/admin/upload`, form, {
+    headers: { "Content-Type": "multipart/form-data" },
+  })
+}
+
+export function adminCreateDocument(data: {
+  title: string
+  slug: string
+  description?: string
+  category?: string
+  tags?: string[]
+  file_key: string
+  file_type?: string
+  file_size_bytes?: number
+  preview_images?: string[]
+  price_cents: number
+  active?: boolean
+}) {
+  return api.post(`${baseUrl}/documents/admin`, data)
+}
+
+export function adminUpdateDocument(id: string, data: {
+  title?: string
+  slug?: string
+  description?: string
+  category?: string
+  tags?: string[]
+  file_key?: string
+  file_type?: string
+  file_size_bytes?: number
+  preview_images?: string[]
+  price_cents?: number
+  active?: boolean
+}) {
+  return api.put(`${baseUrl}/documents/admin/${id}`, data)
+}
+
+export function adminDocumentPurchases(id: string) {
+  return api.get(`${baseUrl}/documents/admin/${id}/purchases`)
+}
