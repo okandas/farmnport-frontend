@@ -2,53 +2,50 @@ import Link from "next/link"
 import { TrendingUp } from "lucide-react"
 import { bookingsEnabled, documentsEnabled } from "@/flags"
 
-const allSections = [
-    {
-        title: "Prices",
-        description: "Live and historical commodity prices for crops and livestock — track market movements and plan your sales.",
-        href: "/prices",
-        flag: null,
-    },
-    {
-        title: "Bookings",
-        description: "Browse open booking slots from buyers and suppliers — reserve a delivery drop-off or collection slot near you.",
-        href: "/bookings",
-        flag: "bookings_enabled",
-    },
-    {
-        title: "Lots",
-        description: "Browse active lots posted by farmers selling produce — buy directly at listed prices across Zimbabwe.",
-        href: "/lots",
-        flag: null,
-    },
-    {
-        title: "Buyers",
-        description: "Browse verified commodity buyers looking to purchase crops and livestock across Zimbabwe.",
-        href: "/buyers",
-        flag: null,
-    },
-    {
-        title: "Farmers",
-        description: "Find farmers and producers selling commodities — connect directly and negotiate deals.",
-        href: "/farmers",
-        flag: null,
-    },
-    {
-        title: "Documents",
-        description: "Download premium spray programs, agrochemical datasheets, rearing guides and farm management resources.",
-        href: "/documents",
-        flag: "documents",
-    },
-]
-
 export default async function MarketPage() {
     const showBookings = await bookingsEnabled()
     const showDocuments = await documentsEnabled()
-    const sections = allSections.filter(s => {
-        if (s.flag === "bookings_enabled") return showBookings
-        if (s.flag === "documents") return showDocuments
-        return true
-    })
+
+    const allSections = [
+        {
+            title: "Prices",
+            description: "Live and historical commodity prices for crops and livestock — track market movements and plan your sales.",
+            href: "/prices",
+            flag: true,
+        },
+        {
+            title: "Bookings",
+            description: "Browse open booking slots from buyers and suppliers — reserve a delivery drop-off or collection slot near you.",
+            href: "/bookings",
+            flag: showBookings,
+        },
+        {
+            title: "Lots",
+            description: "Browse active lots posted by farmers selling produce — buy directly at listed prices across Zimbabwe.",
+            href: "/lots",
+            flag: true,
+        },
+        {
+            title: "Buyers",
+            description: "Browse verified commodity buyers looking to purchase crops and livestock across Zimbabwe.",
+            href: "/buyers",
+            flag: true,
+        },
+        {
+            title: "Farmers",
+            description: "Find farmers and producers selling commodities — connect directly and negotiate deals.",
+            href: "/farmers",
+            flag: true,
+        },
+        {
+            title: "Documents",
+            description: "Download premium spray programs, agrochemical datasheets, rearing guides and farm management resources.",
+            href: "/documents",
+            flag: showDocuments,
+        },
+    ]
+
+    const sections = allSections.filter(s => s.flag)
 
     return (
         <main className="bg-gradient-to-b from-background to-muted/20">
