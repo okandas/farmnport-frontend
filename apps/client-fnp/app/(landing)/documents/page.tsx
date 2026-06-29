@@ -41,7 +41,7 @@ export default async function DocumentsPage() {
                     <span className="text-foreground font-medium">Documents</span>
                 </nav>
                 <div className="mb-8">
-                    <h1 className="text-4xl font-bold tracking-tight font-heading mb-4">
+                    <h1 className="text-4xl tracking-tight font-heading mb-4">
                         Farm Documents & Guides
                     </h1>
                     <p className="text-lg text-muted-foreground">
