@@ -224,7 +224,7 @@ export function Client({ slug, user, latestPrices }: ClientPageProps) {
                     Unlock →
                   </button>
                 ) : showWhatsapp ? (
-                  <a href={`https://wa.me/263${client.phone.replace(/^0/, '')}`} target="_blank" rel="noopener noreferrer" className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
+                  <a href={`https://wa.me/263${client.phone.replace(/^0/, '')}`} target="_blank" rel="noopener noreferrer" onClick={() => sendGTMEvent({ event: 'whatsapp' })} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
                     Open WhatsApp →
                   </a>
                 ) : (
