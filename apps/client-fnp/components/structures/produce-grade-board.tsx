@@ -313,7 +313,7 @@ export function ProduceGradeBoard({
   const buyerRelations: BuyerEntry[] = buyersData?.data?.data ?? []
   const buyersTotal: number = buyersData?.data?.total ?? 0
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (gradeEntries.length === 0) return
     setSelectedKey(null)
     let match: GradeEntry | undefined
