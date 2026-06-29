@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useLayoutEffect, useRef } from "react"
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { useQuery } from "@tanstack/react-query"
 import { useQueryState } from "nuqs"
@@ -331,12 +331,12 @@ export function ProduceGradeBoard({
   const activeType = best?.price_type ?? priceTypes[0] ?? ""
   const activeKey = best?.key ?? ""
   const peerGrades = gradeEntries.filter(e => e.price_type === activeType)
-  const chartTemplateType = best?.template_type ?? activeTemplateType
+
 
   const { data: chartData, isLoading: isChartLoading } = useQuery({
-    queryKey: ["series-chart", activeCategory, best?.code, chartTemplateType],
-    queryFn: () => querySeriesChart(activeCategory, best?.code ?? "", chartTemplateType),
-    enabled: !!activeKey && !!best,
+    queryKey: ["series-chart", activeCategory, codeParam, activeTemplateType],
+    queryFn: () => querySeriesChart(activeCategory, codeParam, activeTemplateType),
+    enabled: !!codeParam,
     refetchOnWindowFocus: false,
   })
 
