@@ -7,6 +7,8 @@ import { useForm } from "react-hook-form"
 import { useRouter } from "next/navigation"
 
 import { adminUploadPDF, adminCreateDocument, adminUpdateDocument } from "@/lib/query"
+import { FileInput } from "@/components/structures/controls/file-input"
+import { ImageModel } from "@/lib/schemas"
 import { toast } from "@/components/ui/use-toast"
 import { handleApiError, handleFormErrors } from "@/lib/error-handler"
 import { cn } from "@/lib/utilities"
@@ -43,6 +45,8 @@ interface DocumentFormValues {
     file_size_bytes: number
     price_cents: number
     active: string
+    main_image: ImageModel[]
+    other_images: ImageModel[]
 }
 
 interface DocumentFormProps {
@@ -72,6 +76,8 @@ export default function DocumentForm({ mode, documentId, defaultValues }: Docume
             file_size_bytes: 0,
             price_cents: 0,
             active: "true",
+            main_image: [],
+            other_images: [],
             ...defaultValues,
         },
     })
@@ -108,6 +114,8 @@ export default function DocumentForm({ mode, documentId, defaultValues }: Docume
                 file_size_bytes: Number(data.file_size_bytes) || undefined,
                 price_cents: Math.round(Number(data.price_cents) * 100),
                 active: data.active === "true",
+                main_image: data.main_image?.[0]?.img.src ?? undefined,
+                other_images: (data.other_images ?? []).map((img) => img.img.src),
             }
             if (mode === "edit" && documentId) {
                 return adminUpdateDocument(documentId, payload)
@@ -173,6 +181,55 @@ export default function DocumentForm({ mode, documentId, defaultValues }: Docume
                                             <FormItem>
                                                 <FormControl>
                                                     <Input placeholder="e.g. abc123.pdf" className={inputClass} {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )} />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Images */}
+                        <div className="border-b border-gray-900/10 pb-12 dark:border-white/10">
+                            <div className="grid grid-cols-1 gap-x-8 gap-y-10 md:grid-cols-3">
+                                <div>
+                                    <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">Images</h2>
+                                    <p className="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">Main cover image and up to 5 preview images.</p>
+                                </div>
+                                <div className="md:col-span-2 space-y-6">
+                                    <div>
+                                        <label className="block text-sm/6 font-medium text-gray-900 dark:text-white mb-2">Main image</label>
+                                        <FormField control={form.control} name="main_image" render={({ field }) => (
+                                            <FormItem>
+                                                <FormControl>
+                                                    <FileInput
+                                                        id=""
+                                                        fieldName="main_image"
+                                                        value={field.value || []}
+                                                        onChange={field.onChange}
+                                                        maxImages={1}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )} />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm/6 font-medium text-gray-900 dark:text-white mb-2">Preview images <span className="text-gray-400 font-normal">(up to 5)</span></label>
+                                        <FormField control={form.control} name="other_images" render={({ field }) => (
+                                            <FormItem>
+                                                <FormControl>
+                                                    <FileInput
+                                                        id=""
+                                                        fieldName="other_images"
+                                                        value={field.value || []}
+                                                        onChange={field.onChange}
+                                                        maxImages={5}
+                                                        showPlaceholders
+                                                        thumbnailClassName="inline-flex flex-col overflow-hidden border border-gray-200 rounded-lg mt-2 me-2 relative bg-white shadow-sm"
+                                                        imageClassName="flex items-center justify-center w-32 h-32 overflow-hidden bg-gray-50"
+                                                    />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
