@@ -28,6 +28,11 @@ const sections = [
         description: "Certified seed varieties — potatoes, maize, tomatoes, chillies, vegetables and more from trusted suppliers.",
         href: "/seed-guides",
     },
+    {
+        title: "Plans & Documents",
+        description: "Farm plans, design blueprints, and digital resources — downloadable documents to help you plan and build.",
+        href: "/documents",
+    },
 ]
 
 export default function GuidesPage() {
@@ -56,7 +61,7 @@ export default function GuidesPage() {
             {/* Guide Sections */}
             <section className="py-10 lg:py-14">
                 <div className="mx-auto max-w-7xl px-6 lg:px-8">
-                    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
+                    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                         {sections.map(({ title, description, href }) => (
                             <Link
                                 key={href}

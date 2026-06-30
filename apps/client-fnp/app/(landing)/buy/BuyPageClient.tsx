@@ -151,7 +151,7 @@ export function BuyPageClient({
             {feedsTotal > 0 && <Link href="/buy-feeds" className="px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">Animal Feed</Link>}
             {plantNutritionTotal > 0 && <Link href="/buy-plant-nutrition" className="px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">Plant Nutrition</Link>}
             {seedsTotal > 0 && <Link href="/buy-seed-products" className="px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">Seeds</Link>}
-            {showDocuments && documentsTotal > 0 && <Link href="/documents" className="px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">Plans & Documents</Link>}
+            {showDocuments && documentsTotal > 0 && <Link href="/buy-documents" className="px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">Plans & Documents</Link>}
             {showBookings && bookingEvents.length > 0 && <Link href="/bookings" className="px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">Book Online</Link>}
           </nav>
         </aside>
@@ -203,7 +203,7 @@ export function BuyPageClient({
           )}
 
           {showDocuments && documents.length > 0 && (
-            <Section label="Plans & Documents" href="/documents" count={documentsTotal}>
+            <Section label="Plans & Documents" href="/buy-documents" count={documentsTotal}>
               {documents.slice(0, 4).map((doc) => (
                 <DocumentCard key={doc.id} doc={doc} />
               ))}
