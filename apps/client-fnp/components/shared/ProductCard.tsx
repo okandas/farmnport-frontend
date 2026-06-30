@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import Image from "next/image"
+import { sendGTMEvent } from "@next/third-parties/google"
 import { Button } from "@/components/ui/button"
 import { formatProductName, centsToDollars } from "@/lib/utilities"
 import { AddToCartButton, CartProductType } from "@/components/cart/AddToCartButton"
@@ -73,7 +74,7 @@ export function ProductCard({
       </Link>
 
       <div className="p-4 space-y-3 border-t">
-        <Link href={href}>
+        <Link href={href} onClick={mode === "guide" ? () => sendGTMEvent({ event: 'view_guide', value: name }) : undefined}>
           <h3 className="font-semibold text-sm leading-tight line-clamp-2 group-hover:text-primary transition-colors">
             {formatProductName(name)}
           </h3>
@@ -124,7 +125,7 @@ export function ProductCard({
             )}
           </div>
         ) : (
-          <Link href={href} className="block">
+          <Link href={href} className="block" onClick={() => sendGTMEvent({ event: 'view_guide', value: name })}>
             <Button variant="outline" className="w-full" size="sm">
               {buttonLabel}
             </Button>
