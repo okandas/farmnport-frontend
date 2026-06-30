@@ -1,41 +1,49 @@
 import Link from "next/link"
 import { FlaskConical } from "lucide-react"
-// FlaskConical used in hero badge only
+import { documentsEnabled } from "@/flags"
 
-const sections = [
-    {
-        title: "Agrochemical Guides",
-        description: "Pesticides, herbicides, and fungicides — active ingredients, targets, and usage by category.",
-        href: "/agrochemical-guides",
-    },
-    {
-        title: "Animal Health Guides",
-        description: "Vaccines, antibiotics, and supplements — dosage rates, withdrawal periods, and active ingredients for poultry and livestock.",
-        href: "/animal-health-guides",
-    },
-    {
-        title: "Animal Nutrition",
-        description: "Livestock feed products across all categories and animal types — browse feeds by animal, phase, and form.",
-        href: "/feed-guides",
-    },
-    {
-        title: "Plant Nutrition Guides",
-        description: "Fertilizers, foliar feeds, biostimulants, and plant growth regulators — active ingredients and application rates.",
-        href: "/plant-nutrition-guides",
-    },
-    {
-        title: "Seed Guides",
-        description: "Certified seed varieties — potatoes, maize, tomatoes, chillies, vegetables and more from trusted suppliers.",
-        href: "/seed-guides",
-    },
-    {
-        title: "Plans & Documents",
-        description: "Farm plans, design blueprints, and digital resources — downloadable documents to help you plan and build.",
-        href: "/documents",
-    },
-]
+export default async function GuidesPage() {
+    const showDocuments = await documentsEnabled()
 
-export default function GuidesPage() {
+    const sections = [
+        {
+            title: "Agrochemical Guides",
+            description: "Pesticides, herbicides, and fungicides — active ingredients, targets, and usage by category.",
+            href: "/agrochemical-guides",
+            flag: true,
+        },
+        {
+            title: "Animal Health Guides",
+            description: "Vaccines, antibiotics, and supplements — dosage rates, withdrawal periods, and active ingredients for poultry and livestock.",
+            href: "/animal-health-guides",
+            flag: true,
+        },
+        {
+            title: "Animal Nutrition",
+            description: "Livestock feed products across all categories and animal types — browse feeds by animal, phase, and form.",
+            href: "/feed-guides",
+            flag: true,
+        },
+        {
+            title: "Plant Nutrition Guides",
+            description: "Fertilizers, foliar feeds, biostimulants, and plant growth regulators — active ingredients and application rates.",
+            href: "/plant-nutrition-guides",
+            flag: true,
+        },
+        {
+            title: "Seed Guides",
+            description: "Certified seed varieties — potatoes, maize, tomatoes, chillies, vegetables and more from trusted suppliers.",
+            href: "/seed-guides",
+            flag: true,
+        },
+        {
+            title: "Plans & Documents",
+            description: "Farm plans, design blueprints, and digital resources — downloadable documents to help you plan and build.",
+            href: "/documents",
+            flag: showDocuments,
+        },
+    ]
+
     return (
         <main className="bg-gradient-to-b from-background to-muted/20">
             {/* Hero */}
@@ -62,7 +70,7 @@ export default function GuidesPage() {
             <section className="py-10 lg:py-14">
                 <div className="mx-auto max-w-7xl px-6 lg:px-8">
                     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                        {sections.map(({ title, description, href }) => (
+                        {sections.filter(s => s.flag).map(({ title, description, href }) => (
                             <Link
                                 key={href}
                                 href={href}
