@@ -72,6 +72,7 @@ function DocumentCard({ doc }: { doc: any }) {
                     imageSrc={preview}
                     unitPrice={doc.price_cents > 0 ? doc.price_cents : null}
                     loginRedirect={href}
+                    singleUnit
                 />
             </div>
         </div>

@@ -106,7 +106,7 @@ export function DocumentsClient({ initialDocs, initialTotal }: DocumentsClientPr
                             {docs.map((doc: any) => (
                                 <ProductCard
                                     key={doc.id}
-                                    href={`/documents/${doc.slug}`}
+                                    href={`/buy-documents/${doc.slug}`}
                                     imageSrc={doc.preview_images?.[0]}
                                     name={doc.title}
                                     meta={doc.category?.replace("-", " ")}
@@ -116,7 +116,8 @@ export function DocumentsClient({ initialDocs, initialTotal }: DocumentsClientPr
                                     productSlug={doc.slug}
                                     salePrice={doc.price_cents}
                                     availableForSale={doc.active}
-                                    loginRedirect={`/documents/${doc.slug}`}
+                                    loginRedirect={`/buy-documents/${doc.slug}`}
+                                    singleUnit
                                 />
                             ))}
                         </div>

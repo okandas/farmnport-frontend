@@ -135,18 +135,13 @@ export function AddToCartButton({
   if (cartQty > 0) {
     if (singleUnit) {
       return (
-        <div className="flex items-center gap-2 mt-3">
-          <div className="flex items-center gap-1.5 flex-1 h-9 rounded-md border border-primary/40 bg-primary/5 px-3 text-sm font-medium text-primary">
-            <CheckCircle2 className="w-4 h-4 shrink-0" />
-            In your cart
-          </div>
-          <Link
-            href="/checkout"
-            className="h-9 px-4 rounded-md bg-primary text-primary-foreground text-sm font-semibold flex items-center hover:bg-primary/90 transition-colors shrink-0"
-          >
-            Checkout
-          </Link>
-        </div>
+        <button
+          onClick={() => updateMutation.mutate({ qty: 0 })}
+          disabled={updateMutation.isPending}
+          className="w-full mt-3 h-9 rounded-md border border-destructive/40 text-destructive text-sm font-medium hover:bg-destructive/10 transition-colors disabled:opacity-50"
+        >
+          {updateMutation.isPending ? "Removing…" : "Remove"}
+        </button>
       )
     }
     return (
