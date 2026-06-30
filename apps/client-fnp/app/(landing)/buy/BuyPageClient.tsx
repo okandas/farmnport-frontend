@@ -8,20 +8,12 @@ import { Button } from "@/components/ui/button"
 import { listBookingEvents } from "@/lib/query"
 import { ProductCard } from "@/components/shared/ProductCard"
 
-const CATEGORIES = [
-  { id: "pre-orders", label: "Pre-Orders", href: "/bookings" },
-  { id: "agrochemicals", label: "Agrochemicals", href: "/buy-agrochemicals" },
-  { id: "animal-health", label: "Animal Health", href: "/buy-animal-health" },
-  { id: "animal-feed", label: "Animal Feed", href: "/buy-feeds" },
-  { id: "plant-nutrition", label: "Plant Nutrition", href: "/buy-plant-nutrition" },
-  { id: "seeds", label: "Seeds", href: "/buy-seed-products" },
-]
 
 // ── Document card ─────────────────────────────────────────────────────────────
 
 function DocumentCard({ doc }: { doc: any }) {
   const price = doc.price_cents ? `$${(doc.price_cents / 100).toFixed(2)}` : "Free"
-  const preview = doc.preview_images?.[0]
+  const preview = doc.main_image
   const href = `/buy-documents/${doc.slug}`
   return (
     <div className="bg-card border border-border rounded-lg overflow-hidden transition-all duration-200 hover:shadow-lg hover:border-primary/50 group">
@@ -132,6 +124,8 @@ interface BuyPageClientProps {
   documents?: any[]
   documentsTotal?: number
   bookingEvents?: any[]
+  showDocuments?: boolean
+  showBookings?: boolean
 }
 
 export function BuyPageClient({
@@ -142,44 +136,28 @@ export function BuyPageClient({
   seeds = [], seedsTotal = 0,
   documents = [], documentsTotal = 0,
   bookingEvents = [],
+  showDocuments = false,
+  showBookings = false,
 }: BuyPageClientProps) {
-  const categoryTotals: Record<string, number> = {
-    "agrochemicals": agrochemicalTotal,
-    "animal-health": animalHealthTotal,
-    "animal-feed": feedsTotal,
-    "plant-nutrition": plantNutritionTotal,
-    "seeds": seedsTotal,
-  }
-
-  const visibleCategories = CATEGORIES.filter(
-    ({ id }) => (id === "pre-orders" && bookingEvents.length > 0) || (categoryTotals[id] ?? 0) > 0
-  )
-
   return (
     <div className="mx-auto max-w-7xl px-4 lg:px-8 py-8">
       <div className="flex gap-8">
 
         {/* ── Sidebar ── */}
         <aside className="hidden lg:flex flex-col w-56 flex-shrink-0">
-          <div>
-            <nav className="flex flex-col gap-0.5">
-              {visibleCategories.map(({ label, href }) => (
-                <Link
-                  key={href}
-                  href={href}
-                  className="px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-                >
-                  {label}
-                </Link>
-              ))}
-            </nav>
-          </div>
+          <nav className="flex flex-col gap-0.5">
+            {agrochemicalTotal > 0 && <Link href="/buy-agrochemicals" className="px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">Agrochemicals</Link>}
+            {animalHealthTotal > 0 && <Link href="/buy-animal-health" className="px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">Animal Health</Link>}
+            {feedsTotal > 0 && <Link href="/buy-feeds" className="px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">Animal Feed</Link>}
+            {plantNutritionTotal > 0 && <Link href="/buy-plant-nutrition" className="px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">Plant Nutrition</Link>}
+            {seedsTotal > 0 && <Link href="/buy-seed-products" className="px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">Seeds</Link>}
+            {showDocuments && documentsTotal > 0 && <Link href="/documents" className="px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">Plans & Documents</Link>}
+            {showBookings && bookingEvents.length > 0 && <Link href="/bookings" className="px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">Book Online</Link>}
+          </nav>
         </aside>
 
         {/* ── Main content ── */}
         <main className="flex-1 min-w-0 flex flex-col gap-12">
-
-          <PreOrdersSection />
 
           {agrochemicalTotal > 0 && (
             <Section label="Agrochemicals" href="/buy-agrochemicals" count={agrochemicalTotal}>
@@ -224,15 +202,17 @@ export function BuyPageClient({
             </Section>
           )}
 
-          {documents.length > 0 && (
-            <Section label="Plans & Documents" href="/buy-documents" count={documentsTotal}>
+          {showDocuments && documents.length > 0 && (
+            <Section label="Plans & Documents" href="/documents" count={documentsTotal}>
               {documents.slice(0, 4).map((doc) => (
                 <DocumentCard key={doc.id} doc={doc} />
               ))}
             </Section>
           )}
 
-          {agrochemicalTotal === 0 && animalHealthTotal === 0 && feedsTotal === 0 && plantNutritionTotal === 0 && seedsTotal === 0 && documents.length === 0 && bookingEvents.length === 0 && (
+          {showBookings && bookingEvents.length > 0 && <PreOrdersSection />}
+
+          {agrochemicalTotal === 0 && animalHealthTotal === 0 && feedsTotal === 0 && plantNutritionTotal === 0 && seedsTotal === 0 && (!showDocuments || documents.length === 0) && (!showBookings || bookingEvents.length === 0) && (
             <div className="py-16 text-center">
               <p className="text-lg font-semibold">Products Coming Soon</p>
               <p className="text-sm text-muted-foreground mt-1">We&apos;re stocking up. Check back shortly.</p>

@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { BuyPageClient } from "./BuyPageClient"
 import { serverFetch } from "@/lib/serverFetch"
+import { documentsEnabled, bookingsEnabled } from "@/flags"
 
 async function fetchSection(path: string) {
   try {
@@ -12,14 +13,16 @@ async function fetchSection(path: string) {
 }
 
 export default async function BuyPage() {
+  const [showDocuments, showBookings] = await Promise.all([documentsEnabled(), bookingsEnabled()])
+
   const [agro, animalHealth, feeds, plantNutrition, seeds, documents, bookingsRes] = await Promise.all([
     fetchSection("/agrochemical/buy"),
     fetchSection("/animalhealth/buy"),
     fetchSection("/feed/buy"),
     fetchSection("/plantnutrition/buy"),
     fetchSection("/seed-products/buy"),
-    fetchSection("/documents/all"),
-    serverFetch("/booking/events?status=open").catch(() => null),
+    showDocuments ? fetchSection("/documents/all") : Promise.resolve({ data: [], total: 0 }),
+    showBookings ? serverFetch("/booking/events?status=open").catch(() => null) : Promise.resolve(null),
   ])
   const bookingEvents: any[] = bookingsRes?.events ?? []
 
@@ -58,6 +61,8 @@ export default async function BuyPage() {
         documents={documents.data}
         documentsTotal={documents.total}
         bookingEvents={bookingEvents}
+        showDocuments={showDocuments}
+        showBookings={showBookings}
       />
     </main>
   )

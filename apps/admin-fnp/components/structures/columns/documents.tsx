@@ -4,6 +4,7 @@ import Link from "next/link"
 import { ColumnDef } from "@tanstack/react-table"
 import { Checkbox } from "@/components/ui/checkbox"
 import { centsToDollars } from "@/lib/utilities"
+import { DocumentsDropDown } from "@/components/structures/dropdowns/documents-dropdown"
 
 function formatDate(d: string) {
   return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
@@ -78,13 +79,6 @@ export const documentColumns: ColumnDef<any>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => (
-      <Link
-        href={`/dashboard/farmnport/documents/${row.original.id}/purchases`}
-        className="text-xs text-muted-foreground hover:text-foreground hover:underline"
-      >
-        Purchases
-      </Link>
-    ),
+    cell: ({ row }) => <DocumentsDropDown document={row.original} />,
   },
 ]

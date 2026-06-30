@@ -1,10 +1,9 @@
 import Link from "next/link"
 import { TrendingUp } from "lucide-react"
-import { bookingsEnabled, documentsEnabled } from "@/flags"
+import { bookingsEnabled } from "@/flags"
 
 export default async function MarketPage() {
     const showBookings = await bookingsEnabled()
-    const showDocuments = await documentsEnabled()
 
     const allSections = [
         {
@@ -37,12 +36,6 @@ export default async function MarketPage() {
             href: "/farmers",
             flag: true,
         },
-        {
-            title: "Documents",
-            description: "Download premium spray programs, agrochemical datasheets, rearing guides and farm management resources.",
-            href: "/documents",
-            flag: showDocuments,
-        },
     ]
 
     const sections = allSections.filter(s => s.flag)
@@ -69,12 +62,12 @@ export default async function MarketPage() {
 
             <section className="py-10 lg:py-14">
                 <div className="mx-auto max-w-5xl px-6 lg:px-8">
-                    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
+                    <div className="flex flex-wrap gap-6">
                         {sections.map(({ title, description, href }) => (
                             <Link
                                 key={href}
                                 href={href}
-                                className="flex flex-col gap-3 p-6 rounded-xl bg-card border border-border hover:border-primary hover:shadow-md transition-all group"
+                                className="flex flex-col gap-3 p-6 rounded-xl bg-card border border-border hover:border-primary hover:shadow-md transition-all group flex-1 min-w-[160px]"
                             >
                                 <h2 className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">
                                     {title}

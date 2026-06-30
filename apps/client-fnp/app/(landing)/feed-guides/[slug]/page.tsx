@@ -121,7 +121,7 @@ export default async function FeedDetailPage({ params }: FeedDetailPageProps) {
                         )}
 
                         {/* Want to Buy CTA */}
-                        <WantToBuyCTA available_for_sale={product.available_for_sale} name={product.name} brand={product.brand?.name} href={`/buy-feeds/${slug}`} />
+                        <WantToBuyCTA available_for_sale={product.available_for_sale} name={product.name} brand={product.brand?.name} href={`/buy-feeds/${slug}`} interestHref={`/interest/feed/${slug}`} />
 
                         {/* Safety Warnings */}
                         {product.safety_warnings && (

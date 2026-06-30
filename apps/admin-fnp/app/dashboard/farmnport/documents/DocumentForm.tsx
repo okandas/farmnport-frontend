@@ -6,13 +6,14 @@ import { useMutation } from "@tanstack/react-query"
 import { useForm } from "react-hook-form"
 import { useRouter } from "next/navigation"
 
-import { adminUploadPDF, adminCreateDocument, adminUpdateDocument } from "@/lib/query"
-import { FileInput } from "@/components/structures/controls/file-input"
+import { adminUploadPDF, adminCreateDocument, adminUpdateDocument, queryBrands } from "@/lib/query"
 import { ImageModel } from "@/lib/schemas"
+import { buttonVariants } from "@/components/ui/button"
+import { SearchSelect } from "@/components/ui/search-select"
+import { FileInput } from "@/components/structures/controls/file-input"
 import { toast } from "@/components/ui/use-toast"
 import { handleApiError, handleFormErrors } from "@/lib/error-handler"
 import { cn } from "@/lib/utilities"
-import { buttonVariants } from "@/components/ui/button"
 import { Icons } from "@/components/icons/lucide"
 import {
     Form,
@@ -28,6 +29,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 const inputClass = "block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500"
 
 const CATEGORIES = [
+    { value: "plans", label: "Plans" },
     { value: "spray-program", label: "Spray Program" },
     { value: "guide", label: "Guide" },
     { value: "datasheet", label: "Datasheet" },
@@ -44,9 +46,11 @@ interface DocumentFormValues {
     file_type: string
     file_size_bytes: number
     price_cents: number
+    is_test: string
     active: string
     main_image: ImageModel[]
     other_images: ImageModel[]
+    brand_id: string
 }
 
 interface DocumentFormProps {
@@ -75,12 +79,15 @@ export default function DocumentForm({ mode, documentId, defaultValues }: Docume
             file_type: "pdf",
             file_size_bytes: 0,
             price_cents: 0,
+            is_test: "false",
             active: "true",
             main_image: [],
             other_images: [],
+            brand_id: "",
             ...defaultValues,
         },
     })
+
 
     async function handlePDFUpload(e: React.ChangeEvent<HTMLInputElement>) {
         const file = e.target.files?.[0]
@@ -106,6 +113,7 @@ export default function DocumentForm({ mode, documentId, defaultValues }: Docume
             const payload = {
                 title: data.title,
                 slug: data.slug,
+                brand_id: data.brand_id || undefined,
                 description: data.description || undefined,
                 category: data.category || undefined,
                 tags: data.tags ? data.tags.split(",").map(t => t.trim()).filter(Boolean) : [],
@@ -113,6 +121,7 @@ export default function DocumentForm({ mode, documentId, defaultValues }: Docume
                 file_type: data.file_type || undefined,
                 file_size_bytes: Number(data.file_size_bytes) || undefined,
                 price_cents: Math.round(Number(data.price_cents) * 100),
+                is_test: data.is_test === "true",
                 active: data.active === "true",
                 main_image: data.main_image?.[0]?.img.src ?? undefined,
                 other_images: (data.other_images ?? []).map((img) => img.img.src),
@@ -204,7 +213,7 @@ export default function DocumentForm({ mode, documentId, defaultValues }: Docume
                                             <FormItem>
                                                 <FormControl>
                                                     <FileInput
-                                                        id=""
+                                                        id={documentId}
                                                         fieldName="main_image"
                                                         value={field.value || []}
                                                         onChange={field.onChange}
@@ -265,6 +274,31 @@ export default function DocumentForm({ mode, documentId, defaultValues }: Docume
                                                                         form.setValue("slug", slugify(e.target.value))
                                                                     }
                                                                 }}
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )} />
+                                            </div>
+                                        </div>
+
+                                        <div className="sm:col-span-4">
+                                            <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Brand <span className="text-gray-400 font-normal">(optional)</span></label>
+                                            <div className="mt-2">
+                                                <FormField control={form.control} name="brand_id" render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormControl>
+                                                            <SearchSelect
+                                                                queryKey="document-brands"
+                                                                queryFn={(params) => queryBrands(params)}
+                                                                getItems={(page) => page?.data?.brands ?? []}
+                                                                value={field.value}
+                                                                onValueChange={field.onChange}
+                                                                getLabel={(b) => b.name}
+                                                                getValue={(b) => b.id}
+                                                                placeholder="Select brand"
+                                                                clearable
+                                                                capitalize
                                                             />
                                                         </FormControl>
                                                         <FormMessage />
@@ -356,6 +390,24 @@ export default function DocumentForm({ mode, documentId, defaultValues }: Docume
                                                             <SelectContent>
                                                                 <SelectItem value="true">Active</SelectItem>
                                                                 <SelectItem value="false">Inactive</SelectItem>
+                                                            </SelectContent>
+                                                        </Select>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )} />
+                                            </div>
+                                        </div>
+
+                                        <div className="sm:col-span-3">
+                                            <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Test item</label>
+                                            <div className="mt-2">
+                                                <FormField control={form.control} name="is_test" render={({ field }) => (
+                                                    <FormItem>
+                                                        <Select onValueChange={field.onChange} value={field.value}>
+                                                            <FormControl><SelectTrigger><SelectValue placeholder="Test item?" /></SelectTrigger></FormControl>
+                                                            <SelectContent>
+                                                                <SelectItem value="false">No</SelectItem>
+                                                                <SelectItem value="true">Yes — test only</SelectItem>
                                                             </SelectContent>
                                                         </Select>
                                                         <FormMessage />

@@ -1,6 +1,7 @@
 "use client"
 
-import { Minus, Plus, Loader2 } from "lucide-react"
+import { Minus, Plus, Loader2, CheckCircle2 } from "lucide-react"
+import Link from "next/link"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
@@ -21,6 +22,7 @@ interface AddToCartButtonProps {
   unitPrice: number | null
   available?: boolean
   loginRedirect: string
+  singleUnit?: boolean
 }
 
 export function AddToCartButton({
@@ -33,6 +35,7 @@ export function AddToCartButton({
   unitPrice,
   available = true,
   loginRedirect,
+  singleUnit = false,
 }: AddToCartButtonProps) {
   const { data: session } = useSession()
   const router = useRouter()
@@ -68,10 +71,14 @@ export function AddToCartButton({
     },
     onError: (err: any, variables) => {
       if (err?.response?.status === 409) {
-        const isTestConflict = err?.response?.data?.message === "test_conflict"
+        const msg = err?.response?.data?.message
+        const isTestConflict = msg === "test_conflict"
+        const isDigitalConflict = msg === "digital_conflict"
         toast.warning(
           isTestConflict
             ? "Test products cannot be mixed with real products."
+            : isDigitalConflict
+            ? "Documents cannot be mixed with physical products."
             : "This item has a different pickup method.",
           {
             description: "Complete and pay for your current cart first, then add this item.",
@@ -126,6 +133,22 @@ export function AddToCartButton({
   }
 
   if (cartQty > 0) {
+    if (singleUnit) {
+      return (
+        <div className="flex items-center gap-2 mt-3">
+          <div className="flex items-center gap-1.5 flex-1 h-9 rounded-md border border-primary/40 bg-primary/5 px-3 text-sm font-medium text-primary">
+            <CheckCircle2 className="w-4 h-4 shrink-0" />
+            In your cart
+          </div>
+          <Link
+            href="/checkout"
+            className="h-9 px-4 rounded-md bg-primary text-primary-foreground text-sm font-semibold flex items-center hover:bg-primary/90 transition-colors shrink-0"
+          >
+            Checkout
+          </Link>
+        </div>
+      )
+    }
     return (
       <div className="flex items-center mt-3 rounded-md border border-primary overflow-hidden">
         <button

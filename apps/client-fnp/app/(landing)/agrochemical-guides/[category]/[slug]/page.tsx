@@ -219,7 +219,7 @@ export default async function AgroChemicalGuidePage({ params }: GuidePageProps) 
                         )}
 
                         {/* Want to Buy CTA */}
-                        <WantToBuyCTA available_for_sale={chemical.available_for_sale} name={chemical.name} brand={chemical.brand?.name} href={`/buy-agrochemicals/${slug}`} />
+                        <WantToBuyCTA available_for_sale={chemical.available_for_sale} name={chemical.name} brand={chemical.brand?.name} href={`/buy-agrochemicals/${slug}`} interestHref={`/interest/agrochemical/${slug}`} />
 
                         {/* Precautions */}
                         {chemical.precautions && chemical.precautions.length > 0 && (

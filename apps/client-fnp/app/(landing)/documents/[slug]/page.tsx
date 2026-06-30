@@ -113,6 +113,7 @@ export default async function DocumentGuidePage({ params }: Props) {
                             available_for_sale={!!doc.price_cents}
                             name={doc.title}
                             href={`/buy-documents/${slug}`}
+                            interestHref={`/interest/document/${slug}`}
                         />
                     </div>
 
