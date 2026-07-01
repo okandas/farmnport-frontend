@@ -13,7 +13,7 @@ export default async function BuyDocumentsPage() {
 
     try {
         const result = await serverFetch("/documents")
-        initialDocuments = result?.documents || []
+        initialDocuments = result?.data || []
         initialTotal = result?.total || 0
     } catch (error) {
         console.error("Error fetching documents:", error)

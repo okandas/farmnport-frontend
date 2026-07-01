@@ -47,10 +47,10 @@ export function BuyDocumentsClient({ initialDocuments, initialTotal }: BuyDocume
         queryKey: ["documents-shop", queryState.p, queryState.category],
         queryFn: () => queryAllDocuments({ p: queryState.p, category: queryState.category || undefined }),
         refetchOnWindowFocus: false,
-        placeholderData: !hasFilters ? { data: { documents: initialDocuments, total: initialTotal } } as any : undefined,
+        placeholderData: !hasFilters ? { data: { data: initialDocuments, total: initialTotal } } as any : undefined,
     })
 
-    const documents = data?.data?.documents || []
+    const documents = data?.data?.data || []
     const total = data?.data?.total || 0
     const totalPages = Math.ceil(total / 24)
 
