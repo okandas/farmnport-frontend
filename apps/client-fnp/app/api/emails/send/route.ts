@@ -12,6 +12,7 @@ import {
   BookingConfirmedEmail,
   BookingStatusEmail,
   BookingAdminAlertEmail,
+  OrderDocumentConfirmationEmail,
 } from "@/emails"
 
 const FROM = "farmnport <noreply@farmnport.com>"
@@ -84,6 +85,11 @@ export async function POST(req: NextRequest) {
     case "booking-admin-alert":
       subject = `New booking ${(props as { bookingRef?: string }).bookingRef ?? ""} — action required`
       html = await render(BookingAdminAlertEmail(props as Parameters<typeof BookingAdminAlertEmail>[0]))
+      break
+
+    case "order-document-confirmation":
+      subject = `Your document is ready — order ${(props as { orderNumber?: string }).orderNumber ?? ""} confirmed`
+      html = await render(OrderDocumentConfirmationEmail(props as Parameters<typeof OrderDocumentConfirmationEmail>[0]))
       break
 
     default:

@@ -8,6 +8,7 @@ import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
 import { BaseURL } from "@/lib/schemas"
 import { buildBuyMetadata } from "@/lib/utilities"
 import { BuyProductInteractive } from "@/components/shop/BuyProductInteractive"
+import { guardTestItem } from "@/lib/guardTestItem"
 import { BackToProgram } from "./BackToProgram"
 import Link from "next/link"
 
@@ -41,6 +42,7 @@ export default async function BuyFeedPage({ params }: BuyFeedPageProps) {
     const product = await getFeedProduct(slug)
 
     if (!product) notFound()
+    await guardTestItem(!!product.is_test)
 
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://farmnport.com'
 

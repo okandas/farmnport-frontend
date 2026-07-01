@@ -1,8 +1,9 @@
 import { notFound } from "next/navigation"
 import Link from "next/link"
-import { Tag, Download, Share2, ShieldCheck, RotateCcw, Hash, FileText } from "lucide-react"
+import { Tag, Download, ShieldCheck, RotateCcw, Hash, FileText } from "lucide-react"
 import { serverFetch } from "@/lib/serverFetch"
-import { AddToCartButton } from "@/components/cart/AddToCartButton"
+import { guardTestItem } from "@/lib/guardTestItem"
+import { DocumentPricingPanel } from "@/components/shop/DocumentPricingPanel"
 import { Badge } from "@/components/ui/badge"
 import { ProductImageGallery } from "@/components/shared/ProductImageGallery"
 
@@ -37,6 +38,7 @@ export default async function BuyDocumentDetailPage({ params }: Props) {
     }
 
     if (!doc) notFound()
+    await guardTestItem(!!doc.is_test)
 
     const price = doc.price_cents ? `$${(doc.price_cents / 100).toFixed(2)}` : "Free"
     const fileSizeKB = doc.file_size_bytes ? Math.round(doc.file_size_bytes / 1024) : null
@@ -138,31 +140,13 @@ export default async function BuyDocumentDetailPage({ params }: Props) {
 
                     {/* Column 3: Sticky pricing panel */}
                     <div className="sticky top-20">
-                        <div className="border rounded-xl bg-card overflow-hidden">
-                            <div className="p-4 border-b">
-                                <p className="text-3xl font-bold leading-none">{price}</p>
-                                <p className="text-[11px] text-muted-foreground mt-2">One-time purchase · instant download</p>
-                                <AddToCartButton
-                                    productId={doc.id}
-                                    productType="document"
-                                    productName={doc.title}
-                                    productSlug={slug}
-                                    unitPrice={doc.price_cents}
-                                    loginRedirect={`/buy-documents/${slug}`}
-                                    singleUnit
-                                />
-                            </div>
-                            <div className="px-5 pb-5 space-y-2.5 text-xs text-muted-foreground pt-4">
-                                <div className="flex items-center gap-1.5">
-                                    <span className="font-medium text-foreground">Sold by</span>
-                                    <span>farmnport</span>
-                                </div>
-                                <div className="flex items-start gap-1.5">
-                                    <Share2 className="w-3 h-3 shrink-0 mt-0.5" />
-                                    <span>Digital delivery — no shipping required</span>
-                                </div>
-                            </div>
-                        </div>
+                        <DocumentPricingPanel
+                            docId={doc.id}
+                            docSlug={slug}
+                            docTitle={doc.title}
+                            priceCents={doc.price_cents}
+                            price={price}
+                        />
                     </div>
 
                 </div>

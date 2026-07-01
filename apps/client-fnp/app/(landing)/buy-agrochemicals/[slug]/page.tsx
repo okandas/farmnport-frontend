@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from "next/navigation"
 import { serverFetch } from "@/lib/serverFetch"
 import { buildBuyMetadata } from "@/lib/utilities"
+import { guardTestItem } from "@/lib/guardTestItem"
 import Link from "next/link"
 import { Beaker } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -23,6 +24,7 @@ export default async function BuyAgroChemicalPage({ params }: BuyAgroChemicalPag
 
     const chemical = await serverFetch(`/agrochemical/${slug}`).catch(() => null)
     if (!chemical) notFound()
+    await guardTestItem(!!chemical.is_test)
 
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://farmnport.com'
 

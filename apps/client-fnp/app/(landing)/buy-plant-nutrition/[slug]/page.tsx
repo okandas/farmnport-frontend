@@ -5,6 +5,7 @@ import { buildBuyMetadata } from "@/lib/utilities"
 import Link from "next/link"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { BuyProductInteractive } from "@/components/shop/BuyProductInteractive"
+import { guardTestItem } from "@/lib/guardTestItem"
 
 interface BuyPlantNutritionProductPageProps {
     params: Promise<{ slug: string }>
@@ -22,6 +23,7 @@ export default async function BuyPlantNutritionProductPage({ params }: BuyPlantN
 
     const product = await serverFetch(`/plantnutrition/${slug}`).catch(() => null)
     if (!product) notFound()
+    await guardTestItem(!!product.is_test)
 
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://farmnport.com'
 

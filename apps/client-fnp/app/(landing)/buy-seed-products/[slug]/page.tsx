@@ -5,6 +5,7 @@ import { formatProductName } from "@/lib/utilities"
 import Link from "next/link"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { BuyProductInteractive } from "@/components/shop/BuyProductInteractive"
+import { guardTestItem } from "@/lib/guardTestItem"
 
 interface Props {
     params: Promise<{ slug: string }>
@@ -43,6 +44,7 @@ export default async function BuySeedProductPage({ params }: Props) {
     )
 
     if (!product) notFound()
+    await guardTestItem(!!product.is_test)
 
     if (!product) {
         return (
