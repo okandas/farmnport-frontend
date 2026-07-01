@@ -6,13 +6,14 @@ import { useQuery } from "@tanstack/react-query"
 import { Download, FileText, Loader2, KeyRound } from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner"
+import { sendGTMEvent } from "@next/third-parties/google"
 import { myDownloads, downloadDocument } from "@/lib/query"
 
 function formatDate(d: string) {
     return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
 }
 
-function DownloadButton({ token, title }: { token: string; title: string }) {
+function DownloadButton({ token, slug }: { token: string; slug?: string }) {
     const [loading, setLoading] = useState(false)
 
     async function handleDownload() {
@@ -21,6 +22,7 @@ function DownloadButton({ token, title }: { token: string; title: string }) {
             const res = await downloadDocument(token)
             const url = res.data?.download_url
             if (!url) throw new Error("No download URL returned")
+            sendGTMEvent({ event: "document_download", slug })
             window.open(url, "_blank", "noopener,noreferrer")
         } catch {
             toast.error("Download failed. Please try again.")
@@ -82,9 +84,9 @@ export default function AccountDocumentsPage() {
             <nav className="flex items-center gap-1.5 text-sm text-muted-foreground mb-4">
                 <Link href="/account" className="hover:text-foreground transition-colors">Account</Link>
                 <span>/</span>
-                <span className="text-foreground font-medium">My Downloads</span>
+                <span className="text-foreground font-medium">My Documents</span>
             </nav>
-            <h1 className="text-xl font-bold mb-6">My Downloads</h1>
+            <h1 className="text-xl font-bold mb-6">My Documents</h1>
 
             {downloads.length === 0 ? (
                 <div className="text-center py-16 space-y-4">
@@ -106,15 +108,17 @@ export default function AccountDocumentsPage() {
                         return (
                             <div key={purchase.id} className="py-4 flex items-start justify-between gap-4">
                                 <div className="flex items-start gap-3 min-w-0">
-                                    {doc?.preview_images?.[0] ? (
-                                        <img src={doc.preview_images[0]} alt={doc.title} className="w-12 h-16 rounded object-cover shrink-0 border border-border" />
-                                    ) : (
-                                        <div className="w-12 h-16 rounded bg-muted/30 flex items-center justify-center shrink-0 border border-border">
-                                            <FileText className="w-5 h-5 text-muted-foreground/40" />
-                                        </div>
-                                    )}
+                                    <Link href={`/buy-documents/${doc?.slug}`} className="shrink-0">
+                                        {doc?.preview_images?.[0] ? (
+                                            <img src={doc.preview_images[0]} alt={doc.title} className="w-12 h-16 rounded object-cover border border-border hover:opacity-80 transition-opacity" />
+                                        ) : (
+                                            <div className="w-12 h-16 rounded bg-muted/30 flex items-center justify-center border border-border">
+                                                <FileText className="w-5 h-5 text-muted-foreground/40" />
+                                            </div>
+                                        )}
+                                    </Link>
                                     <div className="space-y-1 min-w-0">
-                                        <p className="font-semibold text-sm truncate">{doc?.title}</p>
+                                        <Link href={`/buy-documents/${doc?.slug}`} className="font-semibold text-sm truncate hover:text-primary transition-colors block">{doc?.title}</Link>
                                         {doc?.category && (
                                             <p className="text-xs text-muted-foreground capitalize">{doc.category.replace("-", " ")}</p>
                                         )}
@@ -130,7 +134,7 @@ export default function AccountDocumentsPage() {
                                     </div>
                                 </div>
                                 <div className="shrink-0">
-                                    <DownloadButton token={purchase.download_token} title={doc?.title ?? "document"} />
+                                    <DownloadButton token={purchase.download_token} slug={doc?.slug} />
                                 </div>
                             </div>
                         )
