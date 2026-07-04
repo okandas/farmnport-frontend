@@ -9,13 +9,14 @@ import Link from "next/link"
 import Image from "next/image"
 import { toast } from "sonner"
 
-import { getBookingEvent, createBooking, queryClient as queryClientProfile } from "@/lib/query"
+import { getPreOrder, createBooking, queryClient as queryClientProfile } from "@/lib/query"
+import { ShareBar } from "@/components/shared/ShareBar"
 
 function formatDate(d: string) {
   return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
 }
 
-export default function BookingEventDetailPage() {
+export default function PreOrderDetailPage() {
   const params = useParams()
   const slug = params.slug as string
   const { data: session } = useSession()
@@ -24,10 +25,11 @@ export default function BookingEventDetailPage() {
   const queryClient = useQueryClient()
 
   const [quantity, setQuantity] = useState("")
+  const [notes, setNotes] = useState("")
 
   const { data, isLoading } = useQuery({
     queryKey: ["booking-event", slug],
-    queryFn: () => getBookingEvent(slug).then((r) => r.data),
+    queryFn: () => getPreOrder(slug).then((r) => r.data),
   })
 
   const { data: profileData } = useQuery({
@@ -47,14 +49,15 @@ export default function BookingEventDetailPage() {
         event_id: event?.id,
         quantity: parseInt(quantity),
         phone,
+        notes: notes || undefined,
       }),
     onSuccess: () => {
-      toast.success("Booking placed successfully")
+      toast.success("Booking request submitted! We'll confirm availability and notify you.")
       queryClient.invalidateQueries({ queryKey: ["my-bookings"] })
       router.push("/account/bookings")
     },
-    onError: () => {
-      toast.error("Failed to place booking. Please try again.")
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.message || "Failed to submit booking request. Please try again.")
     },
   })
 
@@ -133,6 +136,7 @@ export default function BookingEventDetailPage() {
           <div className="space-y-6">
             <div>
               <h1 className="text-2xl font-bold leading-tight">{event.title}</h1>
+              <div className="mt-3"><ShareBar name={event.title} /></div>
               <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground flex-wrap">
                 <span className="flex items-center gap-1.5">
                   <Users className="w-4 h-4" />
@@ -189,12 +193,12 @@ export default function BookingEventDetailPage() {
 
             {/* How it works */}
             <div className="bg-muted/40 rounded-xl p-5 space-y-3">
-              <h3 className="font-semibold text-sm">How Forward Bookings Work</h3>
+              <h3 className="font-semibold text-sm">How Pre-Orders Work</h3>
               <ol className="space-y-2 text-sm text-muted-foreground list-decimal list-inside">
-                <li>Enter your desired quantity and collection date</li>
-                <li>Pay the deposit to secure your reservation</li>
-                <li>We confirm your booking and notify you</li>
-                <li>Pay the balance and collect your order on the agreed date</li>
+                <li>Submit your booking request with your desired quantity</li>
+                <li>We confirm availability and notify you</li>
+                <li>Pay to secure your allocation{event.payment_deadline_hours ? ` (within ${event.payment_deadline_hours} hours)` : ""}</li>
+                <li>Collect your order when ready — balance due on collection</li>
               </ol>
             </div>
           </div>
@@ -247,6 +251,18 @@ export default function BookingEventDetailPage() {
                   />
                 </div>
 
+                {event.buyer_notes && (
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-medium text-muted-foreground">Notes / Preferences (optional)</label>
+                    <textarea
+                      value={notes}
+                      onChange={(e) => setNotes(e.target.value)}
+                      placeholder="e.g. preferred seed size, delivery preferences..."
+                      rows={2}
+                      className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
+                    />
+                  </div>
+                )}
 
                 {qty >= minQty && (
                   <div className="bg-muted/50 rounded-lg p-3 text-sm space-y-1.5">
@@ -271,11 +287,11 @@ export default function BookingEventDetailPage() {
                   className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground font-semibold py-2.5 rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-50 text-sm"
                 >
                   {mutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
-                  Confirm Booking
+                  Submit Booking Request
                 </button>
 
                 <p className="text-xs text-muted-foreground text-center">
-                  By booking you agree to pay the deposit to secure your reservation
+                  We&apos;ll confirm availability and notify you to pay
                 </p>
               </div>
             )}

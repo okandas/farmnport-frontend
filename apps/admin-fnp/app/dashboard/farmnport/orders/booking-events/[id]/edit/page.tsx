@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation"
 import { Loader2 } from "lucide-react"
 import Link from "next/link"
 
-import { queryAdminBookingEvents, updateBookingEvent, queryClientLocations, queryUsers, queryLivestockPoultryProducts, querySeedProducts, queryBrands } from "@/lib/query"
+import { queryAdminPreOrders, updatePreOrder, queryClientLocations, queryUsers, queryLivestockPoultryProducts, querySeedProducts, queryBrands } from "@/lib/query"
 import { LocationMultiSelect } from "@/components/ui/location-multi-select"
 import { capitalizeWords } from "@/lib/utilities"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -33,14 +33,14 @@ function toInputDate(iso: string) {
 }
 
 
-export default function EditBookingEventPage({ params }: { params: Promise<{ id: string }> }) {
+export default function EditPreOrderPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const router = useRouter()
   const queryClient = useQueryClient()
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["admin-booking-events"],
-    queryFn: () => queryAdminBookingEvents(),
+    queryFn: () => queryAdminPreOrders(),
     refetchOnWindowFocus: false,
   })
 
@@ -117,7 +117,7 @@ export default function EditBookingEventPage({ params }: { params: Promise<{ id:
 
   const mutation = useMutation({
     mutationFn: () =>
-      updateBookingEvent(id, {
+      updatePreOrder(id, {
         title: form!.title,
         description: form!.description || undefined,
         status: form!.status,

@@ -155,35 +155,39 @@ export function CartDrawer() {
 
                     {/* Qty controls */}
                     <div className="flex items-center gap-2 mt-2">
-                      <button
-                        onClick={() =>
-                          updateMutation.mutate({
-                            productId: item.product_id,
-                            quantity: item.quantity - 1,
-                            sku: item.sku,
-                          })
-                        }
-                        disabled={updateMutation.isPending}
-                        className="w-6 h-6 rounded border flex items-center justify-center hover:bg-muted transition-colors"
-                      >
-                        <Minus className="w-3 h-3" />
-                      </button>
-                      <span className="text-sm font-medium w-6 text-center">
-                        {item.quantity}
-                      </span>
-                      <button
-                        onClick={() =>
-                          updateMutation.mutate({
-                            productId: item.product_id,
-                            quantity: item.quantity + 1,
-                            sku: item.sku,
-                          })
-                        }
-                        disabled={updateMutation.isPending}
-                        className="w-6 h-6 rounded border flex items-center justify-center hover:bg-muted transition-colors"
-                      >
-                        <Plus className="w-3 h-3" />
-                      </button>
+                      {item.product_type !== "document" && (
+                        <>
+                          <button
+                            onClick={() =>
+                              updateMutation.mutate({
+                                productId: item.product_id,
+                                quantity: item.quantity - 1,
+                                sku: item.sku,
+                              })
+                            }
+                            disabled={updateMutation.isPending}
+                            className="w-6 h-6 rounded border flex items-center justify-center hover:bg-muted transition-colors"
+                          >
+                            <Minus className="w-3 h-3" />
+                          </button>
+                          <span className="text-sm font-medium w-6 text-center">
+                            {item.quantity}
+                          </span>
+                          <button
+                            onClick={() =>
+                              updateMutation.mutate({
+                                productId: item.product_id,
+                                quantity: item.quantity + 1,
+                                sku: item.sku,
+                              })
+                            }
+                            disabled={updateMutation.isPending}
+                            className="w-6 h-6 rounded border flex items-center justify-center hover:bg-muted transition-colors"
+                          >
+                            <Plus className="w-3 h-3" />
+                          </button>
+                        </>
+                      )}
                       <button
                         onClick={() => removeMutation.mutate({ productId: item.product_id, sku: item.sku })}
                         disabled={removeMutation.isPending}

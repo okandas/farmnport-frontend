@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query"
 import { Button } from "@/components/ui/button"
 import { queryBuySeedProducts } from "@/lib/query"
 import { ProductCard } from "@/components/shared/ProductCard"
-import { BuyCategoriesNav } from "@/components/generic/BuyCategoriesNav"
+import { BuyCategoriesNavClient } from "@/components/generic/BuyCategoriesNavClient"
 import { SeedBuyFilterSidebar } from "@/components/generic/seedFilterSidebar"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
 
@@ -12,9 +12,10 @@ interface BuySeedProductsClientProps {
   initialProducts: any[]
   initialTotal: number
   bookingEvents: any[]
+  categories: { label: string; href: string }[]
 }
 
-export function BuySeedProductsClient({ initialProducts, initialTotal, bookingEvents }: BuySeedProductsClientProps) {
+export function BuySeedProductsClient({ initialProducts, initialTotal, bookingEvents, categories }: BuySeedProductsClientProps) {
   const [queryState, setQueryState] = useQueryStates({
     brand: parseAsArrayOf(parseAsString),
     p: parseAsInteger.withDefault(1),
@@ -43,7 +44,7 @@ export function BuySeedProductsClient({ initialProducts, initialTotal, bookingEv
   return (
     <div className="flex flex-col lg:flex-row gap-8">
       <aside className="w-full lg:w-64 flex-shrink-0">
-        <BuyCategoriesNav />
+        <BuyCategoriesNavClient categories={categories} />
         <SeedBuyFilterSidebar />
       </aside>
 

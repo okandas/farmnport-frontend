@@ -20,6 +20,7 @@ import { toast } from "sonner"
 import { AuthSignUpSchema, SignUpFormData, LoginFormData, FarmProduceCategoriesResponse, FarmProduceResponse, FarmProduce } from "@/lib/schemas"
 import { cn, capitalizeFirstLetter } from "@/lib/utilities"
 import { clientSignup, queryFarmProduceCategories, queryFarmProduceByCategory } from "@/lib/query"
+import { trackSignUp } from "@/lib/analytics"
 import { signIn } from "next-auth/react"
 
 
@@ -77,7 +78,7 @@ export function SignUpAuthForm({ className, ...props }: AuthFormProps) {
     const { mutate, isPending, isSuccess } = useMutation({
         mutationFn: clientSignup,
         onSuccess: async (response) => {
-    
+            trackSignUp()
             toast("Success", {
                 description: "Sign up successful, logging you in and redirecting you to dashboard.",
             })

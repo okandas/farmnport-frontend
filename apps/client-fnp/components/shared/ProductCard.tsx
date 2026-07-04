@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import Image from "next/image"
+import { sendGTMEvent } from "@next/third-parties/google"
 import { Button } from "@/components/ui/button"
 import { formatProductName, centsToDollars } from "@/lib/utilities"
 import { AddToCartButton, CartProductType } from "@/components/cart/AddToCartButton"
@@ -29,12 +30,14 @@ interface ProductCardProps {
   variantPriceRange?: { min: number; max: number }
   pickupOnly?: boolean
   isTest?: boolean
+  singleUnit?: boolean
+  imageFill?: boolean
 }
 
 export function ProductCard({
   href, imageSrc, name, brand, meta, mode, buttonLabel = "View Guide",
   salePrice, wasPrice, showWasPrice, availableForSale,
-  productId, productType, productSlug, loginRedirect, preorderHref, stockLevel, hasVariants, variantPriceRange, pickupOnly, isTest,
+  productId, productType, productSlug, loginRedirect, preorderHref, stockLevel, hasVariants, variantPriceRange, pickupOnly, isTest, singleUnit, imageFill,
 }: ProductCardProps) {
   const inStock = availableForSale && (stockLevel === undefined || stockLevel > 0)
 
@@ -54,7 +57,7 @@ export function ProductCard({
               alt={name}
               fill
               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-              className="object-contain transition-transform duration-200 group-hover:scale-105"
+              className={`${imageFill ? "object-cover p-2" : "object-contain"} transition-transform duration-200 group-hover:scale-105`}
             />
           ) : (
             <div className="absolute inset-0 bg-muted/30" />
@@ -73,7 +76,7 @@ export function ProductCard({
       </Link>
 
       <div className="p-4 space-y-3 border-t">
-        <Link href={href}>
+        <Link href={href} onClick={mode === "guide" ? () => sendGTMEvent({ event: 'view_guide', value: name }) : undefined}>
           <h3 className="font-semibold text-sm leading-tight line-clamp-2 group-hover:text-primary transition-colors">
             {formatProductName(name)}
           </h3>
@@ -120,11 +123,12 @@ export function ProductCard({
                 unitPrice={salePrice && salePrice > 0 ? salePrice : null}
                 available={inStock}
                 loginRedirect={loginRedirect ?? href}
+                singleUnit={singleUnit}
               />
             )}
           </div>
         ) : (
-          <Link href={href} className="block">
+          <Link href={href} className="block" onClick={() => sendGTMEvent({ event: 'view_guide', value: name })}>
             <Button variant="outline" className="w-full" size="sm">
               {buttonLabel}
             </Button>

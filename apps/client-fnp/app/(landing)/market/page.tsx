@@ -2,42 +2,43 @@ import Link from "next/link"
 import { TrendingUp } from "lucide-react"
 import { bookingsEnabled } from "@/flags"
 
-const allSections = [
-    {
-        title: "Prices",
-        description: "Live and historical commodity prices for crops and livestock — track market movements and plan your sales.",
-        href: "/prices",
-        flag: null,
-    },
-    {
-        title: "Bookings",
-        description: "Browse open booking slots from buyers and suppliers — reserve a delivery drop-off or collection slot near you.",
-        href: "/bookings",
-        flag: "bookings_enabled",
-    },
-    {
-        title: "Lots",
-        description: "Browse active lots posted by farmers selling produce — buy directly at listed prices across Zimbabwe.",
-        href: "/lots",
-        flag: null,
-    },
-    {
-        title: "Buyers",
-        description: "Browse verified commodity buyers looking to purchase crops and livestock across Zimbabwe.",
-        href: "/buyers",
-        flag: null,
-    },
-    {
-        title: "Farmers",
-        description: "Find farmers and producers selling commodities — connect directly and negotiate deals.",
-        href: "/farmers",
-        flag: null,
-    },
-]
-
 export default async function MarketPage() {
     const showBookings = await bookingsEnabled()
-    const sections = allSections.filter(s => s.flag !== "bookings_enabled" || showBookings)
+
+    const allSections = [
+        {
+            title: "Prices",
+            description: "Live and historical commodity prices for crops and livestock — track market movements and plan your sales.",
+            href: "/prices",
+            flag: true,
+        },
+        {
+            title: "Bookings",
+            description: "Browse open booking slots from buyers and suppliers — reserve a delivery drop-off or collection slot near you.",
+            href: "/bookings",
+            flag: showBookings,
+        },
+        {
+            title: "Lots",
+            description: "Browse active lots posted by farmers selling produce — buy directly at listed prices across Zimbabwe.",
+            href: "/lots",
+            flag: true,
+        },
+        {
+            title: "Buyers",
+            description: "Browse verified commodity buyers looking to purchase crops and livestock across Zimbabwe.",
+            href: "/buyers",
+            flag: true,
+        },
+        {
+            title: "Farmers",
+            description: "Find farmers and producers selling commodities — connect directly and negotiate deals.",
+            href: "/farmers",
+            flag: true,
+        },
+    ]
+
+    const sections = allSections.filter(s => s.flag)
 
     return (
         <main className="bg-gradient-to-b from-background to-muted/20">
@@ -61,12 +62,12 @@ export default async function MarketPage() {
 
             <section className="py-10 lg:py-14">
                 <div className="mx-auto max-w-5xl px-6 lg:px-8">
-                    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
+                    <div className="flex flex-wrap gap-6">
                         {sections.map(({ title, description, href }) => (
                             <Link
                                 key={href}
                                 href={href}
-                                className="flex flex-col gap-3 p-6 rounded-xl bg-card border border-border hover:border-primary hover:shadow-md transition-all group"
+                                className="flex flex-col gap-3 p-6 rounded-xl bg-card border border-border hover:border-primary hover:shadow-md transition-all group flex-1 min-w-[160px]"
                             >
                                 <h2 className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">
                                     {title}

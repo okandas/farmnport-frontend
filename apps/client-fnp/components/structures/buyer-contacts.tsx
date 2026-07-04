@@ -35,7 +35,7 @@ function ShowPhone({ phone }: { phone: string }) {
   const [show, setShow] = useState(false)
 
   return show ? (
-    <Link href={`tel:${phone}`} className="text-sm text-muted-foreground hover:underline">
+    <Link href={`tel:${phone}`} className="text-sm text-muted-foreground hover:underline" onClick={() => sendGTMEvent({ event: 'phone_call' })}>
       {phone}
     </Link>
   ) : (
@@ -56,7 +56,7 @@ function ShowEmail({ email }: { email: string }) {
   const [show, setShow] = useState(false)
 
   return show ? (
-    <Link href={`mailto:${email}`} className="text-sm text-muted-foreground hover:underline">
+    <Link href={`mailto:${email}`} className="text-sm text-muted-foreground hover:underline" onClick={() => sendGTMEvent({ event: 'email' })}>
       {email}
     </Link>
   ) : (

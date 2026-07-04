@@ -9,6 +9,7 @@ import {
 } from "lucide-react"
 import { capitalizeFirstLetter, titleCase } from "@/lib/utilities"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
+import { ShareBar } from "@/components/shared/ShareBar"
 
 // Unified stage styling -- clean, minimal
 const STAGE_STYLE = {
@@ -150,6 +151,7 @@ export function SprayProgramDetailClient({ program, slug }: SprayProgramDetailCl
                                     {program.scientific_name}
                                 </p>
                             )}
+                            <div className="mt-3"><ShareBar name={program.name} /></div>
                             {program.description && (
                                 <p className="mt-3 text-base sm:text-lg text-muted-foreground max-w-2xl">
                                     {program.description}
@@ -183,6 +185,7 @@ export function SprayProgramDetailClient({ program, slug }: SprayProgramDetailCl
                                     {program.scientific_name}
                                 </p>
                             )}
+                            <div className="mt-3"><ShareBar name={program.name} /></div>
                             {program.description && (
                                 <p className="mt-3 text-base sm:text-lg text-muted-foreground max-w-2xl">
                                     {program.description}

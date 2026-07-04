@@ -76,6 +76,13 @@ export function trackBeginCheckout(params: {
   })
 }
 
+export function trackSignUp() {
+  if (typeof window === "undefined") return
+  const dataLayer = (window as any).dataLayer = (window as any).dataLayer || []
+  dataLayer.push({ event: "sign_up" })
+}
+
+
 export function trackPurchase(params: {
   transaction_id: string
   value: number       // in dollars (not cents)

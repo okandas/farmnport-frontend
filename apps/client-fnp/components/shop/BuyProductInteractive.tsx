@@ -3,11 +3,12 @@
 import { useState, useEffect, useRef, ReactNode } from "react"
 import { trackViewItem } from "@/lib/analytics"
 import { createPortal } from "react-dom"
-import Image from "next/image"
 import Link from "next/link"
+import { ProductImageGallery } from "@/components/shared/ProductImageGallery"
 import { Badge } from "@/components/ui/badge"
 import { Check, Share2 } from "lucide-react"
 import { AddToCartButton, CartProductType } from "@/components/cart/AddToCartButton"
+import { ShareBar } from "@/components/shared/ShareBar"
 
 interface BuyProductInteractiveProps {
   product: any
@@ -43,7 +44,6 @@ export function BuyProductInteractive({
   const hasVariants = product.variants && product.variants.length > 0
   const inStock = product.available_for_sale && (product.stock_level === undefined || product.stock_level > 0)
   const [selectedVariant, setSelectedVariant] = useState<any>(hasVariants ? product.variants[0] : null)
-  const [selectedImage, setSelectedImage] = useState(0)
 const [mounted, setMounted] = useState(false)
   const viewTracked = useRef(false)
   useEffect(() => {
@@ -91,39 +91,7 @@ const [mounted, setMounted] = useState(false)
       <div className="grid lg:grid-cols-[480px_1fr_300px] gap-6 items-start">
 
         {/* ── Column 1: Image ── */}
-        <div className="flex gap-2">
-          {images.length > 1 && (
-            <div className="flex flex-col gap-2 shrink-0">
-              {images.map((img: any, idx: number) => (
-                <button
-                  key={idx}
-                  onClick={() => setSelectedImage(idx)}
-                  className={`relative w-16 h-16 rounded-lg border-2 overflow-hidden bg-white transition-colors ${
-                    selectedImage === idx ? "border-primary" : "border-border hover:border-primary/50"
-                  }`}
-                >
-                  {img.img?.src && (
-                    <Image src={img.img.src} alt={`${product.name} ${idx + 1}`} fill sizes="64px" className="object-contain p-1" />
-                  )}
-                </button>
-              ))}
-            </div>
-          )}
-          <div className="relative flex-1 bg-white rounded-xl border overflow-hidden" style={{ height: "520px" }}>
-            {images[selectedImage]?.img?.src ? (
-              <Image
-                src={images[selectedImage].img.src}
-                alt={product.name}
-                fill
-                sizes="(max-width: 1024px) 100vw, 480px"
-                className="object-contain p-10"
-                priority
-              />
-            ) : (
-              <div className="absolute inset-0 bg-muted/30" />
-            )}
-          </div>
-        </div>
+        <ProductImageGallery images={images} name={product.name} />
 
         {/* ── Column 2: Product info ── */}
         <div className="space-y-5">
@@ -138,6 +106,8 @@ const [mounted, setMounted] = useState(false)
           {categoryName && (
             <Badge variant="secondary" className="capitalize">{categoryName}</Badge>
           )}
+
+          <div className="mt-3"><ShareBar name={product.name} /></div>
 
           <div className="h-px bg-border" />
 

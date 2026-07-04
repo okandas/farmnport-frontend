@@ -25,7 +25,7 @@ export default function RearingProgramsPage() {
                         <span className="text-foreground">Rearing Programs</span>
                     </nav>
                     <p className="text-xs font-semibold text-primary tracking-wide uppercase">Livestock & Poultry</p>
-                    <h1 className="mt-1 text-3xl font-bold font-heading tracking-tight">Rearing Programs</h1>
+                    <h1 className="mt-1 text-3xl font-light tracking-tight text-foreground">Rearing Programs</h1>
                     <p className="mt-2 text-sm text-muted-foreground">
                         Structured rearing guides for livestock and poultry — brooding, housing, nutrition, biosecurity, and management from arrival to maturity.
                     </p>

@@ -63,6 +63,7 @@ interface CartItem {
   fulfillment?: {
     delivery_available: boolean
     pickup_available: boolean
+    is_digital?: boolean
     pickup_locations?: { id: string; name: string; address: string; city: string; time_slots?: string[] }[]
   }
 }
@@ -264,6 +265,7 @@ export default function CheckoutPage() {
     .flatMap((i) => i.fulfillment?.pickup_locations ?? [])
     .filter((loc, idx, arr) => arr.findIndex((l) => l.id === loc.id) === idx)
   const deliveryAvailable = items.every((i) => i.fulfillment?.delivery_available)
+  const isDigitalOrder = items.length > 0 && items.every((i) => i.fulfillment?.is_digital)
   const subtotalCents = items.reduce((s, i) => s + (i.unit_price * i.quantity), 0)
 
   useEffect(() => {
@@ -574,8 +576,24 @@ function onSubmit(data: CheckoutForm) {
                 </section>
               )}
 
+              {/* Digital delivery notice */}
+              {isDigitalOrder && (
+                <section className="border rounded-xl p-5 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h2 className="font-semibold">Digital Delivery</h2>
+                    <span className="text-xs text-muted-foreground bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium">Instant</span>
+                  </div>
+                  <ul className="space-y-2 text-sm text-muted-foreground">
+                    <li className="flex items-start gap-2"><span className="text-primary font-bold mt-0.5">✓</span> Sent to your email address after payment</li>
+                    <li className="flex items-start gap-2"><span className="text-primary font-bold mt-0.5">✓</span> Available in your account under <span className="font-medium text-foreground">My Downloads</span></li>
+                    <li className="flex items-start gap-2"><span className="text-primary font-bold mt-0.5">✓</span> No shipping or collection required</li>
+                    <li className="flex items-start gap-2"><span className="text-primary font-bold mt-0.5">✓</span> Download at any time from your account</li>
+                  </ul>
+                </section>
+              )}
+
               {/* Tumira Pickup Points */}
-              {needsTumira && (() => {
+              {!isDigitalOrder && needsTumira && (() => {
                 const selected = tumiraLocations.find((l) => l.id === selectedLocationId)
                 const filtered = tumiraLocations
                 return (
@@ -656,7 +674,7 @@ function onSubmit(data: CheckoutForm) {
               })()}
 
               {/* Static Collection Points */}
-              {needsTumira && pickupLocations.length > 0 && (
+              {!isDigitalOrder && needsTumira && pickupLocations.length > 0 && (
                 <section className="border rounded-xl p-5 space-y-3">
                   <h2 className="font-semibold">Collection Point</h2>
                   {pickupLocations.map((loc) => (
@@ -1110,7 +1128,7 @@ function onSubmit(data: CheckoutForm) {
                 <div className="px-5 pb-5">
                   <button
                     type="submit"
-                    disabled={checkoutMutation.isPending || items.length === 0 || (needsTumira && (pickupLocations.length > 0 || needsTumira) && !selectedLocationId) || (fulfillment === "delivery" && !selectedCourierId)}
+                    disabled={checkoutMutation.isPending || items.length === 0 || (!isDigitalOrder && needsTumira && (pickupLocations.length > 0 || needsTumira) && !selectedLocationId) || (fulfillment === "delivery" && !selectedCourierId)}
                     className="flex items-center justify-center gap-2 w-full bg-primary hover:bg-primary/90 disabled:opacity-60 text-primary-foreground font-semibold text-sm py-3 rounded-full transition-colors"
                   >
                     {checkoutMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <CreditCard className="w-4 h-4" />}

@@ -5,8 +5,9 @@ const ALL_NAV: (NavItem & { flag?: () => Promise<boolean> })[] = [
   { label: "Orders",            href: "/account/orders" },
   { label: "Bids",              href: "/account/bids" },
   { label: "Lots",              href: "/account/lots" },
-  { label: "Bookings",          href: "/account/bookings",          flag: bookingsEnabled },
-  { label: "Incoming Bookings", href: "/account/incoming-bookings", flag: bookingsEnabled },
+  { label: "My Booking Orders",  href: "/account/bookings",          flag: bookingsEnabled },
+  { label: "Incoming Orders",   href: "/account/incoming-bookings", flag: bookingsEnabled },
+  { label: "My Pre-Orders",     href: "/account/booking-events",   flag: bookingsEnabled, tooltip: "Create and manage pre-order batches for your products. Buyers request bookings, you confirm availability, then they pay." },
   { label: "Notifications",     href: "/account/notifications",     flag: notificationsEnabled },
   { label: "Documents",         href: "/account/documents",         flag: documentsEnabled },
   { label: "Profile",           href: "/account/profile",           flag: profileEnabled },
@@ -21,7 +22,7 @@ export default async function AccountSectionsLayout({ children }: { children: Re
 
   const items: NavItem[] = ALL_NAV
     .filter((_, i) => flagResults[i])
-    .map(({ label, href }) => ({ label, href }))
+    .map(({ label, href, tooltip }) => ({ label, href, tooltip }))
 
   return <AccountSectionsNav items={items}>{children}</AccountSectionsNav>
 }

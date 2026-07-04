@@ -119,6 +119,7 @@ export const Icons = {
   bird: Bird,
   piggyBank: PiggyBank,
   utensilsCrossed: UtensilsCrossed,
+  fileText: FileText,
   fileSpreadsheet: FileSpreadsheet,
   upload: Upload,
   edit: Pencil,

@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { serverFetch } from "@/lib/serverFetch"
 import { BuyDocumentsClient } from "./BuyDocumentsClient"
+import { getBuyCategories } from "@/components/generic/BuyCategoriesNav"
 
 export const metadata = {
     title: "Buy Documents & Plans | farm&port",
@@ -12,12 +13,14 @@ export default async function BuyDocumentsPage() {
     let initialTotal = 0
 
     try {
-        const result = await serverFetch("/documents")
-        initialDocuments = result?.documents || []
+        const result = await serverFetch("/documents/all")
+        initialDocuments = result?.data || []
         initialTotal = result?.total || 0
     } catch (error) {
         console.error("Error fetching documents:", error)
     }
+
+    const categories = await getBuyCategories()
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
@@ -40,6 +43,7 @@ export default async function BuyDocumentsPage() {
                 <BuyDocumentsClient
                     initialDocuments={initialDocuments}
                     initialTotal={initialTotal}
+                    categories={categories}
                 />
             </div>
         </div>

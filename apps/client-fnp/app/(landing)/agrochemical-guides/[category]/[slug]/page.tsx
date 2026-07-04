@@ -12,6 +12,7 @@ import { AgrochemicalDosageTable } from "@/components/agrochemical/AgrochemicalD
 import { ProductTargets } from "@/components/agrochemical/ProductTargets"
 import { WantToBuyCTA } from "@/components/shared/WantToBuyCTA"
 import { GuideProductTitle } from "@/components/shared/GuideProductTitle"
+import { ShareBar } from "@/components/shared/ShareBar"
 
 type Props = { params: Promise<{ category: string; slug: string }> }
 
@@ -219,7 +220,7 @@ export default async function AgroChemicalGuidePage({ params }: GuidePageProps) 
                         )}
 
                         {/* Want to Buy CTA */}
-                        <WantToBuyCTA available_for_sale={chemical.available_for_sale} name={chemical.name} brand={chemical.brand?.name} href={`/buy-agrochemicals/${slug}`} />
+                        <WantToBuyCTA available_for_sale={chemical.available_for_sale} name={chemical.name} brand={chemical.brand?.name} href={`/buy-agrochemicals/${slug}`} interestHref={`/interest/agrochemical/${slug}`} />
 
                         {/* Precautions */}
                         {chemical.precautions && chemical.precautions.length > 0 && (
@@ -244,6 +245,7 @@ export default async function AgroChemicalGuidePage({ params }: GuidePageProps) 
                     <div className="space-y-6">
                         {/* Product Name */}
                         <GuideProductTitle name={chemical.name} brand={chemical.brand?.name} />
+                        <div className="mt-3"><ShareBar name={chemical.name} /></div>
 
                         {/* Category Badge & Buy Link */}
                         <div className="flex items-center gap-3 flex-wrap">

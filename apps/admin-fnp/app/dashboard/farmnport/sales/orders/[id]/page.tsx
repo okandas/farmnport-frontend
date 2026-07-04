@@ -51,6 +51,7 @@ const STATUS_ICONS: Record<string, React.ReactNode> = {
 
 interface OrderItem {
   product_id: string
+  product_type: string
   product_name: string
   product_slug: string
   quantity: number
@@ -192,10 +193,12 @@ export default function OrderDetailPage() {
     )
   }
 
-  const steps =
-    order.fulfillment === "click_collect" ? STATUS_STEPS_COLLECT : STATUS_STEPS
+  const isDigitalOrder = order.items.length > 0 && order.items.every((i) => i.product_type === "document")
+  const steps = isDigitalOrder
+    ? ["pending", "paid"]
+    : order.fulfillment === "click_collect" ? STATUS_STEPS_COLLECT : STATUS_STEPS
   const currentStepIndex = steps.indexOf(order.status)
-  const actions = getNextActions(order.status, order.fulfillment)
+  const actions = isDigitalOrder ? [] : getNextActions(order.status, order.fulfillment)
 
   return (
     <div className="flex flex-col gap-6">
@@ -336,89 +339,71 @@ export default function OrderDetailPage() {
           </CardContent>
         </Card>
 
-        {/* Delivery Info */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Fulfillment</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2 text-sm">
-            <p>
-              <span className="text-muted-foreground">Method:</span>{" "}
-              {order.fulfillment === "click_collect"
-                ? "Click & Collect"
-                : "Delivery"}
-            </p>
-            {order.collection_location && (
-              <>
-                <p>
-                  <span className="text-muted-foreground">Hub:</span>{" "}
-                  Tumira Hub{order.collection_location.courier_name ? ` by ${order.collection_location.courier_name}` : ""}
-                </p>
-                <p>
-                  <span className="text-muted-foreground">Location:</span>{" "}
-                  {order.collection_location.name}
-                </p>
-              </>
-            )}
-            {order.delivery_address && (
-              <>
-                <p>
-                  <span className="text-muted-foreground">Recipient:</span>{" "}
-                  {order.delivery_address.name}
-                </p>
-                <p>
-                  <span className="text-muted-foreground">Address:</span>{" "}
-                  {order.delivery_address.address}
-                </p>
-                <p>
-                  <span className="text-muted-foreground">City:</span>{" "}
-                  {order.delivery_address.city},{" "}
-                  {order.delivery_address.province}
-                </p>
-                {order.delivery_address.courier_name && (
-                  <p>
-                    <span className="text-muted-foreground">Courier:</span>{" "}
-                    {order.delivery_address.courier_name}
-                  </p>
-                )}
-              </>
-            )}
-            {order.delivered_at && (
+        {/* Fulfillment */}
+        {isDigitalOrder ? (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Fulfillment</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-1 text-sm">
+              <p><span className="text-muted-foreground">Method:</span> Digital Delivery</p>
+              <p className="text-muted-foreground text-xs">Document sent to customer email. Available in their account under My Documents.</p>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Fulfillment</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2 text-sm">
               <p>
-                <span className="text-muted-foreground">{order.fulfillment === "click_collect" ? "Collected:" : "Delivered:"}</span>{" "}
-                {format(new Date(order.delivered_at), "PPp")}
+                <span className="text-muted-foreground">Method:</span>{" "}
+                {order.fulfillment === "click_collect" ? "Click & Collect" : "Delivery"}
               </p>
-            )}
-          </CardContent>
-        </Card>
+              {order.collection_location && (
+                <>
+                  <p><span className="text-muted-foreground">Hub:</span> Tumira Hub{order.collection_location.courier_name ? ` by ${order.collection_location.courier_name}` : ""}</p>
+                  <p><span className="text-muted-foreground">Location:</span> {order.collection_location.name}</p>
+                </>
+              )}
+              {order.delivery_address && (
+                <>
+                  <p><span className="text-muted-foreground">Recipient:</span> {order.delivery_address.name}</p>
+                  <p><span className="text-muted-foreground">Address:</span> {order.delivery_address.address}</p>
+                  <p><span className="text-muted-foreground">City:</span> {order.delivery_address.city}, {order.delivery_address.province}</p>
+                  {order.delivery_address.courier_name && (
+                    <p><span className="text-muted-foreground">Courier:</span> {order.delivery_address.courier_name}</p>
+                  )}
+                </>
+              )}
+              {order.delivered_at && (
+                <p><span className="text-muted-foreground">{order.fulfillment === "click_collect" ? "Collected:" : "Delivered:"}</span> {format(new Date(order.delivered_at), "PPp")}</p>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
-        {/* QR Verification */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">QR Verification</CardTitle>
-          </CardHeader>
-          <CardContent className="text-sm space-y-2">
-            <code className="block rounded bg-muted p-2 text-xs break-all">
-              {CLIENT_URL}/order/verify/{order.id}/{order.verify_token}
-            </code>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => navigator.clipboard.writeText(`${CLIENT_URL}/order/verify/${order.id}/${order.verify_token}`)}
-              >
-                <Copy className="h-3.5 w-3.5 mr-1" /> Copy
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => window.open(`${CLIENT_URL}/order/verify/${order.id}/${order.verify_token}`, "_blank")}
-              >
-                View
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        {/* QR Verification — physical orders only */}
+        {!isDigitalOrder && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">QR Verification</CardTitle>
+            </CardHeader>
+            <CardContent className="text-sm space-y-2">
+              <code className="block rounded bg-muted p-2 text-xs break-all">
+                {CLIENT_URL}/order/verify/{order.id}/{order.verify_token}
+              </code>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" onClick={() => navigator.clipboard.writeText(`${CLIENT_URL}/order/verify/${order.id}/${order.verify_token}`)}>
+                  <Copy className="h-3.5 w-3.5 mr-1" /> Copy
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => window.open(`${CLIENT_URL}/order/verify/${order.id}/${order.verify_token}`, "_blank")}>
+                  View
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       {/* Order Items */}

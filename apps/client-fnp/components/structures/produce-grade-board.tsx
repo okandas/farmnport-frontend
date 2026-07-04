@@ -4,10 +4,11 @@ import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { useQuery } from "@tanstack/react-query"
 import { useQueryState } from "nuqs"
-import { querySeriesSummary, querySeriesChart, querySeriesBuyers } from "@/lib/query"
+import { querySeriesSummary, querySeriesChart, querySeriesBuyers, queryMarketNews } from "@/lib/query"
 import { makeAbbveriation, slug } from "@/lib/utilities"
 import { PriceChart } from "@/components/structures/price-chart"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Sheet, SheetContent, SheetClose } from "@/components/ui/sheet"
 
 const toDollars = (v: number) => (v / 100).toFixed(2)
 
@@ -88,6 +89,172 @@ function filterByRange(history: { value: number; date: string }[], range: TimeRa
   return history.slice(-points)
 }
 
+// ── Market Insights ───────────────────────────────────────────────────────────
+
+interface MarketNewsItem {
+  id: string
+  guid: string
+  title: string
+  link: string
+  description: string
+  published_at: string
+  source: string
+  source_url: string
+}
+
+function addUTM(url: string): string {
+  try {
+    const u = new URL(url)
+    u.searchParams.set("utm_source", "farmnport")
+    u.searchParams.set("utm_medium", "prices_board")
+    u.searchParams.set("utm_campaign", "market_news")
+    return u.toString()
+  } catch {
+    return url
+  }
+}
+
+function timeAgo(dateStr: string): string {
+  const diff = Date.now() - new Date(dateStr).getTime()
+  const mins = Math.floor(diff / 60000)
+  if (mins < 60) return `${mins}m ago`
+  const hrs = Math.floor(mins / 60)
+  if (hrs < 24) return `${hrs}h ago`
+  const days = Math.floor(hrs / 24)
+  return `${days}d ago`
+}
+
+function NewsSheet({ item, open, onClose }: { item: MarketNewsItem | null; open: boolean; onClose: () => void }) {
+  return (
+    <Sheet open={open} onOpenChange={v => { if (!v) onClose() }}>
+      <SheetContent side="right" className="w-full sm:max-w-md p-0 flex flex-col">
+        <div className="flex items-center gap-3 px-5 py-4 border-b">
+          <SheetClose asChild>
+            <button className="text-muted-foreground hover:text-foreground transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+            </button>
+          </SheetClose>
+        </div>
+        {item && (
+          <div className="flex-1 overflow-y-auto">
+            <div className="px-5 py-5 border-b">
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-3">TLDR</p>
+              <p className="text-base font-bold text-foreground leading-snug mb-3">{item.title}</p>
+              <p className="text-sm text-muted-foreground leading-relaxed">{item.description}</p>
+            </div>
+            <div className="px-5 py-5">
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-3">Sources</p>
+              <div className="rounded-xl border bg-muted/20 p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="w-7 h-7 rounded-full bg-muted flex items-center justify-center text-[11px] font-bold text-muted-foreground">{item.source[0]}</span>
+                    <span className="text-sm font-semibold text-foreground">{item.source}</span>
+                  </div>
+                  <a href={addUTM(item.link)} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                  </a>
+                </div>
+                <p className="text-xs text-muted-foreground leading-relaxed mb-3">{item.description}</p>
+                <p className="text-[11px] text-muted-foreground/60">{timeAgo(item.published_at)}</p>
+              </div>
+            </div>
+          </div>
+        )}
+      </SheetContent>
+    </Sheet>
+  )
+}
+
+const NEWS_PAGE_SIZE = 20
+
+function InsightsTimeline() {
+  const [selected, setSelected] = useState<MarketNewsItem | null>(null)
+  const [page, setPage] = useState(1)
+  const [allItems, setAllItems] = useState<MarketNewsItem[]>([])
+  const [total, setTotal] = useState(0)
+  const sentinelRef = useRef<HTMLDivElement>(null)
+
+  const { data, isFetching } = useQuery({
+    queryKey: ["market-news", page],
+    queryFn: () => queryMarketNews(page, NEWS_PAGE_SIZE),
+    refetchOnWindowFocus: false,
+  })
+
+  useEffect(() => {
+    const incoming: MarketNewsItem[] = data?.data?.data ?? []
+    const t: number = data?.data?.total ?? 0
+    if (incoming.length === 0) return
+    setTotal(t)
+    setAllItems(prev => {
+      const existingGuids = new Set(prev.map(i => i.guid))
+      const fresh = incoming.filter(i => !existingGuids.has(i.guid))
+      return [...prev, ...fresh]
+    })
+  }, [data])
+
+  const hasMore = allItems.length < total
+
+  useEffect(() => {
+    const el = sentinelRef.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting && !isFetching && hasMore) setPage(p => p + 1) },
+      { threshold: 0.1 }
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [isFetching, hasMore])
+
+  return (
+    <>
+      <NewsSheet item={selected} open={!!selected} onClose={() => setSelected(null)} />
+      <div>
+        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-4">Latest News</p>
+        {allItems.map((item, i) => (
+          <div key={item.guid} className="relative pb-6 last:pb-0">
+            {i < allItems.length - 1 && (
+              <span className="absolute left-[4px] top-[18px] bottom-0 w-px bg-border" />
+            )}
+            <div className="flex gap-3">
+              <div className="mt-[9px] shrink-0 w-2 flex justify-center">
+                <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40 block" />
+              </div>
+              <button onClick={() => setSelected(item)} className="min-w-0 flex-1 text-left">
+                <p className="text-[11px] text-muted-foreground mb-1">{timeAgo(item.published_at)}</p>
+                <p className="text-xs font-semibold text-foreground leading-snug mb-2">{item.title}</p>
+                <div className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <span className="w-4 h-4 rounded-full bg-muted flex items-center justify-center text-[9px] font-bold leading-none text-muted-foreground">{item.source[0]}</span>
+                  1 source
+                </div>
+              </button>
+            </div>
+          </div>
+        ))}
+        <div ref={sentinelRef} className="h-4" />
+        {isFetching && (
+          <div className="space-y-4 pt-2">
+            {Array.from({ length: 2 }).map((_, i) => (
+              <div key={i} className="flex gap-3">
+                <div className="mt-[9px] shrink-0 w-2 flex justify-center">
+                  <span className="w-1.5 h-1.5 rounded-full bg-muted/60 block" />
+                </div>
+                <div className="flex-1 space-y-1.5">
+                  <div className="h-2.5 w-16 bg-muted/60 rounded animate-pulse" />
+                  <div className="h-3 w-full bg-muted/60 rounded animate-pulse" />
+                  <div className="h-3 w-3/4 bg-muted/60 rounded animate-pulse" />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        {allItems.length === 0 && !isFetching && (
+          <p className="text-xs text-muted-foreground">No news available</p>
+        )}
+      </div>
+    </>
+  )
+}
+
 export function ProduceGradeBoard({
   produce,
   code: initialCode,
@@ -164,12 +331,12 @@ export function ProduceGradeBoard({
   const activeType = best?.price_type ?? priceTypes[0] ?? ""
   const activeKey = best?.key ?? ""
   const peerGrades = gradeEntries.filter(e => e.price_type === activeType)
-  const chartTemplateType = best?.template_type ?? activeTemplateType
 
-  const { data: chartData } = useQuery({
-    queryKey: ["series-chart", activeCategory, best?.code, chartTemplateType],
-    queryFn: () => querySeriesChart(activeCategory, best?.code ?? "", chartTemplateType),
-    enabled: !!activeKey && !!best,
+
+  const { data: chartData, isLoading: isChartLoading } = useQuery({
+    queryKey: ["series-chart", activeCategory, codeParam, activeTemplateType],
+    queryFn: () => querySeriesChart(activeCategory, codeParam, activeTemplateType),
+    enabled: !!codeParam,
     refetchOnWindowFocus: false,
   })
 
@@ -269,13 +436,15 @@ export function ProduceGradeBoard({
                 </div>
               </div>
               <div style={{ height: 300 }}>
-                {chartValues.length > 0 && (
+                {isChartLoading ? (
+                  <div className="w-full h-full rounded-lg bg-muted/30 animate-pulse" />
+                ) : chartValues.length > 0 ? (
                   <PriceChart
                     values={chartValues.length === 1 ? [chartValues[0], chartValues[0]] : chartValues}
                     dates={chartDates.length === 1 ? [chartDates[0], chartDates[0]] : chartDates}
                     animKey={chartKey}
                   />
-                )}
+                ) : null}
               </div>
               {best && (
                 <div className="md:hidden mt-6 pt-4 border-t">
@@ -372,11 +541,13 @@ export function ProduceGradeBoard({
 
         {/* right sidebar */}
         <aside className="hidden lg:block w-72 xl:w-80 shrink-0 border-l">
-          <div className="sticky top-10 pl-5 pt-6">
-            <p className="text-sm mb-3">
-              <span className="font-bold text-foreground">Market</span>{" "}
-              <span className="font-normal text-muted-foreground">Insights</span>
-            </p>
+          <div className="sticky top-6 pt-6 overflow-y-auto max-h-screen [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+            <div className="px-5 mb-5">
+              <p className="text-sm"><span className="font-bold text-foreground">Market</span>{" "}<span className="font-normal text-muted-foreground">Insights</span></p>
+            </div>
+            <div className="px-5 pb-8">
+              <InsightsTimeline />
+            </div>
           </div>
         </aside>
       </div>

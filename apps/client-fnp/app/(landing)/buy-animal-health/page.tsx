@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { serverFetch } from "@/lib/serverFetch"
 import { BuyAnimalHealthClient } from "./BuyAnimalHealthClient"
+import { getBuyCategories } from "@/components/generic/BuyCategoriesNav"
 
 export default async function BuyAnimalHealthPage() {
     let initialProducts: any[] = []
@@ -13,6 +14,8 @@ export default async function BuyAnimalHealthPage() {
     } catch (error) {
         console.error("Error fetching animal health products:", error)
     }
+
+    const categories = await getBuyCategories()
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
@@ -36,6 +39,7 @@ export default async function BuyAnimalHealthPage() {
                 <BuyAnimalHealthClient
                     initialProducts={initialProducts}
                     initialTotal={initialTotal}
+                    categories={categories}
                 />
             </div>
         </div>

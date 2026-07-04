@@ -2,41 +2,78 @@
 
 import { useSession } from "next-auth/react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { Loader2, CalendarDays, Truck, Package, CheckCircle, XCircle, Clock } from "lucide-react"
+import { Loader2, CalendarDays, Truck, Package, CheckCircle, XCircle, Clock, AlertTriangle, CreditCard, Timer } from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner"
 import { use } from "react"
 
-import { getBooking, cancelBooking, checkout } from "@/lib/query"
+import { getBooking, cancelBooking, initiatePreOrderPayment, pollPreOrderPayment } from "@/lib/query"
 
 const STATUS_STYLES: Record<string, string> = {
-  pending:   "bg-yellow-100 text-yellow-800",
-  confirmed: "bg-blue-100 text-blue-800",
-  approved:  "bg-purple-100 text-purple-800",
-  ready:     "bg-orange-100 text-orange-800",
-  completed: "bg-green-100 text-green-800",
-  cancelled: "bg-red-100 text-red-800",
+  pending:          "bg-yellow-100 text-yellow-800",
+  confirmed:        "bg-blue-100 text-blue-800",
+  pending_payment:  "bg-orange-100 text-orange-800",
+  paid:             "bg-green-100 text-green-800",
+  approved:         "bg-purple-100 text-purple-800",
+  ready:            "bg-emerald-100 text-emerald-800",
+  collected:        "bg-green-100 text-green-800",
+  completed:        "bg-green-100 text-green-800",
+  rejected:         "bg-red-100 text-red-800",
+  expired:          "bg-muted text-muted-foreground",
+  cancelled:        "bg-red-100 text-red-800",
+}
+
+const STATUS_LABELS: Record<string, string> = {
+  pending:          "Pending Approval",
+  confirmed:        "Confirmed — Pay Now",
+  pending_payment:  "Payment Processing",
+  paid:             "Paid",
+  approved:         "Approved",
+  ready:            "Ready for Collection",
+  collected:        "Collected",
+  completed:        "Completed",
+  rejected:         "Rejected",
+  expired:          "Expired",
+  cancelled:        "Cancelled",
 }
 
 const STATUS_ICONS: Record<string, React.ReactNode> = {
-  pending:   <Clock className="w-4 h-4" />,
-  confirmed: <CheckCircle className="w-4 h-4" />,
-  approved:  <CheckCircle className="w-4 h-4" />,
-  ready:     <Package className="w-4 h-4" />,
-  completed: <CheckCircle className="w-4 h-4" />,
-  cancelled: <XCircle className="w-4 h-4" />,
-}
-
-function capitalize(s: string) {
-  return s.charAt(0).toUpperCase() + s.slice(1)
+  pending:          <Clock className="w-4 h-4" />,
+  confirmed:        <CreditCard className="w-4 h-4" />,
+  pending_payment:  <Timer className="w-4 h-4" />,
+  paid:             <CheckCircle className="w-4 h-4" />,
+  approved:         <CheckCircle className="w-4 h-4" />,
+  ready:            <Package className="w-4 h-4" />,
+  collected:        <CheckCircle className="w-4 h-4" />,
+  completed:        <CheckCircle className="w-4 h-4" />,
+  rejected:         <XCircle className="w-4 h-4" />,
+  expired:          <AlertTriangle className="w-4 h-4" />,
+  cancelled:        <XCircle className="w-4 h-4" />,
 }
 
 function formatDate(d: string) {
-  return new Date(d).toLocaleDateString("en-US", { day: "numeric", month: "long", year: "numeric" })
+  return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })
 }
 
 function formatDateTime(d: string) {
-  return new Date(d).toLocaleString("en-US", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })
+  return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })
+}
+
+function PaymentDeadlineCountdown({ deadline }: { deadline: string }) {
+  const deadlineDate = new Date(deadline)
+  const now = new Date()
+  const diff = deadlineDate.getTime() - now.getTime()
+
+  if (diff <= 0) return <span className="text-red-600 font-medium">Deadline passed</span>
+
+  const hours = Math.floor(diff / (1000 * 60 * 60))
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+
+  return (
+    <span className="text-orange-700 font-medium">
+      {hours}h {minutes}m remaining
+    </span>
+  )
 }
 
 export default function BookingDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -46,7 +83,7 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
 
   const { data, isLoading } = useQuery({
     queryKey: ["booking", id],
-    queryFn: () => getBooking(id).then((r) => r.data),
+    queryFn: () => getBooking(id).then((r: any) => r.data),
     enabled: !!session,
   })
 
@@ -62,23 +99,25 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
     },
   })
 
-  const depositMutation = useMutation({
-    mutationFn: (booking: any) =>
-      checkout({
-        order_type: "booking_deposit",
-        booking_id: booking.id,
-        provider: "paynow",
-        method: "",
+  const payMutation = useMutation({
+    mutationFn: () =>
+      initiatePreOrderPayment(id, {
         phone: (session?.user as any)?.phone ?? "",
-        email: session?.user?.email ?? "",
-        fulfillment: "",
       }),
-    onSuccess: (res) => {
+    onSuccess: (res: any) => {
       const url = res.data?.redirect_url
-      if (url) window.location.href = url
+      if (url) {
+        window.location.href = url
+      } else if (res.data?.instructions) {
+        toast.success(res.data.instructions)
+        // Start polling
+        setTimeout(() => {
+          queryClient.invalidateQueries({ queryKey: ["booking", id] })
+        }, 5000)
+      }
     },
-    onError: () => {
-      toast.error("Failed to initiate payment. Please try again.")
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.message || "Failed to initiate payment. Please try again.")
     },
   })
 
@@ -100,14 +139,15 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
     )
   }
 
-  const canCancel = !["completed", "cancelled"].includes(booking.status)
+  const canCancel = !["completed", "collected", "cancelled", "rejected", "expired", "paid"].includes(booking.status)
+  const canPay = booking.status === "confirmed" && booking.type === "pre-order"
 
   return (
     <div>
       <nav className="flex items-center gap-1.5 text-sm text-muted-foreground mb-4">
         <Link href="/account" className="hover:text-foreground transition-colors">Account</Link>
         <span>/</span>
-        <Link href="/account/bookings" className="hover:text-foreground transition-colors">My Bookings</Link>
+        <Link href="/account/bookings" className="hover:text-foreground transition-colors">My Booking Orders</Link>
         <span>/</span>
         <span className="text-foreground font-medium">{booking.booking_ref}</span>
       </nav>
@@ -118,19 +158,61 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
         <div className="flex items-start justify-between gap-4">
           <div>
             <h1 className="text-xl font-bold">{booking.booking_ref}</h1>
-            <p className="text-sm text-muted-foreground mt-1">Booked on {formatDateTime(booking.created)}</p>
+            <p className="text-sm text-muted-foreground mt-1">Submitted {formatDateTime(booking.created)}</p>
           </div>
           <span className={`inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full font-medium ${STATUS_STYLES[booking.status] ?? "bg-muted text-muted-foreground"}`}>
             {STATUS_ICONS[booking.status]}
-            {capitalize(booking.status)}
+            {STATUS_LABELS[booking.status] ?? booking.status}
           </span>
         </div>
+
+        {/* Pay Now banner for confirmed bookings */}
+        {canPay && (
+          <div className="border border-orange-200 bg-orange-50 rounded-xl p-5 space-y-3">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="font-semibold text-orange-900">Your booking is confirmed — pay to secure</p>
+                <p className="text-sm text-orange-700 mt-1">
+                  Pay ${(booking.pre_order.deposit_amount / 100).toFixed(2)} to secure your {booking.pre_order.quantity} {booking.pre_order.product_name}
+                </p>
+              </div>
+              {booking.pre_order?.payment_deadline && (
+                <div className="text-right shrink-0">
+                  <p className="text-xs text-muted-foreground">Deadline</p>
+                  <PaymentDeadlineCountdown deadline={booking.pre_order.payment_deadline} />
+                </div>
+              )}
+            </div>
+            <button
+              onClick={() => payMutation.mutate()}
+              disabled={payMutation.isPending}
+              className="w-full flex items-center justify-center gap-2 bg-orange-600 hover:bg-orange-700 text-white font-semibold py-2.5 rounded-xl transition-colors disabled:opacity-50 text-sm"
+            >
+              {payMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <CreditCard className="w-4 h-4" />}
+              Pay Now
+            </button>
+          </div>
+        )}
+
+        {/* Rejected reason */}
+        {booking.status === "rejected" && booking.pre_order?.reject_reason && (
+          <div className="border border-red-200 bg-red-50 rounded-xl p-4">
+            <p className="text-sm font-medium text-red-800">Reason: {booking.pre_order.reject_reason}</p>
+          </div>
+        )}
+
+        {/* Expired notice */}
+        {booking.status === "expired" && (
+          <div className="border border-muted bg-muted/30 rounded-xl p-4">
+            <p className="text-sm text-muted-foreground">This booking expired because the payment was not received within the deadline.</p>
+          </div>
+        )}
 
         {/* Booking type card */}
         <div className="border rounded-xl p-5 space-y-4">
           <div className="flex items-center gap-2 text-sm font-semibold capitalize">
             {booking.type === "delivery" || booking.type === "pickup" ? <Truck className="w-4 h-4" /> : <CalendarDays className="w-4 h-4" />}
-            {booking.type === "pre-order" ? "Forward" : capitalize(booking.type)} Booking
+            {booking.type === "pre-order" ? "Pre-Order" : booking.type} Booking
           </div>
 
           {booking.type === "pre-order" && booking.pre_order && (
@@ -154,24 +236,21 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
                 </div>
               </div>
 
+              {booking.pre_order.buyer_notes && (
+                <div className="border-t pt-3 text-sm">
+                  <p className="text-muted-foreground text-xs mb-0.5">Your Notes</p>
+                  <p>{booking.pre_order.buyer_notes}</p>
+                </div>
+              )}
+
               <div className="border-t pt-3 grid grid-cols-2 gap-3 text-sm">
                 <div>
-                  <p className="text-muted-foreground text-xs mb-0.5">Deposit</p>
+                  <p className="text-muted-foreground text-xs mb-0.5">Amount Due</p>
                   <p className="font-bold text-orange-700">${(booking.pre_order.deposit_amount / 100).toFixed(2)}</p>
                   <p className="text-xs text-muted-foreground">{booking.pre_order.deposit_paid ? "Paid" : "Not yet paid"}</p>
-                  {!booking.pre_order.deposit_paid && booking.status !== "cancelled" && (
-                    <button
-                      onClick={() => depositMutation.mutate(booking)}
-                      disabled={depositMutation.isPending}
-                      className="mt-2 inline-flex items-center gap-1.5 bg-orange-600 hover:bg-orange-700 text-white text-xs font-medium px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
-                    >
-                      {depositMutation.isPending ? <Loader2 className="w-3 h-3 animate-spin" /> : null}
-                      Pay Deposit
-                    </button>
-                  )}
                 </div>
                 <div>
-                  <p className="text-muted-foreground text-xs mb-0.5">Balance Due</p>
+                  <p className="text-muted-foreground text-xs mb-0.5">Balance on Collection</p>
                   <p className="font-bold">${(booking.pre_order.balance_due / 100).toFixed(2)}</p>
                 </div>
               </div>
@@ -193,12 +272,6 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
                   <div>
                     <p className="text-muted-foreground text-xs mb-0.5">Time Slot</p>
                     <p className="font-medium">{booking.time_slot}</p>
-                  </div>
-                )}
-                {booking.delivery.approved_by_name && (
-                  <div>
-                    <p className="text-muted-foreground text-xs mb-0.5">Approved By</p>
-                    <p className="font-medium">{booking.delivery.approved_by_name}</p>
                   </div>
                 )}
               </div>
@@ -228,7 +301,7 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
                     {STATUS_ICONS[h.to] ?? <Clock className="w-4 h-4 text-muted-foreground" />}
                   </div>
                   <div>
-                    <p className="font-medium">{capitalize(h.to)}</p>
+                    <p className="font-medium">{STATUS_LABELS[h.to] ?? h.to}</p>
                     {h.note && <p className="text-xs text-muted-foreground">{h.note}</p>}
                     <p className="text-xs text-muted-foreground">{formatDateTime(h.timestamp)}</p>
                   </div>

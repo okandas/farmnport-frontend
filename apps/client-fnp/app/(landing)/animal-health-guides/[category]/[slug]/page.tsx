@@ -8,6 +8,7 @@ import { capitalizeFirstLetter, formatUnit, buildGuideMetadata } from "@/lib/uti
 import { GuideProductTitle } from "@/components/shared/GuideProductTitle"
 import { BaseURL } from "@/lib/schemas"
 import { WantToBuyCTA } from "@/components/shared/WantToBuyCTA"
+import { ShareBar } from "@/components/shared/ShareBar"
 
 type Props = { params: Promise<{ category: string; slug: string }> }
 
@@ -300,7 +301,7 @@ export default async function AnimalHealthGuidePage({ params }: GuidePageProps) 
                         )}
 
                         {/* Want to Buy CTA */}
-                        <WantToBuyCTA available_for_sale={product.available_for_sale} name={product.name} brand={product.brand?.name} href={`/buy-animal-health/${slug}`} />
+                        <WantToBuyCTA available_for_sale={product.available_for_sale} name={product.name} brand={product.brand?.name} href={`/buy-animal-health/${slug}`} interestHref={`/interest/animal-health/${slug}`} />
 
                         {/* Precautions */}
                         {product.precautions && product.precautions.length > 0 && (
@@ -325,6 +326,7 @@ export default async function AnimalHealthGuidePage({ params }: GuidePageProps) 
                     <div className="space-y-6">
                         {/* Product Name */}
                         <GuideProductTitle name={product.name} brand={product.brand?.name} />
+                        <div className="mt-3"><ShareBar name={product.name} /></div>
 
                         {/* Category Badge */}
                         <div className="flex items-center gap-3 flex-wrap">

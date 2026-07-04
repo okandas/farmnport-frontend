@@ -3,6 +3,7 @@
 import { useParams, useRouter } from "next/navigation"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { format } from "date-fns"
+import { useState } from "react"
 import {
   ArrowLeft,
   CalendarCheck,
@@ -19,6 +20,15 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useToast } from "@/components/ui/use-toast"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog"
+import { Textarea } from "@/components/ui/textarea"
+import { Label } from "@/components/ui/label"
 
 const STATUS_STEPS = ["pending", "confirmed", "completed"]
 
@@ -95,6 +105,8 @@ export default function ReservationDetailPage() {
   const router = useRouter()
   const queryClient = useQueryClient()
   const { toast } = useToast()
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false)
+  const [cancelNote, setCancelNote] = useState("")
 
   const id = params.id as string
 
@@ -105,7 +117,8 @@ export default function ReservationDetailPage() {
   })
 
   const statusMutation = useMutation({
-    mutationFn: (status: string) => updateTableReservationStatus(id, status),
+    mutationFn: ({ status, admin_notes }: { status: string; admin_notes?: string }) =>
+      updateTableReservationStatus(id, status, admin_notes),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-reservation", id] })
       queryClient.invalidateQueries({ queryKey: ["admin-reservations"] })
@@ -113,6 +126,20 @@ export default function ReservationDetailPage() {
     },
     onError: () => toast({ title: "Failed to update reservation", variant: "destructive" }),
   })
+
+  function handleActionClick(status: string) {
+    if (status === "cancelled") {
+      setCancelNote("")
+      setCancelDialogOpen(true)
+    } else {
+      statusMutation.mutate({ status })
+    }
+  }
+
+  function handleConfirmCancel() {
+    statusMutation.mutate({ status: "cancelled", admin_notes: cancelNote })
+    setCancelDialogOpen(false)
+  }
 
   if (isLoading) {
     return (
@@ -194,7 +221,7 @@ export default function ReservationDetailPage() {
             <Button
               key={action.status}
               variant={action.variant}
-              onClick={() => statusMutation.mutate(action.status)}
+              onClick={() => handleActionClick(action.status)}
               disabled={statusMutation.isPending}
             >
               {action.label}
@@ -307,6 +334,37 @@ export default function ReservationDetailPage() {
           </CardContent>
         </Card>
       )}
+
+      {/* Cancel Dialog */}
+      <Dialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Cancel Reservation</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 py-2">
+            <Label htmlFor="cancel-note">Reason for cancellation</Label>
+            <Textarea
+              id="cancel-note"
+              placeholder="Enter reason (will be included in the cancellation email)"
+              value={cancelNote}
+              onChange={(e) => setCancelNote(e.target.value)}
+              rows={4}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setCancelDialogOpen(false)}>
+              Go back
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleConfirmCancel}
+              disabled={statusMutation.isPending}
+            >
+              Confirm Cancellation
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
     </div>
   )

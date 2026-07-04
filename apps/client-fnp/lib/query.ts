@@ -891,6 +891,28 @@ export function retryOrderPayment(id: string) {
   return api.post(`${BaseURL}/order/${id}/pay`, {})
 }
 
+// Documents
+export function listDocumentCategories() {
+  return api.get(`${BaseURL}/documents/categories`)
+}
+
+export function listDocuments(category?: string) {
+  const q = category ? `?category=${category}` : ""
+  return api.get(`${BaseURL}/documents/all${q}`)
+}
+
+export function getDocument(slug: string) {
+  return api.get(`${BaseURL}/documents/${slug}`)
+}
+
+export function myDownloads() {
+  return api.get(`${BaseURL}/documents/my-downloads`)
+}
+
+export function downloadDocument(token: string) {
+  return api.get(`${BaseURL}/documents/download/${token}`)
+}
+
 // Lots
 export function myLots(page?: number) {
   const p = page && page >= 2 ? `?p=${page}` : ""
@@ -932,7 +954,7 @@ export function getLotBids(slug: string) {
 }
 
 // Bookings
-export function listBookingEvents(options?: { product_id?: string; status?: string }) {
+export function listPreOrders(options?: { product_id?: string; status?: string }) {
   const params = new URLSearchParams()
   if (options?.product_id) params.set("product_id", options.product_id)
   if (options?.status) params.set("status", options.status)
@@ -940,8 +962,13 @@ export function listBookingEvents(options?: { product_id?: string; status?: stri
   return api.get(`${BaseURL}/booking/events${qs ? `?${qs}` : ""}`)
 }
 
-export function getBookingEvent(id: string) {
+export function getPreOrder(id: string) {
   return api.get(`${BaseURL}/booking/events/${id}`)
+}
+
+export function myPreOrders(page?: number) {
+  const p = page && page >= 2 ? `?p=${page}` : ""
+  return api.get(`${BaseURL}/booking/my-preorders${p}`)
 }
 
 export function listDeliveryLocations(clientId?: string) {
@@ -990,6 +1017,35 @@ export function getBooking(id: string) {
 
 export function cancelBooking(id: string) {
   return api.put(`${BaseURL}/booking/${id}/cancel`, {})
+}
+
+export function initiatePreOrderPayment(id: string, data: { method?: string; phone?: string }) {
+  return api.post(`${BaseURL}/booking/${id}/initiate-payment`, data)
+}
+
+export function pollPreOrderPayment(id: string) {
+  return api.get(`${BaseURL}/booking/${id}/poll-payment`)
+}
+
+// Client — manage bookings on their own pre-orders
+export function clientConfirmBooking(id: string) {
+  return api.put(`${BaseURL}/booking/client/${id}/confirm`, {})
+}
+
+export function clientRejectBooking(id: string, reason: string) {
+  return api.put(`${BaseURL}/booking/client/${id}/reject`, { reason })
+}
+
+export function clientMarkReady(id: string) {
+  return api.put(`${BaseURL}/booking/client/${id}/mark-ready`, {})
+}
+
+export function clientMarkCollected(id: string) {
+  return api.put(`${BaseURL}/booking/client/${id}/mark-collected`, {})
+}
+
+export function clientPreOrderBookings(preOrderId: string) {
+  return api.get(`${BaseURL}/booking/client/preorder/${preOrderId}/bookings`)
 }
 
 export function buyerUpdateBookingStatus(id: string, status: string, note?: string) {
@@ -1098,4 +1154,8 @@ export function queryTumiraRates(payload: {
 
 export function queryMarketNews(page: number = 1, limit: number = 20) {
   return api.get(`${BaseURL}/market-news/?page=${page}&limit=${limit}`)
+}
+
+export function recordProductInterest(productType: string, slug: string) {
+  return api.post(`${BaseURL}/interest/${productType}/${slug}`, {})
 }

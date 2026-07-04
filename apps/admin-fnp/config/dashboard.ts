@@ -86,7 +86,7 @@ export const dashboardConfig: DashboardConfig = {
       ],
     },
     {
-      label: "Pre Orders",
+      label: "Bookings",
       items: [
         {
           title: "Bookings",
@@ -113,6 +113,17 @@ export const dashboardConfig: DashboardConfig = {
           title: "Lots",
           href: "/dashboard/farmnport/lots",
           icon: "box",
+        },
+      ],
+    },
+    {
+      label: "Documents",
+      alwaysOpen: true,
+      items: [
+        {
+          title: "Documents",
+          href: "/dashboard/farmnport/documents",
+          icon: "fileText",
         },
       ],
     },

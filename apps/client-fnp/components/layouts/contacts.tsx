@@ -108,7 +108,7 @@ export function Contacts({ user, client, quickOverview }: ContactPageProps) {
                 {
                     showDetail ?
                         <dd className="text-sm font-medium leading-6 text-muted-foreground hover:underline">
-                            <Link href={`mailto:${email}`}>
+                            <Link href={`mailto:${email}`} onClick={() => sendGTMEvent({ event: 'email' })}>
                                 {email}
                             </Link>
                         </dd>
@@ -137,7 +137,7 @@ export function Contacts({ user, client, quickOverview }: ContactPageProps) {
                 {
                     showDetail ?
                         <dd className="text-sm font-medium leading-6 text-muted-foreground hover:underline">
-                            <Link href={`tel:${phone}`}>
+                            <Link href={`tel:${phone}`} onClick={() => sendGTMEvent({ event: 'phone_call' })}>
                                 {phone}
                             </Link>
                         </dd>

@@ -2,81 +2,19 @@
 
 import { useQuery } from "@tanstack/react-query"
 import { queryAllDocuments } from "@/lib/query"
-import Link from "next/link"
-import Image from "next/image"
 import { parseAsInteger, parseAsString, useQueryStates } from "nuqs"
-import { FileText, Download } from "lucide-react"
+import { FileText } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { AddToCartButton } from "@/components/cart/AddToCartButton"
-import { BuyCategoriesNav } from "@/components/generic/BuyCategoriesNav"
+import { ProductCard } from "@/components/shared/ProductCard"
+import { BuyCategoriesNavClient } from "@/components/generic/BuyCategoriesNavClient"
 import { DocumentFilterSidebar } from "@/components/generic/documentFilterSidebar"
 
 interface BuyDocumentsClientProps {
     initialDocuments: any[]
     initialTotal: number
+    categories: { label: string; href: string }[]
 }
 
-function DocumentCard({ doc }: { doc: any }) {
-    const price = doc.price_cents ? `$${(doc.price_cents / 100).toFixed(2)}` : "Free"
-    const preview = doc.preview_images?.[0]
-    const href = `/buy-documents/${doc.slug}`
-
-    return (
-        <div className="bg-card border border-border rounded-lg overflow-hidden transition-all duration-200 hover:shadow-lg hover:border-primary/50 group">
-            <Link href={href} className="block">
-                <div className="relative aspect-square bg-muted/20">
-                    {preview ? (
-                        <Image
-                            src={preview}
-                            alt={doc.title}
-                            fill
-                            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                            className="object-cover transition-transform duration-200 group-hover:scale-105"
-                        />
-                    ) : (
-                        <div className="absolute inset-0 bg-muted/30" />
-                    )}
-                </div>
-            </Link>
-
-            <div className="p-4 space-y-3 border-t">
-                {doc.category && (
-                    <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">
-                        {doc.category.replace(/_/g, " ")}
-                    </p>
-                )}
-
-                <Link href={href}>
-                    <h3 className="font-semibold text-sm leading-tight line-clamp-2 min-h-[2.5rem] group-hover:text-primary transition-colors">
-                        {doc.title}
-                    </h3>
-                </Link>
-
-                <div className="flex items-center gap-4 text-xs text-muted-foreground pt-2 border-t">
-                    <div className="flex items-center gap-1.5">
-                        <Download className="w-3.5 h-3.5" />
-                        <span className="uppercase">{doc.file_type || "pdf"}</span>
-                    </div>
-                    {doc.price_cents > 0 ? (
-                        <span className="text-sm font-bold text-primary">{price}</span>
-                    ) : (
-                        <span className="text-sm font-bold text-primary">Free</span>
-                    )}
-                </div>
-
-                <AddToCartButton
-                    productId={doc.id}
-                    productType="document"
-                    productName={doc.title}
-                    productSlug={doc.slug}
-                    imageSrc={preview}
-                    unitPrice={doc.price_cents > 0 ? doc.price_cents : null}
-                    loginRedirect={href}
-                />
-            </div>
-        </div>
-    )
-}
 
 function DocumentCardSkeleton() {
     return (
@@ -98,7 +36,7 @@ function DocumentCardSkeleton() {
     )
 }
 
-export function BuyDocumentsClient({ initialDocuments, initialTotal }: BuyDocumentsClientProps) {
+export function BuyDocumentsClient({ initialDocuments, initialTotal, categories }: BuyDocumentsClientProps) {
     const [queryState, setQueryState] = useQueryStates({
         category: parseAsString.withDefault(""),
         p: parseAsInteger.withDefault(1),
@@ -110,10 +48,10 @@ export function BuyDocumentsClient({ initialDocuments, initialTotal }: BuyDocume
         queryKey: ["documents-shop", queryState.p, queryState.category],
         queryFn: () => queryAllDocuments({ p: queryState.p, category: queryState.category || undefined }),
         refetchOnWindowFocus: false,
-        placeholderData: !hasFilters ? { data: { documents: initialDocuments, total: initialTotal } } as any : undefined,
+        placeholderData: !hasFilters ? { data: { data: initialDocuments, total: initialTotal } } as any : undefined,
     })
 
-    const documents = data?.data?.documents || []
+    const documents = data?.data?.data || []
     const total = data?.data?.total || 0
     const totalPages = Math.ceil(total / 24)
 
@@ -121,7 +59,7 @@ export function BuyDocumentsClient({ initialDocuments, initialTotal }: BuyDocume
         <div className="flex flex-col lg:flex-row gap-8">
             {/* Sidebar */}
             <aside className="w-full lg:w-64 flex-shrink-0">
-                <BuyCategoriesNav />
+                <BuyCategoriesNavClient categories={categories} />
                 <DocumentFilterSidebar />
             </aside>
 
@@ -144,7 +82,23 @@ export function BuyDocumentsClient({ initialDocuments, initialTotal }: BuyDocume
 
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
                             {documents.map((doc: any) => (
-                                <DocumentCard key={doc.id} doc={doc} />
+                                <ProductCard
+                                    key={doc.id}
+                                    mode="buy"
+                                    href={`/buy-documents/${doc.slug}`}
+                                    imageSrc={doc.main_image}
+                                    name={doc.title}
+                                    meta={doc.category?.replace(/_/g, " ")}
+                                    productId={doc.id}
+                                    productType="document"
+                                    productSlug={doc.slug}
+                                    salePrice={doc.price_cents > 0 ? doc.price_cents : undefined}
+                                    availableForSale={true}
+                                    loginRedirect={`/buy-documents/${doc.slug}`}
+                                    isTest={doc.is_test}
+                                    singleUnit
+                                    imageFill={doc.image_fill}
+                                />
                             ))}
                         </div>
 

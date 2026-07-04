@@ -148,6 +148,7 @@ export default function OrderDetailPage() {
     )
   }
 
+  const isDigitalOrder = order.items.length > 0 && order.items.every((i) => i.product_type === "document")
   const steps = order.fulfillment === "click_collect" ? STATUS_STEPS_COLLECT : STATUS_STEPS_DELIVERY
   const currentStepIndex = steps.indexOf(order.status)
 
@@ -232,7 +233,7 @@ export default function OrderDetailPage() {
         )}
 
         {/* Status Stepper */}
-        {order.status !== "cancelled" && (
+        {order.status !== "cancelled" && !isDigitalOrder && (
           <div className="border rounded-xl p-5">
             <h2 className="text-sm font-semibold mb-4">Order Progress</h2>
             <div className="flex items-center justify-between">
@@ -307,39 +308,59 @@ export default function OrderDetailPage() {
 
         <div className="grid sm:grid-cols-2 gap-4">
           {/* Fulfillment */}
-          <div className="border rounded-xl p-5 space-y-3">
-            <div className="flex items-center gap-2">
-              {order.fulfillment === "click_collect" ? (
-                <Store className="w-4 h-4 text-muted-foreground" />
-              ) : (
-                <Truck className="w-4 h-4 text-muted-foreground" />
-              )}
-              <h2 className="font-semibold text-sm">
-                {order.fulfillment === "click_collect" ? "Click & Collect" : "Delivery"}
-              </h2>
+          {isDigitalOrder ? (
+            <div className="border rounded-xl p-5 space-y-3">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-primary" />
+                <h2 className="font-semibold text-sm">Digital Delivery</h2>
+              </div>
+              <ul className="space-y-1.5 text-xs text-muted-foreground">
+                <li className="flex items-start gap-1.5"><span className="text-primary font-bold">✓</span> Sent to your email address</li>
+                <li className="flex items-start gap-1.5"><span className="text-primary font-bold">✓</span> Available in My Documents below</li>
+                <li className="flex items-start gap-1.5"><span className="text-primary font-bold">✓</span> No shipping required</li>
+              </ul>
+              <Link
+                href="/account/documents"
+                className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline"
+              >
+                Go to My Documents <ExternalLink className="w-3 h-3" />
+              </Link>
             </div>
-            {order.collection_location ? (
-              <div className="text-sm space-y-0.5">
-                <p className="font-medium">Tumira Hub{order.collection_location.courier_name ? ` by ${order.collection_location.courier_name}` : ""}</p>
-                <p className="text-muted-foreground">{order.collection_location.name}</p>
-              </div>
-            ) : order.delivery_address ? (
-              <div className="text-xs space-y-1 text-muted-foreground">
-                <p className="text-foreground font-medium capitalize">{order.delivery_address.name}</p>
-                <p>{order.delivery_address.address}</p>
-                <p>{order.delivery_address.city}, {order.delivery_address.province}</p>
-                {order.delivery_address.phone && <p>{order.delivery_address.phone}</p>}
-                {order.delivery_address.courier_name && (
-                  <p className="pt-1 text-xs">Shipment handled by <span className="text-foreground font-medium">{order.delivery_address.courier_name}</span></p>
+          ) : (
+            <div className="border rounded-xl p-5 space-y-3">
+              <div className="flex items-center gap-2">
+                {order.fulfillment === "click_collect" ? (
+                  <Store className="w-4 h-4 text-muted-foreground" />
+                ) : (
+                  <Truck className="w-4 h-4 text-muted-foreground" />
                 )}
+                <h2 className="font-semibold text-sm">
+                  {order.fulfillment === "click_collect" ? "Click & Collect" : "Delivery"}
+                </h2>
               </div>
-            ) : (
-              <p className="text-sm text-muted-foreground">Collect in person</p>
-            )}
-            {order.delivered_at && (
-              <p className="text-xs text-green-700 dark:text-green-400">{order.fulfillment === "click_collect" ? "Collected" : "Delivered"} {formatDate(order.delivered_at)}</p>
-            )}
-          </div>
+              {order.collection_location ? (
+                <div className="text-sm space-y-0.5">
+                  <p className="font-medium">Tumira Hub{order.collection_location.courier_name ? ` by ${order.collection_location.courier_name}` : ""}</p>
+                  <p className="text-muted-foreground">{order.collection_location.name}</p>
+                </div>
+              ) : order.delivery_address ? (
+                <div className="text-xs space-y-1 text-muted-foreground">
+                  <p className="text-foreground font-medium capitalize">{order.delivery_address.name}</p>
+                  <p>{order.delivery_address.address}</p>
+                  <p>{order.delivery_address.city}, {order.delivery_address.province}</p>
+                  {order.delivery_address.phone && <p>{order.delivery_address.phone}</p>}
+                  {order.delivery_address.courier_name && (
+                    <p className="pt-1 text-xs">Shipment handled by <span className="text-foreground font-medium">{order.delivery_address.courier_name}</span></p>
+                  )}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">Collect in person</p>
+              )}
+              {order.delivered_at && (
+                <p className="text-xs text-green-700 dark:text-green-400">{order.fulfillment === "click_collect" ? "Collected" : "Delivered"} {formatDate(order.delivered_at)}</p>
+              )}
+            </div>
+          )}
 
           {/* Payment */}
           <div className="border rounded-xl p-5 space-y-3">
@@ -363,7 +384,10 @@ export default function OrderDetailPage() {
           <div className="border rounded-xl p-5">
             <h2 className="font-semibold text-sm mb-4">Timeline</h2>
             <div className="space-y-4">
-              {[...order.status_history].reverse().map((change, i, arr) => (
+              {(isDigitalOrder
+                ? [...order.status_history].filter((c) => c.to === "paid")
+                : [...order.status_history].reverse()
+              ).map((change, i, arr) => (
                 <div key={i} className="flex gap-3">
                   <div className="flex flex-col items-center shrink-0">
                     <div className="h-2 w-2 rounded-full bg-primary mt-1.5" />

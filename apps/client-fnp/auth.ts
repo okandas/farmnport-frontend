@@ -10,6 +10,7 @@ declare module "next-auth" {
     interface User {
         bad_participant: boolean
         admin: boolean
+        is_internal: boolean
         banned: boolean
         subscription_active: boolean
         exp: number

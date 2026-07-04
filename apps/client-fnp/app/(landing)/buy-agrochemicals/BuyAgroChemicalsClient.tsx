@@ -5,16 +5,17 @@ import { queryBuyAgroChemicals } from "@/lib/query"
 import { Button } from "@/components/ui/button"
 import { AgroChemicalFilterSidebar } from "@/components/generic/agroChemicalFilterSidebar"
 import { ProductCard } from "@/components/shared/ProductCard"
-import { BuyCategoriesNav } from "@/components/generic/BuyCategoriesNav"
+import { BuyCategoriesNavClient } from "@/components/generic/BuyCategoriesNavClient"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
 import { Beaker } from "lucide-react"
 
 interface BuyAgroChemicalsClientProps {
     initialChemicals: any[]
     initialTotal: number
+    categories: { label: string; href: string }[]
 }
 
-export function BuyAgroChemicalsClient({ initialChemicals, initialTotal }: BuyAgroChemicalsClientProps) {
+export function BuyAgroChemicalsClient({ initialChemicals, initialTotal, categories }: BuyAgroChemicalsClientProps) {
     const [queryState, setQueryState] = useQueryStates({
         brand: parseAsArrayOf(parseAsString),
         target: parseAsArrayOf(parseAsString),
@@ -55,7 +56,7 @@ export function BuyAgroChemicalsClient({ initialChemicals, initialTotal }: BuyAg
         <div className="flex flex-col lg:flex-row gap-8">
             {/* Sidebar Filters */}
             <aside className="w-full lg:w-64 flex-shrink-0">
-                <BuyCategoriesNav />
+                <BuyCategoriesNavClient categories={categories} />
                 <AgroChemicalFilterSidebar />
             </aside>
 

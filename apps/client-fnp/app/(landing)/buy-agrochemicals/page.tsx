@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { serverFetch } from "@/lib/serverFetch"
 import { BuyAgroChemicalsClient } from "./BuyAgroChemicalsClient"
+import { getBuyCategories } from "@/components/generic/BuyCategoriesNav"
 
 export default async function BuyAgroChemicalsPage() {
     let initialChemicals: any[] = []
@@ -13,6 +14,8 @@ export default async function BuyAgroChemicalsPage() {
     } catch (error) {
         console.error("Error fetching agrochemicals:", error)
     }
+
+    const categories = await getBuyCategories()
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
@@ -36,6 +39,7 @@ export default async function BuyAgroChemicalsPage() {
                 <BuyAgroChemicalsClient
                     initialChemicals={initialChemicals}
                     initialTotal={initialTotal}
+                    categories={categories}
                 />
             </div>
         </div>

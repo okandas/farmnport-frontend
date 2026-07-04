@@ -1,139 +1,163 @@
-import { serverFetch } from "@/lib/serverFetch"
 import { notFound } from "next/navigation"
-import { AddToCartButton } from "@/components/cart/AddToCartButton"
-import { FileText, Download, Tag } from "lucide-react"
+import Link from "next/link"
+import { Tag, Download, ShieldCheck, RotateCcw, Hash, FileText } from "lucide-react"
+import { ShareBar } from "@/components/shared/ShareBar"
+import { serverFetch } from "@/lib/serverFetch"
+import { guardTestItem } from "@/lib/guardTestItem"
+import { DocumentPricingPanel } from "@/components/shop/DocumentPricingPanel"
+import { Badge } from "@/components/ui/badge"
+import { ProductImageGallery } from "@/components/shared/ProductImageGallery"
 
 interface Props {
     params: Promise<{ slug: string }>
 }
 
 export async function generateMetadata({ params }: Props) {
-    const { slug } = await params
     try {
-        const res = await serverFetch(`/documents/${slug}`)
-        const doc = res?.document
+        const { slug } = await params
+        const result = await serverFetch(`/documents/${slug}`)
+        const doc = result?.document
+        if (!doc) return {}
         return {
-            title: `${doc?.title} | farm&port`,
-            description: doc?.description,
+            title: `${doc.title} | Farmnport Documents`,
+            description: doc.description,
         }
     } catch {
-        return { title: "Document | farm&port" }
+        return {}
     }
 }
 
-export default async function DocumentDetailPage({ params }: Props) {
+export default async function BuyDocumentDetailPage({ params }: Props) {
     const { slug } = await params
     let doc: any = null
 
     try {
-        const res = await serverFetch(`/documents/${slug}`)
-        doc = res?.document
+        const result = await serverFetch(`/documents/${slug}`)
+        doc = result?.document
     } catch {
         notFound()
     }
 
     if (!doc) notFound()
+    await guardTestItem(!!doc.is_test)
 
-    const price = doc.price_cents ? doc.price_cents / 100 : null
-    const displayPrice = price ? `$${price.toFixed(2)}` : "Free"
+    const price = doc.price_cents ? `$${(doc.price_cents / 100).toFixed(2)}` : "Free"
+    const fileSizeKB = doc.file_size_bytes ? Math.round(doc.file_size_bytes / 1024) : null
+    const otherImages: string[] = doc.other_images ?? []
+    const allImages = [doc.main_image, ...otherImages].filter(Boolean)
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
-            <div className="mx-auto max-w-5xl px-6 lg:px-8 py-12">
+        <div className="min-h-screen bg-background">
+            <div className="border-b">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+                    <nav className="flex text-sm text-muted-foreground">
+                        <Link href="/buy" className="hover:text-foreground transition-colors">Buy</Link>
+                        <span className="mx-2">/</span>
+                        <Link href="/buy-documents" className="hover:text-foreground transition-colors">Documents</Link>
+                        <span className="mx-2">/</span>
+                        <span className="text-foreground truncate">{doc.title}</span>
+                    </nav>
+                </div>
+            </div>
 
-                {/* Breadcrumb */}
-                <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-8">
-                    <a href="/buy" className="hover:text-foreground transition-colors">Shop</a>
-                    <span>/</span>
-                    <a href="/buy-documents" className="hover:text-foreground transition-colors">Documents</a>
-                    <span>/</span>
-                    <span className="text-foreground font-medium">{doc.title}</span>
-                </nav>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div className="grid lg:grid-cols-[480px_1fr_300px] gap-8 items-start">
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                    {/* Preview */}
-                    <div className="flex flex-col gap-4">
-                        {doc.preview_images?.length > 0 ? (
-                            <div className="rounded-xl overflow-hidden border border-border bg-muted">
-                                <img
-                                    src={doc.preview_images[0]}
-                                    alt={doc.title}
-                                    className="w-full object-cover"
-                                />
-                            </div>
-                        ) : (
-                            <div className="aspect-[4/3] rounded-xl border border-border bg-muted flex items-center justify-center">
-                                <FileText className="w-20 h-20 text-muted-foreground/30" />
-                            </div>
-                        )}
-                        {doc.preview_images?.length > 1 && (
-                            <div className="grid grid-cols-4 gap-2">
-                                {doc.preview_images.slice(1).map((src: string, i: number) => (
-                                    <div key={i} className="aspect-square rounded-lg overflow-hidden border border-border bg-muted">
-                                        <img src={src} alt="" className="w-full h-full object-cover" />
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
+                    {/* Column 1: Image */}
+                    <ProductImageGallery
+                        images={allImages.map((src: string) => ({ img: { src } }))}
+                        name={doc.title}
+                        fallback={<FileText className="w-24 h-24 text-muted-foreground/20" />}
+                    />
 
-                    {/* Info */}
-                    <div className="flex flex-col gap-6">
+                    {/* Column 2: Details */}
+                    <div className="space-y-5">
                         {doc.category && (
-                            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">
-                                {doc.category.replace(/_/g, " ")}
+                            <span className="text-xs uppercase tracking-widest font-semibold text-muted-foreground">
+                                {doc.category.replace(/-/g, " ")}
                             </span>
                         )}
 
-                        <h1 className="text-3xl font-bold tracking-tight font-heading">{doc.title}</h1>
+                        <div>
+                            <h1 className="text-2xl lg:text-3xl font-bold leading-snug">{doc.title}</h1>
+                            {doc.brand?.name && (
+                                <p className="text-sm text-muted-foreground font-medium mt-1">{doc.brand.name}</p>
+                            )}
+                            <div className="mt-3">
+                                <ShareBar name={doc.title} />
+                            </div>
+                        </div>
 
                         {doc.description && (
                             <p className="text-muted-foreground leading-relaxed">{doc.description}</p>
                         )}
 
-                        {/* File info */}
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                            <div className="flex items-center gap-1.5">
-                                <Download className="w-4 h-4" />
-                                <span className="uppercase font-medium">{doc.file_type || "PDF"}</span>
-                            </div>
-                            {doc.file_size_bytes > 0 && (
-                                <span>{(doc.file_size_bytes / 1024 / 1024).toFixed(1)} MB</span>
+                        <div className="h-px bg-border" />
+
+                        {/* File meta */}
+                        <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
+                            {doc.file_type && (
+                                <span className="flex items-center gap-1.5">
+                                    <FileText className="w-4 h-4" />
+                                    {doc.file_type.toUpperCase()} file
+                                </span>
+                            )}
+                            {fileSizeKB && (
+                                <span className="flex items-center gap-1.5">
+                                    <Download className="w-4 h-4" />
+                                    {fileSizeKB < 1024 ? `${fileSizeKB} KB` : `${(fileSizeKB / 1024).toFixed(1)} MB`}
+                                </span>
                             )}
                         </div>
 
-                        {/* Tags */}
                         {doc.tags?.length > 0 && (
                             <div className="flex flex-wrap gap-2">
                                 {doc.tags.map((tag: string) => (
-                                    <span
-                                        key={tag}
-                                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-muted text-xs text-muted-foreground"
-                                    >
+                                    <Badge key={tag} variant="secondary" className="gap-1 font-normal">
                                         <Tag className="w-3 h-3" />
                                         {tag}
-                                    </span>
+                                    </Badge>
                                 ))}
                             </div>
                         )}
 
-                        {/* Price + CTA */}
-                        <div className="border-t border-border pt-6 flex flex-col gap-4">
-                            <div className="text-4xl font-bold text-primary">{displayPrice}</div>
-                            <AddToCartButton
-                                productId={doc.id}
-                                productType="document"
-                                productName={doc.title}
-                                productSlug={doc.slug}
-                                imageSrc={doc.preview_images?.[0]}
-                                unitPrice={price}
-                                loginRedirect={`/buy-documents/${doc.slug}`}
-                            />
-                            <p className="text-xs text-muted-foreground text-center">
-                                Download link available in your account after purchase.
-                            </p>
+                        <div className="h-px bg-border" />
+
+                        {/* What you get */}
+                        <div>
+                            <p className="text-sm font-semibold mb-3">What you get</p>
+                            <ul className="space-y-2.5 text-sm text-muted-foreground">
+                                <li className="flex items-start gap-2">
+                                    <Download className="w-4 h-4 mt-0.5 shrink-0 text-green-600" />
+                                    Instant digital download after payment
+                                </li>
+                                <li className="flex items-start gap-2">
+                                    <ShieldCheck className="w-4 h-4 mt-0.5 shrink-0 text-green-600" />
+                                    Watermarked with your name for security
+                                </li>
+                                <li className="flex items-start gap-2">
+                                    <RotateCcw className="w-4 h-4 mt-0.5 shrink-0 text-green-600" />
+                                    Re-download anytime from your account
+                                </li>
+                                <li className="flex items-start gap-2">
+                                    <Hash className="w-4 h-4 mt-0.5 shrink-0 text-green-600" />
+                                    Unique license serial number included
+                                </li>
+                            </ul>
                         </div>
                     </div>
+
+                    {/* Column 3: Sticky pricing panel */}
+                    <div className="sticky top-20">
+                        <DocumentPricingPanel
+                            docId={doc.id}
+                            docSlug={slug}
+                            docTitle={doc.title}
+                            priceCents={doc.price_cents}
+                            price={price}
+                        />
+                    </div>
+
                 </div>
             </div>
         </div>

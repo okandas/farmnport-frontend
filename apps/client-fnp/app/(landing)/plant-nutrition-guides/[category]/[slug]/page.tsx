@@ -10,6 +10,7 @@ import { AgrochemicalDosageTable } from "@/components/agrochemical/AgrochemicalD
 import { ActiveIngredientsList } from "@/components/shared/ActiveIngredientUnitsKey"
 import { WantToBuyCTA } from "@/components/shared/WantToBuyCTA"
 import { GuideProductTitle } from "@/components/shared/GuideProductTitle"
+import { ShareBar } from "@/components/shared/ShareBar"
 
 type Props = { params: Promise<{ category: string; slug: string }> }
 
@@ -174,7 +175,7 @@ export default async function PlantNutritionGuidePage({ params }: GuidePageProps
                         )}
 
                         {/* Want to Buy CTA */}
-                        <WantToBuyCTA available_for_sale={product.available_for_sale} name={product.name} brand={product.brand?.name} href={`/buy-plant-nutrition/${slug}`} />
+                        <WantToBuyCTA available_for_sale={product.available_for_sale} name={product.name} brand={product.brand?.name} href={`/buy-plant-nutrition/${slug}`} interestHref={`/interest/plant-nutrition/${slug}`} />
 
                         {/* Precautions */}
                         {product.precautions && product.precautions.length > 0 && (
@@ -198,6 +199,7 @@ export default async function PlantNutritionGuidePage({ params }: GuidePageProps
                     {/* Right - Product Info */}
                     <div className="space-y-6">
                         <GuideProductTitle name={product.name} brand={product.brand?.name} />
+                        <div className="mt-3"><ShareBar name={product.name} /></div>
 
                         {/* Category Badge */}
                         <div className="flex items-center gap-3 flex-wrap">

@@ -9,6 +9,7 @@ import { fetchLot, fetchLotBids, fetchMyBidOnLot } from "@/lib/serverFetch"
 import { retrieveUser } from "@/lib/actions"
 import { capitalizeFirstLetter, formatDate, centsToDollars } from "@/lib/utilities"
 import { PayBidButton } from "@/components/ui/pay-bid-button"
+import { ShareBar } from "@/components/shared/ShareBar"
 import { AppURL } from "@/lib/schemas"
 
 import type { Metadata } from "next"
@@ -96,6 +97,7 @@ export default async function LotDetailPage({ params }: Props) {
                                             <p className="text-xs font-mono font-semibold text-foreground">Lot #{slug.split("-").pop()}</p>
                                         </div>
                                     </div>
+                                    <div className="mt-3"><ShareBar name={breed ?? produce} /></div>
                                     {isSelling ? (
                                         (lot.city || lot.province) && (
                                             <p className="text-sm text-muted-foreground mt-0.5 capitalize">

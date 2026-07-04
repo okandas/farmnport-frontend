@@ -1,6 +1,6 @@
 {
   "name": "client-farmnport",
-  "version": "4.0.4",
+  "version": "5.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev --port 3001",
@@ -11,6 +11,7 @@
   "dependencies": {
     "@flags-sdk/growthbook": "^0.2.0",
     "@hookform/resolvers": "^3.1.1",
+    "@tanstack/react-table": "^8.21.3",
     "@logtail/browser": "^0.5.3",
     "@next/third-parties": "^16.1.6",
     "@radix-ui/react-accordion": "^1.1.2",

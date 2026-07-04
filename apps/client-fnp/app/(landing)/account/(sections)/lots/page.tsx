@@ -1,39 +1,102 @@
 "use client"
 
+import { useState } from "react"
 import { useSession } from "next-auth/react"
 import { useQuery } from "@tanstack/react-query"
-import { Loader2, Package } from "lucide-react"
+import { ColumnDef } from "@tanstack/react-table"
+import { PaginationState } from "@tanstack/react-table"
+import { Loader2, Package, MoreVertical, Eye } from "lucide-react"
 import Link from "next/link"
+
 import { myLots } from "@/lib/query"
 import { centsToDollars } from "@/lib/utilities"
-
-const STATUS_STYLES: Record<string, string> = {
-  live:             "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
-  fulfilled:        "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
-  awaitingPayment:  "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400",
-  pending:          "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400",
-  expired:          "bg-muted text-muted-foreground",
-}
-
-function lotStatus(lot: any): { label: string; style: string } {
-  if (lot.has_accepted_bid && lot.type === "request") return { label: "Awaiting Payment", style: STATUS_STYLES.awaitingPayment }
-  if (lot.has_accepted_bid) return { label: "Fulfilled", style: STATUS_STYLES.fulfilled }
-  const expired = lot.expires_at && new Date(lot.expires_at) < new Date()
-  if (expired) return { label: "Expired", style: STATUS_STYLES.expired }
-  if (!lot.moderated) return { label: "Pending", style: STATUS_STYLES.pending }
-  return { label: "Live", style: STATUS_STYLES.live }
-}
+import { DataTable } from "@/components/structures/tables/data-table"
 
 function formatDate(d: string) {
   return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
 }
 
+function lotStatusBadge(lot: any) {
+  if (lot.has_accepted_bid && lot.type === "request")
+    return <span className="inline-flex items-center rounded-md bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">Awaiting Payment</span>
+  if (lot.has_accepted_bid)
+    return <span className="inline-flex items-center rounded-md bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900/30 dark:text-green-400">Fulfilled</span>
+  const expired = lot.expires_at && new Date(lot.expires_at) < new Date()
+  if (expired)
+    return <span className="inline-flex items-center rounded-md bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">Expired</span>
+  if (!lot.moderated)
+    return <span className="inline-flex items-center rounded-md bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">Pending</span>
+  return <span className="inline-flex items-center rounded-md bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900/30 dark:text-green-400">Live</span>
+}
+
+const columns: ColumnDef<any>[] = [
+  {
+    accessorKey: "slug",
+    header: "Lot",
+    cell: ({ row }) => (
+      <Link href={`/account/lots/${row.original.slug}`} className="font-semibold text-sm font-mono hover:text-primary transition-colors">
+        {row.original.slug}
+      </Link>
+    ),
+  },
+  {
+    accessorKey: "type",
+    header: "Type",
+    cell: ({ row }) => (
+      row.original.type === "sell"
+        ? <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">Selling</span>
+        : <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400">Buying</span>
+    ),
+  },
+  {
+    accessorKey: "breed",
+    header: "Variety",
+    cell: ({ row }) => (
+      <span className="capitalize">{row.original.breed?.name ?? row.original.farm_produce?.name ?? "—"}</span>
+    ),
+  },
+  {
+    accessorKey: "quantity",
+    header: "Quantity",
+    cell: ({ row }) => (
+      <span>{row.original.quantity?.toLocaleString()} {row.original.unit}</span>
+    ),
+  },
+  {
+    accessorKey: "price_per_unit_cents",
+    header: "Price",
+    cell: ({ row }) => (
+      <span>{row.original.price_per_unit_cents ? `${centsToDollars(row.original.price_per_unit_cents)}/${row.original.unit}` : "Negotiable"}</span>
+    ),
+  },
+  {
+    accessorKey: "moderated",
+    header: "Status",
+    cell: ({ row }) => lotStatusBadge(row.original),
+  },
+  {
+    accessorKey: "created",
+    header: "Listed",
+    cell: ({ row }) => <span className="text-muted-foreground text-xs">{formatDate(row.original.created)}</span>,
+  },
+  {
+    id: "actions",
+    cell: ({ row }) => (
+      <Link href={`/account/lots/${row.original.slug}`} className="text-muted-foreground hover:text-foreground transition-colors">
+        <Eye className="w-4 h-4" />
+      </Link>
+    ),
+  },
+]
+
 export default function MyLotsPage() {
   const { data: session, status } = useSession()
+  const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: 20 })
+  const [search, setSearch] = useState("")
 
   const { data, isLoading } = useQuery({
-    queryKey: ["my-lots"],
-    queryFn: () => myLots().then((r) => r.data),
+    queryKey: ["my-lots", pagination.pageIndex],
+    queryFn: () => myLots(pagination.pageIndex + 1).then((r) => r.data),
     enabled: !!session,
     refetchOnMount: "always",
   })
@@ -64,6 +127,7 @@ export default function MyLotsPage() {
   }
 
   const lots: any[] = data?.data ?? []
+  const total: number = data?.total ?? lots.length
 
   return (
     <div>
@@ -74,46 +138,17 @@ export default function MyLotsPage() {
       </nav>
       <h1 className="text-xl font-bold mb-6">My Lots</h1>
 
-      {lots.length === 0 ? (
-        <div className="text-center py-16 space-y-4">
-          <Package className="w-12 h-12 mx-auto text-muted-foreground/40" />
-          <p className="font-semibold">No lots yet</p>
-          <p className="text-sm text-muted-foreground">When you post a lot, it will appear here.</p>
-        </div>
-      ) : (
-        <div className="divide-y">
-          {lots.map((lot) => {
-            const { label, style } = lotStatus(lot)
-            return (
-              <Link key={lot.id} href={`/account/lots/${lot.slug}`} className="flex items-start justify-between gap-3 py-4 group transition-colors px-1">
-                <div className="space-y-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-semibold text-sm font-mono group-hover:text-primary transition-colors">{lot.slug}</span>
-                    <span className={`text-xs px-2 py-0.5 rounded-md font-medium ${style}`}>{label}</span>
-                    <span className={`text-xs px-2 py-0.5 rounded-md font-medium ${lot.type === "sell" ? "bg-blue-50 text-blue-700" : "bg-green-50 text-green-700"}`}>
-                      {lot.type === "sell" ? "Selling" : "Buying"}
-                    </span>
-                  </div>
-                  {lot.type !== "request" && (
-                    <p className="text-xs text-muted-foreground capitalize">
-                      {lot.breed?.name ?? lot.farm_produce?.name ?? "—"} · {lot.quantity?.toLocaleString()} {lot.unit}
-                    </p>
-                  )}
-                  {lot.has_accepted_bid && lot.type === "request" && (
-                    <p className="text-xs text-amber-700 dark:text-amber-400 font-medium">You have selected a supplier — pay to confirm</p>
-                  )}
-                  <p className="text-xs text-muted-foreground">Listed {formatDate(lot.created)}</p>
-                </div>
-                <div className="text-right shrink-0 space-y-0.5">
-                  <p className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">{lot.type === "request" ? "Your request lot was for" : "Your listing"}</p>
-                  <p className="font-semibold text-sm capitalize group-hover:text-primary transition-colors">{lot.breed?.name ?? lot.farm_produce?.name ?? "—"} · {lot.quantity?.toLocaleString()} {lot.unit}</p>
-                  <p className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">@ {centsToDollars(lot.price_per_unit_cents)} / {lot.unit}</p>
-                </div>
-              </Link>
-            )
-          })}
-        </div>
-      )}
+      <DataTable
+        columns={columns}
+        data={lots}
+        tableName="Lot"
+        total={total}
+        pagination={pagination}
+        setPagination={setPagination}
+        search={search}
+        setSearch={setSearch}
+        emptyMessage="No lots yet. When you post a lot, it will appear here."
+      />
     </div>
   )
 }

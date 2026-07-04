@@ -1543,12 +1543,36 @@ export function updateBookingStatus(id: string, status: string, note?: string) {
   return api.put(`${baseUrl}/booking/admin/${id}/status`, { status, note })
 }
 
-export function queryAdminBookingEvents(status?: string) {
+export function confirmPreOrderBooking(id: string) {
+  return api.put(`${baseUrl}/booking/admin/${id}/confirm`, {})
+}
+
+export function rejectPreOrderBooking(id: string, reason: string) {
+  return api.put(`${baseUrl}/booking/admin/${id}/reject`, { reason })
+}
+
+export function markPreOrderReady(id: string) {
+  return api.put(`${baseUrl}/booking/admin/${id}/mark-ready`, {})
+}
+
+export function markPreOrderCollected(id: string) {
+  return api.put(`${baseUrl}/booking/admin/${id}/mark-collected`, {})
+}
+
+export function queryPreOrderBookings(preOrderId: string) {
+  return api.get(`${baseUrl}/booking/admin/events/${preOrderId}/bookings`)
+}
+
+export function approvePreOrderStock(preOrderId: string, actualQuantity?: number) {
+  return api.post(`${baseUrl}/booking/admin/events/${preOrderId}/approve-stock`, { actual_quantity: actualQuantity || 0 })
+}
+
+export function queryAdminPreOrders(status?: string) {
   const qs = status ? `?status=${status}` : ""
   return api.get(`${baseUrl}/booking/admin/events${qs}`)
 }
 
-export function createBookingEvent(data: {
+export function createPreOrder(data: {
   title: string
   description?: string
   client_id: string
@@ -1570,12 +1594,16 @@ export function createBookingEvent(data: {
   close_date: string
   status?: string
   image_src?: string
+  payment_deadline_hours?: number
+  buyer_notes?: boolean
+  cancellation_fee?: number
+  transferable?: boolean
   delivery_locations?: { id: string; name: string }[]
 }) {
   return api.post(`${baseUrl}/booking/admin/events`, data)
 }
 
-export function updateBookingEvent(id: string, data: Partial<{
+export function updatePreOrder(id: string, data: Partial<{
   title: string
   description: string
   client_id: string
@@ -1597,6 +1625,10 @@ export function updateBookingEvent(id: string, data: Partial<{
   open_date: string
   close_date: string
   image_src: string
+  payment_deadline_hours: number
+  buyer_notes: boolean
+  cancellation_fee: number
+  transferable: boolean
   delivery_locations: { id: string; name: string }[]
   collection_locations: { id: string; name: string }[]
 }>) {
@@ -1809,4 +1841,62 @@ export function queryTableReservation(id: string) {
 
 export function updateTableReservationStatus(id: string, status: string, admin_notes?: string) {
   return api.put(`${baseUrl}/table-reservations/admin/${id}/status`, { status, admin_notes: admin_notes ?? "" })
+}
+
+// ── Documents ──────────────────────────────────────────────────────────────────
+
+export function adminListDocuments(params?: { category?: string; p?: number }) {
+  const qs = new URLSearchParams()
+  if (params?.category) qs.set("category", params.category)
+  if (params?.p && params.p > 1) qs.set("p", params.p.toString())
+  const q = qs.toString()
+  return api.get(`${baseUrl}/documents/admin/list${q ? `?${q}` : ""}`)
+}
+
+export function adminGetDocument(id: string) {
+  return api.get(`${baseUrl}/documents/admin/${id}`)
+}
+
+export function adminUploadPDF(file: File) {
+  const form = new FormData()
+  form.append("pdf", file)
+  return api.post(`${baseUrl}/documents/admin/upload`, form, {
+    headers: { "Content-Type": "multipart/form-data" },
+  })
+}
+
+export function adminCreateDocument(data: {
+  title: string
+  slug: string
+  description?: string
+  category?: string
+  tags?: string[]
+  file_key: string
+  file_type?: string
+  file_size_bytes?: number
+  preview_images?: string[]
+  price_cents: number
+  active?: boolean
+}) {
+  return api.post(`${baseUrl}/documents/admin`, data)
+}
+
+export function adminUpdateDocument(id: string, data: {
+  title?: string
+  slug?: string
+  description?: string
+  category?: string
+  tags?: string[]
+  file_key?: string
+  file_type?: string
+  file_size_bytes?: number
+  preview_images?: string[]
+  price_cents?: number
+  active?: boolean
+}) {
+  return api.put(`${baseUrl}/documents/admin/${id}`, data)
+}
+
+export function adminDocumentPurchases(id: string) {
+  return api.get(`${baseUrl}/documents/admin/${id}/purchases`)
 }

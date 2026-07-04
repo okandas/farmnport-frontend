@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { serverFetch } from "@/lib/serverFetch"
 import { BuySeedProductsClient } from "./BuySeedProductsClient"
+import { getBuyCategories } from "@/components/generic/BuyCategoriesNav"
 
 export default async function BuySeedProductsPage() {
     let initialProducts: any[] = []
@@ -18,6 +19,8 @@ export default async function BuySeedProductsPage() {
     } catch (error) {
         console.error("Error fetching seed products:", error)
     }
+
+    const categories = await getBuyCategories()
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
@@ -41,6 +44,7 @@ export default async function BuySeedProductsPage() {
                     initialProducts={initialProducts}
                     initialTotal={initialTotal}
                     bookingEvents={bookingEvents}
+                    categories={categories}
                 />
             </div>
         </div>

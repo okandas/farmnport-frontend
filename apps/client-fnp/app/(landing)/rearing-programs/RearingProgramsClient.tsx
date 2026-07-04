@@ -154,7 +154,7 @@ export function RearingProgramsClient({ programs }: { programs: RearingProgram[]
                                     className="group rounded-xl border bg-card overflow-hidden hover:shadow-md hover:border-primary/20 transition-all"
                                 >
                                     <div className="p-4">
-                                        <h2 className="text-sm font-bold font-heading mb-0.5 group-hover:text-primary transition-colors">
+                                        <h2 className="text-sm font-heading mb-0.5 group-hover:text-primary transition-colors">
                                             {program.title}
                                         </h2>
                                         <p className="text-[11px] text-muted-foreground mb-2">by {program.author}</p>

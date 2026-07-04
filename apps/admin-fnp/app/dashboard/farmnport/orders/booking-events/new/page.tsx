@@ -7,7 +7,7 @@ import { Loader2, X, MapPin, Search } from "lucide-react"
 import { toast } from "@/components/ui/use-toast"
 import Link from "next/link"
 
-import { createBookingEvent, queryClientLocations, queryUsers, queryLivestockPoultryProducts, querySeedProducts, queryBrands } from "@/lib/query"
+import { createPreOrder, queryClientLocations, queryUsers, queryLivestockPoultryProducts, querySeedProducts, queryBrands } from "@/lib/query"
 import { capitalizeWords } from "@/lib/utilities"
 import { DashboardHeader } from "@/components/state/dashboardHeader"
 import { DashboardShell } from "@/components/state/dashboardShell"
@@ -121,7 +121,7 @@ function LocationMultiSelect({
   )
 }
 
-export default function NewBookingEventPage() {
+export default function NewPreOrderPage() {
   const router = useRouter()
   const queryClient = useQueryClient()
   const [selectedLocations, setSelectedLocations] = useState<SelectedLocation[]>([])
@@ -157,11 +157,15 @@ export default function NewBookingEventPage() {
     client_name: "",
     brand_id: "",
     brand_name: "",
+    payment_deadline_hours: "48",
+    buyer_notes: false,
+    cancellation_fee: "0",
+    transferable: false,
   })
 
   const mutation = useMutation({
     mutationFn: () =>
-      createBookingEvent({
+      createPreOrder({
         title: form.title,
         description: form.description || undefined,
         product_id: form.product_id,
@@ -183,6 +187,10 @@ export default function NewBookingEventPage() {
         client_name: form.client_name,
         brand_id: form.brand_id || undefined,
         brand_name: form.brand_name || undefined,
+        payment_deadline_hours: parseInt(form.payment_deadline_hours) || 48,
+        buyer_notes: form.buyer_notes,
+        cancellation_fee: parseInt(form.cancellation_fee) || 0,
+        transferable: form.transferable,
         delivery_locations: selectedLocations.length ? selectedLocations : undefined,
       }),
     onSuccess: () => {
@@ -483,6 +491,44 @@ export default function NewBookingEventPage() {
               <div className="mt-2">
                 <input type="datetime-local" value={form.close_date} onChange={(e) => set("close_date", e.target.value)} className={inputCls} />
               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Booking Settings */}
+        <div className="grid grid-cols-1 gap-x-8 gap-y-10 py-10 md:grid-cols-3">
+          <div>
+            <h2 className="text-base/7 font-semibold text-foreground">Booking Settings</h2>
+            <p className="mt-1 text-sm/6 text-muted-foreground">Payment deadline, cancellation, and buyer preferences.</p>
+          </div>
+          <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6 md:col-span-2">
+            <div className="sm:col-span-3">
+              <label className={labelCls}>Payment Deadline (hours)</label>
+              <div className="mt-2">
+                <input type="number" min="1" value={form.payment_deadline_hours} onChange={(e) => set("payment_deadline_hours", e.target.value)} placeholder="48" className={inputCls} />
+              </div>
+              <p className="mt-1 text-xs text-muted-foreground">Hours buyer has to pay after confirmation. Default 48.</p>
+            </div>
+            <div className="sm:col-span-3">
+              <label className={labelCls}>Cancellation Fee (%)</label>
+              <div className="mt-2">
+                <input type="number" min="0" max="100" value={form.cancellation_fee} onChange={(e) => set("cancellation_fee", e.target.value)} placeholder="0" className={inputCls} />
+              </div>
+              <p className="mt-1 text-xs text-muted-foreground">Handling fee on cancellations before deadline. 0 = no fee.</p>
+            </div>
+            <div className="sm:col-span-3">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" checked={form.buyer_notes} onChange={(e) => setForm((f) => ({ ...f, buyer_notes: e.target.checked }))} className="rounded border-border" />
+                <span className={labelCls}>Allow buyer notes</span>
+              </label>
+              <p className="mt-1 text-xs text-muted-foreground">Show a notes field for preferences (e.g. seed size).</p>
+            </div>
+            <div className="sm:col-span-3">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" checked={form.transferable} onChange={(e) => setForm((f) => ({ ...f, transferable: e.target.checked }))} className="rounded border-border" />
+                <span className={labelCls}>Transferable bookings</span>
+              </label>
+              <p className="mt-1 text-xs text-muted-foreground">Allow bookings to be transferred to another buyer or variety.</p>
             </div>
           </div>
         </div>
