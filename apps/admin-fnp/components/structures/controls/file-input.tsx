@@ -22,11 +22,12 @@ interface FileInputProps {
     imageClassName?: string // Custom classes for image container
     maxImages?: number // Maximum number of images allowed (default: unlimited for "images", 1 for labels)
     showPlaceholders?: boolean // Show empty state placeholders (default: false)
+    compact?: boolean // Inline dropzone same size as thumbnails (default: false)
 }
 
 
 
-export function FileInput({ id, value, fieldName = "images", entityType, onChange, thumbnailClassName, imageClassName, maxImages, showPlaceholders = false }: FileInputProps) {
+export function FileInput({ id, value, fieldName = "images", entityType, onChange, thumbnailClassName, imageClassName, maxImages, showPlaceholders = false, compact = false }: FileInputProps) {
     const [files, setFiles] = useState<ImageModel[]>(value ?? [])
     const [localPreviews, setLocalPreviews] = useState<Record<string, string>>({})
     const entity_id = id
@@ -207,14 +208,31 @@ export function FileInput({ id, value, fieldName = "images", entityType, onChang
         mutationRemoveImage.mutate(image)
     }
 
+    const [dragIndex, setDragIndex] = useState<number | null>(null)
+
+    function handleDrop(targetIndex: number) {
+        if (dragIndex === null || dragIndex === targetIndex) return
+        const updated = [...files]
+        const [moved] = updated.splice(dragIndex, 1)
+        updated.splice(targetIndex, 0, moved)
+        setFiles(updated)
+        onChange(updated)
+        setDragIndex(null)
+    }
+
     const defaultThumbnailClass = "inline-flex flex-col overflow-hidden border border-gray-200 rounded-lg mt-2 me-2 relative bg-white shadow-sm"
     const defaultImageClass = "flex items-center justify-center w-48 h-48 overflow-hidden bg-gray-50"
 
     const thumbnails = files.map((file: ImageModel, index) => {
         {
             return file.img.id.length > 0 ? (<div
-                className={thumbnailClassName || defaultThumbnailClass}
+                className={`${thumbnailClassName || defaultThumbnailClass} ${files.length > 1 ? "cursor-grab active:cursor-grabbing" : ""} ${dragIndex === index ? "opacity-40" : ""}`}
                 key={index}
+                draggable={files.length > 1}
+                onDragStart={() => setDragIndex(index)}
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={(e) => { e.preventDefault(); handleDrop(index) }}
+                onDragEnd={() => setDragIndex(null)}
             >
                 <div className={imageClassName || defaultImageClass}>
                     {localPreviews[file.img.id] ? (
@@ -265,10 +283,31 @@ export function FileInput({ id, value, fieldName = "images", entityType, onChang
         ))
     ) : null
 
+    const compactDropzone = compact && !isDisabled ? (
+        <div className={thumbnailClassName || "inline-flex flex-col overflow-hidden border border-gray-200 border-dashed rounded-lg mt-2 me-2 relative bg-gray-50"}>
+            <label htmlFor={`dropzone-${fieldName}`}
+                className={`${imageClassName || "flex items-center justify-center w-32 h-32 overflow-hidden bg-gray-50"} cursor-pointer hover:bg-gray-100 transition-colors`}>
+                <div className="flex flex-col items-center justify-center">
+                    {mutationUploadImage.isPending ? (
+                        <Icons.spinner className="w-5 h-5 animate-spin text-gray-400" />
+                    ) : (
+                        <>
+                            <Icons.image className="w-5 h-5 text-gray-400" />
+                            <p className="mt-1 text-[10px] text-gray-400">Add</p>
+                        </>
+                    )}
+                    <div {...getRootProps()}>
+                        <input id={`dropzone-${fieldName}`} type="file" className="hidden" {...getInputProps()} />
+                    </div>
+                </div>
+            </label>
+        </div>
+    ) : null
+
     return (
         <>
 
-            {!isDisabled && (
+            {!compact && !isDisabled && (
                 <div className="flex items-center justify-center w-full">
                     <label htmlFor={`dropzone-${fieldName}`}
                         className="flex flex-col items-center justify-center w-full h-32 border border-gray-300 border-dashed rounded-lg cursor-pointer hover:bg-gray-50">
@@ -296,6 +335,10 @@ export function FileInput({ id, value, fieldName = "images", entityType, onChang
 
                 {
                     thumbnails.length > 0 && thumbnails
+                }
+
+                {
+                    compactDropzone
                 }
 
                 {

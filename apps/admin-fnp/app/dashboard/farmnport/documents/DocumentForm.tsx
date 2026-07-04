@@ -232,7 +232,8 @@ export default function DocumentForm({ mode, documentId, defaultValues }: Docume
                                         )} />
                                     </div>
                                     <div>
-                                        <label className="block text-sm/6 font-medium text-gray-900 dark:text-white mb-2">Other images <span className="text-gray-400 font-normal">(up to 5)</span></label>
+                                        <label className="block text-sm/6 font-medium text-gray-900 dark:text-white mb-1">Other images <span className="text-gray-400 font-normal">(up to 10)</span></label>
+                                        <p className="text-xs text-muted-foreground mb-2">Drag to reorder</p>
                                         <FormField control={form.control} name="other_images" render={({ field }) => (
                                             <FormItem>
                                                 <FormControl>
@@ -241,8 +242,8 @@ export default function DocumentForm({ mode, documentId, defaultValues }: Docume
                                                         fieldName="other_images"
                                                         value={field.value || []}
                                                         onChange={field.onChange}
-                                                        maxImages={5}
-                                                        showPlaceholders
+                                                        maxImages={10}
+                                                        compact
                                                         thumbnailClassName="inline-flex flex-col overflow-hidden border border-gray-200 rounded-lg mt-2 me-2 relative bg-white shadow-sm"
                                                         imageClassName="flex items-center justify-center w-32 h-32 overflow-hidden bg-gray-50"
                                                     />
