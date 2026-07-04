@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query"
 import Link from "next/link"
 import { Loader2 } from "lucide-react"
 
-import { listBookingEvents } from "@/lib/query"
+import { listPreOrders } from "@/lib/query"
 import { BuyCategoriesNavClient } from "@/components/generic/BuyCategoriesNavClient"
 
 function formatDate(d: string) {
@@ -69,7 +69,7 @@ interface BookingsClientProps {
 export function BookingsClient({ categories }: BookingsClientProps) {
   const { data, isLoading } = useQuery({
     queryKey: ["booking-events"],
-    queryFn: () => listBookingEvents({ status: "open" }),
+    queryFn: () => listPreOrders({ status: "open" }),
   })
 
   const events: any[] = data?.data?.events ?? []

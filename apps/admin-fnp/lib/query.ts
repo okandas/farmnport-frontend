@@ -1543,12 +1543,12 @@ export function updateBookingStatus(id: string, status: string, note?: string) {
   return api.put(`${baseUrl}/booking/admin/${id}/status`, { status, note })
 }
 
-export function queryAdminBookingEvents(status?: string) {
+export function queryAdminPreOrders(status?: string) {
   const qs = status ? `?status=${status}` : ""
   return api.get(`${baseUrl}/booking/admin/events${qs}`)
 }
 
-export function createBookingEvent(data: {
+export function createPreOrder(data: {
   title: string
   description?: string
   client_id: string
@@ -1575,7 +1575,7 @@ export function createBookingEvent(data: {
   return api.post(`${baseUrl}/booking/admin/events`, data)
 }
 
-export function updateBookingEvent(id: string, data: Partial<{
+export function updatePreOrder(id: string, data: Partial<{
   title: string
   description: string
   client_id: string

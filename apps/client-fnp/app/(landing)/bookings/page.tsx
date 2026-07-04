@@ -12,7 +12,7 @@ const breadcrumbJsonLd = {
   ],
 }
 
-export default async function BookingEventsPage() {
+export default async function PreOrdersPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />

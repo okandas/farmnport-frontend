@@ -9,14 +9,14 @@ import Link from "next/link"
 import Image from "next/image"
 import { toast } from "sonner"
 
-import { getBookingEvent, createBooking, queryClient as queryClientProfile } from "@/lib/query"
+import { getPreOrder, createBooking, queryClient as queryClientProfile } from "@/lib/query"
 import { ShareBar } from "@/components/shared/ShareBar"
 
 function formatDate(d: string) {
   return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
 }
 
-export default function BookingEventDetailPage() {
+export default function PreOrderDetailPage() {
   const params = useParams()
   const slug = params.slug as string
   const { data: session } = useSession()
@@ -28,7 +28,7 @@ export default function BookingEventDetailPage() {
 
   const { data, isLoading } = useQuery({
     queryKey: ["booking-event", slug],
-    queryFn: () => getBookingEvent(slug).then((r) => r.data),
+    queryFn: () => getPreOrder(slug).then((r) => r.data),
   })
 
   const { data: profileData } = useQuery({

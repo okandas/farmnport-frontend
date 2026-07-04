@@ -5,7 +5,7 @@ import Image from "next/image"
 import { ArrowRight } from "lucide-react"
 import { useQuery } from "@tanstack/react-query"
 import { Button } from "@/components/ui/button"
-import { listBookingEvents } from "@/lib/query"
+import { listPreOrders } from "@/lib/query"
 import { ProductCard } from "@/components/shared/ProductCard"
 
 
@@ -46,7 +46,7 @@ function DocumentCard({ doc }: { doc: any }) {
 function PreOrdersSection() {
   const { data, isLoading } = useQuery({
     queryKey: ["booking-events-buy-page"],
-    queryFn: () => listBookingEvents({ status: "open" }),
+    queryFn: () => listPreOrders({ status: "open" }),
   })
   const events: any[] = data?.data?.events ?? []
 

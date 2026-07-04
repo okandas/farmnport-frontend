@@ -7,7 +7,7 @@ import { Loader2, X, MapPin, Search } from "lucide-react"
 import { toast } from "@/components/ui/use-toast"
 import Link from "next/link"
 
-import { createBookingEvent, queryClientLocations, queryUsers, queryLivestockPoultryProducts, querySeedProducts, queryBrands } from "@/lib/query"
+import { createPreOrder, queryClientLocations, queryUsers, queryLivestockPoultryProducts, querySeedProducts, queryBrands } from "@/lib/query"
 import { capitalizeWords } from "@/lib/utilities"
 import { DashboardHeader } from "@/components/state/dashboardHeader"
 import { DashboardShell } from "@/components/state/dashboardShell"
@@ -121,7 +121,7 @@ function LocationMultiSelect({
   )
 }
 
-export default function NewBookingEventPage() {
+export default function NewPreOrderPage() {
   const router = useRouter()
   const queryClient = useQueryClient()
   const [selectedLocations, setSelectedLocations] = useState<SelectedLocation[]>([])
@@ -161,7 +161,7 @@ export default function NewBookingEventPage() {
 
   const mutation = useMutation({
     mutationFn: () =>
-      createBookingEvent({
+      createPreOrder({
         title: form.title,
         description: form.description || undefined,
         product_id: form.product_id,

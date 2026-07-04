@@ -954,7 +954,7 @@ export function getLotBids(slug: string) {
 }
 
 // Bookings
-export function listBookingEvents(options?: { product_id?: string; status?: string }) {
+export function listPreOrders(options?: { product_id?: string; status?: string }) {
   const params = new URLSearchParams()
   if (options?.product_id) params.set("product_id", options.product_id)
   if (options?.status) params.set("status", options.status)
@@ -962,8 +962,13 @@ export function listBookingEvents(options?: { product_id?: string; status?: stri
   return api.get(`${BaseURL}/booking/events${qs ? `?${qs}` : ""}`)
 }
 
-export function getBookingEvent(id: string) {
+export function getPreOrder(id: string) {
   return api.get(`${BaseURL}/booking/events/${id}`)
+}
+
+export function myPreOrders(page?: number) {
+  const p = page && page >= 2 ? `?p=${page}` : ""
+  return api.get(`${BaseURL}/booking/my-preorders${p}`)
 }
 
 export function listDeliveryLocations(clientId?: string) {

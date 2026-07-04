@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query"
 import Link from "next/link"
 import { PlusCircle, CalendarDays } from "lucide-react"
 
-import { queryAdminBookingEvents } from "@/lib/query"
+import { queryAdminPreOrders } from "@/lib/query"
 import { DashboardHeader } from "@/components/state/dashboardHeader"
 import { FormSkeleton } from "@/components/state/skeleton-table"
 import { DashboardShell } from "@/components/state/dashboardShell"
@@ -26,10 +26,10 @@ function formatDate(d: string) {
   return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
 }
 
-export default function BookingEventsPage() {
+export default function PreOrdersPage() {
   const { data, isLoading, isError } = useQuery({
     queryKey: ["admin-booking-events"],
-    queryFn: () => queryAdminBookingEvents(),
+    queryFn: () => queryAdminPreOrders(),
     refetchOnWindowFocus: false,
   })
 
