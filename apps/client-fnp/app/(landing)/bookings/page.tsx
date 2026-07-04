@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { BookingsClient } from "./BookingsClient"
+import { getBuyCategories } from "@/components/generic/BuyCategoriesNav"
 
 const breadcrumbJsonLd = {
   "@context": "https://schema.org",
@@ -11,7 +12,7 @@ const breadcrumbJsonLd = {
   ],
 }
 
-export default function BookingEventsPage() {
+export default async function BookingEventsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
@@ -29,7 +30,7 @@ export default function BookingEventsPage() {
           <p className="text-lg text-muted-foreground">Reserve livestock and farm produce from upcoming supplier batches.</p>
         </div>
 
-        <BookingsClient />
+        <BookingsClient categories={await getBuyCategories()} />
       </div>
     </div>
   )

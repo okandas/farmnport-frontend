@@ -6,12 +6,13 @@ import { parseAsInteger, parseAsString, useQueryStates } from "nuqs"
 import { FileText } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ProductCard } from "@/components/shared/ProductCard"
-import { BuyCategoriesNav } from "@/components/generic/BuyCategoriesNav"
+import { BuyCategoriesNavClient } from "@/components/generic/BuyCategoriesNavClient"
 import { DocumentFilterSidebar } from "@/components/generic/documentFilterSidebar"
 
 interface BuyDocumentsClientProps {
     initialDocuments: any[]
     initialTotal: number
+    categories: { label: string; href: string }[]
 }
 
 
@@ -35,7 +36,7 @@ function DocumentCardSkeleton() {
     )
 }
 
-export function BuyDocumentsClient({ initialDocuments, initialTotal }: BuyDocumentsClientProps) {
+export function BuyDocumentsClient({ initialDocuments, initialTotal, categories }: BuyDocumentsClientProps) {
     const [queryState, setQueryState] = useQueryStates({
         category: parseAsString.withDefault(""),
         p: parseAsInteger.withDefault(1),
@@ -58,7 +59,7 @@ export function BuyDocumentsClient({ initialDocuments, initialTotal }: BuyDocume
         <div className="flex flex-col lg:flex-row gap-8">
             {/* Sidebar */}
             <aside className="w-full lg:w-64 flex-shrink-0">
-                <BuyCategoriesNav />
+                <BuyCategoriesNavClient categories={categories} />
                 <DocumentFilterSidebar />
             </aside>
 

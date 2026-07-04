@@ -5,7 +5,7 @@ import Link from "next/link"
 import { Loader2 } from "lucide-react"
 
 import { listBookingEvents } from "@/lib/query"
-import { BuyCategoriesNav } from "@/components/generic/BuyCategoriesNav"
+import { BuyCategoriesNavClient } from "@/components/generic/BuyCategoriesNavClient"
 
 function formatDate(d: string) {
   return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
@@ -62,7 +62,11 @@ function EventCard({ event }: { event: any }) {
   )
 }
 
-export function BookingsClient() {
+interface BookingsClientProps {
+  categories: { label: string; href: string }[]
+}
+
+export function BookingsClient({ categories }: BookingsClientProps) {
   const { data, isLoading } = useQuery({
     queryKey: ["booking-events"],
     queryFn: () => listBookingEvents({ status: "open" }),
@@ -73,7 +77,7 @@ export function BookingsClient() {
   return (
     <div className="flex flex-col lg:flex-row gap-8">
       <aside className="w-full lg:w-64 flex-shrink-0">
-        <BuyCategoriesNav />
+        <BuyCategoriesNavClient categories={categories} />
       </aside>
 
       <main className="flex-1">

@@ -1,10 +1,8 @@
-"use client"
+import { bookingsEnabled } from "@/flags"
+import { BuyCategoriesNavClient } from "./BuyCategoriesNavClient"
 
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-
-const BUY_CATEGORIES = [
-  { label: "Pre-Orders", href: "/bookings" },
+const ALL_CATEGORIES: { label: string; href: string; flag?: () => Promise<boolean> }[] = [
+  { label: "Bookings", href: "/bookings", flag: bookingsEnabled },
   { label: "Agrochemicals", href: "/buy-agrochemicals" },
   { label: "Animal Health", href: "/buy-animal-health" },
   { label: "Animal Feed", href: "/buy-feeds" },
@@ -12,30 +10,18 @@ const BUY_CATEGORIES = [
   { label: "Seeds", href: "/buy-seed-products" },
 ]
 
-export function BuyCategoriesNav() {
-  const pathname = usePathname()
-
-  return (
-    <div className="mb-6">
-      <nav className="flex flex-col gap-0.5">
-        {BUY_CATEGORIES.map(({ label, href }) => {
-          const isActive = pathname.startsWith(href)
-          return (
-            <Link
-              key={href}
-              href={href}
-              className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                isActive
-                  ? "bg-primary/10 text-primary"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
-              }`}
-            >
-              {label}
-            </Link>
-          )
-        })}
-      </nav>
-      <div className="mt-4 border-t" />
-    </div>
+export async function getBuyCategories(): Promise<{ label: string; href: string }[]> {
+  const resolved = await Promise.all(
+    ALL_CATEGORIES.map(async (c) => {
+      if (!c.flag) return c
+      const enabled = await c.flag()
+      return enabled ? c : null
+    })
   )
+  return resolved.filter(Boolean) as { label: string; href: string }[]
+}
+
+export async function BuyCategoriesNav() {
+  const categories = await getBuyCategories()
+  return <BuyCategoriesNavClient categories={categories} />
 }

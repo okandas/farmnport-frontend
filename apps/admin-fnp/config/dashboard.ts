@@ -86,7 +86,7 @@ export const dashboardConfig: DashboardConfig = {
       ],
     },
     {
-      label: "Pre Orders",
+      label: "Bookings",
       items: [
         {
           title: "Bookings",

@@ -34,6 +34,11 @@ const CATEGORIES = [
     { value: "guide", label: "Guide" },
     { value: "datasheet", label: "Datasheet" },
     { value: "catalogue", label: "Catalogue" },
+    { value: "agrochemicals", label: "Agrochemicals" },
+    { value: "animal-health", label: "Animal Health" },
+    { value: "animal-feed", label: "Animal Feed" },
+    { value: "plant-nutrition", label: "Plant Nutrition" },
+    { value: "seeds", label: "Seeds" },
 ]
 
 interface DocumentFormValues {

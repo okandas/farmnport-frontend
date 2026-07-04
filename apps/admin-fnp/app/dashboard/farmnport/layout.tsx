@@ -4,6 +4,7 @@ import { AccountNavigation } from "@/components/navigation/account"
 import { NotificationBell } from "@/components/notifications/notification-bell"
 import { SidebarNavigation } from "@/components/navigation/sidebar"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { bookingsEnabled } from "@/flags"
 
 export const metadata = {
   title: "OI - Farmnport Management",
@@ -16,6 +17,12 @@ interface DashboardLayoutProps {
 export default async function DashboardLayout({
   children,
 }: DashboardLayoutProps) {
+  const showBookings = await bookingsEnabled()
+
+  const sidebarNavigation = showBookings
+    ? dashboardConfig.sidebarNavigation
+    : dashboardConfig.sidebarNavigation.filter(g => g.label !== "Bookings")
+
   return (
     <div className="flex flex-col min-h-screen">
       <header className="sticky top-0 z-40 border-b shadow-sm bg-background">
@@ -33,7 +40,7 @@ export default async function DashboardLayout({
         <aside className="fixed top-16 hidden h-[calc(100vh-4rem)] w-[220px] flex-col border-r md:flex">
           <ScrollArea className="flex-1 px-4 py-4">
             <SidebarNavigation
-              navigationGroups={dashboardConfig.sidebarNavigation}
+              navigationGroups={sidebarNavigation}
             />
           </ScrollArea>
         </aside>
