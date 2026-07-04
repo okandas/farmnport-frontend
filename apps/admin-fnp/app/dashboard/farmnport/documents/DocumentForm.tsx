@@ -168,6 +168,13 @@ export default function DocumentForm({ mode, documentId, defaultValues }: Docume
                                 <div className="md:col-span-2 space-y-4">
                                     <div>
                                         <label className="block text-sm/6 font-medium text-gray-900 dark:text-white mb-2">Upload PDF</label>
+                                        {mode === "edit" && form.getValues("file_key") && !uploadedFilename && !uploadingPDF && (
+                                            <div className="flex items-center gap-2 mb-3 p-3 rounded-md bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
+                                                <Icons.check className="w-4 h-4 text-green-600" />
+                                                <span className="text-sm text-green-700 dark:text-green-400 font-medium">PDF uploaded</span>
+                                                <span className="text-xs text-muted-foreground">({form.getValues("file_key")})</span>
+                                            </div>
+                                        )}
                                         <input
                                             type="file"
                                             accept="application/pdf,.pdf"
@@ -184,17 +191,9 @@ export default function DocumentForm({ mode, documentId, defaultValues }: Docume
                                             <p className="mt-2 text-sm text-green-600">✓ {uploadedFilename}</p>
                                         )}
                                     </div>
-                                    <div>
-                                        <label className="block text-sm/6 font-medium text-gray-900 dark:text-white mb-2">File Key <span className="text-gray-400 font-normal">(auto-filled on upload)</span></label>
-                                        <FormField control={form.control} name="file_key" render={({ field }) => (
-                                            <FormItem>
-                                                <FormControl>
-                                                    <Input placeholder="e.g. abc123.pdf" className={inputClass} {...field} />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )} />
-                                    </div>
+                                    {form.getValues("file_key") && (
+                                        <p className="text-xs text-muted-foreground">File key: {form.getValues("file_key")}</p>
+                                    )}
                                 </div>
                             </div>
                         </div>

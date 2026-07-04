@@ -83,6 +83,7 @@ export function AddToCartButton({
           {
             description: "Complete and pay for your current cart first, then add this item.",
             duration: Infinity,
+            closeButton: true,
             action: {
               label: "Go to checkout",
               onClick: () => router.push("/checkout"),
