@@ -1,20 +1,17 @@
 "use client"
 
-import { use, useState } from "react"
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { useState } from "react"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
-import { Loader2 } from "lucide-react"
+import { Loader2, X, MapPin, Search } from "lucide-react"
+import { toast } from "@/components/ui/use-toast"
 import Link from "next/link"
 
-import { queryAdminPreOrders, updatePreOrder, queryClientLocations, queryUsers, queryLivestockPoultryProducts, querySeedProducts, queryBrands } from "@/lib/query"
-import { LocationMultiSelect } from "@/components/ui/location-multi-select"
+import { createPreOrder, queryClientLocations, queryUsers, queryLivestockPoultryProducts, querySeedProducts, queryBrands } from "@/lib/query"
 import { capitalizeWords } from "@/lib/utilities"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { toast } from "@/components/ui/use-toast"
 import { DashboardHeader } from "@/components/state/dashboardHeader"
-import { FormSkeleton } from "@/components/state/skeleton-table"
 import { DashboardShell } from "@/components/state/dashboardShell"
-import { Placeholder } from "@/components/state/placeholder"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { SearchSelect } from "@/components/ui/search-select"
 
 type SelectedLocation = { id: string; name: string }
@@ -27,22 +24,107 @@ function buildName(clientName: string, productName: string, totalAvailable: stri
   return parts.length ? parts.join(" ") + " Book Today" : ""
 }
 
-function toInputDate(iso: string) {
-  if (!iso) return ""
-  return new Date(iso).toISOString().slice(0, 16)
+function LocationMultiSelect({
+  allLocations,
+  selected,
+  onChange,
+}: {
+  allLocations: { id: string; name: string; active: boolean }[]
+  selected: SelectedLocation[]
+  onChange: (locs: SelectedLocation[]) => void
+}) {
+  const [search, setSearch] = useState("")
+  const [open, setOpen] = useState(false)
+
+  const active = allLocations.filter((l) => l.active)
+  const filtered = active.filter(
+    (l) =>
+      l.name.toLowerCase().includes(search.toLowerCase()) &&
+      !selected.find((s) => s.id === l.id)
+  )
+
+  function add(loc: { id: string; name: string }) {
+    onChange([...selected, { id: loc.id, name: loc.name }])
+    setSearch("")
+    setOpen(false)
+  }
+
+  function remove(id: string) {
+    onChange(selected.filter((s) => s.id !== id))
+  }
+
+  return (
+    <div className="space-y-2">
+      {selected.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {selected.map((loc) => (
+            <span
+              key={loc.id}
+              className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary"
+            >
+              <MapPin className="w-3 h-3" />
+              {loc.name}
+              <button type="button" onClick={() => remove(loc.id)} className="hover:text-destructive ml-0.5">
+                <X className="w-3 h-3" />
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
+
+      <div className="relative">
+        <div className="flex items-center rounded-md bg-background outline outline-1 -outline-offset-1 outline-border focus-within:outline focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-ring px-3 py-1.5 gap-2">
+          <Search className="w-4 h-4 text-muted-foreground shrink-0" />
+          <input
+            value={search}
+            onChange={(e) => { setSearch(e.target.value); setOpen(true) }}
+            onFocus={() => setOpen(true)}
+            onBlur={() => setTimeout(() => setOpen(false), 150)}
+            placeholder="Search locations..."
+            className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
+          />
+        </div>
+
+        {open && filtered.length > 0 && (
+          <div className="absolute z-10 mt-1 w-full rounded-md border border-border bg-popover shadow-md">
+            {filtered.map((loc) => (
+              <button
+                key={loc.id}
+                type="button"
+                onMouseDown={() => add(loc)}
+                className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted text-left"
+              >
+                <MapPin className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                {loc.name}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {open && filtered.length === 0 && search.length > 0 && (
+          <div className="absolute z-10 mt-1 w-full rounded-md border border-border bg-popover shadow-md px-3 py-2 text-sm text-muted-foreground">
+            No locations found.{" "}
+            <Link href="/dashboard/farmnport/orders/client-locations/new" target="_blank" className="text-primary hover:underline">
+              Add one
+            </Link>
+          </div>
+        )}
+      </div>
+
+      <p className="text-xs text-muted-foreground">
+        Can&apos;t find a location?{" "}
+        <Link href="/dashboard/farmnport/orders/client-locations/new" target="_blank" className="text-primary hover:underline">
+          Add new location
+        </Link>
+      </p>
+    </div>
+  )
 }
 
-
-export default function EditPreOrderPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params)
+export default function NewPreOrderPage() {
   const router = useRouter()
   const queryClient = useQueryClient()
-
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ["admin-booking-events"],
-    queryFn: () => queryAdminPreOrders(),
-    refetchOnWindowFocus: false,
-  })
+  const [selectedLocations, setSelectedLocations] = useState<SelectedLocation[]>([])
 
   const { data: locationsData } = useQuery({
     queryKey: ["admin-client-locations"],
@@ -50,134 +132,82 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
     refetchOnWindowFocus: false,
   })
 
-  const allLocations: { id: string; name: string; active: boolean; types?: string[] }[] = locationsData?.data?.locations ?? []
-  const [selectedDeliveryLocs, setSelectedDeliveryLocs] = useState<SelectedLocation[] | null>(null)
-  const [selectedCollectionLocs, setSelectedCollectionLocs] = useState<SelectedLocation[] | null>(null)
+  const allLocations: { id: string; name: string; active: boolean }[] = locationsData?.data?.locations ?? []
 
-  const events: any[] = data?.data?.events ?? []
-  const event = events.find((e: any) => e.id === id)
-
-  const [form, setForm] = useState<{
-    title: string
-    description: string
-    status: string
-    product_type: string
-    product_id: string
-    product_name: string
-    product_slug: string
-    unit: string
-    name: string
-    total_available: string
-    unit_price: string
-    deposit_per_unit: string
-    min_quantity: string
-    max_quantity: string
-    open_date: string
-    close_date: string
-    image_src: string
-    supplier_type: "client" | "brand"
-    client_id: string
-    client_name: string
-    brand_id: string
-    brand_name: string
-  } | null>(null)
-
-  if (event && form === null) {
-    if (selectedDeliveryLocs === null) {
-      setSelectedDeliveryLocs(event.delivery_locations ?? [])
-    }
-    if (selectedCollectionLocs === null) {
-      setSelectedCollectionLocs(event.collection_locations ?? [])
-    }
-    setForm({
-      title: event.title ?? "",
-      description: event.description ?? "",
-      status: event.status ?? "draft",
-      product_type: event.product_type ?? "",
-      product_id: event.product_id ?? "",
-      product_name: event.product_name ?? "",
-      product_slug: event.product_slug ?? "",
-      unit: event.unit ?? "",
-      name: event.name ?? "",
-      total_available: String(event.total_available ?? ""),
-      unit_price: ((event.unit_price ?? 0) / 100).toFixed(2),
-      deposit_per_unit: ((event.deposit_per_unit ?? 0) / 100).toFixed(2),
-      min_quantity: event.min_quantity ? String(event.min_quantity) : "",
-      max_quantity: event.max_quantity ? String(event.max_quantity) : "",
-      open_date: toInputDate(event.open_date),
-      close_date: toInputDate(event.close_date),
-      image_src: event.image_src ?? "",
-      supplier_type: (event.client_id && !event.brand_id ? "client" : "brand") as "client" | "brand",
-      client_id: event.client_id ?? "",
-      client_name: event.client_name ?? "",
-      brand_id: event.brand_id ?? "",
-      brand_name: event.brand_name ?? "",
-    })
-  }
+  const [form, setForm] = useState({
+    title: "",
+    description: "",
+    product_type: "",
+    product_id: "",
+    product_name: "",
+    product_slug: "",
+    unit: "",
+    name: "",
+    unit_price: "",
+    deposit_per_unit: "",
+    min_quantity: "",
+    max_quantity: "",
+    total_available: "",
+    open_date: "",
+    close_date: "",
+    status: "draft",
+    image_src: "",
+    supplier_type: "brand" as "client" | "brand",
+    client_id: "",
+    client_name: "",
+    brand_id: "",
+    brand_name: "",
+    payment_deadline_hours: "48",
+    buyer_notes: false,
+    cancellation_fee: "0",
+    transferable: false,
+  })
 
   const mutation = useMutation({
     mutationFn: () =>
-      updatePreOrder(id, {
-        title: form!.title,
-        description: form!.description || undefined,
-        status: form!.status,
-        product_id: form!.product_id || undefined,
-        product_name: form!.product_name || undefined,
-        product_slug: form!.product_slug || undefined,
-        product_type: form!.product_type || undefined,
-        unit: form!.unit || undefined,
-        name: form!.name || undefined,
-        total_available: parseInt(form!.total_available),
-        unit_price: Math.round(parseFloat(form!.unit_price) * 100),
-        deposit_per_unit: Math.round(parseFloat(form!.deposit_per_unit) * 100),
-        min_quantity: form!.min_quantity ? parseInt(form!.min_quantity) : undefined,
-        max_quantity: form!.max_quantity ? parseInt(form!.max_quantity) : undefined,
-        open_date: new Date(form!.open_date).toISOString(),
-        close_date: new Date(form!.close_date).toISOString(),
-        image_src: form!.image_src || undefined,
-        client_id: form!.client_id || undefined,
-        client_name: form!.client_name || undefined,
-        brand_id: form!.brand_id || undefined,
-        brand_name: form!.brand_name || undefined,
-        delivery_locations: selectedDeliveryLocs ?? undefined,
-        collection_locations: selectedCollectionLocs ?? undefined,
+      createPreOrder({
+        title: form.title,
+        description: form.description || undefined,
+        product_id: form.product_id,
+        product_name: form.product_name,
+        product_slug: form.product_slug,
+        product_type: form.product_type,
+        unit: form.unit || undefined,
+        name: form.name || undefined,
+        unit_price: Math.round(parseFloat(form.unit_price) * 100),
+        deposit_per_unit: Math.round(parseFloat(form.deposit_per_unit) * 100),
+        min_quantity: form.min_quantity ? parseInt(form.min_quantity) : undefined,
+        max_quantity: form.max_quantity ? parseInt(form.max_quantity) : undefined,
+        total_available: parseInt(form.total_available),
+        open_date: new Date(form.open_date).toISOString(),
+        close_date: new Date(form.close_date).toISOString(),
+        status: form.status,
+        image_src: form.image_src || undefined,
+        client_id: form.client_id,
+        client_name: form.client_name,
+        brand_id: form.brand_id || undefined,
+        brand_name: form.brand_name || undefined,
+        payment_deadline_hours: parseInt(form.payment_deadline_hours) || 48,
+        buyer_notes: form.buyer_notes,
+        cancellation_fee: parseInt(form.cancellation_fee) || 0,
+        transferable: form.transferable,
+        delivery_locations: selectedLocations.length ? selectedLocations : undefined,
       }),
     onSuccess: () => {
-      toast({ description: "Event updated" })
+      toast({ description: "Booking event created" })
       queryClient.invalidateQueries({ queryKey: ["admin-booking-events"] })
-      router.push("/dashboard/farmnport/orders/booking-events")
+      router.push("/dashboard/farmnport/orders/booking-preorders")
     },
-    onError: () => toast({ description: "Failed to update event", variant: "destructive" }),
+    onError: (err: any) => toast({ description: err?.response?.data?.message || "Failed to create event", variant: "destructive" }),
   })
 
   function set(field: string, value: string) {
-    setForm((f) => f ? { ...f, [field]: value } : f)
+    setForm((f) => ({ ...f, [field]: value }))
   }
-
-  if (isLoading) {
-    return (
-      <DashboardShell>
-        <FormSkeleton />
-      </DashboardShell>
-    )
-  }
-
-  if (isError || (!isLoading && !event)) {
-    return (
-      <DashboardShell>
-        <Placeholder>
-          <Placeholder.Icon name="close" />
-          <Placeholder.Title>Event not found</Placeholder.Title>
-        </Placeholder>
-      </DashboardShell>
-    )
-  }
-
-  if (!form) return null
 
   return (
     <DashboardShell>
-      <DashboardHeader heading="Edit Booking Event" text={event?.title ?? ""} />
+      <DashboardHeader heading="New Booking Event" text="Create a pre-order batch for customers to book." />
 
       <div className="mt-4 space-y-0 divide-y divide-border">
 
@@ -191,13 +221,13 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
             <div className="col-span-full">
               <label className={labelCls}>Title (Lot Name) *</label>
               <div className="mt-2">
-                <input value={form.title} onChange={(e) => set("title", e.target.value)} className={inputCls} />
+                <input value={form.title} onChange={(e) => set("title", e.target.value)} placeholder="e.g. Fivet Day-Old Chicks — June 2026 Batch" className={inputCls} />
               </div>
             </div>
             <div className="col-span-full">
               <label className={labelCls}>Description</label>
               <div className="mt-2">
-                <textarea value={form.description} onChange={(e) => set("description", e.target.value)} rows={3} className={inputCls + " resize-none"} />
+                <textarea value={form.description} onChange={(e) => set("description", e.target.value)} rows={3} placeholder="What's included in this batch..." className={inputCls + " resize-none"} />
               </div>
             </div>
             <div className="sm:col-span-3">
@@ -211,8 +241,6 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
                     <SelectItem value="draft">Draft</SelectItem>
                     <SelectItem value="open">Open</SelectItem>
                     <SelectItem value="closed">Closed</SelectItem>
-                    <SelectItem value="fulfilled">Fulfilled</SelectItem>
-                    <SelectItem value="cancelled">Cancelled</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -234,11 +262,11 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
                   <button
                     key={type}
                     type="button"
-                    onClick={() => setForm((f) => f ? {
+                    onClick={() => setForm((f) => ({
                       ...f, supplier_type: type,
                       client_id: "", client_name: "", brand_id: "", brand_name: "",
                       product_id: "", product_name: "", product_slug: "", unit: "", name: "",
-                    } : f)}
+                    }))}
                     className={`px-4 py-1.5 rounded-md text-sm font-medium border transition-colors ${
                       form.supplier_type === type
                         ? "bg-primary text-primary-foreground border-primary"
@@ -259,13 +287,13 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
                     queryFn={(params) => queryUsers(params)}
                     getItems={(page) => page?.data?.data || []}
                     value={form.client_id}
-                    onValueChange={(v) => setForm((f) => f ? { ...f, client_id: v, product_id: "", product_name: "", product_slug: "", unit: "", name: "" } : f)}
-                    onItemSelect={(u) => setForm((f) => f ? {
+                    onValueChange={(v) => setForm((f) => ({ ...f, client_id: v, product_id: "", product_name: "", product_slug: "", unit: "", name: "" }))}
+                    onItemSelect={(u) => setForm((f) => ({
                       ...f,
                       client_id: u.id, client_name: u.name,
                       product_id: "", product_name: "", product_slug: "", unit: "",
                       name: buildName(u.name, "", f.total_available, ""),
-                    } : f)}
+                    }))}
                     getLabel={(u) => u.name}
                     getValue={(u) => u.id}
                     placeholder="Select client"
@@ -278,13 +306,13 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
                     queryFn={(params) => queryBrands(params)}
                     getItems={(page) => page?.data?.data || []}
                     value={form.brand_id}
-                    onValueChange={(v) => setForm((f) => f ? { ...f, brand_id: v, product_id: "", product_name: "", product_slug: "", unit: "", name: "" } : f)}
-                    onItemSelect={(b) => setForm((f) => f ? {
+                    onValueChange={(v) => setForm((f) => ({ ...f, brand_id: v, product_id: "", product_name: "", product_slug: "", unit: "", name: "" }))}
+                    onItemSelect={(b) => setForm((f) => ({
                       ...f,
                       brand_id: b.id, brand_name: b.name,
                       product_id: "", product_name: "", product_slug: "", unit: "",
                       name: buildName(b.name, "", f.total_available, ""),
-                    } : f)}
+                    }))}
                     getLabel={(b) => b.name}
                     getValue={(b) => b.id}
                     placeholder="Select brand"
@@ -309,9 +337,9 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
               <div className="mt-2">
                 <Select
                   value={form.product_type}
-                  onValueChange={(v) => setForm((f) => f ? {
+                  onValueChange={(v) => setForm((f) => ({
                     ...f, product_type: v, product_id: "", product_name: "", product_slug: "", unit: "", name: "",
-                  } : f)}
+                  }))}
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select type" />
@@ -338,15 +366,15 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
                   }}
                   getItems={(page) => page?.data?.data || []}
                   value={form.product_id}
-                  onValueChange={(v) => setForm((f) => f ? { ...f, product_id: v } : f)}
-                  onItemSelect={(p) => setForm((f) => f ? {
+                  onValueChange={(v) => setForm((f) => ({ ...f, product_id: v }))}
+                  onItemSelect={(p) => setForm((f) => ({
                     ...f,
                     product_id: p.id,
                     product_name: p.name,
                     product_slug: p.slug,
                     unit: "",
                     name: buildName(f.client_name || f.brand_name, p.name, f.total_available, ""),
-                  } : f)}
+                  }))}
                   getLabel={(p) => p.name}
                   getValue={(p) => p.id}
                   placeholder="Select product"
@@ -362,9 +390,9 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
               <div className="mt-2">
                 <Select
                   value={form.unit}
-                  onValueChange={(v) => setForm((f) => f ? {
+                  onValueChange={(v) => setForm((f) => ({
                     ...f, unit: v, name: buildName(f.client_name, f.product_name, f.total_available, v),
-                  } : f)}
+                  }))}
                   disabled={!form.product_id}
                 >
                   <SelectTrigger className="w-full">
@@ -407,13 +435,13 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
             <div className="sm:col-span-3">
               <label className={labelCls}>Unit Price ($) *</label>
               <div className="mt-2">
-                <input type="number" step="0.01" min="0" value={form.unit_price} onChange={(e) => set("unit_price", e.target.value)} className={inputCls} />
+                <input type="number" step="0.01" min="0" value={form.unit_price} onChange={(e) => set("unit_price", e.target.value)} placeholder="5.00" className={inputCls} />
               </div>
             </div>
             <div className="sm:col-span-3">
               <label className={labelCls}>Deposit per Unit ($) *</label>
               <div className="mt-2">
-                <input type="number" step="0.01" min="0" value={form.deposit_per_unit} onChange={(e) => set("deposit_per_unit", e.target.value)} className={inputCls} />
+                <input type="number" step="0.01" min="0" value={form.deposit_per_unit} onChange={(e) => set("deposit_per_unit", e.target.value)} placeholder="1.00" className={inputCls} />
               </div>
             </div>
             <div className="sm:col-span-2">
@@ -421,12 +449,12 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
               <div className="mt-2">
                 <input
                   type="number" min="1" value={form.total_available}
-                  onChange={(e) => setForm((f) => f ? {
+                  onChange={(e) => setForm((f) => ({
                     ...f,
                     total_available: e.target.value,
                     name: buildName(f.client_name, f.product_name, e.target.value, f.unit),
-                  } : f)}
-                  className={inputCls}
+                  }))}
+                  placeholder="500" className={inputCls}
                 />
               </div>
             </div>
@@ -467,31 +495,56 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
           </div>
         </div>
 
+        {/* Booking Settings */}
+        <div className="grid grid-cols-1 gap-x-8 gap-y-10 py-10 md:grid-cols-3">
+          <div>
+            <h2 className="text-base/7 font-semibold text-foreground">Booking Settings</h2>
+            <p className="mt-1 text-sm/6 text-muted-foreground">Payment deadline, cancellation, and buyer preferences.</p>
+          </div>
+          <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6 md:col-span-2">
+            <div className="sm:col-span-3">
+              <label className={labelCls}>Payment Deadline (hours)</label>
+              <div className="mt-2">
+                <input type="number" min="1" value={form.payment_deadline_hours} onChange={(e) => set("payment_deadline_hours", e.target.value)} placeholder="48" className={inputCls} />
+              </div>
+              <p className="mt-1 text-xs text-muted-foreground">Hours buyer has to pay after confirmation. Default 48.</p>
+            </div>
+            <div className="sm:col-span-3">
+              <label className={labelCls}>Cancellation Fee (%)</label>
+              <div className="mt-2">
+                <input type="number" min="0" max="100" value={form.cancellation_fee} onChange={(e) => set("cancellation_fee", e.target.value)} placeholder="0" className={inputCls} />
+              </div>
+              <p className="mt-1 text-xs text-muted-foreground">Handling fee on cancellations before deadline. 0 = no fee.</p>
+            </div>
+            <div className="sm:col-span-3">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" checked={form.buyer_notes} onChange={(e) => setForm((f) => ({ ...f, buyer_notes: e.target.checked }))} className="rounded border-border" />
+                <span className={labelCls}>Allow buyer notes</span>
+              </label>
+              <p className="mt-1 text-xs text-muted-foreground">Show a notes field for preferences (e.g. seed size).</p>
+            </div>
+            <div className="sm:col-span-3">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" checked={form.transferable} onChange={(e) => setForm((f) => ({ ...f, transferable: e.target.checked }))} className="rounded border-border" />
+                <span className={labelCls}>Transferable bookings</span>
+              </label>
+              <p className="mt-1 text-xs text-muted-foreground">Allow bookings to be transferred to another buyer or variety.</p>
+            </div>
+          </div>
+        </div>
+
         {/* Collection Points */}
         <div className="grid grid-cols-1 gap-x-8 gap-y-10 py-10 md:grid-cols-3">
           <div>
             <h2 className="text-base/7 font-semibold text-foreground">Collection Points</h2>
             <p className="mt-1 text-sm/6 text-muted-foreground">Where customers can collect their order.</p>
           </div>
-          <div className="max-w-2xl md:col-span-2 space-y-6">
-            <div>
-              <p className="text-sm font-medium text-foreground mb-2">Delivery</p>
-              <LocationMultiSelect
-                queryKey="location-picker-delivery"
-                allLocations={allLocations.filter((l) => l.active)}
-                selected={selectedDeliveryLocs ?? []}
-                onChange={setSelectedDeliveryLocs}
-              />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-foreground mb-2">Collection</p>
-              <LocationMultiSelect
-                queryKey="location-picker-collection"
-                allLocations={allLocations.filter((l) => l.active)}
-                selected={selectedCollectionLocs ?? []}
-                onChange={setSelectedCollectionLocs}
-              />
-            </div>
+          <div className="max-w-2xl md:col-span-2">
+            <LocationMultiSelect
+              allLocations={allLocations}
+              selected={selectedLocations}
+              onChange={setSelectedLocations}
+            />
           </div>
         </div>
 
@@ -499,16 +552,16 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
 
       {/* Actions */}
       <div className="flex items-center justify-end gap-x-4 border-t border-border pt-6">
-        <Link href="/dashboard/farmnport/orders/booking-events" className="text-sm/6 font-semibold text-foreground">
+        <Link href="/dashboard/farmnport/orders/booking-preorders" className="text-sm/6 font-semibold text-foreground">
           Cancel
         </Link>
         <button
           onClick={() => mutation.mutate()}
-          disabled={mutation.isPending || !form.title || !form.unit_price || !form.total_available}
+          disabled={mutation.isPending || !form.client_id || !form.title || !form.product_id || !form.unit || !form.unit_price || !form.total_available || !form.open_date || !form.close_date}
           className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 disabled:opacity-50 transition-colors"
         >
           {mutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
-          Save Changes
+          Create Booking Event
         </button>
       </div>
     </DashboardShell>

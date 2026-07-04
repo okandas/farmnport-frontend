@@ -1,5 +1,7 @@
+import { notFound } from "next/navigation"
 import Link from "next/link"
 import { serverFetch } from "@/lib/serverFetch"
+import { documentsEnabled } from "@/flags"
 import { DocumentsClient } from "./DocumentsClient"
 
 export const metadata = {
@@ -18,6 +20,9 @@ const breadcrumbJsonLd = {
 }
 
 export default async function DocumentsPage() {
+    const showDocuments = await documentsEnabled()
+    if (!showDocuments) notFound()
+
     let initialDocs: any[] = []
     let initialTotal = 0
 

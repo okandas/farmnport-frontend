@@ -1,10 +1,10 @@
 import { notFound } from "next/navigation"
 import { bookingsEnabled } from "@/flags"
-import PreOrderDetailClient from "./PreOrderDetailClient"
+import BookingPreordersClient from "./BookingPreordersClient"
 
-export default async function PreOrderDetailPage() {
+export default async function BookingPreordersPage() {
     const showBookings = await bookingsEnabled()
     if (!showBookings) notFound()
 
-    return <PreOrderDetailClient />
+    return <BookingPreordersClient />
 }

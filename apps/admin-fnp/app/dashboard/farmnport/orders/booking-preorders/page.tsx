@@ -43,7 +43,7 @@ export default function PreOrdersPage() {
     <DashboardShell>
       <DashboardHeader heading="Booking Events" text="Create and manage pre-orders and delivery bookings.">
         <Link
-          href="/dashboard/farmnport/orders/booking-events/new"
+          href="/dashboard/farmnport/orders/booking-preorders/new"
           className="inline-flex items-center gap-2 bg-primary text-primary-foreground text-sm font-medium px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors"
         >
           <PlusCircle className="w-4 h-4" />
@@ -57,7 +57,7 @@ export default function PreOrdersPage() {
           <p className="font-semibold">No booking events yet</p>
           <p className="text-sm text-muted-foreground">Create a pre-order batch to let clients reserve livestock.</p>
           <Link
-            href="/dashboard/farmnport/orders/booking-events/new"
+            href="/dashboard/farmnport/orders/booking-preorders/new"
             className="inline-flex items-center gap-2 bg-primary text-primary-foreground text-sm font-medium px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors"
           >
             <PlusCircle className="w-4 h-4" />
@@ -101,13 +101,13 @@ export default function PreOrdersPage() {
                   </td>
                   <td className="px-4 py-3 space-x-3">
                     <Link
-                      href={`/dashboard/farmnport/orders/booking-events/${event.id}`}
+                      href={`/dashboard/farmnport/orders/booking-preorders/${event.id}`}
                       className="text-xs text-primary hover:underline"
                     >
                       View
                     </Link>
                     <Link
-                      href={`/dashboard/farmnport/orders/booking-events/${event.id}/edit`}
+                      href={`/dashboard/farmnport/orders/booking-preorders/${event.id}/edit`}
                       className="text-xs text-muted-foreground hover:underline"
                     >
                       Edit

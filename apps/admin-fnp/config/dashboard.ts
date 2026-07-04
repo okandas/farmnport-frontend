@@ -94,8 +94,8 @@ export const dashboardConfig: DashboardConfig = {
           icon: "calender",
         },
         {
-          title: "Booking Events",
-          href: "/dashboard/farmnport/orders/booking-events",
+          title: "Booking Pre-Orders",
+          href: "/dashboard/farmnport/orders/booking-preorders",
           icon: "calender",
         },
         {
