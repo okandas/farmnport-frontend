@@ -59,14 +59,14 @@ export function ProductImageGallery({ images, name, height = 520, fallback }: Pr
                             alt={name}
                             fill
                             sizes="(max-width: 1024px) 100vw, 480px"
-                            className="object-contain p-10"
+                            className="object-contain"
                             priority
                         />
                     ) : (
                         <FpPlaceholder />
                     )}
                     {images[selected]?.img?.src && (
-                        <span className="absolute bottom-3 right-3 w-8 h-8 flex items-center justify-center rounded-full bg-black/50 text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                        <span className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full bg-white border border-border text-foreground shadow-sm">
                             <Expand className="w-4 h-4" />
                         </span>
                     )}
@@ -122,7 +122,7 @@ export function ProductImageGallery({ images, name, height = 520, fallback }: Pr
                                         alt={name}
                                         fill
                                         sizes="80vw"
-                                        className="object-contain p-8"
+                                        className="object-cover p-2"
                                     />
                                 )}
                             </div>

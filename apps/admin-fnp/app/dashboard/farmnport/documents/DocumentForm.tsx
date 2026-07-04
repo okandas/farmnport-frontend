@@ -53,6 +53,7 @@ interface DocumentFormValues {
     price_cents: number
     is_test: string
     active: string
+    image_fill: string
     main_image: ImageModel[]
     other_images: ImageModel[]
     brand_id: string
@@ -86,6 +87,7 @@ export default function DocumentForm({ mode, documentId, defaultValues }: Docume
             price_cents: 0,
             is_test: "false",
             active: "true",
+            image_fill: "false",
             main_image: [],
             other_images: [],
             brand_id: "",
@@ -128,6 +130,7 @@ export default function DocumentForm({ mode, documentId, defaultValues }: Docume
                 price_cents: Math.round(Number(data.price_cents) * 100),
                 is_test: data.is_test === "true",
                 active: data.active === "true",
+                image_fill: data.image_fill === "true",
                 main_image: data.main_image?.[0]?.img.src ?? undefined,
                 other_images: (data.other_images ?? []).map((img) => img.img.src),
             }
@@ -412,6 +415,25 @@ export default function DocumentForm({ mode, documentId, defaultValues }: Docume
                                                             <SelectContent>
                                                                 <SelectItem value="false">No</SelectItem>
                                                                 <SelectItem value="true">Yes — test only</SelectItem>
+                                                            </SelectContent>
+                                                        </Select>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )} />
+                                            </div>
+                                        </div>
+
+                                        <div className="sm:col-span-3">
+                                            <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Image fill</label>
+                                            <p className="text-xs text-muted-foreground mt-0.5">Image covers the full area instead of fitting inside with whitespace</p>
+                                            <div className="mt-2">
+                                                <FormField control={form.control} name="image_fill" render={({ field }) => (
+                                                    <FormItem>
+                                                        <Select onValueChange={field.onChange} value={field.value}>
+                                                            <FormControl><SelectTrigger><SelectValue placeholder="Image fill?" /></SelectTrigger></FormControl>
+                                                            <SelectContent>
+                                                                <SelectItem value="false">No — fit inside</SelectItem>
+                                                                <SelectItem value="true">Yes — fill area</SelectItem>
                                                             </SelectContent>
                                                         </Select>
                                                         <FormMessage />

@@ -86,7 +86,7 @@ export function BuyDocumentsClient({ initialDocuments, initialTotal, categories 
                                     key={doc.id}
                                     mode="buy"
                                     href={`/buy-documents/${doc.slug}`}
-                                    imageSrc={doc.preview_images?.[0]}
+                                    imageSrc={doc.main_image}
                                     name={doc.title}
                                     meta={doc.category?.replace(/_/g, " ")}
                                     productId={doc.id}
@@ -97,6 +97,7 @@ export function BuyDocumentsClient({ initialDocuments, initialTotal, categories 
                                     loginRedirect={`/buy-documents/${doc.slug}`}
                                     isTest={doc.is_test}
                                     singleUnit
+                                    imageFill={doc.image_fill}
                                 />
                             ))}
                         </div>

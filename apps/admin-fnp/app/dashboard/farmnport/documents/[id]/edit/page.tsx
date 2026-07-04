@@ -42,6 +42,7 @@ export default function EditDocumentPage() {
                 file_size_bytes: doc.file_size_bytes ?? 0,
                 price_cents: doc.price_cents ? doc.price_cents / 100 : 0,
                 active: doc.active ? "true" : "false",
+                image_fill: doc.image_fill ? "true" : "false",
                 brand_id: doc.brand_id ?? "",
                 main_image: doc.main_image ? [{ img: { id: doc.main_image, src: doc.main_image } }] : [],
                 other_images: (doc.other_images ?? []).map((src: string) => ({ img: { id: src, src } })),
