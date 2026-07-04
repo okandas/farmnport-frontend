@@ -9,6 +9,7 @@ import {
 } from "lucide-react"
 import { capitalizeFirstLetter, titleCase } from "@/lib/utilities"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
+import { ShareBar } from "@/components/shared/ShareBar"
 
 const STAGE_STYLE = {
     dot: "bg-amber-600 dark:bg-amber-500",
@@ -143,6 +144,7 @@ export function FeedingProgramDetailClient({ program, slug }: FeedingProgramDeta
                             <h1 className="text-3xl sm:text-4xl font-bold font-heading tracking-tight">
                                 {titleCase(program.name)}
                             </h1>
+                            <div className="mt-3"><ShareBar name={program.name} /></div>
                             {program.description && (
                                 <p className="mt-2 text-sm sm:text-base text-muted-foreground max-w-2xl">
                                     {program.description}
@@ -166,6 +168,7 @@ export function FeedingProgramDetailClient({ program, slug }: FeedingProgramDeta
                         <h1 className="text-3xl sm:text-4xl font-bold font-heading tracking-tight">
                             {titleCase(program.name)}
                         </h1>
+                        <div className="mt-3"><ShareBar name={program.name} /></div>
                         {program.description && (
                             <p className="mt-2 text-sm text-muted-foreground max-w-2xl">
                                 {program.description}

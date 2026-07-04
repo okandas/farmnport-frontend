@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation"
 import Link from "next/link"
 import { Tag, Download, ShieldCheck, RotateCcw, Hash, FileText } from "lucide-react"
+import { ShareBar } from "@/components/shared/ShareBar"
 import { serverFetch } from "@/lib/serverFetch"
 import { guardTestItem } from "@/lib/guardTestItem"
 import { DocumentPricingPanel } from "@/components/shop/DocumentPricingPanel"
@@ -77,7 +78,15 @@ export default async function BuyDocumentDetailPage({ params }: Props) {
                             </span>
                         )}
 
-                        <h1 className="text-2xl lg:text-3xl font-bold leading-snug">{doc.title}</h1>
+                        <div>
+                            <h1 className="text-2xl lg:text-3xl font-bold leading-snug">{doc.title}</h1>
+                            {doc.brand?.name && (
+                                <p className="text-sm text-muted-foreground font-medium mt-1">{doc.brand.name}</p>
+                            )}
+                            <div className="mt-3">
+                                <ShareBar name={doc.title} />
+                            </div>
+                        </div>
 
                         {doc.description && (
                             <p className="text-muted-foreground leading-relaxed">{doc.description}</p>

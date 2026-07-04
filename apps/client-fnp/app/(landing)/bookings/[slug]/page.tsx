@@ -10,6 +10,7 @@ import Image from "next/image"
 import { toast } from "sonner"
 
 import { getBookingEvent, createBooking, queryClient as queryClientProfile } from "@/lib/query"
+import { ShareBar } from "@/components/shared/ShareBar"
 
 function formatDate(d: string) {
   return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
@@ -133,6 +134,7 @@ export default function BookingEventDetailPage() {
           <div className="space-y-6">
             <div>
               <h1 className="text-2xl font-bold leading-tight">{event.title}</h1>
+              <div className="mt-3"><ShareBar name={event.title} /></div>
               <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground flex-wrap">
                 <span className="flex items-center gap-1.5">
                   <Users className="w-4 h-4" />

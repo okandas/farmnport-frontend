@@ -8,6 +8,7 @@ import { ProductImageGallery } from "@/components/shared/ProductImageGallery"
 import { Badge } from "@/components/ui/badge"
 import { Check, Share2 } from "lucide-react"
 import { AddToCartButton, CartProductType } from "@/components/cart/AddToCartButton"
+import { ShareBar } from "@/components/shared/ShareBar"
 
 interface BuyProductInteractiveProps {
   product: any
@@ -105,6 +106,8 @@ const [mounted, setMounted] = useState(false)
           {categoryName && (
             <Badge variant="secondary" className="capitalize">{categoryName}</Badge>
           )}
+
+          <div className="mt-3"><ShareBar name={product.name} /></div>
 
           <div className="h-px bg-border" />
 

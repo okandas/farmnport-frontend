@@ -3,6 +3,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { WantToBuyCTA } from "@/components/shared/WantToBuyCTA"
 import { GuideProductTitle } from "@/components/shared/GuideProductTitle"
+import { ShareBar } from "@/components/shared/ShareBar"
 import { formatProductName } from "@/lib/utilities"
 
 interface Props {
@@ -139,6 +140,7 @@ export default async function SeedGuidePage({ params }: Props) {
                     <div className="space-y-6">
                         {/* Product Name */}
                         <GuideProductTitle name={product.name} brand={product.brand?.name} />
+                        <div className="mt-3"><ShareBar name={product.name} /></div>
 
                         {/* Category Badge */}
                         {categoryLabel && (

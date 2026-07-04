@@ -6,6 +6,7 @@ import { BaseURL } from "@/lib/schemas"
 import { FeedBreadcrumb } from "./FeedBreadcrumb"
 import { WantToBuyCTA } from "@/components/shared/WantToBuyCTA"
 import { GuideProductTitle } from "@/components/shared/GuideProductTitle"
+import { ShareBar } from "@/components/shared/ShareBar"
 
 interface FeedDetailPageProps {
     params: Promise<{ slug: string }>
@@ -138,6 +139,7 @@ export default async function FeedDetailPage({ params }: FeedDetailPageProps) {
                     {/* Right - Product Info */}
                     <div className="space-y-6">
                         <GuideProductTitle name={product.name} brand={product.brand?.name} />
+                        <div className="mt-3"><ShareBar name={product.name} /></div>
 
                         <div className="flex items-center gap-3 flex-wrap">
                             {product.feed_category && (

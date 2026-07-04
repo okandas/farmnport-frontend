@@ -59,8 +59,9 @@ export function FileInput({ id, value, fieldName = "images", entityType, onChang
                 const uploaded: ImageModel[] = isSingleField ? [data.data] : data.data
                 setLocalPreviews(prev => {
                     const next = { ...prev }
-                    // Match by insertion order: newest local previews correspond to the returned images
-                    const pendingKeys = Object.keys(next)
+                    // Only consider keys that are file names (pending), not server image IDs (already mapped)
+                    const serverIds = new Set(newImages.map((f: ImageModel) => f.img.id))
+                    const pendingKeys = Object.keys(next).filter(k => !serverIds.has(k))
                     uploaded.forEach((img, i) => {
                         if (pendingKeys[i]) {
                             next[img.img.id] = next[pendingKeys[i]]

@@ -7,6 +7,7 @@ import { serverFetch } from "@/lib/serverFetch"
 import { Badge } from "@/components/ui/badge"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
 import { WantToBuyCTA } from "@/components/shared/WantToBuyCTA"
+import { ShareBar } from "@/components/shared/ShareBar"
 
 interface Props {
     params: Promise<{ slug: string }>
@@ -126,6 +127,8 @@ export default async function DocumentGuidePage({ params }: Props) {
                         )}
 
                         <h1 className="text-2xl lg:text-3xl font-bold leading-snug">{doc.title}</h1>
+
+                        <div className="mt-3"><ShareBar name={doc.title} /></div>
 
                         <div className="h-px bg-border" />
 

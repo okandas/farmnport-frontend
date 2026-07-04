@@ -10,6 +10,7 @@ import { AgrochemicalDosageTable } from "@/components/agrochemical/AgrochemicalD
 import { ActiveIngredientsList } from "@/components/shared/ActiveIngredientUnitsKey"
 import { WantToBuyCTA } from "@/components/shared/WantToBuyCTA"
 import { GuideProductTitle } from "@/components/shared/GuideProductTitle"
+import { ShareBar } from "@/components/shared/ShareBar"
 
 type Props = { params: Promise<{ category: string; slug: string }> }
 
@@ -198,6 +199,7 @@ export default async function PlantNutritionGuidePage({ params }: GuidePageProps
                     {/* Right - Product Info */}
                     <div className="space-y-6">
                         <GuideProductTitle name={product.name} brand={product.brand?.name} />
+                        <div className="mt-3"><ShareBar name={product.name} /></div>
 
                         {/* Category Badge */}
                         <div className="flex items-center gap-3 flex-wrap">

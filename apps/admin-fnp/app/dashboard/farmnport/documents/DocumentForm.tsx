@@ -229,7 +229,7 @@ export default function DocumentForm({ mode, documentId, defaultValues }: Docume
                                         )} />
                                     </div>
                                     <div>
-                                        <label className="block text-sm/6 font-medium text-gray-900 dark:text-white mb-2">Preview images <span className="text-gray-400 font-normal">(up to 5)</span></label>
+                                        <label className="block text-sm/6 font-medium text-gray-900 dark:text-white mb-2">Other images <span className="text-gray-400 font-normal">(up to 5)</span></label>
                                         <FormField control={form.control} name="other_images" render={({ field }) => (
                                             <FormItem>
                                                 <FormControl>
@@ -295,7 +295,7 @@ export default function DocumentForm({ mode, documentId, defaultValues }: Docume
                                                             <SearchSelect
                                                                 queryKey="document-brands"
                                                                 queryFn={(params) => queryBrands(params)}
-                                                                getItems={(page) => page?.data?.brands ?? []}
+                                                                getItems={(page) => page?.data?.data ?? []}
                                                                 value={field.value}
                                                                 onValueChange={field.onChange}
                                                                 getLabel={(b) => b.name}
