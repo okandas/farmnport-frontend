@@ -13,7 +13,7 @@ export default async function BuyDocumentsPage() {
     let initialTotal = 0
 
     try {
-        const result = await serverFetch("/documents")
+        const result = await serverFetch("/documents/all")
         initialDocuments = result?.data || []
         initialTotal = result?.total || 0
     } catch (error) {

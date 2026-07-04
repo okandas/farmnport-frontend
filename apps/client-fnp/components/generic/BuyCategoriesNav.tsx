@@ -1,4 +1,4 @@
-import { bookingsEnabled } from "@/flags"
+import { bookingsEnabled, documentsEnabled } from "@/flags"
 import { BuyCategoriesNavClient } from "./BuyCategoriesNavClient"
 
 const ALL_CATEGORIES: { label: string; href: string; flag?: () => Promise<boolean> }[] = [
@@ -8,14 +8,15 @@ const ALL_CATEGORIES: { label: string; href: string; flag?: () => Promise<boolea
   { label: "Animal Feed", href: "/buy-feeds" },
   { label: "Plant Nutrition", href: "/buy-plant-nutrition" },
   { label: "Seeds", href: "/buy-seed-products" },
+  { label: "Plans & Documents", href: "/buy-documents", flag: documentsEnabled },
 ]
 
 export async function getBuyCategories(): Promise<{ label: string; href: string }[]> {
   const resolved = await Promise.all(
     ALL_CATEGORIES.map(async (c) => {
-      if (!c.flag) return c
+      if (!c.flag) return { label: c.label, href: c.href }
       const enabled = await c.flag()
-      return enabled ? c : null
+      return enabled ? { label: c.label, href: c.href } : null
     })
   )
   return resolved.filter(Boolean) as { label: string; href: string }[]
