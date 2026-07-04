@@ -109,8 +109,8 @@ export default function AccountDocumentsPage() {
                             <div key={purchase.id} className="py-4 flex items-start justify-between gap-4">
                                 <div className="flex items-start gap-3 min-w-0">
                                     <Link href={`/buy-documents/${doc?.slug}`} className="shrink-0">
-                                        {doc?.preview_images?.[0] ? (
-                                            <img src={doc.preview_images[0]} alt={doc.title} className="w-12 h-16 rounded object-cover border border-border hover:opacity-80 transition-opacity" />
+                                        {doc?.main_image ? (
+                                            <img src={doc.main_image} alt={doc.title} className="w-12 h-16 rounded object-cover border border-border hover:opacity-80 transition-opacity" />
                                         ) : (
                                             <div className="w-12 h-16 rounded bg-muted/30 flex items-center justify-center border border-border">
                                                 <FileText className="w-5 h-5 text-muted-foreground/40" />
