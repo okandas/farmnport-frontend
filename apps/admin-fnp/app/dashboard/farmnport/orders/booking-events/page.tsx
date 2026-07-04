@@ -99,10 +99,16 @@ export default function PreOrdersPage() {
                       {capitalize(event.status)}
                     </span>
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-3 space-x-3">
+                    <Link
+                      href={`/dashboard/farmnport/orders/booking-events/${event.id}`}
+                      className="text-xs text-primary hover:underline"
+                    >
+                      View
+                    </Link>
                     <Link
                       href={`/dashboard/farmnport/orders/booking-events/${event.id}/edit`}
-                      className="text-xs text-primary hover:underline"
+                      className="text-xs text-muted-foreground hover:underline"
                     >
                       Edit
                     </Link>

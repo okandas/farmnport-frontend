@@ -8,20 +8,35 @@ import Link from "next/link"
 import { myBookings } from "@/lib/query"
 
 const STATUS_STYLES: Record<string, string> = {
-  pending:   "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400",
-  confirmed: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
-  approved:  "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400",
-  ready:     "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400",
-  completed: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
-  cancelled: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
+  pending:          "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400",
+  confirmed:        "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
+  pending_payment:  "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400",
+  paid:             "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
+  approved:         "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400",
+  ready:            "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400",
+  collected:        "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
+  completed:        "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
+  rejected:         "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
+  expired:          "bg-muted text-muted-foreground",
+  cancelled:        "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
 }
 
-function capitalize(s: string) {
-  return s.charAt(0).toUpperCase() + s.slice(1)
+const STATUS_LABELS: Record<string, string> = {
+  pending:          "Pending Approval",
+  confirmed:        "Pay Now",
+  pending_payment:  "Payment Processing",
+  paid:             "Paid",
+  approved:         "Approved",
+  ready:            "Ready for Collection",
+  collected:        "Collected",
+  completed:        "Completed",
+  rejected:         "Rejected",
+  expired:          "Expired",
+  cancelled:        "Cancelled",
 }
 
 function formatDate(d: string) {
-  return new Date(d).toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" })
+  return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
 }
 
 interface Booking {
@@ -86,10 +101,10 @@ export default function BookingsPage() {
       <nav className="flex items-center gap-1.5 text-sm text-muted-foreground mb-4">
         <Link href="/account" className="hover:text-foreground transition-colors">Account</Link>
         <span>/</span>
-        <span className="text-foreground font-medium">My Bookings</span>
+        <span className="text-foreground font-medium">My Booking Orders</span>
       </nav>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-bold">My Bookings</h1>
+        <h1 className="text-xl font-bold">My Booking Orders</h1>
         <Link href="/bookings" className="text-sm text-primary hover:underline">View available bookings</Link>
       </div>
 
@@ -114,7 +129,7 @@ export default function BookingsPage() {
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-bold text-sm">{booking.booking_ref}</span>
                       <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_STYLES[booking.status] ?? "bg-muted text-muted-foreground"}`}>
-                        {capitalize(booking.status)}
+                        {STATUS_LABELS[booking.status] ?? booking.status}
                       </span>
                       <span className="text-xs text-muted-foreground capitalize flex items-center gap-1">
                         {booking.type === "delivery" ? <Truck className="w-3 h-3" /> : booking.type === "pickup" ? <Truck className="w-3 h-3" /> : <CalendarDays className="w-3 h-3" />}

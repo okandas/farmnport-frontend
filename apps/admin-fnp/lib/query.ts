@@ -1543,6 +1543,30 @@ export function updateBookingStatus(id: string, status: string, note?: string) {
   return api.put(`${baseUrl}/booking/admin/${id}/status`, { status, note })
 }
 
+export function confirmPreOrderBooking(id: string) {
+  return api.put(`${baseUrl}/booking/admin/${id}/confirm`, {})
+}
+
+export function rejectPreOrderBooking(id: string, reason: string) {
+  return api.put(`${baseUrl}/booking/admin/${id}/reject`, { reason })
+}
+
+export function markPreOrderReady(id: string) {
+  return api.put(`${baseUrl}/booking/admin/${id}/mark-ready`, {})
+}
+
+export function markPreOrderCollected(id: string) {
+  return api.put(`${baseUrl}/booking/admin/${id}/mark-collected`, {})
+}
+
+export function queryPreOrderBookings(preOrderId: string) {
+  return api.get(`${baseUrl}/booking/admin/events/${preOrderId}/bookings`)
+}
+
+export function approvePreOrderStock(preOrderId: string, actualQuantity?: number) {
+  return api.post(`${baseUrl}/booking/admin/events/${preOrderId}/approve-stock`, { actual_quantity: actualQuantity || 0 })
+}
+
 export function queryAdminPreOrders(status?: string) {
   const qs = status ? `?status=${status}` : ""
   return api.get(`${baseUrl}/booking/admin/events${qs}`)
@@ -1570,6 +1594,10 @@ export function createPreOrder(data: {
   close_date: string
   status?: string
   image_src?: string
+  payment_deadline_hours?: number
+  buyer_notes?: boolean
+  cancellation_fee?: number
+  transferable?: boolean
   delivery_locations?: { id: string; name: string }[]
 }) {
   return api.post(`${baseUrl}/booking/admin/events`, data)
@@ -1597,6 +1625,10 @@ export function updatePreOrder(id: string, data: Partial<{
   open_date: string
   close_date: string
   image_src: string
+  payment_deadline_hours: number
+  buyer_notes: boolean
+  cancellation_fee: number
+  transferable: boolean
   delivery_locations: { id: string; name: string }[]
   collection_locations: { id: string; name: string }[]
 }>) {

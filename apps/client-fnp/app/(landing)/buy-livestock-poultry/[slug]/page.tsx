@@ -22,10 +22,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function BuyLivestockPoultryProductPage({ params }: Props) {
     const { slug } = await params
-    const product = await serverFetch(`/livestock-poultry/${slug}`).catch(() => null)
+    const [product, bookingRes] = await Promise.all([
+        serverFetch(`/livestock-poultry/${slug}`).catch(() => null),
+        serverFetch(`/booking/events?status=open`).catch(() => null),
+    ])
     if (!product) notFound()
     await guardTestItem(!!product.is_test)
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://farmnport.com'
+
+    const openEvent = (bookingRes?.events ?? []).find(
+        (e: any) => e.product_id && product?.id && e.product_id === product.id
+    )
 
     if (!product) {
         return (
@@ -171,6 +178,16 @@ export default async function BuyLivestockPoultryProductPage({ params }: Props) 
                     shopHref="/buy-livestock-poultry"
                     loginRedirect={`/buy-livestock-poultry/${slug}`}
                     tabsContent={tabsContent}
+                    ctaSlot={
+                        (!product.available_for_sale || product.stock_level === 0) && openEvent ? (
+                            <Link
+                                href={`/bookings/${openEvent.slug}`}
+                                className="mt-3 flex w-full items-center justify-center gap-2 bg-primary text-primary-foreground font-semibold py-2.5 rounded-xl hover:bg-primary/90 transition-colors text-sm"
+                            >
+                                Pre-order Now
+                            </Link>
+                        ) : undefined
+                    }
                 />
             </div>
         </div>

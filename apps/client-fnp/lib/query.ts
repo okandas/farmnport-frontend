@@ -1019,6 +1019,14 @@ export function cancelBooking(id: string) {
   return api.put(`${BaseURL}/booking/${id}/cancel`, {})
 }
 
+export function initiatePreOrderPayment(id: string, data: { method?: string; phone?: string }) {
+  return api.post(`${BaseURL}/booking/${id}/initiate-payment`, data)
+}
+
+export function pollPreOrderPayment(id: string) {
+  return api.get(`${BaseURL}/booking/${id}/poll-payment`)
+}
+
 export function buyerUpdateBookingStatus(id: string, status: string, note?: string) {
   return api.put(`${BaseURL}/booking/${id}/buyer-status`, { status, note })
 }
