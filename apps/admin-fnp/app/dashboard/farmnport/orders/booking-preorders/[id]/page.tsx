@@ -106,7 +106,7 @@ export default function PreOrderDetailPage({ params }: { params: Promise<{ id: s
     <DashboardShell>
       <div className="mb-8">
         <Link
-          href="/dashboard/farmnport/orders/booking-events"
+          href="/dashboard/farmnport/orders/booking-preorders"
           className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-4"
         >
           <ArrowLeft className="w-3.5 h-3.5" /> All Pre-Orders
@@ -120,7 +120,7 @@ export default function PreOrderDetailPage({ params }: { params: Promise<{ id: s
             </span>
           </div>
           <Link
-            href={`/dashboard/farmnport/orders/booking-events/${id}/edit`}
+            href={`/dashboard/farmnport/orders/booking-preorders/${id}/edit`}
             className="text-sm text-primary hover:underline"
           >
             Edit

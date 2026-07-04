@@ -39,7 +39,7 @@ const columns: ColumnDef<any>[] = [
     header: "Event",
     cell: ({ row }) => (
       <div className="space-y-0.5">
-        <Link href={`/account/booking-events/${row.original.id}`} className="font-semibold text-sm hover:text-primary transition-colors line-clamp-1">
+        <Link href={`/account/booking-preorders/${row.original.id}`} className="font-semibold text-sm hover:text-primary transition-colors line-clamp-1">
           {row.original.title || row.original.name || "—"}
         </Link>
         {row.original.product_name && (
@@ -96,7 +96,7 @@ const columns: ColumnDef<any>[] = [
   {
     id: "actions",
     cell: ({ row }) => (
-      <Link href={`/account/booking-events/${row.original.id}`} className="text-muted-foreground hover:text-foreground transition-colors">
+      <Link href={`/account/booking-preorders/${row.original.id}`} className="text-muted-foreground hover:text-foreground transition-colors">
         <Eye className="w-4 h-4" />
       </Link>
     ),
@@ -130,7 +130,7 @@ export default function MyPreOrdersPage() {
           <CalendarCheck className="w-12 h-12 mx-auto text-muted-foreground/40" />
           <p className="font-semibold">Sign in to view your booking events</p>
           <Link
-            href="/login?next=/account/booking-events"
+            href="/login?next=/account/booking-preorders"
             className="inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground text-sm font-semibold px-6 py-2.5 hover:bg-primary/90 transition-colors"
           >
             Sign In

@@ -1,5 +1,7 @@
+import { notFound } from "next/navigation"
 import Link from "next/link"
 import { serverFetch } from "@/lib/serverFetch"
+import { documentsEnabled } from "@/flags"
 import { BuyDocumentsClient } from "./BuyDocumentsClient"
 import { getBuyCategories } from "@/components/generic/BuyCategoriesNav"
 
@@ -9,6 +11,9 @@ export const metadata = {
 }
 
 export default async function BuyDocumentsPage() {
+    const showDocuments = await documentsEnabled()
+    if (!showDocuments) notFound()
+
     let initialDocuments: any[] = []
     let initialTotal = 0
 

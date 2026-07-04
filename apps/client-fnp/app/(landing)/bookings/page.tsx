@@ -1,4 +1,6 @@
+import { notFound } from "next/navigation"
 import Link from "next/link"
+import { bookingsEnabled } from "@/flags"
 import { BookingsClient } from "./BookingsClient"
 import { getBuyCategories } from "@/components/generic/BuyCategoriesNav"
 
@@ -13,6 +15,9 @@ const breadcrumbJsonLd = {
 }
 
 export default async function PreOrdersPage() {
+  const showBookings = await bookingsEnabled()
+  if (!showBookings) notFound()
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />

@@ -5,6 +5,7 @@ import Image from "next/image"
 import { Tag, Download, FileText } from "lucide-react"
 import { serverFetch } from "@/lib/serverFetch"
 import { guardTestItem } from "@/lib/guardTestItem"
+import { documentsEnabled } from "@/flags"
 import { Badge } from "@/components/ui/badge"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
 import { WantToBuyCTA } from "@/components/shared/WantToBuyCTA"
@@ -48,6 +49,8 @@ export default async function DocumentGuidePage({ params }: Props) {
     }
 
     if (!doc) notFound()
+    const showDocuments = await documentsEnabled()
+    if (!showDocuments) notFound()
     await guardTestItem(!!doc.is_test)
 
     const fileSizeKB = doc.file_size_bytes ? Math.round(doc.file_size_bytes / 1024) : null

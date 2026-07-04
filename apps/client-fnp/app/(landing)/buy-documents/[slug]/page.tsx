@@ -4,6 +4,7 @@ import { Tag, Download, ShieldCheck, RotateCcw, Hash, FileText } from "lucide-re
 import { ShareBar } from "@/components/shared/ShareBar"
 import { serverFetch } from "@/lib/serverFetch"
 import { guardTestItem } from "@/lib/guardTestItem"
+import { documentsEnabled } from "@/flags"
 import { DocumentPricingPanel } from "@/components/shop/DocumentPricingPanel"
 import { Badge } from "@/components/ui/badge"
 import { ProductImageGallery } from "@/components/shared/ProductImageGallery"
@@ -39,6 +40,8 @@ export default async function BuyDocumentDetailPage({ params }: Props) {
     }
 
     if (!doc) notFound()
+    const showDocuments = await documentsEnabled()
+    if (!showDocuments) notFound()
     await guardTestItem(!!doc.is_test)
 
     const price = doc.price_cents ? `$${(doc.price_cents / 100).toFixed(2)}` : "Free"

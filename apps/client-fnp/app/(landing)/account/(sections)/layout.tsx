@@ -7,7 +7,7 @@ const ALL_NAV: (NavItem & { flag?: () => Promise<boolean> })[] = [
   { label: "Lots",              href: "/account/lots" },
   { label: "My Booking Orders",  href: "/account/bookings",          flag: bookingsEnabled },
   { label: "Incoming Orders",   href: "/account/incoming-bookings", flag: bookingsEnabled },
-  { label: "My Pre-Orders",     href: "/account/booking-events",   flag: bookingsEnabled, tooltip: "Create and manage pre-order batches for your products. Buyers request bookings, you confirm availability, then they pay." },
+  { label: "My Pre-Orders",     href: "/account/booking-preorders",   flag: bookingsEnabled, tooltip: "Create and manage pre-order batches for your products. Buyers request bookings, you confirm availability, then they pay." },
   { label: "Notifications",     href: "/account/notifications",     flag: notificationsEnabled },
   { label: "Documents",         href: "/account/documents",         flag: documentsEnabled },
   { label: "Profile",           href: "/account/profile",           flag: profileEnabled },
