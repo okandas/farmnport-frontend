@@ -1,10 +1,10 @@
-"use client"
+import { notFound } from "next/navigation"
+import { securityEnabled } from "@/flags"
+import SecurityClient from "./SecurityClient"
 
-export default function AccountSecurityPage() {
-    return (
-        <div className="space-y-6">
-            <h1 className="text-xl font-bold">Security</h1>
-            <p className="text-sm text-muted-foreground">Password management coming soon.</p>
-        </div>
-    )
+export default async function SecurityPage() {
+    const show = await securityEnabled()
+    if (!show) notFound()
+
+    return <SecurityClient />
 }
