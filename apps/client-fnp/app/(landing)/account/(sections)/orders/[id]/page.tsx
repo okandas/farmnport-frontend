@@ -308,7 +308,7 @@ export default function OrderDetailPage() {
 
         <div className="grid sm:grid-cols-2 gap-4">
           {/* Fulfillment */}
-          {isDigitalOrder ? (
+          {isDigitalOrder && order.status !== "cancelled" ? (
             <div className="border rounded-xl p-5 space-y-3">
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-primary" />
