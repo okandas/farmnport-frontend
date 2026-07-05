@@ -14,7 +14,7 @@ const breadcrumbJsonLd = {
     "@type": "BreadcrumbList",
     "itemListElement": [
         { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://farmnport.com" },
-        { "@type": "ListItem", "position": 2, "name": "Market", "item": "https://farmnport.com/market" },
+        { "@type": "ListItem", "position": 2, "name": "Guides", "item": "https://farmnport.com/guides" },
         { "@type": "ListItem", "position": 3, "name": "Documents", "item": "https://farmnport.com/documents" },
     ],
 }
@@ -41,7 +41,7 @@ export default async function DocumentsPage() {
                 <nav className="flex items-center gap-1.5 text-xs text-muted-foreground mb-6">
                     <Link href="/" className="hover:text-foreground transition-colors">Home</Link>
                     <span>/</span>
-                    <Link href="/market" className="hover:text-foreground transition-colors">Market</Link>
+                    <Link href="/guides" className="hover:text-foreground transition-colors">Guides</Link>
                     <span>/</span>
                     <span className="text-foreground font-medium">Documents</span>
                 </nav>
