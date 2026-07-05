@@ -173,7 +173,7 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
               <div>
                 <p className="font-semibold text-orange-900">Your booking is confirmed — pay to secure</p>
                 <p className="text-sm text-orange-700 mt-1">
-                  Pay ${(booking.pre_order.deposit_amount / 100).toFixed(2)} to secure your {booking.pre_order.quantity} {booking.pre_order.product_name}
+                  Pay ${(booking.pre_order.deposit_amount / 100).toFixed(2)} to secure your {booking.pre_order.quantity} {booking.pre_order.produce_name}
                 </p>
               </div>
               {booking.pre_order?.payment_deadline && (
@@ -224,7 +224,7 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
                 </div>
                 <div>
                   <p className="text-muted-foreground text-xs mb-0.5">Product</p>
-                  <p className="font-medium">{booking.pre_order.product_name}</p>
+                  <p className="font-medium">{booking.pre_order.produce_name}</p>
                 </div>
                 <div>
                   <p className="text-muted-foreground text-xs mb-0.5">Quantity</p>

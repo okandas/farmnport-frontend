@@ -49,7 +49,7 @@ interface Booking {
   created: string
   pre_order?: {
     event_title: string
-    product_name: string
+    produce_name: string
     quantity: number
     deposit_amount: number
     deposit_paid: boolean

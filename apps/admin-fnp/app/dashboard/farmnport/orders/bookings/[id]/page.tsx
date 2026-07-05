@@ -232,7 +232,7 @@ export default function AdminBookingDetailPage({ params }: { params: Promise<{ i
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-4">Pre-Order Details</p>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                 <Field label="Event" value={booking.pre_order.event_title} />
-                <Field label="Product" value={booking.pre_order.product_name} />
+                <Field label="Produce" value={booking.pre_order.produce_name} />
                 <Field label="Quantity" value={`${booking.pre_order.quantity?.toLocaleString()} units`} />
                 <Field label="Unit Price" value={String(centsToDollars(booking.pre_order.unit_price))} />
               </div>

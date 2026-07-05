@@ -173,10 +173,10 @@ export default function PreOrderDetailPage() {
                   <Users className="w-4 h-4" />
                   {event.client_name}
                 </span>
-                {event.product_name && (
+                {event.produce_name && (
                   <span className="flex items-center gap-1.5">
                     <Package className="w-4 h-4" />
-                    {event.product_name}
+                    {event.produce_name}
                   </span>
                 )}
               </div>

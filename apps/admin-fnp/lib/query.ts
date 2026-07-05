@@ -1579,10 +1579,10 @@ export function createPreOrder(data: {
   client_name: string
   brand_id?: string
   brand_name?: string
-  product_id: string
-  product_name: string
-  product_slug: string
-  product_type: string
+  produce_id: string
+  produce_name: string
+  breed_id?: string
+  breed_name?: string
   unit?: string
   name?: string
   unit_price: number
@@ -1611,10 +1611,8 @@ export function updatePreOrder(id: string, data: Partial<{
   client_name: string
   brand_id: string
   brand_name: string
-  product_id: string
-  product_name: string
-  product_slug: string
-  product_type: string
+  produce_id: string
+  produce_name: string
   unit: string
   name: string
   status: string

@@ -161,7 +161,7 @@ export default function PreOrderDetailPage({ params }: { params: Promise<{ id: s
           </div>
           <button
             onClick={() => {
-              if (confirm(`Add ${remaining} ${event.unit} back to ${event.product_name} stock?`)) {
+              if (confirm(`Add ${remaining} ${event.unit} back to ${event.produce_name} stock?`)) {
                 approveMutation.mutate()
               }
             }}
