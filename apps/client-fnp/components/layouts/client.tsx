@@ -192,11 +192,11 @@ export function Client({ slug, user, latestPrices }: ClientPageProps) {
                   <p className="text-xs text-muted-foreground mt-1 leading-relaxed">Call directly.</p>
                 </div>
                 {!user ? (
-                  <button onClick={() => { sendGTMEvent({ event: 'action', value: 'LoggedOutViewNumber' }); router.push(`/login?entity=${client.type}&wantToSee=${slug}`) }} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
+                  <button onClick={() => { sendGTMEvent({ event: 'login_prompt', reason: 'view_phone', client_name: client.name }); router.push(`/login?entity=${client.type}&wantToSee=${slug}`) }} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
                     See Number →
                   </button>
                 ) : !isSubscribed ? (
-                  <button onClick={() => { sendGTMEvent({ event: 'action', value: 'SubscribeToViewPhone' }); router.push('/pricing') }} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
+                  <button onClick={() => { sendGTMEvent({ event: 'paywall_hit', reason: 'view_phone', client_name: client.name }); router.push('/pricing') }} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
                     Unlock →
                   </button>
                 ) : showPhone ? (
@@ -204,7 +204,7 @@ export function Client({ slug, user, latestPrices }: ClientPageProps) {
                     {client.phone}
                   </a>
                 ) : (
-                  <button onClick={() => { sendGTMEvent({ event: 'action', value: 'LoggedInViewPhone' }); if (user?.id) recordContactView(user.id, client.id, "phone").catch(() => {}); setShowPhone(true) }} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
+                  <button onClick={() => { sendGTMEvent({ event: 'phone_reveal', client_name: client.name }); if (user?.id) recordContactView(user.id, client.id, "phone").catch(() => {}); setShowPhone(true) }} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
                     Show Number →
                   </button>
                 )}
@@ -216,19 +216,19 @@ export function Client({ slug, user, latestPrices }: ClientPageProps) {
                   <p className="text-xs text-muted-foreground mt-1 leading-relaxed">Message on WhatsApp.</p>
                 </div>
                 {!user ? (
-                  <button onClick={() => { sendGTMEvent({ event: 'action', value: 'LoggedOutViewWhatsapp' }); router.push(`/login?entity=${client.type}&wantToSee=${slug}`) }} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
+                  <button onClick={() => { sendGTMEvent({ event: 'login_prompt', reason: 'view_whatsapp', client_name: client.name }); router.push(`/login?entity=${client.type}&wantToSee=${slug}`) }} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
                     See WhatsApp →
                   </button>
                 ) : !isSubscribed ? (
-                  <button onClick={() => { sendGTMEvent({ event: 'action', value: 'SubscribeToViewWhatsapp' }); router.push('/pricing') }} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
+                  <button onClick={() => { sendGTMEvent({ event: 'paywall_hit', reason: 'view_whatsapp', client_name: client.name }); router.push('/pricing') }} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
                     Unlock →
                   </button>
                 ) : showWhatsapp ? (
-                  <a href={`https://wa.me/263${client.phone.replace(/^0/, '')}`} target="_blank" rel="noopener noreferrer" onClick={() => sendGTMEvent({ event: 'whatsapp' })} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
+                  <a href={`https://wa.me/263${client.phone.replace(/^0/, '')}`} target="_blank" rel="noopener noreferrer" onClick={() => sendGTMEvent({ event: 'whatsapp_click', client_name: client.name })} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
                     Open WhatsApp →
                   </a>
                 ) : (
-                  <button onClick={() => { sendGTMEvent({ event: 'action', value: 'LoggedInViewWhatsapp' }); if (user?.id) recordContactView(user.id, client.id, "whatsapp").catch(() => {}); setShowWhatsapp(true) }} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
+                  <button onClick={() => { sendGTMEvent({ event: 'whatsapp_reveal', client_name: client.name }); if (user?.id) recordContactView(user.id, client.id, "whatsapp").catch(() => {}); setShowWhatsapp(true) }} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
                     Show WhatsApp →
                   </button>
                 )}
@@ -240,11 +240,11 @@ export function Client({ slug, user, latestPrices }: ClientPageProps) {
                   <p className="text-xs text-muted-foreground mt-1 leading-relaxed">Send an email.</p>
                 </div>
                 {!user ? (
-                  <button onClick={() => { sendGTMEvent({ event: 'action', value: 'LoggedOutViewEmail' }); router.push(`/login?entity=${client.type}&wantToSee=${slug}`) }} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
+                  <button onClick={() => { sendGTMEvent({ event: 'login_prompt', reason: 'view_email', client_name: client.name }); router.push(`/login?entity=${client.type}&wantToSee=${slug}`) }} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
                     See Email →
                   </button>
                 ) : !isSubscribed ? (
-                  <button onClick={() => { sendGTMEvent({ event: 'action', value: 'SubscribeToViewEmail' }); router.push('/pricing') }} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
+                  <button onClick={() => { sendGTMEvent({ event: 'paywall_hit', reason: 'view_email', client_name: client.name }); router.push('/pricing') }} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
                     Unlock →
                   </button>
                 ) : showEmail ? (
@@ -252,7 +252,7 @@ export function Client({ slug, user, latestPrices }: ClientPageProps) {
                     {client.email}
                   </a>
                 ) : (
-                  <button onClick={() => { sendGTMEvent({ event: 'action', value: 'LoggedInViewEmail' }); if (user?.id) recordContactView(user.id, client.id, "email").catch(() => {}); setShowEmail(true) }} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
+                  <button onClick={() => { sendGTMEvent({ event: 'email_reveal', client_name: client.name }); if (user?.id) recordContactView(user.id, client.id, "email").catch(() => {}); setShowEmail(true) }} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
                     Show Email →
                   </button>
                 )}

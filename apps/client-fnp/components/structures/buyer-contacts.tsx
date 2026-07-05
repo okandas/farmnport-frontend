@@ -29,13 +29,14 @@ interface BuyerContactsProps {
   clientId: string
   clientName: string
   user: AuthenticatedUser | null
+  product?: string
 }
 
-function ShowPhone({ phone }: { phone: string }) {
+function ShowPhone({ phone, buyerName, contactName }: { phone: string, buyerName: string, contactName: string }) {
   const [show, setShow] = useState(false)
 
   return show ? (
-    <Link href={`tel:${phone}`} className="text-sm text-muted-foreground hover:underline" onClick={() => sendGTMEvent({ event: 'phone_call' })}>
+    <Link href={`tel:${phone}`} className="text-sm text-muted-foreground hover:underline" onClick={() => sendGTMEvent({ event: 'phone_call', client_name: buyerName, contact_name: contactName })}>
       {phone}
     </Link>
   ) : (
@@ -43,7 +44,7 @@ function ShowPhone({ phone }: { phone: string }) {
       className="p-0 h-[22px]"
       variant="link"
       onClick={() => {
-        sendGTMEvent({ event: 'action', value: 'ViewBuyerContactPhone' })
+        sendGTMEvent({ event: 'phone_reveal', client_name: buyerName, contact_name: contactName })
         setShow(true)
       }}
     >
@@ -52,11 +53,11 @@ function ShowPhone({ phone }: { phone: string }) {
   )
 }
 
-function ShowEmail({ email }: { email: string }) {
+function ShowEmail({ email, buyerName, contactName }: { email: string, buyerName: string, contactName: string }) {
   const [show, setShow] = useState(false)
 
   return show ? (
-    <Link href={`mailto:${email}`} className="text-sm text-muted-foreground hover:underline" onClick={() => sendGTMEvent({ event: 'email' })}>
+    <Link href={`mailto:${email}`} className="text-sm text-muted-foreground hover:underline" onClick={() => sendGTMEvent({ event: 'email_click', client_name: buyerName, contact_name: contactName })}>
       {email}
     </Link>
   ) : (
@@ -64,7 +65,7 @@ function ShowEmail({ email }: { email: string }) {
       className="p-0 h-[22px]"
       variant="link"
       onClick={() => {
-        sendGTMEvent({ event: 'action', value: 'ViewBuyerContactEmail' })
+        sendGTMEvent({ event: 'email_reveal', client_name: buyerName, contact_name: contactName })
         setShow(true)
       }}
     >
@@ -73,7 +74,7 @@ function ShowEmail({ email }: { email: string }) {
   )
 }
 
-export function BuyerContacts({ clientId, clientName, user }: BuyerContactsProps) {
+export function BuyerContacts({ clientId, clientName, user, product }: BuyerContactsProps) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -119,20 +120,20 @@ export function BuyerContacts({ clientId, clientName, user }: BuyerContactsProps
                     className="p-0 h-[22px]"
                     variant="link"
                     onClick={() => {
-                      sendGTMEvent({ event: 'action', value: 'LoggedOutViewBuyerContactPhone' })
+                      sendGTMEvent({ event: 'login_prompt', reason: 'view_phone', client_name: clientName })
                       router.push(`/login?${queryString.toString()}`)
                     }}
                   >
                     Login to view
                   </Button>
                 ) : isSubscribed && contact.phone ? (
-                  <ShowPhone phone={contact.phone} />
+                  <ShowPhone phone={contact.phone} buyerName={clientName} contactName={contact.name} />
                 ) : (
                   <Button
                     className="p-0 h-[22px]"
                     variant="link"
                     onClick={() => {
-                      sendGTMEvent({ event: 'action', value: 'SubscribeToViewBuyerContactPhone' })
+                      sendGTMEvent({ event: 'paywall_hit', reason: 'view_phone', client_name: clientName })
                       router.push('/pricing')
                     }}
                   >
@@ -148,20 +149,20 @@ export function BuyerContacts({ clientId, clientName, user }: BuyerContactsProps
                       className="p-0 h-[22px]"
                       variant="link"
                       onClick={() => {
-                        sendGTMEvent({ event: 'action', value: 'LoggedOutViewBuyerContactEmail' })
+                        sendGTMEvent({ event: 'login_prompt', reason: 'view_email', client_name: clientName })
                         router.push(`/login?${queryString.toString()}`)
                       }}
                     >
                       Login to view
                     </Button>
                   ) : isSubscribed && contact.email ? (
-                    <ShowEmail email={contact.email} />
+                    <ShowEmail email={contact.email} buyerName={clientName} contactName={contact.name} />
                   ) : (
                     <Button
                       className="p-0 h-[22px]"
                       variant="link"
                       onClick={() => {
-                        sendGTMEvent({ event: 'action', value: 'SubscribeToViewBuyerContactEmail' })
+                        sendGTMEvent({ event: 'paywall_hit', reason: 'view_email', client_name: clientName })
                         router.push('/pricing')
                       }}
                     >

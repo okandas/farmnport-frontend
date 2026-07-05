@@ -43,7 +43,7 @@ export function ContactBuyerButton({ user, clientName, clientId }: ContactBuyerB
         'entity': 'buyer',
         'wantToContact': clientId
       })
-      sendGTMEvent({ event: 'action', value: 'LoggedOutContactBuyer' })
+      sendGTMEvent({ event: 'login_prompt', reason: 'contact_buyer', client_name: clientName })
       router.push(`/login?${queryString}`)
     } else {
       // User is logged in - check if paid (implement your paid user check logic)
@@ -52,10 +52,10 @@ export function ContactBuyerButton({ user, clientName, clientId }: ContactBuyerB
       const isPaidUser = false // Replace with actual check from user object
 
       if (!isPaidUser) {
-        sendGTMEvent({ event: 'action', value: 'UnpaidUserContactAttempt' })
+        sendGTMEvent({ event: 'paywall_hit', reason: 'contact_buyer', client_name: clientName })
         router.push('/pricing')
       } else {
-        sendGTMEvent({ event: 'action', value: 'PaidUserContactBuyer' })
+        sendGTMEvent({ event: 'contact_buyer', client_name: clientName })
         // Show contact information or open contact modal
         // TODO: Implement contact functionality
         alert(`Contact information for ${clientName} will be shown here.`)

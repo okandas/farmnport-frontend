@@ -62,7 +62,7 @@ export function Contacts({ user, client, quickOverview }: ContactPageProps) {
         return (
             <dd>
                 <Button className="p-0 h-[22px]" variant="link" onClick={() => {
-                    sendGTMEvent({ event: 'action', value: info.action })
+                    sendGTMEvent({ event: 'login_prompt', reason: `view_${info.title.toLowerCase()}`, client_name: client.name })
                     router.push(`/login?${queryString}`)
                 }
                 }>
@@ -87,7 +87,7 @@ export function Contacts({ user, client, quickOverview }: ContactPageProps) {
         return (
             <dd>
                 <Button className="p-0 h-[22px]" variant="link" onClick={() => {
-                    sendGTMEvent({ event: 'action', value: `SubscribeToView${capitalizeFirstLetter(type)}` })
+                    sendGTMEvent({ event: 'paywall_hit', reason: `view_${type}`, client_name: client.name })
                     router.push('/pricing')
                 }}>
                     Unlock {type === "phone" ? "number" : "email"}
@@ -108,13 +108,13 @@ export function Contacts({ user, client, quickOverview }: ContactPageProps) {
                 {
                     showDetail ?
                         <dd className="text-sm font-medium leading-6 text-muted-foreground hover:underline">
-                            <Link href={`mailto:${email}`} onClick={() => sendGTMEvent({ event: 'email' })}>
+                            <Link href={`mailto:${email}`} onClick={() => sendGTMEvent({ event: 'email_click', client_name: client.name })}>
                                 {email}
                             </Link>
                         </dd>
                         : (
                             <Button className="p-0 h-[22px]" variant="link" onClick={() => {
-                                sendGTMEvent({ event: 'action', value: 'LoggedInViewEmail' })
+                                sendGTMEvent({ event: 'email_reveal', client_name: client.name })
                                 if (user?.id) recordContactView(user.id, client.id, "email").catch(() => {})
                                 showDetailButton()
                             }}>
@@ -137,13 +137,13 @@ export function Contacts({ user, client, quickOverview }: ContactPageProps) {
                 {
                     showDetail ?
                         <dd className="text-sm font-medium leading-6 text-muted-foreground hover:underline">
-                            <Link href={`tel:${phone}`} onClick={() => sendGTMEvent({ event: 'phone_call' })}>
+                            <Link href={`tel:${phone}`} onClick={() => sendGTMEvent({ event: 'phone_call', client_name: client.name })}>
                                 {phone}
                             </Link>
                         </dd>
                         : (
                             <Button className="p-0 h-[22px]" variant="link" onClick={() => {
-                                sendGTMEvent({ event: 'action', value: 'LoggedInViewPhone' })
+                                sendGTMEvent({ event: 'phone_reveal', client_name: client.name })
                                 if (user?.id) recordContactView(user.id, client.id, "phone").catch(() => {})
                                 showDetailButton()
                             }}>

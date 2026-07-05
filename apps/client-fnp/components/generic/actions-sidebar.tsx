@@ -102,7 +102,7 @@ export function ActionsSidebar({type = "buyers", product, showPremiumCTA = true}
           <Link
             href={action.href}
             className={`block w-full ${action.button} text-white px-4 py-2.5 rounded-lg font-medium transition-colors text-sm text-center`}
-            onClick={() => sendGTMEvent({ event: "click", value: action.event })}
+            onClick={() => sendGTMEvent({ event: "sidebar_cta_click", cta_name: action.event })}
           >
             {action.cta}
           </Link>

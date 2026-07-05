@@ -101,7 +101,7 @@ export function ProductResources({ product }: ProductResourcesProps) {
                         key={program.id}
                         href={`/feeding-programs/${program.slug}`}
                         className="flex items-center gap-3 rounded-lg border bg-card p-3 transition hover:border-primary/50 hover:shadow-sm group"
-                        onClick={() => sendGTMEvent({ event: "click", value: `CrossSellFeedProgram_${program.slug}` })}
+                        onClick={() => sendGTMEvent({ event: "cross_sell_click", cta_name: "feed_program", item_name: program.slug })}
                     >
                         <div className="flex h-9 w-9 flex-none items-center justify-center rounded-full bg-muted text-muted-foreground group-hover:bg-primary group-hover:text-white transition-colors">
                             <Layers className="h-5 w-5" />
@@ -117,7 +117,7 @@ export function ProductResources({ product }: ProductResourcesProps) {
                         key={card.title}
                         href={card.href}
                         className="flex items-center gap-3 rounded-lg border bg-card p-3 transition hover:border-primary/50 hover:shadow-sm group"
-                        onClick={() => sendGTMEvent({ event: "click", value: card.event })}
+                        onClick={() => sendGTMEvent({ event: "cross_sell_click", cta_name: card.event })}
                     >
                         <div className="flex h-9 w-9 flex-none items-center justify-center rounded-full bg-muted text-muted-foreground group-hover:bg-primary group-hover:text-white transition-colors">
                             {card.icon}

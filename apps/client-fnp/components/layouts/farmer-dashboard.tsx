@@ -95,7 +95,7 @@ export function FarmerDashboard({ user }: FarmerDashboardProps) {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <Link
               href="/lots/new"
-              onClick={() => sendGTMEvent({ event: "click", value: "DashboardPostLot" })}
+              onClick={() => sendGTMEvent({ event: "dashboard_cta_click", cta_name: "post_lot" })}
               className="flex items-center justify-between gap-4 rounded-xl border bg-card p-5 hover:bg-muted/50 transition-colors group"
             >
               <div className="flex items-center gap-4">
@@ -159,7 +159,7 @@ export function FarmerDashboard({ user }: FarmerDashboardProps) {
                   key={program.id}
                   href={`/feeding-programs/${program.slug}`}
                   className="group rounded-lg border bg-card p-4 hover:shadow-md hover:border-primary/20 transition-all"
-                  onClick={() => sendGTMEvent({ event: "click", value: `DashboardFeedProgram_${program.slug}` })}
+                  onClick={() => sendGTMEvent({ event: "dashboard_cta_click", cta_name: "feed_program", item_name: program.slug })}
                 >
                   <h3 className="text-sm font-bold font-heading mb-1 group-hover:text-primary transition-colors">
                     {capitalizeFirstLetter(program.name)}
@@ -193,7 +193,7 @@ export function FarmerDashboard({ user }: FarmerDashboardProps) {
                     <Link
                       href={`/animal-health-guides/vaccines?used_on=${otherAnimal}`}
                       className="flex items-center gap-3 rounded-lg border bg-card p-3 hover:border-primary/50 hover:shadow-sm transition group"
-                      onClick={() => sendGTMEvent({ event: "click", value: `DashboardVaccines_${otherAnimal}` })}
+                      onClick={() => sendGTMEvent({ event: "dashboard_cta_click", cta_name: "vaccines", item_name: otherAnimal })}
                     >
                       <span className="text-sm font-medium group-hover:text-primary transition-colors">{display} Vaccines</span>
                       <ChevronRight className="h-4 w-4 text-muted-foreground ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -201,7 +201,7 @@ export function FarmerDashboard({ user }: FarmerDashboardProps) {
                     <Link
                       href={`/animal-health-guides/nutrition-supplements?used_on=${otherAnimal}`}
                       className="flex items-center gap-3 rounded-lg border bg-card p-3 hover:border-primary/50 hover:shadow-sm transition group"
-                      onClick={() => sendGTMEvent({ event: "click", value: `DashboardNutrition_${otherAnimal}` })}
+                      onClick={() => sendGTMEvent({ event: "dashboard_cta_click", cta_name: "nutrition", item_name: otherAnimal })}
                     >
                       <span className="text-sm font-medium group-hover:text-primary transition-colors">{display} Nutrition</span>
                       <ChevronRight className="h-4 w-4 text-muted-foreground ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -209,7 +209,7 @@ export function FarmerDashboard({ user }: FarmerDashboardProps) {
                     <Link
                       href={`/feeding-programs?animal=${otherAnimal}`}
                       className="flex items-center gap-3 rounded-lg border bg-card p-3 hover:border-primary/50 hover:shadow-sm transition group"
-                      onClick={() => sendGTMEvent({ event: "click", value: `DashboardFeedingPrograms_${otherAnimal}` })}
+                      onClick={() => sendGTMEvent({ event: "dashboard_cta_click", cta_name: "feeding_programs", item_name: otherAnimal })}
                     >
                       <span className="text-sm font-medium group-hover:text-primary transition-colors">{display} Feeding Programs</span>
                       <ChevronRight className="h-4 w-4 text-muted-foreground ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />

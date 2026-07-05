@@ -26,7 +26,7 @@ export function BuyerDashboard({ user }: BuyerDashboardProps) {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <Link
               href="/lots/new"
-              onClick={() => sendGTMEvent({ event: "click", value: "DashboardPostLot" })}
+              onClick={() => sendGTMEvent({ event: "dashboard_cta_click", cta_name: "post_lot" })}
               className="flex items-center justify-between gap-4 rounded-xl border bg-card p-5 hover:bg-muted/50 transition-colors group"
             >
               <div className="flex items-center gap-4">
