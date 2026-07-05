@@ -440,6 +440,14 @@ export function queryAllFarmProduce() {
   return api.get(url)
 }
 
+export function queryFarmProduceById(id: string) {
+  return api.get(`${baseUrl}/farmproduce/by-id/${id}`)
+}
+
+export function queryBreedById(id: string) {
+  return api.get(`${baseUrl}/breeds/${id}`)
+}
+
 export function queryFarmProduceBySlug(slug: string) {
   return api.get(`${baseUrl}/farmproduce/${slug}`)
 }

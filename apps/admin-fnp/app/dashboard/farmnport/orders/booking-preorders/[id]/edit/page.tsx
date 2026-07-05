@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation"
 import { Loader2 } from "lucide-react"
 import Link from "next/link"
 
-import { queryAdminPreOrders, updatePreOrder, queryClientLocations, queryUsers, queryFarmProduce, queryBreeds, queryBrands } from "@/lib/query"
+import { queryAdminPreOrders, updatePreOrder, queryClientLocations, queryUsers, queryFarmProduce, queryFarmProduceById, queryBreeds, queryBreedById, queryBrands } from "@/lib/query"
 import { LocationMultiSelect } from "@/components/ui/location-multi-select"
 import { capitalizeWords } from "@/lib/utilities"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -195,10 +195,11 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
           </div>
           <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6 md:col-span-2">
             <div className="col-span-full">
-              <label className={labelCls}>Title (Lot Name) *</label>
+              <label className={labelCls}>Subtitle (marketing copy)</label>
               <div className="mt-2">
-                <input value={form.subtitle} onChange={(e) => set("title", e.target.value)} className={inputCls} />
+                <input value={form.subtitle} onChange={(e) => { if (e.target.value.length <= 120) set("subtitle", e.target.value) }} maxLength={120} className={inputCls} />
               </div>
+              <p className="mt-1 text-xs text-muted-foreground">{form.subtitle.length}/120 — Title is auto-generated from supplier + produce.</p>
             </div>
             <div className="col-span-full">
               <label className={labelCls}>Description</label>
@@ -316,6 +317,7 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
                 <SearchSelect
                   queryKey="booking-event-produce"
                   queryFn={(params) => queryFarmProduce(params)}
+                  fetchById={(id) => queryFarmProduceById(id).then((r) => r.data)}
                   getItems={(page) => page?.data?.data || []}
                   value={form.produce_id}
                   onValueChange={(v) => setForm((f) => f ? { ...f, produce_id: v } : f)}
@@ -329,6 +331,7 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
                   getValue={(p) => p.id}
                   placeholder="Select produce"
                   searchPlaceholder="Search produce..."
+                  valueLabel={form.produce_name}
                   clearable
                   capitalize
                 />
@@ -340,6 +343,7 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
                 <SearchSelect
                   queryKey={["booking-event-breed", form.produce_id]}
                   queryFn={(params) => queryBreeds({ ...params, farm_produce_id: form.produce_id || undefined })}
+                  fetchById={(id) => queryBreedById(id).then((r) => r.data)}
                   getItems={(page) => page?.data?.data || []}
                   value={form.breed_id}
                   onValueChange={(v) => setForm((f) => f ? { ...f, breed_id: v } : f)}
@@ -353,6 +357,7 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
                   getValue={(b) => b.id}
                   placeholder="Select breed/variety"
                   searchPlaceholder="Search breeds..."
+                  valueLabel={form.breed_name}
                   disabled={!form.produce_id}
                   clearable
                   capitalize
@@ -524,7 +529,7 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
         </Link>
         <button
           onClick={() => mutation.mutate()}
-          disabled={mutation.isPending || !form.subtitle || !form.unit_price || !form.total_available}
+          disabled={mutation.isPending || !form.unit_price || !form.total_available}
           className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 disabled:opacity-50 transition-colors"
         >
           {mutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}

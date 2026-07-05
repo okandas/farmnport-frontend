@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { useInfiniteQuery } from "@tanstack/react-query"
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query"
 import { Check, ChevronsUpDown, X } from "lucide-react"
 import { cn } from "@/lib/utilities"
 import { Button } from "@/components/ui/button"
@@ -11,6 +11,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 interface SearchSelectProps {
     queryKey: string | (string | undefined)[]
     queryFn: (params: { p: number; search: string }) => Promise<any>
+    fetchById?: (id: string) => Promise<any>
     getItems: (page: any) => any[]
     value: string
     onValueChange: (value: string) => void
@@ -23,11 +24,13 @@ interface SearchSelectProps {
     clearable?: boolean
     capitalize?: boolean
     className?: string
+    valueLabel?: string
 }
 
 export function SearchSelect({
     queryKey,
     queryFn,
+    fetchById,
     getItems,
     value,
     onValueChange,
@@ -40,6 +43,7 @@ export function SearchSelect({
     capitalize = false,
     onItemSelect,
     className,
+    valueLabel,
 }: SearchSelectProps) {
     const [open, setOpen] = useState(false)
     const [search, setSearch] = useState("")
@@ -65,7 +69,17 @@ export function SearchSelect({
 
     const items = data?.pages.flatMap((p) => getItems(p)) ?? []
     const selectedItem = items.find((item) => getValue(item) === value)
-    const selectedLabel = selectedItem ? getLabel(selectedItem) : value ? `ID: ${value.slice(-6)}` : ""
+
+    // Fetch the selected item by ID if it's not in the paginated list
+    const { data: fetchedItem } = useQuery({
+        queryKey: [...(Array.isArray(queryKey) ? queryKey : [queryKey]), "by-id", value],
+        queryFn: () => fetchById!(value),
+        enabled: !!value && !selectedItem && !!fetchById,
+        staleTime: 1000 * 60 * 10,
+    })
+
+    const resolvedItem = selectedItem || (fetchedItem?.data ?? fetchedItem) || null
+    const selectedLabel = resolvedItem ? getLabel(resolvedItem) : (valueLabel || "")
 
     function handleScroll() {
         const el = listRef.current
