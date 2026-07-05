@@ -1065,33 +1065,35 @@ function onSubmit(data: CheckoutForm) {
                       </div>
                       <div className="flex-1 min-w-0 space-y-1">
                         <p className="text-sm font-medium capitalize truncate">{item.product_name}</p>
-                        <div className="flex items-center gap-2">
-                          <button
-                            type="button"
-                            onClick={() => item.quantity > 1
-                              ? updateMutation.mutate({ product_id: item.product_id, quantity: item.quantity - 1, sku: item.sku })
-                              : removeMutation.mutate({ product_id: item.product_id, sku: item.sku })
-                            }
-                            className="w-6 h-6 rounded-full border flex items-center justify-center hover:bg-muted transition-colors"
-                          >
-                            <Minus className="w-3 h-3" />
-                          </button>
-                          <span className="text-xs font-medium w-4 text-center">{item.quantity}</span>
-                          <button
-                            type="button"
-                            onClick={() => updateMutation.mutate({ product_id: item.product_id, quantity: item.quantity + 1, sku: item.sku })}
-                            className="w-6 h-6 rounded-full border flex items-center justify-center hover:bg-muted transition-colors"
-                          >
-                            <Plus className="w-3 h-3" />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => removeMutation.mutate({ product_id: item.product_id, sku: item.sku })}
-                            className="ml-1 text-muted-foreground hover:text-destructive transition-colors"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
+                        {item.product_type !== "document" && (
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => item.quantity > 1
+                                ? updateMutation.mutate({ product_id: item.product_id, quantity: item.quantity - 1, sku: item.sku })
+                                : removeMutation.mutate({ product_id: item.product_id, sku: item.sku })
+                              }
+                              className="w-6 h-6 rounded-full border flex items-center justify-center hover:bg-muted transition-colors"
+                            >
+                              <Minus className="w-3 h-3" />
+                            </button>
+                            <span className="text-xs font-medium w-4 text-center">{item.quantity}</span>
+                            <button
+                              type="button"
+                              onClick={() => updateMutation.mutate({ product_id: item.product_id, quantity: item.quantity + 1, sku: item.sku })}
+                              className="w-6 h-6 rounded-full border flex items-center justify-center hover:bg-muted transition-colors"
+                            >
+                              <Plus className="w-3 h-3" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => removeMutation.mutate({ product_id: item.product_id, sku: item.sku })}
+                              className="ml-1 text-muted-foreground hover:text-destructive transition-colors"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        )}
                       </div>
                       <p className="text-sm font-semibold shrink-0">{centsToDollars(item.unit_price * item.quantity)}</p>
                     </div>
