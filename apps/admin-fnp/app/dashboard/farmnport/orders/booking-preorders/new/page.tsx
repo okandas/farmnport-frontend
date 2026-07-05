@@ -136,7 +136,7 @@ export default function NewPreOrderPage() {
   const allLocations: { id: string; name: string; active: boolean }[] = locationsData?.data?.locations ?? []
 
   const [form, setForm] = useState({
-    title: "",
+    subtitle: "",
     description: "",
     produce_id: "",
     produce_name: "",
@@ -168,7 +168,7 @@ export default function NewPreOrderPage() {
   const mutation = useMutation({
     mutationFn: () =>
       createPreOrder({
-        title: form.title,
+        subtitle: form.subtitle || undefined,
         description: form.description || undefined,
         produce_id: form.produce_id,
         produce_name: form.produce_name,
@@ -222,10 +222,11 @@ export default function NewPreOrderPage() {
           </div>
           <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6 md:col-span-2">
             <div className="col-span-full">
-              <label className={labelCls}>Title (Lot Name) *</label>
+              <label className={labelCls}>Subtitle (marketing copy)</label>
               <div className="mt-2">
-                <input value={form.title} onChange={(e) => set("title", e.target.value)} placeholder="e.g. Fivet Day-Old Chicks — June 2026 Batch" className={inputCls} />
+                <input value={form.subtitle} onChange={(e) => set("subtitle", e.target.value)} placeholder="e.g. Reserve your seed potatoes for early summer planting" className={inputCls} />
               </div>
+              <p className="mt-1 text-xs text-muted-foreground">The title is auto-generated from supplier + produce + date.</p>
             </div>
             <div className="col-span-full">
               <label className={labelCls}>Description</label>
@@ -569,7 +570,7 @@ export default function NewPreOrderPage() {
         </Link>
         <button
           onClick={() => mutation.mutate()}
-          disabled={mutation.isPending || !form.title || !form.produce_id || !form.unit || !form.unit_price || !form.total_available || !form.open_date}
+          disabled={mutation.isPending || !form.produce_id || !form.unit || !form.unit_price || !form.total_available || !form.open_date}
           className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 disabled:opacity-50 transition-colors"
         >
           {mutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}

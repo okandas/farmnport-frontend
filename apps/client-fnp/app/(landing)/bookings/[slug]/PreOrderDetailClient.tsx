@@ -113,7 +113,7 @@ export default function PreOrderDetailPage() {
             <span className="mx-2">/</span>
             <Link href="/bookings" className="hover:text-foreground">Forward Bookings</Link>
             <span className="mx-2">/</span>
-            <span className="text-foreground line-clamp-1">{event.title}</span>
+            <span className="text-foreground line-clamp-1">{event.name}</span>
           </nav>
         </div>
       </div>
@@ -125,7 +125,7 @@ export default function PreOrderDetailPage() {
           <div>
             {event.image_src ? (
               <div className="relative aspect-square w-full rounded-2xl overflow-hidden border bg-muted">
-                <Image src={event.image_src} alt={event.title} fill className="object-cover" />
+                <Image src={event.image_src} alt={event.name} fill className="object-cover" />
               </div>
             ) : (
               <div className="aspect-square w-full rounded-2xl border bg-muted/40" />
@@ -166,8 +166,9 @@ export default function PreOrderDetailPage() {
           {/* ── Column 2: Details ── */}
           <div className="space-y-6">
             <div>
-              <h1 className="text-2xl font-bold leading-tight">{event.title}</h1>
-              <div className="mt-3"><ShareBar name={event.title} /></div>
+              <h1 className="text-2xl font-bold leading-tight">{event.name}</h1>
+              {event.subtitle && <p className="text-sm text-muted-foreground mt-1">{event.subtitle}</p>}
+              <div className="mt-3"><ShareBar name={event.name} /></div>
               <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground flex-wrap">
                 <span className="flex items-center gap-1.5">
                   <Users className="w-4 h-4" />
@@ -233,6 +234,23 @@ export default function PreOrderDetailPage() {
                 )}
               </div>
             </div>
+
+            {/* Collection points */}
+            {(() => {
+              const locs = [...(event.delivery_locations || []), ...(event.collection_locations || [])]
+              if (locs.length === 0) return null
+              return (
+                <div className="rounded-xl border bg-muted/30 p-4 space-y-2">
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Collection Points</p>
+                  {locs.map((loc: any, i: number) => (
+                    <div key={i} className="flex items-center gap-2 text-sm">
+                      <span className="h-1.5 w-1.5 rounded-full bg-primary shrink-0" />
+                      <span>{loc.name}</span>
+                    </div>
+                  ))}
+                </div>
+              )
+            })()}
 
             {/* How it works */}
             <div className="bg-muted/40 rounded-xl p-5 space-y-3">

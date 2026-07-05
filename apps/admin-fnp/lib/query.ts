@@ -1573,7 +1573,7 @@ export function queryAdminPreOrders(status?: string) {
 }
 
 export function createPreOrder(data: {
-  title: string
+  subtitle?: string
   description?: string
   client_id: string
   client_name: string
@@ -1605,7 +1605,7 @@ export function createPreOrder(data: {
 }
 
 export function updatePreOrder(id: string, data: Partial<{
-  title: string
+  subtitle: string
   description: string
   client_id: string
   client_name: string
@@ -1613,6 +1613,8 @@ export function updatePreOrder(id: string, data: Partial<{
   brand_name: string
   produce_id: string
   produce_name: string
+  breed_id: string
+  breed_name: string
   unit: string
   name: string
   status: string

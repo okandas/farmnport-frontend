@@ -20,16 +20,17 @@ function EventCard({ event }: { event: any }) {
     >
       <div className="relative h-36 bg-muted/30">
         {event.image_src && (
-          <img src={event.image_src} alt={event.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-200 group-hover:scale-105" />
+          <img src={event.image_src} alt={event.name} className="absolute inset-0 w-full h-full object-cover transition-transform duration-200 group-hover:scale-105" />
         )}
       </div>
 
       <div className="p-4 space-y-3 border-t flex flex-col flex-1">
         <h3 className="font-semibold text-sm leading-tight group-hover:text-primary transition-colors">
-          {event.title}
+          {event.name}
         </h3>
-
-        <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">{event.client_name}</p>
+        {event.subtitle && (
+          <p className="text-xs text-muted-foreground line-clamp-2">{event.subtitle}</p>
+        )}
 
         <div className="text-xs text-muted-foreground pt-2 border-t space-y-1.5">
           <div className="flex justify-between">
@@ -46,9 +47,25 @@ function EventCard({ event }: { event: any }) {
             <span>Available</span>
             <span className="font-medium text-foreground">{available} of {event.total_available}</span>
           </div>
+          {event.delivery_dates?.length > 0 && (
+            <div className="flex items-center justify-between">
+              <span>Delivery dates</span>
+              <span className="font-medium text-foreground">{event.delivery_dates.length}</span>
+            </div>
+          )}
+          {(event.delivery_locations?.length > 0 || event.collection_locations?.length > 0) && (
+            <div className="flex items-center justify-between">
+              <span>Locations</span>
+              <span className="font-medium text-foreground">
+                {[...(event.delivery_locations || []), ...(event.collection_locations || [])].length}
+              </span>
+            </div>
+          )}
           <div className="flex items-center justify-between">
             <span>Closes</span>
-            <span className="font-medium text-foreground">{formatDate(event.close_date)}</span>
+            <span className="font-medium text-foreground">
+              {!event.close_date || event.close_date === "0001-01-01T00:00:00Z" ? "Always open" : formatDate(event.close_date)}
+            </span>
           </div>
         </div>
 
@@ -92,7 +109,7 @@ export function BookingsClient({ categories }: BookingsClientProps) {
           </div>
         ) : (
           <div className="mb-4 text-sm text-muted-foreground">
-            {events.length} Open {events.length === 1 ? "Lot" : "Lots"}
+            {events.length} Open {events.length === 1 ? "Pre-Order" : "Pre-Orders"}
           </div>
         )}
 

@@ -60,7 +60,7 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
   const event = events.find((e: any) => e.id === id)
 
   const [form, setForm] = useState<{
-    title: string
+    subtitle: string
     description: string
     status: string
     produce_id: string
@@ -95,7 +95,7 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
       setDeliveryDates((event.delivery_dates ?? []).map((d: string) => new Date(d + "T00:00:00")))
     }
     setForm({
-      title: event.title ?? "",
+      subtitle: event.subtitle ?? "",
       description: event.description ?? "",
       status: event.status ?? "draft",
       produce_id: event.produce_id ?? "",
@@ -123,7 +123,7 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
   const mutation = useMutation({
     mutationFn: () =>
       updatePreOrder(id, {
-        title: form!.title,
+        subtitle: form!.subtitle || undefined,
         description: form!.description || undefined,
         status: form!.status,
         produce_id: form!.produce_id || undefined,
@@ -183,7 +183,7 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
 
   return (
     <DashboardShell>
-      <DashboardHeader heading="Edit Booking Event" text={event?.title ?? ""} />
+      <DashboardHeader heading="Edit Pre-Order" text={event?.name ?? ""} />
 
       <div className="mt-4 space-y-0 divide-y divide-border">
 
@@ -197,7 +197,7 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
             <div className="col-span-full">
               <label className={labelCls}>Title (Lot Name) *</label>
               <div className="mt-2">
-                <input value={form.title} onChange={(e) => set("title", e.target.value)} className={inputCls} />
+                <input value={form.subtitle} onChange={(e) => set("title", e.target.value)} className={inputCls} />
               </div>
             </div>
             <div className="col-span-full">
@@ -524,7 +524,7 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
         </Link>
         <button
           onClick={() => mutation.mutate()}
-          disabled={mutation.isPending || !form.title || !form.unit_price || !form.total_available}
+          disabled={mutation.isPending || !form.subtitle || !form.unit_price || !form.total_available}
           className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 disabled:opacity-50 transition-colors"
         >
           {mutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}

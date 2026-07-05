@@ -3,6 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table"
 import Link from "next/link"
 import { centsToDollars } from "@/lib/utilities"
+import { PreOrderDropDown } from "@/components/structures/dropdowns/preorder-dropdown"
 
 const STATUS_STYLES: Record<string, string> = {
   draft:                  "bg-muted text-muted-foreground",
@@ -89,15 +90,6 @@ export const preorderColumns: ColumnDef<any>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => (
-      <div className="space-x-3">
-        <Link href={`/dashboard/farmnport/orders/booking-preorders/${row.original.id}`} className="text-xs text-primary hover:underline">
-          View
-        </Link>
-        <Link href={`/dashboard/farmnport/orders/booking-preorders/${row.original.id}/edit`} className="text-xs text-muted-foreground hover:underline">
-          Edit
-        </Link>
-      </div>
-    ),
+    cell: ({ row }) => <PreOrderDropDown preorder={row.original} />,
   },
 ]
