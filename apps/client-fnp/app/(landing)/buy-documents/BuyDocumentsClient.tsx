@@ -93,7 +93,7 @@ export function BuyDocumentsClient({ initialDocuments, initialTotal, categories 
                                     productType="document"
                                     productSlug={doc.slug}
                                     salePrice={doc.price_cents > 0 ? doc.price_cents : undefined}
-                                    availableForSale={true}
+                                    availableForSale={doc.available_for_sale}
                                     loginRedirect={`/buy-documents/${doc.slug}`}
                                     isTest={doc.is_test}
                                     singleUnit
