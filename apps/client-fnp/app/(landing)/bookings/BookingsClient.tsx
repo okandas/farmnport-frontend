@@ -47,12 +47,6 @@ function EventCard({ event }: { event: any }) {
             <span>Available</span>
             <span className="font-medium text-foreground">{available} of {event.total_available}</span>
           </div>
-          {event.delivery_dates?.length > 0 && (
-            <div className="flex items-center justify-between">
-              <span>Delivery dates</span>
-              <span className="font-medium text-foreground">{event.delivery_dates.length}</span>
-            </div>
-          )}
           {(event.delivery_locations?.length > 0 || event.collection_locations?.length > 0) && (
             <div className="flex items-center justify-between">
               <span>Locations</span>
