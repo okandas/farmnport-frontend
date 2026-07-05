@@ -13,6 +13,15 @@ import {
   BookingStatusEmail,
   BookingAdminAlertEmail,
   OrderDocumentConfirmationEmail,
+  PreorderRequestReceivedEmail,
+  PreorderRequestAdminEmail,
+  PreorderConfirmedEmail,
+  PreorderRejectedEmail,
+  PreorderDepositPaidEmail,
+  PreorderDepositPaidAdminEmail,
+  PreorderReadyEmail,
+  PreorderCollectedEmail,
+  PreorderExpiredEmail,
 } from "@/emails"
 
 const FROM = "farmnport <noreply@farmnport.com>"
@@ -102,6 +111,51 @@ export async function POST(req: NextRequest) {
     case "order-document-confirmation":
       subject = `Your document is ready — order ${(props as { orderNumber?: string }).orderNumber ?? ""} confirmed`
       html = await render(OrderDocumentConfirmationEmail(props as Parameters<typeof OrderDocumentConfirmationEmail>[0]))
+      break
+
+    case "preorder-request-received":
+      subject = `Booking request ${(props as { bookingRef?: string }).bookingRef ?? ""} submitted`
+      html = await render(PreorderRequestReceivedEmail(props as Parameters<typeof PreorderRequestReceivedEmail>[0]))
+      break
+
+    case "preorder-request-admin":
+      subject = `New pre-order request ${(props as { bookingRef?: string }).bookingRef ?? ""} — action required`
+      html = await render(PreorderRequestAdminEmail(props as Parameters<typeof PreorderRequestAdminEmail>[0]))
+      break
+
+    case "preorder-confirmed":
+      subject = `Booking ${(props as { bookingRef?: string }).bookingRef ?? ""} confirmed — pay to secure`
+      html = await render(PreorderConfirmedEmail(props as Parameters<typeof PreorderConfirmedEmail>[0]))
+      break
+
+    case "preorder-rejected":
+      subject = `Booking ${(props as { bookingRef?: string }).bookingRef ?? ""} could not be fulfilled`
+      html = await render(PreorderRejectedEmail(props as Parameters<typeof PreorderRejectedEmail>[0]))
+      break
+
+    case "preorder-deposit-paid":
+      subject = `Deposit received — ${(props as { bookingRef?: string }).bookingRef ?? ""}`
+      html = await render(PreorderDepositPaidEmail(props as Parameters<typeof PreorderDepositPaidEmail>[0]))
+      break
+
+    case "preorder-deposit-paid-admin":
+      subject = `Deposit received — ${(props as { bookingRef?: string }).bookingRef ?? ""}`
+      html = await render(PreorderDepositPaidAdminEmail(props as Parameters<typeof PreorderDepositPaidAdminEmail>[0]))
+      break
+
+    case "preorder-ready":
+      subject = `Order ${(props as { bookingRef?: string }).bookingRef ?? ""} ready for collection`
+      html = await render(PreorderReadyEmail(props as Parameters<typeof PreorderReadyEmail>[0]))
+      break
+
+    case "preorder-collected":
+      subject = `Order ${(props as { bookingRef?: string }).bookingRef ?? ""} collected — thank you`
+      html = await render(PreorderCollectedEmail(props as Parameters<typeof PreorderCollectedEmail>[0]))
+      break
+
+    case "preorder-expired":
+      subject = `Booking ${(props as { bookingRef?: string }).bookingRef ?? ""} expired`
+      html = await render(PreorderExpiredEmail(props as Parameters<typeof PreorderExpiredEmail>[0]))
       break
 
     default:

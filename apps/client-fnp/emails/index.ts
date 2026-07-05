@@ -16,3 +16,14 @@ export { default as OrderDocumentConfirmationEmail } from "./templates/orders/or
 export { default as BookingConfirmedEmail } from "./templates/bookings/booking-confirmed"
 export { default as BookingStatusEmail } from "./templates/bookings/booking-status"
 export { default as BookingAdminAlertEmail } from "./templates/bookings/booking-admin-alert"
+
+// Pre-order templates
+export { default as PreorderRequestReceivedEmail } from "./templates/bookings/preorder-request-received"
+export { default as PreorderRequestAdminEmail } from "./templates/bookings/preorder-request-admin"
+export { default as PreorderConfirmedEmail } from "./templates/bookings/preorder-confirmed"
+export { default as PreorderRejectedEmail } from "./templates/bookings/preorder-rejected"
+export { default as PreorderDepositPaidEmail } from "./templates/bookings/preorder-deposit-paid"
+export { default as PreorderDepositPaidAdminEmail } from "./templates/bookings/preorder-deposit-paid-admin"
+export { default as PreorderReadyEmail } from "./templates/bookings/preorder-ready"
+export { default as PreorderCollectedEmail } from "./templates/bookings/preorder-collected"
+export { default as PreorderExpiredEmail } from "./templates/bookings/preorder-expired"
