@@ -1598,6 +1598,7 @@ export function createPreOrder(data: {
   buyer_notes?: boolean
   cancellation_fee?: number
   transferable?: boolean
+  delivery_dates?: string[]
   delivery_locations?: { id: string; name: string }[]
 }) {
   return api.post(`${baseUrl}/booking/admin/events`, data)
@@ -1629,6 +1630,7 @@ export function updatePreOrder(id: string, data: Partial<{
   buyer_notes: boolean
   cancellation_fee: number
   transferable: boolean
+  delivery_dates: string[]
   delivery_locations: { id: string; name: string }[]
   collection_locations: { id: string; name: string }[]
 }>) {

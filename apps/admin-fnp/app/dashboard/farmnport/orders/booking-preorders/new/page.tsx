@@ -13,6 +13,7 @@ import { DashboardHeader } from "@/components/state/dashboardHeader"
 import { DashboardShell } from "@/components/state/dashboardShell"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { SearchSelect } from "@/components/ui/search-select"
+import { Calendar } from "@/components/ui/calendar"
 
 type SelectedLocation = { id: string; name: string }
 
@@ -161,6 +162,7 @@ export default function NewPreOrderPage() {
     buyer_notes: false,
     cancellation_fee: "0",
     transferable: false,
+    delivery_dates: [] as Date[],
   })
 
   const mutation = useMutation({
@@ -180,7 +182,7 @@ export default function NewPreOrderPage() {
         max_quantity: form.max_quantity ? parseInt(form.max_quantity) : undefined,
         total_available: parseInt(form.total_available),
         open_date: new Date(form.open_date).toISOString(),
-        close_date: new Date(form.close_date).toISOString(),
+        close_date: form.close_date ? new Date(form.close_date).toISOString() : "",
         status: form.status,
         image_src: form.image_src || undefined,
         client_id: form.client_id,
@@ -191,6 +193,7 @@ export default function NewPreOrderPage() {
         buyer_notes: form.buyer_notes,
         cancellation_fee: parseInt(form.cancellation_fee) || 0,
         transferable: form.transferable,
+        delivery_dates: form.delivery_dates.length ? form.delivery_dates.map((d) => d.toISOString().split("T")[0]) : undefined,
         delivery_locations: selectedLocations.length ? selectedLocations : undefined,
       }),
     onSuccess: () => {
@@ -530,6 +533,25 @@ export default function NewPreOrderPage() {
               </label>
               <p className="mt-1 text-xs text-muted-foreground">Allow bookings to be transferred to another buyer or variety.</p>
             </div>
+            {!form.close_date && (
+              <div className="col-span-full">
+                <label className={labelCls}>Available Delivery Dates</label>
+                <p className="mt-1 mb-3 text-xs text-muted-foreground">
+                  No close date = always available. Click dates on the calendar to mark when you can deliver. Buyers will pick from these dates.
+                </p>
+                {form.delivery_dates.length > 0 && (
+                  <p className="text-xs font-medium text-primary mb-2">{form.delivery_dates.length} date{form.delivery_dates.length !== 1 ? "s" : ""} selected</p>
+                )}
+                <Calendar
+                  mode="multiple"
+                  selected={form.delivery_dates}
+                  onSelect={(dates) => setForm((f) => ({ ...f, delivery_dates: dates || [] }))}
+                  disabled={{ before: new Date() }}
+                  numberOfMonths={2}
+                  className="rounded-md border"
+                />
+              </div>
+            )}
           </div>
         </div>
 

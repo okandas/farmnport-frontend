@@ -51,19 +51,31 @@ export async function POST(req: NextRequest) {
       break
 
     case "order-confirmation":
-      subject = `Order ${(props as { orderNumber?: string }).orderNumber ?? ""} confirmed`
+      subject = `Order Confirmed — ${(props as { orderNumber?: string }).orderNumber ?? ""}`
       html = await render(OrderConfirmationEmail(props as Parameters<typeof OrderConfirmationEmail>[0]))
       break
 
     case "order-dispatch":
-      subject = `[DISPATCH] New order ${(props as { orderNumber?: string }).orderNumber ?? ""}`
+      subject = `New Order ${(props as { orderNumber?: string }).orderNumber ?? ""} — Action Required`
       html = await render(OrderDispatchEmail(props as Parameters<typeof OrderDispatchEmail>[0]))
       break
 
-    case "order-status":
-      subject = `Order ${(props as { orderNumber?: string }).orderNumber ?? ""} update`
+    case "order-status": {
+      const orderNum = (props as { orderNumber?: string }).orderNumber ?? ""
+      const status = (props as { status?: string }).status ?? ""
+      const statusLabels: Record<string, string> = {
+        processing: "Order Processing",
+        ready: "Order Ready for Collection",
+        dispatched: "Order Dispatched",
+        delivered: "Order Delivered",
+        collected: "Order Collected",
+        cancelled: "Order Cancelled",
+        rejected: "Order Rejected",
+      }
+      subject = `${statusLabels[status] || "Order Update"} — ${orderNum}`
       html = await render(OrderStatusEmail(props as Parameters<typeof OrderStatusEmail>[0]))
       break
+    }
 
     case "blast": {
       const p = props as Parameters<typeof BlastEmail>[0]

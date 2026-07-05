@@ -1048,6 +1048,14 @@ export function clientPreOrderBookings(preOrderId: string) {
   return api.get(`${BaseURL}/booking/client/preorder/${preOrderId}/bookings`)
 }
 
+export function clientResetPreOrderCapacity(preOrderId: string) {
+  return api.put(`${BaseURL}/booking/client/preorder/${preOrderId}/reset`, {})
+}
+
+export function clientUpdatePreOrderCapacity(preOrderId: string, totalAvailable: number) {
+  return api.put(`${BaseURL}/booking/client/preorder/${preOrderId}/update-capacity`, { total_available: totalAvailable })
+}
+
 export function buyerUpdateBookingStatus(id: string, status: string, note?: string) {
   return api.put(`${BaseURL}/booking/${id}/buyer-status`, { status, note })
 }
