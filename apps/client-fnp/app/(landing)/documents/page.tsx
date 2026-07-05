@@ -28,7 +28,7 @@ export default async function DocumentsPage() {
 
     try {
         const result = await serverFetch("/documents/all")
-        initialDocs = result?.documents || []
+        initialDocs = result?.data || []
         initialTotal = result?.total || 0
     } catch {
         // render empty — client will retry
