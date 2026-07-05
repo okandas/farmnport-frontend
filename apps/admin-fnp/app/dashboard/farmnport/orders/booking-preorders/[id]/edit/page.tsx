@@ -16,6 +16,7 @@ import { FormSkeleton } from "@/components/state/skeleton-table"
 import { DashboardShell } from "@/components/state/dashboardShell"
 import { Placeholder } from "@/components/state/placeholder"
 import { SearchSelect } from "@/components/ui/search-select"
+import { Calendar } from "@/components/ui/calendar"
 
 type SelectedLocation = { id: string; name: string }
 
@@ -53,6 +54,7 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
   const allLocations: { id: string; name: string; active: boolean; types?: string[] }[] = locationsData?.data?.locations ?? []
   const [selectedDeliveryLocs, setSelectedDeliveryLocs] = useState<SelectedLocation[] | null>(null)
   const [selectedCollectionLocs, setSelectedCollectionLocs] = useState<SelectedLocation[] | null>(null)
+  const [deliveryDates, setDeliveryDates] = useState<Date[] | null>(null)
 
   const events: any[] = data?.data?.events ?? []
   const event = events.find((e: any) => e.id === id)
@@ -88,6 +90,9 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
     }
     if (selectedCollectionLocs === null) {
       setSelectedCollectionLocs(event.collection_locations ?? [])
+    }
+    if (deliveryDates === null) {
+      setDeliveryDates((event.delivery_dates ?? []).map((d: string) => new Date(d + "T00:00:00")))
     }
     setForm({
       title: event.title ?? "",
@@ -133,12 +138,13 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
         min_quantity: form!.min_quantity ? parseInt(form!.min_quantity) : undefined,
         max_quantity: form!.max_quantity ? parseInt(form!.max_quantity) : undefined,
         open_date: new Date(form!.open_date).toISOString(),
-        close_date: new Date(form!.close_date).toISOString(),
+        close_date: form!.close_date ? new Date(form!.close_date).toISOString() : "",
         image_src: form!.image_src || undefined,
         client_id: form!.client_id || undefined,
         client_name: form!.client_name || undefined,
         brand_id: form!.brand_id || undefined,
         brand_name: form!.brand_name || undefined,
+        delivery_dates: deliveryDates ? deliveryDates.map((d) => d.toISOString().split("T")[0]) : undefined,
         delivery_locations: selectedDeliveryLocs ?? undefined,
         collection_locations: selectedCollectionLocs ?? undefined,
       }),
@@ -459,11 +465,35 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
               </div>
             </div>
             <div className="sm:col-span-3">
-              <label className={labelCls}>Closes *</label>
+              <label className={labelCls}>Closes (leave empty = always available)</label>
               <div className="mt-2">
                 <input type="datetime-local" value={form.close_date} onChange={(e) => set("close_date", e.target.value)} className={inputCls} />
               </div>
+              {form.close_date && (
+                <button type="button" onClick={() => set("close_date", "")} className="mt-1 text-xs text-primary hover:underline">
+                  Clear close date (make always available)
+                </button>
+              )}
             </div>
+            {!form.close_date && (
+              <div className="col-span-full">
+                <label className={labelCls}>Available Delivery Dates</label>
+                <p className="mt-1 mb-3 text-xs text-muted-foreground">
+                  No close date = always available. Click dates to mark when you can deliver.
+                </p>
+                {(deliveryDates ?? []).length > 0 && (
+                  <p className="text-xs font-medium text-primary mb-2">{(deliveryDates ?? []).length} date{(deliveryDates ?? []).length !== 1 ? "s" : ""} selected</p>
+                )}
+                <Calendar
+                  mode="multiple"
+                  selected={deliveryDates ?? []}
+                  onSelect={(dates) => setDeliveryDates(dates || [])}
+                  disabled={{ before: new Date() }}
+                  numberOfMonths={2}
+                  className="rounded-md border"
+                />
+              </div>
+            )}
           </div>
         </div>
 

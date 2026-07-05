@@ -996,6 +996,7 @@ export function createBooking(data: {
   // pre-order
   event_id?: string
   quantity?: number
+  delivery_date?: string // RFC3339 — buyer-selected delivery date
   // delivery
   delivery_location_id?: string
   goods_items?: GoodsItemPayload[]

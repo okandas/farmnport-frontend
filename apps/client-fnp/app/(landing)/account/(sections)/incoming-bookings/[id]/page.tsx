@@ -7,25 +7,51 @@ import { Loader2, CheckCircle2, Circle, Truck } from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner"
 
-import { getIncomingBooking, buyerUpdateBookingStatus } from "@/lib/query"
+import { getIncomingBooking, buyerUpdateBookingStatus, clientConfirmBooking, clientRejectBooking, clientMarkReady, clientMarkCollected } from "@/lib/query"
+import { centsToDollars } from "@/lib/utilities"
 
 const STATUS_STYLES: Record<string, string> = {
-  pending:   "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400",
-  confirmed: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
-  approved:  "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400",
-  ready:     "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400",
-  completed: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
-  cancelled: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
+  pending:          "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400",
+  confirmed:        "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
+  pending_payment:  "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400",
+  paid:             "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
+  approved:         "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400",
+  ready:            "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400",
+  collected:        "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
+  completed:        "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
+  rejected:         "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
+  expired:          "bg-muted text-muted-foreground",
+  cancelled:        "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
 }
 
-// Buyer-facing step labels for delivery bookings
+const STATUS_LABELS: Record<string, string> = {
+  pending:          "Pending Approval",
+  confirmed:        "Confirmed",
+  pending_payment:  "Payment Processing",
+  paid:             "Paid",
+  approved:         "Approved",
+  ready:            "Ready for Collection",
+  collected:        "Collected",
+  completed:        "Completed",
+  rejected:         "Rejected",
+  expired:          "Expired",
+  cancelled:        "Cancelled",
+}
+
 const DELIVERY_STEPS = [
   { status: "pending",   label: "Received" },
   { status: "confirmed", label: "Processing" },
   { status: "completed", label: "Completed" },
 ]
 
-// What action buttons to show per current status
+const PRE_ORDER_STEPS = [
+  { status: "pending",   label: "Pending" },
+  { status: "confirmed", label: "Confirmed" },
+  { status: "paid",      label: "Paid" },
+  { status: "ready",     label: "Ready" },
+  { status: "collected", label: "Collected" },
+]
+
 const BUYER_TRANSITIONS: Record<string, { label: string; status: string }[]> = {
   pending:   [{ label: "Mark as Received",    status: "confirmed"  }],
   confirmed: [{ label: "Processing Complete", status: "completed"  }],
@@ -48,16 +74,19 @@ function Field({ label, value }: { label: string; value?: string | null }) {
   )
 }
 
-function StatusSteps({ status }: { status: string }) {
-  if (status === "cancelled") {
-    return <span className="text-sm font-medium text-red-600">This booking was cancelled.</span>
+function StatusSteps({ status, type }: { status: string; type: string }) {
+  if (["cancelled", "rejected", "expired"].includes(status)) {
+    return <span className="text-sm font-medium text-red-600">
+      {status === "rejected" ? "This booking was rejected." : status === "expired" ? "Payment deadline passed." : "This booking was cancelled."}
+    </span>
   }
-  const currentIdx = DELIVERY_STEPS.findIndex((s) => s.status === status)
+  const steps = type === "pre-order" ? PRE_ORDER_STEPS : DELIVERY_STEPS
+  const currentIdx = steps.findIndex((s) => s.status === status)
   return (
     <div className="flex items-start gap-0">
-      {DELIVERY_STEPS.map((step, i) => {
+      {steps.map((step, i) => {
         const done   = i <= currentIdx
-        const isLast = i === DELIVERY_STEPS.length - 1
+        const isLast = i === steps.length - 1
         return (
           <div key={step.status} className="flex items-start flex-1 last:flex-none">
             <div className="flex flex-col items-center gap-1.5">
@@ -85,6 +114,8 @@ export default function IncomingBookingDetailPage({ params }: { params: Promise<
   const [note, setNote] = useState("")
   const [cancelOpen, setCancelOpen] = useState(false)
   const [cancelReason, setCancelReason] = useState("")
+  const [rejectOpen, setRejectOpen] = useState(false)
+  const [rejectReason, setRejectReason] = useState("")
 
   const { data, isLoading } = useQuery({
     queryKey: ["incoming-booking", id],
@@ -105,6 +136,35 @@ export default function IncomingBookingDetailPage({ params }: { params: Promise<
     onError: (err: any) => {
       toast.error(err?.response?.data?.message ?? "Failed to update booking")
     },
+  })
+
+  const invalidate = () => {
+    qc.invalidateQueries({ queryKey: ["incoming-booking", id] })
+    qc.invalidateQueries({ queryKey: ["incoming-bookings"] })
+  }
+
+  const confirmMutation = useMutation({
+    mutationFn: () => clientConfirmBooking(id),
+    onSuccess: () => { toast.success("Booking confirmed — buyer notified to pay"); invalidate() },
+    onError: (err: any) => toast.error(err?.response?.data?.message || "Failed to confirm"),
+  })
+
+  const rejectMutation = useMutation({
+    mutationFn: () => clientRejectBooking(id, rejectReason),
+    onSuccess: () => { toast.success("Booking rejected"); setRejectOpen(false); setRejectReason(""); invalidate() },
+    onError: () => toast.error("Failed to reject"),
+  })
+
+  const readyMutation = useMutation({
+    mutationFn: () => clientMarkReady(id),
+    onSuccess: () => { toast.success("Marked as ready — buyer notified"); invalidate() },
+    onError: (err: any) => toast.error(err?.response?.data?.message || "Failed to update"),
+  })
+
+  const collectedMutation = useMutation({
+    mutationFn: () => clientMarkCollected(id),
+    onSuccess: () => { toast.success("Marked as collected — order complete"); invalidate() },
+    onError: (err: any) => toast.error(err?.response?.data?.message || "Failed to update"),
   })
 
   if (isLoading) {
@@ -137,10 +197,10 @@ export default function IncomingBookingDetailPage({ params }: { params: Promise<
         <div className="flex items-center gap-3 flex-wrap">
           <h1 className="text-lg font-bold font-mono tracking-tight">{booking.booking_ref}</h1>
           <span className={`text-xs px-2.5 py-0.5 rounded-full font-medium ${STATUS_STYLES[booking.status] ?? "bg-muted text-muted-foreground"}`}>
-            {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
+            {STATUS_LABELS[booking.status] ?? booking.status}
           </span>
           <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
-            <Truck className="w-3.5 h-3.5" /> Delivery
+            <Truck className="w-3.5 h-3.5" /> {booking.type === "pre-order" ? "Pre-Order" : "Delivery"}
           </span>
         </div>
         <p className="text-xs text-muted-foreground">{formatDateTime(booking.created)}</p>
@@ -154,7 +214,7 @@ export default function IncomingBookingDetailPage({ params }: { params: Promise<
           {/* Progress steps */}
           <div className="border rounded-xl p-5">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-4">Progress</p>
-            <StatusSteps status={booking.status} />
+            <StatusSteps status={booking.status} type={booking.type} />
           </div>
 
           {/* Farmer details */}
@@ -194,12 +254,89 @@ export default function IncomingBookingDetailPage({ params }: { params: Promise<
               )}
             </div>
           )}
+
+          {/* Pre-order details */}
+          {booking.type === "pre-order" && booking.pre_order && (
+            <div className="border rounded-xl p-5">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-4">Pre-Order Details</p>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                <Field label="Event" value={booking.pre_order.event_title} />
+                <Field label="Product" value={booking.pre_order.product_name} />
+                <Field label="Quantity" value={`${booking.pre_order.quantity?.toLocaleString()} units`} />
+                <Field label="Unit Price" value={centsToDollars(booking.pre_order.unit_price)} />
+                <Field label="Amount Due" value={centsToDollars(booking.pre_order.deposit_amount)} />
+                <Field label="Payment" value={booking.pre_order.deposit_paid ? "Paid" : "Not yet paid"} />
+              </div>
+              {booking.pre_order.buyer_notes && (
+                <div className="mt-4 pt-4 border-t">
+                  <p className="text-xs text-muted-foreground">Buyer Notes</p>
+                  <p className="text-sm mt-0.5">{booking.pre_order.buyer_notes}</p>
+                </div>
+              )}
+              {booking.pre_order.delivery_date && (
+                <div className="mt-4 pt-4 border-t">
+                  <p className="text-xs text-muted-foreground">Requested Delivery Date</p>
+                  <p className="text-sm font-medium mt-0.5">{formatDate(booking.pre_order.delivery_date)}</p>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* ── Right: actions + history ── */}
         <div className="space-y-5">
 
-          {actions.length > 0 && (
+          {/* Pre-order actions */}
+          {booking.type === "pre-order" && !["completed", "collected", "cancelled", "rejected", "expired"].includes(booking.status) && (
+            <div className="border rounded-xl p-5 space-y-3">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Actions</p>
+
+              {booking.status === "pending" && (
+                <>
+                  <button
+                    onClick={() => confirmMutation.mutate()}
+                    disabled={confirmMutation.isPending}
+                    className="w-full py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90"
+                  >
+                    {confirmMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : "Confirm Booking"}
+                  </button>
+                  <button
+                    onClick={() => setRejectOpen(true)}
+                    className="w-full py-2 rounded-lg text-sm font-medium border border-red-200 text-red-600 hover:bg-red-50 transition-colors"
+                  >
+                    Reject Booking
+                  </button>
+                </>
+              )}
+
+              {booking.status === "paid" && (
+                <button
+                  onClick={() => readyMutation.mutate()}
+                  disabled={readyMutation.isPending}
+                  className="w-full py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90"
+                >
+                  {readyMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : "Mark Ready for Collection"}
+                </button>
+              )}
+
+              {booking.status === "ready" && (
+                <button
+                  onClick={() => collectedMutation.mutate()}
+                  disabled={collectedMutation.isPending}
+                  className="w-full py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90"
+                >
+                  {collectedMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : "Mark as Collected"}
+                </button>
+              )}
+
+              {["confirmed", "pending_payment"].includes(booking.status) && (
+                <p className="text-xs text-muted-foreground text-center">Waiting for buyer to pay</p>
+              )}
+            </div>
+          )}
+
+          {/* Delivery actions */}
+          {booking.type !== "pre-order" && actions.length > 0 && (
             <div className="border rounded-xl p-5 space-y-3">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Update Status</p>
               <textarea
@@ -254,6 +391,34 @@ export default function IncomingBookingDetailPage({ params }: { params: Promise<
             >
               Cancel Booking
             </button>
+          )}
+
+          {rejectOpen && (
+            <div className="border border-red-200 rounded-xl p-4 space-y-3">
+              <p className="text-sm font-medium text-red-600">Reject Booking</p>
+              <textarea
+                value={rejectReason}
+                onChange={(e) => setRejectReason(e.target.value)}
+                placeholder="e.g. Insufficient stock, quantity too high..."
+                rows={2}
+                className="w-full text-sm border rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-1 focus:ring-ring bg-transparent"
+              />
+              <div className="flex gap-2">
+                <button
+                  onClick={() => { setRejectOpen(false); setRejectReason("") }}
+                  className="flex-1 py-2 text-sm rounded-lg border hover:bg-muted transition-colors"
+                >
+                  Go back
+                </button>
+                <button
+                  onClick={() => rejectMutation.mutate()}
+                  disabled={!rejectReason.trim() || rejectMutation.isPending}
+                  className="flex-1 py-2 text-sm rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors disabled:opacity-50"
+                >
+                  {rejectMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : "Reject"}
+                </button>
+              </div>
+            </div>
           )}
 
           {cancelOpen && (

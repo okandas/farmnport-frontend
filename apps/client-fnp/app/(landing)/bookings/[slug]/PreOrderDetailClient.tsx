@@ -11,6 +11,7 @@ import { toast } from "sonner"
 
 import { getPreOrder, createBooking, queryClient as queryClientProfile } from "@/lib/query"
 import { ShareBar } from "@/components/shared/ShareBar"
+import { Calendar } from "@/components/ui/calendar"
 
 function formatDate(d: string) {
   return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
@@ -26,6 +27,7 @@ export default function PreOrderDetailPage() {
 
   const [quantity, setQuantity] = useState("")
   const [notes, setNotes] = useState("")
+  const [selectedDeliveryDate, setSelectedDeliveryDate] = useState<Date | undefined>()
 
   const { data, isLoading } = useQuery({
     queryKey: ["booking-event", slug],
@@ -50,6 +52,7 @@ export default function PreOrderDetailPage() {
         quantity: parseInt(quantity),
         phone,
         notes: notes || undefined,
+        delivery_date: selectedDeliveryDate ? selectedDeliveryDate.toISOString() : undefined,
       }),
     onSuccess: () => {
       toast.success("Booking request submitted! We'll confirm availability and notify you.")
@@ -84,15 +87,19 @@ export default function PreOrderDetailPage() {
   const depositTotal = qty * (event.deposit_per_unit / 100)
   const orderTotal = qty * (event.unit_price / 100)
   const balanceDue = orderTotal - depositTotal
-  const available = event.total_available - event.total_booked
+  const available = event.total_available - (event.total_booked ?? 0)
   const minQty = event.min_quantity || 1
+  const isOpenEnded = !event.close_date || event.close_date === "0001-01-01T00:00:00Z"
+  const hasDeliveryDates = event.delivery_dates && event.delivery_dates.length > 0
+  const needsDeliveryDate = isOpenEnded && hasDeliveryDates
 
   const canSubmit =
     !!session &&
     qty >= minQty &&
     qty <= available &&
     (event.max_quantity === 0 || qty <= event.max_quantity) &&
-    !!phone
+    !!phone &&
+    (!needsDeliveryDate || !!selectedDeliveryDate)
 
   return (
     <div className="min-h-screen bg-background">
@@ -126,7 +133,15 @@ export default function PreOrderDetailPage() {
 
             <div className="mt-4 space-y-3">
               <div className="flex gap-3 flex-wrap">
-                <span className="text-xs px-3 py-1 rounded-full bg-green-100 text-green-800 font-medium">Open for bookings</span>
+                {isOpenEnded ? (
+                  available > 0 ? (
+                    <span className="text-xs px-3 py-1 rounded-full bg-green-100 text-green-800 font-medium">Always Available</span>
+                  ) : (
+                    <span className="text-xs px-3 py-1 rounded-full bg-orange-100 text-orange-800 font-medium">Pre-order for Next Batch</span>
+                  )
+                ) : (
+                  <span className="text-xs px-3 py-1 rounded-full bg-green-100 text-green-800 font-medium">Open for bookings</span>
+                )}
                 {available <= 20 && available > 0 && (
                   <span className="text-xs px-3 py-1 rounded-full bg-red-100 text-red-800 font-medium">Only {available} left!</span>
                 )}
@@ -199,11 +214,23 @@ export default function PreOrderDetailPage() {
                 </p>
               </div>
               <div className="rounded-xl border bg-muted/30 p-4">
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2 flex items-center gap-1">
-                  <Clock className="w-3 h-3" /> Closes
-                </p>
-                <p className="text-lg font-bold">{formatDate(event.close_date)}</p>
-                <p className="text-xs text-muted-foreground mt-1">booking deadline</p>
+                {isOpenEnded ? (
+                  <>
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2 flex items-center gap-1">
+                      <Clock className="w-3 h-3" /> Availability
+                    </p>
+                    <p className="text-lg font-bold">Always Open</p>
+                    <p className="text-xs text-muted-foreground mt-1">recurring supply</p>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2 flex items-center gap-1">
+                      <Clock className="w-3 h-3" /> Closes
+                    </p>
+                    <p className="text-lg font-bold">{formatDate(event.close_date)}</p>
+                    <p className="text-xs text-muted-foreground mt-1">booking deadline</p>
+                  </>
+                )}
               </div>
             </div>
 
@@ -280,6 +307,27 @@ export default function PreOrderDetailPage() {
                   </div>
                 )}
 
+                {needsDeliveryDate && (
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-medium text-muted-foreground">Select Delivery Date *</label>
+                    <Calendar
+                      mode="single"
+                      selected={selectedDeliveryDate}
+                      onSelect={setSelectedDeliveryDate}
+                      disabled={(date) => {
+                        const dateStr = date.toISOString().split("T")[0]
+                        return !event.delivery_dates.includes(dateStr) || date < new Date()
+                      }}
+                      className="rounded-md border"
+                    />
+                    {selectedDeliveryDate && (
+                      <p className="text-xs text-primary font-medium">
+                        Delivery: {formatDate(selectedDeliveryDate.toISOString())}
+                      </p>
+                    )}
+                  </div>
+                )}
+
                 {qty >= minQty && (
                   <div className="bg-muted/50 rounded-lg p-3 text-sm space-y-1.5">
                     <div className="flex justify-between">
@@ -318,10 +366,17 @@ export default function PreOrderDetailPage() {
                 <span className="text-muted-foreground flex items-center gap-1"><CalendarDays className="w-3.5 h-3.5" /> Opens</span>
                 <span className="font-medium">{formatDate(event.open_date)}</span>
               </div>
-              <div className="flex justify-between text-xs">
-                <span className="text-muted-foreground flex items-center gap-1"><CalendarDays className="w-3.5 h-3.5" /> Closes</span>
-                <span className="font-medium">{formatDate(event.close_date)}</span>
-              </div>
+              {isOpenEnded ? (
+                <div className="flex justify-between text-xs">
+                  <span className="text-muted-foreground flex items-center gap-1"><CalendarDays className="w-3.5 h-3.5" /> Closes</span>
+                  <span className="font-medium text-green-700">Always open</span>
+                </div>
+              ) : (
+                <div className="flex justify-between text-xs">
+                  <span className="text-muted-foreground flex items-center gap-1"><CalendarDays className="w-3.5 h-3.5" /> Closes</span>
+                  <span className="font-medium">{formatDate(event.close_date)}</span>
+                </div>
+              )}
             </div>
           </div>
         </div>
