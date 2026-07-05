@@ -106,18 +106,12 @@ export function DocumentsClient({ initialDocs, initialTotal }: DocumentsClientPr
                             {docs.map((doc: any) => (
                                 <ProductCard
                                     key={doc.id}
-                                    href={`/buy-documents/${doc.slug}`}
-                                    imageSrc={doc.preview_images?.[0]}
+                                    href={`/documents/${doc.slug}`}
+                                    imageSrc={doc.main_image}
                                     name={doc.title}
                                     meta={doc.category?.replace("-", " ")}
-                                    mode="buy"
-                                    productId={doc.id}
-                                    productType="document"
-                                    productSlug={doc.slug}
-                                    salePrice={doc.price_cents}
-                                    availableForSale={doc.active}
-                                    loginRedirect={`/buy-documents/${doc.slug}`}
-                                    singleUnit
+                                    mode="guide"
+                                    buttonLabel="View Guide"
                                 />
                             ))}
                         </div>
