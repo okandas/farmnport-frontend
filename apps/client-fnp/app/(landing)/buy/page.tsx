@@ -22,9 +22,9 @@ export default async function BuyPage() {
     fetchSection("/plantnutrition/buy"),
     fetchSection("/seed-products/buy"),
     showDocuments ? fetchSection("/documents/all") : Promise.resolve({ data: [], total: 0 }),
-    showBookings ? serverFetch("/booking/events?status=open").catch(() => null) : Promise.resolve(null),
+    showBookings ? serverFetch("/booking/preorders?status=open").catch(() => null) : Promise.resolve(null),
   ])
-  const bookingEvents: any[] = bookingsRes?.events ?? []
+  const bookingEvents: any[] = bookingsRes?.preorders ?? []
 
   return (
     <main className="bg-gradient-to-b from-background to-muted/20 min-h-screen">

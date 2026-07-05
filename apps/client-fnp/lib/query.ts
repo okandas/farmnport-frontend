@@ -959,11 +959,11 @@ export function listPreOrders(options?: { product_id?: string; status?: string }
   if (options?.product_id) params.set("product_id", options.product_id)
   if (options?.status) params.set("status", options.status)
   const qs = params.toString()
-  return api.get(`${BaseURL}/booking/events${qs ? `?${qs}` : ""}`)
+  return api.get(`${BaseURL}/booking/preorders${qs ? `?${qs}` : ""}`)
 }
 
 export function getPreOrder(id: string) {
-  return api.get(`${BaseURL}/booking/events/${id}`)
+  return api.get(`${BaseURL}/booking/preorders/${id}`)
 }
 
 export function myPreOrders(page?: number) {

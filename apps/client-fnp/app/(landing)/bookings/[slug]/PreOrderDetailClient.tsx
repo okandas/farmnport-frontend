@@ -42,7 +42,7 @@ export default function PreOrderDetailPage() {
 
   const phone: string = profileData?.phone ?? ""
 
-  const event = data?.event
+  const event = data?.preorder
 
   const mutation = useMutation({
     mutationFn: () =>

@@ -86,7 +86,7 @@ export default function PreOrderDetailPage({ params }: { params: Promise<{ id: s
     return <DashboardShell><FormSkeleton /></DashboardShell>
   }
 
-  const events: any[] = eventsData?.data?.events ?? []
+  const events: any[] = eventsData?.data?.preorders ?? []
   const event = events.find((e: any) => e.id === id)
   const bookings: any[] = bookingsData?.data?.bookings ?? []
 

@@ -56,7 +56,7 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
   const [selectedCollectionLocs, setSelectedCollectionLocs] = useState<SelectedLocation[] | null>(null)
   const [deliveryDates, setDeliveryDates] = useState<Date[] | null>(null)
 
-  const events: any[] = data?.data?.events ?? []
+  const events: any[] = data?.data?.preorders ?? []
   const event = events.find((e: any) => e.id === id)
 
   const [form, setForm] = useState<{

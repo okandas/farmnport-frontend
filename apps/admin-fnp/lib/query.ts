@@ -1560,16 +1560,16 @@ export function markPreOrderCollected(id: string) {
 }
 
 export function queryPreOrderBookings(preOrderId: string) {
-  return api.get(`${baseUrl}/booking/admin/events/${preOrderId}/bookings`)
+  return api.get(`${baseUrl}/booking/admin/preorders/${preOrderId}/bookings`)
 }
 
 export function approvePreOrderStock(preOrderId: string, actualQuantity?: number) {
-  return api.post(`${baseUrl}/booking/admin/events/${preOrderId}/approve-stock`, { actual_quantity: actualQuantity || 0 })
+  return api.post(`${baseUrl}/booking/admin/preorders/${preOrderId}/approve-stock`, { actual_quantity: actualQuantity || 0 })
 }
 
 export function queryAdminPreOrders(status?: string) {
   const qs = status ? `?status=${status}` : ""
-  return api.get(`${baseUrl}/booking/admin/events${qs}`)
+  return api.get(`${baseUrl}/booking/admin/preorders${qs}`)
 }
 
 export function createPreOrder(data: {
@@ -1601,7 +1601,7 @@ export function createPreOrder(data: {
   delivery_dates?: string[]
   delivery_locations?: { id: string; name: string }[]
 }) {
-  return api.post(`${baseUrl}/booking/admin/events`, data)
+  return api.post(`${baseUrl}/booking/admin/preorders`, data)
 }
 
 export function updatePreOrder(id: string, data: Partial<{
@@ -1632,7 +1632,7 @@ export function updatePreOrder(id: string, data: Partial<{
   delivery_locations: { id: string; name: string }[]
   collection_locations: { id: string; name: string }[]
 }>) {
-  return api.put(`${baseUrl}/booking/admin/events/${id}`, data)
+  return api.put(`${baseUrl}/booking/admin/preorders/${id}`, data)
 }
 
 export function queryClientLocations() {

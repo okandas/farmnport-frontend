@@ -83,47 +83,30 @@ export const dashboardConfig: DashboardConfig = {
           href: "/dashboard/farmnport/orders/sales",
           icon: "shoppingCart",
         },
-      ],
-    },
-    {
-      label: "Bookings",
-      items: [
         {
           title: "Bookings",
           href: "/dashboard/farmnport/orders/bookings",
           icon: "calender",
         },
         {
-          title: "Booking Pre-Orders",
+          title: "Pre-Orders",
           href: "/dashboard/farmnport/orders/booking-preorders",
           icon: "calender",
         },
-        {
-          title: "Client Locations",
-          href: "/dashboard/farmnport/orders/client-locations",
-          icon: "mapPin",
-        },
-      ],
-    },
-    {
-      label: "Lots & Bids",
-      alwaysOpen: true,
-      items: [
         {
           title: "Lots",
           href: "/dashboard/farmnport/lots",
           icon: "box",
         },
-      ],
-    },
-    {
-      label: "Documents",
-      alwaysOpen: true,
-      items: [
         {
           title: "Documents",
           href: "/dashboard/farmnport/documents",
           icon: "fileText",
+        },
+        {
+          title: "Client Locations",
+          href: "/dashboard/farmnport/orders/client-locations",
+          icon: "mapPin",
         },
       ],
     },

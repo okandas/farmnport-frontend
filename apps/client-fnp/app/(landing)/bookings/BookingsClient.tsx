@@ -72,7 +72,7 @@ export function BookingsClient({ categories }: BookingsClientProps) {
     queryFn: () => listPreOrders({ status: "open" }),
   })
 
-  const events: any[] = data?.data?.events ?? []
+  const events: any[] = data?.data?.preorders ?? []
 
   return (
     <div className="flex flex-col lg:flex-row gap-8">
