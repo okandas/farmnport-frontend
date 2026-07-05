@@ -23,7 +23,7 @@ export function DocumentsClient({ initialDocs, initialTotal }: DocumentsClientPr
     const { data, isLoading } = useQuery({
         queryKey: ["documents", qs.category, qs.p],
         queryFn: () => listDocuments(qs.category || undefined).then(r => r.data),
-        placeholderData: !hasFilters ? { documents: initialDocs, total: initialTotal } as any : undefined,
+        placeholderData: !hasFilters ? { data: initialDocs, total: initialTotal } as any : undefined,
         refetchOnWindowFocus: false,
     })
 
@@ -34,7 +34,7 @@ export function DocumentsClient({ initialDocs, initialTotal }: DocumentsClientPr
     })
     const categories: string[] = categoriesData?.categories ?? []
 
-    const docs: any[] = data?.documents ?? []
+    const docs: any[] = data?.data ?? []
     const total: number = data?.total ?? 0
     const totalPages = Math.ceil(total / 24)
 
