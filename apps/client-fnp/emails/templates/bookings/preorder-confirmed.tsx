@@ -19,7 +19,7 @@ export default function PreorderConfirmedEmail({
         <Section style={header}><Text style={brandName}>farmnport</Text><Text style={brandTagline}>getting you to market</Text></Section>
         <Hr style={headerDivider} />
         <Section style={content}>
-          <Section style={pillWrapper}><Text style={pill}>✓ &nbsp;Booking Confirmed</Text></Section>
+          <Section style={pillWrapper}><Text style={pill}>Booking Confirmed</Text></Section>
           <Text style={greeting}>Great news, {name}!</Text>
           <Text style={paragraph}>Your booking has been confirmed. Pay within {deadlineHours} hours to secure your allocation.</Text>
           <Section style={refCard}><Text style={refLabel}>Booking reference</Text><Text style={refNumber}>{bookingRef}</Text></Section>
@@ -48,7 +48,7 @@ const brandTagline: React.CSSProperties = { fontSize: "12px", color: "#94a3b8", 
 const headerDivider: React.CSSProperties = { borderColor: "#f1f5f9", margin: 0 }
 const content: React.CSSProperties = { padding: "32px 40px 24px" }
 const pillWrapper: React.CSSProperties = { marginBottom: "24px" }
-const pill: React.CSSProperties = { display: "inline-block", fontSize: "12px", fontWeight: "600", letterSpacing: "0.04em", color: "#16a34a", border: "1px solid #16a34a", borderRadius: "999px", padding: "4px 12px", margin: 0 }
+const pill: React.CSSProperties = { display: "inline-block", fontSize: "12px", fontWeight: "600", letterSpacing: "0.04em", color: "#16a34a", border: "1px solid #16a34a", padding: "4px 12px", margin: 0 }
 const greeting: React.CSSProperties = { fontSize: "20px", color: "#0f172a", margin: "0 0 12px" }
 const paragraph: React.CSSProperties = { fontSize: "15px", lineHeight: "1.7", color: "#475569", margin: "0 0 24px" }
 const refCard: React.CSSProperties = { backgroundColor: "#f8fafc", padding: "14px 18px", marginBottom: "28px" }

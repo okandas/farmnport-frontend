@@ -18,7 +18,7 @@ export default function PreorderRejectedEmail({
         <Section style={header}><Text style={brandName}>farmnport</Text><Text style={brandTagline}>getting you to market</Text></Section>
         <Hr style={headerDivider} />
         <Section style={content}>
-          <Section style={pillWrapper}><Text style={pill}>✗ &nbsp;Not Fulfilled</Text></Section>
+          <Section style={pillWrapper}><Text style={pill}>Not Fulfilled</Text></Section>
           <Text style={greeting}>Hi {name},</Text>
           <Text style={paragraph}>Unfortunately, your booking request for {quantity} {productName} could not be fulfilled.</Text>
           <Section style={refCard}><Text style={refLabel}>Booking reference</Text><Text style={refNumber}>{bookingRef}</Text></Section>
@@ -47,7 +47,7 @@ const brandTagline: React.CSSProperties = { fontSize: "12px", color: "#94a3b8", 
 const headerDivider: React.CSSProperties = { borderColor: "#f1f5f9", margin: 0 }
 const content: React.CSSProperties = { padding: "32px 40px 24px" }
 const pillWrapper: React.CSSProperties = { marginBottom: "24px" }
-const pill: React.CSSProperties = { display: "inline-block", fontSize: "12px", fontWeight: "600", letterSpacing: "0.04em", color: "#ef4444", border: "1px solid #ef4444", borderRadius: "999px", padding: "4px 12px", margin: 0 }
+const pill: React.CSSProperties = { display: "inline-block", fontSize: "12px", fontWeight: "600", letterSpacing: "0.04em", color: "#ef4444", border: "1px solid #ef4444", padding: "4px 12px", margin: 0 }
 const greeting: React.CSSProperties = { fontSize: "20px", color: "#0f172a", margin: "0 0 12px" }
 const paragraph: React.CSSProperties = { fontSize: "15px", lineHeight: "1.7", color: "#475569", margin: "0 0 24px" }
 const refCard: React.CSSProperties = { backgroundColor: "#f8fafc", padding: "14px 18px", marginBottom: "28px" }
