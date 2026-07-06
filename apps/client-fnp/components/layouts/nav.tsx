@@ -75,7 +75,7 @@ function BellIcon({ user }: { user: AuthenticatedUser | null }) {
   })
   const count: number = (data as any)?.count ?? 0
 
-  if (!user || count === 0) return null
+  if (!POLLING_ENABLED || !user || count === 0) return null
 
   return (
     <Button variant="outline" size="sm" asChild>
