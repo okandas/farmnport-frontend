@@ -9,7 +9,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { toast } from "sonner"
 
-import { getPreOrder, createBooking, queryClient as queryClientProfile } from "@/lib/query"
+import { createBooking, queryClient as queryClientProfile } from "@/lib/query"
 import { ShareBar } from "@/components/shared/ShareBar"
 import { Calendar } from "@/components/ui/calendar"
 
@@ -17,7 +17,7 @@ function formatDate(d: string) {
   return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
 }
 
-export default function PreOrderDetailPage({ depositEnabled = false }: { depositEnabled?: boolean }) {
+export default function PreOrderDetailPage({ preorder, depositEnabled = false }: { preorder: any; depositEnabled?: boolean }) {
   const params = useParams()
   const slug = params.slug as string
   const { data: session } = useSession()
@@ -29,11 +29,6 @@ export default function PreOrderDetailPage({ depositEnabled = false }: { deposit
   const [notes, setNotes] = useState("")
   const [selectedDeliveryDate, setSelectedDeliveryDate] = useState<Date | undefined>()
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["booking-event", slug],
-    queryFn: () => getPreOrder(slug).then((r) => r.data),
-  })
-
   const { data: profileData } = useQuery({
     queryKey: ["my-profile", user?.username],
     queryFn: () => queryClientProfile(user.username.replace(/ /g, "-")).then((r) => r.data),
@@ -42,7 +37,7 @@ export default function PreOrderDetailPage({ depositEnabled = false }: { deposit
 
   const phone: string = profileData?.phone ?? ""
 
-  const event = data?.preorder
+  const event = preorder
 
   const mutation = useMutation({
     mutationFn: () =>
@@ -64,20 +59,12 @@ export default function PreOrderDetailPage({ depositEnabled = false }: { deposit
     },
   })
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-      </div>
-    )
-  }
-
   if (!event) {
     return (
       <div className="min-h-screen flex items-center justify-center text-center">
         <div>
-          <p className="font-semibold text-lg mb-2">Forward booking not found</p>
-          <Link href="/bookings" className="text-sm text-primary underline">Back to forward bookings</Link>
+          <p className="font-semibold text-lg mb-2">Pre-order not found</p>
+          <Link href="/bookings" className="text-sm text-primary underline">Back to pre-orders</Link>
         </div>
       </div>
     )
@@ -113,7 +100,7 @@ export default function PreOrderDetailPage({ depositEnabled = false }: { deposit
             <span className="mx-2">/</span>
             <Link href="/buy" className="hover:text-foreground">Buy</Link>
             <span className="mx-2">/</span>
-            <Link href="/bookings" className="hover:text-foreground">Forward Bookings</Link>
+            <Link href="/bookings" className="hover:text-foreground">Pre-Order Bookings</Link>
             <span className="mx-2">/</span>
             <span className="text-foreground line-clamp-1">{event.name}</span>
           </nav>
@@ -128,9 +115,12 @@ export default function PreOrderDetailPage({ depositEnabled = false }: { deposit
             {event.image_src ? (
               <div className="relative aspect-square w-full rounded-2xl overflow-hidden border bg-muted">
                 <Image src={event.image_src} alt={event.name} fill className="object-cover" />
+                {event.is_test && <span className="absolute top-3 right-3 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded">TEST</span>}
               </div>
             ) : (
-              <div className="aspect-square w-full rounded-2xl border bg-muted/40" />
+              <div className="relative aspect-square w-full rounded-2xl border bg-muted/40">
+                {event.is_test && <span className="absolute top-3 right-3 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded">TEST</span>}
+              </div>
             )}
 
             <div className="mt-4 space-y-3">

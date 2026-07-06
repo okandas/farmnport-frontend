@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation"
 import Link from "next/link"
 import { bookingsEnabled } from "@/flags"
+import { serverFetch } from "@/lib/serverFetch"
 import { BookingsClient } from "./BookingsClient"
 import { getBuyCategories } from "@/components/generic/BuyCategoriesNav"
 
@@ -35,7 +36,10 @@ export default async function PreOrdersPage() {
           <p className="text-lg text-muted-foreground">Book and reserve produce directly from suppliers. Confirm availability, pay, and collect.</p>
         </div>
 
-        <BookingsClient categories={await getBuyCategories()} />
+        <BookingsClient
+          categories={await getBuyCategories()}
+          initialPreOrders={await serverFetch("/booking/preorders?status=open").then((r: any) => r?.preorders ?? []).catch(() => [])}
+        />
       </div>
     </div>
   )

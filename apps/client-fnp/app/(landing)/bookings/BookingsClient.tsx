@@ -1,10 +1,7 @@
 "use client"
 
-import { useQuery } from "@tanstack/react-query"
 import Link from "next/link"
-import { Loader2 } from "lucide-react"
 
-import { listPreOrders } from "@/lib/query"
 import { BuyCategoriesNavClient } from "@/components/generic/BuyCategoriesNavClient"
 
 function formatDate(d: string) {
@@ -21,6 +18,9 @@ function EventCard({ event }: { event: any }) {
       <div className="relative h-36 bg-muted/30">
         {event.image_src && (
           <img src={event.image_src} alt={event.name} className="absolute inset-0 w-full h-full object-cover transition-transform duration-200 group-hover:scale-105" />
+        )}
+        {event.is_test && (
+          <span className="absolute top-2 right-2 bg-orange-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">TEST</span>
         )}
       </div>
 
@@ -75,15 +75,11 @@ function EventCard({ event }: { event: any }) {
 
 interface BookingsClientProps {
   categories: { label: string; href: string }[]
+  initialPreOrders: any[]
 }
 
-export function BookingsClient({ categories }: BookingsClientProps) {
-  const { data, isLoading } = useQuery({
-    queryKey: ["booking-events"],
-    queryFn: () => listPreOrders({ status: "open" }),
-  })
-
-  const events: any[] = data?.data?.preorders ?? []
+export function BookingsClient({ categories, initialPreOrders }: BookingsClientProps) {
+  const events = initialPreOrders
 
   return (
     <div className="flex flex-col lg:flex-row gap-8">
@@ -92,11 +88,7 @@ export function BookingsClient({ categories }: BookingsClientProps) {
       </aside>
 
       <main className="flex-1">
-        {isLoading ? (
-          <div className="flex justify-center py-20">
-            <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-          </div>
-        ) : events.length === 0 ? (
+        {events.length === 0 ? (
           <div className="text-center py-20 space-y-3">
             <p className="font-semibold">No open batches right now</p>
             <p className="text-sm text-muted-foreground">Check back soon for upcoming forward booking batches.</p>
