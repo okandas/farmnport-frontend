@@ -105,7 +105,7 @@ export default function IncomingBookingsPage() {
                 <p className="text-xs text-muted-foreground">
                   {booking.client_name}
                   {booking.type === "pre-order" && booking.pre_order
-                    ? ` · ${booking.pre_order.event_title} · ${booking.pre_order.quantity} units`
+                    ? ` · ${booking.pre_order.event_title} · ${booking.pre_order.quantity} ${booking.pre_order.unit || "units"}`
                     : booking.delivery?.delivery_location_name ? ` · ${booking.delivery.delivery_location_name}` : ""}
                 </p>
                 {booking.type === "pre-order" && booking.pre_order?.fulfillment_type && (

@@ -267,7 +267,7 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
                 </div>
                 <div>
                   <p className="text-muted-foreground text-xs mb-0.5">Quantity</p>
-                  <p className="font-medium">{booking.pre_order.quantity} units</p>
+                  <p className="font-medium">{booking.pre_order.quantity} {booking.pre_order.unit || "units"}</p>
                 </div>
                 <div>
                   <p className="text-muted-foreground text-xs mb-0.5">Unit Price</p>

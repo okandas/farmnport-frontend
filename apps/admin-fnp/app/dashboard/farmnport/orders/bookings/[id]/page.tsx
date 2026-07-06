@@ -237,7 +237,7 @@ export default function AdminBookingDetailPage({ params }: { params: Promise<{ i
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                 <Field label="Event" value={booking.pre_order.event_title} />
                 <Field label="Produce" value={booking.pre_order.produce_name} />
-                <Field label="Quantity" value={`${booking.pre_order.quantity?.toLocaleString()} units`} />
+                <Field label="Quantity" value={`${booking.pre_order.quantity?.toLocaleString()} ${booking.pre_order.unit || "units"}`} />
                 <Field label="Unit Price" value={String(centsToDollars(booking.pre_order.unit_price))} />
               </div>
               {booking.pre_order.fulfillment_type && (
@@ -306,7 +306,7 @@ export default function AdminBookingDetailPage({ params }: { params: Promise<{ i
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-4">Payment</p>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Order Total ({booking.pre_order.quantity?.toLocaleString()} units)</span>
+                  <span className="text-muted-foreground">Order Total ({booking.pre_order.quantity?.toLocaleString()} {booking.pre_order.unit || "units"})</span>
                   <span className="font-medium">{centsToDollars((booking.pre_order.unit_price ?? 0) * (booking.pre_order.quantity ?? 0))}</span>
                 </div>
                 <div className="flex justify-between">

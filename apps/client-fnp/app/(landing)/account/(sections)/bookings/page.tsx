@@ -139,7 +139,7 @@ export default function BookingsPage() {
 
                     {booking.type === "pre-order" && booking.pre_order && (
                       <p className="text-xs text-muted-foreground">
-                        {booking.pre_order.event_title} · {booking.pre_order.quantity} units
+                        {booking.pre_order.event_title} · {booking.pre_order.quantity} {booking.pre_order.unit || "units"}
                       </p>
                     )}
 
