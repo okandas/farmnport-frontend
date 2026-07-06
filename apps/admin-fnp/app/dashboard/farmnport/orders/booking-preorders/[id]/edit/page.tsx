@@ -392,7 +392,7 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
             </div>
             {form.name && (
               <div className="col-span-full rounded-md bg-muted/50 px-3 py-2 text-sm text-muted-foreground">
-                <span className="font-medium text-foreground">Pre-order name:</span>{form.name}
+                <span className="font-medium text-foreground">Pre-order name: </span>{form.name}
               </div>
             )}
           </div>

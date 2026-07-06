@@ -17,7 +17,7 @@ function formatDate(d: string) {
   return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
 }
 
-export default function PreOrderDetailPage() {
+export default function PreOrderDetailPage({ depositEnabled = false }: { depositEnabled?: boolean }) {
   const params = useParams()
   const slug = params.slug as string
   const { data: session } = useSession()
@@ -89,6 +89,7 @@ export default function PreOrderDetailPage() {
   const balanceDue = orderTotal - depositTotal
   const available = event.total_available - (event.total_booked ?? 0)
   const minQty = event.min_quantity || 1
+  const step = event.quantity_step || 1
   const isOpenEnded = !event.close_date || event.close_date === "0001-01-01T00:00:00Z"
   const hasDeliveryDates = event.delivery_dates && event.delivery_dates.length > 0
   const needsDeliveryDate = isOpenEnded && hasDeliveryDates
@@ -97,6 +98,7 @@ export default function PreOrderDetailPage() {
     !!session &&
     qty >= minQty &&
     qty <= available &&
+    (step <= 1 || qty % step === 0) &&
     (event.max_quantity === 0 || qty <= event.max_quantity) &&
     !!phone &&
     (!needsDeliveryDate || !!selectedDeliveryDate)
@@ -188,17 +190,19 @@ export default function PreOrderDetailPage() {
             )}
 
             {/* Pricing & capacity */}
-            <div className="grid grid-cols-2 gap-3">
+            <div className={`grid gap-3 ${depositEnabled && event.deposit_per_unit > 0 ? "grid-cols-2" : "grid-cols-1"}`}>
               <div className="rounded-xl border bg-muted/30 p-4">
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Unit Price</p>
                 <p className="text-2xl font-bold">${(event.unit_price / 100).toFixed(2)}</p>
-                <p className="text-xs text-muted-foreground mt-1">per unit · full price</p>
+                <p className="text-xs text-muted-foreground mt-1">per {event.unit || "unit"}</p>
               </div>
-              <div className="rounded-xl border border-orange-200 bg-orange-50 p-4">
-                <p className="text-xs font-medium text-orange-700 uppercase tracking-wide mb-2">Deposit per Unit</p>
-                <p className="text-2xl font-bold text-orange-700">${(event.deposit_per_unit / 100).toFixed(2)}</p>
-                <p className="text-xs text-orange-600 mt-1">to secure your booking</p>
-              </div>
+              {depositEnabled && event.deposit_per_unit > 0 && (
+                <div className="rounded-xl border border-orange-200 bg-orange-50 p-4">
+                  <p className="text-xs font-medium text-orange-700 uppercase tracking-wide mb-2">Deposit per Unit</p>
+                  <p className="text-2xl font-bold text-orange-700">${(event.deposit_per_unit / 100).toFixed(2)}</p>
+                  <p className="text-xs text-orange-600 mt-1">to secure your booking</p>
+                </div>
+              )}
             </div>
 
             <div className="grid grid-cols-3 gap-3">
@@ -289,15 +293,16 @@ export default function PreOrderDetailPage() {
 
                 <div className="space-y-1.5">
                   <label className="text-xs font-medium text-muted-foreground">
-                    Quantity *{event.max_quantity > 0 ? ` (${minQty}–${event.max_quantity})` : ` (min ${minQty})`}
+                    Quantity *{step > 1 ? ` (multiples of ${step})` : event.max_quantity > 0 ? ` (${minQty}–${event.max_quantity})` : ` (min ${minQty})`}
                   </label>
                   <input
                     type="number"
                     min={minQty}
                     max={event.max_quantity > 0 ? event.max_quantity : available}
+                    step={step > 1 ? step : 1}
                     value={quantity}
                     onChange={(e) => setQuantity(e.target.value)}
-                    placeholder={`e.g. ${minQty}`}
+                    placeholder={`e.g. ${step > 1 ? step : minQty}`}
                     className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                 </div>
@@ -352,14 +357,23 @@ export default function PreOrderDetailPage() {
                       <span className="text-muted-foreground">Order total ({qty.toLocaleString()} units)</span>
                       <span className="font-medium">${orderTotal.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Deposit due now</span>
-                      <span className="font-semibold text-orange-700">${depositTotal.toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between border-t pt-1.5">
-                      <span className="text-muted-foreground">Balance on collection</span>
-                      <span className="font-medium">${balanceDue.toFixed(2)}</span>
-                    </div>
+                    {depositEnabled && event.deposit_per_unit > 0 ? (
+                      <>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Deposit due now</span>
+                          <span className="font-semibold text-orange-700">${depositTotal.toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between border-t pt-1.5">
+                          <span className="text-muted-foreground">Balance on collection</span>
+                          <span className="font-medium">${balanceDue.toFixed(2)}</span>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="flex justify-between border-t pt-1.5">
+                        <span className="font-semibold">Total</span>
+                        <span className="font-bold">${orderTotal.toFixed(2)}</span>
+                      </div>
+                    )}
                   </div>
                 )}
 

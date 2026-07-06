@@ -148,6 +148,7 @@ export default function NewPreOrderPage() {
     deposit_per_unit: "",
     min_quantity: "",
     max_quantity: "",
+    quantity_step: "",
     total_available: "",
     open_date: "",
     close_date: "",
@@ -180,6 +181,7 @@ export default function NewPreOrderPage() {
         deposit_per_unit: Math.round(parseFloat(form.deposit_per_unit) * 100),
         min_quantity: form.min_quantity ? parseInt(form.min_quantity) : undefined,
         max_quantity: form.max_quantity ? parseInt(form.max_quantity) : undefined,
+        quantity_step: form.quantity_step ? parseInt(form.quantity_step) : undefined,
         total_available: parseInt(form.total_available),
         open_date: new Date(form.open_date).toISOString(),
         close_date: form.close_date ? new Date(form.close_date).toISOString() : "",
@@ -413,7 +415,7 @@ export default function NewPreOrderPage() {
             </div>
             {form.name && (
               <div className="col-span-full rounded-md bg-muted/50 px-3 py-2 text-sm text-muted-foreground">
-                <span className="font-medium text-foreground">Pre-order name:</span>{form.name}
+                <span className="font-medium text-foreground">Pre-order name: </span>{form.name}
               </div>
             )}
           </div>
@@ -463,6 +465,13 @@ export default function NewPreOrderPage() {
               <div className="mt-2">
                 <input type="number" min="0" value={form.max_quantity} onChange={(e) => set("max_quantity", e.target.value)} placeholder="200" className={inputCls} />
               </div>
+            </div>
+            <div className="sm:col-span-2">
+              <label className={labelCls}>Batch Size</label>
+              <div className="mt-2">
+                <input type="number" min="0" value={form.quantity_step} onChange={(e) => set("quantity_step", e.target.value)} placeholder="e.g. 50" className={inputCls} />
+              </div>
+              <p className="mt-1 text-xs text-muted-foreground">Buyers order in multiples of this. Leave empty for any quantity.</p>
             </div>
           </div>
         </div>

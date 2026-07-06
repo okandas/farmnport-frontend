@@ -1597,6 +1597,7 @@ export function createPreOrder(data: {
   deposit_per_unit: number
   min_quantity?: number
   max_quantity?: number
+  quantity_step?: number
   total_available: number
   open_date: string
   close_date: string

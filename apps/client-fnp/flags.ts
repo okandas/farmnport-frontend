@@ -40,6 +40,13 @@ export const bookingsEnabled = flag<boolean>({
   identify,
 })
 
+export const preorderDepositEnabled = flag<boolean>({
+  key: "preorder_deposit_enabled",
+  adapter: growthbookAdapter.feature<boolean>(),
+  defaultValue: false,
+  identify,
+})
+
 export const profileEnabled = flag<boolean>({
   key: "profile_enabled",
   adapter: growthbookAdapter.feature<boolean>(),
