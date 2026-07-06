@@ -78,7 +78,7 @@ function PaymentDeadlineCountdown({ deadline }: { deadline: string }) {
 
 export default function BookingDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
-  const { data: session } = useSession()
+  const { data: session, status } = useSession()
   const queryClient = useQueryClient()
 
   const { data, isLoading } = useQuery({
@@ -121,12 +121,17 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
     },
   })
 
-  if (isLoading) {
+  if (status === "loading" || isLoading) {
     return (
       <div className="flex items-center justify-center py-24">
         <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
       </div>
     )
+  }
+
+  if (status === "unauthenticated") {
+    if (typeof window !== "undefined") window.location.href = `/login?next=/account/bookings/${id}`
+    return null
   }
 
   const booking = (data as any)?.booking
