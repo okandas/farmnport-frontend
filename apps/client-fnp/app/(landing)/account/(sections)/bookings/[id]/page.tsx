@@ -209,26 +209,29 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
                 <span className="font-bold text-orange-900">${total.toFixed(2)}</span>
               </div>
             </div>
-            <button
-              onClick={() => payMutation.mutate()}
-              disabled={payMutation.isPending}
-              className="w-full flex items-center justify-center gap-2 bg-orange-600 hover:bg-orange-700 text-white font-semibold py-2.5 rounded-xl transition-colors disabled:opacity-50 text-sm"
-            >
-              {payMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <CreditCard className="w-4 h-4" />}
-              Pay Now — ${total.toFixed(2)}
-            </button>
-            <button
-              type="button"
-              onClick={async () => {
-                const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3744"
-                await fetch(`${baseUrl}/v1/booking/preorder-result?reference=${booking.pre_order.payment_ref || `PREORDER-${booking.id}`}&status=paid`, { method: "POST" })
-                queryClient.invalidateQueries({ queryKey: ["booking", id] })
-                toast.success("Payment confirmed")
-              }}
-              className="text-xs text-muted-foreground hover:text-foreground transition-colors underline"
-            >
-              I have already paid
-            </button>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => payMutation.mutate()}
+                disabled={payMutation.isPending}
+                className="flex items-center justify-center gap-2 bg-orange-600 hover:bg-orange-700 text-white font-semibold py-2.5 rounded-xl transition-colors disabled:opacity-50 text-sm"
+              >
+                {payMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <CreditCard className="w-4 h-4" />}
+                Pay Online
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3744"
+                  await fetch(`${baseUrl}/v1/booking/preorder-result?reference=${booking.pre_order.payment_ref || `PREORDER-${booking.id}`}&status=paid`, { method: "POST" })
+                  queryClient.invalidateQueries({ queryKey: ["booking", id] })
+                  toast.success("Payment confirmed")
+                }}
+                className="flex items-center justify-center gap-2 border font-semibold py-2.5 rounded-xl hover:bg-muted transition-colors text-sm"
+              >
+                I Have Paid
+              </button>
+            </div>
+            <p className="text-xs text-muted-foreground text-center">Total: ${total.toFixed(2)}</p>
           </div>
           )
         })()}
