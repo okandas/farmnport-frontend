@@ -103,10 +103,13 @@ export default function AdminBookingDetailPage({ params }: { params: Promise<{ i
   const queryClient = useQueryClient()
   const [note, setNote] = useState("")
   const [confirmOpen, setConfirmOpen] = useState(false)
+  const [confirmInput, setConfirmInput] = useState("")
   const [cancelOpen, setCancelOpen] = useState(false)
   const [cancelReason, setCancelReason] = useState("")
+  const [cancelInput, setCancelInput] = useState("")
   const [rejectOpen, setRejectOpen] = useState(false)
   const [rejectReason, setRejectReason] = useState("")
+  const [rejectInput, setRejectInput] = useState("")
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin-booking", id],
@@ -440,29 +443,38 @@ export default function AdminBookingDetailPage({ params }: { params: Promise<{ i
         </div>
 
         {/* Cancel dialog */}
-        <Dialog open={cancelOpen} onOpenChange={setCancelOpen}>
+        <Dialog open={cancelOpen} onOpenChange={(o) => { setCancelOpen(o); if (!o) { setCancelInput(""); setCancelReason("") } }}>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Cancel Booking</DialogTitle>
             </DialogHeader>
-            <div className="bg-muted/50 rounded-lg px-3 py-2 text-sm font-mono font-semibold">{booking.booking_ref}</div>
-            <p className="text-sm text-muted-foreground">Please provide a reason for cancelling this booking.</p>
+            <div className="flex items-center justify-between bg-muted/50 rounded-lg px-3 py-2">
+              <span className="text-sm font-mono font-semibold">{booking.booking_ref}</span>
+              <button type="button" onClick={() => { navigator.clipboard.writeText(booking.booking_ref); toast({ description: "Copied" }) }} className="text-xs text-primary hover:underline">Copy</button>
+            </div>
+            <p className="text-sm text-muted-foreground">Please provide a reason and paste the booking reference to cancel.</p>
             <textarea
               value={cancelReason}
               onChange={(e) => setCancelReason(e.target.value)}
               placeholder="Reason for cancellation..."
-              rows={3}
+              rows={2}
               className="w-full text-sm border rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-1 focus:ring-ring bg-transparent"
             />
+            <input
+              value={cancelInput}
+              onChange={(e) => setCancelInput(e.target.value)}
+              placeholder="Paste booking reference here"
+              className="w-full text-sm border rounded-lg px-3 py-2 font-mono focus:outline-none focus:ring-1 focus:ring-ring bg-transparent"
+            />
             <DialogFooter>
-              <button onClick={() => setCancelOpen(false)} className="px-4 py-2 text-sm rounded-lg border hover:bg-muted transition-colors">
+              <button onClick={() => { setCancelOpen(false); setCancelInput(""); setCancelReason("") }} className="px-4 py-2 text-sm rounded-lg border hover:bg-muted transition-colors">
                 Go back
               </button>
               <button
                 onClick={() => {
-                  statusMutation.mutate("cancelled", { onSuccess: () => { setCancelOpen(false); setCancelReason("") } })
+                  statusMutation.mutate("cancelled", { onSuccess: () => { setCancelOpen(false); setCancelInput(""); setCancelReason("") } })
                 }}
-                disabled={!cancelReason.trim() || statusMutation.isPending}
+                disabled={!cancelReason.trim() || cancelInput !== booking.booking_ref || statusMutation.isPending}
                 className="px-4 py-2 text-sm rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors disabled:opacity-50"
               >
                 {statusMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Confirm Cancel"}
@@ -473,22 +485,31 @@ export default function AdminBookingDetailPage({ params }: { params: Promise<{ i
 
         {/* Reject dialog */}
         {/* Confirm dialog */}
-        <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <Dialog open={confirmOpen} onOpenChange={(o) => { setConfirmOpen(o); if (!o) setConfirmInput("") }}>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Confirm Booking</DialogTitle>
             </DialogHeader>
-            <p className="text-sm text-muted-foreground">Confirm this booking? The buyer will be notified to pay.</p>
-            <div className="bg-muted/50 rounded-lg px-3 py-2 text-sm font-mono font-semibold">{booking.booking_ref}</div>
+            <p className="text-sm text-muted-foreground">The buyer will be notified to pay. Paste the booking reference to confirm.</p>
+            <div className="flex items-center justify-between bg-muted/50 rounded-lg px-3 py-2">
+              <span className="text-sm font-mono font-semibold">{booking.booking_ref}</span>
+              <button type="button" onClick={() => { navigator.clipboard.writeText(booking.booking_ref); toast({ description: "Copied" }) }} className="text-xs text-primary hover:underline">Copy</button>
+            </div>
+            <input
+              value={confirmInput}
+              onChange={(e) => setConfirmInput(e.target.value)}
+              placeholder="Paste booking reference here"
+              className="w-full text-sm border rounded-lg px-3 py-2 font-mono focus:outline-none focus:ring-1 focus:ring-ring bg-transparent"
+            />
             <DialogFooter>
-              <button onClick={() => setConfirmOpen(false)} className="px-4 py-2 text-sm rounded-lg border hover:bg-muted transition-colors">
+              <button onClick={() => { setConfirmOpen(false); setConfirmInput("") }} className="px-4 py-2 text-sm rounded-lg border hover:bg-muted transition-colors">
                 Go back
               </button>
               <button
                 onClick={() => {
-                  confirmMutation.mutate(undefined, { onSuccess: () => setConfirmOpen(false) })
+                  confirmMutation.mutate(undefined, { onSuccess: () => { setConfirmOpen(false); setConfirmInput("") } })
                 }}
-                disabled={confirmMutation.isPending}
+                disabled={confirmMutation.isPending || confirmInput !== booking.booking_ref}
                 className="px-4 py-2 text-sm rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50"
               >
                 {confirmMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Confirm"}
@@ -498,27 +519,36 @@ export default function AdminBookingDetailPage({ params }: { params: Promise<{ i
         </Dialog>
 
         {/* Reject dialog */}
-        <Dialog open={rejectOpen} onOpenChange={setRejectOpen}>
+        <Dialog open={rejectOpen} onOpenChange={(o) => { setRejectOpen(o); if (!o) { setRejectInput(""); setRejectReason("") } }}>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Reject Booking</DialogTitle>
             </DialogHeader>
-            <div className="bg-muted/50 rounded-lg px-3 py-2 text-sm font-mono font-semibold">{booking.booking_ref}</div>
-            <p className="text-sm text-muted-foreground">Please provide a reason for rejecting this booking.</p>
+            <div className="flex items-center justify-between bg-muted/50 rounded-lg px-3 py-2">
+              <span className="text-sm font-mono font-semibold">{booking.booking_ref}</span>
+              <button type="button" onClick={() => { navigator.clipboard.writeText(booking.booking_ref); toast({ description: "Copied" }) }} className="text-xs text-primary hover:underline">Copy</button>
+            </div>
+            <p className="text-sm text-muted-foreground">Please provide a reason and paste the booking reference to reject.</p>
             <textarea
               value={rejectReason}
               onChange={(e) => setRejectReason(e.target.value)}
               placeholder="e.g. Insufficient stock, quantity too high..."
-              rows={3}
+              rows={2}
               className="w-full text-sm border rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-1 focus:ring-ring bg-transparent"
             />
+            <input
+              value={rejectInput}
+              onChange={(e) => setRejectInput(e.target.value)}
+              placeholder="Paste booking reference here"
+              className="w-full text-sm border rounded-lg px-3 py-2 font-mono focus:outline-none focus:ring-1 focus:ring-ring bg-transparent"
+            />
             <DialogFooter>
-              <button onClick={() => setRejectOpen(false)} className="px-4 py-2 text-sm rounded-lg border hover:bg-muted transition-colors">
+              <button onClick={() => { setRejectOpen(false); setRejectInput(""); setRejectReason("") }} className="px-4 py-2 text-sm rounded-lg border hover:bg-muted transition-colors">
                 Go back
               </button>
               <button
                 onClick={() => rejectMutation.mutate()}
-                disabled={!rejectReason.trim() || rejectMutation.isPending}
+                disabled={!rejectReason.trim() || rejectInput !== booking.booking_ref || rejectMutation.isPending}
                 className="px-4 py-2 text-sm rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors disabled:opacity-50"
               >
                 {rejectMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Reject"}
