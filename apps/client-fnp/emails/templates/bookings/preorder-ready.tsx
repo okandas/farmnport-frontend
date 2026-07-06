@@ -23,7 +23,7 @@ export default function PreorderReadyEmail({
           <Text style={paragraph}>Your {quantity} {productName} are ready for collection. Please bring your booking reference and payment for the balance.</Text>
           <Section style={refCard}><Text style={refLabel}>Booking reference</Text><Text style={refNumber}>{bookingRef}</Text></Section>
           <Text style={sectionLabel}>Collection details</Text>
-          <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Product</Text></Column><Column><Text style={valText}>{productName}</Text></Column></Row>
+          <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Produce</Text></Column><Column><Text style={valText}>{productName}</Text></Column></Row>
           <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Quantity</Text></Column><Column><Text style={valText}>{quantity} units</Text></Column></Row>
           <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Balance due</Text></Column><Column><Text style={depositText}>{balanceDue}</Text></Column></Row>
           <Section style={buttonWrapper}><Button href={bookingUrl} style={button}>View collection details</Button></Section>

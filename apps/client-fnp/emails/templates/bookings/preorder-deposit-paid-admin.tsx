@@ -22,7 +22,7 @@ export default function PreorderDepositPaidAdminEmail({
           <Text style={paragraph}>Deposit payment received for a pre-order booking.</Text>
           <Section style={refCard}><Text style={refLabel}>Booking reference</Text><Text style={refNumber}>{bookingRef}</Text></Section>
           <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Customer</Text></Column><Column><Text style={valText}>{customerName}</Text></Column></Row>
-          <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Product</Text></Column><Column><Text style={valText}>{productName}</Text></Column></Row>
+          <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Produce</Text></Column><Column><Text style={valText}>{productName}</Text></Column></Row>
           <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Quantity</Text></Column><Column><Text style={valText}>{quantity} units</Text></Column></Row>
           <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Deposit</Text></Column><Column><Text style={depositText}>{depositAmount}</Text></Column></Row>
           <Section style={buttonWrapper}><Button href={adminUrl} style={button}>View Booking</Button></Section>

@@ -29,7 +29,7 @@ export default function PreorderRequestAdminEmail({
           <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Phone</Text></Column><Column><Text style={valText}>{customerPhone}</Text></Column></Row>
           <Hr style={thinDivider} />
           <Text style={sectionLabel}>Order</Text>
-          <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Product</Text></Column><Column><Text style={valText}>{productName}</Text></Column></Row>
+          <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Produce</Text></Column><Column><Text style={valText}>{productName}</Text></Column></Row>
           <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Quantity</Text></Column><Column><Text style={valText}>{quantity} units</Text></Column></Row>
           {buyerNotes && <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Notes</Text></Column><Column><Text style={valText}>{buyerNotes}</Text></Column></Row>}
           <Section style={buttonWrapper}><Button href={adminUrl} style={button}>Review Booking</Button></Section>

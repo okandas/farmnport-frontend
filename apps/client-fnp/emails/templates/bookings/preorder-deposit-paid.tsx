@@ -24,7 +24,7 @@ export default function PreorderDepositPaidEmail({
           <Text style={paragraph}>Your deposit of {depositAmount} has been received. Your {quantity} {productName} are secured. We&apos;ll notify you when your order is ready for collection.</Text>
           <Section style={refCard}><Text style={refLabel}>Booking reference</Text><Text style={refNumber}>{bookingRef}</Text></Section>
           <Text style={sectionLabel}>Summary</Text>
-          <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Product</Text></Column><Column><Text style={valText}>{productName}</Text></Column></Row>
+          <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Produce</Text></Column><Column><Text style={valText}>{productName}</Text></Column></Row>
           <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Quantity</Text></Column><Column><Text style={valText}>{quantity} units</Text></Column></Row>
           <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Deposit paid</Text></Column><Column><Text style={depositText}>{depositAmount}</Text></Column></Row>
           <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Balance on collection</Text></Column><Column><Text style={valText}>{balanceDue}</Text></Column></Row>

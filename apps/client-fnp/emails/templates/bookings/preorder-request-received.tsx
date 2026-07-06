@@ -17,7 +17,7 @@ export default function PreorderRequestReceivedEmail({ name = "Okandas", booking
             <Text style={paragraph}>Your pre-order request has been submitted. We&apos;ll confirm availability and notify you to pay.</Text>
             <Section style={refCard}><Text style={refLabel}>Booking reference</Text><Text style={refNumber}>{bookingRef}</Text></Section>
             <Text style={sectionLabel}>Details</Text>
-            <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Product</Text></Column><Column><Text style={valText}>{productName}</Text></Column></Row>
+            <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Produce</Text></Column><Column><Text style={valText}>{productName}</Text></Column></Row>
             <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Quantity</Text></Column><Column><Text style={valText}>{quantity} units</Text></Column></Row>
             <Section style={buttonWrapper}><Button href={bookingUrl} style={button}>View your booking</Button></Section>
             <Hr style={divider} />

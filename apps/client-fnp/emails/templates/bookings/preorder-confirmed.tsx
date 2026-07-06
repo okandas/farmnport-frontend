@@ -21,10 +21,10 @@ export default function PreorderConfirmedEmail({
         <Section style={content}>
           <Section style={pillWrapper}><Text style={pill}>✓ &nbsp;Booking Confirmed</Text></Section>
           <Text style={greeting}>Great news, {name}!</Text>
-          <Text style={paragraph}>Your booking has been confirmed. Pay your deposit within {deadlineHours} hours to secure your allocation.</Text>
+          <Text style={paragraph}>Your booking has been confirmed. Pay within {deadlineHours} hours to secure your allocation.</Text>
           <Section style={refCard}><Text style={refLabel}>Booking reference</Text><Text style={refNumber}>{bookingRef}</Text></Section>
           <Text style={sectionLabel}>Details</Text>
-          <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Product</Text></Column><Column><Text style={valText}>{productName}</Text></Column></Row>
+          <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Produce</Text></Column><Column><Text style={valText}>{productName}</Text></Column></Row>
           <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Quantity</Text></Column><Column><Text style={valText}>{quantity} units</Text></Column></Row>
           <Hr style={thinDivider} />
           <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Amount due</Text></Column><Column><Text style={depositText}>{depositAmount}</Text></Column></Row>
