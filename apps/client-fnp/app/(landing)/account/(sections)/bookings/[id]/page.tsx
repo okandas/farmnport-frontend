@@ -223,7 +223,7 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
                   <p className="font-medium">{booking.pre_order.event_title}</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground text-xs mb-0.5">Product</p>
+                  <p className="text-muted-foreground text-xs mb-0.5">Produce</p>
                   <p className="font-medium">{booking.pre_order.produce_name}</p>
                 </div>
                 <div>

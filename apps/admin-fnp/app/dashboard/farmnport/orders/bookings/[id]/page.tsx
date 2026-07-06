@@ -102,6 +102,7 @@ export default function AdminBookingDetailPage({ params }: { params: Promise<{ i
   const { id } = use(params)
   const queryClient = useQueryClient()
   const [note, setNote] = useState("")
+  const [confirmOpen, setConfirmOpen] = useState(false)
   const [cancelOpen, setCancelOpen] = useState(false)
   const [cancelReason, setCancelReason] = useState("")
   const [rejectOpen, setRejectOpen] = useState(false)
@@ -334,11 +335,10 @@ export default function AdminBookingDetailPage({ params }: { params: Promise<{ i
               {booking.status === "pending" && (
                 <>
                   <button
-                    onClick={() => confirmMutation.mutate()}
-                    disabled={confirmMutation.isPending}
-                    className="w-full py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90"
+                    onClick={() => setConfirmOpen(true)}
+                    className="w-full py-2 rounded-lg text-sm font-medium transition-colors bg-primary text-primary-foreground hover:bg-primary/90"
                   >
-                    {confirmMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : "Confirm Booking"}
+                    Confirm Booking
                   </button>
                   <button
                     onClick={() => setRejectOpen(true)}
@@ -445,6 +445,7 @@ export default function AdminBookingDetailPage({ params }: { params: Promise<{ i
             <DialogHeader>
               <DialogTitle>Cancel Booking</DialogTitle>
             </DialogHeader>
+            <div className="bg-muted/50 rounded-lg px-3 py-2 text-sm font-mono font-semibold">{booking.booking_ref}</div>
             <p className="text-sm text-muted-foreground">Please provide a reason for cancelling this booking.</p>
             <textarea
               value={cancelReason}
@@ -471,12 +472,39 @@ export default function AdminBookingDetailPage({ params }: { params: Promise<{ i
         </Dialog>
 
         {/* Reject dialog */}
+        {/* Confirm dialog */}
+        <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Confirm Booking</DialogTitle>
+            </DialogHeader>
+            <p className="text-sm text-muted-foreground">Confirm this booking? The buyer will be notified to pay.</p>
+            <div className="bg-muted/50 rounded-lg px-3 py-2 text-sm font-mono font-semibold">{booking.booking_ref}</div>
+            <DialogFooter>
+              <button onClick={() => setConfirmOpen(false)} className="px-4 py-2 text-sm rounded-lg border hover:bg-muted transition-colors">
+                Go back
+              </button>
+              <button
+                onClick={() => {
+                  confirmMutation.mutate(undefined, { onSuccess: () => setConfirmOpen(false) })
+                }}
+                disabled={confirmMutation.isPending}
+                className="px-4 py-2 text-sm rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50"
+              >
+                {confirmMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Confirm"}
+              </button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Reject dialog */}
         <Dialog open={rejectOpen} onOpenChange={setRejectOpen}>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Reject Booking</DialogTitle>
             </DialogHeader>
-            <p className="text-sm text-muted-foreground">Please provide a reason for rejecting this booking request.</p>
+            <div className="bg-muted/50 rounded-lg px-3 py-2 text-sm font-mono font-semibold">{booking.booking_ref}</div>
+            <p className="text-sm text-muted-foreground">Please provide a reason for rejecting this booking.</p>
             <textarea
               value={rejectReason}
               onChange={(e) => setRejectReason(e.target.value)}

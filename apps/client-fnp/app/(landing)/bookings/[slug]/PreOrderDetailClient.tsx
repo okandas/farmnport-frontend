@@ -25,7 +25,7 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
   const router = useRouter()
   const queryClient = useQueryClient()
 
-  const [quantity, setQuantity] = useState("")
+  const [quantity, setQuantity] = useState(String(preorder.min_quantity || 1))
   const [notes, setNotes] = useState("")
   const [selectedDeliveryDate, setSelectedDeliveryDate] = useState<Date | undefined>()
 
@@ -285,16 +285,34 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
                   <label className="text-xs font-medium text-muted-foreground">
                     Quantity *{step > 1 ? ` (multiples of ${step})` : event.max_quantity > 0 ? ` (${minQty}–${event.max_quantity})` : ` (min ${minQty})`}
                   </label>
-                  <input
-                    type="number"
-                    min={minQty}
-                    max={event.max_quantity > 0 ? event.max_quantity : available}
-                    step={step > 1 ? step : 1}
-                    value={quantity}
-                    onChange={(e) => setQuantity(e.target.value)}
-                    placeholder={`e.g. ${step > 1 ? step : minQty}`}
-                    className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                  />
+                  <div className="flex items-center gap-0 border border-input rounded-md overflow-hidden">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const next = qty - (step > 1 ? step : 1)
+                        if (next >= minQty) setQuantity(String(next))
+                      }}
+                      disabled={qty <= minQty}
+                      className="h-9 w-10 flex items-center justify-center text-lg font-medium hover:bg-muted transition-colors disabled:opacity-30 shrink-0 border-r"
+                    >
+                      −
+                    </button>
+                    <span className="flex-1 h-9 flex items-center justify-center text-sm font-semibold">
+                      {qty.toLocaleString()} {event.unit}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const max = event.max_quantity > 0 ? Math.min(event.max_quantity, available) : available
+                        const next = qty + (step > 1 ? step : 1)
+                        if (next <= max) setQuantity(String(next))
+                      }}
+                      disabled={qty >= (event.max_quantity > 0 ? Math.min(event.max_quantity, available) : available)}
+                      className="h-9 w-10 flex items-center justify-center text-lg font-medium hover:bg-muted transition-colors disabled:opacity-30 shrink-0 border-l"
+                    >
+                      +
+                    </button>
+                  </div>
                 </div>
 
                 <div className="space-y-1.5">
