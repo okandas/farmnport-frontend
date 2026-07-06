@@ -8,7 +8,8 @@ import Link from "next/link"
 import { toast } from "sonner"
 
 import { getIncomingBooking, buyerUpdateBookingStatus, clientConfirmBooking, clientRejectBooking, clientMarkReady, clientMarkCollected } from "@/lib/query"
-import { centsToDollars } from "@/lib/utilities"
+import { centsToDollars, platformFee, withPlatformFee } from "@/lib/utilities"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 
 const STATUS_STYLES: Record<string, string> = {
   pending:          "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400",
@@ -114,6 +115,8 @@ export default function IncomingBookingDetailPage({ params }: { params: Promise<
   const [note, setNote] = useState("")
   const [cancelOpen, setCancelOpen] = useState(false)
   const [cancelReason, setCancelReason] = useState("")
+  const [confirmOpen, setConfirmOpen] = useState(false)
+  const [confirmInput, setConfirmInput] = useState("")
   const [rejectOpen, setRejectOpen] = useState(false)
   const [rejectReason, setRejectReason] = useState("")
 
@@ -259,13 +262,47 @@ export default function IncomingBookingDetailPage({ params }: { params: Promise<
           {booking.type === "pre-order" && booking.pre_order && (
             <div className="border rounded-xl p-5">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-4">Pre-Order Details</p>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                <Field label="Event" value={booking.pre_order.event_title} />
-                <Field label="Produce" value={booking.pre_order.produce_name} />
-                <Field label="Quantity" value={`${booking.pre_order.quantity?.toLocaleString()} units`} />
-                <Field label="Unit Price" value={centsToDollars(booking.pre_order.unit_price)} />
-                <Field label="Amount Due" value={centsToDollars(booking.pre_order.deposit_amount)} />
-                <Field label="Payment" value={booking.pre_order.deposit_paid ? "Paid" : "Not yet paid"} />
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Pre-Order</span>
+                  <Link href={`/bookings/${booking.pre_order.event_id}`} className="font-medium text-primary hover:underline">{booking.pre_order.event_title}</Link>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Produce</span>
+                  <span className="font-medium">{booking.pre_order.produce_name}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Quantity</span>
+                  <span className="font-medium">{booking.pre_order.quantity?.toLocaleString()} units</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Your Unit Price</span>
+                  <span className="font-medium">{centsToDollars(booking.pre_order.unit_price)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Our Fee — Buyer Pays (6.9%)</span>
+                  <span className="font-medium">${(booking.pre_order.unit_price / 100 * 0.069).toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between border-t pt-2">
+                  <span className="font-semibold">Total Unit Price</span>
+                  <span className="font-bold">${(booking.pre_order.unit_price / 100 * 1.069).toFixed(2)}</span>
+                </div>
+                <div className="border-t pt-2 mt-2 flex justify-between">
+                  <span className="text-muted-foreground">Subtotal</span>
+                  <span className="font-medium">{centsToDollars(booking.pre_order.deposit_amount)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Platform Fee (6.9%)</span>
+                  <span className="font-medium">{centsToDollars(platformFee(booking.pre_order.deposit_amount))}</span>
+                </div>
+                <div className="flex justify-between border-t pt-2">
+                  <span className="font-semibold">Total Due</span>
+                  <span className="font-bold">{centsToDollars(withPlatformFee(booking.pre_order.deposit_amount))}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Payment</span>
+                  <span className={`font-medium ${booking.pre_order.deposit_paid ? "text-green-700" : "text-red-600"}`}>{booking.pre_order.deposit_paid ? "Paid" : "Not yet paid"}</span>
+                </div>
               </div>
               {booking.pre_order.buyer_notes && (
                 <div className="mt-4 pt-4 border-t">
@@ -294,9 +331,8 @@ export default function IncomingBookingDetailPage({ params }: { params: Promise<
               {booking.status === "pending" && (
                 <>
                   <button
-                    onClick={() => confirmMutation.mutate()}
-                    disabled={confirmMutation.isPending}
-                    className="w-full py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90"
+                    onClick={() => setConfirmOpen(true)}
+                    className="w-full py-2 rounded-lg text-sm font-medium transition-colors bg-primary text-primary-foreground hover:bg-primary/90"
                   >
                     {confirmMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : "Confirm Booking"}
                   </button>
@@ -450,6 +486,40 @@ export default function IncomingBookingDetailPage({ params }: { params: Promise<
           )}
         </div>
       </div>
+
+      {/* Confirm dialog */}
+      <Dialog open={confirmOpen} onOpenChange={(o) => { setConfirmOpen(o); if (!o) setConfirmInput("") }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Booking</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">The buyer will be notified to pay. Paste the booking reference to confirm.</p>
+          <div className="flex items-center justify-between bg-muted/50 rounded-lg px-3 py-2">
+            <span className="text-sm font-mono font-semibold">{booking.booking_ref}</span>
+            <button type="button" onClick={() => { navigator.clipboard.writeText(booking.booking_ref); toast.success("Copied") }} className="text-xs text-primary hover:underline">Copy</button>
+          </div>
+          <input
+            value={confirmInput}
+            onChange={(e) => setConfirmInput(e.target.value)}
+            placeholder="Paste booking reference here"
+            className="w-full text-sm border rounded-lg px-3 py-2 font-mono focus:outline-none focus:ring-1 focus:ring-ring bg-transparent"
+          />
+          <DialogFooter>
+            <button onClick={() => { setConfirmOpen(false); setConfirmInput("") }} className="px-4 py-2 text-sm rounded-lg border hover:bg-muted transition-colors">
+              Go back
+            </button>
+            <button
+              onClick={() => {
+                confirmMutation.mutate(undefined, { onSuccess: () => { setConfirmOpen(false); setConfirmInput("") } })
+              }}
+              disabled={confirmMutation.isPending || confirmInput !== booking.booking_ref}
+              className="px-4 py-2 text-sm rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50"
+            >
+              {confirmMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Confirm"}
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
