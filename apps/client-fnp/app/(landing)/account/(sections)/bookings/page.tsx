@@ -51,6 +51,7 @@ interface Booking {
     event_title: string
     produce_name: string
     quantity: number
+    unit?: string
     deposit_amount: number
     deposit_paid: boolean
   }
@@ -133,7 +134,7 @@ export default function BookingsPage() {
                       </span>
                       <span className="text-xs text-muted-foreground capitalize flex items-center gap-1">
                         {booking.type === "delivery" ? <Truck className="w-3 h-3" /> : booking.type === "pickup" ? <Truck className="w-3 h-3" /> : <CalendarDays className="w-3 h-3" />}
-                        {booking.type === "pre-order" ? "Forward Booking" : booking.type}
+                        {booking.type === "pre-order" ? "Pre-Order" : booking.type}
                       </span>
                     </div>
 
@@ -158,10 +159,10 @@ export default function BookingsPage() {
                   {booking.type === "pre-order" && booking.pre_order && (
                     <div className="text-right shrink-0">
                       <p className="font-bold text-sm">
-                        ${(booking.pre_order.deposit_amount / 100).toFixed(2)}
+                        ${(Math.round(booking.pre_order.deposit_amount * 1.069) / 100).toFixed(2)}
                       </p>
-                      <p className="text-xs text-muted-foreground">
-                        {booking.pre_order.deposit_paid ? "Deposit paid" : "Deposit due"}
+                      <p className={`text-xs ${booking.pre_order.deposit_paid ? "text-green-700" : ["cancelled", "rejected", "expired"].includes(booking.status) ? "text-red-600" : "text-muted-foreground"}`}>
+                        {booking.pre_order.deposit_paid ? "Paid" : ["cancelled", "rejected", "expired"].includes(booking.status) ? booking.status.charAt(0).toUpperCase() + booking.status.slice(1) : "Not yet paid"}
                       </p>
                     </div>
                   )}

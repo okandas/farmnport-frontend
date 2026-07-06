@@ -273,7 +273,7 @@ export default function IncomingBookingDetailPage({ params }: { params: Promise<
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Quantity</span>
-                  <span className="font-medium">{booking.pre_order.quantity?.toLocaleString()} units</span>
+                  <span className="font-medium">{booking.pre_order.quantity?.toLocaleString()} {booking.pre_order.unit || "units"}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Your Unit Price</span>
