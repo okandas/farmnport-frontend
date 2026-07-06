@@ -83,6 +83,8 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
   const queryClient = useQueryClient()
   const [cancelOpen, setCancelOpen] = useState(false)
   const [cancelInput, setCancelInput] = useState("")
+  const [paying, setPaying] = useState(false)
+  const [checking, setChecking] = useState(false)
 
   const { data, isLoading } = useQuery({
     queryKey: ["booking", id],
@@ -102,27 +104,6 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
     },
   })
 
-  const payMutation = useMutation({
-    mutationFn: () =>
-      initiatePreOrderPayment(id, {
-        phone: (session?.user as any)?.phone ?? "",
-      }),
-    onSuccess: (res: any) => {
-      const url = res.data?.redirect_url
-      if (url) {
-        window.location.href = url
-      } else if (res.data?.instructions) {
-        toast.success(res.data.instructions)
-        // Start polling
-        setTimeout(() => {
-          queryClient.invalidateQueries({ queryKey: ["booking", id] })
-        }, 5000)
-      }
-    },
-    onError: (err: any) => {
-      toast.error(err?.response?.data?.message || "Failed to initiate payment. Please try again.")
-    },
-  })
 
   if (status === "loading" || isLoading) {
     return (
@@ -209,29 +190,45 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
                 <span className="font-bold text-orange-900">${total.toFixed(2)}</span>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="flex items-center gap-2">
               <button
-                onClick={() => payMutation.mutate()}
-                disabled={payMutation.isPending}
-                className="flex items-center justify-center gap-2 bg-orange-600 hover:bg-orange-700 text-white font-semibold py-2.5 rounded-xl transition-colors disabled:opacity-50 text-sm"
+                disabled={paying}
+                onClick={async () => {
+                  setPaying(true)
+                  try {
+                    const res = await initiatePreOrderPayment(id, { phone: (session?.user as any)?.phone ?? "" })
+                    const redirectUrl = res.data?.redirect_url
+                    if (redirectUrl) window.open(redirectUrl, "_blank")
+                  } catch {
+                    // silent
+                  } finally {
+                    setPaying(false)
+                  }
+                }}
+                className="inline-flex items-center gap-2 rounded-md bg-primary text-primary-foreground text-sm font-semibold px-4 py-1.5 hover:bg-primary/90 transition-colors disabled:opacity-50"
               >
-                {payMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <CreditCard className="w-4 h-4" />}
-                Pay Online
+                {paying ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                Pay Now
               </button>
               <button
-                type="button"
+                disabled={checking}
                 onClick={async () => {
-                  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3744"
-                  await fetch(`${baseUrl}/v1/booking/preorder-result?reference=${booking.pre_order.payment_ref || `PREORDER-${booking.id}`}&status=paid`, { method: "POST" })
-                  queryClient.invalidateQueries({ queryKey: ["booking", id] })
-                  toast.success("Payment confirmed")
+                  setChecking(true)
+                  try {
+                    await pollPreOrderPayment(id)
+                    queryClient.invalidateQueries({ queryKey: ["booking", id] })
+                  } catch {
+                    // silent
+                  } finally {
+                    setChecking(false)
+                  }
                 }}
-                className="flex items-center justify-center gap-2 border font-semibold py-2.5 rounded-xl hover:bg-muted transition-colors text-sm"
+                className="inline-flex items-center gap-2 rounded-md border text-sm font-semibold px-4 py-1.5 hover:bg-muted transition-colors disabled:opacity-50"
               >
-                I Have Paid
+                {checking ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                I have paid
               </button>
             </div>
-            <p className="text-xs text-muted-foreground text-center">Total: ${total.toFixed(2)}</p>
           </div>
           )
         })()}
