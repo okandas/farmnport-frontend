@@ -27,6 +27,8 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
 
   const [quantity, setQuantity] = useState(String(preorder.min_quantity || 1))
   const [notes, setNotes] = useState("")
+  const [fulfillment, setFulfillment] = useState<"collection" | "delivery" | "">("")
+  const [selectedCollectionPoint, setSelectedCollectionPoint] = useState<{ id: string; name: string } | null>(null)
   const [selectedDeliveryDate, setSelectedDeliveryDate] = useState<Date | undefined>()
 
   const { data: profileData } = useQuery({
@@ -47,6 +49,9 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
         quantity: parseInt(quantity),
         phone,
         notes: notes || undefined,
+        fulfillment_type: fulfillment || undefined,
+        collection_point_id: selectedCollectionPoint?.id || undefined,
+        collection_point_name: selectedCollectionPoint?.name || undefined,
         delivery_date: selectedDeliveryDate ? selectedDeliveryDate.toISOString() : undefined,
       }),
     onSuccess: () => {
@@ -88,7 +93,8 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
     (step <= 1 || qty % step === 0) &&
     (event.max_quantity === 0 || qty <= event.max_quantity) &&
     !!phone &&
-    (!needsDeliveryDate || !!selectedDeliveryDate)
+    (fulfillment === "collection" ? !!selectedCollectionPoint : true) &&
+    (fulfillment === "delivery" ? !!selectedDeliveryDate : true)
 
   return (
     <div className="min-h-screen bg-background">
@@ -183,8 +189,8 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
             <div className={`grid gap-3 ${depositEnabled && event.deposit_per_unit > 0 ? "grid-cols-2" : "grid-cols-1"}`}>
               <div className="rounded-xl border bg-muted/30 p-4">
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Unit Price</p>
-                <p className="text-2xl font-bold">${(event.unit_price / 100).toFixed(2)}</p>
-                <p className="text-xs text-muted-foreground mt-1">per {event.unit || "unit"}</p>
+                <p className="text-2xl font-bold">${(event.unit_price / 100 * 1.069).toFixed(2)}</p>
+                <p className="text-xs text-muted-foreground mt-1">per {event.unit || "unit"} incl. fees</p>
               </div>
               {depositEnabled && event.deposit_per_unit > 0 && (
                 <div className="rounded-xl border border-orange-200 bg-orange-50 p-4">
@@ -315,6 +321,69 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
                   </div>
                 </div>
 
+                {/* Fulfillment */}
+                {(() => {
+                  const locs = [...(event.delivery_locations || []), ...(event.collection_locations || [])]
+                  const hasCollection = locs.length > 0
+                  const hasDelivery = hasDeliveryDates
+                  if (!hasCollection && !hasDelivery) return null
+
+                  // Auto-select if only one option
+                  if (hasCollection && !hasDelivery && fulfillment !== "collection") setFulfillment("collection")
+                  if (hasDelivery && !hasCollection && fulfillment !== "delivery") setFulfillment("delivery")
+
+                  const showToggle = hasCollection && hasDelivery
+                  return (
+                    <div className="space-y-2">
+                      {showToggle && (
+                        <>
+                          <label className="text-xs font-medium text-muted-foreground">How would you like to receive your order? *</label>
+                          <div className="flex gap-2">
+                            <button
+                              type="button"
+                              onClick={() => { setFulfillment("collection"); setSelectedDeliveryDate(undefined) }}
+                              className={`flex-1 py-2 rounded-lg text-sm font-medium border transition-colors ${fulfillment === "collection" ? "bg-primary text-primary-foreground border-primary" : "border-border hover:border-foreground text-muted-foreground"}`}
+                            >
+                              Collection
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => { setFulfillment("delivery"); setSelectedCollectionPoint(null) }}
+                              className={`flex-1 py-2 rounded-lg text-sm font-medium border transition-colors ${fulfillment === "delivery" ? "bg-primary text-primary-foreground border-primary" : "border-border hover:border-foreground text-muted-foreground"}`}
+                            >
+                              Delivery
+                            </button>
+                          </div>
+                        </>
+                      )}
+                      {fulfillment === "collection" && locs.length > 0 && (
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-medium text-muted-foreground">Collection Point *</label>
+                          {selectedCollectionPoint ? (
+                            <div className="flex items-center justify-between bg-muted/50 rounded-lg px-3 py-2">
+                              <span className="text-sm font-medium">{selectedCollectionPoint.name}</span>
+                              <button type="button" onClick={() => setSelectedCollectionPoint(null)} className="text-xs text-muted-foreground hover:text-foreground">Change</button>
+                            </div>
+                          ) : (
+                            <div className="border rounded-lg overflow-y-auto max-h-40">
+                              {locs.map((loc: any) => (
+                                <button
+                                  key={loc.id}
+                                  type="button"
+                                  onClick={() => setSelectedCollectionPoint({ id: loc.id, name: loc.name })}
+                                  className="w-full text-left px-3 py-2.5 hover:bg-muted/50 transition-colors border-b last:border-b-0 text-sm"
+                                >
+                                  {loc.name}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )
+                })()}
+
                 <div className="space-y-1.5">
                   <label className="text-xs font-medium text-muted-foreground">Phone Number</label>
                   <input
@@ -338,7 +407,7 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
                   </div>
                 )}
 
-                {needsDeliveryDate && (
+                {fulfillment === "delivery" && hasDeliveryDates && (
                   <div className="space-y-1.5">
                     <label className="text-xs font-medium text-muted-foreground">Select Delivery Date *</label>
                     <Calendar
@@ -377,10 +446,16 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
                         </div>
                       </>
                     ) : (
-                      <div className="flex justify-between border-t pt-1.5">
-                        <span className="font-semibold">Total</span>
-                        <span className="font-bold">${orderTotal.toFixed(2)}</span>
-                      </div>
+                      <>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Platform fee (6.9%)</span>
+                          <span className="font-medium">${(orderTotal * 0.069).toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between border-t pt-1.5">
+                          <span className="font-semibold">Total</span>
+                          <span className="font-bold">${(orderTotal * 1.069).toFixed(2)}</span>
+                        </div>
+                      </>
                     )}
                   </div>
                 )}

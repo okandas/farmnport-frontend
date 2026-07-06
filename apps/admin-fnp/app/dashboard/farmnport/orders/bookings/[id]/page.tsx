@@ -240,6 +240,13 @@ export default function AdminBookingDetailPage({ params }: { params: Promise<{ i
                 <Field label="Quantity" value={`${booking.pre_order.quantity?.toLocaleString()} units`} />
                 <Field label="Unit Price" value={String(centsToDollars(booking.pre_order.unit_price))} />
               </div>
+              {booking.pre_order.fulfillment_type && (
+                <div className="mt-4 pt-4 border-t grid grid-cols-2 gap-4">
+                  <Field label="Fulfillment" value={booking.pre_order.fulfillment_type === "delivery" ? "Delivery" : "Collection"} />
+                  {booking.pre_order.collection_point_name && <Field label="Collection Point" value={booking.pre_order.collection_point_name} />}
+                  {booking.pre_order.delivery_date && <Field label="Delivery Date" value={formatDate(booking.pre_order.delivery_date)} />}
+                </div>
+              )}
               {booking.pre_order.buyer_notes && (
                 <div className="mt-4 pt-4 border-t">
                   <p className="text-xs text-muted-foreground">Buyer Notes</p>
@@ -358,7 +365,7 @@ export default function AdminBookingDetailPage({ params }: { params: Promise<{ i
                   disabled={readyMutation.isPending}
                   className="w-full py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90"
                 >
-                  {readyMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : "Mark Ready for Collection"}
+                  {readyMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : booking.pre_order?.fulfillment_type === "delivery" ? "Mark as Shipped" : "Mark Ready for Collection"}
                 </button>
               )}
 

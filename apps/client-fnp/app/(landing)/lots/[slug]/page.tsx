@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const province = lot.province ? `, ${capitalizeFirstLetter(lot.province)}` : ""
 
     const title = `${typeLabel}: ${produce}${breed}${province} | farmnport.com`
-    const description = `${typeLabel} ${produce}${breed} in Zimbabwe. ${lot.quantity.toLocaleString()} ${lot.unit} available at ${centsToDollars(lot.price_per_unit_cents)}/${lot.unit}. ${lot.notes ?? ""}`
+    const description = `${typeLabel} ${produce}${breed} in Zimbabwe. ${lot.quantity.toLocaleString()} ${lot.unit} available at ${centsToDollars(Math.round(lot.price_per_unit_cents * 1.069))}/${lot.unit}. ${lot.notes ?? ""}`
 
     return {
         title,
@@ -134,8 +134,8 @@ export default async function LotDetailPage({ params }: Props) {
                                 <div className="grid grid-cols-3 gap-3">
                                     <div className="rounded-xl border bg-card p-4">
                                         <p className="text-xs text-muted-foreground mb-1">Listed price</p>
-                                        <p className="text-2xl font-bold">{centsToDollars(lot.price_per_unit_cents)}</p>
-                                        <p className="text-xs text-muted-foreground mt-0.5">per {lot.unit}</p>
+                                        <p className="text-2xl font-bold">{centsToDollars(Math.round(lot.price_per_unit_cents * 1.069))}</p>
+                                        <p className="text-xs text-muted-foreground mt-0.5">per {lot.unit} incl. fees</p>
                                     </div>
                                     <div className="rounded-xl border bg-card p-4">
                                         <p className="text-xs text-muted-foreground mb-1">Quantity</p>
