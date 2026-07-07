@@ -17,6 +17,7 @@ import { Badge } from "@/components/ui/badge"
 import { BuyerContacts } from "@/components/structures/buyer-contacts"
 import { ProductResources } from "@/components/monetization/product-resources"
 import { BuyerPriceUploads } from "@/components/structures/buyer-price-uploads"
+import { ShareBar } from "@/components/shared/ShareBar"
 
 
 interface LatestPrices {
@@ -76,8 +77,7 @@ export function Client({ slug, user, latestPrices }: ClientPageProps) {
       </div>
 
       {/* Breadcrumb */}
-      <div className="border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
           <nav className="flex text-sm text-muted-foreground">
             <Link href="/" className="hover:text-foreground">Home</Link>
             <span className="mx-2">/</span>
@@ -85,7 +85,7 @@ export function Client({ slug, user, latestPrices }: ClientPageProps) {
             <span className="mx-2">/</span>
             <span className="text-foreground capitalize">{name}</span>
           </nav>
-        </div>
+          <ShareBar name={name} />
       </div>
 
       {/* Hero Header Section */}

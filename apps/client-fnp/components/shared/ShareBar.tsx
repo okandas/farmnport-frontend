@@ -20,7 +20,7 @@ export function ShareBar({ name }: ShareBarProps) {
                     sendGTMEvent({ event: "product_share", product_name: name, method: "copy_link" })
                     setTimeout(() => setCopied(false), 2000)
                 }}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border border-border hover:bg-muted text-xs text-muted-foreground hover:text-foreground transition-colors"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md hover:bg-muted text-xs text-muted-foreground hover:text-foreground transition-colors"
             >
                 {copied ? <Check className="w-3.5 h-3.5 text-green-600" /> : <Link2 className="w-3.5 h-3.5" />}
                 {copied ? "Copied!" : "Copy link"}
@@ -37,7 +37,7 @@ export function ShareBar({ name }: ShareBarProps) {
                         setTimeout(() => setCopied(false), 2000)
                     }
                 }}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border border-border hover:bg-muted text-xs text-muted-foreground hover:text-foreground transition-colors"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md hover:bg-muted text-xs text-muted-foreground hover:text-foreground transition-colors"
             >
                 <Share2 className="w-3.5 h-3.5" />
                 Share
