@@ -1,6 +1,6 @@
 import { Body, Button, Container, Head, Hr, Html, Preview, Row, Column, Section, Text } from "@react-email/components"
 
-interface Props { name?: string; bookingRef?: string; productName?: string; quantity?: number; depositAmount?: string; balanceDue?: string; bookingUrl?: string }
+interface Props { name?: string; bookingRef?: string; productName?: string; quantity?: string | number; depositAmount?: string; balanceDue?: string; bookingUrl?: string }
 
 export default function PreorderDepositPaidEmail({
   name = "Okandas",
