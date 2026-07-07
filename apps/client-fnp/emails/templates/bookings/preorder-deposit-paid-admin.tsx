@@ -1,12 +1,12 @@
 import { Body, Button, Container, Head, Hr, Html, Preview, Row, Column, Section, Text } from "@react-email/components"
 
-interface Props { bookingRef?: string; customerName?: string; productName?: string; quantity?: string | number; depositAmount?: string; adminUrl?: string }
+interface Props { bookingRef?: string; customerName?: string; productName?: string; quantity?: string; depositAmount?: string; adminUrl?: string }
 
 export default function PreorderAmountPaidAdminEmail({
   bookingRef = "FNP-BK-PO-0001",
   customerName = "Okandas",
   productName = "Fivet Cobb 500 Day-Old Chicks",
-  quantity = 100,
+  quantity = "100",
   depositAmount = "$50.00",
   adminUrl = "https://admin.farmnport.com",
 }: Props) {
