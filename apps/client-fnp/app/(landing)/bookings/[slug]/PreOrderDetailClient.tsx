@@ -10,6 +10,7 @@ import Image from "next/image"
 import { toast } from "sonner"
 
 import { createBooking, queryClient as queryClientProfile } from "@/lib/query"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ShareBar } from "@/components/shared/ShareBar"
 import { Calendar } from "@/components/ui/calendar"
 
@@ -369,25 +370,24 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
                       {fulfillment === "collection" && locs.length > 0 && (
                         <div className="space-y-1.5">
                           <label className="text-xs font-medium text-muted-foreground">Collection Point *</label>
-                          {selectedCollectionPoint ? (
-                            <div className="flex items-center justify-between bg-muted/50 rounded-lg px-3 py-2">
-                              <span className="text-sm font-medium">{selectedCollectionPoint.name}</span>
-                              <button type="button" onClick={() => setSelectedCollectionPoint(null)} className="text-xs text-muted-foreground hover:text-foreground">Change</button>
-                            </div>
-                          ) : (
-                            <div className="border rounded-lg overflow-y-auto max-h-40">
+                          <Select
+                            value={selectedCollectionPoint?.id ?? ""}
+                            onValueChange={(val) => {
+                              const loc = locs.find((l: any) => l.id === val)
+                              setSelectedCollectionPoint(loc ? { id: loc.id, name: loc.name } : null)
+                            }}
+                          >
+                            <SelectTrigger><SelectValue placeholder="Select a collection point" /></SelectTrigger>
+                            <SelectContent>
                               {locs.map((loc: any) => (
-                                <button
-                                  key={loc.id}
-                                  type="button"
-                                  onClick={() => setSelectedCollectionPoint({ id: loc.id, name: loc.name })}
-                                  className="w-full text-left px-3 py-2.5 hover:bg-muted/50 transition-colors border-b last:border-b-0 text-sm"
-                                >
-                                  {loc.name}
-                                </button>
+                                <SelectItem key={loc.id} value={loc.id}>{loc.name}</SelectItem>
                               ))}
-                            </div>
-                          )}
+                            </SelectContent>
+                          </Select>
+                          {selectedCollectionPoint && (() => {
+                            const loc = locs.find((l: any) => l.id === selectedCollectionPoint.id)
+                            return loc?.address ? <p className="text-xs text-muted-foreground mt-1">You will collect your {event.produce_name?.toLowerCase()} at <span className="text-foreground font-medium">{loc.address}</span></p> : null
+                          })()}
                         </div>
                       )}
                     </div>
