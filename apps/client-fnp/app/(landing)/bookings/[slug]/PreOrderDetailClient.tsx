@@ -258,22 +258,6 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
               )}
             </div>
 
-            {/* Collection points */}
-            {(() => {
-              const locs = [...(event.delivery_locations || []), ...(event.collection_locations || [])]
-              if (locs.length === 0) return null
-              return (
-                <div className="rounded-xl border bg-muted/30 p-4 space-y-2">
-                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{event.market_side === "demand" ? "Delivery Points" : "Collection Points"}</p>
-                  {locs.map((loc: any, i: number) => (
-                    <div key={i} className="flex items-center gap-2 text-sm">
-                      <span className="h-1.5 w-1.5 rounded-full bg-primary shrink-0" />
-                      <span>{loc.name}</span>
-                    </div>
-                  ))}
-                </div>
-              )
-            })()}
 
             {/* How it works */}
             <div className="bg-muted/40 rounded-xl p-5 space-y-3">
