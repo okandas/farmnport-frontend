@@ -326,15 +326,12 @@ export function queryClientFilterAggregates(type: 'buyers' | 'farmers', filters?
   return api.get(`${BaseURL}/client/aggregates/filters?${params.toString()}`)
 }
 
-export function queryClientPricing(clientId: string, pagination?: PaginationModel) {
-  let url: string
-
-  if (pagination?.p !== undefined && pagination.p >= 2) {
-    url = `${BaseURL}/prices/client/${clientId}?p=${pagination.p}`
-  } else {
-    url = `${BaseURL}/prices/client/${clientId}`
-  }
-
+export function queryClientPricing(clientId: string, pagination?: PaginationModel, produce?: string) {
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) params.set("p", String(pagination.p))
+  if (produce) params.set("produce", produce)
+  const qs = params.toString()
+  const url = `${BaseURL}/prices/client/${clientId}${qs ? `?${qs}` : ""}`
   return api.get(url)
 }
 

@@ -41,6 +41,14 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
 
   const event = preorder
 
+  const clientSlug = event.client_name?.toLowerCase().replace(/\s+/g, "-") ?? ""
+  const { data: eventClientData } = useQuery({
+    queryKey: ["event-client", clientSlug],
+    queryFn: () => queryClientProfile(clientSlug).then((r) => r.data),
+    enabled: event.market_side === "demand" && !!clientSlug,
+  })
+  const eventClientHasPrices = eventClientData?.has_prices ?? false
+
   const mutation = useMutation({
     mutationFn: () =>
       createBooking({
@@ -84,7 +92,7 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
   const step = event.quantity_step || 1
   const isOpenEnded = !event.close_date || event.close_date === "0001-01-01T00:00:00Z"
   const hasDeliveryDates = event.delivery_dates && event.delivery_dates.length > 0
-  const needsDeliveryDate = isOpenEnded && hasDeliveryDates
+
 
   const canSubmit =
     !!session &&
@@ -144,6 +152,7 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
                   <span className="text-xs px-3 py-1 rounded-full bg-red-100 text-red-800 font-medium">Only {available} left!</span>
                 )}
               </div>
+              {event.unit_price > 0 && (
               <div className="space-y-1.5">
                 <div className="flex justify-between text-xs">
                   <span className="text-muted-foreground">{event.total_booked?.toLocaleString() ?? 0} of {event.total_available.toLocaleString()} {event.unit} booked</span>
@@ -158,6 +167,7 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
                   />
                 </div>
               </div>
+              )}
             </div>
           </div>
 
@@ -239,6 +249,13 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
                   </>
                 )}
               </div>
+              {event.market_side === "demand" && eventClientHasPrices && (
+                <div className="rounded-xl border bg-muted/30 p-4">
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Current Prices</p>
+                  <Link href={`/buyer/${clientSlug}`} className="text-lg font-bold text-primary">View →</Link>
+                  <p className="text-xs text-muted-foreground mt-1">latest {event.produce_name} prices from {event.client_name}</p>
+                </div>
+              )}
             </div>
 
             {/* Collection points */}
@@ -247,7 +264,7 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
               if (locs.length === 0) return null
               return (
                 <div className="rounded-xl border bg-muted/30 p-4 space-y-2">
-                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Collection Points</p>
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{event.market_side === "demand" ? "Delivery Points" : "Collection Points"}</p>
                   {locs.map((loc: any, i: number) => (
                     <div key={i} className="flex items-center gap-2 text-sm">
                       <span className="h-1.5 w-1.5 rounded-full bg-primary shrink-0" />
@@ -260,12 +277,15 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
 
             {/* How it works */}
             <div className="bg-muted/40 rounded-xl p-5 space-y-3">
-              <h3 className="font-semibold text-sm">How Pre-Orders Work</h3>
+              <h3 className="font-semibold text-sm">{event.market_side === "demand" ? "How Bookings Work" : "How Pre-Orders Work"}</h3>
               <ol className="space-y-2 text-sm text-muted-foreground list-decimal list-inside">
-                <li>Submit your booking request with your desired quantity</li>
-                <li>We confirm availability and notify you</li>
-                <li>Pay to secure your allocation{event.payment_deadline_hours ? ` (within ${event.payment_deadline_hours} hours)` : ""}</li>
-                <li>Collect your order when ready — balance due on collection</li>
+                <li>Submit your booking request</li>
+                <li>We confirm your delivery or collection date and notify you</li>
+                <li>{event.market_side === "demand"
+                  ? "Ensure you deliver on your confirmed date or are ready for collection on the agreed date"
+                  : `Pay to secure your allocation${event.payment_deadline_hours ? ` (within ${event.payment_deadline_hours} hours)` : ""}`}
+                </li>
+                {event.market_side !== "demand" && <li>Collect your order when ready — balance due on collection</li>}
               </ol>
             </div>
           </div>
@@ -483,10 +503,12 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
 
             {/* Booking window */}
             <div className="border rounded-xl p-4 space-y-2">
+              {!isOpenEnded && (
               <div className="flex justify-between text-xs">
                 <span className="text-muted-foreground flex items-center gap-1"><CalendarDays className="w-3.5 h-3.5" /> Opens</span>
                 <span className="font-medium">{formatDate(event.open_date)}</span>
               </div>
+              )}
               {isOpenEnded ? (
                 <div className="flex justify-between text-xs">
                   <span className="text-muted-foreground flex items-center gap-1"><CalendarDays className="w-3.5 h-3.5" /> Closes</span>
