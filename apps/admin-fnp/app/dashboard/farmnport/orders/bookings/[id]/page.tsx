@@ -238,7 +238,7 @@ export default function AdminBookingDetailPage({ params }: { params: Promise<{ i
                 <Field label="Event" value={booking.pre_order.event_title} />
                 <Field label="Produce" value={booking.pre_order.produce_name} />
                 <Field label="Quantity" value={`${booking.pre_order.quantity?.toLocaleString()} ${booking.pre_order.unit || "units"}`} />
-                <Field label="Unit Price" value={String(centsToDollars(booking.pre_order.unit_price))} />
+                {booking.pre_order.unit_price > 0 && <Field label="Unit Price" value={String(centsToDollars(booking.pre_order.unit_price))} />}
               </div>
               {booking.pre_order.fulfillment_type && (
                 <div className="mt-4 pt-4 border-t grid grid-cols-2 gap-4">
@@ -300,8 +300,8 @@ export default function AdminBookingDetailPage({ params }: { params: Promise<{ i
             </div>
           )}
 
-          {/* Payment summary — pre-order only */}
-          {isPreOrder && booking.pre_order && (
+          {/* Payment summary — pre-order only, hide for zero-price demand bookings */}
+          {isPreOrder && booking.pre_order && booking.pre_order.unit_price > 0 && (
             <div className="border rounded-xl p-5">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-4">Payment</p>
               <div className="space-y-2 text-sm">

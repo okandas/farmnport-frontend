@@ -7,7 +7,7 @@ import { Loader2, CalendarDays, Truck, Package, CheckCircle, XCircle, Clock, Ale
 import Link from "next/link"
 import { toast } from "sonner"
 
-import { getBooking, cancelBooking, initiatePreOrderPayment } from "@/lib/query"
+import { getBooking, cancelBooking, initiatePreOrderPayment, pollPreOrderPayment } from "@/lib/query"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 
 const STATUS_STYLES: Record<string, string> = {
@@ -129,7 +129,7 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
   }
 
   const canCancel = !["completed", "collected", "cancelled", "rejected", "expired", "paid"].includes(booking.status)
-  const canPay = booking.status === "confirmed" && booking.type === "pre-order"
+  const canPay = booking.status === "confirmed" && booking.type === "pre-order" && (booking.pre_order?.unit_price ?? 0) > 0
 
   return (
     <div>
@@ -269,11 +269,13 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
                   <p className="text-muted-foreground text-xs mb-0.5">Quantity</p>
                   <p className="font-medium">{booking.pre_order.quantity} {booking.pre_order.unit || "units"}</p>
                 </div>
+                {booking.pre_order.unit_price > 0 && (
                 <div>
                   <p className="text-muted-foreground text-xs mb-0.5">Unit Price</p>
                   <p className="font-medium">${(booking.pre_order.unit_price / 100 * 1.069).toFixed(2)}</p>
                   <p className="text-xs text-muted-foreground">incl. fees</p>
                 </div>
+                )}
               </div>
 
               {booking.pre_order.fulfillment_type && (
@@ -303,7 +305,7 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
                 </div>
               )}
 
-              <div className="border-t pt-3 grid grid-cols-2 gap-3 text-sm">
+              {booking.pre_order.unit_price > 0 && <div className="border-t pt-3 grid grid-cols-2 gap-3 text-sm">
                 <div>
                   <p className="text-muted-foreground text-xs mb-0.5">Subtotal</p>
                   <p className="font-medium">${(booking.pre_order.deposit_amount / 100).toFixed(2)}</p>
@@ -323,7 +325,7 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
                     <p className="font-bold">${(booking.pre_order.balance_due / 100).toFixed(2)}</p>
                   </div>
                 )}
-              </div>
+              </div>}
             </div>
           )}
 
