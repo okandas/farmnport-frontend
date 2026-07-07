@@ -33,10 +33,12 @@ function EventCard({ event }: { event: any }) {
         )}
 
         <div className="text-xs text-muted-foreground pt-2 border-t space-y-1.5">
+          {event.unit_price > 0 && (
           <div className="flex justify-between">
             <span>Unit price</span>
             <span className="font-semibold text-foreground">${(event.unit_price / 100 * 1.069).toFixed(2)}</span>
           </div>
+          )}
           {event.deposit_per_unit > 0 && (
             <div className="flex justify-between">
               <span>Deposit/unit</span>

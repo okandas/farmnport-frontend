@@ -187,11 +187,13 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
 
             {/* Pricing & capacity */}
             <div className={`grid gap-3 ${depositEnabled && event.deposit_per_unit > 0 ? "grid-cols-2" : "grid-cols-1"}`}>
+              {event.unit_price > 0 && (
               <div className="rounded-xl border bg-muted/30 p-4">
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Unit Price</p>
                 <p className="text-2xl font-bold">${(event.unit_price / 100 * 1.069).toFixed(2)}</p>
                 <p className="text-xs text-muted-foreground mt-1">per {event.unit || "unit"} incl. fees</p>
               </div>
+              )}
               {depositEnabled && event.deposit_per_unit > 0 && (
                 <div className="rounded-xl border border-orange-200 bg-orange-50 p-4">
                   <p className="text-xs font-medium text-orange-700 uppercase tracking-wide mb-2">Deposit per Unit</p>
@@ -202,11 +204,14 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
             </div>
 
             <div className="grid grid-cols-3 gap-3">
+              {event.unit_price > 0 && (
               <div className="rounded-xl border bg-muted/30 p-4">
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Available</p>
                 <p className="text-lg font-bold">{available.toLocaleString()}</p>
                 <p className="text-xs text-muted-foreground mt-1">of {event.total_available.toLocaleString()} {event.unit} total</p>
               </div>
+              )}
+              {event.unit_price > 0 && (
               <div className="rounded-xl border bg-muted/30 p-4">
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Min Order</p>
                 <p className="text-lg font-bold">{minQty.toLocaleString()}</p>
@@ -214,6 +219,7 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
                   {event.max_quantity > 0 ? `max ${event.max_quantity.toLocaleString()} ${event.unit}` : `${event.unit} minimum`}
                 </p>
               </div>
+              )}
               <div className="rounded-xl border bg-muted/30 p-4">
                 {isOpenEnded ? (
                   <>
@@ -221,7 +227,7 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
                       <Clock className="w-3 h-3" /> Availability
                     </p>
                     <p className="text-lg font-bold">Always Open</p>
-                    <p className="text-xs text-muted-foreground mt-1">recurring supply</p>
+                    <p className="text-xs text-muted-foreground mt-1">{event.market_side === "demand" ? "recurring demand" : "recurring supply"}</p>
                   </>
                 ) : (
                   <>
@@ -428,7 +434,7 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
                   </div>
                 )}
 
-                {qty >= minQty && (
+                {qty >= minQty && event.unit_price > 0 && (
                   <div className="bg-muted/50 rounded-lg p-3 text-sm space-y-1.5">
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Order total ({qty.toLocaleString()} units)</span>

@@ -159,6 +159,7 @@ export default function NewPreOrderPage() {
     client_name: "",
     brand_id: "",
     brand_name: "",
+    market_side: "supply" as "supply" | "demand",
     payment_deadline_hours: "48",
     buyer_notes: false,
     cancellation_fee: "0",
@@ -191,6 +192,7 @@ export default function NewPreOrderPage() {
         client_name: form.client_name,
         brand_id: form.brand_id || undefined,
         brand_name: form.brand_name || undefined,
+        market_side: form.market_side,
         payment_deadline_hours: parseInt(form.payment_deadline_hours) || 48,
         buyer_notes: form.buyer_notes,
         cancellation_fee: parseInt(form.cancellation_fee) || 0,
@@ -505,6 +507,18 @@ export default function NewPreOrderPage() {
             <p className="mt-1 text-sm/6 text-muted-foreground">Payment deadline, cancellation, and buyer preferences.</p>
           </div>
           <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6 md:col-span-2">
+            <div className="sm:col-span-3">
+              <label className={labelCls}>Market Side</label>
+              <div className="mt-2">
+                <Select value={form.market_side} onValueChange={(v) => set("market_side", v as "supply" | "demand")}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="supply">Supply — seller listing (eggs, chicks, seed)</SelectItem>
+                    <SelectItem value="demand">Demand — buyer wanting product brought to them (abattoir slot)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
             <div className="sm:col-span-3">
               <label className={labelCls}>Payment Deadline (hours)</label>
               <div className="mt-2">
