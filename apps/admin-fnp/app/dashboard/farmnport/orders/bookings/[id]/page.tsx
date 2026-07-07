@@ -110,6 +110,10 @@ export default function AdminBookingDetailPage({ params }: { params: Promise<{ i
   const [rejectOpen, setRejectOpen] = useState(false)
   const [rejectReason, setRejectReason] = useState("")
   const [rejectInput, setRejectInput] = useState("")
+  const [readyOpen, setReadyOpen] = useState(false)
+  const [readyInput, setReadyInput] = useState("")
+  const [collectedOpen, setCollectedOpen] = useState(false)
+  const [collectedInput, setCollectedInput] = useState("")
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin-booking", id],
@@ -243,7 +247,12 @@ export default function AdminBookingDetailPage({ params }: { params: Promise<{ i
               {booking.pre_order.fulfillment_type && (
                 <div className="mt-4 pt-4 border-t grid grid-cols-2 gap-4">
                   <Field label="Fulfillment" value={booking.pre_order.fulfillment_type === "delivery" ? "Delivery" : "Collection"} />
-                  {booking.pre_order.collection_point_name && <Field label="Collection Point" value={booking.pre_order.collection_point_name} />}
+                  {booking.pre_order.collection_point_name && (
+                    <div>
+                      <Field label="Collection Point" value={booking.pre_order.collection_point_name} />
+                      {booking.pre_order.collection_point_address && <p className="text-xs text-muted-foreground mt-0.5">{booking.pre_order.collection_point_address}</p>}
+                    </div>
+                  )}
                   {booking.pre_order.delivery_date && <Field label="Delivery Date" value={formatDate(booking.pre_order.delivery_date)} />}
                 </div>
               )}
@@ -304,32 +313,54 @@ export default function AdminBookingDetailPage({ params }: { params: Promise<{ i
           {isPreOrder && booking.pre_order && booking.pre_order.unit_price > 0 && (
             <div className="border rounded-xl p-5">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-4">Payment</p>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Order Total ({booking.pre_order.quantity?.toLocaleString()} {booking.pre_order.unit || "units"})</span>
-                  <span className="font-medium">{centsToDollars((booking.pre_order.unit_price ?? 0) * (booking.pre_order.quantity ?? 0))}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Amount Due</span>
-                  <span className="font-semibold text-orange-700">{centsToDollars(booking.pre_order.deposit_amount)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Payment Status</span>
-                  <span className={`font-medium ${booking.pre_order.deposit_paid ? "text-green-700" : "text-red-600"}`}>
-                    {booking.pre_order.deposit_paid ? "Paid" : "Not yet paid"}
-                  </span>
-                </div>
-                {booking.pre_order.payment_deadline && (
+              {(() => {
+                const subtotal = (booking.pre_order.unit_price ?? 0) * (booking.pre_order.quantity ?? 0)
+                const fee = Math.round(subtotal * 0.069)
+                const total = subtotal + fee
+                return (
+                <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Payment Deadline</span>
-                    <span className="font-medium">{formatDateTime(booking.pre_order.payment_deadline)}</span>
+                    <span className="text-muted-foreground">Subtotal ({booking.pre_order.quantity?.toLocaleString()} {booking.pre_order.unit || "units"})</span>
+                    <span className="font-medium">{centsToDollars(subtotal)}</span>
                   </div>
-                )}
-                <div className="flex justify-between border-t pt-2 mt-1">
-                  <span className="font-semibold">Balance on Collection</span>
-                  <span className="font-bold">{centsToDollars(booking.pre_order.balance_due)}</span>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Platform Fee (6.9%)</span>
+                    <span className="font-medium">{centsToDollars(fee)}</span>
+                  </div>
+                  <div className="flex justify-between border-t pt-2 mt-1">
+                    <span className="font-semibold">Total</span>
+                    <span className="font-bold">{centsToDollars(total)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Payment Status</span>
+                    <span className={`font-medium ${booking.pre_order.deposit_paid ? "text-green-700" : "text-red-600"}`}>
+                      {booking.pre_order.deposit_paid ? "Paid" : "Not yet paid"}
+                    </span>
+                  </div>
+                  {booking.pre_order.deposit_paid && (() => {
+                    const paidEntry = booking.status_history?.find((h: any) => h.to === "paid")
+                    return paidEntry ? (
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Paid at</span>
+                        <span className="font-medium">{formatDateTime(paidEntry.timestamp)}</span>
+                      </div>
+                    ) : null
+                  })()}
+                  {!booking.pre_order.deposit_paid && booking.pre_order.payment_deadline && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Payment Deadline</span>
+                      <span className="font-medium">{formatDateTime(booking.pre_order.payment_deadline)}</span>
+                    </div>
+                  )}
+                  {booking.pre_order.balance_due > 0 && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Balance on Collection</span>
+                      <span className="font-bold">{centsToDollars(booking.pre_order.balance_due)}</span>
+                    </div>
+                  )}
                 </div>
-              </div>
+                )
+              })()}
             </div>
           )}
         </div>
@@ -361,21 +392,19 @@ export default function AdminBookingDetailPage({ params }: { params: Promise<{ i
 
               {booking.status === "paid" && (
                 <button
-                  onClick={() => readyMutation.mutate()}
-                  disabled={readyMutation.isPending}
-                  className="w-full py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90"
+                  onClick={() => setReadyOpen(true)}
+                  className="w-full py-2 rounded-lg text-sm font-medium transition-colors bg-primary text-primary-foreground hover:bg-primary/90"
                 >
-                  {readyMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : booking.pre_order?.fulfillment_type === "delivery" ? "Mark as Shipped" : "Mark Ready for Collection"}
+                  {booking.pre_order?.fulfillment_type === "delivery" ? "Mark as Shipped" : "Mark Ready for Collection"}
                 </button>
               )}
 
               {booking.status === "ready" && (
                 <button
-                  onClick={() => collectedMutation.mutate()}
-                  disabled={collectedMutation.isPending}
-                  className="w-full py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90"
+                  onClick={() => setCollectedOpen(true)}
+                  className="w-full py-2 rounded-lg text-sm font-medium transition-colors bg-primary text-primary-foreground hover:bg-primary/90"
                 >
-                  {collectedMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : "Mark as Collected"}
+                  Mark as Collected
                 </button>
               )}
 
@@ -559,6 +588,70 @@ export default function AdminBookingDetailPage({ params }: { params: Promise<{ i
                 className="px-4 py-2 text-sm rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors disabled:opacity-50"
               >
                 {rejectMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Reject"}
+              </button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Ready for Collection dialog */}
+        <Dialog open={readyOpen} onOpenChange={(o) => { setReadyOpen(o); if (!o) setReadyInput("") }}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{booking.pre_order?.fulfillment_type === "delivery" ? "Mark as Shipped" : "Mark Ready for Collection"}</DialogTitle>
+            </DialogHeader>
+            <p className="text-sm text-muted-foreground">The buyer will be notified. Paste the booking reference to confirm.</p>
+            <div className="flex items-center justify-between bg-muted/50 rounded-lg px-3 py-2">
+              <span className="text-sm font-mono font-semibold">{booking.booking_ref}</span>
+              <button type="button" onClick={() => { navigator.clipboard.writeText(booking.booking_ref) }} className="text-xs text-primary hover:underline">Copy</button>
+            </div>
+            <input
+              value={readyInput}
+              onChange={(e) => setReadyInput(e.target.value)}
+              placeholder="Paste booking reference here"
+              className="w-full text-sm border rounded-lg px-3 py-2 font-mono focus:outline-none focus:ring-1 focus:ring-ring bg-transparent"
+            />
+            <DialogFooter>
+              <button onClick={() => { setReadyOpen(false); setReadyInput("") }} className="px-4 py-2 text-sm rounded-lg border hover:bg-muted transition-colors">
+                Go back
+              </button>
+              <button
+                onClick={() => { readyMutation.mutate(undefined, { onSuccess: () => { setReadyOpen(false); setReadyInput("") } }) }}
+                disabled={readyMutation.isPending || readyInput !== booking.booking_ref}
+                className="px-4 py-2 text-sm rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50"
+              >
+                {readyMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Confirm"}
+              </button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Mark as Collected dialog */}
+        <Dialog open={collectedOpen} onOpenChange={(o) => { setCollectedOpen(o); if (!o) setCollectedInput("") }}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Mark as Collected</DialogTitle>
+            </DialogHeader>
+            <p className="text-sm text-muted-foreground">This will complete the order. Paste the booking reference to confirm.</p>
+            <div className="flex items-center justify-between bg-muted/50 rounded-lg px-3 py-2">
+              <span className="text-sm font-mono font-semibold">{booking.booking_ref}</span>
+              <button type="button" onClick={() => { navigator.clipboard.writeText(booking.booking_ref) }} className="text-xs text-primary hover:underline">Copy</button>
+            </div>
+            <input
+              value={collectedInput}
+              onChange={(e) => setCollectedInput(e.target.value)}
+              placeholder="Paste booking reference here"
+              className="w-full text-sm border rounded-lg px-3 py-2 font-mono focus:outline-none focus:ring-1 focus:ring-ring bg-transparent"
+            />
+            <DialogFooter>
+              <button onClick={() => { setCollectedOpen(false); setCollectedInput("") }} className="px-4 py-2 text-sm rounded-lg border hover:bg-muted transition-colors">
+                Go back
+              </button>
+              <button
+                onClick={() => { collectedMutation.mutate(undefined, { onSuccess: () => { setCollectedOpen(false); setCollectedInput("") } }) }}
+                disabled={collectedMutation.isPending || collectedInput !== booking.booking_ref}
+                className="px-4 py-2 text-sm rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50"
+              >
+                {collectedMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Confirm"}
               </button>
             </DialogFooter>
           </DialogContent>
