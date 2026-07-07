@@ -1,12 +1,12 @@
 import { Body, Button, Container, Head, Hr, Html, Preview, Row, Column, Section, Text } from "@react-email/components"
 
-interface Props { name?: string; bookingRef?: string; productName?: string; quantity?: string | number; depositAmount?: string; balanceDue?: string; bookingUrl?: string }
+interface Props { name?: string; bookingRef?: string; productName?: string; quantity?: string; depositAmount?: string; balanceDue?: string; bookingUrl?: string }
 
 export default function PreorderDepositPaidEmail({
   name = "Okandas",
   bookingRef = "FNP-BK-PO-0001",
   productName = "Fivet Cobb 500 Day-Old Chicks",
-  quantity = 100,
+  quantity = "100",
   depositAmount = "$50.00",
   balanceDue = "$450.00",
   bookingUrl = "https://farmnport.com/account/bookings/preview",
@@ -14,7 +14,7 @@ export default function PreorderDepositPaidEmail({
   return (
     <Html lang="en">
       <Head />
-      <Preview>Payment received — {quantity} {productName} secured</Preview>
+      <Preview>{`Payment received — ${quantity} ${productName} secured`}</Preview>
       <Body style={body}><Container style={container}>
         <Section style={header}><Text style={brandName}>farmnport</Text><Text style={brandTagline}>getting you to market</Text></Section>
         <Hr style={headerDivider} />

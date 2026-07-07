@@ -1,6 +1,6 @@
 import { Body, Button, Container, Head, Hr, Html, Preview, Row, Column, Section, Text } from "@react-email/components"
 
-interface Props { bookingRef?: string; customerName?: string; customerEmail?: string; customerPhone?: string; productName?: string; quantity?: string | number; buyerNotes?: string; adminUrl?: string }
+interface Props { bookingRef?: string; customerName?: string; customerEmail?: string; customerPhone?: string; productName?: string; quantity?: string; buyerNotes?: string; adminUrl?: string }
 
 export default function PreorderRequestAdminEmail({
   bookingRef = "FNP-BK-PO-0001",
@@ -8,14 +8,14 @@ export default function PreorderRequestAdminEmail({
   customerEmail = "okandas@farmnport.com",
   customerPhone = "0719099990",
   productName = "Fivet Cobb 500 Day-Old Chicks",
-  quantity = 100,
+  quantity = "100",
   buyerNotes = "",
   adminUrl = "https://admin.farmnport.com",
 }: Props) {
   return (
     <Html lang="en">
       <Head />
-      <Preview>New pre-order request from {customerName} — {quantity} {productName}</Preview>
+      <Preview>{`New pre-order request from ${customerName} — ${quantity} ${productName}`}</Preview>
       <Body style={body}><Container style={container}>
         <Section style={header}><Text style={brandName}>farmnport</Text><Text style={brandTagline}>admin alert</Text></Section>
         <Hr style={headerDivider} />

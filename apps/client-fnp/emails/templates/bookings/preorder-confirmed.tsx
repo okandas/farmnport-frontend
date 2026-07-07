@@ -1,12 +1,12 @@
 import { Body, Button, Container, Head, Hr, Html, Preview, Row, Column, Section, Text } from "@react-email/components"
 
-interface Props { name?: string; bookingRef?: string; productName?: string; quantity?: string | number; depositAmount?: string; deadlineHours?: number; bookingUrl?: string }
+interface Props { name?: string; bookingRef?: string; productName?: string; quantity?: string; depositAmount?: string; deadlineHours?: number; bookingUrl?: string }
 
 export default function PreorderConfirmedEmail({
   name = "Okandas",
   bookingRef = "FNP-BK-PO-0001",
   productName = "Fivet Cobb 500 Day-Old Chicks",
-  quantity = 100,
+  quantity = "100",
   depositAmount = "$50.00",
   deadlineHours = 48,
   bookingUrl = "https://farmnport.com/account/bookings/preview",
