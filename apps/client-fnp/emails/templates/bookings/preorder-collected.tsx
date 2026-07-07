@@ -1,6 +1,6 @@
 import { Body, Button, Container, Head, Hr, Html, Preview, Section, Text } from "@react-email/components"
 
-interface Props { name?: string; bookingRef?: string; productName?: string; quantity?: number; bookingUrl?: string }
+interface Props { name?: string; bookingRef?: string; productName?: string; quantity?: string | number; bookingUrl?: string }
 
 export default function PreorderCollectedEmail({
   name = "Okandas",
