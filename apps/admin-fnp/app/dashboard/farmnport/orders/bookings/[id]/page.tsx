@@ -254,6 +254,7 @@ export default function AdminBookingDetailPage({ params }: { params: Promise<{ i
                     </div>
                   )}
                   {booking.pre_order.delivery_date && <Field label="Delivery Date" value={formatDate(booking.pre_order.delivery_date)} />}
+                  {booking.pre_order.payment_deadline && <Field label="Payment Deadline" value={formatDateTime(booking.pre_order.payment_deadline)} />}
                 </div>
               )}
               {booking.pre_order.buyer_notes && (
