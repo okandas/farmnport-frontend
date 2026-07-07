@@ -457,7 +457,7 @@ export default function AdminBookingDetailPage({ params }: { params: Promise<{ i
             </DialogHeader>
             <div className="flex items-center justify-between bg-muted/50 rounded-lg px-3 py-2">
               <span className="text-sm font-mono font-semibold">{booking.booking_ref}</span>
-              <button type="button" onClick={() => { navigator.clipboard.writeText(booking.booking_ref); toast({ description: "Copied" }) }} className="text-xs text-primary hover:underline">Copy</button>
+              <button type="button" onClick={() => { navigator.clipboard.writeText(booking.booking_ref) }} className="text-xs text-primary hover:underline">Copy</button>
             </div>
             <p className="text-sm text-muted-foreground">Please provide a reason and paste the booking reference to cancel.</p>
             <textarea
@@ -500,7 +500,7 @@ export default function AdminBookingDetailPage({ params }: { params: Promise<{ i
             <p className="text-sm text-muted-foreground">The buyer will be notified to pay. Paste the booking reference to confirm.</p>
             <div className="flex items-center justify-between bg-muted/50 rounded-lg px-3 py-2">
               <span className="text-sm font-mono font-semibold">{booking.booking_ref}</span>
-              <button type="button" onClick={() => { navigator.clipboard.writeText(booking.booking_ref); toast({ description: "Copied" }) }} className="text-xs text-primary hover:underline">Copy</button>
+              <button type="button" onClick={() => { navigator.clipboard.writeText(booking.booking_ref) }} className="text-xs text-primary hover:underline">Copy</button>
             </div>
             <input
               value={confirmInput}
@@ -533,7 +533,7 @@ export default function AdminBookingDetailPage({ params }: { params: Promise<{ i
             </DialogHeader>
             <div className="flex items-center justify-between bg-muted/50 rounded-lg px-3 py-2">
               <span className="text-sm font-mono font-semibold">{booking.booking_ref}</span>
-              <button type="button" onClick={() => { navigator.clipboard.writeText(booking.booking_ref); toast({ description: "Copied" }) }} className="text-xs text-primary hover:underline">Copy</button>
+              <button type="button" onClick={() => { navigator.clipboard.writeText(booking.booking_ref) }} className="text-xs text-primary hover:underline">Copy</button>
             </div>
             <p className="text-sm text-muted-foreground">Please provide a reason and paste the booking reference to reject.</p>
             <textarea

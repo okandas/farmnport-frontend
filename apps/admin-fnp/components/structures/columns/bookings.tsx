@@ -2,7 +2,9 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 import Link from "next/link"
-import { CalendarDays, Truck } from "lucide-react"
+import { CalendarDays, Truck, MoreHorizontal } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
 const STATUS_STYLES: Record<string, string> = {
   pending:          "bg-yellow-100 text-yellow-800",
@@ -101,6 +103,25 @@ export const bookingColumns: ColumnDef<any>[] = [
       <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_STYLES[row.original.status] ?? "bg-muted text-muted-foreground"}`}>
         {STATUS_LABELS[row.original.status] ?? row.original.status}
       </span>
+    ),
+  },
+  {
+    id: "actions",
+    cell: ({ row }) => (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="w-8 h-8 p-0">
+            <span className="sr-only">Open menu</span>
+            <MoreHorizontal className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+          <DropdownMenuItem asChild>
+            <Link href={`/dashboard/farmnport/orders/bookings/${row.original.id}`}>Manage</Link>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     ),
   },
 ]

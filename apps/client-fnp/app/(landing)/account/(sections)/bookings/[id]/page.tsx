@@ -410,7 +410,7 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
             <p className="text-sm text-muted-foreground">This action cannot be undone. Paste the booking reference to confirm cancellation.</p>
             <div className="flex items-center justify-between bg-muted/50 rounded-lg px-3 py-2">
               <span className="text-sm font-mono font-semibold">{booking.booking_ref}</span>
-              <button type="button" onClick={() => { navigator.clipboard.writeText(booking.booking_ref); toast.success("Copied") }} className="text-xs text-primary hover:underline">Copy</button>
+              <button type="button" onClick={() => { navigator.clipboard.writeText(booking.booking_ref) }} className="text-xs text-primary hover:underline">Copy</button>
             </div>
             <input
               value={cancelInput}

@@ -496,7 +496,7 @@ export default function IncomingBookingDetailPage({ params }: { params: Promise<
           <p className="text-sm text-muted-foreground">The buyer will be notified to pay. Paste the booking reference to confirm.</p>
           <div className="flex items-center justify-between bg-muted/50 rounded-lg px-3 py-2">
             <span className="text-sm font-mono font-semibold">{booking.booking_ref}</span>
-            <button type="button" onClick={() => { navigator.clipboard.writeText(booking.booking_ref); toast.success("Copied") }} className="text-xs text-primary hover:underline">Copy</button>
+            <button type="button" onClick={() => { navigator.clipboard.writeText(booking.booking_ref) }} className="text-xs text-primary hover:underline">Copy</button>
           </div>
           <input
             value={confirmInput}
