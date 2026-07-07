@@ -65,7 +65,7 @@ function EventCard({ event }: { event: any }) {
 
         <div className="mt-auto pt-1">
           <div className="w-full text-center text-sm font-medium py-2 rounded-md border hover:bg-muted transition-colors">
-            Reserve Now
+            Book Now
           </div>
         </div>
       </div>
