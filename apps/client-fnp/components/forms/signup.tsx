@@ -234,16 +234,36 @@ export function SignUpAuthForm({ className, ...props }: AuthFormProps) {
                         <Label htmlFor="phone">
                             Phone number
                         </Label>
-                        <Input
-                            className="mt-2"
-                            id="phone"
-                            placeholder="0719 099 790"
-                            type="text"
-                            autoCapitalize="none"
-                            autoComplete="off"
-                            disabled={isPending}
-                            {...register("phone", { required: true })}
-                        />
+                        <div className="mt-2 flex gap-2">
+                            <Controller
+                                control={control}
+                                name="code"
+                                defaultValue="263"
+                                render={({ field }) => (
+                                    <Select onValueChange={field.onChange} defaultValue="263">
+                                        <SelectTrigger className="w-[120px]">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="263">🇿🇼 +263</SelectItem>
+                                            <SelectItem value="27">🇿🇦 +27</SelectItem>
+                                            <SelectItem value="44">🇬🇧 +44</SelectItem>
+                                            <SelectItem value="1">🇺🇸 +1</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                )}
+                            />
+                            <Input
+                                className="flex-1"
+                                id="phone"
+                                placeholder="719 099 790"
+                                type="text"
+                                autoCapitalize="none"
+                                autoComplete="off"
+                                disabled={isPending}
+                                {...register("phone", { required: true })}
+                            />
+                        </div>
                         {errors?.phone && (
                             <p className="px-2 text-xs text-red-600 py-2">
                                 {errors.phone.message}

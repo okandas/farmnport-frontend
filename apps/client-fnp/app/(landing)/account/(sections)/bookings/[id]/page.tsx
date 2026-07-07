@@ -288,6 +288,7 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
                     <div>
                       <p className="text-muted-foreground text-xs mb-0.5">Collection Point</p>
                       <p className="font-medium">{booking.pre_order.collection_point_name}</p>
+                      {booking.pre_order.collection_point_address && <p className="text-xs text-muted-foreground">{booking.pre_order.collection_point_address}</p>}
                     </div>
                   )}
                   {booking.pre_order.delivery_date && (

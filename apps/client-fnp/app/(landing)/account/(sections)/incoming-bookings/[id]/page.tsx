@@ -184,7 +184,7 @@ export default function IncomingBookingDetailPage({ params }: { params: Promise<
   }
 
   const actions = BUYER_TRANSITIONS[booking.status] ?? []
-  const canCancel = !["completed", "cancelled"].includes(booking.status)
+  const canCancel = !["completed", "cancelled", "expired", "rejected"].includes(booking.status)
 
   return (
     <div>

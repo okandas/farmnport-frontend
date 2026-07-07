@@ -22,9 +22,9 @@ export function LoggedOutLanding({ counts = { buyers: 0, farmers: 0 } }: { count
                 <div className="mx-auto max-w-7xl px-6 lg:px-8">
                     <div className="mx-auto max-w-2xl text-center">
                         <div className="mb-6 inline-flex">
-                            <Link href="/buy" onClick={() => sendGTMEvent({ event: "hero_cta_click", cta_name: "buy_online" })}>
-                                <div className="text-sm leading-6 text-green-600 dark:text-green-400 font-medium">
-                                    New! <span className="whitespace-nowrap font-semibold">Buy Online <span aria-hidden="true">&rarr;</span></span>
+                            <Link href="/signup" onClick={() => sendGTMEvent({ event: "hero_cta_click", cta_name: "international_signup" })}>
+                                <div className="animate-bounce text-sm leading-6 text-green-600 dark:text-green-400 font-medium rounded-full bg-green-50 dark:bg-green-900/30 px-4 py-1.5">
+                                    New! <span className="whitespace-nowrap font-semibold">UK and South African users can now sign up <span aria-hidden="true">&rarr;</span></span>
                                 </div>
                             </Link>
                         </div>
