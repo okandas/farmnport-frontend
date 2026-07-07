@@ -1603,6 +1603,7 @@ export function createPreOrder(data: {
   close_date: string
   status?: string
   image_src?: string
+  market_side?: string
   payment_deadline_hours?: number
   buyer_notes?: boolean
   cancellation_fee?: number
