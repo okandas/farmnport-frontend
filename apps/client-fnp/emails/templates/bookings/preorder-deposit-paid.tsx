@@ -14,19 +14,19 @@ export default function PreorderDepositPaidEmail({
   return (
     <Html lang="en">
       <Head />
-      <Preview>Deposit received — {quantity} {productName} secured</Preview>
+      <Preview>Payment received — {quantity} {productName} secured</Preview>
       <Body style={body}><Container style={container}>
         <Section style={header}><Text style={brandName}>farmnport</Text><Text style={brandTagline}>getting you to market</Text></Section>
         <Hr style={headerDivider} />
         <Section style={content}>
-          <Section style={pillWrapper}><Text style={pill}>Deposit Received</Text></Section>
+          <Section style={pillWrapper}><Text style={pill}>Payment Received</Text></Section>
           <Text style={greeting}>Payment received, {name}!</Text>
-          <Text style={paragraph}>Your deposit of {depositAmount} has been received. Your {quantity} {productName} are secured. We&apos;ll notify you when your order is ready for collection.</Text>
+          <Text style={paragraph}>Your payment of {depositAmount} has been received. Your {quantity} {productName} are secured. We&apos;ll notify you when your order is ready for collection.</Text>
           <Section style={refCard}><Text style={refLabel}>Booking reference</Text><Text style={refNumber}>{bookingRef}</Text></Section>
           <Text style={sectionLabel}>Summary</Text>
           <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Produce</Text></Column><Column><Text style={valText}>{productName}</Text></Column></Row>
           <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Quantity</Text></Column><Column><Text style={valText}>{quantity} units</Text></Column></Row>
-          <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Deposit paid</Text></Column><Column><Text style={depositText}>{depositAmount}</Text></Column></Row>
+          <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Amount paid</Text></Column><Column><Text style={depositText}>{depositAmount}</Text></Column></Row>
           <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Balance on collection</Text></Column><Column><Text style={valText}>{balanceDue}</Text></Column></Row>
           <Section style={buttonWrapper}><Button href={bookingUrl} style={button}>View your booking</Button></Section>
           <Hr style={divider} />
