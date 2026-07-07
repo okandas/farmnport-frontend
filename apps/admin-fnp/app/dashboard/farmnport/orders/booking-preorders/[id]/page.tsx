@@ -1,6 +1,7 @@
 "use client"
 
-import { use } from "react"
+import { use, useState } from "react"
+import { PaginationState } from "@tanstack/react-table"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { Loader2, ArrowLeft, Package, Users, CalendarDays, CheckCircle2 } from "lucide-react"
 import Link from "next/link"
@@ -10,6 +11,8 @@ import { centsToDollars } from "@/lib/utilities"
 import { toast } from "@/components/ui/use-toast"
 import { FormSkeleton } from "@/components/state/skeleton-table"
 import { DashboardShell } from "@/components/state/dashboardShell"
+import { DataTable } from "@/components/structures/data-table"
+import { bookingColumns } from "@/components/structures/columns/bookings"
 
 const STATUS_STYLES: Record<string, string> = {
   pending:          "bg-yellow-100 text-yellow-800",
@@ -59,6 +62,8 @@ function capitalize(s: string) {
 export default function PreOrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const queryClient = useQueryClient()
+  const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: 20 })
+  const [search, setSearch] = useState("")
 
   const { data: eventsData, isLoading: eventsLoading } = useQuery({
     queryKey: ["admin-preorders"],
@@ -86,7 +91,7 @@ export default function PreOrderDetailPage({ params }: { params: Promise<{ id: s
     return <DashboardShell><FormSkeleton /></DashboardShell>
   }
 
-  const events: any[] = eventsData?.data?.events ?? []
+  const events: any[] = eventsData?.data?.preorders ?? []
   const event = events.find((e: any) => e.id === id)
   const bookings: any[] = bookingsData?.data?.bookings ?? []
 
@@ -161,7 +166,7 @@ export default function PreOrderDetailPage({ params }: { params: Promise<{ id: s
           </div>
           <button
             onClick={() => {
-              if (confirm(`Add ${remaining} ${event.unit} back to ${event.product_name} stock?`)) {
+              if (confirm(`Add ${remaining} ${event.unit} back to ${event.produce_name} stock?`)) {
                 approveMutation.mutate()
               }
             }}
@@ -181,61 +186,17 @@ export default function PreOrderDetailPage({ params }: { params: Promise<{ id: s
       )}
 
       {/* Bookings table */}
-      <div className="border rounded-xl overflow-hidden">
-        <div className="px-5 py-3 border-b bg-muted/30">
-          <p className="text-sm font-semibold">Bookings ({bookings.length})</p>
-        </div>
-        {bookings.length === 0 ? (
-          <div className="p-8 text-center text-muted-foreground">
-            <Users className="w-8 h-8 mx-auto mb-2 opacity-40" />
-            <p className="text-sm">No bookings yet</p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-xs text-muted-foreground uppercase tracking-wide">
-                  <th className="text-left px-5 py-3 font-medium">Ref</th>
-                  <th className="text-left px-5 py-3 font-medium">Customer</th>
-                  <th className="text-left px-5 py-3 font-medium">Quantity</th>
-                  <th className="text-left px-5 py-3 font-medium">Amount Due</th>
-                  <th className="text-left px-5 py-3 font-medium">Paid</th>
-                  <th className="text-left px-5 py-3 font-medium">Status</th>
-                  <th className="text-left px-5 py-3 font-medium">Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {bookings.map((b: any) => (
-                  <tr key={b.id} className="hover:bg-muted/50 transition-colors">
-                    <td className="px-5 py-3">
-                      <Link href={`/dashboard/farmnport/orders/bookings/${b.id}`} className="font-mono font-semibold text-primary hover:underline">
-                        {b.booking_ref}
-                      </Link>
-                    </td>
-                    <td className="px-5 py-3">
-                      <p className="font-medium">{b.client_name}</p>
-                      <p className="text-xs text-muted-foreground">{b.client_phone}</p>
-                    </td>
-                    <td className="px-5 py-3">{b.pre_order?.quantity?.toLocaleString()} {event.unit}</td>
-                    <td className="px-5 py-3 font-medium">{centsToDollars(b.pre_order?.deposit_amount ?? 0)}</td>
-                    <td className="px-5 py-3">
-                      <span className={`text-xs font-medium ${b.pre_order?.deposit_paid ? "text-green-700" : "text-red-600"}`}>
-                        {b.pre_order?.deposit_paid ? "Yes" : "No"}
-                      </span>
-                    </td>
-                    <td className="px-5 py-3">
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_STYLES[b.status] ?? "bg-muted text-muted-foreground"}`}>
-                        {STATUS_LABELS[b.status] ?? b.status}
-                      </span>
-                    </td>
-                    <td className="px-5 py-3 text-muted-foreground text-xs">{formatDateTime(b.created)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+      <DataTable
+        columns={bookingColumns}
+        data={bookings}
+        tableName="Booking"
+        total={bookings.length}
+        pagination={pagination}
+        setPagination={setPagination}
+        search={search}
+        setSearch={setSearch}
+        emptyMessage="No bookings yet for this pre-order"
+      />
     </DashboardShell>
   )
 }

@@ -4,14 +4,14 @@ import { useState, useEffect, useRef } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { PaginationState } from "@tanstack/react-table"
 
-import { queryAdminBookings } from "@/lib/query"
+import { queryAdminPreOrders } from "@/lib/query"
 import { handleFetchError } from "@/lib/error-handler"
 import { Placeholder } from "@/components/state/placeholder"
 import { TableSkeleton } from "@/components/state/skeleton-table"
 import { DataTable } from "@/components/structures/data-table"
-import { bookingColumns } from "@/components/structures/columns/bookings"
+import { preorderColumns } from "@/components/structures/columns/preorders"
 
-export function BookingsTable() {
+export function PreOrdersTable() {
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 20,
@@ -19,13 +19,13 @@ export function BookingsTable() {
   const [search, setSearch] = useState("")
 
   const { isError, isLoading, isFetching, refetch, data, error } = useQuery({
-    queryKey: ["admin-bookings", { p: pagination.pageIndex + 1, search }],
-    queryFn: () => queryAdminBookings({ p: pagination.pageIndex + 1 }),
+    queryKey: ["admin-preorders", { p: pagination.pageIndex + 1, search }],
+    queryFn: () => queryAdminPreOrders(),
     refetchOnWindowFocus: false,
   })
 
-  const bookings = data?.data?.bookings || []
-  const total = (data?.data?.total as number) ?? 0
+  const events = data?.data?.preorders || []
+  const total = events.length
 
   const hasShownError = useRef(false)
   useEffect(() => {
@@ -36,7 +36,7 @@ export function BookingsTable() {
           hasShownError.current = false
           refetch()
         },
-        context: "bookings",
+        context: "pre-orders",
       })
     }
     if (!isError) {
@@ -48,8 +48,8 @@ export function BookingsTable() {
     return (
       <Placeholder>
         <Placeholder.Icon name="close" />
-        <Placeholder.Title>Error Fetching Bookings</Placeholder.Title>
-        <Placeholder.Description>Error fetching bookings from the database</Placeholder.Description>
+        <Placeholder.Title>Error Fetching Pre-Orders</Placeholder.Title>
+        <Placeholder.Description>Error fetching pre-orders from the database</Placeholder.Description>
       </Placeholder>
     )
   }
@@ -60,9 +60,10 @@ export function BookingsTable() {
 
   return (
     <DataTable
-      columns={bookingColumns}
-      data={bookings}
-      tableName="Booking"
+      columns={preorderColumns}
+      data={events}
+      newUrl="/dashboard/farmnport/orders/booking-preorders/new"
+      tableName="Pre-Order"
       total={total}
       pagination={pagination}
       setPagination={setPagination}

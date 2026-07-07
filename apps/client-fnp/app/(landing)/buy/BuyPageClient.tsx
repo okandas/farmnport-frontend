@@ -48,7 +48,7 @@ function PreOrdersSection() {
     queryKey: ["booking-events-buy-page"],
     queryFn: () => listPreOrders({ status: "open" }),
   })
-  const events: any[] = data?.data?.events ?? []
+  const events: any[] = data?.data?.preorders ?? []
 
   if (isLoading || events.length === 0) return null
 

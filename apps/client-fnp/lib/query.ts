@@ -326,15 +326,12 @@ export function queryClientFilterAggregates(type: 'buyers' | 'farmers', filters?
   return api.get(`${BaseURL}/client/aggregates/filters?${params.toString()}`)
 }
 
-export function queryClientPricing(clientId: string, pagination?: PaginationModel) {
-  let url: string
-
-  if (pagination?.p !== undefined && pagination.p >= 2) {
-    url = `${BaseURL}/prices/client/${clientId}?p=${pagination.p}`
-  } else {
-    url = `${BaseURL}/prices/client/${clientId}`
-  }
-
+export function queryClientPricing(clientId: string, pagination?: PaginationModel, produce?: string) {
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) params.set("p", String(pagination.p))
+  if (produce) params.set("produce", produce)
+  const qs = params.toString()
+  const url = `${BaseURL}/prices/client/${clientId}${qs ? `?${qs}` : ""}`
   return api.get(url)
 }
 
@@ -959,11 +956,11 @@ export function listPreOrders(options?: { product_id?: string; status?: string }
   if (options?.product_id) params.set("product_id", options.product_id)
   if (options?.status) params.set("status", options.status)
   const qs = params.toString()
-  return api.get(`${BaseURL}/booking/events${qs ? `?${qs}` : ""}`)
+  return api.get(`${BaseURL}/booking/preorders${qs ? `?${qs}` : ""}`)
 }
 
 export function getPreOrder(id: string) {
-  return api.get(`${BaseURL}/booking/events/${id}`)
+  return api.get(`${BaseURL}/booking/preorders/${id}`)
 }
 
 export function myPreOrders(page?: number) {
@@ -996,6 +993,10 @@ export function createBooking(data: {
   // pre-order
   event_id?: string
   quantity?: number
+  fulfillment_type?: string // "collection" or "delivery"
+  collection_point_id?: string
+  collection_point_name?: string
+  delivery_date?: string
   // delivery
   delivery_location_id?: string
   goods_items?: GoodsItemPayload[]
@@ -1046,6 +1047,14 @@ export function clientMarkCollected(id: string) {
 
 export function clientPreOrderBookings(preOrderId: string) {
   return api.get(`${BaseURL}/booking/client/preorder/${preOrderId}/bookings`)
+}
+
+export function clientResetPreOrderCapacity(preOrderId: string) {
+  return api.put(`${BaseURL}/booking/client/preorder/${preOrderId}/reset`, {})
+}
+
+export function clientUpdatePreOrderCapacity(preOrderId: string, totalAvailable: number) {
+  return api.put(`${BaseURL}/booking/client/preorder/${preOrderId}/update-capacity`, { total_available: totalAvailable })
 }
 
 export function buyerUpdateBookingStatus(id: string, status: string, note?: string) {

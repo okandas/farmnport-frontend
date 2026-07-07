@@ -38,7 +38,7 @@ export function RelatedMarkets({ currentProduct, context }: RelatedMarketsProps)
                         key={market.slug}
                         href={`${basePath}/${market.slug}`}
                         className="flex items-center gap-3 rounded-lg border bg-card p-4 transition hover:border-primary/50 hover:shadow-md group"
-                        onClick={() => sendGTMEvent({ event: "click", value: `RelatedMarket${market.name}` })}
+                        onClick={() => sendGTMEvent({ event: "cross_sell_click", cta_name: "related_market", item_name: market.name })}
                     >
                         <div className="flex h-10 w-10 flex-none items-center justify-center rounded-full shadow-sm ring-1 ring-zinc-900/5 dark:border dark:border-zinc-700/50 dark:bg-zinc-800 dark:ring-0">
                             <Image src={market.logo} alt="" className="h-7 w-7" unoptimized />

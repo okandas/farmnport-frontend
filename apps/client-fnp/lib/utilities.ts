@@ -78,6 +78,24 @@ export function centsToDollars(cents: number): string {
   return `$${dollars.toFixed(2)}`
 }
 
+const PLATFORM_FEE_RATE = 0.069
+
+export function platformFee(cents: number): number {
+  return Math.round(cents * PLATFORM_FEE_RATE)
+}
+
+export function withPlatformFee(cents: number): number {
+  return cents + platformFee(cents)
+}
+
+export function platformFeeDisplay(cents: number): string {
+  return centsToDollars(platformFee(cents))
+}
+
+export function withPlatformFeeDisplay(cents: number): string {
+  return centsToDollars(withPlatformFee(cents))
+}
+
 export function titleCase(str?: string): string {
   if (!str) return ""
   return str.split(' ').map(w => w.length <= 2 ? w.toUpperCase() : w.charAt(0).toUpperCase() + w.slice(1)).join(' ')

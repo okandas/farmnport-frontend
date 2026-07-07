@@ -9,21 +9,31 @@ import Link from "next/link"
 import { incomingBookings } from "@/lib/query"
 
 const STATUS_STYLES: Record<string, string> = {
-  pending:   "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400",
-  confirmed: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
-  approved:  "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400",
-  ready:     "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400",
-  completed: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
-  cancelled: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
+  pending:          "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400",
+  confirmed:        "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
+  pending_payment:  "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400",
+  paid:             "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
+  approved:         "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400",
+  ready:            "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400",
+  collected:        "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
+  completed:        "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
+  rejected:         "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
+  expired:          "bg-muted text-muted-foreground",
+  cancelled:        "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
 }
 
 const STATUS_LABELS: Record<string, string> = {
-  pending:   "Received",
-  confirmed: "Processing",
-  approved:  "Approved",
-  ready:     "Ready",
-  completed: "Completed",
-  cancelled: "Cancelled",
+  pending:          "Pending Approval",
+  confirmed:        "Confirmed",
+  pending_payment:  "Payment Processing",
+  paid:             "Paid",
+  approved:         "Approved",
+  ready:            "Ready for Collection",
+  collected:        "Collected",
+  completed:        "Completed",
+  rejected:         "Rejected",
+  expired:          "Expired",
+  cancelled:        "Cancelled",
 }
 
 function formatDate(d: string) {
@@ -72,7 +82,7 @@ export default function IncomingBookingsPage() {
         <div className="text-center py-16 space-y-3">
           <Truck className="w-10 h-10 mx-auto text-muted-foreground/40" />
           <p className="font-semibold">No incoming bookings</p>
-          <p className="text-sm text-muted-foreground">Delivery bookings made to your locations will appear here.</p>
+          <p className="text-sm text-muted-foreground">Pre-order and delivery bookings will appear here.</p>
         </div>
       ) : (
         <div className="space-y-2">
@@ -94,15 +104,26 @@ export default function IncomingBookingsPage() {
                 </div>
                 <p className="text-xs text-muted-foreground">
                   {booking.client_name}
-                  {booking.delivery?.delivery_location_name ? ` · ${booking.delivery.delivery_location_name}` : ""}
+                  {booking.type === "pre-order" && booking.pre_order
+                    ? ` · ${booking.pre_order.event_title} · ${booking.pre_order.quantity} ${booking.pre_order.unit || "units"}`
+                    : booking.delivery?.delivery_location_name ? ` · ${booking.delivery.delivery_location_name}` : ""}
                 </p>
+                {booking.type === "pre-order" && booking.pre_order?.fulfillment_type && (
+                  <p className="text-xs text-muted-foreground">
+                    {booking.pre_order.fulfillment_type === "delivery" ? "Delivery" : "Collection"}
+                    {booking.pre_order.collection_point_name ? ` · ${booking.pre_order.collection_point_name}` : ""}
+                    {booking.pre_order.delivery_date ? ` · ${formatDate(booking.pre_order.delivery_date)}` : ""}
+                  </p>
+                )}
                 {booking.delivery?.goods && (
                   <p className="text-xs text-muted-foreground truncate max-w-sm">{booking.delivery.goods}</p>
                 )}
-                <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">
-                  Delivery {formatDate(booking.booking_date)}
-                  {booking.time_slot ? ` · ${booking.time_slot}` : ""}
-                </p>
+                {booking.type !== "pre-order" && (
+                  <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">
+                    Delivery {formatDate(booking.booking_date)}
+                    {booking.time_slot ? ` · ${booking.time_slot}` : ""}
+                  </p>
+                )}
               </div>
               <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0 group-hover:text-foreground transition-colors" />
             </Link>

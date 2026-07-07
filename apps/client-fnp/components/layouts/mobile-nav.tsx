@@ -119,7 +119,7 @@ export function MobileNav({ user }: MobileNavProps) {
                    <Link
                      href="/guides"
                      onClick={() => {
-                       sendGTMEvent({ event: 'link', value: 'GuidesTopNavigation' })
+                       sendGTMEvent({ event: 'nav_click', link_name: 'guides' })
                        setIsOpen(false)
                      }}
                      className="flex items-center gap-3 px-3 py-2 text-base font-medium rounded-md hover:bg-accent transition-colors"
@@ -131,7 +131,7 @@ export function MobileNav({ user }: MobileNavProps) {
                    <Link
                      href="/programs"
                      onClick={() => {
-                       sendGTMEvent({ event: 'link', value: 'ProgramsTopNavigation' })
+                       sendGTMEvent({ event: 'nav_click', link_name: 'programs' })
                        setIsOpen(false)
                      }}
                      className="flex items-center gap-3 px-3 py-2 text-base font-medium rounded-md hover:bg-accent transition-colors"
@@ -143,7 +143,7 @@ export function MobileNav({ user }: MobileNavProps) {
                    <Link
                      href="/market"
                      onClick={() => {
-                       sendGTMEvent({ event: 'link', value: 'MarketTopNavigation' })
+                       sendGTMEvent({ event: 'nav_click', link_name: 'market' })
                        setIsOpen(false)
                      }}
                      className="flex items-center gap-3 px-3 py-2 text-base font-medium rounded-md hover:bg-accent transition-colors"
@@ -155,7 +155,7 @@ export function MobileNav({ user }: MobileNavProps) {
                    <Link
                      href="/buy"
                      onClick={() => {
-                       sendGTMEvent({ event: 'link', value: 'BuyTopNavigation' })
+                       sendGTMEvent({ event: 'nav_click', link_name: 'buy' })
                        setIsOpen(false)
                      }}
                      className="flex items-center gap-3 px-3 py-2 text-base font-medium rounded-md hover:bg-accent transition-colors"
@@ -170,7 +170,7 @@ export function MobileNav({ user }: MobileNavProps) {
                    <Link
                      href={user ? "/lots/new" : "/login?next=/lots/new"}
                      onClick={() => {
-                       sendGTMEvent({ event: 'link', value: 'PostLotNavigation' })
+                       sendGTMEvent({ event: 'nav_click', link_name: 'post_lot' })
                        setIsOpen(false)
                      }}
                      className="flex items-center gap-3 px-3 py-2 text-base font-semibold rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"

@@ -26,7 +26,6 @@ interface DashboardStats {
   guides: { spray_programs: number; feeding_programs: number }
   buyer_contacts: number
   brands: number
-  producer_prices: number
   contact_views: number
 }
 
@@ -301,17 +300,6 @@ export default function DashboardPage() {
           </div>
           <div className="text-3xl font-bold">{stats.brands}</div>
           <p className="text-xs text-muted-foreground mt-1">Registered brands</p>
-        </div>
-
-        <div className="rounded-xl border bg-card p-5">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-sm font-medium text-muted-foreground">Producer Prices</span>
-            <div className="h-8 w-8 rounded-lg bg-cyan-100 dark:bg-cyan-900/40 flex items-center justify-center">
-              <TrendingUp className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
-            </div>
-          </div>
-          <div className="text-3xl font-bold">{stats.producer_prices}</div>
-          <p className="text-xs text-muted-foreground mt-1">Active price listings</p>
         </div>
 
         <div className="rounded-xl border bg-card p-5">

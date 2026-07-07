@@ -440,6 +440,14 @@ export function queryAllFarmProduce() {
   return api.get(url)
 }
 
+export function queryFarmProduceById(id: string) {
+  return api.get(`${baseUrl}/farmproduce/by-id/${id}`)
+}
+
+export function queryBreedById(id: string) {
+  return api.get(`${baseUrl}/breeds/${id}`)
+}
+
 export function queryFarmProduceBySlug(slug: string) {
   return api.get(`${baseUrl}/farmproduce/${slug}`)
 }
@@ -1560,35 +1568,36 @@ export function markPreOrderCollected(id: string) {
 }
 
 export function queryPreOrderBookings(preOrderId: string) {
-  return api.get(`${baseUrl}/booking/admin/events/${preOrderId}/bookings`)
+  return api.get(`${baseUrl}/booking/admin/preorders/${preOrderId}/bookings`)
 }
 
 export function approvePreOrderStock(preOrderId: string, actualQuantity?: number) {
-  return api.post(`${baseUrl}/booking/admin/events/${preOrderId}/approve-stock`, { actual_quantity: actualQuantity || 0 })
+  return api.post(`${baseUrl}/booking/admin/preorders/${preOrderId}/approve-stock`, { actual_quantity: actualQuantity || 0 })
 }
 
 export function queryAdminPreOrders(status?: string) {
   const qs = status ? `?status=${status}` : ""
-  return api.get(`${baseUrl}/booking/admin/events${qs}`)
+  return api.get(`${baseUrl}/booking/admin/preorders${qs}`)
 }
 
 export function createPreOrder(data: {
-  title: string
+  subtitle?: string
   description?: string
   client_id: string
   client_name: string
   brand_id?: string
   brand_name?: string
-  product_id: string
-  product_name: string
-  product_slug: string
-  product_type: string
+  produce_id: string
+  produce_name: string
+  breed_id?: string
+  breed_name?: string
   unit?: string
   name?: string
   unit_price: number
   deposit_per_unit: number
   min_quantity?: number
   max_quantity?: number
+  quantity_step?: number
   total_available: number
   open_date: string
   close_date: string
@@ -1598,22 +1607,23 @@ export function createPreOrder(data: {
   buyer_notes?: boolean
   cancellation_fee?: number
   transferable?: boolean
+  delivery_dates?: string[]
   delivery_locations?: { id: string; name: string }[]
 }) {
-  return api.post(`${baseUrl}/booking/admin/events`, data)
+  return api.post(`${baseUrl}/booking/admin/preorders`, data)
 }
 
 export function updatePreOrder(id: string, data: Partial<{
-  title: string
+  subtitle: string
   description: string
   client_id: string
   client_name: string
   brand_id: string
   brand_name: string
-  product_id: string
-  product_name: string
-  product_slug: string
-  product_type: string
+  produce_id: string
+  produce_name: string
+  breed_id: string
+  breed_name: string
   unit: string
   name: string
   status: string
@@ -1629,10 +1639,11 @@ export function updatePreOrder(id: string, data: Partial<{
   buyer_notes: boolean
   cancellation_fee: number
   transferable: boolean
+  delivery_dates: string[]
   delivery_locations: { id: string; name: string }[]
   collection_locations: { id: string; name: string }[]
 }>) {
-  return api.put(`${baseUrl}/booking/admin/events/${id}`, data)
+  return api.put(`${baseUrl}/booking/admin/preorders/${id}`, data)
 }
 
 export function queryClientLocations() {

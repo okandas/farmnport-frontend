@@ -35,12 +35,12 @@ export default async function BuySeedProductPage({ params }: Props) {
     const { slug } = await params
     const [product, bookingRes] = await Promise.all([
         serverFetch(`/seed-products/${slug}`).catch(() => null),
-        serverFetch(`/booking/events?status=open`).catch(() => null),
+        serverFetch(`/booking/preorders?status=open`).catch(() => null),
     ])
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://farmnport.com'
 
-    const openEvent = (bookingRes?.events ?? []).find(
-        (e: any) => e.product_id && product?.id && e.product_id === product.id
+    const openEvent = (bookingRes?.preorders ?? []).find(
+        (e: any) => e.produce_id && product?.id && e.produce_id === product.id
     )
 
     if (!product) notFound()

@@ -25,7 +25,7 @@ export function PricingClient({ user }: PricingClientProps) {
     mutationFn: initiateSubscription,
     onSuccess: (response) => {
       const data = response.data
-      sendGTMEvent({ event: 'action', value: 'SubscriptionInitiated' })
+      sendGTMEvent({ event: 'subscription_initiated' })
 
       if (data.redirect_url) {
         // Web checkout - redirect to Paynow
@@ -47,7 +47,7 @@ export function PricingClient({ user }: PricingClientProps) {
     setError("")
 
     if (!user) {
-      sendGTMEvent({ event: 'action', value: 'SubscribeRedirectToLogin' })
+      sendGTMEvent({ event: 'login_prompt', reason: 'subscribe' })
       router.push("/login?redirect=/pricing")
       return
     }
@@ -179,7 +179,7 @@ export function PricingClient({ user }: PricingClientProps) {
           <Button
             className="w-full"
             onClick={() => {
-              sendGTMEvent({ event: 'action', value: 'SubscribeRedirectToLogin' })
+              sendGTMEvent({ event: 'login_prompt', reason: 'subscribe' })
               router.push("/login?redirect=/pricing")
             }}
           >

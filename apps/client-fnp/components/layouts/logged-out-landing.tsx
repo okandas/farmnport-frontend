@@ -22,9 +22,9 @@ export function LoggedOutLanding({ counts = { buyers: 0, farmers: 0 } }: { count
                 <div className="mx-auto max-w-7xl px-6 lg:px-8">
                     <div className="mx-auto max-w-2xl text-center">
                         <div className="mb-6 inline-flex">
-                            <Link href="/buy" onClick={() => sendGTMEvent({ event: "click", value: "PricingCTAHero" })}>
-                                <div className="text-sm leading-6 text-green-600 dark:text-green-400 font-medium">
-                                    New! <span className="whitespace-nowrap font-semibold">Buy Online <span aria-hidden="true">&rarr;</span></span>
+                            <Link href="/signup" onClick={() => sendGTMEvent({ event: "hero_cta_click", cta_name: "international_signup" })}>
+                                <div className="animate-bounce text-sm leading-6 text-green-600 dark:text-green-400 font-medium rounded-full bg-green-50 dark:bg-green-900/30 px-4 py-1.5">
+                                    New! <span className="whitespace-nowrap font-semibold">UK and South African users can now sign up <span aria-hidden="true">&rarr;</span></span>
                                 </div>
                             </Link>
                         </div>
@@ -126,7 +126,7 @@ export function LoggedOutLanding({ counts = { buyers: 0, farmers: 0 } }: { count
                                 </p>
                             </div>
                             <Link href="/signup" className="shrink-0">
-                                <Button className="bg-orange-700 hover:bg-orange-800 text-white dark:bg-orange-500 dark:hover:bg-orange-400" onClick={() => sendGTMEvent({ event: "link", value: "SignupHeroNavigation" })}>
+                                <Button className="bg-orange-700 hover:bg-orange-800 text-white dark:bg-orange-500 dark:hover:bg-orange-400" onClick={() => sendGTMEvent({ event: "hero_cta_click", cta_name: "signup" })}>
                                     Get Started
                                     <ArrowDownIcon className="h-4 w-4 text-white" />
                                 </Button>
@@ -218,7 +218,7 @@ function Featured() {
                             key={resource.name}
                             href={resource.href}
                             className="group flex items-start gap-4 rounded-lg border bg-card text-card-foreground p-5 shadow-sm transition hover:border-orange-500 hover:shadow-md"
-                            onClick={() => sendGTMEvent({ event: "click", value: resource.event })}
+                            onClick={() => sendGTMEvent({ event: "hero_cta_click", cta_name: resource.event })}
                         >
                             <div className="relative mt-1 flex h-10 w-10 flex-none items-center justify-center rounded-full shadow-md shadow-zinc-800/5 ring-1 ring-zinc-900/5 dark:border dark:border-zinc-700/50 dark:bg-zinc-800 dark:ring-0 group-hover:bg-orange-600 group-hover:text-white dark:group-hover:bg-orange-500 transition-colors">
                                 {resource.icon}
@@ -287,7 +287,7 @@ function FeaturedPopularSection() {
                             key={market.name}
                             href={market.link}
                             className="block rounded-lg border bg-card text-card-foreground p-5 shadow-sm transition hover:border-orange-500 hover:shadow-md"
-                            onClick={() => sendGTMEvent({ event: "view", value: "FeaturedLink" })}
+                            onClick={() => sendGTMEvent({ event: "hero_cta_click", cta_name: "featured_market", item_name: market.name })}
                         >
                             <h3 className="text-sm font-semibold">{market.name}</h3>
                             <p className="text-sm text-muted-foreground mt-1">{market.message}</p>

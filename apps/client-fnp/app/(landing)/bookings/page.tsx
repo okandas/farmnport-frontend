@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation"
 import Link from "next/link"
 import { bookingsEnabled } from "@/flags"
+import { serverFetch } from "@/lib/serverFetch"
 import { BookingsClient } from "./BookingsClient"
 import { getBuyCategories } from "@/components/generic/BuyCategoriesNav"
 
@@ -10,7 +11,7 @@ const breadcrumbJsonLd = {
   "itemListElement": [
     { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://farmnport.com" },
     { "@type": "ListItem", "position": 2, "name": "Market", "item": "https://farmnport.com/market" },
-    { "@type": "ListItem", "position": 3, "name": "Bookings", "item": "https://farmnport.com/bookings" },
+    { "@type": "ListItem", "position": 3, "name": "Pre-Orders", "item": "https://farmnport.com/bookings" },
   ],
 }
 
@@ -27,15 +28,18 @@ export default async function PreOrdersPage() {
           <span>/</span>
           <Link href="/market" className="hover:text-foreground transition-colors">Market</Link>
           <span>/</span>
-          <span className="text-foreground font-medium">Bookings</span>
+          <span className="text-foreground font-medium">Pre-Orders</span>
         </nav>
 
         <div className="mb-8">
-          <h1 className="text-4xl font-bold tracking-tight font-heading mb-2">Forward Booking Batches</h1>
-          <p className="text-lg text-muted-foreground">Reserve livestock and farm produce from upcoming supplier batches.</p>
+          <h1 className="text-4xl font-bold tracking-tight font-heading mb-2">Pre-Orders</h1>
+          <p className="text-lg text-muted-foreground">Book and reserve produce directly from suppliers. Confirm availability, pay, and collect.</p>
         </div>
 
-        <BookingsClient categories={await getBuyCategories()} />
+        <BookingsClient
+          categories={await getBuyCategories()}
+          initialPreOrders={await serverFetch("/booking/preorders?status=open").then((r: any) => r?.preorders ?? []).catch(() => [])}
+        />
       </div>
     </div>
   )

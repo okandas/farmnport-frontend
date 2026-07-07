@@ -1,13 +1,14 @@
 "use client"
 
+import { useState, use } from "react"
 import { useSession } from "next-auth/react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { Loader2, CalendarDays, Truck, Package, CheckCircle, XCircle, Clock, AlertTriangle, CreditCard, Timer } from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner"
-import { use } from "react"
 
 import { getBooking, cancelBooking, initiatePreOrderPayment, pollPreOrderPayment } from "@/lib/query"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 
 const STATUS_STYLES: Record<string, string> = {
   pending:          "bg-yellow-100 text-yellow-800",
@@ -78,8 +79,12 @@ function PaymentDeadlineCountdown({ deadline }: { deadline: string }) {
 
 export default function BookingDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
-  const { data: session } = useSession()
+  const { data: session, status } = useSession()
   const queryClient = useQueryClient()
+  const [cancelOpen, setCancelOpen] = useState(false)
+  const [cancelInput, setCancelInput] = useState("")
+  const [paying, setPaying] = useState(false)
+  const [checking, setChecking] = useState(false)
 
   const { data, isLoading } = useQuery({
     queryKey: ["booking", id],
@@ -99,34 +104,18 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
     },
   })
 
-  const payMutation = useMutation({
-    mutationFn: () =>
-      initiatePreOrderPayment(id, {
-        phone: (session?.user as any)?.phone ?? "",
-      }),
-    onSuccess: (res: any) => {
-      const url = res.data?.redirect_url
-      if (url) {
-        window.location.href = url
-      } else if (res.data?.instructions) {
-        toast.success(res.data.instructions)
-        // Start polling
-        setTimeout(() => {
-          queryClient.invalidateQueries({ queryKey: ["booking", id] })
-        }, 5000)
-      }
-    },
-    onError: (err: any) => {
-      toast.error(err?.response?.data?.message || "Failed to initiate payment. Please try again.")
-    },
-  })
 
-  if (isLoading) {
+  if (status === "loading" || isLoading) {
     return (
       <div className="flex items-center justify-center py-24">
         <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
       </div>
     )
+  }
+
+  if (status === "unauthenticated") {
+    if (typeof window !== "undefined") window.location.href = `/login?next=/account/bookings/${id}`
+    return null
   }
 
   const booking = (data as any)?.booking
@@ -140,7 +129,7 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
   }
 
   const canCancel = !["completed", "collected", "cancelled", "rejected", "expired", "paid"].includes(booking.status)
-  const canPay = booking.status === "confirmed" && booking.type === "pre-order"
+  const canPay = booking.status === "confirmed" && booking.type === "pre-order" && (booking.pre_order?.unit_price ?? 0) > 0
 
   return (
     <div>
@@ -167,13 +156,17 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
         </div>
 
         {/* Pay Now banner for confirmed bookings */}
-        {canPay && (
+        {canPay && (() => {
+          const subtotal = booking.pre_order.deposit_amount / 100
+          const fee = Math.round(booking.pre_order.deposit_amount * 0.069) / 100
+          const total = subtotal + fee
+          return (
           <div className="border border-orange-200 bg-orange-50 rounded-xl p-5 space-y-3">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="font-semibold text-orange-900">Your booking is confirmed — pay to secure</p>
                 <p className="text-sm text-orange-700 mt-1">
-                  Pay ${(booking.pre_order.deposit_amount / 100).toFixed(2)} to secure your {booking.pre_order.quantity} {booking.pre_order.product_name}
+                  Pay ${total.toFixed(2)} to secure your {booking.pre_order.quantity} {booking.pre_order.produce_name}
                 </p>
               </div>
               {booking.pre_order?.payment_deadline && (
@@ -183,16 +176,62 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
                 </div>
               )}
             </div>
-            <button
-              onClick={() => payMutation.mutate()}
-              disabled={payMutation.isPending}
-              className="w-full flex items-center justify-center gap-2 bg-orange-600 hover:bg-orange-700 text-white font-semibold py-2.5 rounded-xl transition-colors disabled:opacity-50 text-sm"
-            >
-              {payMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <CreditCard className="w-4 h-4" />}
-              Pay Now
-            </button>
+            <div className="bg-white/60 rounded-lg p-3 text-sm space-y-1">
+              <div className="flex justify-between">
+                <span className="text-orange-700">Subtotal</span>
+                <span className="font-medium">${subtotal.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-orange-700">Platform fee (6.9%)</span>
+                <span className="font-medium">${fee.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between border-t pt-1">
+                <span className="font-semibold text-orange-900">Total</span>
+                <span className="font-bold text-orange-900">${total.toFixed(2)}</span>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                disabled={paying}
+                onClick={async () => {
+                  setPaying(true)
+                  try {
+                    const res = await initiatePreOrderPayment(id, { phone: (session?.user as any)?.phone ?? "" })
+                    const redirectUrl = res.data?.redirect_url
+                    if (redirectUrl) window.open(redirectUrl, "_blank")
+                  } catch {
+                    // silent
+                  } finally {
+                    setPaying(false)
+                  }
+                }}
+                className="inline-flex items-center gap-2 rounded-md bg-primary text-primary-foreground text-sm font-semibold px-4 py-1.5 hover:bg-primary/90 transition-colors disabled:opacity-50"
+              >
+                {paying ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                Pay Now
+              </button>
+              <button
+                disabled={checking}
+                onClick={async () => {
+                  setChecking(true)
+                  try {
+                    await pollPreOrderPayment(id)
+                    queryClient.invalidateQueries({ queryKey: ["booking", id] })
+                  } catch {
+                    // silent
+                  } finally {
+                    setChecking(false)
+                  }
+                }}
+                className="inline-flex items-center gap-2 rounded-md border text-sm font-semibold px-4 py-1.5 hover:bg-muted transition-colors disabled:opacity-50"
+              >
+                {checking ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                I have paid
+              </button>
+            </div>
           </div>
-        )}
+          )
+        })()}
 
         {/* Rejected reason */}
         {booking.status === "rejected" && booking.pre_order?.reject_reason && (
@@ -223,19 +262,43 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
                   <p className="font-medium">{booking.pre_order.event_title}</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground text-xs mb-0.5">Product</p>
-                  <p className="font-medium">{booking.pre_order.product_name}</p>
+                  <p className="text-muted-foreground text-xs mb-0.5">Produce</p>
+                  <p className="font-medium">{booking.pre_order.produce_name}</p>
                 </div>
                 <div>
                   <p className="text-muted-foreground text-xs mb-0.5">Quantity</p>
-                  <p className="font-medium">{booking.pre_order.quantity} units</p>
+                  <p className="font-medium">{booking.pre_order.quantity} {booking.pre_order.unit || "units"}</p>
                 </div>
+                {booking.pre_order.unit_price > 0 && (
                 <div>
                   <p className="text-muted-foreground text-xs mb-0.5">Unit Price</p>
-                  <p className="font-medium">${(booking.pre_order.unit_price / 100).toFixed(2)}</p>
+                  <p className="font-medium">${(booking.pre_order.unit_price / 100 * 1.069).toFixed(2)}</p>
+                  <p className="text-xs text-muted-foreground">incl. fees</p>
                 </div>
+                )}
               </div>
 
+              {booking.pre_order.fulfillment_type && (
+                <div className="border-t pt-3 grid grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <p className="text-muted-foreground text-xs mb-0.5">Fulfillment</p>
+                    <p className="font-medium">{booking.pre_order.fulfillment_type === "delivery" ? "Delivery" : "Collection"}</p>
+                  </div>
+                  {booking.pre_order.collection_point_name && (
+                    <div>
+                      <p className="text-muted-foreground text-xs mb-0.5">Collection Point</p>
+                      <p className="font-medium">{booking.pre_order.collection_point_name}</p>
+                      {booking.pre_order.collection_point_address && <p className="text-xs text-muted-foreground">{booking.pre_order.collection_point_address}</p>}
+                    </div>
+                  )}
+                  {booking.pre_order.delivery_date && (
+                    <div>
+                      <p className="text-muted-foreground text-xs mb-0.5">Delivery Date</p>
+                      <p className="font-medium">{new Date(booking.pre_order.delivery_date).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</p>
+                    </div>
+                  )}
+                </div>
+              )}
               {booking.pre_order.buyer_notes && (
                 <div className="border-t pt-3 text-sm">
                   <p className="text-muted-foreground text-xs mb-0.5">Your Notes</p>
@@ -243,17 +306,27 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
                 </div>
               )}
 
-              <div className="border-t pt-3 grid grid-cols-2 gap-3 text-sm">
+              {booking.pre_order.unit_price > 0 && <div className="border-t pt-3 grid grid-cols-2 gap-3 text-sm">
                 <div>
-                  <p className="text-muted-foreground text-xs mb-0.5">Amount Due</p>
-                  <p className="font-bold text-orange-700">${(booking.pre_order.deposit_amount / 100).toFixed(2)}</p>
+                  <p className="text-muted-foreground text-xs mb-0.5">Subtotal</p>
+                  <p className="font-medium">${(booking.pre_order.deposit_amount / 100).toFixed(2)}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground text-xs mb-0.5">Platform Fee (6.9%)</p>
+                  <p className="font-medium">${(Math.round(booking.pre_order.deposit_amount * 0.069) / 100).toFixed(2)}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground text-xs mb-0.5">Total Due</p>
+                  <p className="font-bold text-orange-700">${(Math.round(booking.pre_order.deposit_amount * 1.069) / 100).toFixed(2)}</p>
                   <p className="text-xs text-muted-foreground">{booking.pre_order.deposit_paid ? "Paid" : "Not yet paid"}</p>
                 </div>
-                <div>
-                  <p className="text-muted-foreground text-xs mb-0.5">Balance on Collection</p>
-                  <p className="font-bold">${(booking.pre_order.balance_due / 100).toFixed(2)}</p>
-                </div>
-              </div>
+                {booking.pre_order.balance_due > 0 && (
+                  <div>
+                    <p className="text-muted-foreground text-xs mb-0.5">Balance on Collection</p>
+                    <p className="font-bold">${(booking.pre_order.balance_due / 100).toFixed(2)}</p>
+                  </div>
+                )}
+              </div>}
             </div>
           )}
 
@@ -314,15 +387,10 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
         {/* Actions */}
         {canCancel && (
           <button
-            onClick={() => {
-              if (confirm("Are you sure you want to cancel this booking?")) {
-                cancelMutation.mutate()
-              }
-            }}
-            disabled={cancelMutation.isPending}
-            className="w-full flex items-center justify-center gap-2 border border-red-200 text-red-600 rounded-xl py-2.5 text-sm font-medium hover:bg-red-50 transition-colors disabled:opacity-50"
+            onClick={() => setCancelOpen(true)}
+            className="w-full flex items-center justify-center gap-2 border border-red-200 text-red-600 rounded-xl py-2.5 text-sm font-medium hover:bg-red-50 transition-colors"
           >
-            {cancelMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <XCircle className="w-4 h-4" />}
+            <XCircle className="w-4 h-4" />
             Cancel Booking
           </button>
         )}
@@ -333,6 +401,40 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
         >
           Back to all bookings
         </Link>
+
+        {/* Cancel dialog */}
+        <Dialog open={cancelOpen} onOpenChange={(o) => { setCancelOpen(o); if (!o) setCancelInput("") }}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Cancel Booking</DialogTitle>
+            </DialogHeader>
+            <p className="text-sm text-muted-foreground">This action cannot be undone. Paste the booking reference to confirm cancellation.</p>
+            <div className="flex items-center justify-between bg-muted/50 rounded-lg px-3 py-2">
+              <span className="text-sm font-mono font-semibold">{booking.booking_ref}</span>
+              <button type="button" onClick={() => { navigator.clipboard.writeText(booking.booking_ref) }} className="text-xs text-primary hover:underline">Copy</button>
+            </div>
+            <input
+              value={cancelInput}
+              onChange={(e) => setCancelInput(e.target.value)}
+              placeholder="Paste booking reference here"
+              className="w-full text-sm border rounded-lg px-3 py-2 font-mono focus:outline-none focus:ring-1 focus:ring-ring bg-transparent"
+            />
+            <DialogFooter>
+              <button onClick={() => { setCancelOpen(false); setCancelInput("") }} className="px-4 py-2 text-sm rounded-lg border hover:bg-muted transition-colors">
+                Go back
+              </button>
+              <button
+                onClick={() => {
+                  cancelMutation.mutate(undefined, { onSuccess: () => { setCancelOpen(false); setCancelInput("") } })
+                }}
+                disabled={cancelInput !== booking.booking_ref || cancelMutation.isPending}
+                className="px-4 py-2 text-sm rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors disabled:opacity-50"
+              >
+                {cancelMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Cancel Booking"}
+              </button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   )

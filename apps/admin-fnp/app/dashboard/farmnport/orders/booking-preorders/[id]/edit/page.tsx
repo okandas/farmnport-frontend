@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation"
 import { Loader2 } from "lucide-react"
 import Link from "next/link"
 
-import { queryAdminPreOrders, updatePreOrder, queryClientLocations, queryUsers, queryLivestockPoultryProducts, querySeedProducts, queryBrands } from "@/lib/query"
+import { queryAdminPreOrders, updatePreOrder, queryClientLocations, queryUsers, queryFarmProduce, queryFarmProduceById, queryBreeds, queryBreedById, queryBrands } from "@/lib/query"
 import { LocationMultiSelect } from "@/components/ui/location-multi-select"
 import { capitalizeWords } from "@/lib/utilities"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -16,6 +16,7 @@ import { FormSkeleton } from "@/components/state/skeleton-table"
 import { DashboardShell } from "@/components/state/dashboardShell"
 import { Placeholder } from "@/components/state/placeholder"
 import { SearchSelect } from "@/components/ui/search-select"
+import { Calendar } from "@/components/ui/calendar"
 
 type SelectedLocation = { id: string; name: string }
 
@@ -53,18 +54,19 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
   const allLocations: { id: string; name: string; active: boolean; types?: string[] }[] = locationsData?.data?.locations ?? []
   const [selectedDeliveryLocs, setSelectedDeliveryLocs] = useState<SelectedLocation[] | null>(null)
   const [selectedCollectionLocs, setSelectedCollectionLocs] = useState<SelectedLocation[] | null>(null)
+  const [deliveryDates, setDeliveryDates] = useState<Date[] | null>(null)
 
-  const events: any[] = data?.data?.events ?? []
+  const events: any[] = data?.data?.preorders ?? []
   const event = events.find((e: any) => e.id === id)
 
   const [form, setForm] = useState<{
-    title: string
+    subtitle: string
     description: string
     status: string
-    product_type: string
-    product_id: string
-    product_name: string
-    product_slug: string
+    produce_id: string
+    produce_name: string
+    breed_id: string
+    breed_name: string
     unit: string
     name: string
     total_available: string
@@ -89,14 +91,17 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
     if (selectedCollectionLocs === null) {
       setSelectedCollectionLocs(event.collection_locations ?? [])
     }
+    if (deliveryDates === null) {
+      setDeliveryDates((event.delivery_dates ?? []).map((d: string) => new Date(d + "T00:00:00")))
+    }
     setForm({
-      title: event.title ?? "",
+      subtitle: event.subtitle ?? "",
       description: event.description ?? "",
       status: event.status ?? "draft",
-      product_type: event.product_type ?? "",
-      product_id: event.product_id ?? "",
-      product_name: event.product_name ?? "",
-      product_slug: event.product_slug ?? "",
+      produce_id: event.produce_id ?? "",
+      produce_name: event.produce_name ?? "",
+      breed_id: event.breed_id ?? "",
+      breed_name: event.breed_name ?? "",
       unit: event.unit ?? "",
       name: event.name ?? "",
       total_available: String(event.total_available ?? ""),
@@ -118,13 +123,13 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
   const mutation = useMutation({
     mutationFn: () =>
       updatePreOrder(id, {
-        title: form!.title,
+        subtitle: form!.subtitle || undefined,
         description: form!.description || undefined,
         status: form!.status,
-        product_id: form!.product_id || undefined,
-        product_name: form!.product_name || undefined,
-        product_slug: form!.product_slug || undefined,
-        product_type: form!.product_type || undefined,
+        produce_id: form!.produce_id || undefined,
+        produce_name: form!.produce_name || undefined,
+        breed_id: form!.breed_id || undefined,
+        breed_name: form!.breed_name || undefined,
         unit: form!.unit || undefined,
         name: form!.name || undefined,
         total_available: parseInt(form!.total_available),
@@ -133,12 +138,13 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
         min_quantity: form!.min_quantity ? parseInt(form!.min_quantity) : undefined,
         max_quantity: form!.max_quantity ? parseInt(form!.max_quantity) : undefined,
         open_date: new Date(form!.open_date).toISOString(),
-        close_date: new Date(form!.close_date).toISOString(),
+        close_date: form!.close_date ? new Date(form!.close_date).toISOString() : "",
         image_src: form!.image_src || undefined,
         client_id: form!.client_id || undefined,
         client_name: form!.client_name || undefined,
         brand_id: form!.brand_id || undefined,
         brand_name: form!.brand_name || undefined,
+        delivery_dates: deliveryDates ? deliveryDates.map((d) => d.toISOString().split("T")[0]) : undefined,
         delivery_locations: selectedDeliveryLocs ?? undefined,
         collection_locations: selectedCollectionLocs ?? undefined,
       }),
@@ -177,7 +183,7 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
 
   return (
     <DashboardShell>
-      <DashboardHeader heading="Edit Booking Event" text={event?.title ?? ""} />
+      <DashboardHeader heading="Edit Pre-Order" text={event?.name ?? ""} />
 
       <div className="mt-4 space-y-0 divide-y divide-border">
 
@@ -189,10 +195,11 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
           </div>
           <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6 md:col-span-2">
             <div className="col-span-full">
-              <label className={labelCls}>Title (Lot Name) *</label>
+              <label className={labelCls}>Subtitle (marketing copy)</label>
               <div className="mt-2">
-                <input value={form.title} onChange={(e) => set("title", e.target.value)} className={inputCls} />
+                <input value={form.subtitle} onChange={(e) => { if (e.target.value.length <= 120) set("subtitle", e.target.value) }} maxLength={120} className={inputCls} />
               </div>
+              <p className="mt-1 text-xs text-muted-foreground">{form.subtitle.length}/120 — Title is auto-generated from supplier + produce.</p>
             </div>
             <div className="col-span-full">
               <label className={labelCls}>Description</label>
@@ -237,7 +244,7 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
                     onClick={() => setForm((f) => f ? {
                       ...f, supplier_type: type,
                       client_id: "", client_name: "", brand_id: "", brand_name: "",
-                      product_id: "", product_name: "", product_slug: "", unit: "", name: "",
+                      produce_id: "", produce_name: "", unit: "", name: "",
                     } : f)}
                     className={`px-4 py-1.5 rounded-md text-sm font-medium border transition-colors ${
                       form.supplier_type === type
@@ -259,11 +266,11 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
                     queryFn={(params) => queryUsers(params)}
                     getItems={(page) => page?.data?.data || []}
                     value={form.client_id}
-                    onValueChange={(v) => setForm((f) => f ? { ...f, client_id: v, product_id: "", product_name: "", product_slug: "", unit: "", name: "" } : f)}
+                    onValueChange={(v) => setForm((f) => f ? { ...f, client_id: v, produce_id: "", produce_name: "", unit: "", name: "" } : f)}
                     onItemSelect={(u) => setForm((f) => f ? {
                       ...f,
                       client_id: u.id, client_name: u.name,
-                      product_id: "", product_name: "", product_slug: "", unit: "",
+                      produce_id: "", produce_name: "", unit: "",
                       name: buildName(u.name, "", f.total_available, ""),
                     } : f)}
                     getLabel={(u) => u.name}
@@ -278,11 +285,11 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
                     queryFn={(params) => queryBrands(params)}
                     getItems={(page) => page?.data?.data || []}
                     value={form.brand_id}
-                    onValueChange={(v) => setForm((f) => f ? { ...f, brand_id: v, product_id: "", product_name: "", product_slug: "", unit: "", name: "" } : f)}
+                    onValueChange={(v) => setForm((f) => f ? { ...f, brand_id: v, produce_id: "", produce_name: "", unit: "", name: "" } : f)}
                     onItemSelect={(b) => setForm((f) => f ? {
                       ...f,
                       brand_id: b.id, brand_name: b.name,
-                      product_id: "", product_name: "", product_slug: "", unit: "",
+                      produce_id: "", produce_name: "", unit: "",
                       name: buildName(b.name, "", f.total_available, ""),
                     } : f)}
                     getLabel={(b) => b.name}
@@ -297,61 +304,61 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
           </div>
         </div>
 
-        {/* Product */}
+        {/* Produce */}
         <div className="grid grid-cols-1 gap-x-8 gap-y-10 py-10 md:grid-cols-3">
           <div>
-            <h2 className="text-base/7 font-semibold text-foreground">Product</h2>
-            <p className="mt-1 text-sm/6 text-muted-foreground">What is being sold in this event.</p>
+            <h2 className="text-base/7 font-semibold text-foreground">Produce</h2>
+            <p className="mt-1 text-sm/6 text-muted-foreground">What is being sold in this pre-order.</p>
           </div>
           <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6 md:col-span-2">
             <div className="sm:col-span-3">
-              <label className={labelCls}>Product Type *</label>
-              <div className="mt-2">
-                <Select
-                  value={form.product_type}
-                  onValueChange={(v) => setForm((f) => f ? {
-                    ...f, product_type: v, product_id: "", product_name: "", product_slug: "", unit: "", name: "",
-                  } : f)}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="livestock_poultry">Livestock &amp; Poultry</SelectItem>
-                    <SelectItem value="seed">Seed Products</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div className="sm:col-span-3">
-              <label className={labelCls}>Product *</label>
+              <label className={labelCls}>Produce *</label>
               <div className="mt-2">
                 <SearchSelect
-                  queryKey={["booking-event-product", form.product_type, form.supplier_type, form.client_id, form.brand_id]}
-                  queryFn={(params) => {
-                    const filter = form.supplier_type === "client"
-                      ? { seller_id: form.client_id || undefined }
-                      : { brand_id: form.brand_id || undefined }
-                    return form.product_type === "livestock_poultry"
-                      ? queryLivestockPoultryProducts({ ...params, ...filter })
-                      : querySeedProducts({ ...params, ...filter })
-                  }}
+                  queryKey="booking-event-produce"
+                  queryFn={(params) => queryFarmProduce(params)}
+                  fetchById={(id) => queryFarmProduceById(id).then((r) => r.data)}
                   getItems={(page) => page?.data?.data || []}
-                  value={form.product_id}
-                  onValueChange={(v) => setForm((f) => f ? { ...f, product_id: v } : f)}
+                  value={form.produce_id}
+                  onValueChange={(v) => setForm((f) => f ? { ...f, produce_id: v } : f)}
                   onItemSelect={(p) => setForm((f) => f ? {
                     ...f,
-                    product_id: p.id,
-                    product_name: p.name,
-                    product_slug: p.slug,
-                    unit: "",
-                    name: buildName(f.client_name || f.brand_name, p.name, f.total_available, ""),
+                    produce_id: p.id,
+                    produce_name: p.name,
+                    name: buildName(f.client_name || f.brand_name, p.name, f.total_available, f.unit),
                   } : f)}
                   getLabel={(p) => p.name}
                   getValue={(p) => p.id}
-                  placeholder="Select product"
-                  searchPlaceholder="Search products..."
-                  disabled={!form.product_type || (form.supplier_type === "client" ? !form.client_id : !form.brand_id)}
+                  placeholder="Select produce"
+                  searchPlaceholder="Search produce..."
+                  valueLabel={form.produce_name}
+                  clearable
+                  capitalize
+                />
+              </div>
+            </div>
+            <div className="sm:col-span-3">
+              <label className={labelCls}>Breed / Variety</label>
+              <div className="mt-2">
+                <SearchSelect
+                  queryKey={["booking-event-breed", form.produce_id]}
+                  queryFn={(params) => queryBreeds({ ...params, farm_produce_id: form.produce_id || undefined })}
+                  fetchById={(id) => queryBreedById(id).then((r) => r.data)}
+                  getItems={(page) => page?.data?.data || []}
+                  value={form.breed_id}
+                  onValueChange={(v) => setForm((f) => f ? { ...f, breed_id: v } : f)}
+                  onItemSelect={(b) => setForm((f) => f ? {
+                    ...f,
+                    breed_id: b.id,
+                    breed_name: b.name,
+                    name: buildName(f.client_name || f.brand_name, b.name || f.produce_name, f.total_available, f.unit),
+                  } : f)}
+                  getLabel={(b) => b.name}
+                  getValue={(b) => b.id}
+                  placeholder="Select breed/variety"
+                  searchPlaceholder="Search breeds..."
+                  valueLabel={form.breed_name}
+                  disabled={!form.produce_id}
                   clearable
                   capitalize
                 />
@@ -363,35 +370,29 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
                 <Select
                   value={form.unit}
                   onValueChange={(v) => setForm((f) => f ? {
-                    ...f, unit: v, name: buildName(f.client_name, f.product_name, f.total_available, v),
+                    ...f, unit: v, name: buildName(f.client_name || f.brand_name, f.produce_name, f.total_available, v),
                   } : f)}
-                  disabled={!form.product_id}
+                  disabled={!form.produce_id}
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select unit" />
                   </SelectTrigger>
                   <SelectContent>
-                    {form.product_type === "livestock_poultry" && (
-                      <>
-                        <SelectItem value="birds">Birds</SelectItem>
-                        <SelectItem value="chicks">Chicks</SelectItem>
-                        <SelectItem value="heads">Heads</SelectItem>
-                      </>
-                    )}
-                    {form.product_type === "seed" && (
-                      <>
-                        <SelectItem value="pockets">Pockets</SelectItem>
-                        <SelectItem value="bags">Bags</SelectItem>
-                        <SelectItem value="kg">Kg</SelectItem>
-                      </>
-                    )}
+                    <SelectItem value="birds">Birds</SelectItem>
+                    <SelectItem value="chicks">Chicks</SelectItem>
+                    <SelectItem value="heads">Heads</SelectItem>
+                    <SelectItem value="crates">Crates</SelectItem>
+                    <SelectItem value="pockets">Pockets</SelectItem>
+                    <SelectItem value="bags">Bags</SelectItem>
+                    <SelectItem value="kg">Kg</SelectItem>
+                    <SelectItem value="units">Units</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
             {form.name && (
               <div className="col-span-full rounded-md bg-muted/50 px-3 py-2 text-sm text-muted-foreground">
-                <span className="font-medium text-foreground">Event name: </span>{form.name}
+                <span className="font-medium text-foreground">Pre-order name: </span>{form.name}
               </div>
             )}
           </div>
@@ -424,7 +425,7 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
                   onChange={(e) => setForm((f) => f ? {
                     ...f,
                     total_available: e.target.value,
-                    name: buildName(f.client_name, f.product_name, e.target.value, f.unit),
+                    name: buildName(f.client_name || f.brand_name, f.produce_name, e.target.value, f.unit),
                   } : f)}
                   className={inputCls}
                 />
@@ -459,11 +460,35 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
               </div>
             </div>
             <div className="sm:col-span-3">
-              <label className={labelCls}>Closes *</label>
+              <label className={labelCls}>Closes (leave empty = always available)</label>
               <div className="mt-2">
                 <input type="datetime-local" value={form.close_date} onChange={(e) => set("close_date", e.target.value)} className={inputCls} />
               </div>
+              {form.close_date && (
+                <button type="button" onClick={() => set("close_date", "")} className="mt-1 text-xs text-primary hover:underline">
+                  Clear close date (make always available)
+                </button>
+              )}
             </div>
+            {!form.close_date && (
+              <div className="col-span-full">
+                <label className={labelCls}>Available Delivery Dates</label>
+                <p className="mt-1 mb-3 text-xs text-muted-foreground">
+                  No close date = always available. Click dates to mark when you can deliver.
+                </p>
+                {(deliveryDates ?? []).length > 0 && (
+                  <p className="text-xs font-medium text-primary mb-2">{(deliveryDates ?? []).length} date{(deliveryDates ?? []).length !== 1 ? "s" : ""} selected</p>
+                )}
+                <Calendar
+                  mode="multiple"
+                  selected={deliveryDates ?? []}
+                  onSelect={(dates) => setDeliveryDates(dates || [])}
+                  disabled={{ before: new Date() }}
+                  numberOfMonths={2}
+                  className="rounded-md border"
+                />
+              </div>
+            )}
           </div>
         </div>
 
@@ -504,7 +529,7 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
         </Link>
         <button
           onClick={() => mutation.mutate()}
-          disabled={mutation.isPending || !form.title || !form.unit_price || !form.total_available}
+          disabled={mutation.isPending || !form.unit_price || !form.total_available}
           className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 disabled:opacity-50 transition-colors"
         >
           {mutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}

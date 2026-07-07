@@ -9,7 +9,7 @@ import { Package } from "lucide-react"
 import { Pagination } from "@/components/generic/pagination"
 import { Badge } from "@/components/ui/badge"
 import { queryLots } from "@/lib/query"
-import { capitalizeFirstLetter, formatDate, centsToDollars } from "@/lib/utilities"
+import { capitalizeFirstLetter, formatDate, withPlatformFeeDisplay } from "@/lib/utilities"
 
 interface FarmLot {
   _id: string
@@ -212,7 +212,7 @@ export function Lots({ mode }: LotsProps) {
                   {lot.quantity.toLocaleString()} {lot.unit}{lot.province ? ` · ${capitalizeFirstLetter(lot.province)}` : ""}
                 </p>
                 <p className="text-base font-bold">
-                  {centsToDollars(lot.price_per_unit_cents)}<span className="text-xs font-normal text-muted-foreground">/{lot.unit}</span>
+                  {withPlatformFeeDisplay(lot.price_per_unit_cents)}<span className="text-xs font-normal text-muted-foreground">/{lot.unit}</span>
                 </p>
               </div>
             </Link>

@@ -11,11 +11,11 @@ export default async function BuySeedProductsPage() {
     try {
         const [productsRes, bookingsRes] = await Promise.all([
             serverFetch("/seed-products/buy"),
-            serverFetch("/booking/events?status=open"),
+            serverFetch("/booking/preorders?status=open"),
         ])
         initialProducts = productsRes?.data || []
         initialTotal = productsRes?.total || 0
-        bookingEvents = bookingsRes?.events || []
+        bookingEvents = bookingsRes?.preorders || []
     } catch (error) {
         console.error("Error fetching seed products:", error)
     }

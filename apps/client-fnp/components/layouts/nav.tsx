@@ -75,7 +75,7 @@ function BellIcon({ user }: { user: AuthenticatedUser | null }) {
   })
   const count: number = (data as any)?.count ?? 0
 
-  if (!user || count === 0) return null
+  if (!POLLING_ENABLED || !user || count === 0) return null
 
   return (
     <Button variant="outline" size="sm" asChild>
@@ -89,29 +89,29 @@ function BellIcon({ user }: { user: AuthenticatedUser | null }) {
 export function Navigation({ user }: NavigationProps) {
   return (
       <nav className="lg:flex lg:space-x-2">
-        <Link href="/guides" onClick={() => sendGTMEvent({ event: 'link', value: 'GuidesTopNavigation' })}
+        <Link href="/guides" onClick={() => sendGTMEvent({ event: 'nav_click', link_name: 'guides' })}
               className={buttonVariants({ size: "sm", variant: "link" })}
         >
           Guides
         </Link>
-        <Link href="/programs" onClick={() => sendGTMEvent({ event: 'link', value: 'ProgramsTopNavigation' })}
+        <Link href="/programs" onClick={() => sendGTMEvent({ event: 'nav_click', link_name: 'programs' })}
               className={buttonVariants({ size: "sm", variant: "link" })}
         >
           Programs
         </Link>
-        <Link href="/market" onClick={() => sendGTMEvent({ event: 'link', value: 'MarketTopNavigation' })}
+        <Link href="/market" onClick={() => sendGTMEvent({ event: 'nav_click', link_name: 'market' })}
               className={buttonVariants({ size: "sm", variant: "link" })}
         >
           Market
         </Link>
-        <Link href="/buy" onClick={() => sendGTMEvent({ event: 'link', value: 'BuyTopNavigation' })}
+        <Link href="/buy" onClick={() => sendGTMEvent({ event: 'nav_click', link_name: 'buy' })}
               className={buttonVariants({ size: "sm", variant: "link" })}
         >
           Buy
         </Link>
         <Link
           href={user ? "/lots/new" : "/login?next=/lots/new"}
-          onClick={() => sendGTMEvent({ event: 'link', value: 'ListLotNavigation' })}
+          onClick={() => sendGTMEvent({ event: 'nav_click', link_name: 'list_lot' })}
           className={`${buttonVariants({ size: "sm" })} mr-2`}
         >
           List a Lot

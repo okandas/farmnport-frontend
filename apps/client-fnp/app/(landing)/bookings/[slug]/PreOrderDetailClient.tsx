@@ -9,14 +9,16 @@ import Link from "next/link"
 import Image from "next/image"
 import { toast } from "sonner"
 
-import { getPreOrder, createBooking, queryClient as queryClientProfile } from "@/lib/query"
+import { createBooking, queryClient as queryClientProfile } from "@/lib/query"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ShareBar } from "@/components/shared/ShareBar"
+import { Calendar } from "@/components/ui/calendar"
 
 function formatDate(d: string) {
   return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
 }
 
-export default function PreOrderDetailPage() {
+export default function PreOrderDetailPage({ preorder, depositEnabled = false }: { preorder: any; depositEnabled?: boolean }) {
   const params = useParams()
   const slug = params.slug as string
   const { data: session } = useSession()
@@ -24,13 +26,11 @@ export default function PreOrderDetailPage() {
   const router = useRouter()
   const queryClient = useQueryClient()
 
-  const [quantity, setQuantity] = useState("")
+  const [quantity, setQuantity] = useState(String(preorder.min_quantity || 1))
   const [notes, setNotes] = useState("")
-
-  const { data, isLoading } = useQuery({
-    queryKey: ["booking-event", slug],
-    queryFn: () => getPreOrder(slug).then((r) => r.data),
-  })
+  const [fulfillment, setFulfillment] = useState<"collection" | "delivery" | "">("")
+  const [selectedCollectionPoint, setSelectedCollectionPoint] = useState<{ id: string; name: string } | null>(null)
+  const [selectedDeliveryDate, setSelectedDeliveryDate] = useState<Date | undefined>()
 
   const { data: profileData } = useQuery({
     queryKey: ["my-profile", user?.username],
@@ -40,7 +40,15 @@ export default function PreOrderDetailPage() {
 
   const phone: string = profileData?.phone ?? ""
 
-  const event = data?.event
+  const event = preorder
+
+  const clientSlug = event.client_name?.toLowerCase().replace(/\s+/g, "-") ?? ""
+  const { data: eventClientData } = useQuery({
+    queryKey: ["event-client", clientSlug],
+    queryFn: () => queryClientProfile(clientSlug).then((r) => r.data),
+    enabled: event.market_side === "demand" && !!clientSlug,
+  })
+  const eventClientHasPrices = eventClientData?.has_prices ?? false
 
   const mutation = useMutation({
     mutationFn: () =>
@@ -50,6 +58,10 @@ export default function PreOrderDetailPage() {
         quantity: parseInt(quantity),
         phone,
         notes: notes || undefined,
+        fulfillment_type: fulfillment || undefined,
+        collection_point_id: selectedCollectionPoint?.id || undefined,
+        collection_point_name: selectedCollectionPoint?.name || undefined,
+        delivery_date: selectedDeliveryDate ? selectedDeliveryDate.toISOString() : undefined,
       }),
     onSuccess: () => {
       toast.success("Booking request submitted! We'll confirm availability and notify you.")
@@ -61,20 +73,12 @@ export default function PreOrderDetailPage() {
     },
   })
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-      </div>
-    )
-  }
-
   if (!event) {
     return (
       <div className="min-h-screen flex items-center justify-center text-center">
         <div>
-          <p className="font-semibold text-lg mb-2">Forward booking not found</p>
-          <Link href="/bookings" className="text-sm text-primary underline">Back to forward bookings</Link>
+          <p className="font-semibold text-lg mb-2">Pre-order not found</p>
+          <Link href="/bookings" className="text-sm text-primary underline">Back to pre-orders</Link>
         </div>
       </div>
     )
@@ -84,15 +88,22 @@ export default function PreOrderDetailPage() {
   const depositTotal = qty * (event.deposit_per_unit / 100)
   const orderTotal = qty * (event.unit_price / 100)
   const balanceDue = orderTotal - depositTotal
-  const available = event.total_available - event.total_booked
+  const available = event.total_available - (event.total_booked ?? 0)
   const minQty = event.min_quantity || 1
+  const step = event.quantity_step || 1
+  const isOpenEnded = !event.close_date || event.close_date === "0001-01-01T00:00:00Z"
+  const hasDeliveryDates = event.delivery_dates && event.delivery_dates.length > 0
+
 
   const canSubmit =
     !!session &&
     qty >= minQty &&
     qty <= available &&
+    (step <= 1 || qty % step === 0) &&
     (event.max_quantity === 0 || qty <= event.max_quantity) &&
-    !!phone
+    !!phone &&
+    (fulfillment === "collection" ? !!selectedCollectionPoint : true) &&
+    (fulfillment === "delivery" ? !!selectedDeliveryDate : true)
 
   return (
     <div className="min-h-screen bg-background">
@@ -104,9 +115,9 @@ export default function PreOrderDetailPage() {
             <span className="mx-2">/</span>
             <Link href="/buy" className="hover:text-foreground">Buy</Link>
             <span className="mx-2">/</span>
-            <Link href="/bookings" className="hover:text-foreground">Forward Bookings</Link>
+            <Link href="/bookings" className="hover:text-foreground">Pre-Order Bookings</Link>
             <span className="mx-2">/</span>
-            <span className="text-foreground line-clamp-1">{event.title}</span>
+            <span className="text-foreground line-clamp-1">{event.name}</span>
           </nav>
         </div>
       </div>
@@ -118,19 +129,31 @@ export default function PreOrderDetailPage() {
           <div>
             {event.image_src ? (
               <div className="relative aspect-square w-full rounded-2xl overflow-hidden border bg-muted">
-                <Image src={event.image_src} alt={event.title} fill className="object-cover" />
+                <Image src={event.image_src} alt={event.name} fill className="object-cover" />
+                {event.is_test && <span className="absolute top-3 right-3 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded">TEST</span>}
               </div>
             ) : (
-              <div className="aspect-square w-full rounded-2xl border bg-muted/40" />
+              <div className="relative aspect-square w-full rounded-2xl border bg-muted/40">
+                {event.is_test && <span className="absolute top-3 right-3 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded">TEST</span>}
+              </div>
             )}
 
             <div className="mt-4 space-y-3">
               <div className="flex gap-3 flex-wrap">
-                <span className="text-xs px-3 py-1 rounded-full bg-green-100 text-green-800 font-medium">Open for bookings</span>
+                {isOpenEnded ? (
+                  available > 0 ? (
+                    <span className="text-xs px-3 py-1 rounded-full bg-green-100 text-green-800 font-medium">Always Available</span>
+                  ) : (
+                    <span className="text-xs px-3 py-1 rounded-full bg-orange-100 text-orange-800 font-medium">Pre-order for Next Batch</span>
+                  )
+                ) : (
+                  <span className="text-xs px-3 py-1 rounded-full bg-green-100 text-green-800 font-medium">Open for bookings</span>
+                )}
                 {available <= 20 && available > 0 && (
                   <span className="text-xs px-3 py-1 rounded-full bg-red-100 text-red-800 font-medium">Only {available} left!</span>
                 )}
               </div>
+              {event.unit_price > 0 && (
               <div className="space-y-1.5">
                 <div className="flex justify-between text-xs">
                   <span className="text-muted-foreground">{event.total_booked?.toLocaleString() ?? 0} of {event.total_available.toLocaleString()} {event.unit} booked</span>
@@ -145,23 +168,25 @@ export default function PreOrderDetailPage() {
                   />
                 </div>
               </div>
+              )}
             </div>
           </div>
 
           {/* ── Column 2: Details ── */}
           <div className="space-y-6">
             <div>
-              <h1 className="text-2xl font-bold leading-tight">{event.title}</h1>
-              <div className="mt-3"><ShareBar name={event.title} /></div>
+              <h1 className="text-2xl font-bold leading-tight">{event.name}</h1>
+              {event.subtitle && <p className="text-sm text-muted-foreground mt-1">{event.subtitle}</p>}
+              <div className="mt-3"><ShareBar name={event.name} /></div>
               <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground flex-wrap">
                 <span className="flex items-center gap-1.5">
                   <Users className="w-4 h-4" />
                   {event.client_name}
                 </span>
-                {event.product_name && (
+                {event.produce_name && (
                   <span className="flex items-center gap-1.5">
                     <Package className="w-4 h-4" />
-                    {event.product_name}
+                    {event.produce_name}
                   </span>
                 )}
               </div>
@@ -172,25 +197,32 @@ export default function PreOrderDetailPage() {
             )}
 
             {/* Pricing & capacity */}
-            <div className="grid grid-cols-2 gap-3">
+            <div className={`grid gap-3 ${depositEnabled && event.deposit_per_unit > 0 ? "grid-cols-2" : "grid-cols-1"}`}>
+              {event.unit_price > 0 && (
               <div className="rounded-xl border bg-muted/30 p-4">
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Unit Price</p>
-                <p className="text-2xl font-bold">${(event.unit_price / 100).toFixed(2)}</p>
-                <p className="text-xs text-muted-foreground mt-1">per unit · full price</p>
+                <p className="text-2xl font-bold">${(event.unit_price / 100 * 1.069).toFixed(2)}</p>
+                <p className="text-xs text-muted-foreground mt-1">per {event.unit || "unit"} incl. fees</p>
               </div>
-              <div className="rounded-xl border border-orange-200 bg-orange-50 p-4">
-                <p className="text-xs font-medium text-orange-700 uppercase tracking-wide mb-2">Deposit per Unit</p>
-                <p className="text-2xl font-bold text-orange-700">${(event.deposit_per_unit / 100).toFixed(2)}</p>
-                <p className="text-xs text-orange-600 mt-1">to secure your booking</p>
-              </div>
+              )}
+              {depositEnabled && event.deposit_per_unit > 0 && (
+                <div className="rounded-xl border border-orange-200 bg-orange-50 p-4">
+                  <p className="text-xs font-medium text-orange-700 uppercase tracking-wide mb-2">Deposit per Unit</p>
+                  <p className="text-2xl font-bold text-orange-700">${(event.deposit_per_unit / 100).toFixed(2)}</p>
+                  <p className="text-xs text-orange-600 mt-1">to secure your booking</p>
+                </div>
+              )}
             </div>
 
             <div className="grid grid-cols-3 gap-3">
+              {event.unit_price > 0 && (
               <div className="rounded-xl border bg-muted/30 p-4">
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Available</p>
                 <p className="text-lg font-bold">{available.toLocaleString()}</p>
                 <p className="text-xs text-muted-foreground mt-1">of {event.total_available.toLocaleString()} {event.unit} total</p>
               </div>
+              )}
+              {event.unit_price > 0 && (
               <div className="rounded-xl border bg-muted/30 p-4">
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Min Order</p>
                 <p className="text-lg font-bold">{minQty.toLocaleString()}</p>
@@ -198,23 +230,47 @@ export default function PreOrderDetailPage() {
                   {event.max_quantity > 0 ? `max ${event.max_quantity.toLocaleString()} ${event.unit}` : `${event.unit} minimum`}
                 </p>
               </div>
+              )}
               <div className="rounded-xl border bg-muted/30 p-4">
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2 flex items-center gap-1">
-                  <Clock className="w-3 h-3" /> Closes
-                </p>
-                <p className="text-lg font-bold">{formatDate(event.close_date)}</p>
-                <p className="text-xs text-muted-foreground mt-1">booking deadline</p>
+                {isOpenEnded ? (
+                  <>
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2 flex items-center gap-1">
+                      <Clock className="w-3 h-3" /> Availability
+                    </p>
+                    <p className="text-lg font-bold">Always Open</p>
+                    <p className="text-xs text-muted-foreground mt-1">{event.market_side === "demand" ? "recurring demand" : "recurring supply"}</p>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2 flex items-center gap-1">
+                      <Clock className="w-3 h-3" /> Closes
+                    </p>
+                    <p className="text-lg font-bold">{formatDate(event.close_date)}</p>
+                    <p className="text-xs text-muted-foreground mt-1">booking deadline</p>
+                  </>
+                )}
               </div>
+              {event.market_side === "demand" && eventClientHasPrices && (
+                <div className="rounded-xl border bg-muted/30 p-4">
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Current Prices</p>
+                  <Link href={`/buyer/${clientSlug}`} className="text-lg font-bold text-primary">View →</Link>
+                  <p className="text-xs text-muted-foreground mt-1">latest {event.produce_name} prices from {event.client_name}</p>
+                </div>
+              )}
             </div>
+
 
             {/* How it works */}
             <div className="bg-muted/40 rounded-xl p-5 space-y-3">
-              <h3 className="font-semibold text-sm">How Pre-Orders Work</h3>
+              <h3 className="font-semibold text-sm">{event.market_side === "demand" ? "How Bookings Work" : "How Pre-Orders Work"}</h3>
               <ol className="space-y-2 text-sm text-muted-foreground list-decimal list-inside">
-                <li>Submit your booking request with your desired quantity</li>
-                <li>We confirm availability and notify you</li>
-                <li>Pay to secure your allocation{event.payment_deadline_hours ? ` (within ${event.payment_deadline_hours} hours)` : ""}</li>
-                <li>Collect your order when ready — balance due on collection</li>
+                <li>Submit your booking request</li>
+                <li>We confirm your delivery or collection date and notify you</li>
+                <li>{event.market_side === "demand"
+                  ? "Ensure you deliver on your confirmed date or are ready for collection on the agreed date"
+                  : `Pay to secure your allocation${event.payment_deadline_hours ? ` (within ${event.payment_deadline_hours} hours)` : ""}`}
+                </li>
+                {event.market_side !== "demand" && <li>Collect your order when ready — balance due on collection</li>}
               </ol>
             </div>
           </div>
@@ -244,18 +300,99 @@ export default function PreOrderDetailPage() {
 
                 <div className="space-y-1.5">
                   <label className="text-xs font-medium text-muted-foreground">
-                    Quantity *{event.max_quantity > 0 ? ` (${minQty}–${event.max_quantity})` : ` (min ${minQty})`}
+                    Quantity *{step > 1 ? ` (multiples of ${step})` : event.max_quantity > 0 ? ` (${minQty}–${event.max_quantity})` : ` (min ${minQty})`}
                   </label>
-                  <input
-                    type="number"
-                    min={minQty}
-                    max={event.max_quantity > 0 ? event.max_quantity : available}
-                    value={quantity}
-                    onChange={(e) => setQuantity(e.target.value)}
-                    placeholder={`e.g. ${minQty}`}
-                    className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                  />
+                  <div className="flex items-center gap-0 border border-input rounded-md overflow-hidden">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const next = qty - (step > 1 ? step : 1)
+                        if (next >= minQty) setQuantity(String(next))
+                      }}
+                      disabled={qty <= minQty}
+                      className="h-9 w-10 flex items-center justify-center text-lg font-medium hover:bg-muted transition-colors disabled:opacity-30 shrink-0 border-r"
+                    >
+                      −
+                    </button>
+                    <span className="flex-1 h-9 flex items-center justify-center text-sm font-semibold">
+                      {qty.toLocaleString()} {event.unit}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const max = event.max_quantity > 0 ? Math.min(event.max_quantity, available) : available
+                        const next = qty + (step > 1 ? step : 1)
+                        if (next <= max) setQuantity(String(next))
+                      }}
+                      disabled={qty >= (event.max_quantity > 0 ? Math.min(event.max_quantity, available) : available)}
+                      className="h-9 w-10 flex items-center justify-center text-lg font-medium hover:bg-muted transition-colors disabled:opacity-30 shrink-0 border-l"
+                    >
+                      +
+                    </button>
+                  </div>
                 </div>
+
+                {/* Fulfillment */}
+                {(() => {
+                  const locs = [...(event.delivery_locations || []), ...(event.collection_locations || [])]
+                  const hasCollection = locs.length > 0
+                  const hasDelivery = hasDeliveryDates
+                  if (!hasCollection && !hasDelivery) return null
+
+                  // Auto-select if only one option
+                  if (hasCollection && !hasDelivery && fulfillment !== "collection") setFulfillment("collection")
+                  if (hasDelivery && !hasCollection && fulfillment !== "delivery") setFulfillment("delivery")
+
+                  const showToggle = hasCollection && hasDelivery
+                  return (
+                    <div className="space-y-2">
+                      {showToggle && (
+                        <>
+                          <label className="text-xs font-medium text-muted-foreground">How would you like to receive your order? *</label>
+                          <div className="flex gap-2">
+                            <button
+                              type="button"
+                              onClick={() => { setFulfillment("collection"); setSelectedDeliveryDate(undefined) }}
+                              className={`flex-1 py-2 rounded-lg text-sm font-medium border transition-colors ${fulfillment === "collection" ? "bg-primary text-primary-foreground border-primary" : "border-border hover:border-foreground text-muted-foreground"}`}
+                            >
+                              Collection
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => { setFulfillment("delivery"); setSelectedCollectionPoint(null) }}
+                              className={`flex-1 py-2 rounded-lg text-sm font-medium border transition-colors ${fulfillment === "delivery" ? "bg-primary text-primary-foreground border-primary" : "border-border hover:border-foreground text-muted-foreground"}`}
+                            >
+                              Delivery
+                            </button>
+                          </div>
+                        </>
+                      )}
+                      {fulfillment === "collection" && locs.length > 0 && (
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-medium text-muted-foreground">Collection Point *</label>
+                          <Select
+                            value={selectedCollectionPoint?.id ?? ""}
+                            onValueChange={(val) => {
+                              const loc = locs.find((l: any) => l.id === val)
+                              setSelectedCollectionPoint(loc ? { id: loc.id, name: loc.name } : null)
+                            }}
+                          >
+                            <SelectTrigger><SelectValue placeholder="Select a collection point" /></SelectTrigger>
+                            <SelectContent>
+                              {locs.map((loc: any) => (
+                                <SelectItem key={loc.id} value={loc.id}>{loc.name}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          {selectedCollectionPoint && (() => {
+                            const loc = locs.find((l: any) => l.id === selectedCollectionPoint.id)
+                            return loc?.address ? <p className="text-xs text-muted-foreground mt-1">You will collect your {event.produce_name?.toLowerCase()} at <span className="text-foreground font-medium">{loc.address}</span></p> : null
+                          })()}
+                        </div>
+                      )}
+                    </div>
+                  )
+                })()}
 
                 <div className="space-y-1.5">
                   <label className="text-xs font-medium text-muted-foreground">Phone Number</label>
@@ -280,20 +417,56 @@ export default function PreOrderDetailPage() {
                   </div>
                 )}
 
-                {qty >= minQty && (
+                {fulfillment === "delivery" && hasDeliveryDates && (
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-medium text-muted-foreground">Select Delivery Date *</label>
+                    <Calendar
+                      mode="single"
+                      selected={selectedDeliveryDate}
+                      onSelect={setSelectedDeliveryDate}
+                      disabled={(date) => {
+                        const dateStr = date.toISOString().split("T")[0]
+                        return !event.delivery_dates.includes(dateStr) || date < new Date()
+                      }}
+                      className="rounded-md border"
+                    />
+                    {selectedDeliveryDate && (
+                      <p className="text-xs text-primary font-medium">
+                        Delivery: {formatDate(selectedDeliveryDate.toISOString())}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {qty >= minQty && event.unit_price > 0 && (
                   <div className="bg-muted/50 rounded-lg p-3 text-sm space-y-1.5">
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Order total ({qty.toLocaleString()} units)</span>
                       <span className="font-medium">${orderTotal.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Deposit due now</span>
-                      <span className="font-semibold text-orange-700">${depositTotal.toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between border-t pt-1.5">
-                      <span className="text-muted-foreground">Balance on collection</span>
-                      <span className="font-medium">${balanceDue.toFixed(2)}</span>
-                    </div>
+                    {depositEnabled && event.deposit_per_unit > 0 ? (
+                      <>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Deposit due now</span>
+                          <span className="font-semibold text-orange-700">${depositTotal.toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between border-t pt-1.5">
+                          <span className="text-muted-foreground">Balance on collection</span>
+                          <span className="font-medium">${balanceDue.toFixed(2)}</span>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Platform fee (6.9%)</span>
+                          <span className="font-medium">${(orderTotal * 0.069).toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between border-t pt-1.5">
+                          <span className="font-semibold">Total</span>
+                          <span className="font-bold">${(orderTotal * 1.069).toFixed(2)}</span>
+                        </div>
+                      </>
+                    )}
                   </div>
                 )}
 
@@ -314,14 +487,23 @@ export default function PreOrderDetailPage() {
 
             {/* Booking window */}
             <div className="border rounded-xl p-4 space-y-2">
+              {!isOpenEnded && (
               <div className="flex justify-between text-xs">
                 <span className="text-muted-foreground flex items-center gap-1"><CalendarDays className="w-3.5 h-3.5" /> Opens</span>
                 <span className="font-medium">{formatDate(event.open_date)}</span>
               </div>
-              <div className="flex justify-between text-xs">
-                <span className="text-muted-foreground flex items-center gap-1"><CalendarDays className="w-3.5 h-3.5" /> Closes</span>
-                <span className="font-medium">{formatDate(event.close_date)}</span>
-              </div>
+              )}
+              {isOpenEnded ? (
+                <div className="flex justify-between text-xs">
+                  <span className="text-muted-foreground flex items-center gap-1"><CalendarDays className="w-3.5 h-3.5" /> Closes</span>
+                  <span className="font-medium text-green-700">Always open</span>
+                </div>
+              ) : (
+                <div className="flex justify-between text-xs">
+                  <span className="text-muted-foreground flex items-center gap-1"><CalendarDays className="w-3.5 h-3.5" /> Closes</span>
+                  <span className="font-medium">{formatDate(event.close_date)}</span>
+                </div>
+              )}
             </div>
           </div>
         </div>

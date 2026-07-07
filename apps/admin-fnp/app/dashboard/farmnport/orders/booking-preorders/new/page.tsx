@@ -7,12 +7,13 @@ import { Loader2, X, MapPin, Search } from "lucide-react"
 import { toast } from "@/components/ui/use-toast"
 import Link from "next/link"
 
-import { createPreOrder, queryClientLocations, queryUsers, queryLivestockPoultryProducts, querySeedProducts, queryBrands } from "@/lib/query"
+import { createPreOrder, queryClientLocations, queryUsers, queryFarmProduce, queryBreeds, queryBrands } from "@/lib/query"
 import { capitalizeWords } from "@/lib/utilities"
 import { DashboardHeader } from "@/components/state/dashboardHeader"
 import { DashboardShell } from "@/components/state/dashboardShell"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { SearchSelect } from "@/components/ui/search-select"
+import { Calendar } from "@/components/ui/calendar"
 
 type SelectedLocation = { id: string; name: string }
 
@@ -135,18 +136,19 @@ export default function NewPreOrderPage() {
   const allLocations: { id: string; name: string; active: boolean }[] = locationsData?.data?.locations ?? []
 
   const [form, setForm] = useState({
-    title: "",
+    subtitle: "",
     description: "",
-    product_type: "",
-    product_id: "",
-    product_name: "",
-    product_slug: "",
+    produce_id: "",
+    produce_name: "",
+    breed_id: "",
+    breed_name: "",
     unit: "",
     name: "",
     unit_price: "",
     deposit_per_unit: "",
     min_quantity: "",
     max_quantity: "",
+    quantity_step: "",
     total_available: "",
     open_date: "",
     close_date: "",
@@ -157,40 +159,45 @@ export default function NewPreOrderPage() {
     client_name: "",
     brand_id: "",
     brand_name: "",
+    market_side: "supply" as "supply" | "demand",
     payment_deadline_hours: "48",
     buyer_notes: false,
     cancellation_fee: "0",
     transferable: false,
+    delivery_dates: [] as Date[],
   })
 
   const mutation = useMutation({
     mutationFn: () =>
       createPreOrder({
-        title: form.title,
+        subtitle: form.subtitle || undefined,
         description: form.description || undefined,
-        product_id: form.product_id,
-        product_name: form.product_name,
-        product_slug: form.product_slug,
-        product_type: form.product_type,
+        produce_id: form.produce_id,
+        produce_name: form.produce_name,
+        breed_id: form.breed_id || undefined,
+        breed_name: form.breed_name || undefined,
         unit: form.unit || undefined,
         name: form.name || undefined,
         unit_price: Math.round(parseFloat(form.unit_price) * 100),
         deposit_per_unit: Math.round(parseFloat(form.deposit_per_unit) * 100),
         min_quantity: form.min_quantity ? parseInt(form.min_quantity) : undefined,
         max_quantity: form.max_quantity ? parseInt(form.max_quantity) : undefined,
+        quantity_step: form.quantity_step ? parseInt(form.quantity_step) : undefined,
         total_available: parseInt(form.total_available),
         open_date: new Date(form.open_date).toISOString(),
-        close_date: new Date(form.close_date).toISOString(),
+        close_date: form.close_date ? new Date(form.close_date).toISOString() : "",
         status: form.status,
         image_src: form.image_src || undefined,
         client_id: form.client_id,
         client_name: form.client_name,
         brand_id: form.brand_id || undefined,
         brand_name: form.brand_name || undefined,
+        market_side: form.market_side,
         payment_deadline_hours: parseInt(form.payment_deadline_hours) || 48,
         buyer_notes: form.buyer_notes,
         cancellation_fee: parseInt(form.cancellation_fee) || 0,
         transferable: form.transferable,
+        delivery_dates: form.delivery_dates.length ? form.delivery_dates.map((d) => d.toISOString().split("T")[0]) : undefined,
         delivery_locations: selectedLocations.length ? selectedLocations : undefined,
       }),
     onSuccess: () => {
@@ -219,10 +226,11 @@ export default function NewPreOrderPage() {
           </div>
           <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6 md:col-span-2">
             <div className="col-span-full">
-              <label className={labelCls}>Title (Lot Name) *</label>
+              <label className={labelCls}>Subtitle (marketing copy)</label>
               <div className="mt-2">
-                <input value={form.title} onChange={(e) => set("title", e.target.value)} placeholder="e.g. Fivet Day-Old Chicks — June 2026 Batch" className={inputCls} />
+                <input value={form.subtitle} onChange={(e) => { if (e.target.value.length <= 120) set("subtitle", e.target.value) }} maxLength={120} placeholder="e.g. Reserve your seed potatoes for early summer planting" className={inputCls} />
               </div>
+              <p className="mt-1 text-xs text-muted-foreground">{form.subtitle.length}/120 — Title is auto-generated from supplier + produce.</p>
             </div>
             <div className="col-span-full">
               <label className={labelCls}>Description</label>
@@ -265,7 +273,7 @@ export default function NewPreOrderPage() {
                     onClick={() => setForm((f) => ({
                       ...f, supplier_type: type,
                       client_id: "", client_name: "", brand_id: "", brand_name: "",
-                      product_id: "", product_name: "", product_slug: "", unit: "", name: "",
+                      produce_id: "", produce_name: "", unit: "", name: "",
                     }))}
                     className={`px-4 py-1.5 rounded-md text-sm font-medium border transition-colors ${
                       form.supplier_type === type
@@ -287,7 +295,7 @@ export default function NewPreOrderPage() {
                     queryFn={(params) => queryUsers(params)}
                     getItems={(page) => page?.data?.data || []}
                     value={form.client_id}
-                    onValueChange={(v) => setForm((f) => ({ ...f, client_id: v, product_id: "", product_name: "", product_slug: "", unit: "", name: "" }))}
+                    onValueChange={(v) => setForm((f) => ({ ...f, client_id: v, produce_id: "", produce_name: "", unit: "", name: "" }))}
                     onItemSelect={(u) => setForm((f) => ({
                       ...f,
                       client_id: u.id, client_name: u.name,
@@ -306,7 +314,7 @@ export default function NewPreOrderPage() {
                     queryFn={(params) => queryBrands(params)}
                     getItems={(page) => page?.data?.data || []}
                     value={form.brand_id}
-                    onValueChange={(v) => setForm((f) => ({ ...f, brand_id: v, product_id: "", product_name: "", product_slug: "", unit: "", name: "" }))}
+                    onValueChange={(v) => setForm((f) => ({ ...f, brand_id: v, produce_id: "", produce_name: "", unit: "", name: "" }))}
                     onItemSelect={(b) => setForm((f) => ({
                       ...f,
                       brand_id: b.id, brand_name: b.name,
@@ -325,61 +333,57 @@ export default function NewPreOrderPage() {
           </div>
         </div>
 
-        {/* Product */}
+        {/* Produce */}
         <div className="grid grid-cols-1 gap-x-8 gap-y-10 py-10 md:grid-cols-3">
           <div>
-            <h2 className="text-base/7 font-semibold text-foreground">Product</h2>
-            <p className="mt-1 text-sm/6 text-muted-foreground">What is being sold in this event.</p>
+            <h2 className="text-base/7 font-semibold text-foreground">Produce</h2>
+            <p className="mt-1 text-sm/6 text-muted-foreground">What is being sold in this pre-order.</p>
           </div>
           <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6 md:col-span-2">
             <div className="sm:col-span-3">
-              <label className={labelCls}>Product Type *</label>
-              <div className="mt-2">
-                <Select
-                  value={form.product_type}
-                  onValueChange={(v) => setForm((f) => ({
-                    ...f, product_type: v, product_id: "", product_name: "", product_slug: "", unit: "", name: "",
-                  }))}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="livestock_poultry">Livestock &amp; Poultry</SelectItem>
-                    <SelectItem value="seed">Seed Products</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div className="sm:col-span-3">
-              <label className={labelCls}>Product *</label>
+              <label className={labelCls}>Produce *</label>
               <div className="mt-2">
                 <SearchSelect
-                  queryKey={["booking-event-product", form.product_type, form.supplier_type, form.client_id, form.brand_id]}
-                  queryFn={(params) => {
-                    const filter = form.supplier_type === "client"
-                      ? { seller_id: form.client_id || undefined }
-                      : { brand_id: form.brand_id || undefined }
-                    return form.product_type === "livestock_poultry"
-                      ? queryLivestockPoultryProducts({ ...params, ...filter })
-                      : querySeedProducts({ ...params, ...filter })
-                  }}
+                  queryKey="booking-event-produce"
+                  queryFn={(params) => queryFarmProduce(params)}
                   getItems={(page) => page?.data?.data || []}
-                  value={form.product_id}
-                  onValueChange={(v) => setForm((f) => ({ ...f, product_id: v }))}
+                  value={form.produce_id}
+                  onValueChange={(v) => setForm((f) => ({ ...f, produce_id: v }))}
                   onItemSelect={(p) => setForm((f) => ({
                     ...f,
-                    product_id: p.id,
-                    product_name: p.name,
-                    product_slug: p.slug,
-                    unit: "",
-                    name: buildName(f.client_name || f.brand_name, p.name, f.total_available, ""),
+                    produce_id: p.id,
+                    produce_name: p.name,
+                    name: buildName(f.client_name || f.brand_name, p.name, f.total_available, f.unit),
                   }))}
                   getLabel={(p) => p.name}
                   getValue={(p) => p.id}
-                  placeholder="Select product"
-                  searchPlaceholder="Search products..."
-                  disabled={!form.product_type || (form.supplier_type === "client" ? !form.client_id : !form.brand_id)}
+                  placeholder="Select produce"
+                  searchPlaceholder="Search produce..."
+                  clearable
+                  capitalize
+                />
+              </div>
+            </div>
+            <div className="sm:col-span-3">
+              <label className={labelCls}>Breed / Variety</label>
+              <div className="mt-2">
+                <SearchSelect
+                  queryKey={["booking-event-breed", form.produce_id]}
+                  queryFn={(params) => queryBreeds({ ...params, farm_produce_id: form.produce_id || undefined })}
+                  getItems={(page) => page?.data?.data || []}
+                  value={form.breed_id}
+                  onValueChange={(v) => setForm((f) => ({ ...f, breed_id: v }))}
+                  onItemSelect={(b) => setForm((f) => ({
+                    ...f,
+                    breed_id: b.id,
+                    breed_name: b.name,
+                    name: buildName(f.client_name || f.brand_name, b.name || f.produce_name, f.total_available, f.unit),
+                  }))}
+                  getLabel={(b) => b.name}
+                  getValue={(b) => b.id}
+                  placeholder="Select breed/variety"
+                  searchPlaceholder="Search breeds..."
+                  disabled={!form.produce_id}
                   clearable
                   capitalize
                 />
@@ -391,35 +395,29 @@ export default function NewPreOrderPage() {
                 <Select
                   value={form.unit}
                   onValueChange={(v) => setForm((f) => ({
-                    ...f, unit: v, name: buildName(f.client_name, f.product_name, f.total_available, v),
+                    ...f, unit: v, name: buildName(f.client_name || f.brand_name, f.produce_name, f.total_available, v),
                   }))}
-                  disabled={!form.product_id}
+                  disabled={!form.produce_id}
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select unit" />
                   </SelectTrigger>
                   <SelectContent>
-                    {form.product_type === "livestock_poultry" && (
-                      <>
-                        <SelectItem value="birds">Birds</SelectItem>
-                        <SelectItem value="chicks">Chicks</SelectItem>
-                        <SelectItem value="heads">Heads</SelectItem>
-                      </>
-                    )}
-                    {form.product_type === "seed" && (
-                      <>
-                        <SelectItem value="pockets">Pockets</SelectItem>
-                        <SelectItem value="bags">Bags</SelectItem>
-                        <SelectItem value="kg">Kg</SelectItem>
-                      </>
-                    )}
+                    <SelectItem value="birds">Birds</SelectItem>
+                    <SelectItem value="chicks">Chicks</SelectItem>
+                    <SelectItem value="heads">Heads</SelectItem>
+                    <SelectItem value="crates">Crates</SelectItem>
+                    <SelectItem value="pockets">Pockets</SelectItem>
+                    <SelectItem value="bags">Bags</SelectItem>
+                    <SelectItem value="kg">Kg</SelectItem>
+                    <SelectItem value="units">Units</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
             {form.name && (
               <div className="col-span-full rounded-md bg-muted/50 px-3 py-2 text-sm text-muted-foreground">
-                <span className="font-medium text-foreground">Event name: </span>{form.name}
+                <span className="font-medium text-foreground">Pre-order name: </span>{form.name}
               </div>
             )}
           </div>
@@ -452,7 +450,7 @@ export default function NewPreOrderPage() {
                   onChange={(e) => setForm((f) => ({
                     ...f,
                     total_available: e.target.value,
-                    name: buildName(f.client_name, f.product_name, e.target.value, f.unit),
+                    name: buildName(f.client_name || f.brand_name, f.produce_name, e.target.value, f.unit),
                   }))}
                   placeholder="500" className={inputCls}
                 />
@@ -469,6 +467,13 @@ export default function NewPreOrderPage() {
               <div className="mt-2">
                 <input type="number" min="0" value={form.max_quantity} onChange={(e) => set("max_quantity", e.target.value)} placeholder="200" className={inputCls} />
               </div>
+            </div>
+            <div className="sm:col-span-2">
+              <label className={labelCls}>Batch Size</label>
+              <div className="mt-2">
+                <input type="number" min="0" value={form.quantity_step} onChange={(e) => set("quantity_step", e.target.value)} placeholder="e.g. 50" className={inputCls} />
+              </div>
+              <p className="mt-1 text-xs text-muted-foreground">Buyers order in multiples of this. Leave empty for any quantity.</p>
             </div>
           </div>
         </div>
@@ -503,6 +508,18 @@ export default function NewPreOrderPage() {
           </div>
           <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6 md:col-span-2">
             <div className="sm:col-span-3">
+              <label className={labelCls}>Market Side</label>
+              <div className="mt-2">
+                <Select value={form.market_side} onValueChange={(v) => set("market_side", v as "supply" | "demand")}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="supply">Supply — seller listing (eggs, chicks, seed)</SelectItem>
+                    <SelectItem value="demand">Demand — buyer wanting product brought to them (abattoir slot)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="sm:col-span-3">
               <label className={labelCls}>Payment Deadline (hours)</label>
               <div className="mt-2">
                 <input type="number" min="1" value={form.payment_deadline_hours} onChange={(e) => set("payment_deadline_hours", e.target.value)} placeholder="48" className={inputCls} />
@@ -530,6 +547,25 @@ export default function NewPreOrderPage() {
               </label>
               <p className="mt-1 text-xs text-muted-foreground">Allow bookings to be transferred to another buyer or variety.</p>
             </div>
+            {!form.close_date && (
+              <div className="col-span-full">
+                <label className={labelCls}>Available Delivery Dates</label>
+                <p className="mt-1 mb-3 text-xs text-muted-foreground">
+                  No close date = always available. Click dates on the calendar to mark when you can deliver. Buyers will pick from these dates.
+                </p>
+                {form.delivery_dates.length > 0 && (
+                  <p className="text-xs font-medium text-primary mb-2">{form.delivery_dates.length} date{form.delivery_dates.length !== 1 ? "s" : ""} selected</p>
+                )}
+                <Calendar
+                  mode="multiple"
+                  selected={form.delivery_dates}
+                  onSelect={(dates) => setForm((f) => ({ ...f, delivery_dates: dates || [] }))}
+                  disabled={{ before: new Date() }}
+                  numberOfMonths={2}
+                  className="rounded-md border"
+                />
+              </div>
+            )}
           </div>
         </div>
 
@@ -557,7 +593,7 @@ export default function NewPreOrderPage() {
         </Link>
         <button
           onClick={() => mutation.mutate()}
-          disabled={mutation.isPending || !form.client_id || !form.title || !form.product_id || !form.unit || !form.unit_price || !form.total_available || !form.open_date || !form.close_date}
+          disabled={mutation.isPending || !form.produce_id || !form.unit || !form.unit_price || !form.total_available || !form.open_date}
           className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 disabled:opacity-50 transition-colors"
         >
           {mutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
