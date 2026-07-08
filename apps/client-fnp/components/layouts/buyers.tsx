@@ -14,6 +14,7 @@ import {AdSenseInFeed} from "@/components/ads/AdSenseInFeed"
 import {ApplicationUser, AuthenticatedUser} from "@/lib/schemas"
 import {capitalizeFirstLetter, plural} from "@/lib/utilities"
 import {BuyerContactsCard} from "@/components/layouts/buyer-contacts"
+import {ClientListSkeleton} from "@/components/skeletons/client-list"
 
 interface BuyersPageProps {
   user: AuthenticatedUser | null
@@ -64,7 +65,7 @@ export function Buyers({queryBy}: BuyersPageProps) {
   }
 
   if (isFetching) {
-    return null
+    return <ClientListSkeleton />
   }
 
   const buyers = data?.data?.data as ApplicationUser[]

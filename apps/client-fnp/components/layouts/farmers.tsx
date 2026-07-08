@@ -12,6 +12,7 @@ import {queryClients, queryClientsByProduct} from "@/lib/query"
 import {ApplicationUser, AuthenticatedUser} from "@/lib/schemas"
 import {slug, capitalizeFirstLetter, plural} from "@/lib/utilities"
 import {ArrowRight} from "lucide-react"
+import {ClientListSkeleton} from "@/components/skeletons/client-list"
 
 interface FarmersPageProps {
   user: AuthenticatedUser | null
@@ -57,7 +58,7 @@ export function Farmers({user, queryBy}: FarmersPageProps) {
   }
 
   if (isFetching) {
-    return null
+    return <ClientListSkeleton />
   }
 
   const farmers = data?.data?.data as ApplicationUser[]

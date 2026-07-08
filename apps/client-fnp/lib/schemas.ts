@@ -141,6 +141,7 @@ export const ApplicationUserSchema = z.object({
     payment_terms: z.string(),
     has_prices: z.boolean().optional(),
     has_booking: z.boolean().optional(),
+    has_active_booking: z.boolean().optional(),
     has_pickup: z.boolean().optional(),
     contact_views: z.number().optional(),
 })
