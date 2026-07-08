@@ -47,9 +47,9 @@ export default middleware(async (request) => {
   }
 
   // Redirect unauthenticated users to login for protected paths
-  const paths = ["profile", "bookings", "incoming-bookings", "security"]
+  const paths = ["/account/profile", "/account/bookings", "/account/incoming-bookings", "/account/security", "/account/booking-preorders"]
   for (const path of paths) {
-    if (pathname.includes(path) && request.auth?.user === undefined) {
+    if (pathname.startsWith(path) && request.auth?.user === undefined) {
       const url = request.nextUrl.clone()
       url.pathname = "/login"
       return NextResponse.redirect(url)
