@@ -38,8 +38,6 @@ export function Client({ slug, user, latestPrices }: ClientPageProps) {
   const [showWhatsapp, setShowWhatsapp] = useState(false)
   const [showEmail, setShowEmail] = useState(false)
 
-  const paywallEnabled = process.env.NEXT_PUBLIC_ENABLE_PAYWALL === "true"
-  const isSubscribed = !paywallEnabled || user?.subscription_active === true
 
   const { data, isError, isFetching } = useQuery({
     queryKey: [`result-client-${slug}`, slug],
@@ -119,7 +117,7 @@ export function Client({ slug, user, latestPrices }: ClientPageProps) {
                 <Badge variant="secondary" className="font-medium">
                   {capitalizeFirstLetter(client.type)}
                 </Badge>
-                {client.has_booking && (
+                {client.has_active_booking && (
                   <Link href={`/book/${slug}`}>
                     <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100 border-blue-200 cursor-pointer">
                       Accepts Online Bookings →
@@ -186,8 +184,18 @@ export function Client({ slug, user, latestPrices }: ClientPageProps) {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 space-y-6">
         <div className="flex flex-col sm:flex-row gap-4">
-
-            {/* Phone + Email CTAs */}
+          {client.has_active_booking ? (
+            <Link
+              href={`/book/${slug}`}
+              className="flex-1 bg-blue-50 border border-blue-200 rounded-xl p-5 flex items-center justify-between hover:bg-blue-100 transition-colors"
+            >
+              <p className="font-semibold text-sm text-blue-900">Book from {titleCase(client.name)}</p>
+              <span className="bg-blue-700 text-white text-sm font-semibold px-4 py-2.5 rounded-lg">
+                Book Now →
+              </span>
+            </Link>
+          ) : (
+            <>
               <div className="flex-1 bg-card border rounded-xl p-4 space-y-3">
                 <div>
                   <p className="font-semibold text-sm">Phone</p>
@@ -196,10 +204,6 @@ export function Client({ slug, user, latestPrices }: ClientPageProps) {
                 {!user ? (
                   <button onClick={() => { sendGTMEvent({ event: 'login_prompt', reason: 'view_phone', client_name: client.name }); router.push(`/login?entity=${client.type}&wantToSee=${slug}`) }} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
                     See Number →
-                  </button>
-                ) : !isSubscribed ? (
-                  <button onClick={() => { sendGTMEvent({ event: 'paywall_hit', reason: 'view_phone', client_name: client.name }); router.push('/pricing') }} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
-                    Unlock →
                   </button>
                 ) : showPhone ? (
                   <a href={`tel:${client.phone}`} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
@@ -221,10 +225,6 @@ export function Client({ slug, user, latestPrices }: ClientPageProps) {
                   <button onClick={() => { sendGTMEvent({ event: 'login_prompt', reason: 'view_whatsapp', client_name: client.name }); router.push(`/login?entity=${client.type}&wantToSee=${slug}`) }} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
                     See WhatsApp →
                   </button>
-                ) : !isSubscribed ? (
-                  <button onClick={() => { sendGTMEvent({ event: 'paywall_hit', reason: 'view_whatsapp', client_name: client.name }); router.push('/pricing') }} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
-                    Unlock →
-                  </button>
                 ) : showWhatsapp ? (
                   <a href={`https://wa.me/263${client.phone.replace(/^0/, '')}`} target="_blank" rel="noopener noreferrer" onClick={() => sendGTMEvent({ event: 'whatsapp_click', client_name: client.name })} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
                     Open WhatsApp →
@@ -245,10 +245,6 @@ export function Client({ slug, user, latestPrices }: ClientPageProps) {
                   <button onClick={() => { sendGTMEvent({ event: 'login_prompt', reason: 'view_email', client_name: client.name }); router.push(`/login?entity=${client.type}&wantToSee=${slug}`) }} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
                     See Email →
                   </button>
-                ) : !isSubscribed ? (
-                  <button onClick={() => { sendGTMEvent({ event: 'paywall_hit', reason: 'view_email', client_name: client.name }); router.push('/pricing') }} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
-                    Unlock →
-                  </button>
                 ) : showEmail ? (
                   <a href={`mailto:${client.email}`} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
                     {client.email}
@@ -259,27 +255,8 @@ export function Client({ slug, user, latestPrices }: ClientPageProps) {
                   </button>
                 )}
               </div>}
-
-            {(client.has_booking || client.has_pickup) && client.type === 'buyer' && (
-              <div className="flex-1 bg-blue-50 border border-blue-200 rounded-xl p-4 space-y-3">
-                <div>
-                  <p className="font-semibold text-sm text-blue-900">Sell to {titleCase(client.name)}</p>
-                  <p className="text-xs text-blue-700 mt-1 leading-relaxed">
-                    {client.has_booking && client.has_pickup
-                      ? "Select a drop-off location or request pickup, and pick a date to reserve your slot."
-                      : client.has_booking
-                      ? "Reserve a drop-off slot directly from the platform."
-                      : "Request this buyer to collect goods directly from your farm."}
-                  </p>
-                </div>
-                <Link
-                  href={`/book/${slug}`}
-                  className="block w-full text-center bg-blue-700 text-white text-sm font-semibold px-4 py-2.5 rounded-lg hover:bg-blue-800 transition-colors"
-                >
-                  Book a Sale →
-                </Link>
-              </div>
-            )}
+            </>
+          )}
         </div>
 
         {client.type === 'buyer' && (
