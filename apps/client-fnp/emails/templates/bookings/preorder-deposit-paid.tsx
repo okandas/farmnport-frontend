@@ -1,12 +1,13 @@
 import { Body, Button, Container, Head, Hr, Html, Preview, Row, Column, Section, Text } from "@react-email/components"
 
-interface Props { name?: string; bookingRef?: string; productName?: string; quantity?: string; depositAmount?: string; balanceDue?: string; bookingUrl?: string }
+interface Props { name?: string; bookingRef?: string; productName?: string; quantity?: string; unit?: string; depositAmount?: string; balanceDue?: string; bookingUrl?: string }
 
 export default function PreorderDepositPaidEmail({
   name = "Okandas",
   bookingRef = "FNP-BK-PO-0001",
   productName = "Fivet Cobb 500 Day-Old Chicks",
   quantity = "100",
+  unit = "units",
   depositAmount = "$50.00",
   balanceDue = "$450.00",
   bookingUrl = "https://farmnport.com/account/bookings/preview",
@@ -25,7 +26,7 @@ export default function PreorderDepositPaidEmail({
           <Section style={refCard}><Text style={refLabel}>Booking reference</Text><Text style={refNumber}>{bookingRef}</Text></Section>
           <Text style={sectionLabel}>Summary</Text>
           <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Produce</Text></Column><Column><Text style={valText}>{productName}</Text></Column></Row>
-          <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Quantity</Text></Column><Column><Text style={valText}>{quantity} units</Text></Column></Row>
+          <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Quantity</Text></Column><Column><Text style={valText}>{quantity} {unit || "units"}</Text></Column></Row>
           <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Amount paid</Text></Column><Column><Text style={depositText}>{depositAmount}</Text></Column></Row>
           <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Balance on collection</Text></Column><Column><Text style={valText}>{balanceDue}</Text></Column></Row>
           <Section style={buttonWrapper}><Button href={bookingUrl} style={button}>View your booking</Button></Section>

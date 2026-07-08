@@ -1,6 +1,6 @@
 import { Body, Button, Container, Head, Hr, Html, Preview, Row, Column, Section, Text } from "@react-email/components"
 
-interface Props { bookingRef?: string; customerName?: string; customerEmail?: string; customerPhone?: string; productName?: string; quantity?: string; buyerNotes?: string; adminUrl?: string }
+interface Props { bookingRef?: string; customerName?: string; customerEmail?: string; customerPhone?: string; productName?: string; quantity?: string; unit?: string; buyerNotes?: string; adminUrl?: string }
 
 export default function PreorderRequestAdminEmail({
   bookingRef = "FNP-BK-PO-0001",
@@ -9,6 +9,7 @@ export default function PreorderRequestAdminEmail({
   customerPhone = "0719099990",
   productName = "Fivet Cobb 500 Day-Old Chicks",
   quantity = "100",
+  unit = "units",
   buyerNotes = "",
   adminUrl = "https://admin.farmnport.com",
 }: Props) {
@@ -30,7 +31,7 @@ export default function PreorderRequestAdminEmail({
           <Hr style={thinDivider} />
           <Text style={sectionLabel}>Order</Text>
           <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Produce</Text></Column><Column><Text style={valText}>{productName}</Text></Column></Row>
-          <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Quantity</Text></Column><Column><Text style={valText}>{quantity} units</Text></Column></Row>
+          <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Quantity</Text></Column><Column><Text style={valText}>{quantity} {unit || "units"}</Text></Column></Row>
           {buyerNotes && <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Notes</Text></Column><Column><Text style={valText}>{buyerNotes}</Text></Column></Row>}
           <Section style={buttonWrapper}><Button href={adminUrl} style={button}>Review Booking</Button></Section>
         </Section>
