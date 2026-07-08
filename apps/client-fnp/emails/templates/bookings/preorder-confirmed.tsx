@@ -1,12 +1,13 @@
 import { Body, Button, Container, Head, Hr, Html, Preview, Row, Column, Section, Text } from "@react-email/components"
 
-interface Props { name?: string; bookingRef?: string; productName?: string; quantity?: string; depositAmount?: string; deadlineHours?: number; bookingUrl?: string }
+interface Props { name?: string; bookingRef?: string; productName?: string; quantity?: string; unit?: string; depositAmount?: string; deadlineHours?: number; bookingUrl?: string }
 
 export default function PreorderConfirmedEmail({
   name = "Okandas",
   bookingRef = "FNP-BK-PO-0001",
   productName = "Fivet Cobb 500 Day-Old Chicks",
   quantity = "100",
+  unit = "units",
   depositAmount = "$50.00",
   deadlineHours = 48,
   bookingUrl = "https://farmnport.com/account/bookings/preview",
@@ -25,7 +26,7 @@ export default function PreorderConfirmedEmail({
           <Section style={refCard}><Text style={refLabel}>Booking reference</Text><Text style={refNumber}>{bookingRef}</Text></Section>
           <Text style={sectionLabel}>Details</Text>
           <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Produce</Text></Column><Column><Text style={valText}>{productName}</Text></Column></Row>
-          <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Quantity</Text></Column><Column><Text style={valText}>{quantity} units</Text></Column></Row>
+          <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Quantity</Text></Column><Column><Text style={valText}>{quantity} {unit || "units"}</Text></Column></Row>
           <Hr style={thinDivider} />
           <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Amount due</Text></Column><Column><Text style={depositText}>{depositAmount}</Text></Column></Row>
           <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Pay within</Text></Column><Column><Text style={valText}>{deadlineHours} hours</Text></Column></Row>
