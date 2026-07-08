@@ -120,9 +120,11 @@ export function Client({ slug, user, latestPrices }: ClientPageProps) {
                   {capitalizeFirstLetter(client.type)}
                 </Badge>
                 {client.has_booking && (
-                  <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100 border-blue-200">
-                    Accepts Online Bookings
-                  </Badge>
+                  <Link href={`/book/${slug}`}>
+                    <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100 border-blue-200 cursor-pointer">
+                      Accepts Online Bookings →
+                    </Badge>
+                  </Link>
                 )}
               </div>
 
