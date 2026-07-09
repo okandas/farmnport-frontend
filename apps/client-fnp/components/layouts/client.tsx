@@ -118,7 +118,7 @@ export function Client({ slug, user, latestPrices }: ClientPageProps) {
                   {capitalizeFirstLetter(client.type)}
                 </Badge>
                 {client.has_active_booking && (
-                  <Link href={`/book/${slug}`}>
+                  <Link href="/bookings">
                     <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100 border-blue-200 cursor-pointer">
                       Accepts Online Bookings →
                     </Badge>
@@ -184,18 +184,6 @@ export function Client({ slug, user, latestPrices }: ClientPageProps) {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 space-y-6">
         <div className="flex flex-col sm:flex-row gap-4">
-          {client.has_active_booking ? (
-            <Link
-              href={`/book/${slug}`}
-              className="flex-1 bg-blue-50 border border-blue-200 rounded-xl p-5 flex items-center justify-between hover:bg-blue-100 transition-colors"
-            >
-              <p className="font-semibold text-sm text-blue-900">Book from {titleCase(client.name)}</p>
-              <span className="bg-blue-700 text-white text-sm font-semibold px-4 py-2.5 rounded-lg">
-                Book Now →
-              </span>
-            </Link>
-          ) : (
-            <>
               <div className="flex-1 bg-card border rounded-xl p-4 space-y-3">
                 <div>
                   <p className="font-semibold text-sm">Phone</p>
@@ -255,8 +243,6 @@ export function Client({ slug, user, latestPrices }: ClientPageProps) {
                   </button>
                 )}
               </div>}
-            </>
-          )}
         </div>
 
         {client.type === 'buyer' && (
