@@ -6,6 +6,7 @@ import { Beaker, AlertTriangle } from "lucide-react"
 import Link from "next/link"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
 import { capitalizeFirstLetter, buildGuideMetadata } from "@/lib/utilities"
+import { guardTestItem } from "@/lib/guardTestItem"
 import { SprayProgramBackLink } from "./SprayProgramBackLink"
 import { FertilizerApplicationRates } from "@/components/agrochemical/FertilizerApplicationRates"
 import { AgrochemicalDosageTable } from "@/components/agrochemical/AgrochemicalDosageTable"
@@ -53,6 +54,8 @@ export default async function AgroChemicalGuidePage({ params }: GuidePageProps) 
     const { category, slug } = await params
 
     const chemical = await serverFetch(`/agrochemical/${slug}`)
+
+    await guardTestItem(!!chemical?.is_test)
 
     const categorySlug = chemical?.agrochemical_category?.slug || ""
     const targetLabel: Record<string, string> = {

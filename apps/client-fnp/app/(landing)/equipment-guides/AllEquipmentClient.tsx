@@ -1,41 +1,31 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
-import { queryAllAnimalHealthProducts } from "@/lib/query"
+import { queryAllEquipmentProducts } from "@/lib/query"
 import { Button } from "@/components/ui/button"
-import { AnimalHealthFilterSidebar } from "@/components/generic/animalHealthFilterSidebar"
 import { ProductCard } from "@/components/shared/ProductCard"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
 
-interface AllAnimalHealthClientProps {
+interface AllEquipmentClientProps {
     initialProducts: any[]
     initialTotal: number
 }
 
-export function AllAnimalHealthClient({ initialProducts, initialTotal }: AllAnimalHealthClientProps) {
+export function AllEquipmentClient({ initialProducts, initialTotal }: AllEquipmentClientProps) {
     const [queryState, setQueryState] = useQueryStates({
         brand: parseAsArrayOf(parseAsString),
-        target: parseAsArrayOf(parseAsString),
-        active_ingredient: parseAsArrayOf(parseAsString),
-        used_on: parseAsString,
         p: parseAsInteger.withDefault(1),
     })
 
     const hasFilters =
         (queryState.brand && queryState.brand.length > 0) ||
-        (queryState.target && queryState.target.length > 0) ||
-        (queryState.active_ingredient && queryState.active_ingredient.length > 0) ||
-        !!queryState.used_on ||
         queryState.p > 1
 
     const { data: productsData, isLoading: productsLoading } = useQuery({
-        queryKey: ["animal-health-all", queryState.p, queryState.brand, queryState.target, queryState.active_ingredient, queryState.used_on],
-        queryFn: () => queryAllAnimalHealthProducts({
+        queryKey: ["equipment-all", queryState.p, queryState.brand],
+        queryFn: () => queryAllEquipmentProducts({
             p: queryState.p,
             brand: queryState.brand || [],
-            target: queryState.target || [],
-            active_ingredient: queryState.active_ingredient || [],
-            used_on: queryState.used_on ? [queryState.used_on] : [],
         }),
         refetchOnWindowFocus: false,
         placeholderData: !hasFilters ? { data: { data: initialProducts, total: initialTotal } } as any : undefined,
@@ -50,10 +40,6 @@ export function AllAnimalHealthClient({ initialProducts, initialTotal }: AllAnim
 
     return (
         <div className="flex flex-col lg:flex-row gap-8">
-            <aside className="w-full lg:w-64 flex-shrink-0">
-                <AnimalHealthFilterSidebar />
-            </aside>
-
             <main className="flex-1">
                 {productsLoading ? (
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
@@ -76,7 +62,7 @@ export function AllAnimalHealthClient({ initialProducts, initialTotal }: AllAnim
                     </div>
                 ) : products.length === 0 ? (
                     <div className="text-center py-12">
-                        <p className="text-muted-foreground">No animal health products found matching your filters.</p>
+                        <p className="text-muted-foreground">No equipment products found.</p>
                     </div>
                 ) : (
                     <>
@@ -84,11 +70,11 @@ export function AllAnimalHealthClient({ initialProducts, initialTotal }: AllAnim
                             {products.map((product: any) => (
                                 <ProductCard
                                     key={product.id}
-                                    href={`/animal-health-guides/${product.animal_health_category?.slug || "all"}/${product.slug}`}
+                                    href={`/equipment-guides/${product.equipment_category?.slug || "all"}/${product.slug}`}
                                     imageSrc={product.images?.[0]?.img?.src}
                                     name={product.name}
                                     brand={product.brand?.name}
-                                    meta={product.animal_health_category?.name}
+                                    meta={product.equipment_category?.name}
                                     mode="guide"
                                     isTest={product.is_test}
                                 />

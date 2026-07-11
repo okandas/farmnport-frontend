@@ -1,45 +1,35 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
-import { queryAnimalHealthProductsByCategory } from "@/lib/query"
+import { queryEquipmentProductsByCategory } from "@/lib/query"
 import { Button } from "@/components/ui/button"
-import { AnimalHealthFilterSidebar } from "@/components/generic/animalHealthFilterSidebar"
 import { ProductCard } from "@/components/shared/ProductCard"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
 import Link from "next/link"
 
-interface AnimalHealthCategoryClientProps {
+interface EquipmentCategoryClientProps {
     category: string
     categoryName: string
     initialProducts: any[]
     initialTotal: number
 }
 
-export function AnimalHealthCategoryClient({ category, categoryName, initialProducts, initialTotal }: AnimalHealthCategoryClientProps) {
+export function EquipmentCategoryClient({ category, categoryName, initialProducts, initialTotal }: EquipmentCategoryClientProps) {
     const [queryState, setQueryState] = useQueryStates({
         brand: parseAsArrayOf(parseAsString),
-        target: parseAsArrayOf(parseAsString),
-        active_ingredient: parseAsArrayOf(parseAsString),
-        used_on: parseAsString,
         p: parseAsInteger.withDefault(1),
     })
 
     const hasFilters =
         (queryState.brand && queryState.brand.length > 0) ||
-        (queryState.target && queryState.target.length > 0) ||
-        (queryState.active_ingredient && queryState.active_ingredient.length > 0) ||
-        !!queryState.used_on ||
         queryState.p > 1
 
     const { data: productsData, isLoading: productsLoading } = useQuery({
-        queryKey: ["animal-health-category", category, queryState.p, queryState.brand, queryState.target, queryState.active_ingredient, queryState.used_on],
-        queryFn: () => queryAnimalHealthProductsByCategory({
+        queryKey: ["equipment-category", category, queryState.p, queryState.brand],
+        queryFn: () => queryEquipmentProductsByCategory({
             category,
             p: queryState.p,
             brand: queryState.brand || [],
-            target: queryState.target || [],
-            active_ingredient: queryState.active_ingredient || [],
-            used_on: queryState.used_on ? [queryState.used_on] : [],
         }),
         refetchOnWindowFocus: false,
         placeholderData: !hasFilters ? { data: { data: initialProducts, total: initialTotal } } as any : undefined,
@@ -54,23 +44,16 @@ export function AnimalHealthCategoryClient({ category, categoryName, initialProd
 
     return (
         <>
-            {/* Header */}
             <div className="mb-8">
                 <h1 className="text-4xl font-bold tracking-tight font-heading mb-4 capitalize">
                     {categoryName}
                 </h1>
                 <p className="text-lg text-muted-foreground">
-                    Browse our collection of {typeof categoryName === 'string' ? categoryName.toLowerCase() : category} products for poultry and livestock
+                    Browse our collection of {typeof categoryName === 'string' ? categoryName.toLowerCase() : category} equipment
                 </p>
             </div>
 
             <div className="flex flex-col lg:flex-row gap-8">
-                {/* Sidebar Filters */}
-                <aside className="w-full lg:w-64 flex-shrink-0">
-                    <AnimalHealthFilterSidebar categorySlug={category} />
-                </aside>
-
-                {/* Main Content */}
                 <main className="flex-1">
                     {productsLoading ? (
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
@@ -93,9 +76,9 @@ export function AnimalHealthCategoryClient({ category, categoryName, initialProd
                         </div>
                     ) : products.length === 0 ? (
                         <div className="text-center py-12">
-                            <p className="text-muted-foreground mb-4">No {typeof categoryName === 'string' ? categoryName.toLowerCase() : ''} products found matching your filters.</p>
-                            <Link href="/animal-health-guides">
-                                <Button variant="outline">View All Animal Health Products</Button>
+                            <p className="text-muted-foreground mb-4">No {typeof categoryName === 'string' ? categoryName.toLowerCase() : ''} equipment found.</p>
+                            <Link href="/equipment-guides">
+                                <Button variant="outline">View All Equipment</Button>
                             </Link>
                         </div>
                     ) : (
@@ -104,18 +87,17 @@ export function AnimalHealthCategoryClient({ category, categoryName, initialProd
                                 {products.map((product: any) => (
                                     <ProductCard
                                         key={product.id}
-                                        href={`/animal-health-guides/${product.animal_health_category?.slug || "all"}/${product.slug}`}
+                                        href={`/equipment-guides/${product.equipment_category?.slug || "all"}/${product.slug}`}
                                         imageSrc={product.images?.[0]?.img?.src}
                                         name={product.name}
                                         brand={product.brand?.name}
-                                        meta={product.animal_health_category?.name}
+                                        meta={product.equipment_category?.name}
                                         mode="guide"
                                         isTest={product.is_test}
                                     />
                                 ))}
                             </div>
 
-                            {/* Pagination */}
                             {totalPages > 1 && (
                                 <div className="mt-8 flex justify-center gap-1">
                                     {Array.from({ length: totalPages }, (_, i) => i + 1)

@@ -833,6 +833,78 @@ export type FormAnimalHealthTargetModel = z.infer<typeof FormAnimalHealthTargetS
 export type AnimalHealthProduct = z.infer<typeof AnimalHealthProductSchema>
 export type FormAnimalHealthProductModel = z.infer<typeof FormAnimalHealthProductSchema>
 
+// Equipment Schemas
+
+export const EquipmentCategorySchema = z.object({
+  id: z.string(),
+  name: z.string().min(1, "Name is required"),
+  slug: z.string().optional(),
+  short_description: z.string().max(100, "Short description cannot exceed 100 characters").optional().default(""),
+  description: z.string().max(500, "Description cannot exceed 500 characters").optional().default(""),
+  created: z.string().optional(),
+  updated: z.string().optional(),
+})
+
+export const FormEquipmentCategorySchema = EquipmentCategorySchema.pick({
+  id: true,
+  name: true,
+  short_description: true,
+  description: true,
+})
+
+export const EquipmentProductSchema = z.object({
+  id: z.string(),
+  name: z.string().min(1, "Name is required"),
+  slug: z.string().optional(),
+  brand_id: z.string().min(1, "Brand is required"),
+  brand: z.object({
+    id: z.string(),
+    name: z.string(),
+  }).optional(),
+  equipment_category_id: z.string().min(1, "Equipment category is required"),
+  equipment_category: z.object({
+    id: z.string(),
+    name: z.string(),
+    slug: z.string(),
+  }).optional(),
+  front_label: z.custom<ImageModel>().optional(),
+  back_label: z.custom<ImageModel>().optional(),
+  images: z.array(z.custom<ImageModel>()).max(5, "Maximum 5 images allowed"),
+  specifications: z.array(z.string()).default([]),
+  stock_level: z.coerce.number().int().nonnegative().default(0),
+  available_for_sale: z.boolean().default(false),
+  sale_price: z.coerce.number().nonnegative().default(0),
+  was_price: z.coerce.number().nonnegative().default(0),
+  variants: z.array(z.object({
+    sku: z.string().default(""),
+    name: z.string().min(1, "Variant name is required"),
+    stock_level: z.coerce.number().int().nonnegative().default(0),
+    sale_price: z.coerce.number().nonnegative().default(0),
+    was_price: z.coerce.number().nonnegative().default(0),
+    wholesale_price: z.coerce.number().nonnegative().default(0),
+    weight_grams: z.coerce.number().int().nonnegative().default(0),
+  })).default([]),
+  status: z.enum(["active", "inactive"]).default("active"),
+  weight_grams: z.coerce.number().int().nonnegative().default(0),
+  is_test: z.boolean().default(false),
+  delivery_available: z.boolean().default(false),
+  pickup_available: z.boolean().default(false),
+  pickup_location_ids: z.array(z.string()).optional().default([]),
+  delivery_location_ids: z.array(z.string()).optional().default([]),
+  created: z.string().optional(),
+  updated: z.string().optional(),
+}).refine(data => !data.available_for_sale || data.weight_grams > 0, {
+  message: "Weight is required before enabling available for sale",
+  path: ["weight_grams"],
+})
+
+export const FormEquipmentProductSchema = EquipmentProductSchema
+
+export type EquipmentCategory = z.infer<typeof EquipmentCategorySchema>
+export type FormEquipmentCategoryModel = z.infer<typeof FormEquipmentCategorySchema>
+export type EquipmentProduct = z.infer<typeof EquipmentProductSchema>
+export type FormEquipmentProductModel = z.infer<typeof FormEquipmentProductSchema>
+
 // Spray Program Schemas
 
 export const SprayProgramRecommendationSchema = z.object({
@@ -1616,6 +1688,7 @@ export const EditLotSchema = z.object({
   unit: z.string().min(1, "Unit is required"),
   price_per_unit: z.coerce.number().positive("Price must be greater than 0"),
   notes: z.string().optional(),
+  is_test: z.boolean().optional(),
   expires_date: z.string().min(1, "Expiry date is required"),
   expires_time: z.string().min(1, "Expiry time is required"),
 })

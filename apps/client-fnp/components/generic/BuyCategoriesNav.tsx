@@ -6,6 +6,7 @@ const ALL_CATEGORIES: { label: string; href: string; flag?: () => Promise<boolea
   { label: "Agrochemicals", href: "/buy-agrochemicals" },
   { label: "Animal Health", href: "/buy-animal-health" },
   { label: "Animal Feed", href: "/buy-feeds" },
+  { label: "Equipment", href: "/buy-equipment" },
   { label: "Plant Nutrition", href: "/buy-plant-nutrition" },
   { label: "Seeds", href: "/buy-seed-products" },
   { label: "Plans & Documents", href: "/buy-documents", flag: documentsEnabled },

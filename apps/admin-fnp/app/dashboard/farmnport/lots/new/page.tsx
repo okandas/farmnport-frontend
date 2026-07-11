@@ -27,6 +27,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { SearchSelect } from "@/components/ui/search-select"
+import { Checkbox } from "@/components/ui/checkbox"
 
 const LOT_UNITS = ["kg", "head", "unit", "tonne", "bag", "dozen", "litre"]
 
@@ -42,6 +43,7 @@ interface NewLotForm {
   unit: string
   price_per_unit: number
   notes: string
+  is_test: boolean
   expires_at: string
   main_image: ImageModel[]
   images: ImageModel[]
@@ -62,6 +64,7 @@ export default function NewAdminLotPage() {
       unit: "kg",
       price_per_unit: 0,
       notes: "",
+      is_test: false,
       expires_at: "",
       main_image: [],
       images: [],
@@ -79,6 +82,7 @@ export default function NewAdminLotPage() {
       unit: data.unit,
       price_per_unit_cents: Math.round(Number(data.price_per_unit) * 100),
       notes: data.notes || undefined,
+      is_test: data.is_test,
       expires_at: new Date(data.expires_at).toISOString(),
       main_image: data.main_image?.[0] ?? undefined,
       images: data.images ?? [],
@@ -354,6 +358,19 @@ export default function NewAdminLotPage() {
                           </FormItem>
                         )} />
                       </div>
+                    </div>
+
+                    <div className="sm:col-span-3">
+                      <FormField control={form.control} name="is_test" render={({ field }) => (
+                        <FormItem className="flex items-center gap-2">
+                          <FormControl>
+                            <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                          </FormControl>
+                          <label className="text-sm font-medium text-gray-900 dark:text-white cursor-pointer" onClick={() => field.onChange(!field.value)}>
+                            Test item
+                          </label>
+                        </FormItem>
+                      )} />
                     </div>
 
                   </div>

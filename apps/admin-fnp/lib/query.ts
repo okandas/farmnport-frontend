@@ -682,6 +682,59 @@ export function deleteAnimalHealthTargets(targetIds: string[]) {
   return api.post(url, { target_ids: targetIds })
 }
 
+// Equipment Product functions
+export function queryEquipmentProducts(pagination?: pagination) {
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) params.append("p", String(pagination.p))
+  if (pagination?.search !== undefined && pagination.search.length >= 2) params.append("search", pagination.search)
+  const qs = params.toString()
+  return api.get(qs ? `${baseUrl}/user/equipment-products?${qs}` : `${baseUrl}/user/equipment-products`)
+}
+
+export function queryEquipmentProduct(id: string) {
+  const url = `${baseUrl}/user/equipment-products/${id}`
+  return api.get(url)
+}
+
+export function addEquipmentProduct(data: any) {
+  let url = `${baseUrl}/user/equipment-products/add`
+  return api.post(url, data)
+}
+
+export function updateEquipmentProduct(data: any) {
+  let url = `${baseUrl}/user/equipment-products/update`
+  return api.post(url, data)
+}
+
+// Equipment Category functions
+export function queryEquipmentCategories(pagination?: pagination) {
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) params.append("p", String(pagination.p))
+  if (pagination?.search !== undefined && pagination.search.length >= 2) params.append("search", pagination.search)
+  const qs = params.toString()
+  return api.get(qs ? `${baseUrl}/user/equipment-categories?${qs}` : `${baseUrl}/user/equipment-categories`)
+}
+
+export function queryEquipmentCategory(id: string) {
+  const url = `${baseUrl}/user/equipment-categories/${id}`
+  return api.get(url)
+}
+
+export function addEquipmentCategory(data: { name: string; short_description: string; description: string }) {
+  let url = `${baseUrl}/user/equipment-categories/add`
+  return api.post(url, data)
+}
+
+export function updateEquipmentCategory(data: { id: string; name: string; short_description: string; description: string }) {
+  let url = `${baseUrl}/user/equipment-categories/update`
+  return api.post(url, data)
+}
+
+export function deleteEquipmentCategories(categoryIds: string[]) {
+  let url = `${baseUrl}/user/equipment-categories/delete`
+  return api.post(url, { category_ids: categoryIds })
+}
+
 // Spray Program functions
 
 export function querySprayPrograms(pagination?: pagination) {

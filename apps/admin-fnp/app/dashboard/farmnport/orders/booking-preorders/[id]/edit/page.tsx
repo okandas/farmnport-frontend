@@ -82,6 +82,7 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
     client_name: string
     brand_id: string
     brand_name: string
+    is_test: boolean
   } | null>(null)
 
   if (event && form === null) {
@@ -117,6 +118,7 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
       client_name: event.client_name ?? "",
       brand_id: event.brand_id ?? "",
       brand_name: event.brand_name ?? "",
+      is_test: event.is_test ?? false,
     })
   }
 
@@ -144,6 +146,7 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
         client_name: form!.client_name || undefined,
         brand_id: form!.brand_id || undefined,
         brand_name: form!.brand_name || undefined,
+        is_test: form!.is_test || undefined,
         delivery_dates: deliveryDates ? deliveryDates.map((d) => d.toISOString().split("T")[0]) : undefined,
         delivery_locations: selectedDeliveryLocs ?? undefined,
         collection_locations: selectedCollectionLocs ?? undefined,
@@ -517,6 +520,20 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
                 onChange={setSelectedCollectionLocs}
               />
             </div>
+          </div>
+        </div>
+
+        {/* Test Item */}
+        <div className="grid grid-cols-1 gap-x-8 gap-y-10 py-10 md:grid-cols-3">
+          <div>
+            <h2 className="text-base/7 font-semibold text-foreground">Testing</h2>
+          </div>
+          <div className="max-w-2xl md:col-span-2">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" checked={form.is_test} onChange={(e) => setForm((f) => f ? { ...f, is_test: e.target.checked } : f)} className="rounded border-border" />
+              <span className={labelCls}>Test item</span>
+            </label>
+            <p className="mt-1 text-xs text-muted-foreground">Mark as test — shown with a TEST badge, hidden from non-internal users on detail page.</p>
           </div>
         </div>
 

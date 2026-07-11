@@ -94,6 +94,7 @@ export function AllAgroChemicalsClient({ initialChemicals, initialTotal }: AllAg
                                     brand={chemical.brand?.name}
                                     meta={chemical.agrochemical_category?.name}
                                     mode="guide"
+                                    isTest={chemical.is_test}
                                 />
                             ))}
                         </div>

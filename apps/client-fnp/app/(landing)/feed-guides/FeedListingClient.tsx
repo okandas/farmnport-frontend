@@ -104,6 +104,7 @@ export function FeedListingClient({ initialData, initialTotal }: FeedListingClie
                                     brand={product.brand?.name}
                                     meta={product.animal}
                                     mode="guide"
+                                    isTest={product.is_test}
                                 />
                             ))}
                         </div>

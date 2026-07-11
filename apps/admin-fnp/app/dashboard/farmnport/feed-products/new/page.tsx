@@ -109,6 +109,7 @@ export default function NewFeedProductPage() {
             adaptation_schedule: [],
             stock_level: 0,
             available_for_sale: false,
+            is_test: false,
             sale_price: 0,
             was_price: 0,
             weight_grams: 0,
