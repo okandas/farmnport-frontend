@@ -842,6 +842,23 @@ export function AgroChemicalForm({ agroChemical, mode = "create" }: AgroChemical
                                     </FormItem>
                                 )}
                             />
+                            <FormField
+                                control={form.control}
+                                name="is_test"
+                                render={({ field }) => (
+                                    <FormItem className="flex items-center gap-2">
+                                        <FormControl>
+                                            <Checkbox
+                                                checked={field.value}
+                                                onCheckedChange={field.onChange}
+                                            />
+                                        </FormControl>
+                                        <label className="text-sm font-medium text-gray-900 dark:text-white cursor-pointer" onClick={() => field.onChange(!field.value)}>
+                                            Test item
+                                        </label>
+                                    </FormItem>
+                                )}
+                            />
                         </div>
                         <div className="sm:col-span-2">
                             <FormField

@@ -1,20 +1,19 @@
 import { Body, Button, Container, Head, Hr, Html, Preview, Row, Column, Section, Text } from "@react-email/components"
 
-interface Props { bookingRef?: string; customerName?: string; productName?: string; quantity?: string; unit?: string; depositAmount?: string; adminUrl?: string }
+interface Props { bookingRef?: string; customerName?: string; productName?: string; quantity?: number; depositAmount?: string; adminUrl?: string }
 
 export default function PreorderAmountPaidAdminEmail({
   bookingRef = "FNP-BK-PO-0001",
   customerName = "Okandas",
   productName = "Fivet Cobb 500 Day-Old Chicks",
-  quantity = "100",
-  unit = "units",
+  quantity = 100,
   depositAmount = "$50.00",
   adminUrl = "https://admin.farmnport.com",
 }: Props) {
   return (
     <Html lang="en">
       <Head />
-      <Preview>{`Payment received from ${customerName} — ${quantity} ${productName}`}</Preview>
+      <Preview>Payment received from {customerName} — {quantity} {productName}</Preview>
       <Body style={body}><Container style={container}>
         <Section style={header}><Text style={brandName}>farmnport</Text><Text style={brandTagline}>admin alert</Text></Section>
         <Hr style={headerDivider} />
@@ -24,7 +23,7 @@ export default function PreorderAmountPaidAdminEmail({
           <Section style={refCard}><Text style={refLabel}>Booking reference</Text><Text style={refNumber}>{bookingRef}</Text></Section>
           <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Customer</Text></Column><Column><Text style={valText}>{customerName}</Text></Column></Row>
           <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Produce</Text></Column><Column><Text style={valText}>{productName}</Text></Column></Row>
-          <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Quantity</Text></Column><Column><Text style={valText}>{quantity} {unit || "units"}</Text></Column></Row>
+          <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Quantity</Text></Column><Column><Text style={valText}>{quantity} units</Text></Column></Row>
           <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Amount</Text></Column><Column><Text style={depositText}>{depositAmount}</Text></Column></Row>
           <Section style={buttonWrapper}><Button href={adminUrl} style={button}>View Booking</Button></Section>
         </Section>

@@ -35,8 +35,9 @@ export function ProductImageGallery({ images, name, height = 520, fallback }: Pr
                             <button
                                 key={idx}
                                 onClick={() => setSelected(idx)}
-                                className={`relative w-16 h-16 rounded-lg border-2 overflow-hidden bg-white transition-colors ${
-                                    selected === idx ? "border-primary" : "border-border hover:border-primary/50"
+                                onMouseEnter={() => setSelected(idx)}
+                                className={`relative w-16 h-16 rounded-lg overflow-hidden bg-background transition-colors ${
+                                    selected === idx ? "ring-2 ring-primary" : "opacity-60 hover:opacity-100"
                                 }`}
                             >
                                 {img.img?.src ? (
@@ -49,7 +50,7 @@ export function ProductImageGallery({ images, name, height = 520, fallback }: Pr
                     </div>
                 )}
                 <button
-                    className="relative flex-1 bg-white rounded-xl border overflow-hidden cursor-zoom-in group"
+                    className="relative flex-1 bg-background rounded-xl overflow-hidden cursor-pointer group"
                     style={{ height }}
                     onClick={() => images[selected]?.img?.src && setOpen(true)}
                 >
@@ -66,7 +67,7 @@ export function ProductImageGallery({ images, name, height = 520, fallback }: Pr
                         <FpPlaceholder />
                     )}
                     {images[selected]?.img?.src && (
-                        <span className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full bg-white border border-border text-foreground shadow-sm">
+                        <span className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full bg-background text-foreground shadow-sm">
                             <Expand className="w-4 h-4" />
                         </span>
                     )}
@@ -74,17 +75,18 @@ export function ProductImageGallery({ images, name, height = 520, fallback }: Pr
             </div>
 
             <Dialog open={open} onOpenChange={setOpen}>
-                <DialogContent className="max-w-5xl h-[85vh] p-0 bg-white">
+                <DialogContent className="max-w-[95vw] w-full h-[92vh] p-0 bg-background">
 
                     <div className="flex h-full">
                         {images.length > 1 && (
-                            <div className="flex flex-col gap-2 p-3 border-r overflow-y-auto shrink-0">
+                            <div className="flex flex-col gap-1.5 p-3 overflow-y-auto shrink-0 w-20">
                                 {images.map((img, idx) => (
                                     <button
                                         key={idx}
                                         onClick={() => setSelected(idx)}
-                                        className={`relative w-14 h-14 rounded-lg border-2 overflow-hidden bg-white shrink-0 transition-colors ${
-                                            selected === idx ? "border-primary" : "border-border hover:border-primary/50"
+                                        onMouseEnter={() => setSelected(idx)}
+                                        className={`relative w-14 h-14 rounded-lg overflow-hidden bg-background shrink-0 transition-colors ${
+                                            selected === idx ? "ring-2 ring-primary" : "opacity-60 hover:opacity-100"
                                         }`}
                                     >
                                         {img.img?.src ? (
@@ -102,33 +104,33 @@ export function ProductImageGallery({ images, name, height = 520, fallback }: Pr
                                 <>
                                     <button
                                         onClick={() => setSelected((selected - 1 + images.length) % images.length)}
-                                        className="absolute left-3 z-50 w-9 h-9 flex items-center justify-center rounded-full border border-border bg-white hover:bg-muted text-foreground transition-colors"
+                                        className="absolute left-3 z-50 w-9 h-9 flex items-center justify-center rounded-full bg-background/80 hover:bg-muted text-foreground transition-colors"
                                     >
                                         <ChevronLeft className="w-5 h-5" />
                                     </button>
                                     <button
                                         onClick={() => setSelected((selected + 1) % images.length)}
-                                        className="absolute right-3 z-50 w-9 h-9 flex items-center justify-center rounded-full border border-border bg-white hover:bg-muted text-foreground transition-colors"
+                                        className="absolute right-3 z-50 w-9 h-9 flex items-center justify-center rounded-full bg-background/80 hover:bg-muted text-foreground transition-colors"
                                     >
                                         <ChevronRight className="w-5 h-5" />
                                     </button>
                                 </>
                             )}
 
-                            <div className="relative w-full h-full">
+                            <div className="relative w-[60%] h-[70%]">
                                 {images[selected]?.img?.src && (
                                     <Image
                                         src={images[selected].img.src}
                                         alt={name}
                                         fill
-                                        sizes="80vw"
-                                        className="object-cover p-2"
+                                        sizes="60vw"
+                                        className="object-contain"
                                     />
                                 )}
                             </div>
                         </div>
 
-                        <div className="flex flex-col gap-2 p-3 pt-12 border-l shrink-0">
+                        <div className="flex flex-col gap-2 p-3 pt-12 shrink-0">
                             <button
                                 onClick={() => {
                                     navigator.clipboard.writeText(window.location.href)
@@ -136,7 +138,7 @@ export function ProductImageGallery({ images, name, height = 520, fallback }: Pr
                                     sendGTMEvent({ event: "product_share", product_name: name })
                                     setTimeout(() => setCopied(false), 2000)
                                 }}
-                                className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border bg-white hover:bg-muted text-sm text-foreground transition-colors"
+                                className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-muted text-sm text-foreground transition-colors"
                             >
                                 {copied ? <Check className="w-4 h-4 text-green-600" /> : <Link2 className="w-4 h-4" />}
                                 {copied ? "Copied!" : "Copy link"}
@@ -148,7 +150,7 @@ export function ProductImageGallery({ images, name, height = 520, fallback }: Pr
                                         sendGTMEvent({ event: "product_share", product_name: name })
                                     }
                                 }}
-                                className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border bg-white hover:bg-muted text-sm text-foreground transition-colors"
+                                className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-muted text-sm text-foreground transition-colors"
                             >
                                 <Share2 className="w-4 h-4" />
                                 Share

@@ -110,6 +110,7 @@ export function AnimalHealthCategoryClient({ category, categoryName, initialProd
                                         brand={product.brand?.name}
                                         meta={product.animal_health_category?.name}
                                         mode="guide"
+                                        isTest={product.is_test}
                                     />
                                 ))}
                             </div>

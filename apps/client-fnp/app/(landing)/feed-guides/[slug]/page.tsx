@@ -3,6 +3,7 @@ import { AlertTriangle } from "lucide-react"
 import Link from "next/link"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
 import { BaseURL } from "@/lib/schemas"
+import { guardTestItem } from "@/lib/guardTestItem"
 import { FeedBreadcrumb } from "./FeedBreadcrumb"
 import { WantToBuyCTA } from "@/components/shared/WantToBuyCTA"
 import { GuideProductTitle } from "@/components/shared/GuideProductTitle"
@@ -48,6 +49,8 @@ export default async function FeedDetailPage({ params }: FeedDetailPageProps) {
             </div>
         )
     }
+
+    await guardTestItem(!!product.is_test)
 
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://farmnport.com'
     const url = `${baseUrl}/feeds/${slug}`

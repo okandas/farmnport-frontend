@@ -288,18 +288,19 @@ export function PricesBoard({ mode = "kg" }: { mode?: Mode }) {
     queryFn: () => queryProducerPriceLists({ p: 1, limit: 1 } as any),
     refetchOnWindowFocus: false,
   })
-  const { data: seriesSummaryData } = useQuery({
+  const { data: seriesSummaryData, isFetching: fetchingKg } = useQuery({
     queryKey: ["series-summary"],
     queryFn: querySeriesSummary,
     enabled: mode === "kg",
     refetchOnWindowFocus: false,
   })
-  const { data: headSummaryData } = useQuery({
+  const { data: headSummaryData, isFetching: fetchingHead } = useQuery({
     queryKey: ["head-summary"],
     queryFn: queryHeadSummary,
     enabled: mode === "head",
     refetchOnWindowFocus: false,
   })
+  const pricesLoading = mode === "kg" ? fetchingKg : fetchingHead
 
   const lwtTotal: number = lwtMeta?.data?.total ?? 0
   const cdmTotal: number = cdmData?.data?.total ?? 0
@@ -319,6 +320,67 @@ export function PricesBoard({ mode = "kg" }: { mode?: Mode }) {
     .filter(e => e.pct !== null && e.avg > 0)
     .sort((a, b) => b.pct! - a.pct!)
     .slice(0, 3)
+
+  const initialLoading = !cdmData && !seriesSummaryData && !headSummaryData
+
+  if (initialLoading) {
+    return (
+      <main className="min-h-screen">
+        {/* stat strip skeleton */}
+        <div className="border-b bg-muted/30">
+          <div className="px-4 sm:px-6 lg:px-8 py-2 flex gap-5">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="h-4 w-24 rounded bg-muted animate-pulse" />
+            ))}
+          </div>
+        </div>
+
+        <div className="flex items-stretch min-h-[calc(100vh-33px)]">
+          <div className="flex-1 min-w-0">
+            <div className="px-4 sm:px-6 lg:px-8 py-10">
+              {/* hero skeleton */}
+              <div className="mb-8">
+                <div className="h-9 w-72 rounded bg-muted animate-pulse" />
+                <div className="h-4 w-48 rounded bg-muted animate-pulse mt-3" />
+              </div>
+
+              {/* summary cards skeleton */}
+              <ul className="grid grid-cols-1 gap-x-6 gap-y-4 lg:grid-cols-3 xl:gap-x-8 mb-10">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <li key={i} className="overflow-hidden rounded-lg outline outline-1 outline-gray-200 dark:outline-white/10">
+                    <div className="px-5 py-5 space-y-4">
+                      <div className="h-4 w-40 rounded bg-muted animate-pulse" />
+                      {Array.from({ length: 3 }).map((_, j) => (
+                        <div key={j} className="flex items-center gap-3">
+                          <div className="h-6 w-10 rounded bg-muted animate-pulse" />
+                          <div className="h-4 flex-1 rounded bg-muted animate-pulse" />
+                          <div className="h-4 w-16 rounded bg-muted animate-pulse" />
+                        </div>
+                      ))}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+
+              {/* table skeleton */}
+              <div className="h-8 w-64 rounded bg-muted animate-pulse mb-4" />
+              <div className="space-y-4 px-4 md:px-8 py-4">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <div key={i} className="flex items-center gap-4">
+                    <div className="h-4 w-10 rounded bg-muted animate-pulse" />
+                    <div className="h-4 w-24 rounded bg-muted animate-pulse" />
+                    <div className="h-4 flex-1 rounded bg-muted animate-pulse" />
+                    <div className="h-4 w-16 rounded bg-muted animate-pulse" />
+                    <div className="h-4 w-16 rounded bg-muted animate-pulse hidden sm:block" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    )
+  }
 
   return (
     <main className="min-h-screen">
@@ -358,26 +420,26 @@ export function PricesBoard({ mode = "kg" }: { mode?: Mode }) {
           {/* summary cards */}
           <ul role="list" className="grid grid-cols-1 gap-x-6 gap-y-4 lg:grid-cols-3 xl:gap-x-8 mb-10">
 
-            {/* Card 1 */}
-            <li className="flex flex-col gap-4">
+            {/* Card 1: Coming Soon — last on mobile, last on desktop */}
+            <li className="flex flex-col gap-4 order-3 lg:order-3">
               <div className="overflow-hidden rounded-lg outline outline-1 outline-gray-200 dark:outline-white/10 flex-1">
                 <div className="px-5 py-5 h-full flex flex-col justify-center">
-                  <p className="text-sm font-semibold text-foreground mb-1">Auction Lots</p>
-                  <p className="text-xs text-muted-foreground">Browse and bid on upcoming livestock auction lots from verified sellers.</p>
-                  <p className="text-[11px] text-muted-foreground/60 mt-2 uppercase tracking-widest">Coming Soon</p>
+                  <p className="text-sm font-semibold text-foreground mb-1">Booking Now Live</p>
+                  <p className="text-xs text-muted-foreground">See what to sell and buy online.</p>
+                  <Link href="/bookings" className="text-xs text-primary hover:underline mt-2 inline-block">View more →</Link>
                 </div>
               </div>
               <div className="overflow-hidden rounded-lg outline outline-1 outline-gray-200 dark:outline-white/10 flex-1">
                 <div className="px-5 py-5 h-full flex flex-col justify-center">
-                  <p className="text-sm font-semibold text-foreground mb-1">Price Alerts</p>
-                  <p className="text-xs text-muted-foreground">Favourite a price to get alerted when it moves.</p>
-                  <p className="text-[11px] text-muted-foreground/60 mt-2 uppercase tracking-widest">Coming Soon</p>
+                  <p className="text-sm font-semibold text-foreground mb-1">Timed Lots</p>
+                  <p className="text-xs text-muted-foreground">Now live.</p>
+                  <Link href="/lots" className="text-xs text-primary hover:underline mt-2 inline-block">View more →</Link>
                 </div>
               </div>
             </li>
 
-            {/* Card 2: Most Requested */}
-            <li className="overflow-hidden rounded-lg outline outline-1 outline-gray-200 dark:outline-white/10">
+            {/* Card 2: Most Requested — first on both mobile and desktop */}
+            <li className="overflow-hidden rounded-lg outline outline-1 outline-gray-200 dark:outline-white/10 order-1 lg:order-1">
               <div className="px-5 py-5">
                 <p className="text-sm font-semibold text-foreground mb-4">Most Requested Buyer Prices</p>
                 <ul className="space-y-5">
@@ -421,8 +483,8 @@ export function PricesBoard({ mode = "kg" }: { mode?: Mode }) {
               </div>
             </li>
 
-            {/* Card 3: Top Gainers */}
-            <li className="overflow-hidden rounded-lg outline outline-1 outline-gray-200 dark:outline-white/10">
+            {/* Card 3: Top Gainers — second on both */}
+            <li className="overflow-hidden rounded-lg outline outline-1 outline-gray-200 dark:outline-white/10 order-2 lg:order-2">
               <div className="px-5 py-5">
                 <p className="text-sm font-semibold text-foreground mb-4">Top Gainers</p>
                 <ul className="space-y-5">
@@ -466,7 +528,20 @@ export function PricesBoard({ mode = "kg" }: { mode?: Mode }) {
 
           {/* ── Price table ── */}
           <PricesTabNav />
-          {rawEntries.length > 0 && (
+          {pricesLoading && (
+            <div className="mt-2 px-4 md:px-8 py-4 space-y-4">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="flex items-center gap-4">
+                  <div className="h-4 w-10 rounded bg-muted animate-pulse" />
+                  <div className="h-4 w-24 rounded bg-muted animate-pulse" />
+                  <div className="h-4 flex-1 rounded bg-muted animate-pulse" />
+                  <div className="h-4 w-16 rounded bg-muted animate-pulse" />
+                  <div className="h-4 w-16 rounded bg-muted animate-pulse hidden sm:block" />
+                </div>
+              ))}
+            </div>
+          )}
+          {!pricesLoading && rawEntries.length > 0 && (
             <div className="mt-2 px-4 md:px-8 py-4">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
@@ -476,11 +551,11 @@ export function PricesBoard({ mode = "kg" }: { mode?: Mode }) {
                       <th className="text-left py-2 font-medium">Code</th>
                       <th className="text-left py-2 pl-2 font-medium">{mode === "head" ? "Breed · Grade" : "Produce · Grade"}</th>
                       <th className="text-left py-2 pl-2 font-medium">{mode === "head" ? "Avg/Head" : "Average"}</th>
-                      {mode === "head" && <th className="text-left py-2 pl-2 font-medium hidden sm:table-cell">Avg Weight</th>}
-                      <th className="text-left py-2 pl-2 font-medium hidden sm:table-cell">Change</th>
-                      <th className="text-left py-2 pl-2 font-medium hidden sm:table-cell">High</th>
-                      <th className="text-left py-2 pl-2 font-medium hidden sm:table-cell">Low</th>
-                      <th className="text-left py-2 pl-2 font-medium hidden lg:table-cell">Trend</th>
+                      {mode === "head" && <th className="text-left py-2 pl-2 font-medium ">Avg Weight</th>}
+                      <th className="text-left py-2 pl-2 font-medium">Change</th>
+                      <th className="text-left py-2 pl-2 font-medium">High</th>
+                      <th className="text-left py-2 pl-2 font-medium">Low</th>
+                      <th className="text-left py-2 pl-2 font-medium">Trend</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -508,11 +583,11 @@ export function PricesBoard({ mode = "kg" }: { mode?: Mode }) {
                               ${toDollars(entry.avg)}<span className="text-xs font-normal text-muted-foreground">{unit}</span>
                             </td>
                             {mode === "head" && (
-                              <td className="py-3 pl-2 tabular-nums text-muted-foreground hidden sm:table-cell">
+                              <td className="py-3 pl-2 tabular-nums text-muted-foreground ">
                                 {gramsToKg((entry as HeadEntry).avg_weight_grams)}
                               </td>
                             )}
-                            <td className="py-3 pl-2 tabular-nums font-medium hidden sm:table-cell">
+                            <td className="py-3 pl-2 tabular-nums font-medium ">
                               {(() => {
                                 const t = entry.trend ?? []
                                 if (t.length < 2) return <span className="text-muted-foreground">—</span>
@@ -523,13 +598,13 @@ export function PricesBoard({ mode = "kg" }: { mode?: Mode }) {
                                 return <span className={up ? "text-green-600 dark:text-green-400" : "text-red-500 dark:text-red-400"}>{up ? "▲" : "▼"} {up ? "+" : ""}{pct.toFixed(2)}%</span>
                               })()}
                             </td>
-                            <td className="py-3 pl-2 tabular-nums font-medium text-green-600 dark:text-green-400 hidden sm:table-cell">
+                            <td className="py-3 pl-2 tabular-nums font-medium text-green-600 dark:text-green-400 ">
                               {entry.high ? `$${toDollars(entry.high)}` : <span className="text-muted-foreground font-normal">—</span>}
                             </td>
-                            <td className="py-3 pl-2 tabular-nums font-medium text-red-500 dark:text-red-400 hidden sm:table-cell">
+                            <td className="py-3 pl-2 tabular-nums font-medium text-red-500 dark:text-red-400 ">
                               {entry.low ? `$${toDollars(entry.low)}` : <span className="text-muted-foreground font-normal">—</span>}
                             </td>
-                            <td className="py-3 pl-2 hidden lg:table-cell">
+                            <td className="py-3 pl-2 ">
                               <MiniSparkline values={entry.trend ?? []} />
                             </td>
                           </tr>

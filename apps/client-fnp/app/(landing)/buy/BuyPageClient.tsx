@@ -34,7 +34,7 @@ function DocumentCard({ doc }: { doc: any }) {
           <span className="font-semibold text-primary">{price}</span>
         </div>
         <Link href={href} className="block">
-          <Button variant="outline" className="w-full" size="sm">View Document</Button>
+          <Button variant="outline" className="w-full" size="sm">Buy Document</Button>
         </Link>
       </div>
     </div>
@@ -68,8 +68,8 @@ function PreOrdersSection() {
           <ProductCard
             key={event.id}
             href={`/bookings/${event.slug}`}
-            name={event.title}
-            brand={event.product_name}
+            imageSrc={event.image_src}
+            name={event.name}
             meta={event.unit_price > 0 ? `$${(event.unit_price / 100).toFixed(2)}` : undefined}
             mode="guide"
             buttonLabel="Pre-order"

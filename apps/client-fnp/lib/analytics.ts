@@ -16,13 +16,13 @@ function pushEcom(event: string, payload: Record<string, unknown>) {
   dataLayer.push({ event, ecommerce: payload })
 }
 
-export function trackViewItem(params: {
+export function trackViewGuide(params: {
   item_id: string
   item_name: string
   item_category: string
   price: number        // in dollars
 }) {
-  pushEcom("view_item", {
+  pushEcom("view_guide", {
     currency: "USD",
     value: params.price,
     items: [{ ...params, quantity: 1 }],

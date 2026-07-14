@@ -24,6 +24,7 @@ interface FarmLot {
   notes: string
   expires_at: string
   created: string
+  is_test?: boolean
   farm_produce?: { name: string; slug: string }
   breed?: { name: string }
   main_image?: { img?: { src?: string } }
@@ -200,6 +201,9 @@ export function Lots({ mode }: LotsProps) {
                 <span className={`absolute top-2 left-2 text-[10px] font-semibold px-2 py-0.5 rounded-full border ${lot.type === "sell" ? "bg-orange-50 text-orange-700 border-orange-200" : "bg-green-50 text-green-700 border-green-200"}`}>
                   {lot.type === "sell" ? "Selling" : "Buying"}
                 </span>
+                {lot.is_test && (
+                  <span className="absolute top-2 right-2 bg-orange-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">TEST</span>
+                )}
               </div>
               <div className="p-3 space-y-1.5 border-t">
                 <h3 className="font-semibold text-sm leading-tight group-hover:text-primary transition-colors">

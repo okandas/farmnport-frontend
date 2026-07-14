@@ -599,6 +599,35 @@ export function queryAnimalHealthProduct(slug: string) {
   return api.get(url)
 }
 
+// Equipment
+export function queryAllEquipmentProducts(pagination?: PaginationModel & { brand?: string[] }) {
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) params.set('p', pagination.p.toString())
+  pagination?.brand?.forEach(b => params.append('brand', b))
+  const qs = params.toString()
+  return api.get(qs ? `${BaseURL}/equipment/all?${qs}` : `${BaseURL}/equipment/all`)
+}
+
+export function queryBuyEquipmentProducts(pagination?: PaginationModel & { brand?: string[] }) {
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) params.set('p', pagination.p.toString())
+  pagination?.brand?.forEach(b => params.append('brand', b))
+  const qs = params.toString()
+  return api.get(qs ? `${BaseURL}/equipment/buy?${qs}` : `${BaseURL}/equipment/buy`)
+}
+
+export function queryEquipmentProductsByCategory(options: { category: string } & PaginationModel & { brand?: string[] }) {
+  const params = new URLSearchParams()
+  if (options.p !== undefined && options.p >= 2) params.set('p', options.p.toString())
+  options.brand?.forEach(b => params.append('brand', b))
+  const qs = params.toString()
+  return api.get(qs ? `${BaseURL}/equipment/category/${options.category}?${qs}` : `${BaseURL}/equipment/category/${options.category}`)
+}
+
+export function queryEquipmentProduct(slug: string) {
+  return api.get(`${BaseURL}/equipment/${slug}`)
+}
+
 // Feed Products
 export function queryAllFeedProducts(pagination?: PaginationModel & { search?: string, category?: string[], brand?: string[], animal?: string[], phase?: string[], sub_type?: string[] }) {
   const params = new URLSearchParams()

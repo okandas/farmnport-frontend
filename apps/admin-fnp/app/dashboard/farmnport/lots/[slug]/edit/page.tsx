@@ -25,6 +25,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Checkbox } from "@/components/ui/checkbox"
 import { FileInput } from "@/components/structures/controls/file-input"
 import { TimePicker } from "@/components/ui/time-picker"
 import { ImageModel } from "@/lib/schemas"
@@ -183,6 +184,18 @@ function AdminLotDetails({ form }: { lot: any; form: any }) {
           )} />
         </div>
       </div>
+      <div className="sm:col-span-3">
+        <FormField control={form.control} name="is_test" render={({ field }: any) => (
+          <FormItem className="flex items-center gap-2">
+            <FormControl>
+              <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+            </FormControl>
+            <label className="text-sm font-medium text-gray-900 dark:text-white cursor-pointer" onClick={() => field.onChange(!field.value)}>
+              Test item
+            </label>
+          </FormItem>
+        )} />
+      </div>
     </div>
   )
 }
@@ -236,6 +249,7 @@ function EditForm({ lot, slug }: { lot: any; slug: string }) {
       unit: lot.unit ?? "kg",
       price_per_unit: lot.price_per_unit_cents ? lot.price_per_unit_cents / 100 : 0,
       notes: lot.notes ?? "",
+      is_test: lot.is_test ?? false,
       expires_date: "",
       expires_time: "",
     },
@@ -250,6 +264,7 @@ function EditForm({ lot, slug }: { lot: any; slug: string }) {
       unit: data.unit,
       price_per_unit_cents: Math.round(Number(data.price_per_unit) * 100),
       notes: data.notes ?? "",
+      is_test: data.is_test ?? false,
       expires_date: data.expires_date,
       expires_time: data.expires_time,
     }),

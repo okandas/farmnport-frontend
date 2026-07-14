@@ -1,0 +1,61 @@
+import Link from "next/link"
+import { BaseURL } from "@/lib/schemas"
+import { AllEquipmentClient } from "./AllEquipmentClient"
+import { OtherGuidesLinks } from "@/components/shared/OtherGuidesLinks"
+
+export const metadata = {
+  title: 'Farm Equipment & Machinery Guides | farmnport.com',
+  description: 'Browse farm equipment guides — knapsack sprayers, irrigation, power tools, and more.',
+  alternates: { canonical: '/equipment-guides' },
+  openGraph: {
+    title: 'Farm Equipment & Machinery Guides | farmnport.com',
+    description: 'Browse farm equipment guides — knapsack sprayers, irrigation, power tools, and more.',
+    siteName: 'farmnport',
+    type: 'website',
+  },
+}
+
+const fetchOptions: RequestInit = process.env.NODE_ENV === "production"
+    ? { next: { revalidate: 3600 } } as RequestInit
+    : { cache: "no-store" }
+
+async function getAllProducts() {
+    try {
+        const res = await fetch(`${BaseURL}/equipment/all`, fetchOptions)
+        if (!res.ok) return { data: [], total: 0 }
+        const json = await res.json()
+        return { data: json?.data || [], total: json?.total || 0 }
+    } catch {
+        return { data: [], total: 0 }
+    }
+}
+
+export default async function EquipmentGuidesPage() {
+    const { data: products, total } = await getAllProducts()
+
+    return (
+        <main className="bg-gradient-to-b from-background to-muted/20">
+            <section className="py-6 lg:py-8 bg-muted/30">
+                <div className="mx-auto max-w-7xl px-6 lg:px-8">
+                    <nav className="flex text-sm text-muted-foreground mb-6">
+                        <Link href="/guides" className="hover:text-foreground transition-colors">Guides</Link>
+                        <span className="mx-2">/</span>
+                        <span className="text-foreground">Equipment Guides</span>
+                    </nav>
+                    <div className="mb-8 flex items-start justify-between gap-4">
+                        <div>
+                            <h2 className="text-3xl font-bold tracking-tight font-heading">
+                                Farm Equipment Guides
+                            </h2>
+                            <p className="text-muted-foreground mt-2 max-w-lg">
+                                Explore farm equipment and machinery by type. Each guide includes specifications, brand info, and usage information.
+                            </p>
+                        </div>
+                        <OtherGuidesLinks current="equipment" />
+                    </div>
+                    <AllEquipmentClient initialProducts={products} initialTotal={total} />
+                </div>
+            </section>
+        </main>
+    )
+}

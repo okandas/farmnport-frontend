@@ -97,6 +97,7 @@ export function AgroCategoryClient({ category, categoryName, initialChemicals, i
                                     brand={chemical.brand?.name}
                                     meta={chemical.agrochemical_category?.name}
                                     mode="guide"
+                                    isTest={chemical.is_test}
                                 />
                             ))}
                         </div>

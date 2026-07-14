@@ -161,6 +161,21 @@ export const dashboardConfig: DashboardConfig = {
       ],
     },
     {
+      label: "Equipment",
+      items: [
+        {
+          title: "Products",
+          href: "/dashboard/farmnport/equipment",
+          icon: "productSearch",
+        },
+        {
+          title: "Categories",
+          href: "/dashboard/farmnport/equipment-categories",
+          icon: "clipboardList",
+        },
+      ],
+    },
+    {
       label: "Farm Produce",
       items: [
         {

@@ -11,6 +11,7 @@ import { capitalizeFirstLetter, formatDate, centsToDollars } from "@/lib/utiliti
 import { PayBidButton } from "@/components/ui/pay-bid-button"
 import { ShareBar } from "@/components/shared/ShareBar"
 import { AppURL } from "@/lib/schemas"
+import { guardTestItem } from "@/lib/guardTestItem"
 
 import type { Metadata } from "next"
 
@@ -50,6 +51,8 @@ export default async function LotDetailPage({ params }: Props) {
     const [lot, user, bidsData, myBidData] = await Promise.all([fetchLot(slug), retrieveUser(), fetchLotBids(slug), fetchMyBidOnLot(slug)])
 
     if (!lot) notFound()
+
+    await guardTestItem(!!lot.is_test)
 
     const produce = lot.farm_produce?.name ?? "Farm Produce"
     const breed = lot.breed?.name ?? null

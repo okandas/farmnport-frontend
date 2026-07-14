@@ -1,13 +1,12 @@
 import { Body, Button, Container, Head, Hr, Html, Preview, Row, Column, Section, Text } from "@react-email/components"
 
-interface Props { name?: string; bookingRef?: string; productName?: string; quantity?: string; unit?: string; reason?: string; bookingUrl?: string }
+interface Props { name?: string; bookingRef?: string; productName?: string; quantity?: number; reason?: string; bookingUrl?: string }
 
 export default function PreorderRejectedEmail({
   name = "Okandas",
   bookingRef = "FNP-BK-PO-0001",
   productName = "Fivet Cobb 500 Day-Old Chicks",
-  quantity = "100",
-  unit = "units",
+  quantity = 100,
   reason = "Insufficient stock for requested quantity",
   bookingUrl = "https://farmnport.com/account/bookings/preview",
 }: Props) {
@@ -21,7 +20,7 @@ export default function PreorderRejectedEmail({
         <Section style={content}>
           <Section style={pillWrapper}><Text style={pill}>Not Fulfilled</Text></Section>
           <Text style={greeting}>Hi {name},</Text>
-          <Text style={paragraph}>Unfortunately, your booking request for {quantity} {unit || "units"} of {productName} could not be fulfilled.</Text>
+          <Text style={paragraph}>Unfortunately, your booking request for {quantity} {productName} could not be fulfilled.</Text>
           <Section style={refCard}><Text style={refLabel}>Booking reference</Text><Text style={refNumber}>{bookingRef}</Text></Section>
           {reason && (
             <>

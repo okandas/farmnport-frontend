@@ -483,6 +483,7 @@ export function adminCreateLot(data: {
   unit: string
   price_per_unit_cents: number
   notes?: string
+  is_test?: boolean
   expires_at: string
   main_image?: ImageModel
   images?: ImageModel[]
@@ -506,6 +507,7 @@ export function updateLot(slug: string, data: {
   unit: string
   price_per_unit_cents: number
   notes: string
+  is_test?: boolean
   expires_date: string
   expires_time: string
 }) {
@@ -680,6 +682,59 @@ export function updateAnimalHealthTarget(data: { id: string; name: string; scien
 export function deleteAnimalHealthTargets(targetIds: string[]) {
   let url = `${baseUrl}/user/animal-health-targets/delete`
   return api.post(url, { target_ids: targetIds })
+}
+
+// Equipment Product functions
+export function queryEquipmentProducts(pagination?: pagination) {
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) params.append("p", String(pagination.p))
+  if (pagination?.search !== undefined && pagination.search.length >= 2) params.append("search", pagination.search)
+  const qs = params.toString()
+  return api.get(qs ? `${baseUrl}/user/equipment-products?${qs}` : `${baseUrl}/user/equipment-products`)
+}
+
+export function queryEquipmentProduct(id: string) {
+  const url = `${baseUrl}/user/equipment-products/${id}`
+  return api.get(url)
+}
+
+export function addEquipmentProduct(data: any) {
+  let url = `${baseUrl}/user/equipment-products/add`
+  return api.post(url, data)
+}
+
+export function updateEquipmentProduct(data: any) {
+  let url = `${baseUrl}/user/equipment-products/update`
+  return api.post(url, data)
+}
+
+// Equipment Category functions
+export function queryEquipmentCategories(pagination?: pagination) {
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) params.append("p", String(pagination.p))
+  if (pagination?.search !== undefined && pagination.search.length >= 2) params.append("search", pagination.search)
+  const qs = params.toString()
+  return api.get(qs ? `${baseUrl}/user/equipment-categories?${qs}` : `${baseUrl}/user/equipment-categories`)
+}
+
+export function queryEquipmentCategory(id: string) {
+  const url = `${baseUrl}/user/equipment-categories/${id}`
+  return api.get(url)
+}
+
+export function addEquipmentCategory(data: { name: string; short_description: string; description: string }) {
+  let url = `${baseUrl}/user/equipment-categories/add`
+  return api.post(url, data)
+}
+
+export function updateEquipmentCategory(data: { id: string; name: string; short_description: string; description: string }) {
+  let url = `${baseUrl}/user/equipment-categories/update`
+  return api.post(url, data)
+}
+
+export function deleteEquipmentCategories(categoryIds: string[]) {
+  let url = `${baseUrl}/user/equipment-categories/delete`
+  return api.post(url, { category_ids: categoryIds })
 }
 
 // Spray Program functions
@@ -1603,6 +1658,7 @@ export function createPreOrder(data: {
   close_date: string
   status?: string
   image_src?: string
+  other_images?: string[]
   market_side?: string
   payment_deadline_hours?: number
   buyer_notes?: boolean
@@ -1636,6 +1692,7 @@ export function updatePreOrder(id: string, data: Partial<{
   open_date: string
   close_date: string
   image_src: string
+  other_images: string[]
   payment_deadline_hours: number
   buyer_notes: boolean
   cancellation_fee: number

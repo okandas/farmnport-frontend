@@ -2,8 +2,6 @@ import { Client } from "@/components/layouts/client"
 import { retrieveUser } from "@/lib/actions"
 import { AppURL } from "@/lib/schemas"
 import { QuickLinks } from "@/components/generic/quick-links"
-import { ShareBar } from "@/components/shared/ShareBar"
-
 import type { Metadata, ResolvingMetadata } from 'next'
 
 import { unSlug } from "@/lib/utilities"
@@ -48,7 +46,6 @@ export default async function BuyerPage({ params }:  BuyerPageProps) {
   return(
     <main className="min-h-[70lvh]">
       <h1 className="sr-only">{name} - Farmer in Zimbabwe</h1>
-      <div className="mt-3"><ShareBar name={name} /></div>
       <div className="mx-auto max-w-7xl min-h-[70lvh]">
         <div className="lg:flex lg:space-x-10">
           <Client slug={slug} user={user}/>
