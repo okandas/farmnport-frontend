@@ -69,20 +69,27 @@ export default async function BuyDocumentDetailPage({ params }: Props) {
 
                     {/* Left col: image + description */}
                     <div className="space-y-6">
-                        <ProductImageGallery
-                            images={allImages.map((src: string) => ({ img: { src } }))}
-                            name={doc.title}
-                            fallback={<FileText className="w-24 h-24 text-muted-foreground/20" />}
-                        />
+                        <div className="relative">
+                            <ProductImageGallery
+                                images={allImages.map((src: string) => ({ img: { src } }))}
+                                name={doc.title}
+                                fallback={<FileText className="w-24 h-24 text-muted-foreground/20" />}
+                            />
+                            {doc.is_test && (
+                                <span className="absolute top-2 left-20 bg-amber-500 text-white text-[10px] font-semibold px-2 py-0.5 rounded-md z-10">
+                                    Test Item
+                                </span>
+                            )}
+                        </div>
 
                         {doc.description && (
                             <div className="flex gap-2">
                                 {allImages.length > 1 && <div className="w-16 shrink-0" />}
                                 <div className="flex-1">
                                     <p className="text-lg font-semibold mb-3">Description</p>
-                                    <div className="prose prose-sm prose-neutral dark:prose-invert max-w-none
+                                    <div className="prose prose-sm prose-neutral dark:prose-invert max-w-none text-foreground
                                         prose-headings:text-sm prose-headings:text-muted-foreground prose-headings:font-normal
-                                        prose-strong:text-foreground prose-strong:font-medium [&_strong]:!font-medium
+                                        prose-strong:text-foreground prose-strong:font-semibold [&_p>strong]:block [&_p>strong]:mt-4 [&_p>strong]:mb-1 [&_p>strong]:text-sm [&_p>strong]:uppercase [&_p>strong]:tracking-widest [&_p>strong]:text-foreground
                                         prose-ul:my-2 prose-li:my-0.5
                                         prose-p:leading-relaxed prose-p:my-2">
                                         <ReactMarkdown>{doc.description}</ReactMarkdown>
