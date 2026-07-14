@@ -506,6 +506,7 @@ export function updateLot(slug: string, data: {
   unit: string
   price_per_unit_cents: number
   notes: string
+  is_test?: boolean
   expires_date: string
   expires_time: string
 }) {
