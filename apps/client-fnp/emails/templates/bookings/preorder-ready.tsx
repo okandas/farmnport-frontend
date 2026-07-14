@@ -13,7 +13,7 @@ export default function PreorderReadyEmail({
   return (
     <Html lang="en">
       <Head />
-      <Preview>Your {quantity} {productName} are ready for collection</Preview>
+      <Preview>{`Your ${String(quantity)} ${productName} are ready for collection`}</Preview>
       <Body style={body}><Container style={container}>
         <Section style={header}><Text style={brandName}>farmnport</Text><Text style={brandTagline}>getting you to market</Text></Section>
         <Hr style={headerDivider} />

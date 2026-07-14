@@ -15,7 +15,7 @@ export default function PreorderRequestAdminEmail({
   return (
     <Html lang="en">
       <Head />
-      <Preview>New pre-order request from {customerName} — {quantity} {productName}</Preview>
+      <Preview>{`New pre-order request from ${customerName} — ${String(quantity)} ${productName}`}</Preview>
       <Body style={body}><Container style={container}>
         <Section style={header}><Text style={brandName}>farmnport</Text><Text style={brandTagline}>admin alert</Text></Section>
         <Hr style={headerDivider} />

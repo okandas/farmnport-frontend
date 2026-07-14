@@ -14,7 +14,7 @@ export default function PreorderDepositPaidEmail({
   return (
     <Html lang="en">
       <Head />
-      <Preview>Payment received — {quantity} {productName} secured</Preview>
+      <Preview>{`Payment received — ${String(quantity)} ${productName} secured`}</Preview>
       <Body style={body}><Container style={container}>
         <Section style={header}><Text style={brandName}>farmnport</Text><Text style={brandTagline}>getting you to market</Text></Section>
         <Hr style={headerDivider} />
