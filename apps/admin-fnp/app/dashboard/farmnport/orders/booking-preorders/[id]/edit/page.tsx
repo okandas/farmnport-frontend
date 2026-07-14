@@ -55,7 +55,7 @@ function ImageUpload({ value, onChange }: { value: string; onChange: (src: strin
             <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
           ) : (
             <>
-              <span className="text-sm text-muted-foreground">Click or drag to upload</span>
+              <span className="text-sm text-muted-foreground">Click to upload</span>
               <span className="text-xs text-muted-foreground mt-1">JPG, PNG, WebP</span>
             </>
           )}
@@ -101,6 +101,7 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
   const [selectedDeliveryLocs, setSelectedDeliveryLocs] = useState<SelectedLocation[] | null>(null)
   const [selectedCollectionLocs, setSelectedCollectionLocs] = useState<SelectedLocation[] | null>(null)
   const [deliveryDates, setDeliveryDates] = useState<Date[] | null>(null)
+  const [otherImages, setOtherImages] = useState<string[] | null>(null)
 
   const events: any[] = data?.data?.preorders ?? []
   const event = events.find((e: any) => e.id === id)
@@ -139,6 +140,9 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
     }
     if (deliveryDates === null) {
       setDeliveryDates((event.delivery_dates ?? []).map((d: string) => new Date(d + "T00:00:00")))
+    }
+    if (otherImages === null) {
+      setOtherImages(event.other_images ?? [])
     }
     setForm({
       subtitle: event.subtitle ?? "",
@@ -186,6 +190,7 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
         open_date: new Date(form!.open_date).toISOString(),
         close_date: form!.close_date ? new Date(form!.close_date).toISOString() : "",
         image_src: form!.image_src || undefined,
+        other_images: otherImages ?? undefined,
         client_id: form!.client_id || undefined,
         client_name: form!.client_name || undefined,
         brand_id: form!.brand_id || undefined,
@@ -257,6 +262,24 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
               <label className={labelCls}>Main Image</label>
               <div className="mt-2">
                 <ImageUpload value={form.image_src} onChange={(src) => set("image_src", src)} />
+              </div>
+            </div>
+            <div className="col-span-full">
+              <label className={labelCls}>Other Images</label>
+              <div className="mt-2 flex flex-wrap gap-3">
+                {(otherImages ?? []).map((src, idx) => (
+                  <div key={idx} className="relative w-32 h-32 rounded-lg overflow-hidden border border-border">
+                    <Image src={src} alt={`image ${idx + 1}`} fill className="object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => setOtherImages((prev) => (prev ?? []).filter((_, i) => i !== idx))}
+                      className="absolute top-1 right-1 w-5 h-5 rounded-full bg-red-600 text-white flex items-center justify-center hover:bg-red-700"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                ))}
+                <ImageUpload value="" onChange={(src) => setOtherImages((prev) => [...(prev ?? []), src])} />
               </div>
             </div>
             <div className="sm:col-span-3">

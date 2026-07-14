@@ -1656,6 +1656,7 @@ export function createPreOrder(data: {
   close_date: string
   status?: string
   image_src?: string
+  other_images?: string[]
   market_side?: string
   payment_deadline_hours?: number
   buyer_notes?: boolean
@@ -1689,6 +1690,7 @@ export function updatePreOrder(id: string, data: Partial<{
   open_date: string
   close_date: string
   image_src: string
+  other_images: string[]
   payment_deadline_hours: number
   buyer_notes: boolean
   cancellation_fee: number

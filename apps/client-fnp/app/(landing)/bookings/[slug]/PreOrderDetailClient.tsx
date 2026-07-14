@@ -12,6 +12,7 @@ import { toast } from "sonner"
 import { createBooking, queryClient as queryClientProfile } from "@/lib/query"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ShareBar } from "@/components/shared/ShareBar"
+import { ProductImageGallery } from "@/components/shared/ProductImageGallery"
 import { Calendar } from "@/components/ui/calendar"
 
 function formatDate(d: string) {
@@ -127,16 +128,17 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
 
           {/* ── Column 1: Image ── */}
           <div>
-            {event.image_src ? (
-              <div className="relative aspect-square w-full rounded-2xl overflow-hidden border bg-muted">
-                <Image src={event.image_src} alt={event.name} fill className="object-cover" />
-                {event.is_test && <span className="absolute top-3 right-3 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded">TEST</span>}
-              </div>
-            ) : (
-              <div className="relative aspect-square w-full rounded-2xl border bg-muted/40">
-                {event.is_test && <span className="absolute top-3 right-3 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded">TEST</span>}
-              </div>
-            )}
+            <div className="relative">
+              <ProductImageGallery
+                images={[
+                  ...(event.image_src ? [{ img: { src: event.image_src } }] : []),
+                  ...((event.other_images ?? []).map((src: string) => ({ img: { src } }))),
+                ]}
+                name={event.name}
+                height={400}
+              />
+              {event.is_test && <span className="absolute top-3 right-3 z-10 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded">TEST</span>}
+            </div>
 
             <div className="mt-4 space-y-3">
               <div className="flex gap-3 flex-wrap">
