@@ -35,7 +35,7 @@ export function ProductImageGallery({ images, name, height = 520, fallback }: Pr
                             <button
                                 key={idx}
                                 onClick={() => setSelected(idx)}
-                                className={`relative w-16 h-16 rounded-lg border-2 overflow-hidden bg-white transition-colors ${
+                                className={`relative w-16 h-16 rounded-lg border-2 overflow-hidden bg-background transition-colors ${
                                     selected === idx ? "border-primary" : "border-border hover:border-primary/50"
                                 }`}
                             >
@@ -49,7 +49,7 @@ export function ProductImageGallery({ images, name, height = 520, fallback }: Pr
                     </div>
                 )}
                 <button
-                    className="relative flex-1 bg-white rounded-xl border overflow-hidden cursor-zoom-in group"
+                    className="relative flex-1 bg-background rounded-xl border overflow-hidden cursor-zoom-in group"
                     style={{ height }}
                     onClick={() => images[selected]?.img?.src && setOpen(true)}
                 >
@@ -66,7 +66,7 @@ export function ProductImageGallery({ images, name, height = 520, fallback }: Pr
                         <FpPlaceholder />
                     )}
                     {images[selected]?.img?.src && (
-                        <span className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full bg-white border border-border text-foreground shadow-sm">
+                        <span className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full bg-background border border-border text-foreground shadow-sm">
                             <Expand className="w-4 h-4" />
                         </span>
                     )}
@@ -74,7 +74,7 @@ export function ProductImageGallery({ images, name, height = 520, fallback }: Pr
             </div>
 
             <Dialog open={open} onOpenChange={setOpen}>
-                <DialogContent className="max-w-5xl h-[85vh] p-0 bg-white">
+                <DialogContent className="max-w-5xl h-[85vh] p-0 bg-background">
 
                     <div className="flex h-full">
                         {images.length > 1 && (
@@ -83,7 +83,7 @@ export function ProductImageGallery({ images, name, height = 520, fallback }: Pr
                                     <button
                                         key={idx}
                                         onClick={() => setSelected(idx)}
-                                        className={`relative w-14 h-14 rounded-lg border-2 overflow-hidden bg-white shrink-0 transition-colors ${
+                                        className={`relative w-14 h-14 rounded-lg border-2 overflow-hidden bg-background shrink-0 transition-colors ${
                                             selected === idx ? "border-primary" : "border-border hover:border-primary/50"
                                         }`}
                                     >
@@ -102,13 +102,13 @@ export function ProductImageGallery({ images, name, height = 520, fallback }: Pr
                                 <>
                                     <button
                                         onClick={() => setSelected((selected - 1 + images.length) % images.length)}
-                                        className="absolute left-3 z-50 w-9 h-9 flex items-center justify-center rounded-full border border-border bg-white hover:bg-muted text-foreground transition-colors"
+                                        className="absolute left-3 z-50 w-9 h-9 flex items-center justify-center rounded-full border border-border bg-background hover:bg-muted text-foreground transition-colors"
                                     >
                                         <ChevronLeft className="w-5 h-5" />
                                     </button>
                                     <button
                                         onClick={() => setSelected((selected + 1) % images.length)}
-                                        className="absolute right-3 z-50 w-9 h-9 flex items-center justify-center rounded-full border border-border bg-white hover:bg-muted text-foreground transition-colors"
+                                        className="absolute right-3 z-50 w-9 h-9 flex items-center justify-center rounded-full border border-border bg-background hover:bg-muted text-foreground transition-colors"
                                     >
                                         <ChevronRight className="w-5 h-5" />
                                     </button>
@@ -136,7 +136,7 @@ export function ProductImageGallery({ images, name, height = 520, fallback }: Pr
                                     sendGTMEvent({ event: "product_share", product_name: name })
                                     setTimeout(() => setCopied(false), 2000)
                                 }}
-                                className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border bg-white hover:bg-muted text-sm text-foreground transition-colors"
+                                className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border bg-background hover:bg-muted text-sm text-foreground transition-colors"
                             >
                                 {copied ? <Check className="w-4 h-4 text-green-600" /> : <Link2 className="w-4 h-4" />}
                                 {copied ? "Copied!" : "Copy link"}
@@ -148,7 +148,7 @@ export function ProductImageGallery({ images, name, height = 520, fallback }: Pr
                                         sendGTMEvent({ event: "product_share", product_name: name })
                                     }
                                 }}
-                                className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border bg-white hover:bg-muted text-sm text-foreground transition-colors"
+                                className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border bg-background hover:bg-muted text-sm text-foreground transition-colors"
                             >
                                 <Share2 className="w-4 h-4" />
                                 Share

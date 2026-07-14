@@ -8,6 +8,7 @@ import { documentsEnabled } from "@/flags"
 import { DocumentPricingPanel } from "@/components/shop/DocumentPricingPanel"
 import { Badge } from "@/components/ui/badge"
 import { ProductImageGallery } from "@/components/shared/ProductImageGallery"
+import ReactMarkdown from "react-markdown"
 
 interface Props {
     params: Promise<{ slug: string }>
@@ -64,94 +65,52 @@ export default async function BuyDocumentDetailPage({ params }: Props) {
             </div>
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div className="grid lg:grid-cols-[480px_1fr_300px] gap-8 items-start">
+                <div className="grid lg:grid-cols-[1fr_360px] gap-8 items-start">
 
-                    {/* Column 1: Image */}
-                    <ProductImageGallery
-                        images={allImages.map((src: string) => ({ img: { src } }))}
-                        name={doc.title}
-                        fallback={<FileText className="w-24 h-24 text-muted-foreground/20" />}
-                    />
-
-                    {/* Column 2: Details */}
-                    <div className="space-y-5">
-                        {doc.category && (
-                            <span className="text-xs uppercase tracking-widest font-semibold text-muted-foreground">
-                                {doc.category.replace(/-/g, " ")}
-                            </span>
-                        )}
-
-                        <div>
-                            <h1 className="text-2xl lg:text-3xl font-bold leading-snug">{doc.title}</h1>
-                            {doc.brand?.name && (
-                                <p className="text-sm text-muted-foreground font-medium mt-1">{doc.brand.name}</p>
-                            )}
-                            <div className="mt-3">
-                                <ShareBar name={doc.title} />
-                            </div>
-                        </div>
+                    {/* Left col: image + description */}
+                    <div className="space-y-6">
+                        <ProductImageGallery
+                            images={allImages.map((src: string) => ({ img: { src } }))}
+                            name={doc.title}
+                            fallback={<FileText className="w-24 h-24 text-muted-foreground/20" />}
+                        />
 
                         {doc.description && (
-                            <p className="text-muted-foreground leading-relaxed">{doc.description}</p>
-                        )}
-
-                        <div className="h-px bg-border" />
-
-                        {/* File meta */}
-                        <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
-                            {doc.file_type && (
-                                <span className="flex items-center gap-1.5">
-                                    <FileText className="w-4 h-4" />
-                                    {doc.file_type.toUpperCase()} file
-                                </span>
-                            )}
-                            {fileSizeKB && (
-                                <span className="flex items-center gap-1.5">
-                                    <Download className="w-4 h-4" />
-                                    {fileSizeKB < 1024 ? `${fileSizeKB} KB` : `${(fileSizeKB / 1024).toFixed(1)} MB`}
-                                </span>
-                            )}
-                        </div>
-
-                        {doc.tags?.length > 0 && (
-                            <div className="flex flex-wrap gap-2">
-                                {doc.tags.map((tag: string) => (
-                                    <Badge key={tag} variant="secondary" className="gap-1 font-normal">
-                                        <Tag className="w-3 h-3" />
-                                        {tag}
-                                    </Badge>
-                                ))}
+                            <div className="prose prose-sm prose-neutral dark:prose-invert max-w-none text-muted-foreground
+                                prose-headings:text-foreground prose-headings:font-semibold
+                                prose-strong:text-foreground prose-strong:font-semibold
+                                prose-ul:my-2 prose-li:my-0.5
+                                prose-p:leading-relaxed prose-p:my-2">
+                                <ReactMarkdown>{doc.description}</ReactMarkdown>
                             </div>
                         )}
-
-                        <div className="h-px bg-border" />
-
-                        {/* What you get */}
-                        <div>
-                            <p className="text-sm font-semibold mb-3">What you get</p>
-                            <ul className="space-y-2.5 text-sm text-muted-foreground">
-                                <li className="flex items-start gap-2">
-                                    <Download className="w-4 h-4 mt-0.5 shrink-0 text-green-600" />
-                                    Instant digital download after payment
-                                </li>
-                                <li className="flex items-start gap-2">
-                                    <ShieldCheck className="w-4 h-4 mt-0.5 shrink-0 text-green-600" />
-                                    Watermarked with your name for security
-                                </li>
-                                <li className="flex items-start gap-2">
-                                    <RotateCcw className="w-4 h-4 mt-0.5 shrink-0 text-green-600" />
-                                    Re-download anytime from your account
-                                </li>
-                                <li className="flex items-start gap-2">
-                                    <Hash className="w-4 h-4 mt-0.5 shrink-0 text-green-600" />
-                                    Unique license serial number included
-                                </li>
-                            </ul>
-                        </div>
                     </div>
 
-                    {/* Column 3: Sticky pricing panel */}
-                    <div className="sticky top-20">
+                    {/* Right col: title + price card + file meta + what you get */}
+                    <div className="sticky top-20 space-y-6">
+                        <div className="space-y-3">
+                            {doc.category && (
+                                <span className="text-xs uppercase tracking-widest font-semibold text-muted-foreground">
+                                    {doc.category.replace(/-/g, " ")}
+                                </span>
+                            )}
+                            <h1 className="text-2xl font-bold leading-snug">{doc.title}</h1>
+                            {doc.brand?.name && (
+                                <p className="text-sm text-muted-foreground font-medium">{doc.brand.name}</p>
+                            )}
+                            {doc.tags?.length > 0 && (
+                                <div className="flex flex-wrap gap-2">
+                                    {doc.tags.map((tag: string) => (
+                                        <Badge key={tag} variant="secondary" className="gap-1 font-normal">
+                                            <Tag className="w-3 h-3" />
+                                            {tag}
+                                        </Badge>
+                                    ))}
+                                </div>
+                            )}
+                            <ShareBar name={doc.title} />
+                        </div>
+
                         <DocumentPricingPanel
                             docId={doc.id}
                             docSlug={slug}
@@ -159,6 +118,46 @@ export default async function BuyDocumentDetailPage({ params }: Props) {
                             priceCents={doc.price_cents}
                             price={price}
                         />
+
+                        {/* File meta */}
+                        <div className="space-y-4 pt-2">
+                            <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
+                                {doc.file_type && (
+                                    <span className="flex items-center gap-1.5">
+                                        <FileText className="w-4 h-4" />
+                                        {doc.file_type.toUpperCase()} file
+                                    </span>
+                                )}
+                                {fileSizeKB && (
+                                    <span className="flex items-center gap-1.5">
+                                        <Download className="w-4 h-4" />
+                                        {fileSizeKB < 1024 ? `${fileSizeKB} KB` : `${(fileSizeKB / 1024).toFixed(1)} MB`}
+                                    </span>
+                                )}
+                            </div>
+
+                            <div>
+                                <p className="text-sm font-semibold mb-3">What you get</p>
+                                <ul className="space-y-2.5 text-sm text-muted-foreground">
+                                    <li className="flex items-start gap-2">
+                                        <Download className="w-4 h-4 mt-0.5 shrink-0 text-green-600" />
+                                        Instant digital download after payment
+                                    </li>
+                                    <li className="flex items-start gap-2">
+                                        <ShieldCheck className="w-4 h-4 mt-0.5 shrink-0 text-green-600" />
+                                        Watermarked with your name for security
+                                    </li>
+                                    <li className="flex items-start gap-2">
+                                        <RotateCcw className="w-4 h-4 mt-0.5 shrink-0 text-green-600" />
+                                        Re-download anytime from your account
+                                    </li>
+                                    <li className="flex items-start gap-2">
+                                        <Hash className="w-4 h-4 mt-0.5 shrink-0 text-green-600" />
+                                        Unique license serial number included
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
 
                 </div>
