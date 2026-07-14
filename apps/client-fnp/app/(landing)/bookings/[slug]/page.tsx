@@ -1,3 +1,4 @@
+import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { bookingsEnabled, preorderDepositEnabled } from "@/flags"
 import { serverFetch } from "@/lib/serverFetch"
@@ -6,6 +7,42 @@ import PreOrderDetailClient from "./PreOrderDetailClient"
 
 interface Props {
     params: Promise<{ slug: string }>
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+    try {
+        const { slug } = await params
+        const res = await serverFetch(`/booking/preorders/${slug}`).catch(() => null)
+        const p = res?.preorder
+        if (!p) return {}
+
+        const supplier = p.client_name || p.brand_name || ""
+        const produce = p.produce_name || ""
+        const isBuyer = p.market_side === "demand"
+        const action = isBuyer ? "Buying" : "Selling"
+        const cta = isBuyer ? "Supply Now" : "Book Now"
+
+        const title = `${supplier} ${action} ${produce} — ${cta} | farmnport`
+        const description = p.description || (isBuyer
+            ? `${supplier} is looking for ${produce}. Supply them now on farmnport.com.`
+            : `${supplier} is selling ${produce}. Pre-order now on farmnport.com — secure your stock before it sells out.`)
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://farmnport.com"
+
+        return {
+            title,
+            description,
+            openGraph: {
+                title,
+                description,
+                url: `${baseUrl}/bookings/${slug}`,
+                images: p.image_src ? [{ url: p.image_src }] : [],
+                siteName: "farmnport",
+                type: "website",
+            },
+        }
+    } catch {
+        return {}
+    }
 }
 
 export default async function PreOrderDetailPage({ params }: Props) {
