@@ -483,6 +483,7 @@ export function adminCreateLot(data: {
   unit: string
   price_per_unit_cents: number
   notes?: string
+  is_test?: boolean
   expires_at: string
   main_image?: ImageModel
   images?: ImageModel[]
