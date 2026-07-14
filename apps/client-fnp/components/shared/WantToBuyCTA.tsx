@@ -32,16 +32,16 @@ export function WantToBuyCTA({ available_for_sale, name, brand, href, interestHr
     return (
         <Link
             href={interestHref}
-            className="flex items-center gap-3 rounded-xl border-2 border-muted bg-muted/30 hover:bg-muted/50 hover:border-muted-foreground/30 transition-colors px-4 py-3"
+            className="flex items-center gap-3 rounded-xl border-2 border-orange-300 bg-orange-50 hover:bg-orange-100 hover:border-orange-400 transition-colors px-4 py-3"
         >
-            <div className="flex items-center justify-center w-9 h-9 rounded-full bg-muted shrink-0">
-                <Bell className="w-4 h-4 text-muted-foreground" />
+            <div className="flex items-center justify-center w-9 h-9 rounded-full bg-orange-100 shrink-0">
+                <Bell className="w-4 h-4 text-orange-600" />
             </div>
             <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-foreground">Want to buy this?</p>
-                <p className="text-xs text-muted-foreground">Sign in and register your interest</p>
+                <p className="text-xs text-orange-700">Sign in and register your interest</p>
             </div>
-            <span className="text-xs font-medium text-muted-foreground shrink-0">Notify me →</span>
+            <span className="text-xs font-medium text-orange-700 shrink-0">Notify me →</span>
         </Link>
     )
 }

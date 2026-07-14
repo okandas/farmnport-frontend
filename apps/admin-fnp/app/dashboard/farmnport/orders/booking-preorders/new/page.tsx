@@ -4,18 +4,65 @@ import { useState } from "react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
 import { Loader2, X, MapPin, Search } from "lucide-react"
+
 import { toast } from "@/components/ui/use-toast"
 import Link from "next/link"
 
-import { createPreOrder, queryClientLocations, queryUsers, queryFarmProduce, queryBreeds, queryBrands } from "@/lib/query"
+import { createPreOrder, queryClientLocations, queryUsers, queryFarmProduce, queryBreeds, queryBrands, uploadImage } from "@/lib/query"
 import { capitalizeWords } from "@/lib/utilities"
 import { DashboardHeader } from "@/components/state/dashboardHeader"
 import { DashboardShell } from "@/components/state/dashboardShell"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { SearchSelect } from "@/components/ui/search-select"
 import { Calendar } from "@/components/ui/calendar"
+import Image from "next/image"
 
 type SelectedLocation = { id: string; name: string }
+
+function ImageUpload({ value, onChange }: { value: string; onChange: (src: string) => void }) {
+  const mutation = useMutation({
+    mutationFn: uploadImage,
+    onSuccess: (res) => { if (res.data?.img?.src) onChange(res.data.img.src) },
+  })
+
+  function onDrop(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const fd = new FormData()
+    fd.append("product_image", file)
+    mutation.mutate(fd)
+  }
+
+  return (
+    <div className="space-y-3">
+      {value && (
+        <div className="relative w-32 h-32 rounded-lg overflow-hidden border border-border">
+          <Image src={value} alt="main image" fill className="object-cover" />
+          <button
+            type="button"
+            onClick={() => onChange("")}
+            className="absolute top-1 right-1 w-5 h-5 rounded-full bg-red-600 text-white flex items-center justify-center hover:bg-red-700"
+          >
+            <X className="w-3 h-3" />
+          </button>
+        </div>
+      )}
+      {!value && (
+        <label className="flex flex-col items-center justify-center w-full h-32 border border-dashed border-border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors">
+          {mutation.isPending ? (
+            <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+          ) : (
+            <>
+              <span className="text-sm text-muted-foreground">Click or drag to upload</span>
+              <span className="text-xs text-muted-foreground mt-1">JPG, PNG, WebP</span>
+            </>
+          )}
+          <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={onDrop} />
+        </label>
+      )}
+    </div>
+  )
+}
 
 const inputCls = "block w-full rounded-md bg-background px-3 py-1.5 text-sm text-foreground outline outline-1 -outline-offset-1 outline-border placeholder:text-muted-foreground focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-ring"
 const labelCls = "block text-sm/6 font-medium text-foreground"
@@ -236,6 +283,12 @@ export default function NewPreOrderPage() {
               <label className={labelCls}>Description</label>
               <div className="mt-2">
                 <textarea value={form.description} onChange={(e) => set("description", e.target.value)} rows={3} placeholder="What's included in this batch..." className={inputCls + " resize-none"} />
+              </div>
+            </div>
+            <div className="col-span-full">
+              <label className={labelCls}>Main Image</label>
+              <div className="mt-2">
+                <ImageUpload value={form.image_src} onChange={(src) => set("image_src", src)} />
               </div>
             </div>
             <div className="sm:col-span-3">
