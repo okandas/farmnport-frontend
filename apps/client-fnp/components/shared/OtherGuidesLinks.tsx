@@ -6,9 +6,10 @@ const guides = [
     { key: "animal-health", label: "Animal Health", href: "/animal-health-guides" },
     { key: "animal-nutrition", label: "Animal Nutrition", href: "/feed-guides" },
     { key: "seeds", label: "Seeds", href: "/seed-guides" },
+    { key: "equipment", label: "Equipment", href: "/equipment-guides" },
 ]
 
-export function OtherGuidesLinks({ current }: { current: "agrochemical" | "plant-nutrition" | "animal-health" | "animal-nutrition" | "seeds" }) {
+export function OtherGuidesLinks({ current }: { current: "agrochemical" | "plant-nutrition" | "animal-health" | "animal-nutrition" | "seeds" | "equipment" }) {
     const others = guides.filter(g => g.key !== current)
 
     return (
