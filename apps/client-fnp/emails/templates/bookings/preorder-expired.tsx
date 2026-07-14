@@ -1,13 +1,12 @@
 import { Body, Button, Container, Head, Hr, Html, Preview, Row, Column, Section, Text } from "@react-email/components"
 
-interface Props { name?: string; bookingRef?: string; productName?: string; quantity?: string; unit?: string; bookingUrl?: string }
+interface Props { name?: string; bookingRef?: string; productName?: string; quantity?: number; bookingUrl?: string }
 
 export default function PreorderExpiredEmail({
   name = "Okandas",
   bookingRef = "FNP-BK-PO-0001",
   productName = "Fivet Cobb 500 Day-Old Chicks",
-  quantity = "100",
-  unit = "units",
+  quantity = 100,
   bookingUrl = "https://farmnport.com/account/bookings/preview",
 }: Props) {
   return (
@@ -20,7 +19,7 @@ export default function PreorderExpiredEmail({
         <Section style={content}>
           <Section style={pillWrapper}><Text style={pill}>Booking Expired</Text></Section>
           <Text style={greeting}>Hi {name},</Text>
-          <Text style={paragraph}>Your booking for {quantity} {unit || "units"} of {productName} has expired because the payment was not received within the deadline. Your reserved quantity has been released.</Text>
+          <Text style={paragraph}>Your booking for {quantity} {productName} has expired because the payment was not received within the deadline. Your reserved quantity has been released.</Text>
           <Section style={refCard}><Text style={refLabel}>Booking reference</Text><Text style={refNumber}>{bookingRef}</Text></Section>
           <Text style={paragraph}>If you&apos;d still like to place an order, you can submit a new booking request.</Text>
           <Section style={buttonWrapper}><Button href={bookingUrl} style={button}>View Details</Button></Section>

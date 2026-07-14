@@ -1,20 +1,19 @@
 import { Body, Button, Container, Head, Hr, Html, Preview, Row, Column, Section, Text } from "@react-email/components"
 
-interface Props { name?: string; bookingRef?: string; productName?: string; quantity?: string; unit?: string; balanceDue?: string; bookingUrl?: string }
+interface Props { name?: string; bookingRef?: string; productName?: string; quantity?: number; balanceDue?: string; bookingUrl?: string }
 
 export default function PreorderReadyEmail({
   name = "Okandas",
   bookingRef = "FNP-BK-PO-0001",
   productName = "Fivet Cobb 500 Day-Old Chicks",
-  quantity = "100",
-  unit = "units",
+  quantity = 100,
   balanceDue = "$450.00",
   bookingUrl = "https://farmnport.com/account/bookings/preview",
 }: Props) {
   return (
     <Html lang="en">
       <Head />
-      <Preview>{`Your ${quantity} ${productName} are ready for collection`}</Preview>
+      <Preview>Your {quantity} {productName} are ready for collection</Preview>
       <Body style={body}><Container style={container}>
         <Section style={header}><Text style={brandName}>farmnport</Text><Text style={brandTagline}>getting you to market</Text></Section>
         <Hr style={headerDivider} />
@@ -25,7 +24,7 @@ export default function PreorderReadyEmail({
           <Section style={refCard}><Text style={refLabel}>Booking reference</Text><Text style={refNumber}>{bookingRef}</Text></Section>
           <Text style={sectionLabel}>Collection details</Text>
           <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Produce</Text></Column><Column><Text style={valText}>{productName}</Text></Column></Row>
-          <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Quantity</Text></Column><Column><Text style={valText}>{quantity} {unit || "units"}</Text></Column></Row>
+          <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Quantity</Text></Column><Column><Text style={valText}>{quantity} units</Text></Column></Row>
           <Row style={detailRow}><Column style={detailKey}><Text style={keyText}>Balance due</Text></Column><Column><Text style={depositText}>{balanceDue}</Text></Column></Row>
           <Section style={buttonWrapper}><Button href={bookingUrl} style={button}>View collection details</Button></Section>
           <Hr style={divider} />

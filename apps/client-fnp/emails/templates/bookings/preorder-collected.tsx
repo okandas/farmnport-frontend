@@ -1,13 +1,12 @@
 import { Body, Button, Container, Head, Hr, Html, Preview, Section, Text } from "@react-email/components"
 
-interface Props { name?: string; bookingRef?: string; productName?: string; quantity?: string; unit?: string; bookingUrl?: string }
+interface Props { name?: string; bookingRef?: string; productName?: string; quantity?: number; bookingUrl?: string }
 
 export default function PreorderCollectedEmail({
   name = "Okandas",
   bookingRef = "FNP-BK-PO-0001",
   productName = "Fivet Cobb 500 Day-Old Chicks",
-  quantity = "100",
-  unit = "units",
+  quantity = 100,
   bookingUrl = "https://farmnport.com/account/bookings/preview",
 }: Props) {
   return (
@@ -20,7 +19,7 @@ export default function PreorderCollectedEmail({
         <Section style={content}>
           <Section style={pillWrapper}><Text style={pill}>Collected</Text></Section>
           <Text style={greeting}>Thank you, {name}!</Text>
-          <Text style={paragraph}>Your order of {quantity} {unit || "units"} of {productName} has been collected. Thank you for sourcing with farmnport.</Text>
+          <Text style={paragraph}>Your order of {quantity} {productName} has been collected. Thank you for sourcing with farmnport.</Text>
           <Section style={refCard}><Text style={refLabel}>Booking reference</Text><Text style={refNumber}>{bookingRef}</Text></Section>
           <Section style={buttonWrapper}><Button href={bookingUrl} style={button}>View your booking</Button></Section>
           <Hr style={divider} />

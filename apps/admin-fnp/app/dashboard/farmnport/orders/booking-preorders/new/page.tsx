@@ -164,7 +164,6 @@ export default function NewPreOrderPage() {
     buyer_notes: false,
     cancellation_fee: "0",
     transferable: false,
-    is_test: false,
     delivery_dates: [] as Date[],
   })
 
@@ -198,7 +197,6 @@ export default function NewPreOrderPage() {
         buyer_notes: form.buyer_notes,
         cancellation_fee: parseInt(form.cancellation_fee) || 0,
         transferable: form.transferable,
-        is_test: form.is_test || undefined,
         delivery_dates: form.delivery_dates.length ? form.delivery_dates.map((d) => d.toISOString().split("T")[0]) : undefined,
         delivery_locations: selectedLocations.length ? selectedLocations : undefined,
       }),
@@ -548,13 +546,6 @@ export default function NewPreOrderPage() {
                 <span className={labelCls}>Transferable bookings</span>
               </label>
               <p className="mt-1 text-xs text-muted-foreground">Allow bookings to be transferred to another buyer or variety.</p>
-            </div>
-            <div className="sm:col-span-3">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" checked={form.is_test} onChange={(e) => setForm((f) => ({ ...f, is_test: e.target.checked }))} className="rounded border-border" />
-                <span className={labelCls}>Test item</span>
-              </label>
-              <p className="mt-1 text-xs text-muted-foreground">Mark as test — shown with a TEST badge, hidden from non-internal users on detail page.</p>
             </div>
             {!form.close_date && (
               <div className="col-span-full">

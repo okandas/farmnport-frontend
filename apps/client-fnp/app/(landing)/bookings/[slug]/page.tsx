@@ -17,6 +17,7 @@ export default async function PreOrderDetailPage({ params }: Props) {
     const preorder = res?.preorder ?? null
     if (!preorder) notFound()
     await guardTestItem(!!preorder.is_test)
+
     const depositEnabled = await preorderDepositEnabled()
 
     return <PreOrderDetailClient preorder={preorder} depositEnabled={depositEnabled} />
