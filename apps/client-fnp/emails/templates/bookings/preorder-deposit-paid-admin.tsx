@@ -13,7 +13,7 @@ export default function PreorderAmountPaidAdminEmail({
   return (
     <Html lang="en">
       <Head />
-      <Preview>Payment received from {customerName} — {quantity} {productName}</Preview>
+      <Preview>{`Payment received from ${customerName} — ${quantity} ${productName}`}</Preview>
       <Body style={body}><Container style={container}>
         <Section style={header}><Text style={brandName}>farmnport</Text><Text style={brandTagline}>admin alert</Text></Section>
         <Hr style={headerDivider} />
