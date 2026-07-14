@@ -21,7 +21,7 @@ import { Calendar } from "@/components/ui/calendar"
 
 type SelectedLocation = { id: string; name: string }
 
-function ImageUpload({ value, onChange }: { value: string; onChange: (src: string) => void }) {
+function ImageUpload({ value, onChange, entityId }: { value: string; onChange: (src: string) => void; entityId?: string }) {
   const mutation = useMutation({
     mutationFn: uploadImages,
     onSuccess: (res) => { const src = res.data?.[0]?.img?.src; if (src) onChange(src) },
@@ -32,6 +32,9 @@ function ImageUpload({ value, onChange }: { value: string; onChange: (src: strin
     if (!file) return
     const fd = new FormData()
     fd.append("product_image", file)
+    if (entityId) fd.append("entity_id", entityId)
+    fd.append("entity_type", "booking_preorder")
+    fd.append("field_name", "images")
     mutation.mutate(fd)
   }
 
@@ -261,7 +264,7 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
             <div className="col-span-full">
               <label className={labelCls}>Main Image</label>
               <div className="mt-2">
-                <ImageUpload value={form.image_src} onChange={(src) => set("image_src", src)} />
+                <ImageUpload value={form.image_src} onChange={(src) => set("image_src", src)} entityId={event?.id} />
               </div>
             </div>
             <div className="col-span-full">

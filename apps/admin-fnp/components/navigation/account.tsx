@@ -1,6 +1,8 @@
 "use client"
 
 import Link from "next/link"
+import { useRouter } from "next/navigation"
+import Cookies from "js-cookie"
 import { LogOut, User } from "lucide-react"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -19,6 +21,13 @@ import {
 interface AccountNavigationProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 export function AccountNavigation({ ...props }: AccountNavigationProps) {
+  const router = useRouter()
+
+  function handleLogout() {
+    Cookies.remove("cl_jtkn")
+    router.push("/login")
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -40,7 +49,7 @@ export function AccountNavigation({ ...props }: AccountNavigationProps) {
           </DropdownMenuItem>
         </DropdownMenuGroup>
 
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={handleLogout}>
           <LogOut className="w-4 h-4 mr-2" />
           <span>Log out</span>
           <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
