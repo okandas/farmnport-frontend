@@ -7,7 +7,7 @@ import { Loader2, X } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 
-import { queryAdminPreOrders, updatePreOrder, queryClientLocations, queryUsers, queryFarmProduce, queryFarmProduceById, queryBreeds, queryBreedById, queryBrands, uploadImage } from "@/lib/query"
+import { queryAdminPreOrders, updatePreOrder, queryClientLocations, queryUsers, queryFarmProduce, queryFarmProduceById, queryBreeds, queryBreedById, queryBrands, uploadImages } from "@/lib/query"
 import { LocationMultiSelect } from "@/components/ui/location-multi-select"
 import { capitalizeWords } from "@/lib/utilities"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -23,8 +23,8 @@ type SelectedLocation = { id: string; name: string }
 
 function ImageUpload({ value, onChange }: { value: string; onChange: (src: string) => void }) {
   const mutation = useMutation({
-    mutationFn: uploadImage,
-    onSuccess: (res) => { if (res.data?.img?.src) onChange(res.data.img.src) },
+    mutationFn: uploadImages,
+    onSuccess: (res) => { const src = res.data?.[0]?.img?.src; if (src) onChange(src) },
   })
 
   function onDrop(e: React.ChangeEvent<HTMLInputElement>) {

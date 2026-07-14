@@ -8,7 +8,7 @@ import { Loader2, X, MapPin, Search } from "lucide-react"
 import { toast } from "@/components/ui/use-toast"
 import Link from "next/link"
 
-import { createPreOrder, queryClientLocations, queryUsers, queryFarmProduce, queryBreeds, queryBrands, uploadImage } from "@/lib/query"
+import { createPreOrder, queryClientLocations, queryUsers, queryFarmProduce, queryBreeds, queryBrands, uploadImages } from "@/lib/query"
 import { capitalizeWords } from "@/lib/utilities"
 import { DashboardHeader } from "@/components/state/dashboardHeader"
 import { DashboardShell } from "@/components/state/dashboardShell"
@@ -21,8 +21,8 @@ type SelectedLocation = { id: string; name: string }
 
 function ImageUpload({ value, onChange }: { value: string; onChange: (src: string) => void }) {
   const mutation = useMutation({
-    mutationFn: uploadImage,
-    onSuccess: (res) => { if (res.data?.img?.src) onChange(res.data.img.src) },
+    mutationFn: uploadImages,
+    onSuccess: (res) => { const src = res.data?.[0]?.img?.src; if (src) onChange(src) },
   })
 
   function onDrop(e: React.ChangeEvent<HTMLInputElement>) {
