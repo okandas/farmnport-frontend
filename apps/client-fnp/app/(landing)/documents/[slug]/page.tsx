@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
 import { WantToBuyCTA } from "@/components/shared/WantToBuyCTA"
 import { ShareBar } from "@/components/shared/ShareBar"
+import ReactMarkdown from "react-markdown"
 
 interface Props {
     params: Promise<{ slug: string }>
@@ -140,7 +141,13 @@ export default async function DocumentGuidePage({ params }: Props) {
                         {doc.description && (
                             <div>
                                 <h2 className="text-lg font-semibold mb-3">Overview</h2>
-                                <p className="text-muted-foreground leading-relaxed text-sm">{doc.description}</p>
+                                <div className="prose prose-sm prose-neutral dark:prose-invert max-w-none text-muted-foreground
+                                    prose-headings:text-sm prose-headings:text-muted-foreground prose-headings:font-normal
+                                    [&_strong]:!font-normal [&_strong]:text-foreground [&_p>strong]:block [&_p>strong]:mt-4 [&_p>strong]:mb-1 [&_p>strong]:text-base
+                                    prose-ul:my-2 prose-li:my-0.5
+                                    prose-p:leading-relaxed prose-p:my-2">
+                                    <ReactMarkdown>{doc.description}</ReactMarkdown>
+                                </div>
                             </div>
                         )}
 
