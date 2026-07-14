@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useEffect, useRef, ReactNode } from "react"
-import { trackViewItem } from "@/lib/analytics"
+import { useState, ReactNode } from "react"
+import { trackViewGuide } from "@/lib/analytics"
 import { createPortal } from "react-dom"
 import Link from "next/link"
 import { ProductImageGallery } from "@/components/shared/ProductImageGallery"
@@ -45,19 +45,6 @@ export function BuyProductInteractive({
   const inStock = product.available_for_sale && (product.stock_level === undefined || product.stock_level > 0)
   const [selectedVariant, setSelectedVariant] = useState<any>(hasVariants ? product.variants[0] : null)
 const [mounted, setMounted] = useState(false)
-  const viewTracked = useRef(false)
-  useEffect(() => {
-    setMounted(true)
-    if (!viewTracked.current && displayPrice !== null) {
-      trackViewItem({
-        item_id: product.id,
-        item_name: product.name,
-        item_category: categoryName ?? productType,
-        price: displayPrice,
-      })
-      viewTracked.current = true
-    }
-  }, [])
 
   const displayPrice = selectedVariant?.sale_price
     ? selectedVariant.sale_price / 100
@@ -153,7 +140,16 @@ const [mounted, setMounted] = useState(false)
           {tabsContent}
 
           {guideHref && (
-            <Link href={guideHref} className="text-sm text-primary hover:underline inline-flex items-center gap-1">
+            <Link
+              href={guideHref}
+              className="text-sm text-primary hover:underline inline-flex items-center gap-1"
+              onClick={() => trackViewGuide({
+                item_id: product.id,
+                item_name: product.name,
+                item_category: categoryName ?? productType,
+                price: displayPrice ?? 0,
+              })}
+            >
               {guideLabel}
             </Link>
           )}
