@@ -76,12 +76,18 @@ export default async function BuyDocumentDetailPage({ params }: Props) {
                         />
 
                         {doc.description && (
-                            <div className="prose prose-sm prose-neutral dark:prose-invert max-w-none text-muted-foreground
-                                prose-headings:text-foreground prose-headings:font-semibold
-                                prose-strong:text-foreground prose-strong:font-semibold
-                                prose-ul:my-2 prose-li:my-0.5
-                                prose-p:leading-relaxed prose-p:my-2">
-                                <ReactMarkdown>{doc.description}</ReactMarkdown>
+                            <div className="flex gap-2">
+                                {allImages.length > 1 && <div className="w-16 shrink-0" />}
+                                <div className="flex-1">
+                                    <p className="text-lg font-semibold mb-3">Description</p>
+                                    <div className="prose prose-sm prose-neutral dark:prose-invert max-w-none
+                                        prose-headings:text-sm prose-headings:text-muted-foreground prose-headings:font-normal
+                                        prose-strong:text-foreground prose-strong:font-medium [&_strong]:!font-medium
+                                        prose-ul:my-2 prose-li:my-0.5
+                                        prose-p:leading-relaxed prose-p:my-2">
+                                        <ReactMarkdown>{doc.description}</ReactMarkdown>
+                                    </div>
+                                </div>
                             </div>
                         )}
                     </div>

@@ -2,6 +2,11 @@
 
 import Link from "next/link"
 import { useState } from "react"
+import dynamic from "next/dynamic"
+import "@uiw/react-md-editor/markdown-editor.css"
+import "@uiw/react-markdown-preview/markdown.css"
+
+const MDEditor = dynamic(() => import("@uiw/react-md-editor"), { ssr: false })
 import { useMutation } from "@tanstack/react-query"
 import { useForm } from "react-hook-form"
 import { useRouter } from "next/navigation"
@@ -366,7 +371,13 @@ export default function DocumentForm({ mode, documentId, defaultValues }: Docume
                                                 <FormField control={form.control} name="description" render={({ field }) => (
                                                     <FormItem>
                                                         <FormControl>
-                                                            <Textarea rows={4} placeholder="What's included, who it's for, key contents…" className={inputClass} {...field} />
+                                                            <MDEditor
+                                                                value={field.value}
+                                                                onChange={(val) => field.onChange(val ?? "")}
+                                                                preview="live"
+                                                                height={300}
+                                                                data-color-mode="dark"
+                                                            />
                                                         </FormControl>
                                                         <FormMessage />
                                                     </FormItem>
