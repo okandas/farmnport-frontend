@@ -25,7 +25,7 @@ export function AccountNavigation({ ...props }: AccountNavigationProps) {
 
   function handleLogout() {
     Cookies.remove("cl_jtkn")
-    router.push("/login")
+    router.push("/")
   }
 
   return (
