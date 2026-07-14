@@ -79,7 +79,7 @@ export function ProductImageGallery({ images, name, height = 520, fallback }: Pr
 
                     <div className="flex h-full">
                         {images.length > 1 && (
-                            <div className="flex flex-col gap-1.5 p-2 overflow-y-auto shrink-0 w-16">
+                            <div className="flex flex-col gap-1.5 p-3 overflow-y-auto shrink-0 w-20">
                                 {images.map((img, idx) => (
                                     <button
                                         key={idx}

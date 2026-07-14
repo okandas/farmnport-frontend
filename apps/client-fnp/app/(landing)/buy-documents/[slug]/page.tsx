@@ -87,9 +87,9 @@ export default async function BuyDocumentDetailPage({ params }: Props) {
                                 {allImages.length > 1 && <div className="w-16 shrink-0" />}
                                 <div className="flex-1">
                                     <p className="text-lg font-semibold mb-3">Description</p>
-                                    <div className="prose prose-sm prose-neutral dark:prose-invert max-w-none text-foreground
+                                    <div className="prose prose-sm prose-neutral dark:prose-invert max-w-none text-muted-foreground
                                         prose-headings:text-sm prose-headings:text-muted-foreground prose-headings:font-normal
-                                        prose-strong:text-foreground prose-strong:font-semibold [&_p>strong]:block [&_p>strong]:mt-4 [&_p>strong]:mb-1 [&_p>strong]:text-sm [&_p>strong]:uppercase [&_p>strong]:tracking-widest [&_p>strong]:text-foreground
+                                        [&_strong]:!font-normal [&_strong]:text-foreground [&_p>strong]:block [&_p>strong]:mt-4 [&_p>strong]:mb-1 [&_p>strong]:text-base
                                         prose-ul:my-2 prose-li:my-0.5
                                         prose-p:leading-relaxed prose-p:my-2">
                                         <ReactMarkdown>{doc.description}</ReactMarkdown>
