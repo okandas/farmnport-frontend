@@ -321,6 +321,67 @@ export function PricesBoard({ mode = "kg" }: { mode?: Mode }) {
     .sort((a, b) => b.pct! - a.pct!)
     .slice(0, 3)
 
+  const initialLoading = !cdmData && !seriesSummaryData && !headSummaryData
+
+  if (initialLoading) {
+    return (
+      <main className="min-h-screen">
+        {/* stat strip skeleton */}
+        <div className="border-b bg-muted/30">
+          <div className="px-4 sm:px-6 lg:px-8 py-2 flex gap-5">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="h-4 w-24 rounded bg-muted animate-pulse" />
+            ))}
+          </div>
+        </div>
+
+        <div className="flex items-stretch min-h-[calc(100vh-33px)]">
+          <div className="flex-1 min-w-0">
+            <div className="px-4 sm:px-6 lg:px-8 py-10">
+              {/* hero skeleton */}
+              <div className="mb-8">
+                <div className="h-9 w-72 rounded bg-muted animate-pulse" />
+                <div className="h-4 w-48 rounded bg-muted animate-pulse mt-3" />
+              </div>
+
+              {/* summary cards skeleton */}
+              <ul className="grid grid-cols-1 gap-x-6 gap-y-4 lg:grid-cols-3 xl:gap-x-8 mb-10">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <li key={i} className="overflow-hidden rounded-lg outline outline-1 outline-gray-200 dark:outline-white/10">
+                    <div className="px-5 py-5 space-y-4">
+                      <div className="h-4 w-40 rounded bg-muted animate-pulse" />
+                      {Array.from({ length: 3 }).map((_, j) => (
+                        <div key={j} className="flex items-center gap-3">
+                          <div className="h-6 w-10 rounded bg-muted animate-pulse" />
+                          <div className="h-4 flex-1 rounded bg-muted animate-pulse" />
+                          <div className="h-4 w-16 rounded bg-muted animate-pulse" />
+                        </div>
+                      ))}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+
+              {/* table skeleton */}
+              <div className="h-8 w-64 rounded bg-muted animate-pulse mb-4" />
+              <div className="space-y-4 px-4 md:px-8 py-4">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <div key={i} className="flex items-center gap-4">
+                    <div className="h-4 w-10 rounded bg-muted animate-pulse" />
+                    <div className="h-4 w-24 rounded bg-muted animate-pulse" />
+                    <div className="h-4 flex-1 rounded bg-muted animate-pulse" />
+                    <div className="h-4 w-16 rounded bg-muted animate-pulse" />
+                    <div className="h-4 w-16 rounded bg-muted animate-pulse hidden sm:block" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    )
+  }
+
   return (
     <main className="min-h-screen">
 
