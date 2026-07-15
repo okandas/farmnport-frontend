@@ -59,7 +59,7 @@ export function BookingCTA({ produce }: BookingCTAProps) {
             <div className="flex gap-3 ml-auto">
                 <Link
                     id="booking-cta-sell"
-                    href="/bookings/new"
+                    href={`/bookings/new${produce ? `?produce=${produce}` : ""}`}
                     className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
                 >
                     Create Booking

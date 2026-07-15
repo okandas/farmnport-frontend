@@ -1036,6 +1036,30 @@ export function createBooking(data: {
   return api.post(`${BaseURL}/booking/`, data)
 }
 
+export function createClientPreOrder(data: {
+  produce_id: string
+  produce_name: string
+  breed_id?: string
+  breed_name?: string
+  unit: string
+  unit_price: number
+  deposit_per_unit: number
+  total_available: number
+  description?: string
+  image_src?: string
+  other_images?: string[]
+  market_side: string
+  subtitle?: string
+  open_date?: string
+  close_date?: string
+  buyer_notes?: boolean
+  delivery_dates?: string[]
+  delivery_locations?: { id: string; name: string }[]
+  collection_locations?: { id: string; name: string }[]
+}) {
+  return api.post(`${BaseURL}/booking/client/preorders`, data)
+}
+
 export function myBookings(page?: number) {
   const url = page && page >= 2 ? `${BaseURL}/booking/my-bookings?p=${page}` : `${BaseURL}/booking/my-bookings`
   return api.get(url)

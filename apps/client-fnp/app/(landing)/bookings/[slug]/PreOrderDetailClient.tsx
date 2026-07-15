@@ -6,7 +6,6 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useRouter, useParams } from "next/navigation"
 import { Loader2, CalendarDays, Package, Users, Clock } from "lucide-react"
 import Link from "next/link"
-import Image from "next/image"
 import { toast } from "sonner"
 
 import { createBooking, queryClient as queryClientProfile } from "@/lib/query"
@@ -478,7 +477,7 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
                   className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground font-semibold py-2.5 rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-50 text-sm"
                 >
                   {mutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
-                  Submit Booking Request
+                  {event.market_side === "demand" ? "Submit Supply Offer" : "Submit Booking Request"}
                 </button>
 
                 <p className="text-xs text-muted-foreground text-center">

@@ -17,6 +17,7 @@ interface Props {
   entityId?: string
   entityType?: string
   maxImages?: number
+  mainOnly?: boolean
   initialMainImage?: { img: { id: string; src: string } } | null
   initialImages?: { img: { id: string; src: string } }[]
   onMainImageChange?: (img: { img: { id: string; src: string } } | null) => void
@@ -24,7 +25,7 @@ interface Props {
   onDelete?: () => void
 }
 
-export function ImageUpload({ entityId, entityType, maxImages = 5, initialMainImage, initialImages, onMainImageChange, onImagesChange, onDelete }: Props) {
+export function ImageUpload({ entityId, entityType, maxImages = 5, mainOnly = false, initialMainImage, initialImages, onMainImageChange, onImagesChange, onDelete }: Props) {
   const [mainImage, setMainImage] = useState<UploadedImage | null>(
     initialMainImage ? { id: initialMainImage.img.id, src: initialMainImage.img.src } : null
   )
@@ -147,7 +148,7 @@ export function ImageUpload({ entityId, entityType, maxImages = 5, initialMainIm
       </div>
 
       {/* Additional images */}
-      <div>
+      {!mainOnly && <div>
         <label className="block text-sm/6 font-medium text-gray-900 dark:text-white mb-2">Additional photos <span className="text-gray-400 font-normal">(up to {maxImages})</span></label>
         <div className="space-y-2">
           {images.length < maxImages && (
@@ -190,7 +191,7 @@ export function ImageUpload({ entityId, entityType, maxImages = 5, initialMainIm
           </div>
           <p className="mt-2 text-xs text-gray-500">Upload up to {maxImages} images.</p>
         </div>
-      </div>
+      </div>}
     </div>
   )
 }
