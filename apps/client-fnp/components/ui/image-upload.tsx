@@ -17,6 +17,7 @@ interface Props {
   entityId?: string
   entityType?: string
   maxImages?: number
+  mainOnly?: boolean
   initialMainImage?: { img: { id: string; src: string } } | null
   initialImages?: { img: { id: string; src: string } }[]
   onMainImageChange?: (img: { img: { id: string; src: string } } | null) => void
@@ -24,7 +25,7 @@ interface Props {
   onDelete?: () => void
 }
 
-export function ImageUpload({ entityId, entityType, maxImages = 5, initialMainImage, initialImages, onMainImageChange, onImagesChange, onDelete }: Props) {
+export function ImageUpload({ entityId, entityType, maxImages = 5, mainOnly = false, initialMainImage, initialImages, onMainImageChange, onImagesChange, onDelete }: Props) {
   const [mainImage, setMainImage] = useState<UploadedImage | null>(
     initialMainImage ? { id: initialMainImage.img.id, src: initialMainImage.img.src } : null
   )
@@ -123,7 +124,7 @@ export function ImageUpload({ entityId, entityType, maxImages = 5, initialMainIm
                   {isUploading ? <Loader2 className="w-8 h-8 animate-spin text-gray-400" /> : (
                     <>
                       <ImagePlus className="w-8 h-8 text-gray-400" />
-                      <p className="mt-2 text-xs text-gray-500">Click or drag to upload</p>
+                      <p className="mt-2 text-xs text-gray-500">Click to upload</p>
                     </>
                   )}
                   <input id="dropzone-main_image" type="file" className="hidden" accept="image/jpeg,image/png,image/webp" onChange={handleMainChange} />
@@ -131,11 +132,10 @@ export function ImageUpload({ entityId, entityType, maxImages = 5, initialMainIm
               </label>
             </div>
           )}
-          <div className="flex flex-wrap mt-2">
+          <div className="mt-2">
             {mainImage && (
-              <div className="inline-flex flex-col overflow-hidden border border-gray-200 rounded-lg mt-2 me-2 relative bg-white shadow-sm">
-                <div className="flex items-center justify-center w-32 h-32 overflow-hidden bg-gray-50">
-                  <Image src={mainImage.localUrl ?? mainImage.src} alt="Main image" width={128} height={128} className="object-cover" />
+              <div className="relative w-full h-48 overflow-hidden border border-gray-200 rounded-lg bg-white shadow-sm">
+                <Image src={mainImage.localUrl ?? mainImage.src} alt="Main image" fill className="object-contain" />
                 </div>
                 <button type="button" onClick={removeMain} className="w-6 h-6 flex items-center justify-center rounded-full bg-red-600 text-white absolute top-2 end-2 shadow-lg hover:bg-red-700 transition-colors">
                   <X className="w-3 h-3" />
@@ -147,7 +147,7 @@ export function ImageUpload({ entityId, entityType, maxImages = 5, initialMainIm
       </div>
 
       {/* Additional images */}
-      <div>
+      {!mainOnly && <div>
         <label className="block text-sm/6 font-medium text-gray-900 dark:text-white mb-2">Additional photos <span className="text-gray-400 font-normal">(up to {maxImages})</span></label>
         <div className="space-y-2">
           {images.length < maxImages && (
@@ -157,7 +157,7 @@ export function ImageUpload({ entityId, entityType, maxImages = 5, initialMainIm
                   {isUploading ? <Loader2 className="w-8 h-8 animate-spin text-gray-400" /> : (
                     <>
                       <ImagePlus className="w-8 h-8 text-gray-400" />
-                      <p className="mt-2 text-xs text-gray-500">Click or drag to upload</p>
+                      <p className="mt-2 text-xs text-gray-500">Click to upload</p>
                     </>
                   )}
                   <input id="dropzone-images" type="file" className="hidden" accept="image/jpeg,image/png,image/webp" multiple onChange={handleExtrasChange} />
@@ -190,7 +190,7 @@ export function ImageUpload({ entityId, entityType, maxImages = 5, initialMainIm
           </div>
           <p className="mt-2 text-xs text-gray-500">Upload up to {maxImages} images.</p>
         </div>
-      </div>
+      </div>}
     </div>
   )
 }

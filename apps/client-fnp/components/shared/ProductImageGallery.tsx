@@ -4,7 +4,8 @@ import { useState } from "react"
 import Image from "next/image"
 import { ChevronLeft, ChevronRight, Expand, Share2, Link2, Check } from "lucide-react"
 import { sendGTMEvent } from "@next/third-parties/google"
-import { Dialog, DialogContent } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 
 function FpPlaceholder({ size = "lg" }: { size?: "sm" | "lg" }) {
     return (
@@ -30,7 +31,7 @@ export function ProductImageGallery({ images, name, height = 520, fallback }: Pr
         <>
             <div className="flex gap-2">
                 {images.length > 1 && (
-                    <div className="flex flex-col gap-2 shrink-0">
+                    <div className="hidden md:flex flex-col gap-2 shrink-0">
                         {images.map((img, idx) => (
                             <button
                                 key={idx}
@@ -51,7 +52,7 @@ export function ProductImageGallery({ images, name, height = 520, fallback }: Pr
                 )}
                 <button
                     className="relative flex-1 bg-background rounded-xl overflow-hidden cursor-pointer group"
-                    style={{ height }}
+                    style={{ height: `min(${height}px, 60vw)` }}
                     onClick={() => images[selected]?.img?.src && setOpen(true)}
                 >
                     {images[selected]?.img?.src ? (
@@ -67,19 +68,39 @@ export function ProductImageGallery({ images, name, height = 520, fallback }: Pr
                         <FpPlaceholder />
                     )}
                     {images[selected]?.img?.src && (
-                        <span className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full bg-background text-foreground shadow-sm">
+                        <span className="absolute bottom-3 right-3 md:top-3 md:bottom-auto w-8 h-8 flex items-center justify-center rounded-full bg-background text-foreground shadow-sm">
                             <Expand className="w-4 h-4" />
                         </span>
                     )}
                 </button>
             </div>
+            {images.length > 1 && (
+                <div className="flex md:hidden gap-2 overflow-x-auto px-1 py-1">
+                    {images.map((img, idx) => (
+                        <button
+                            key={idx}
+                            onClick={() => setSelected(idx)}
+                            className={`relative w-14 h-14 rounded-lg overflow-hidden bg-background shrink-0 transition-colors ${
+                                selected === idx ? "ring-2 ring-primary" : "opacity-60 hover:opacity-100"
+                            }`}
+                        >
+                            {img.img?.src ? (
+                                <Image src={img.img.src} alt={`${name} ${idx + 1}`} fill sizes="56px" className="object-contain p-1" />
+                            ) : (
+                                <FpPlaceholder size="sm" />
+                            )}
+                        </button>
+                    ))}
+                </div>
+            )}
 
             <Dialog open={open} onOpenChange={setOpen}>
-                <DialogContent className="max-w-[95vw] w-full h-[92vh] p-0 bg-background">
+                <DialogContent className="max-w-[95vw] w-full h-[92vh] max-md:max-w-full max-md:h-[100dvh] max-md:rounded-none p-0 bg-background">
+                    <VisuallyHidden><DialogTitle>{name}</DialogTitle></VisuallyHidden>
 
-                    <div className="flex h-full">
+                    <div className="flex h-full max-md:flex-col">
                         {images.length > 1 && (
-                            <div className="flex flex-col gap-1.5 p-3 overflow-y-auto shrink-0 w-20">
+                            <div className="hidden md:flex flex-col gap-1.5 p-3 overflow-y-auto shrink-0 w-20">
                                 {images.map((img, idx) => (
                                     <button
                                         key={idx}
@@ -117,20 +138,34 @@ export function ProductImageGallery({ images, name, height = 520, fallback }: Pr
                                 </>
                             )}
 
-                            <div className="relative w-[60%] h-[70%]">
+                            <div className="relative w-[60%] h-[70%] max-md:w-[90%] max-md:h-[80%]">
                                 {images[selected]?.img?.src && (
                                     <Image
                                         src={images[selected].img.src}
                                         alt={name}
                                         fill
-                                        sizes="60vw"
+                                        sizes="(max-width: 768px) 90vw, 60vw"
                                         className="object-contain"
                                     />
                                 )}
                             </div>
                         </div>
 
-                        <div className="flex flex-col gap-2 p-3 pt-12 shrink-0">
+                        {images.length > 1 && (
+                            <div className="flex md:hidden gap-1.5 justify-center px-3 py-2 shrink-0">
+                                {images.map((_, idx) => (
+                                    <button
+                                        key={idx}
+                                        onClick={() => setSelected(idx)}
+                                        className={`w-2 h-2 rounded-full transition-colors ${
+                                            selected === idx ? "bg-primary" : "bg-muted-foreground/30"
+                                        }`}
+                                    />
+                                ))}
+                            </div>
+                        )}
+
+                        <div className="flex md:flex-col gap-2 p-3 md:pt-12 shrink-0 max-md:justify-center max-md:border-t">
                             <button
                                 onClick={() => {
                                     navigator.clipboard.writeText(window.location.href)

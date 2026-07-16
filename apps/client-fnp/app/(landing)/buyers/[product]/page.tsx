@@ -5,6 +5,7 @@ import { QuickLinks } from "@/components/generic/quick-links"
 import type { Metadata, ResolvingMetadata } from "next";
 import { AppURL, BuyerSeo } from "@/lib/schemas";
 import { FilterSidebar } from "@/components/generic/filterSidebar"
+import { BookingCTA } from "@/components/shared/BookingCTA"
 
 
 type Props = {
@@ -48,9 +49,10 @@ export default async function BuyersProductPage({ params }: BuyerProductPageProp
             <div className="space-y-8 mt-[21px]">
               <div>
                 <h1 className="text-2xl font-semibold">{capitalizeFirstLetter(plural(product))} Produce Buyers in Zimbabwe</h1>
-                <p className="text-base text-muted-foreground pt-1">Sell your {plural(product)} produce directly to buyers across Zimbabwe.</p>
+                <p className="text-base text-muted-foreground pt-1">Supply your {plural(product)} produce directly to buyers across Zimbabwe.</p>
               </div>
             </div>
+            <BookingCTA produce={product} />
             <Buyers user={user} queryBy={product} />
           </div>
           <div className="hidden lg:block lg:w-44 shrink-0">

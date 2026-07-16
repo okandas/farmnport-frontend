@@ -39,13 +39,14 @@ export function MobileNav({ user }: MobileNavProps) {
     const cartCount: number = cartItems.length
     const cartTotalCents: number = cartItems.reduce((s: number, i: any) => s + (i.unit_price * i.quantity), 0)
 
+    const pollingEnabled = process.env.NEXT_PUBLIC_ENABLE_NOTIFICATION_POLLING === "true"
     const { data: notifData } = useQuery({
       queryKey: ["booking-notifications-count"],
       queryFn: () => countBookingNotifications().then((r) => r.data),
-      enabled: !!user,
+      enabled: !!user && pollingEnabled,
       staleTime: 30000,
     })
-    const notifCount: number = (notifData as any)?.count ?? 0
+    const notifCount: number = pollingEnabled ? ((notifData as any)?.count ?? 0) : 0
 
 
     return (

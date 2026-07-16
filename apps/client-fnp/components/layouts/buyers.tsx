@@ -99,22 +99,6 @@ export function Buyers({queryBy}: BuyersPageProps) {
 
   return (
     <section className="space-y-8">
-      {/* Sell CTA */}
-      <Link
-        href={queryBy ? `/sell/${queryBy}` : "/sell"}
-        className="flex items-center justify-between gap-4 rounded-xl border border-primary/20 bg-primary/5 px-5 py-4 hover:bg-primary/10 transition-colors group"
-      >
-        <div>
-          <p className="text-sm font-semibold text-foreground">
-            {queryBy ? `Selling ${capitalizeFirstLetter(plural(queryBy))}?` : "Are you a farmer selling produce?"}
-          </p>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            {queryBy ? `List your ${plural(queryBy)} lot and reach these buyers directly.` : "List a lot and connect directly with buyers on Farmnport."}
-          </p>
-        </div>
-        <ArrowRight className="h-4 w-4 text-primary flex-shrink-0 group-hover:translate-x-0.5 transition-transform" />
-      </Link>
-
       {
         queryBy == undefined ?
           <div>

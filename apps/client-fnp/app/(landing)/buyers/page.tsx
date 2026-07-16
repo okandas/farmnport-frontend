@@ -3,6 +3,7 @@ import { Buyers } from "@/components/layouts/buyers"
 import { retrieveUser } from "@/lib/actions"
 import { FilterSidebar } from "@/components/generic/filterSidebar"
 import { QuickLinks } from "@/components/generic/quick-links"
+import { BookingCTA } from "@/components/shared/BookingCTA"
 
 
 export const metadata = {
@@ -60,6 +61,7 @@ export default async function BuyersPage() {
                     <span>/</span>
                     <span className="text-foreground font-medium">Buyers</span>
                 </nav>
+
             </div>
             <div className="mx-auto max-w-7xl px-6 lg:px-8 min-h-[70lvh] py-8">
                 <div className="lg:flex lg:space-x-10">
@@ -69,6 +71,7 @@ export default async function BuyersPage() {
                     </div>
 
                     <div className="flex-1 min-w-0">
+                        <BookingCTA produce="" />
                         <Buyers user={user} />
                     </div>
                     <div className="hidden lg:block lg:w-44 shrink-0">

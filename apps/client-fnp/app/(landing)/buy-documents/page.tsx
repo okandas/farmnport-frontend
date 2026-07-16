@@ -6,8 +6,21 @@ import { BuyDocumentsClient } from "./BuyDocumentsClient"
 import { getBuyCategories } from "@/components/generic/BuyCategoriesNav"
 
 export const metadata = {
-    title: "Buy Documents & Plans | farm&port",
-    description: "Download rural infrastructure plans, financial planning templates, and more.",
+    title: "Buy Farm Building Plans & Documents Zimbabwe | farmnport.com",
+    description: "Download pig sty, goat pen, chicken house and cattle kraal design plans. Instant PDF download with full floor plans, elevations and 3D impressions.",
+    alternates: { canonical: "https://farmnport.com/buy-documents" },
+    openGraph: {
+        title: "Farm Building Plans & Documents | farmnport.com",
+        description: "Download pig sty, goat pen, chicken house and cattle kraal design plans. Instant PDF download.",
+        siteName: "farmnport",
+        type: "website" as const,
+        url: "https://farmnport.com/buy-documents",
+    },
+    twitter: {
+        card: "summary_large_image" as const,
+        title: "Farm Building Plans & Documents | farmnport.com",
+        description: "Download pig sty, goat pen, chicken house and cattle kraal design plans. Instant PDF download.",
+    },
 }
 
 export default async function BuyDocumentsPage() {

@@ -1,6 +1,6 @@
 {
   "name": "client-farmnport",
-  "version": "5.3.0",
+  "version": "5.4.0",
   "private": true,
   "scripts": {
     "dev": "next dev --port 3001",
@@ -45,6 +45,7 @@
     "d3-selection": "^3.0.0",
     "d3-transition": "^3.0.1",
     "date-fns": "^4.1.0",
+    "driver.js": "^1.7.0",
     "flags": "^4.2.0",
     "google": "^2.1.0",
     "js-cookie": "^3.0.5",
