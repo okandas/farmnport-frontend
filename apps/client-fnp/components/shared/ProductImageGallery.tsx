@@ -31,7 +31,7 @@ export function ProductImageGallery({ images, name, height = 520, fallback }: Pr
         <>
             <div className="flex gap-2">
                 {images.length > 1 && (
-                    <div className="flex flex-col gap-2 shrink-0">
+                    <div className="hidden md:flex flex-col gap-2 shrink-0">
                         {images.map((img, idx) => (
                             <button
                                 key={idx}
@@ -52,7 +52,7 @@ export function ProductImageGallery({ images, name, height = 520, fallback }: Pr
                 )}
                 <button
                     className="relative flex-1 bg-background rounded-xl overflow-hidden cursor-pointer group"
-                    style={{ height }}
+                    style={{ height: `min(${height}px, 60vw)` }}
                     onClick={() => images[selected]?.img?.src && setOpen(true)}
                 >
                     {images[selected]?.img?.src ? (
@@ -68,12 +68,31 @@ export function ProductImageGallery({ images, name, height = 520, fallback }: Pr
                         <FpPlaceholder />
                     )}
                     {images[selected]?.img?.src && (
-                        <span className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full bg-background text-foreground shadow-sm">
+                        <span className="absolute bottom-3 right-3 md:top-3 md:bottom-auto w-8 h-8 flex items-center justify-center rounded-full bg-background text-foreground shadow-sm">
                             <Expand className="w-4 h-4" />
                         </span>
                     )}
                 </button>
             </div>
+            {images.length > 1 && (
+                <div className="flex md:hidden gap-2 overflow-x-auto px-1 py-1">
+                    {images.map((img, idx) => (
+                        <button
+                            key={idx}
+                            onClick={() => setSelected(idx)}
+                            className={`relative w-14 h-14 rounded-lg overflow-hidden bg-background shrink-0 transition-colors ${
+                                selected === idx ? "ring-2 ring-primary" : "opacity-60 hover:opacity-100"
+                            }`}
+                        >
+                            {img.img?.src ? (
+                                <Image src={img.img.src} alt={`${name} ${idx + 1}`} fill sizes="56px" className="object-contain p-1" />
+                            ) : (
+                                <FpPlaceholder size="sm" />
+                            )}
+                        </button>
+                    ))}
+                </div>
+            )}
 
             <Dialog open={open} onOpenChange={setOpen}>
                 <DialogContent className="max-w-[95vw] w-full h-[92vh] max-md:max-w-full max-md:h-[100dvh] max-md:rounded-none p-0 bg-background">
