@@ -565,10 +565,11 @@ export default function NewPreOrderPage() {
               </div>
             </div>
             <div className="sm:col-span-3">
-              <label className={labelCls}>Closes *</label>
+              <label className={labelCls}>Closes</label>
               <div className="mt-2">
                 <input type="datetime-local" value={form.close_date} onChange={(e) => set("close_date", e.target.value)} className={inputCls} />
               </div>
+              <p className="mt-1 text-xs text-muted-foreground">Leave empty if you supply or buy throughout the year.</p>
             </div>
           </div>
         </div>
