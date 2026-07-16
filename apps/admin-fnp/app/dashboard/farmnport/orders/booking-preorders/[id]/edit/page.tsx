@@ -41,8 +41,8 @@ function ImageUpload({ value, onChange, entityId }: { value: string; onChange: (
   return (
     <div className="space-y-3">
       {value && (
-        <div className="relative w-32 h-32 rounded-lg overflow-hidden border border-border">
-          <Image src={value} alt="main image" fill className="object-cover" />
+        <div className="relative w-full h-48 rounded-lg overflow-hidden border border-border">
+          <Image src={value} alt="main image" fill className="object-contain" />
           <button
             type="button"
             onClick={() => onChange("")}
@@ -53,7 +53,7 @@ function ImageUpload({ value, onChange, entityId }: { value: string; onChange: (
         </div>
       )}
       {!value && (
-        <label className="flex flex-col items-center justify-center w-full h-32 border border-dashed border-border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors">
+        <label className="flex flex-col items-center justify-center w-full h-32 border border-dashed border-border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors px-6 py-10">
           {mutation.isPending ? (
             <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
           ) : (

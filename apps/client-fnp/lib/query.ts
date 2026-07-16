@@ -1036,6 +1036,18 @@ export function createBooking(data: {
   return api.post(`${BaseURL}/booking/`, data)
 }
 
+export function queryBrands(pagination?: { p?: number; search?: string }) {
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) params.append("p", String(pagination.p))
+  if (pagination?.search !== undefined && pagination.search.length >= 2) params.append("search", pagination.search)
+  const qs = params.toString()
+  return api.get(qs ? `${BaseURL}/user/brands?${qs}` : `${BaseURL}/user/brands`)
+}
+
+export function queryClientLocations() {
+  return api.get(`${BaseURL}/booking/client-locations`)
+}
+
 export function createClientPreOrder(data: {
   produce_id: string
   produce_name: string
@@ -1045,6 +1057,9 @@ export function createClientPreOrder(data: {
   unit_price: number
   deposit_per_unit: number
   total_available: number
+  min_quantity?: number
+  max_quantity?: number
+  quantity_step?: number
   description?: string
   image_src?: string
   other_images?: string[]
@@ -1052,7 +1067,10 @@ export function createClientPreOrder(data: {
   subtitle?: string
   open_date?: string
   close_date?: string
+  payment_deadline_hours?: number
   buyer_notes?: boolean
+  cancellation_fee?: number
+  transferable?: boolean
   delivery_dates?: string[]
   delivery_locations?: { id: string; name: string }[]
   collection_locations?: { id: string; name: string }[]

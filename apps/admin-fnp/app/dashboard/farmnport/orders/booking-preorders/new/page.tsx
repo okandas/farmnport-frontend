@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
-import { Loader2, X, MapPin, Search } from "lucide-react"
+import { Loader2, X, MapPin, Search, ImagePlus } from "lucide-react"
 
 import { toast } from "@/components/ui/use-toast"
 import Link from "next/link"
@@ -36,8 +36,8 @@ function ImageUpload({ value, onChange }: { value: string; onChange: (src: strin
   return (
     <div className="space-y-3">
       {value && (
-        <div className="relative w-32 h-32 rounded-lg overflow-hidden border border-border">
-          <Image src={value} alt="main image" fill className="object-cover" />
+        <div className="relative w-full h-48 rounded-lg overflow-hidden border border-border">
+          <Image src={value} alt="main image" fill className="object-contain" />
           <button
             type="button"
             onClick={() => onChange("")}
@@ -48,13 +48,13 @@ function ImageUpload({ value, onChange }: { value: string; onChange: (src: strin
         </div>
       )}
       {!value && (
-        <label className="flex flex-col items-center justify-center w-full h-32 border border-dashed border-border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors">
+        <label className="flex flex-col items-center justify-center w-full h-32 border border-dashed border-border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors px-6 py-10">
           {mutation.isPending ? (
             <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
           ) : (
             <>
-              <span className="text-sm text-muted-foreground">Click to upload</span>
-              <span className="text-xs text-muted-foreground mt-1">JPG, PNG, WebP</span>
+              <ImagePlus className="w-8 h-8 text-gray-400" />
+              <p className="mt-2 text-xs text-gray-500">Click to upload</p>
             </>
           )}
           <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={onDrop} />
