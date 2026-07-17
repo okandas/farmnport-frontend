@@ -136,7 +136,6 @@ export function ImageUpload({ entityId, entityType, maxImages = 5, mainOnly = fa
             {mainImage && (
               <div className="relative w-full h-48 overflow-hidden border border-gray-200 rounded-lg bg-white shadow-sm">
                 <Image src={mainImage.localUrl ?? mainImage.src} alt="Main image" fill className="object-contain" />
-                </div>
                 <button type="button" onClick={removeMain} className="w-6 h-6 flex items-center justify-center rounded-full bg-red-600 text-white absolute top-2 end-2 shadow-lg hover:bg-red-700 transition-colors">
                   <X className="w-3 h-3" />
                 </button>
