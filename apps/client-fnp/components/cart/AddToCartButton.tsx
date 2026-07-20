@@ -10,7 +10,7 @@ import { addToCart, clearCart, getCart, updateCartItem, removeFromCart } from "@
 import { trackAddToCart } from "@/lib/analytics"
 import { useCart } from "@/contexts/cart-context"
 
-export type CartProductType = "agrochemical" | "feed" | "animal_health" | "plant_nutrition" | "document" | "livestock_poultry" | "seed_product" | "equipment"
+export type CartProductType = "agrochemical" | "feed" | "animal_health" | "plant_nutrition" | "document" | "seed_product" | "equipment"
 
 interface AddToCartButtonProps {
   productId: string

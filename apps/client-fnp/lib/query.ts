@@ -1170,28 +1170,6 @@ export function queryDocument(slug: string) {
   return api.get(`${BaseURL}/documents/${slug}`)
 }
 
-// ── Livestock & Poultry ───────────────────────────────────────────────────────
-
-export function queryAllLivestockPoultryProducts(pagination?: { p?: number; brand?: string[] }) {
-  const params = new URLSearchParams()
-  if (pagination?.p && pagination.p >= 2) params.set('p', pagination.p.toString())
-  pagination?.brand?.forEach(b => params.append('brand', b))
-  const qs = params.toString()
-  return api.get(qs ? `${BaseURL}/livestock-poultry/all?${qs}` : `${BaseURL}/livestock-poultry/all`)
-}
-
-export function queryBuyLivestockPoultryProducts(pagination?: { p?: number; brand?: string[] }) {
-  const params = new URLSearchParams()
-  if (pagination?.p && pagination.p >= 2) params.set('p', pagination.p.toString())
-  pagination?.brand?.forEach(b => params.append('brand', b))
-  const qs = params.toString()
-  return api.get(qs ? `${BaseURL}/livestock-poultry/buy?${qs}` : `${BaseURL}/livestock-poultry/buy`)
-}
-
-export function queryLivestockPoultryProduct(slug: string) {
-  return api.get(`${BaseURL}/livestock-poultry/${slug}`)
-}
-
 // ── Seed Products ─────────────────────────────────────────────────────────────
 
 export function queryAllSeedProducts(pagination?: { p?: number; brand?: string[] }) {

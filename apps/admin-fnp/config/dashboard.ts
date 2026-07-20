@@ -189,11 +189,6 @@ export const dashboardConfig: DashboardConfig = {
           icon: "package",
         },
         {
-          title: "Livestock & Poultry",
-          href: "/dashboard/farmnport/livestock-poultry",
-          icon: "productSearch",
-        },
-        {
           title: "Seed Products",
           href: "/dashboard/farmnport/seed-products",
           icon: "productSearch",
