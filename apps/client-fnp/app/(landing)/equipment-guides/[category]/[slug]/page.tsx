@@ -8,6 +8,8 @@ import { WantToBuyCTA } from "@/components/shared/WantToBuyCTA"
 import { ShareBar } from "@/components/shared/ShareBar"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
 import { guardTestItem } from "@/lib/guardTestItem"
+import { ProductNotFound } from "@/components/shared/ProductNotFound"
+import { SidebarPromo } from "@/components/ads/SidebarPromo"
 
 type Props = { params: Promise<{ category: string; slug: string }> }
 
@@ -45,26 +47,7 @@ export default async function EquipmentGuidePage({ params }: GuidePageProps) {
     await guardTestItem(!!product?.is_test)
 
     if (!product) {
-        return (
-            <div className="min-h-screen bg-background flex items-center justify-center px-4 pb-4">
-                <div className="text-center max-w-md">
-                    <div className="mb-6">
-                        <div className="mx-auto w-20 h-20 bg-muted/30 rounded-full" />
-                    </div>
-                    <h2 className="text-2xl font-semibold mb-2">Guide Not Found</h2>
-                    <p className="text-muted-foreground mb-6">
-                        We couldn&apos;t find the equipment guide you&apos;re looking for. It may have been removed or the link might be incorrect.
-                    </p>
-                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                        <Link href="/equipment-guides">
-                            <button className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
-                                Browse All Equipment
-                            </button>
-                        </Link>
-                    </div>
-                </div>
-            </div>
-        )
+        return <ProductNotFound title="Equipment Guide Not Found" description="The equipment guide you're looking for doesn't exist or may have been removed." primary={{ href: "/equipment-guides", label: "Browse Equipment Guides" }} secondary={{ href: "/buy-equipment", label: "Buy Equipment" }} />
     }
 
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://farmnport.com'
@@ -117,7 +100,7 @@ export default async function EquipmentGuidePage({ params }: GuidePageProps) {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div className="grid lg:grid-cols-[450px,1fr] gap-12 mb-16">
                     {/* Left - Image */}
-                    <div className="space-y-4">
+                    <div className="flex flex-col gap-4">
                         <div className="relative aspect-square bg-white rounded-xl border overflow-hidden shadow-sm">
                             {product.images && product.images[0] && product.images[0].img?.src ? (
                                 <Image
@@ -157,6 +140,11 @@ export default async function EquipmentGuidePage({ params }: GuidePageProps) {
                         )}
 
                         <WantToBuyCTA available_for_sale={product.available_for_sale} name={product.name} brand={product.brand?.name} href={`/buy-equipment/${slug}`} interestHref={`/interest/equipment/${slug}`} />
+
+                        {/* Promo - fills remaining sidebar space */}
+                        <div className="flex-1">
+                            <SidebarPromo />
+                        </div>
                     </div>
 
                     {/* Right - Product Info */}

@@ -1,5 +1,6 @@
 import React from "react"
 import { formatUnit } from "@/lib/utilities"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 interface AgrochemicalDosageTableProps {
     dosageRates: any[]
@@ -106,7 +107,21 @@ export function AgrochemicalDosageTable({ dosageRates }: AgrochemicalDosageTable
                             <th className="text-left p-3 text-sm font-semibold text-blue-900 dark:text-blue-100 min-w-[140px]">Dosage</th>
                             <th className="text-left p-3 text-sm font-semibold text-orange-700 dark:text-orange-300 min-w-[120px] whitespace-nowrap">Max Applications</th>
                             <th className="text-left p-3 text-sm font-semibold text-teal-700 dark:text-teal-300 min-w-[130px] whitespace-nowrap">Application Interval</th>
-                            <th className="text-left p-3 text-sm font-semibold text-rose-700 dark:text-rose-300 min-w-[60px]">PHI</th>
+                            <th className="text-left p-3 text-sm font-semibold text-rose-700 dark:text-rose-300 min-w-[60px]">
+                                <span className="inline-flex items-center gap-1">
+                                    PHI
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <span className="inline-flex items-center justify-center h-4 w-4 rounded-full text-muted-foreground text-[10px] font-bold cursor-help border border-muted-foreground/30">i</span>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <p>Pre-Harvest Interval — minimum number of days between last application and harvest or feeding</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
+                                </span>
+                            </th>
                             <th className="text-left p-3 text-sm font-semibold text-blue-900 dark:text-blue-100 min-w-[180px]">Remarks</th>
                         </tr>
                     </thead>

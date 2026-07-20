@@ -1,13 +1,14 @@
 import Image from "next/image"
 import { AlertTriangle } from "lucide-react"
-import Link from "next/link"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
 import { BaseURL } from "@/lib/schemas"
 import { guardTestItem } from "@/lib/guardTestItem"
+import { ProductNotFound } from "@/components/shared/ProductNotFound"
 import { FeedBreadcrumb } from "./FeedBreadcrumb"
 import { WantToBuyCTA } from "@/components/shared/WantToBuyCTA"
 import { GuideProductTitle } from "@/components/shared/GuideProductTitle"
 import { ShareBar } from "@/components/shared/ShareBar"
+import { SidebarPromo } from "@/components/ads/SidebarPromo"
 
 interface FeedDetailPageProps {
     params: Promise<{ slug: string }>
@@ -32,22 +33,7 @@ export default async function FeedDetailPage({ params }: FeedDetailPageProps) {
     const product = await getFeedProduct(slug)
 
     if (!product) {
-        return (
-            <div className="min-h-screen bg-background flex items-center justify-center px-4 pb-4">
-                <div className="text-center max-w-md">
-                    <h2 className="text-2xl font-semibold mb-2">Feed Product Not Found</h2>
-                    <p className="text-muted-foreground mb-6">
-                        We couldn&apos;t find the feed product you&apos;re looking for.
-                    </p>
-                    <Link
-                        href="/feed-guides"
-                        className="inline-flex items-center justify-center rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 transition-colors"
-                    >
-                        Browse All Feed Products
-                    </Link>
-                </div>
-            </div>
-        )
+        return <ProductNotFound title="Feed Guide Not Found" description="The feed guide you're looking for doesn't exist or may have been removed." primary={{ href: "/feed-guides", label: "Browse Feed Guides" }} secondary={{ href: "/buy-feeds", label: "Buy Feeds" }} />
     }
 
     await guardTestItem(!!product.is_test)
@@ -90,7 +76,7 @@ export default async function FeedDetailPage({ params }: FeedDetailPageProps) {
                 <div className="grid lg:grid-cols-[450px,1fr] gap-12 mb-16">
 
                     {/* Left - Image */}
-                    <div className="space-y-4">
+                    <div className="flex flex-col gap-4">
                         <div className="relative aspect-square bg-white rounded-xl border overflow-hidden shadow-sm">
                             {product.images?.[0]?.img?.src ? (
                                 <Image
@@ -137,6 +123,11 @@ export default async function FeedDetailPage({ params }: FeedDetailPageProps) {
                                 <p className="text-xs text-red-800 dark:text-red-300 whitespace-pre-line">{product.safety_warnings}</p>
                             </div>
                         )}
+
+                        {/* Promo - fills remaining sidebar space */}
+                        <div className="flex-1">
+                            <SidebarPromo />
+                        </div>
                     </div>
 
                     {/* Right - Product Info */}

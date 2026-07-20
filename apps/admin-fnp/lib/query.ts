@@ -1736,29 +1736,6 @@ export function updateDeliveryLocation(id: string, data: Partial<{
   return api.put(`${baseUrl}/booking/admin/client-locations/${id}`, data)
 }
 
-// Livestock Poultry
-export function queryLivestockPoultryProducts(pagination?: { p?: number; search?: string; seller_id?: string; brand_id?: string }) {
-  const params = new URLSearchParams()
-  if (pagination?.p !== undefined && pagination.p >= 2) params.append("p", String(pagination.p))
-  if (pagination?.search !== undefined && pagination.search.length >= 2) params.append("search", pagination.search)
-  if (pagination?.seller_id) params.append("seller_id", pagination.seller_id)
-  if (pagination?.brand_id) params.append("brand_id", pagination.brand_id)
-  const qs = params.toString()
-  return api.get(qs ? `${baseUrl}/user/livestock-poultry?${qs}` : `${baseUrl}/user/livestock-poultry`)
-}
-
-export function queryLivestockPoultryProduct(id: string) {
-  return api.get(`${baseUrl}/user/livestock-poultry/${id}`)
-}
-
-export function addLivestockPoultryProduct(data: any) {
-  return api.post(`${baseUrl}/user/livestock-poultry/add`, data)
-}
-
-export function updateLivestockPoultryProduct(data: any) {
-  return api.post(`${baseUrl}/user/livestock-poultry/update`, data)
-}
-
 // Seed Products
 export function querySeedProducts(pagination?: { p?: number; search?: string; seller_id?: string; brand_id?: string }) {
   const params = new URLSearchParams()

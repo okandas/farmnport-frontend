@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import { notFound } from "next/navigation"
 import { serverFetch } from "@/lib/serverFetch"
 import { buildBuyMetadata } from "@/lib/utilities"
 import Link from "next/link"
@@ -7,6 +6,7 @@ import { Beaker } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { BuyProductInteractive } from "@/components/shop/BuyProductInteractive"
 import { guardTestItem } from "@/lib/guardTestItem"
+import { ProductNotFound } from "@/components/shared/ProductNotFound"
 
 interface BuyAnimalHealthProductPageProps {
     params: Promise<{ slug: string }>
@@ -23,12 +23,14 @@ export default async function BuyAnimalHealthProductPage({ params }: BuyAnimalHe
     const { slug } = await params
 
     const product = await serverFetch(`/animalhealth/${slug}`).catch(() => null)
-    if (!product) notFound()
+    if (!product) {
+        return <ProductNotFound title="Animal Health Product Not Found" description="The animal health product you're looking for doesn't exist or may have been removed." primary={{ href: "/buy-animal-health", label: "Browse Animal Health" }} secondary={{ href: "/animal-health-guides", label: "View Guides" }} />
+    }
     await guardTestItem(!!product.is_test)
 
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://farmnport.com'
 
-    const structuredData = product ? {
+    const structuredData = {
         "@context": "https://schema.org",
         "@type": "Product",
         "name": product.name,
@@ -47,17 +49,6 @@ export default async function BuyAnimalHealthProductPage({ params }: BuyAnimalHe
             "availability": product.available_for_sale ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
             "seller": { "@type": "Organization", "name": "farmnport" }
         }
-    } : null
-
-    if (!product) {
-        return (
-            <div className="min-h-screen bg-background flex items-center justify-center">
-                <div className="text-center">
-                    <h2 className="text-2xl font-bold mb-2">Product Not Found</h2>
-                    <p className="text-muted-foreground">The product you&apos;re looking for doesn&apos;t exist.</p>
-                </div>
-            </div>
-        )
     }
 
     const categorySlug = product.animal_health_category?.slug || "all"

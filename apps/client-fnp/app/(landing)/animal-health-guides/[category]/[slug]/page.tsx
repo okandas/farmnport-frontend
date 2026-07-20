@@ -9,6 +9,7 @@ import { GuideProductTitle } from "@/components/shared/GuideProductTitle"
 import { BaseURL } from "@/lib/schemas"
 import { WantToBuyCTA } from "@/components/shared/WantToBuyCTA"
 import { ShareBar } from "@/components/shared/ShareBar"
+import { SidebarPromo } from "@/components/ads/SidebarPromo"
 
 type Props = { params: Promise<{ category: string; slug: string }> }
 
@@ -262,7 +263,7 @@ export default async function AnimalHealthGuidePage({ params }: GuidePageProps) 
                 {/* Header Section */}
                 <div className="grid lg:grid-cols-[450px,1fr] gap-12 mb-16">
                     {/* Left - Image */}
-                    <div className="space-y-4">
+                    <div className="flex flex-col gap-4">
                         <div className="relative aspect-square bg-white rounded-xl border overflow-hidden shadow-sm">
                             {product.images && product.images[0] && product.images[0].img?.src ? (
                                 <Image
@@ -320,6 +321,11 @@ export default async function AnimalHealthGuidePage({ params }: GuidePageProps) 
                                 </ul>
                             </div>
                         )}
+
+                        {/* Promo - fills remaining sidebar space */}
+                        <div className="flex-1">
+                            <SidebarPromo />
+                        </div>
                     </div>
 
                     {/* Right - Product Info */}

@@ -2,10 +2,12 @@ import type { Metadata } from 'next'
 import { serverFetch } from "@/lib/serverFetch"
 import { ActiveIngredientsList } from "@/components/shared/ActiveIngredientUnitsKey"
 import Image from "next/image"
-import { Beaker, AlertTriangle } from "lucide-react"
+import { AlertTriangle } from "lucide-react"
 import Link from "next/link"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
+import { SidebarPromo } from "@/components/ads/SidebarPromo"
 import { capitalizeFirstLetter, buildGuideMetadata } from "@/lib/utilities"
+import { ProductNotFound } from "@/components/shared/ProductNotFound"
 import { guardTestItem } from "@/lib/guardTestItem"
 import { SprayProgramBackLink } from "./SprayProgramBackLink"
 import { FertilizerApplicationRates } from "@/components/agrochemical/FertilizerApplicationRates"
@@ -53,7 +55,7 @@ interface GuidePageProps {
 export default async function AgroChemicalGuidePage({ params }: GuidePageProps) {
     const { category, slug } = await params
 
-    const chemical = await serverFetch(`/agrochemical/${slug}`)
+    const chemical = await serverFetch(`/agrochemical/${slug}`).catch(() => null)
 
     await guardTestItem(!!chemical?.is_test)
 
@@ -86,33 +88,7 @@ export default async function AgroChemicalGuidePage({ params }: GuidePageProps) 
     const noTargetMsg = `No ${sectionTitle.toLowerCase()} information available.`
 
     if (!chemical) {
-        return (
-            <div className="min-h-screen bg-background flex items-center justify-center px-4 pb-4">
-                <div className="text-center max-w-md">
-                    <div className="mb-6">
-                        <div className="mx-auto w-20 h-20 bg-muted rounded-full flex items-center justify-center">
-                            <Beaker className="w-10 h-10 text-muted-foreground" />
-                        </div>
-                    </div>
-                    <h2 className="text-2xl font-semibold mb-2">Guide Not Found</h2>
-                    <p className="text-muted-foreground mb-6">
-                        We couldn&apos;t find the agrochemical guide you&apos;re looking for. It may have been removed or the link might be incorrect.
-                    </p>
-                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                        <Link href="/agrochemical-guides">
-                            <button className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
-                                Browse All Guides
-                            </button>
-                        </Link>
-                        <Link href="/agrochemical-guides">
-                            <button className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
-                                Go to Categories
-                            </button>
-                        </Link>
-                    </div>
-                </div>
-            </div>
-        )
+        return <ProductNotFound title="AgroChemical Guide Not Found" description="The agrochemical guide you're looking for doesn't exist or may have been removed." primary={{ href: "/agrochemical-guides", label: "Browse AgroChemical Guides" }} secondary={{ href: "/buy-agrochemicals", label: "Buy AgroChemicals" }} />
     }
 
     // Generate JSON-LD structured data
@@ -182,7 +158,7 @@ export default async function AgroChemicalGuidePage({ params }: GuidePageProps) 
                 {/* Header Section */}
                 <div className="grid lg:grid-cols-[450px,1fr] gap-12 mb-16">
                     {/* Left - Image */}
-                    <div className="space-y-4">
+                    <div className="flex flex-col gap-4">
                         <div className="relative aspect-square bg-white rounded-xl border overflow-hidden shadow-sm">
                             {chemical.images && chemical.images[0] && chemical.images[0].img?.src ? (
                                 <Image
@@ -240,6 +216,11 @@ export default async function AgroChemicalGuidePage({ params }: GuidePageProps) 
                                 </ul>
                             </div>
                         )}
+
+                        {/* Promo - fills remaining sidebar space */}
+                        <div className="flex-1">
+                            <SidebarPromo />
+                        </div>
                     </div>
 
                     {/* Right - Product Info */}

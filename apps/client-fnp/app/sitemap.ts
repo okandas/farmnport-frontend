@@ -49,7 +49,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     feedingPrograms,
     sprayPrograms,
     clients,
-    livestockPoultryProducts,
   ] = await Promise.all([
     fetchFarmProduce(),
     fetchAgroChemicalCategories(),
@@ -60,7 +59,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     fetchFeedingPrograms(),
     fetchSprayPrograms(),
     fetchClients(),
-    fetchLivestockPoultry(),
   ])
 
   // Farm produce → /buyers/{slug} and /farmers/{slug}
@@ -86,7 +84,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Buy agrochemicals listing
   const buyAgroChemicalListingRoutes: MetadataRoute.Sitemap = [
     { url: `${BASE_URL}/buy-agrochemicals`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
-    { url: `${BASE_URL}/buy-livestock-poultry`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
   ]
 
   // Buy feeds routes (individual feed product buy pages)
@@ -155,14 +152,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }))
 
-  // Livestock & poultry routes
-  const livestockPoultryRoutes: MetadataRoute.Sitemap = livestockPoultryProducts.map((p: any) => ({
-    url: `${BASE_URL}/buy-livestock-poultry/${p.slug}`,
-    lastModified: safeDate(p.updated || p.created),
-    changeFrequency: 'weekly' as const,
-    priority: 0.8,
-  }))
-
   return [
     ...staticRoutes,
     ...producePriceRoutes,
@@ -176,7 +165,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...buyFeedRoutes,
     ...feedingProgramRoutes,
     ...sprayProgramRoutes,
-    ...livestockPoultryRoutes,
     ...clientRoutes,
   ]
 }
@@ -271,15 +259,6 @@ async function fetchFeedProducts() {
 async function fetchFeedingPrograms() {
   const programs = await fetchSimpleApi('feedingprograms/')
   return (programs || []).map((p: any) => ({
-    slug: p.slug,
-    updated: p.updated,
-    created: p.created,
-  }))
-}
-
-async function fetchLivestockPoultry() {
-  const products = await fetchPaginatedApi('livestock-poultry/all')
-  return products.map((p: any) => ({
     slug: p.slug,
     updated: p.updated,
     created: p.created,
