@@ -1,10 +1,13 @@
 import { serverFetch } from "@/lib/serverFetch"
 import Image from "next/image"
 import Link from "next/link"
+import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
+import { SidebarPromo } from "@/components/ads/SidebarPromo"
 import { WantToBuyCTA } from "@/components/shared/WantToBuyCTA"
 import { GuideProductTitle } from "@/components/shared/GuideProductTitle"
 import { ShareBar } from "@/components/shared/ShareBar"
 import { formatProductName } from "@/lib/utilities"
+import { ProductNotFound } from "@/components/shared/ProductNotFound"
 
 interface Props {
     params: Promise<{ slug: string }>
@@ -34,15 +37,7 @@ export default async function SeedGuidePage({ params }: Props) {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://farmnport.com"
 
     if (!product) {
-        return (
-            <div className="min-h-screen bg-background flex items-center justify-center">
-                <div className="text-center">
-                    <h2 className="text-2xl font-bold mb-2">Guide Not Found</h2>
-                    <p className="text-muted-foreground">The seed guide you&apos;re looking for doesn&apos;t exist.</p>
-                    <Link href="/seed-guides" className="text-sm text-primary underline mt-4 block">Back to Seed Guides</Link>
-                </div>
-            </div>
-        )
+        return <ProductNotFound title="Seed Guide Not Found" description="The seed guide you're looking for doesn't exist or may have been removed." primary={{ href: "/seed-guides", label: "Browse Seed Guides" }} secondary={{ href: "/buy-seed-products", label: "Buy Seeds" }} />
     }
 
     const structuredData = {
@@ -81,7 +76,7 @@ export default async function SeedGuidePage({ params }: Props) {
                 {/* Header Section */}
                 <div className="grid lg:grid-cols-[450px,1fr] gap-12 mb-16">
                     {/* Left - Image */}
-                    <div className="space-y-4">
+                    <div className="flex flex-col gap-4">
                         <div className="relative aspect-square bg-white rounded-xl border overflow-hidden shadow-sm">
                             {product.images?.[0]?.img?.src ? (
                                 <Image
@@ -134,6 +129,11 @@ export default async function SeedGuidePage({ params }: Props) {
                                 </ul>
                             </div>
                         )}
+
+                        {/* Promo - fills remaining sidebar space */}
+                        <div className="flex-1">
+                            <SidebarPromo />
+                        </div>
                     </div>
 
                     {/* Right - Product Info */}
@@ -160,6 +160,9 @@ export default async function SeedGuidePage({ params }: Props) {
                                 <p className="text-muted-foreground leading-relaxed text-sm">{product.description}</p>
                             </div>
                         )}
+
+                        {/* AdSense Ad */}
+                        <AdSenseInFeed />
 
                         {/* Key Stats Grid */}
                         <div className="grid grid-cols-2 gap-4">
