@@ -1,11 +1,11 @@
 import type { Metadata } from 'next'
-import { notFound } from "next/navigation"
 import { serverFetch } from "@/lib/serverFetch"
 import { formatProductName } from "@/lib/utilities"
 import Link from "next/link"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { BuyProductInteractive } from "@/components/shop/BuyProductInteractive"
 import { guardTestItem } from "@/lib/guardTestItem"
+import { ProductNotFound } from "@/components/shared/ProductNotFound"
 
 interface Props {
     params: Promise<{ slug: string }>
@@ -43,19 +43,10 @@ export default async function BuySeedProductPage({ params }: Props) {
         (e: any) => e.produce_id && product?.id && e.produce_id === product.id
     )
 
-    if (!product) notFound()
-    await guardTestItem(!!product.is_test)
-
     if (!product) {
-        return (
-            <div className="min-h-screen bg-background flex items-center justify-center">
-                <div className="text-center">
-                    <h2 className="text-2xl font-bold mb-2">Product Not Found</h2>
-                    <p className="text-muted-foreground">The product you&apos;re looking for doesn&apos;t exist.</p>
-                </div>
-            </div>
-        )
+        return <ProductNotFound title="Seed Product Not Found" description="The seed product you're looking for doesn't exist or may have been removed." primary={{ href: "/buy-seed-products", label: "Browse Seed Products" }} secondary={{ href: "/seed-guides", label: "View Seed Guides" }} />
     }
+    await guardTestItem(!!product.is_test)
 
     const structuredData = {
         "@context": "https://schema.org",

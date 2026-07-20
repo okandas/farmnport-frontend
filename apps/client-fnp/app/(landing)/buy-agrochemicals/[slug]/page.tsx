@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
-import { notFound } from "next/navigation"
 import { serverFetch } from "@/lib/serverFetch"
 import { buildBuyMetadata } from "@/lib/utilities"
 import { guardTestItem } from "@/lib/guardTestItem"
+import { ProductNotFound } from "@/components/shared/ProductNotFound"
 import Link from "next/link"
 import { Beaker } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -23,12 +23,14 @@ export default async function BuyAgroChemicalPage({ params }: BuyAgroChemicalPag
     const { slug } = await params
 
     const chemical = await serverFetch(`/agrochemical/${slug}`).catch(() => null)
-    if (!chemical) notFound()
+    if (!chemical) {
+        return <ProductNotFound title="AgroChemical Not Found" description="The agrochemical you're looking for doesn't exist or may have been removed." primary={{ href: "/buy-agrochemicals", label: "Browse AgroChemicals" }} secondary={{ href: "/agrochemical-guides", label: "View Guides" }} />
+    }
     await guardTestItem(!!chemical.is_test)
 
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://farmnport.com'
 
-    const structuredData = chemical ? {
+    const structuredData = {
         "@context": "https://schema.org",
         "@type": "Product",
         "name": chemical.name,
@@ -47,17 +49,6 @@ export default async function BuyAgroChemicalPage({ params }: BuyAgroChemicalPag
             "availability": chemical.available_for_sale ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
             "seller": { "@type": "Organization", "name": "farmnport" }
         }
-    } : null
-
-    if (!chemical) {
-        return (
-            <div className="min-h-screen bg-background flex items-center justify-center">
-                <div className="text-center">
-                    <h2 className="text-2xl font-bold mb-2">Product Not Found</h2>
-                    <p className="text-muted-foreground">The product you&apos;re looking for doesn&apos;t exist.</p>
-                </div>
-            </div>
-        )
     }
 
     const tabs = ["overview", "active-ingredients", ...(chemical.targets?.length > 0 ? ["targets"] : [])]

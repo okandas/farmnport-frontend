@@ -1,6 +1,5 @@
 import Image from "next/image"
 import { AlertTriangle } from "lucide-react"
-import Link from "next/link"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
 import { BaseURL } from "@/lib/schemas"
 import { guardTestItem } from "@/lib/guardTestItem"
@@ -34,7 +33,7 @@ export default async function FeedDetailPage({ params }: FeedDetailPageProps) {
     const product = await getFeedProduct(slug)
 
     if (!product) {
-        return <ProductNotFound title="Feed Guide Not Found" description="The feed guide you're looking for doesn't exist or may have been removed." primary={{ href: "/feed-guides", label: "Browse Feed Guides" }} />
+        return <ProductNotFound title="Feed Guide Not Found" description="The feed guide you're looking for doesn't exist or may have been removed." primary={{ href: "/feed-guides", label: "Browse Feed Guides" }} secondary={{ href: "/buy-feeds", label: "Buy Feeds" }} />
     }
 
     await guardTestItem(!!product.is_test)

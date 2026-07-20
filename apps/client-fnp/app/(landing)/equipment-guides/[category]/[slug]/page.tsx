@@ -47,7 +47,7 @@ export default async function EquipmentGuidePage({ params }: GuidePageProps) {
     await guardTestItem(!!product?.is_test)
 
     if (!product) {
-        return <ProductNotFound title="Equipment Guide Not Found" description="The equipment guide you're looking for doesn't exist or may have been removed." primary={{ href: "/equipment-guides", label: "Browse Equipment Guides" }} />
+        return <ProductNotFound title="Equipment Guide Not Found" description="The equipment guide you're looking for doesn't exist or may have been removed." primary={{ href: "/equipment-guides", label: "Browse Equipment Guides" }} secondary={{ href: "/buy-equipment", label: "Buy Equipment" }} />
     }
 
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://farmnport.com'

@@ -13,6 +13,9 @@ const nextConfig = {
       { source: '/prices/produce/:slug', destination: '/prices/:slug', permanent: true },
       { source: '/waiting-list-shop', destination: '/buy', permanent: true },
       { source: '/waiting-list-paying', destination: '/lots', permanent: true },
+      { source: '/agrochemical-guides/foliar-feeds/voema-starter', destination: '/plant-nutrition-guides/foliar-feeds/voema-starter', permanent: true },
+      { source: '/agrochemical-guides/foliar-feeds/voema-vegetative', destination: '/plant-nutrition-guides/foliar-feeds/voema-vegetative', permanent: true },
+      { source: '/agrochemical-guides/foliar-feeds/voema-fruit-flower', destination: '/plant-nutrition-guides/foliar-feeds/voema-flower-fruit', permanent: true },
     ]
   },
   images: {
