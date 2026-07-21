@@ -216,7 +216,7 @@ export function Lots({ mode }: LotsProps) {
                   {lot.quantity.toLocaleString()} {lot.unit}{lot.province ? ` · ${capitalizeFirstLetter(lot.province)}` : ""}
                 </p>
                 <p className="text-base font-bold">
-                  {withPlatformFeeDisplay(lot.price_per_unit_cents)}<span className="text-xs font-normal text-muted-foreground">/{lot.unit}</span>
+                  {withPlatformFeeDisplay(lot.price_per_unit_cents)}
                 </p>
               </div>
             </Link>

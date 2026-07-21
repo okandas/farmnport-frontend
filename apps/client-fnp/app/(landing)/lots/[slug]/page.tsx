@@ -150,7 +150,7 @@ export default async function LotDetailPage({ params }: Props) {
                                         <p className="text-2xl font-bold">{capitalizeFirstLetter(lot.form)}</p>
                                     </div>
                                 </div>
-                                <div className={isExpired ? "" : "rounded-xl bg-card"}>
+                                <div className={isExpired ? "" : "rounded-xl bg-card p-5"}>
                                     {isExpired && bidsData?.accepted && (myBid as any)?.status !== "accepted" ? (
                                         <div className="space-y-1">
                                             <p className="text-sm font-semibold text-amber-700 dark:text-amber-400">Awaiting payment</p>

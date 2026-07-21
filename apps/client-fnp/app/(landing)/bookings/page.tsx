@@ -31,7 +31,7 @@ export default async function PreOrdersPage() {
           <span className="text-foreground font-medium">Pre-Orders</span>
         </nav>
 
-        <div className="mb-8">
+        <div id="bookings-heading" className="mb-8">
           <h1 className="text-4xl font-bold tracking-tight font-heading mb-2">Pre-Orders</h1>
           <p className="text-lg text-muted-foreground">Book and reserve produce directly from suppliers. Confirm availability, pay, and collect.</p>
         </div>
