@@ -20,7 +20,7 @@ import { capitalizeFirstLetter } from "@/lib/utilities"
 import { ImageUpload } from "@/components/ui/image-upload"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 
-const LOT_UNITS = ["kg", "head", "unit", "tonne", "bag", "dozen", "litre"]
+const LOT_UNITS = ["kg", "head", "bird", "pocket", "unit", "tonne", "bag", "dozen", "litre"]
 
 const toDollars = (v: number) => (v / 100).toFixed(2)
 
@@ -353,6 +353,21 @@ export function PostLotForm({ intent }: { intent?: "sell" | "request" } = {}) {
           <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 md:col-span-2">
 
             <div className="sm:col-span-3">
+              <Label htmlFor="quantity" className="text-sm font-medium">Quantity *</Label>
+              <div className="mt-2">
+                <Input
+                  id="quantity"
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  placeholder="e.g. 500"
+                  {...register("quantity")}
+                />
+                {errors.quantity && <p className="mt-1.5 text-xs text-destructive">{errors.quantity.message}</p>}
+              </div>
+            </div>
+
+            <div className="sm:col-span-3">
               <Label className="text-sm font-medium">Unit *</Label>
               <div className="mt-2">
                 <Controller
@@ -372,21 +387,6 @@ export function PostLotForm({ intent }: { intent?: "sell" | "request" } = {}) {
                   )}
                 />
                 {errors.unit && <p className="mt-1.5 text-xs text-destructive">{errors.unit.message}</p>}
-              </div>
-            </div>
-
-            <div className="sm:col-span-3">
-              <Label htmlFor="quantity" className="text-sm font-medium">Quantity ({unit || "unit"}) *</Label>
-              <div className="mt-2">
-                <Input
-                  id="quantity"
-                  type="number"
-                  step="0.1"
-                  min="0"
-                  placeholder="e.g. 500"
-                  {...register("quantity")}
-                />
-                {errors.quantity && <p className="mt-1.5 text-xs text-destructive">{errors.quantity.message}</p>}
               </div>
             </div>
 

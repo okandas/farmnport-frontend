@@ -231,7 +231,6 @@ export function postLot(data: {
   farm_produce_id: string
   breed_id?: string
   produce_condition_id?: string
-  form: string
   quantity: number
   unit: string
   price_per_unit_cents: number
