@@ -155,6 +155,7 @@ export function PlaceBidForm({ lot, topBidCents, onSuccess }: Props) {
       setShowForm(false)
       qc.invalidateQueries({ queryKey: ["my-bid-on-lot", lot.slug, username] })
       qc.invalidateQueries({ queryKey: ["bid-images", lot.slug, username] })
+      qc.invalidateQueries({ queryKey: ["lot-bids", lot.slug] })
       toast.success("Bid placed successfully! The lot owner will be notified.")
       setTimeout(() => router.refresh(), 300)
       onSuccess?.()

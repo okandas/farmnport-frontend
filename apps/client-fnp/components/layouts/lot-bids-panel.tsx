@@ -74,7 +74,7 @@ export function LotBidsPanel({ slug, lotType, myBidId, myBidMainImage, myBidImag
   }
 
   return (
-    <div className="space-y-3">
+    <div className="rounded-xl border bg-card p-4 space-y-3">
       <Dialog open={galleryOpen} onOpenChange={setGalleryOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
