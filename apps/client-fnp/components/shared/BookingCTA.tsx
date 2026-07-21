@@ -2,7 +2,6 @@
 
 import { useEffect } from "react"
 import Link from "next/link"
-import { Truck } from "lucide-react"
 import pluralize from "pluralize"
 import { driver } from "driver.js"
 import "driver.js/dist/driver.css"
@@ -25,23 +24,32 @@ export function BookingCTA({ produce }: BookingCTAProps) {
         localStorage.setItem(key, "1")
 
         const d = driver({
-            showProgress: false,
+            showProgress: true,
             allowClose: true,
             steps: [
                 {
+                    element: "#booking-cta",
+                    popover: {
+                        title: `Sell or buy ${displayName} in Zimbabwe`,
+                        description: "Two ways to trade on farmnport — choose what fits you best.",
+                        side: "bottom",
+                        align: "center",
+                    },
+                },
+                {
                     element: "#booking-cta-sell",
                     popover: {
-                        title: `Supply ${displayName}?`,
-                        description: "Create a booking and reach buyers directly.",
+                        title: "Supply frequently?",
+                        description: "Create a booking for repeat orders. Buyers can book from you regularly.",
                         side: "bottom",
                         align: "start",
                     },
                 },
                 {
-                    element: "#booking-cta-buy",
+                    element: "#booking-cta-lot",
                     popover: {
-                        title: `Buy ${displayName}?`,
-                        description: "Browse available bookings.",
+                        title: "Have stock ready now?",
+                        description: "List a lot for immediate sale. Buyers bid or buy directly.",
                         side: "bottom",
                         align: "start",
                     },
@@ -65,12 +73,11 @@ export function BookingCTA({ produce }: BookingCTAProps) {
                     Create Booking
                 </Link>
                 <Link
-                    id="booking-cta-buy"
-                    href="/bookings"
+                    id="booking-cta-lot"
+                    href="/lots/new"
                     className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted/50 transition-colors"
                 >
-                    <Truck className="w-4 h-4" />
-                    Supply or Buy
+                    List a Lot
                 </Link>
             </div>
         </div>

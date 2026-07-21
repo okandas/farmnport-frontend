@@ -94,7 +94,7 @@ export default function SellPage() {
             Sell at the Price You Want, Not the Price You're Given
           </h1>
           <p className="mt-4 text-lg text-muted-foreground">
-            Been to a live auction and didn't get the price you wanted? List your produce as a timed lot — set your own price, your own deadline, and accept offers on your terms. No auctioneers, no middlemen.
+            Been to a live auction and didn't get the price you wanted? List your produce as a timed lot — set your own price, your own deadline, and accept offers on your terms.
           </p>
           <div className="mt-6">
             <Link
