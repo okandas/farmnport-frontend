@@ -94,6 +94,11 @@ export function Navigation({ user }: NavigationProps) {
         >
           Buy
         </Link>
+        <Link href="/prices" onClick={() => sendGTMEvent({ event: 'nav_click', link_name: 'prices' })}
+              className={buttonVariants({ size: "sm", variant: "link" })}
+        >
+          Prices
+        </Link>
         <Link href="/guides" onClick={() => sendGTMEvent({ event: 'nav_click', link_name: 'guides' })}
               className={buttonVariants({ size: "sm", variant: "link" })}
         >
