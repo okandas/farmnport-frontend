@@ -1,10 +1,10 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
 import { useQuery, useMutation } from "@tanstack/react-query"
 import { AlertCircle } from "lucide-react"
@@ -15,16 +15,103 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { queryClient as queryUserProfile, queryLotsEnabledFarmProduce, queryBreedsByFarmProduce, queryFarmProduceStates, postLot } from "@/lib/query"
+import { queryClient as queryUserProfile, queryLotsEnabledFarmProduce, queryBreedsByFarmProduce, queryFarmProduceStates, queryProduceConditions, queryHeadSummary, postLot } from "@/lib/query"
 import { capitalizeFirstLetter } from "@/lib/utilities"
 import { ImageUpload } from "@/components/ui/image-upload"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 
 const LOT_UNITS = ["kg", "head", "unit", "tonne", "bag", "dozen", "litre"]
+
+const toDollars = (v: number) => (v / 100).toFixed(2)
+
+function ComparePricesDialog() {
+  const [search, setSearch] = useState("")
+  const { data, isLoading } = useQuery({
+    queryKey: ["head-summary-compare"],
+    queryFn: queryHeadSummary,
+    refetchOnWindowFocus: false,
+  })
+
+  const entries: { code: string; name: string; category: string; avg: number; high: number; low: number }[] = data?.data?.data ?? []
+  const filtered = entries
+    .filter(e => e.avg > 0)
+    .filter(e => {
+      if (!search) return true
+      const q = search.toLowerCase()
+      return e.name.toLowerCase().includes(q) || e.category.toLowerCase().includes(q) || e.code.toLowerCase().includes(q)
+    })
+    .sort((a, b) => b.avg - a.avg)
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <button type="button" className="text-[11px] font-medium text-primary hover:underline">
+          Compare prices
+        </button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-lg lg:max-w-xl">
+        <div className="sticky top-0 z-10 bg-background pb-3 space-y-3">
+          <DialogHeader>
+            <DialogTitle className="text-base">Market Prices Per Head</DialogTitle>
+            <p className="text-xs text-muted-foreground">Current averages from verified buyers. Use as a guide.</p>
+          </DialogHeader>
+          <input
+            type="text"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Filter by breed or category..."
+            className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+          />
+        </div>
+        {isLoading ? (
+          <div className="space-y-3 py-4">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="flex items-center gap-3">
+                <div className="h-4 w-20 rounded bg-muted animate-pulse" />
+                <div className="h-4 flex-1 rounded bg-muted animate-pulse" />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="max-h-72 overflow-y-auto pr-3">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b text-xs text-muted-foreground">
+                  <th className="text-left py-2 font-medium">Breed</th>
+                  <th className="text-right py-2 font-medium">Avg</th>
+                  <th className="text-right py-2 font-medium">High</th>
+                  <th className="text-right py-2 font-medium">Low</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map(e => (
+                  <tr key={`${e.category}_${e.code}`} className="border-b border-border/50 last:border-0">
+                    <td className="py-2">
+                      <p className="font-medium text-foreground text-xs">{e.name}</p>
+                      <p className="text-[10px] text-muted-foreground">{e.category.charAt(0) + e.category.slice(1).toLowerCase()}</p>
+                    </td>
+                    <td className="py-2 text-right tabular-nums font-semibold text-xs">${toDollars(e.avg)}</td>
+                    <td className="py-2 text-right tabular-nums text-xs text-green-600">{e.high ? `$${toDollars(e.high)}` : "—"}</td>
+                    <td className="py-2 text-right tabular-nums text-xs text-red-500">{e.low ? `$${toDollars(e.low)}` : "—"}</td>
+                  </tr>
+                ))}
+                {filtered.length === 0 && (
+                  <tr><td colSpan={4} className="py-4 text-center text-xs text-muted-foreground">No matches</td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
+  )
+}
 
 const Schema = z.object({
   type: z.enum(["sell", "request"], { required_error: "Select a lot type" }),
   farm_produce_id: z.string().min(1, "Select a produce"),
   breed_id: z.string().optional(),
+  produce_condition_id: z.string().optional(),
   form: z.string().min(1, "Select a form"),
   quantity: z.coerce.number().positive("Enter a valid quantity"),
   unit: z.string().min(1, "Select a unit"),
@@ -37,7 +124,6 @@ type FormModel = z.infer<typeof Schema>
 
 export function PostLotForm() {
   const router = useRouter()
-  const searchParams = useSearchParams()
   const { data: session } = useSession()
   const user = session?.user as any
 
@@ -52,68 +138,16 @@ export function PostLotForm() {
   })
   const profile = profileData?.data
 
-  // Query params from /prices/head links: ?breed=Super+Brahman&produce=cattle&price=85000
-  const qBreed = searchParams.get("breed")
-  const qProduce = searchParams.get("produce")
-  const qPrice = searchParams.get("price")
-
   const {
     register,
     control,
     handleSubmit,
     watch,
-    setValue,
     formState: { errors },
   } = useForm<FormModel>({
     resolver: zodResolver(Schema),
-    defaultValues: {
-      type: "sell",
-      expires_days: 30,
-      unit: qPrice ? "head" : "kg",
-      price_per_unit: qPrice ? Number(qPrice) / 100 : undefined,
-    },
+    defaultValues: { type: "sell", expires_days: 30, unit: "kg" },
   })
-
-  // Resolve breed name → farm_produce_id + breed_id
-  const [prefillDone, setPrefillDone] = useState(false)
-
-  // Look up farm produce by name from query param
-  const { data: produceSearchData } = useQuery({
-    queryKey: ["prefill-produce", qProduce],
-    queryFn: () => queryLotsEnabledFarmProduce({ p: 1, search: qProduce! }),
-    enabled: !!qProduce && !prefillDone,
-    refetchOnWindowFocus: false,
-  })
-
-  const resolvedProduceId = (() => {
-    const items = produceSearchData?.data?.data ?? []
-    const match = items.find((p: any) => p.name.toLowerCase() === qProduce?.toLowerCase())
-    return match?.id as string | undefined
-  })()
-
-  // Look up breed by name under the resolved produce
-  const { data: breedSearchData } = useQuery({
-    queryKey: ["prefill-breed", resolvedProduceId, qBreed],
-    queryFn: () => queryBreedsByFarmProduce({ farmProduceId: resolvedProduceId!, p: 1, search: qBreed! }),
-    enabled: !!resolvedProduceId && !!qBreed && !prefillDone,
-    refetchOnWindowFocus: false,
-  })
-
-  useEffect(() => {
-    if (prefillDone) return
-    if (!resolvedProduceId) return
-
-    setValue("farm_produce_id", resolvedProduceId)
-
-    if (qBreed && breedSearchData) {
-      const breeds = breedSearchData?.data?.data ?? []
-      const match = breeds.find((b: any) => b.name.toLowerCase() === qBreed.toLowerCase())
-      if (match) setValue("breed_id", match.id)
-      setPrefillDone(true)
-    } else if (!qBreed) {
-      setPrefillDone(true)
-    }
-  }, [resolvedProduceId, breedSearchData, qBreed, prefillDone, setValue])
 
   const farmProduceId = watch("farm_produce_id")
   const unit = watch("unit")
@@ -126,6 +160,7 @@ export function PostLotForm() {
         type: data.type,
         farm_produce_id: data.farm_produce_id,
         breed_id: data.breed_id || undefined,
+        produce_condition_id: data.produce_condition_id || undefined,
         form: data.form,
         quantity: data.quantity,
         unit: data.unit,
@@ -274,6 +309,35 @@ export function PostLotForm() {
                 <p className="mt-1.5 text-xs text-muted-foreground">Optional — buyers search by variety.</p>
               </div>
             </div>
+
+            {farmProduceId && (
+              <div className="sm:col-span-3">
+                <Label className="text-sm font-medium">Condition</Label>
+                <div className="mt-2">
+                  <Controller
+                    name="produce_condition_id"
+                    control={control}
+                    render={({ field }) => (
+                      <SearchSelect
+                        queryKey={["produce-conditions", farmProduceId]}
+                        queryFn={(params) => queryProduceConditions({ farmProduceId, ...params })}
+                        getItems={(page) => page?.data?.data ?? []}
+                        value={field.value ?? ""}
+                        onValueChange={field.onChange}
+                        getLabel={(c) => capitalizeFirstLetter(c.name ?? "")}
+                        getValue={(c) => c.id}
+                        placeholder={farmProduceId ? "Select condition" : "Select produce first"}
+                        searchPlaceholder="Search conditions..."
+                        disabled={!farmProduceId}
+                        clearable
+                        capitalize
+                      />
+                    )}
+                  />
+                  <p className="mt-1.5 text-xs text-muted-foreground">Optional — e.g. in-calf, slaughter-ready, flowering.</p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -350,9 +414,12 @@ export function PostLotForm() {
             </div>
 
             <div className="sm:col-span-3">
-              <Label htmlFor="price_per_unit" className="text-sm font-medium">
-                Price per {unit || "unit"} *
-              </Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="price_per_unit" className="text-sm font-medium">
+                  Price per {unit || "unit"} *
+                </Label>
+                <ComparePricesDialog />
+              </div>
               <div className="mt-2 relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">$</span>
                 <Input

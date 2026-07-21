@@ -610,21 +610,12 @@ export function PricesBoard({ mode = "kg" }: { mode?: Mode }) {
                             </td>
                             {mode === "head" && (
                               <td className="py-3 pl-2">
-                                <div className="flex items-center gap-1.5">
-                                  <Link
-                                    href={`/lots/new?breed=${encodeURIComponent(entry.name)}&produce=${encodeURIComponent(produce.toLowerCase())}&price=${entry.avg}`}
-                                    className="text-[11px] font-medium text-primary hover:underline"
-                                  >
-                                    Sell
-                                  </Link>
-                                  <span className="text-border">·</span>
-                                  <Link
-                                    href={`/lots/buying?breed=${encodeURIComponent(entry.name)}`}
-                                    className="text-[11px] font-medium text-primary hover:underline"
-                                  >
-                                    Buy
-                                  </Link>
-                                </div>
+                                <Link
+                                  href="/lots/new"
+                                  className="text-[11px] font-medium text-primary hover:underline"
+                                >
+                                  Sell
+                                </Link>
                               </td>
                             )}
                           </tr>

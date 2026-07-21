@@ -114,8 +114,8 @@ export function Lots({ mode }: LotsProps) {
       {/* Empty state */}
       {!isFetching && lots.length === 0 && (
         <div className="space-y-6">
-          <div className="flex flex-col items-center justify-center py-16 px-6 text-center border rounded-lg bg-muted/30">
-            <Package className="h-12 w-12 text-muted-foreground/40 mb-4" />
+          <div className="flex flex-col items-center justify-center py-2 px-4 text-center border rounded-lg bg-muted/30">
+            <Package className="h-6 w-6 text-muted-foreground/40 mb-1" />
             <h3 className="text-lg font-semibold mb-1">{isPendingView ? "No Pending Lots" : "No Lots Available Yet"}</h3>
             <p className="text-sm text-muted-foreground max-w-md">
               {isPendingView

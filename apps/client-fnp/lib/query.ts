@@ -214,10 +214,19 @@ export function queryBreedsByFarmProduce({ farmProduceId, p, search }: { farmPro
   return api.get(url)
 }
 
+export function queryProduceConditions({ farmProduceId, p, search }: { farmProduceId: string; p: number; search: string }) {
+  const params = new URLSearchParams()
+  params.set("p", String(p))
+  if (search) params.set("q", search)
+  if (farmProduceId) params.set("farm_produce_id", farmProduceId)
+  return api.get(`${BaseURL}/produce-conditions?${params.toString()}`)
+}
+
 export function postLot(data: {
   type: string
   farm_produce_id: string
   breed_id?: string
+  produce_condition_id?: string
   form: string
   quantity: number
   unit: string
