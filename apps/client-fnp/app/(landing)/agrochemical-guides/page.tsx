@@ -2,6 +2,7 @@ import Link from "next/link"
 import { AllAgroChemicalsClient } from "./AllAgroChemicalsClient"
 import { serverFetch } from "@/lib/serverFetch"
 import { OtherGuidesLinks } from "@/components/shared/OtherGuidesLinks"
+import { getGuidesCategories } from "@/components/generic/GuidesCategoriesNav"
 
 export const metadata = {
   title: 'Agrochemical Guides Zimbabwe – Herbicides, Fungicides, Insecticides & More | farmnport.com',

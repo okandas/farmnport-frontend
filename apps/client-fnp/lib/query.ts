@@ -43,9 +43,9 @@ api.interceptors.response.use(
     }
 )
 
-export function queryClient(slug: string) {
+export function queryClient(slug: string, type?: "buyer" | "farmer") {
 
-  let url = `${BaseURL}/client/${slug}`
+  let url = type ? `${BaseURL}/client/${type}/${slug}` : `${BaseURL}/client/${slug}`
 
   return api.get(url)
 }

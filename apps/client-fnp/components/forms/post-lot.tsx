@@ -1,10 +1,10 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { useSession } from "next-auth/react"
 import { useQuery, useMutation } from "@tanstack/react-query"
 import { AlertCircle } from "lucide-react"
@@ -37,6 +37,7 @@ type FormModel = z.infer<typeof Schema>
 
 export function PostLotForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { data: session } = useSession()
   const user = session?.user as any
 
@@ -51,16 +52,68 @@ export function PostLotForm() {
   })
   const profile = profileData?.data
 
+  // Query params from /prices/head links: ?breed=Super+Brahman&produce=cattle&price=85000
+  const qBreed = searchParams.get("breed")
+  const qProduce = searchParams.get("produce")
+  const qPrice = searchParams.get("price")
+
   const {
     register,
     control,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<FormModel>({
     resolver: zodResolver(Schema),
-    defaultValues: { type: "sell", expires_days: 30, unit: "kg" },
+    defaultValues: {
+      type: "sell",
+      expires_days: 30,
+      unit: qPrice ? "head" : "kg",
+      price_per_unit: qPrice ? Number(qPrice) / 100 : undefined,
+    },
   })
+
+  // Resolve breed name → farm_produce_id + breed_id
+  const [prefillDone, setPrefillDone] = useState(false)
+
+  // Look up farm produce by name from query param
+  const { data: produceSearchData } = useQuery({
+    queryKey: ["prefill-produce", qProduce],
+    queryFn: () => queryLotsEnabledFarmProduce({ p: 1, search: qProduce! }),
+    enabled: !!qProduce && !prefillDone,
+    refetchOnWindowFocus: false,
+  })
+
+  const resolvedProduceId = (() => {
+    const items = produceSearchData?.data?.data ?? []
+    const match = items.find((p: any) => p.name.toLowerCase() === qProduce?.toLowerCase())
+    return match?.id as string | undefined
+  })()
+
+  // Look up breed by name under the resolved produce
+  const { data: breedSearchData } = useQuery({
+    queryKey: ["prefill-breed", resolvedProduceId, qBreed],
+    queryFn: () => queryBreedsByFarmProduce({ farmProduceId: resolvedProduceId!, p: 1, search: qBreed! }),
+    enabled: !!resolvedProduceId && !!qBreed && !prefillDone,
+    refetchOnWindowFocus: false,
+  })
+
+  useEffect(() => {
+    if (prefillDone) return
+    if (!resolvedProduceId) return
+
+    setValue("farm_produce_id", resolvedProduceId)
+
+    if (qBreed && breedSearchData) {
+      const breeds = breedSearchData?.data?.data ?? []
+      const match = breeds.find((b: any) => b.name.toLowerCase() === qBreed.toLowerCase())
+      if (match) setValue("breed_id", match.id)
+      setPrefillDone(true)
+    } else if (!qBreed) {
+      setPrefillDone(true)
+    }
+  }, [resolvedProduceId, breedSearchData, qBreed, prefillDone, setValue])
 
   const farmProduceId = watch("farm_produce_id")
   const unit = watch("unit")

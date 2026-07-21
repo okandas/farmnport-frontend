@@ -28,11 +28,12 @@ interface LatestPrices {
 
 interface ClientPageProps {
   slug: string
+  type?: "buyer" | "farmer"
   user: AuthenticatedUser | null
   latestPrices?: LatestPrices | null
 }
 
-export function Client({ slug, user, latestPrices }: ClientPageProps) {
+export function Client({ slug, type, user, latestPrices }: ClientPageProps) {
   const router = useRouter()
   const [showPhone, setShowPhone] = useState(false)
   const [showWhatsapp, setShowWhatsapp] = useState(false)
@@ -42,8 +43,8 @@ export function Client({ slug, user, latestPrices }: ClientPageProps) {
   const isSubscribed = !paywallEnabled || user?.subscription_active === true
 
   const { data, isError, isFetching } = useQuery({
-    queryKey: [`result-client-${slug}`, slug],
-    queryFn: () => queryClient(slug),
+    queryKey: [`result-client-${slug}`, slug, type],
+    queryFn: () => queryClient(slug, type),
     refetchOnWindowFocus: false
   })
 

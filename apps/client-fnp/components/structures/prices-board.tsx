@@ -556,6 +556,7 @@ export function PricesBoard({ mode = "kg" }: { mode?: Mode }) {
                       <th className="text-left py-2 pl-2 font-medium">High</th>
                       <th className="text-left py-2 pl-2 font-medium">Low</th>
                       <th className="text-left py-2 pl-2 font-medium">Trend</th>
+                      {mode === "head" && <th className="text-left py-2 pl-2 font-medium"></th>}
                     </tr>
                   </thead>
                   <tbody>
@@ -607,6 +608,25 @@ export function PricesBoard({ mode = "kg" }: { mode?: Mode }) {
                             <td className="py-3 pl-2 ">
                               <MiniSparkline values={entry.trend ?? []} />
                             </td>
+                            {mode === "head" && (
+                              <td className="py-3 pl-2">
+                                <div className="flex items-center gap-1.5">
+                                  <Link
+                                    href={`/lots/new?breed=${encodeURIComponent(entry.name)}&produce=${encodeURIComponent(produce.toLowerCase())}&price=${entry.avg}`}
+                                    className="text-[11px] font-medium text-primary hover:underline"
+                                  >
+                                    Sell
+                                  </Link>
+                                  <span className="text-border">·</span>
+                                  <Link
+                                    href={`/lots/buying?breed=${encodeURIComponent(entry.name)}`}
+                                    className="text-[11px] font-medium text-primary hover:underline"
+                                  >
+                                    Buy
+                                  </Link>
+                                </div>
+                              </td>
+                            )}
                           </tr>
                         )
                       })}

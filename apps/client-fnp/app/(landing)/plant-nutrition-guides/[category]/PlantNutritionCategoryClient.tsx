@@ -7,6 +7,7 @@ import { ProductCard } from "@/components/shared/ProductCard"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
 import Link from "next/link"
 import { PlantNutritionFilterSidebar } from "@/components/generic/plantNutritionFilterSidebar"
+import { GuidesSidebarNav } from "@/components/generic/GuidesSidebarNav"
 
 interface PlantNutritionCategoryClientProps {
     category: string
@@ -50,6 +51,7 @@ export function PlantNutritionCategoryClient({ category, categoryName, initialPr
 
             <div className="flex flex-col lg:flex-row gap-8">
                 <aside className="w-full lg:w-64 flex-shrink-0">
+                    <GuidesSidebarNav />
                     <PlantNutritionFilterSidebar hideCategory={true} categorySlug={category} />
                 </aside>
 
