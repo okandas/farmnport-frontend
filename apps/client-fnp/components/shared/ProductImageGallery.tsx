@@ -31,13 +31,13 @@ export function ProductImageGallery({ images, name, height = 520, fallback }: Pr
         <>
             <div className="flex gap-2">
                 {images.length > 1 && (
-                    <div className="hidden md:flex flex-col gap-2 shrink-0">
+                    <div className="hidden md:flex flex-col gap-2 shrink-0 p-1">
                         {images.map((img, idx) => (
                             <button
                                 key={idx}
                                 onClick={() => setSelected(idx)}
                                 onMouseEnter={() => setSelected(idx)}
-                                className={`relative w-16 h-16 rounded-lg overflow-hidden bg-background transition-colors ${
+                                className={`relative w-16 h-16 rounded-lg overflow-hidden bg-background transition-colors ${idx === 0 ? "mt-1" : ""} ${
                                     selected === idx ? "ring-2 ring-primary" : "opacity-60 hover:opacity-100"
                                 }`}
                             >
