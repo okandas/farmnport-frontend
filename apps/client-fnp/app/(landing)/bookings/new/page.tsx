@@ -1,11 +1,10 @@
 import Link from "next/link"
-import { CreateBookingForm } from "./CreateBookingForm"
 import { retrieveUser } from "@/lib/actions"
 import { redirect } from "next/navigation"
 
 export const metadata = {
-  title: "Create a Booking | farmnport.com",
-  description: "List your produce for sale or post a buying request on farmnport.com.",
+  title: "New Booking | farmnport.com",
+  description: "Create a booking to sell or buy produce on farmnport.com.",
 }
 
 export default async function NewBookingPage() {
@@ -28,14 +27,27 @@ export default async function NewBookingPage() {
           </nav>
         </div>
       </div>
-
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-2">
-          <h1 className="text-2xl font-bold tracking-tight">New Booking Event</h1>
-          <p className="text-sm text-muted-foreground mt-1">Create a pre-order batch for customers to book.</p>
+      <div className="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8 py-16">
+        <div className="text-center mb-10">
+          <h1 className="text-3xl font-bold tracking-tight">What would you like to do?</h1>
+          <p className="mt-2 text-sm text-muted-foreground">Choose whether you want to sell or buy through a booking.</p>
         </div>
-
-        <CreateBookingForm />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <Link
+            href="/bookings/new/sell"
+            className="group flex flex-col items-center gap-3 rounded-xl border border-border p-8 hover:border-primary hover:bg-primary/5 transition-colors"
+          >
+            <h2 className="text-lg font-semibold group-hover:text-primary">Sell</h2>
+            <p className="text-sm text-muted-foreground text-center">Create a pre-order for customers to book from you</p>
+          </Link>
+          <Link
+            href="/bookings/new/buy"
+            className="group flex flex-col items-center gap-3 rounded-xl border border-border p-8 hover:border-primary hover:bg-primary/5 transition-colors"
+          >
+            <h2 className="text-lg font-semibold group-hover:text-primary">Buy</h2>
+            <p className="text-sm text-muted-foreground text-center">Post what you want to buy and let sellers come to you</p>
+          </Link>
+        </div>
       </div>
     </div>
   )

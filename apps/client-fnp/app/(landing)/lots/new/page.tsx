@@ -1,5 +1,4 @@
 import Link from "next/link"
-import { PostLotForm } from "@/components/forms/post-lot"
 import { retrieveUser } from "@/lib/actions"
 import { redirect } from "next/navigation"
 
@@ -22,22 +21,33 @@ export default async function PostLotPage() {
           <nav className="flex text-sm text-muted-foreground">
             <Link href="/" className="hover:text-foreground">Home</Link>
             <span className="mx-2">/</span>
-            <Link href="/buy" className="hover:text-foreground">Buy</Link>
-            <span className="mx-2">/</span>
             <Link href="/lots" className="hover:text-foreground">Lots</Link>
             <span className="mx-2">/</span>
             <span className="text-foreground">Post a Lot</span>
           </nav>
         </div>
       </div>
-      <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-10">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight">Post a Lot</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Your lot will be reviewed before going live. We'll notify you once approved.
-          </p>
+      <div className="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8 py-16">
+        <div className="text-center mb-10">
+          <h1 className="text-3xl font-bold tracking-tight">What would you like to do?</h1>
+          <p className="mt-2 text-sm text-muted-foreground">Choose whether you want to sell your produce or find produce to buy.</p>
         </div>
-        <PostLotForm />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <Link
+            href="/lots/new/sell"
+            className="group flex flex-col items-center gap-3 rounded-xl border border-border p-8 hover:border-primary hover:bg-primary/5 transition-colors"
+          >
+            <h2 className="text-lg font-semibold group-hover:text-primary">Sell Produce</h2>
+            <p className="text-sm text-muted-foreground text-center">Post your available stock for buyers to find</p>
+          </Link>
+          <Link
+            href="/lots/new/buy"
+            className="group flex flex-col items-center gap-3 rounded-xl border border-border p-8 hover:border-primary hover:bg-primary/5 transition-colors"
+          >
+            <h2 className="text-lg font-semibold group-hover:text-primary">Request Produce</h2>
+            <p className="text-sm text-muted-foreground text-center">Post what you need and let sellers come to you</p>
+          </Link>
+        </div>
       </div>
     </main>
   )

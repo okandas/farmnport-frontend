@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { queryClient as queryUserProfile, queryLotsEnabledFarmProduce, queryBreedsByFarmProduce, queryFarmProduceStates, queryProduceConditions, queryHeadSummary, postLot } from "@/lib/query"
+import { queryClient as queryUserProfile, queryLotsEnabledFarmProduce, queryBreedsByFarmProduce, queryProduceConditions, queryHeadSummary, postLot } from "@/lib/query"
 import { capitalizeFirstLetter } from "@/lib/utilities"
 import { ImageUpload } from "@/components/ui/image-upload"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
@@ -112,7 +112,6 @@ const Schema = z.object({
   farm_produce_id: z.string().min(1, "Select a produce"),
   breed_id: z.string().optional(),
   produce_condition_id: z.string().optional(),
-  form: z.string().min(1, "Select a form"),
   quantity: z.coerce.number().positive("Enter a valid quantity"),
   unit: z.string().min(1, "Select a unit"),
   price_per_unit: z.coerce.number().min(0.01, "Price is required"),
@@ -122,7 +121,7 @@ const Schema = z.object({
 
 type FormModel = z.infer<typeof Schema>
 
-export function PostLotForm() {
+export function PostLotForm({ intent }: { intent?: "sell" | "request" } = {}) {
   const router = useRouter()
   const { data: session } = useSession()
   const user = session?.user as any
@@ -146,9 +145,10 @@ export function PostLotForm() {
     formState: { errors },
   } = useForm<FormModel>({
     resolver: zodResolver(Schema),
-    defaultValues: { type: "sell", expires_days: 30, unit: "kg" },
+    defaultValues: { type: intent ?? "sell", expires_days: 30, unit: "kg" },
   })
 
+  const lotType = watch("type")
   const farmProduceId = watch("farm_produce_id")
   const unit = watch("unit")
 
@@ -161,7 +161,6 @@ export function PostLotForm() {
         farm_produce_id: data.farm_produce_id,
         breed_id: data.breed_id || undefined,
         produce_condition_id: data.produce_condition_id || undefined,
-        form: data.form,
         quantity: data.quantity,
         unit: data.unit,
         price_per_unit_cents: Math.round(data.price_per_unit * 100),
@@ -188,7 +187,8 @@ export function PostLotForm() {
     <form onSubmit={handleSubmit((d) => mutate(d))}>
       <div className="space-y-12">
 
-        {/* Section 1: Photos */}
+        {/* Section 1: Photos — only for sell lots */}
+        {lotType === "sell" && (
         <div className="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-border pb-12 md:grid-cols-3">
           <div>
             <h2 className="text-base font-semibold text-foreground">Photos</h2>
@@ -203,8 +203,10 @@ export function PostLotForm() {
             </div>
           </div>
         </div>
+        )}
 
-        {/* Section 2: Lot Type */}
+        {/* Section 2: Lot Type — hidden when intent is pre-set via URL */}
+        {!intent && (
         <div className="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-border pb-12 md:grid-cols-3">
           <div>
             <h2 className="text-base font-semibold text-foreground">Lot Type</h2>
@@ -249,6 +251,7 @@ export function PostLotForm() {
             </div>
           </div>
         </div>
+        )}
 
         {/* Section 3: Produce */}
         <div className="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-border pb-12 md:grid-cols-3">
@@ -345,35 +348,9 @@ export function PostLotForm() {
         <div className="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-border pb-12 md:grid-cols-3">
           <div>
             <h2 className="text-base font-semibold text-foreground">Lot Details</h2>
-            <p className="mt-1 text-sm text-muted-foreground">Describe the form, quantity, and price of your lot.</p>
+            <p className="mt-1 text-sm text-muted-foreground">Quantity, unit, and price of your lot.</p>
           </div>
           <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 md:col-span-2">
-
-            <div className="sm:col-span-3">
-              <Label className="text-sm font-medium">State</Label>
-              <div className="mt-2">
-                <Controller
-                  name="form"
-                  control={control}
-                  render={({ field }) => (
-                    <SearchSelect
-                      queryKey="farm-produce-states"
-                      queryFn={(params) => queryFarmProduceStates(params)}
-                      getItems={(page) => page?.data?.data ?? []}
-                      value={field.value ?? ""}
-                      onValueChange={field.onChange}
-                      getLabel={(f) => capitalizeFirstLetter(f.name ?? "")}
-                      getValue={(f) => f.name}
-                      placeholder="Select form..."
-                      searchPlaceholder="Search forms..."
-                      clearable
-                      capitalize
-                    />
-                  )}
-                />
-                {errors.form && <p className="mt-1.5 text-xs text-destructive">{errors.form.message}</p>}
-              </div>
-            </div>
 
             <div className="sm:col-span-3">
               <Label className="text-sm font-medium">Unit *</Label>

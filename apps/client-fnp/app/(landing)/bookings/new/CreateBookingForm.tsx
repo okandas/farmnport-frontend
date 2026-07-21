@@ -159,7 +159,7 @@ function LocationMultiSelect({
   )
 }
 
-export function CreateBookingForm() {
+export function CreateBookingForm({ intent }: { intent?: "supply" | "demand" } = {}) {
   const router = useRouter()
   const [selectedLocations, setSelectedLocations] = useState<SelectedLocation[]>([])
 
@@ -193,7 +193,7 @@ export function CreateBookingForm() {
     supplier_type: "brand" as "client" | "brand",
     brand_id: "",
     brand_name: "",
-    market_side: "supply" as "supply" | "demand",
+    market_side: (intent ?? "supply") as "supply" | "demand",
     payment_deadline_hours: "48",
     buyer_notes: false,
     cancellation_fee: "0",
@@ -503,6 +503,7 @@ export function CreateBookingForm() {
           <p className="mt-1 text-sm/6 text-muted-foreground">Payment deadline, cancellation, and buyer preferences.</p>
         </div>
         <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6 md:col-span-2">
+          {!intent && (
           <div className="sm:col-span-3">
             <label className={labelCls}>Market Side</label>
             <div className="mt-2">
@@ -515,6 +516,7 @@ export function CreateBookingForm() {
               </Select>
             </div>
           </div>
+          )}
           <div className="sm:col-span-3">
             <label className={labelCls}>Payment Deadline (hours)</label>
             <div className="mt-2">
