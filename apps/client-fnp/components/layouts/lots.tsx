@@ -113,22 +113,46 @@ export function Lots({ mode }: LotsProps) {
 
       {/* Empty state */}
       {!isFetching && lots.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-16 px-6 text-center border rounded-lg bg-muted/30">
-          <Package className="h-12 w-12 text-muted-foreground/40 mb-4" />
-          <h3 className="text-lg font-semibold mb-1">{isPendingView ? "No Pending Lots" : "No Lots Available"}</h3>
-          <p className="text-sm text-muted-foreground max-w-md">
-            {isPendingView
-              ? "All submitted lots have been reviewed."
-              : mode === "selling"
-                ? "No selling lots active right now. Check back soon."
-                : mode === "buying"
-                  ? "No buying lots active right now. Check back soon."
-                  : "No active lots right now. Check back soon or be the first to list."}
-          </p>
+        <div className="space-y-6">
+          <div className="flex flex-col items-center justify-center py-16 px-6 text-center border rounded-lg bg-muted/30">
+            <Package className="h-12 w-12 text-muted-foreground/40 mb-4" />
+            <h3 className="text-lg font-semibold mb-1">{isPendingView ? "No Pending Lots" : "No Lots Available Yet"}</h3>
+            <p className="text-sm text-muted-foreground max-w-md">
+              {isPendingView
+                ? "All submitted lots have been reviewed."
+                : "Be the first to list. Set your price, your timeline, and accept offers on your terms."}
+            </p>
+            {!isPendingView && (
+              <Link href="/lots/new" className="mt-4 inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors">
+                List a Lot Now
+              </Link>
+            )}
+          </div>
+
           {!isPendingView && (
-            <Link href="/sell" className="mt-4 text-sm text-primary hover:underline">
-              List your produce
-            </Link>
+            <div className="rounded-xl border border-primary/20 bg-primary/5 p-6 space-y-4">
+              <h3 className="font-semibold text-base">Sell at the price you want, not the price you're given</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Been to a live auction and didn't get the price you wanted? With timed lots, you set your own asking price and timeline. Buyers come to you with offers — accept when the price is right.
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+                <div className="rounded-lg border bg-card p-3 space-y-1">
+                  <p className="font-medium">Set your price</p>
+                  <p className="text-xs text-muted-foreground">List at the price you want — no auctioneer deciding for you</p>
+                </div>
+                <div className="rounded-lg border bg-card p-3 space-y-1">
+                  <p className="font-medium">Set your timeline</p>
+                  <p className="text-xs text-muted-foreground">Choose when bidding closes — 3 days, 7 days, or longer</p>
+                </div>
+                <div className="rounded-lg border bg-card p-3 space-y-1">
+                  <p className="font-medium">Accept on your terms</p>
+                  <p className="text-xs text-muted-foreground">Review offers and accept when you're happy with the price</p>
+                </div>
+              </div>
+              <Link href="/lots/new" className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline">
+                Create your first lot →
+              </Link>
+            </div>
           )}
         </div>
       )}

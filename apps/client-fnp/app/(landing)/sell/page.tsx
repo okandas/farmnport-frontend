@@ -30,21 +30,21 @@ export const metadata: Metadata = {
 const STEPS = [
   {
     icon: Package,
-    title: "List Your Lot",
+    title: "Set Your Price & Timeline",
     description:
-      "Choose your produce, variety, form, quantity and price. Your listing goes live once reviewed — usually within 24 hours.",
+      "Choose your produce, set your asking price, and pick when bidding closes. Your listing goes live once reviewed — usually within 24 hours.",
   },
   {
     icon: Users,
-    title: "Buyers Find You",
+    title: "Buyers Come to You",
     description:
-      "Verified buyers across Zimbabwe browse active lots and make bookings directly. No cold calls, no middlemen.",
+      "Verified buyers across Zimbabwe browse active lots and place offers. No cold calls, no middlemen, no auctioneer deciding your price.",
   },
   {
     icon: Banknote,
-    title: "Close the Sale",
+    title: "Accept When You're Ready",
     description:
-      "Agree on delivery or pickup terms with the buyer and complete the transaction on your own terms.",
+      "Review offers at your own pace. Accept the price that works for you — not the price someone else decided.",
   },
 ]
 
@@ -56,13 +56,31 @@ const ENABLED_COMMODITIES = [
     badge: "Now Open",
     badgeVariant: "default" as const,
   },
+  {
+    slug: "maize",
+    name: "Maize",
+    description: "White and yellow maize — grain, green mealies, and stockfeed.",
+    badge: "Now Open",
+    badgeVariant: "default" as const,
+  },
+  {
+    slug: "cattle",
+    name: "Cattle",
+    description: "Bulls, heifers, cows, and calves — all breeds.",
+    badge: "Now Open",
+    badgeVariant: "default" as const,
+  },
+  {
+    slug: "chicken",
+    name: "Chicken",
+    description: "Broilers, layers, road runners, and day-old chicks.",
+    badge: "Now Open",
+    badgeVariant: "default" as const,
+  },
 ]
 
 const COMING_SOON = [
-  { name: "Maize", slug: "maize" },
-  { name: "Cattle", slug: "cattle" },
   { name: "Soya Beans", slug: "soybeans" },
-  { name: "Chicken", slug: "chicken" },
 ]
 
 export default function SellPage() {
@@ -73,11 +91,10 @@ export default function SellPage() {
         {/* Hero */}
         <div className="max-w-2xl">
           <h1 className="text-3xl font-bold tracking-tight">
-            Sell Your Farm Produce Directly to Buyers in Zimbabwe
+            Sell at the Price You Want, Not the Price You're Given
           </h1>
           <p className="mt-4 text-lg text-muted-foreground">
-            Skip the middlemen. List your produce as a lot, get found by verified buyers, and close sales on your own
-            terms.
+            Been to a live auction and didn't get the price you wanted? List your produce as a timed lot — set your own price, your own deadline, and accept offers on your terms. No auctioneers, no middlemen.
           </p>
           <div className="mt-6">
             <Link
@@ -153,9 +170,9 @@ export default function SellPage() {
         {/* Bottom CTA */}
         <div className="rounded-xl border bg-primary/5 border-primary/20 p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
           <div>
-            <h3 className="text-lg font-semibold">Ready to sell?</h3>
+            <h3 className="text-lg font-semibold">Ready to sell on your terms?</h3>
             <p className="text-sm text-muted-foreground mt-1">
-              Create your lot in minutes. Reviewed and listed within 24 hours.
+              Create your lot in minutes. Set your price, set your deadline, and let buyers come to you.
             </p>
           </div>
           <Link
