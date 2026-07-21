@@ -39,8 +39,8 @@ export function BookingCTA({ produce }: BookingCTAProps) {
                 {
                     element: "#booking-cta-sell",
                     popover: {
-                        title: "Supply frequently?",
-                        description: "Create a booking for repeat orders. Buyers can book from you regularly.",
+                        title: "Supply or buy frequently?",
+                        description: "Create a booking for repeat orders. Buyers and sellers connect directly.",
                         side: "bottom",
                         align: "start",
                     },

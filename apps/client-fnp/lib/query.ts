@@ -88,7 +88,7 @@ export function queryClients(slug: string, pagination?: PaginationModel & { prov
 }
 
 
-export function queryClientsByProduct(slug: string, product: string, pagination?: PaginationModel & { province?: string[], verified?: string[] }) {
+export function queryClientsByProduct(slug: string, product: string, pagination?: PaginationModel & { province?: string[], verified?: string[], has_booking?: string }) {
   const params = new URLSearchParams()
 
   if (pagination?.p !== undefined && pagination.p >= 2) {
@@ -101,6 +101,10 @@ export function queryClientsByProduct(slug: string, product: string, pagination?
 
   if (pagination?.verified && pagination.verified.length > 0) {
     params.set('verified', pagination.verified[0])
+  }
+
+  if (pagination?.has_booking) {
+    params.set('has_booking', pagination.has_booking)
   }
 
   const queryString = params.toString()

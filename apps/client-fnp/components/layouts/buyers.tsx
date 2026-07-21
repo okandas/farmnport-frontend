@@ -56,7 +56,7 @@ export function Buyers({queryBy}: BuyersPageProps) {
 
   const {data, isError, isFetching} = useQuery({
     queryKey: ["results-buyers", {p: page, province: provinceFilters, produce: produceFilter, category: categoryFilter, payment_terms: paymentTermsFilters, pricing: pricingFilters, verified: verifiedFilters, has_booking: hasBookingFilter, queryBy}],
-    queryFn: () => queryBy != undefined ? queryClientsByProduct('buyer', queryBy, {p: page, province: provinceFilters, verified: verifiedFilters}) : queryClients('buyer', {p: page, province: provinceFilters, produce: produceFilter ? [produceFilter] : [], category: categoryFilter ? [categoryFilter] : [], payment_terms: paymentTermsFilters, pricing: pricingFilters, verified: verifiedFilters, has_booking: hasBookingFilter || undefined}),
+    queryFn: () => queryBy != undefined ? queryClientsByProduct('buyer', queryBy, {p: page, province: provinceFilters, verified: verifiedFilters, has_booking: hasBookingFilter || undefined}) : queryClients('buyer', {p: page, province: provinceFilters, produce: produceFilter ? [produceFilter] : [], category: categoryFilter ? [categoryFilter] : [], payment_terms: paymentTermsFilters, pricing: pricingFilters, verified: verifiedFilters, has_booking: hasBookingFilter || undefined}),
     refetchOnWindowFocus: false
   })
 
