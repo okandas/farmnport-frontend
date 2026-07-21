@@ -2,6 +2,7 @@ import Link from "next/link"
 import { BuyPageClient } from "./BuyPageClient"
 import { serverFetch } from "@/lib/serverFetch"
 import { documentsEnabled, bookingsEnabled } from "@/flags"
+import { getBuyCategories } from "@/components/generic/BuyCategoriesNav"
 
 async function fetchSection(path: string) {
   try {
@@ -13,7 +14,7 @@ async function fetchSection(path: string) {
 }
 
 export default async function BuyPage() {
-  const [showDocuments, showBookings] = await Promise.all([documentsEnabled(), bookingsEnabled()])
+  const [showDocuments, showBookings, categories] = await Promise.all([documentsEnabled(), bookingsEnabled(), getBuyCategories()])
 
   const [agro, animalHealth, feeds, plantNutrition, seeds, documents, bookingsRes] = await Promise.all([
     fetchSection("/agrochemical/buy"),
@@ -63,6 +64,7 @@ export default async function BuyPage() {
         bookingEvents={bookingEvents}
         showDocuments={showDocuments}
         showBookings={showBookings}
+        categories={categories}
       />
     </main>
   )

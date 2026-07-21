@@ -70,6 +70,8 @@ export default async function LotDetailPage({ params }: Props) {
                     <nav className="flex text-sm text-muted-foreground">
                         <Link href="/" className="hover:text-foreground">Home</Link>
                         <span className="mx-2">/</span>
+                        <Link href="/buy" className="hover:text-foreground">Buy</Link>
+                        <span className="mx-2">/</span>
                         <Link href="/lots" className="hover:text-foreground">Lots</Link>
                         <span className="mx-2">/</span>
                         <span className="text-foreground">{produce}{breed ? ` — ${breed}` : ""}</span>

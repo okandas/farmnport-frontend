@@ -7,6 +7,7 @@ import { useQuery } from "@tanstack/react-query"
 import { Button } from "@/components/ui/button"
 import { listPreOrders } from "@/lib/query"
 import { ProductCard } from "@/components/shared/ProductCard"
+import { BuyCategoriesNavClient } from "@/components/generic/BuyCategoriesNavClient"
 
 
 // ── Document card ─────────────────────────────────────────────────────────────
@@ -126,6 +127,7 @@ interface BuyPageClientProps {
   bookingEvents?: any[]
   showDocuments?: boolean
   showBookings?: boolean
+  categories?: { label: string; href: string }[]
 }
 
 export function BuyPageClient({
@@ -138,6 +140,7 @@ export function BuyPageClient({
   bookingEvents = [],
   showDocuments = false,
   showBookings = false,
+  categories = [],
 }: BuyPageClientProps) {
   return (
     <div className="mx-auto max-w-7xl px-4 lg:px-8 py-8">
@@ -145,15 +148,7 @@ export function BuyPageClient({
 
         {/* ── Sidebar ── */}
         <aside className="hidden lg:flex flex-col w-56 flex-shrink-0">
-          <nav className="flex flex-col gap-0.5">
-            {agrochemicalTotal > 0 && <Link href="/buy-agrochemicals" className="px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">Agrochemicals</Link>}
-            {animalHealthTotal > 0 && <Link href="/buy-animal-health" className="px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">Animal Health</Link>}
-            {feedsTotal > 0 && <Link href="/buy-feeds" className="px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">Animal Feed</Link>}
-            {plantNutritionTotal > 0 && <Link href="/buy-plant-nutrition" className="px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">Plant Nutrition</Link>}
-            {seedsTotal > 0 && <Link href="/buy-seed-products" className="px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">Seeds</Link>}
-            {showDocuments && <Link href="/buy-documents" className="px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">Plans & Documents</Link>}
-            {showBookings && bookingEvents.length > 0 && <Link href="/bookings" className="px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">Book Online</Link>}
-          </nav>
+          <BuyCategoriesNavClient categories={categories} />
         </aside>
 
         {/* ── Main content ── */}

@@ -1,7 +1,8 @@
 import Link from "next/link"
 import { Lots } from "@/components/layouts/lots"
-import { LotsSidebar } from "@/components/layouts/lots-sidebar"
+import { MarketBuySidebar } from "@/components/layouts/market-buy-sidebar"
 import { QuickLinks } from "@/components/generic/quick-links"
+import { getBuyCategories } from "@/components/generic/BuyCategoriesNav"
 
 export const metadata = {
     title: 'Farm Produce Lots Zimbabwe – Buy & Sell Chillies, Maize, Cattle | farmnport.com',
@@ -34,13 +35,14 @@ export const metadata = {
     },
 }
 
-export default function LotsPage() {
+export default async function LotsPage() {
+    const categories = await getBuyCategories()
     const breadcrumbJsonLd = {
         "@context": "https://schema.org",
         "@type": "BreadcrumbList",
         "itemListElement": [
             { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://farmnport.com" },
-            { "@type": "ListItem", "position": 2, "name": "Market", "item": "https://farmnport.com/market" },
+            { "@type": "ListItem", "position": 2, "name": "Buy", "item": "https://farmnport.com/buy" },
             { "@type": "ListItem", "position": 3, "name": "Lots", "item": "https://farmnport.com/lots" },
         ],
     }
@@ -52,7 +54,7 @@ export default function LotsPage() {
                     <nav className="flex text-sm text-muted-foreground">
                         <Link href="/" className="hover:text-foreground">Home</Link>
                         <span className="mx-2">/</span>
-                        <Link href="/market" className="hover:text-foreground">Market</Link>
+                        <Link href="/buy" className="hover:text-foreground">Buy</Link>
                         <span className="mx-2">/</span>
                         <span className="text-foreground">Lots</span>
                     </nav>
@@ -62,7 +64,7 @@ export default function LotsPage() {
                 <div className="lg:flex lg:space-x-10">
 
                     <div className="hidden lg:block lg:w-44 relative">
-                        <LotsSidebar />
+                        <MarketBuySidebar categories={categories} />
                     </div>
 
                     <div className="flex-1 min-w-0">

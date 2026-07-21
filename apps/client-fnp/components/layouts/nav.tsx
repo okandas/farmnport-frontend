@@ -89,6 +89,11 @@ function BellIcon({ user }: { user: AuthenticatedUser | null }) {
 export function Navigation({ user }: NavigationProps) {
   return (
       <nav className="lg:flex lg:space-x-2">
+        <Link href="/buy" onClick={() => sendGTMEvent({ event: 'nav_click', link_name: 'buy' })}
+              className={buttonVariants({ size: "sm", variant: "link" })}
+        >
+          Buy
+        </Link>
         <Link href="/guides" onClick={() => sendGTMEvent({ event: 'nav_click', link_name: 'guides' })}
               className={buttonVariants({ size: "sm", variant: "link" })}
         >
@@ -98,16 +103,6 @@ export function Navigation({ user }: NavigationProps) {
               className={buttonVariants({ size: "sm", variant: "link" })}
         >
           Programs
-        </Link>
-        <Link href="/market" onClick={() => sendGTMEvent({ event: 'nav_click', link_name: 'market' })}
-              className={buttonVariants({ size: "sm", variant: "link" })}
-        >
-          Market
-        </Link>
-        <Link href="/buy" onClick={() => sendGTMEvent({ event: 'nav_click', link_name: 'buy' })}
-              className={buttonVariants({ size: "sm", variant: "link" })}
-        >
-          Buy
         </Link>
         <Link
           href={user ? "/lots/new" : "/login?next=/lots/new"}
