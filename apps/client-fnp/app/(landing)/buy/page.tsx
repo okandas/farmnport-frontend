@@ -16,7 +16,7 @@ async function fetchSection(path: string) {
 export default async function BuyPage() {
   const [showDocuments, showBookings, categories] = await Promise.all([documentsEnabled(), bookingsEnabled(), getBuyCategories()])
 
-  const [agro, animalHealth, feeds, plantNutrition, seeds, documents, bookingsRes] = await Promise.all([
+  const [agro, animalHealth, feeds, plantNutrition, seeds, documents, bookingsRes, lotsRes] = await Promise.all([
     fetchSection("/agrochemical/buy"),
     fetchSection("/animalhealth/buy"),
     fetchSection("/feed/buy"),
@@ -24,6 +24,7 @@ export default async function BuyPage() {
     fetchSection("/seed-products/buy"),
     showDocuments ? fetchSection("/documents/all") : Promise.resolve({ data: [], total: 0 }),
     showBookings ? serverFetch("/booking/preorders?status=open").catch(() => null) : Promise.resolve(null),
+    fetchSection("/lots/"),
   ])
   const bookingEvents: any[] = bookingsRes?.preorders ?? []
 
@@ -65,6 +66,8 @@ export default async function BuyPage() {
         showDocuments={showDocuments}
         showBookings={showBookings}
         categories={categories}
+        lots={lotsRes.data}
+        lotsTotal={lotsRes.total}
       />
     </main>
   )

@@ -81,6 +81,45 @@ function PreOrdersSection() {
   )
 }
 
+// ── Lot card ─────────────────────────────────────────────────────────────────
+
+function LotCard({ lot }: { lot: any }) {
+  const price = lot.price_per_unit_cents ? `$${(lot.price_per_unit_cents / 100).toFixed(2)}/${lot.unit}` : "Negotiable"
+  const href = `/lots/${lot.slug}`
+  const name = lot.farm_produce?.name ?? "Lot"
+  const variety = lot.breed?.name
+  const condition = lot.produce_condition?.name
+  const meta = [variety, condition].filter(Boolean).join(" · ")
+  const preview = lot.main_image?.img?.src
+
+  return (
+    <div className="bg-card border border-border rounded-lg overflow-hidden transition-all duration-200 hover:shadow-lg hover:border-primary/50 group">
+      <Link href={href} className="block">
+        <div className="relative aspect-square bg-muted/20">
+          {preview ? (
+            <Image src={preview} alt={name} fill className="object-cover" sizes="25vw" />
+          ) : (
+            <div className="absolute inset-0 bg-muted/30" />
+          )}
+          <span className={`absolute top-2 left-2 inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium ${lot.type === "sell" ? "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400" : "bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400"}`}>
+            {lot.type === "sell" ? "Selling" : "Buying"}
+          </span>
+        </div>
+      </Link>
+      <div className="p-4 space-y-2 border-t">
+        <Link href={href}>
+          <h3 className="font-semibold text-sm leading-tight line-clamp-2 group-hover:text-primary transition-colors">{name}</h3>
+        </Link>
+        {meta && <p className="text-xs text-muted-foreground">{meta}</p>}
+        <div className="flex items-center justify-between text-xs pt-2 border-t">
+          <span className="font-semibold text-primary">{price}</span>
+          <span className="text-muted-foreground">{lot.quantity?.toLocaleString()} {lot.unit}</span>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ── Section wrapper ───────────────────────────────────────────────────────────
 
 function Section({ label, href, children, count }: {
@@ -128,6 +167,8 @@ interface BuyPageClientProps {
   showDocuments?: boolean
   showBookings?: boolean
   categories?: { label: string; href: string }[]
+  lots?: any[]
+  lotsTotal?: number
 }
 
 export function BuyPageClient({
@@ -141,6 +182,7 @@ export function BuyPageClient({
   showDocuments = false,
   showBookings = false,
   categories = [],
+  lots = [], lotsTotal = 0,
 }: BuyPageClientProps) {
   return (
     <div className="mx-auto max-w-7xl px-4 lg:px-8 py-8">
@@ -207,7 +249,15 @@ export function BuyPageClient({
 
           {showBookings && bookingEvents.length > 0 && <PreOrdersSection />}
 
-          {agrochemicalTotal === 0 && animalHealthTotal === 0 && feedsTotal === 0 && plantNutritionTotal === 0 && seedsTotal === 0 && (!showDocuments || documents.length === 0) && (!showBookings || bookingEvents.length === 0) && (
+          {lotsTotal > 0 && (
+            <Section label="Lots" href="/lots" count={lotsTotal}>
+              {lots.slice(0, 4).map((lot: any) => (
+                <LotCard key={lot.id} lot={lot} />
+              ))}
+            </Section>
+          )}
+
+          {agrochemicalTotal === 0 && animalHealthTotal === 0 && feedsTotal === 0 && plantNutritionTotal === 0 && seedsTotal === 0 && (!showDocuments || documents.length === 0) && (!showBookings || bookingEvents.length === 0) && lotsTotal === 0 && (
             <div className="py-16 text-center">
               <p className="text-lg font-semibold">Products Coming Soon</p>
               <p className="text-sm text-muted-foreground mt-1">We&apos;re stocking up. Check back shortly.</p>
