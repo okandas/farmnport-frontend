@@ -13,6 +13,7 @@ import {queryClients, queryClientsByProduct} from "@/lib/query"
 import {AdSenseInFeed} from "@/components/ads/AdSenseInFeed"
 import {ApplicationUser, AuthenticatedUser} from "@/lib/schemas"
 import {capitalizeFirstLetter, plural} from "@/lib/utilities"
+import {sendGTMEvent} from "@next/third-parties/google"
 import {BuyerContactsCard} from "@/components/layouts/buyer-contacts"
 import {ClientListSkeleton} from "@/components/skeletons/client-list"
 
@@ -86,6 +87,7 @@ export function Buyers({queryBy}: BuyersPageProps) {
           <div className="flex items-center gap-2 flex-wrap">
             <button
               onClick={() => {
+                sendGTMEvent({ event: 'filter', value: 'RemoveOnlineBookingsFilter' })
                 router.push(pathname + "?" + createQueryString({ has_booking: null, page: null }))
               }}
               className="group inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full border font-medium transition-colors bg-blue-600 text-white border-blue-600"
@@ -138,6 +140,7 @@ export function Buyers({queryBy}: BuyersPageProps) {
       <div className="flex items-center gap-2 flex-wrap">
         <button
           onClick={() => {
+            sendGTMEvent({ event: 'filter', value: hasBookingFilter === "true" ? 'RemoveOnlineBookingsFilter' : 'AddOnlineBookingsFilter' })
             router.push(pathname + "?" + createQueryString({ has_booking: hasBookingFilter === "true" ? null : "true", page: null }))
           }}
           className={`group inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full border font-medium transition-colors ${
