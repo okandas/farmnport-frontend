@@ -63,14 +63,14 @@ export default async function LotsPage() {
             <div className="mx-auto max-w-7xl px-6 lg:px-8 min-h-[70lvh] py-8">
                 <div className="lg:flex lg:space-x-10">
 
-                    <div className="hidden lg:block lg:w-44 relative">
+                    <div className="hidden lg:block lg:w-56 relative">
                         <MarketBuySidebar categories={categories} />
                     </div>
 
                     <div className="flex-1 min-w-0">
                         <Lots mode={undefined} />
                     </div>
-                    <div className="hidden lg:block lg:w-44 shrink-0">
+                    <div className="hidden lg:block lg:w-40 shrink-0">
                         <QuickLinks />
                     </div>
                 </div>
