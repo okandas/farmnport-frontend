@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { retrieveUser } from "@/lib/actions"
 import { redirect } from "next/navigation"
+import { SplitPageTour } from "@/components/shared/SplitPageTour"
 
 export const metadata = {
   title: "Post a Lot | farmnport.com",
@@ -34,6 +35,7 @@ export default async function PostLotPage() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <Link
+            id="lot-new-sell"
             href="/lots/new/sell"
             className="group flex flex-col items-center gap-3 rounded-xl border border-border p-8 hover:border-primary hover:bg-primary/5 transition-colors"
           >
@@ -41,6 +43,7 @@ export default async function PostLotPage() {
             <p className="text-sm text-muted-foreground text-center">Post your available stock for buyers to find</p>
           </Link>
           <Link
+            id="lot-new-buy"
             href="/lots/new/buy"
             className="group flex flex-col items-center gap-3 rounded-xl border border-border p-8 hover:border-primary hover:bg-primary/5 transition-colors"
           >
@@ -48,6 +51,13 @@ export default async function PostLotPage() {
             <p className="text-sm text-muted-foreground text-center">Post what you need and let sellers come to you</p>
           </Link>
         </div>
+        <SplitPageTour
+          storageKey="fnp_lots_new_tour_seen"
+          steps={[
+            { element: "#lot-new-sell", title: "Have stock ready now?", description: "List it and buyers can bid or buy immediately." },
+            { element: "#lot-new-buy", title: "Looking for specific produce?", description: "Post a request and let farmers offer." },
+          ]}
+        />
       </div>
     </main>
   )

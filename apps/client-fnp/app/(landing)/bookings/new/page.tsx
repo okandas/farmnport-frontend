@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { retrieveUser } from "@/lib/actions"
 import { redirect } from "next/navigation"
+import { SplitPageTour } from "@/components/shared/SplitPageTour"
 
 export const metadata = {
   title: "New Booking | farmnport.com",
@@ -34,6 +35,7 @@ export default async function NewBookingPage() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <Link
+            id="booking-new-sell"
             href="/bookings/new/sell"
             className="group flex flex-col items-center gap-3 rounded-xl border border-border p-8 hover:border-primary hover:bg-primary/5 transition-colors"
           >
@@ -41,6 +43,7 @@ export default async function NewBookingPage() {
             <p className="text-sm text-muted-foreground text-center">Create a pre-order for customers to book from you</p>
           </Link>
           <Link
+            id="booking-new-buy"
             href="/bookings/new/buy"
             className="group flex flex-col items-center gap-3 rounded-xl border border-border p-8 hover:border-primary hover:bg-primary/5 transition-colors"
           >
@@ -48,6 +51,13 @@ export default async function NewBookingPage() {
             <p className="text-sm text-muted-foreground text-center">Post what you want to buy and let sellers come to you</p>
           </Link>
         </div>
+        <SplitPageTour
+          storageKey="fnp_bookings_new_tour_seen"
+          steps={[
+            { element: "#booking-new-sell", title: "Supply produce regularly?", description: "Create a pre-order so buyers can book from you on a schedule." },
+            { element: "#booking-new-buy", title: "Need produce?", description: "Post what you want and let farmers come to you." },
+          ]}
+        />
       </div>
     </div>
   )

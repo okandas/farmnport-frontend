@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
 import { Loader2, X, MapPin, Search, ImagePlus } from "lucide-react"
@@ -12,6 +12,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { SearchSelect } from "@/components/ui/search-select"
 import { Calendar } from "@/components/ui/calendar"
 import { createClientPreOrder, queryClientLocations, queryBrands, queryFarmProduceCategories, queryBreedsByFarmProduce, uploadImages } from "@/lib/query"
+import { driver } from "driver.js"
+import "driver.js/dist/driver.css"
 
 type SelectedLocation = { id: string; name: string }
 
@@ -163,6 +165,26 @@ export function CreateBookingForm({ intent }: { intent?: "supply" | "demand" } =
   const router = useRouter()
   const [selectedLocations, setSelectedLocations] = useState<SelectedLocation[]>([])
 
+  useEffect(() => {
+    const key = "fnp_booking_form_tour_seen"
+    if (typeof window === "undefined") return
+    if (localStorage.getItem(key)) return
+    const el = document.getElementById("booking-section-details")
+    if (!el) return
+    localStorage.setItem(key, "1")
+    const d = driver({
+      showProgress: true,
+      allowClose: true,
+      steps: [
+        { element: "#booking-section-details", popover: { title: "Start here", description: "Add a title and description. Upload your logo or product photo.", side: "bottom" as const, align: "center" as const } },
+        { element: "#booking-section-produce", popover: { title: "What are you selling or buying?", description: "Select your produce, variety, and unit.", side: "bottom" as const, align: "center" as const } },
+        { element: "#booking-section-pricing", popover: { title: "Set your price", description: "Enter the price per unit, deposit, and how much is available.", side: "bottom" as const, align: "center" as const } },
+      ],
+    })
+    const t = setTimeout(() => d.drive(), 1500)
+    return () => clearTimeout(t)
+  }, [])
+
   const { data: locationsData } = useQuery({
     queryKey: ["client-locations"],
     queryFn: () => queryClientLocations(),
@@ -248,7 +270,7 @@ export function CreateBookingForm({ intent }: { intent?: "supply" | "demand" } =
     <div className="mt-4 space-y-0 divide-y divide-border">
 
       {/* Event Details */}
-      <div className="grid grid-cols-1 gap-x-8 gap-y-10 py-10 md:grid-cols-3">
+      <div id="booking-section-details" className="grid grid-cols-1 gap-x-8 gap-y-10 py-10 md:grid-cols-3">
         <div>
           <h2 className="text-base/7 font-semibold text-foreground">Event Details</h2>
           <p className="mt-1 text-sm/6 text-muted-foreground">Basic information about this booking batch.</p>
@@ -329,7 +351,7 @@ export function CreateBookingForm({ intent }: { intent?: "supply" | "demand" } =
       </div>
 
       {/* Produce */}
-      <div className="grid grid-cols-1 gap-x-8 gap-y-10 py-10 md:grid-cols-3">
+      <div id="booking-section-produce" className="grid grid-cols-1 gap-x-8 gap-y-10 py-10 md:grid-cols-3">
         <div>
           <h2 className="text-base/7 font-semibold text-foreground">Produce</h2>
           <p className="mt-1 text-sm/6 text-muted-foreground">What is being sold in this pre-order.</p>
@@ -419,7 +441,7 @@ export function CreateBookingForm({ intent }: { intent?: "supply" | "demand" } =
       </div>
 
       {/* Pricing & Capacity */}
-      <div className="grid grid-cols-1 gap-x-8 gap-y-10 py-10 md:grid-cols-3">
+      <div id="booking-section-pricing" className="grid grid-cols-1 gap-x-8 gap-y-10 py-10 md:grid-cols-3">
         <div>
           <h2 className="text-base/7 font-semibold text-foreground">Pricing & Capacity</h2>
           <p className="mt-1 text-sm/6 text-muted-foreground">Set the price, deposit, and quantity limits.</p>

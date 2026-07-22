@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -18,6 +18,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { queryClient as queryUserProfile, queryLotsEnabledFarmProduce, queryBreedsByFarmProduce, queryProduceConditions, queryHeadSummary, postLot } from "@/lib/query"
 import { capitalizeFirstLetter } from "@/lib/utilities"
 import { ImageUpload } from "@/components/ui/image-upload"
+import { driver } from "driver.js"
+import "driver.js/dist/driver.css"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 
 const LOT_UNITS = ["kg", "head", "bird", "pocket", "unit", "tonne", "bag", "dozen", "litre"]
@@ -126,6 +128,28 @@ export function PostLotForm({ intent }: { intent?: "sell" | "request" } = {}) {
   const { data: session } = useSession()
   const user = session?.user as any
 
+  useEffect(() => {
+    const key = "fnp_lot_form_tour_seen"
+    if (typeof window === "undefined") return
+    if (localStorage.getItem(key)) return
+    const el = document.getElementById("lot-section-produce")
+    if (!el) return
+    localStorage.setItem(key, "1")
+    const steps = intent === "sell"
+      ? [
+          { element: "#lot-section-photos", popover: { title: "Add photos", description: "Good photos get more bids. Upload your best produce shots.", side: "bottom" as const, align: "center" as const } },
+          { element: "#lot-section-produce", popover: { title: "Select your produce", description: "Choose what you're selling and the variety.", side: "bottom" as const, align: "center" as const } },
+          { element: "#lot-section-details", popover: { title: "Set quantity and price", description: "Enter how much you have, the price per unit, and how long the listing stays live.", side: "bottom" as const, align: "center" as const } },
+        ]
+      : [
+          { element: "#lot-section-produce", popover: { title: "What do you need?", description: "Select the produce you're looking for.", side: "bottom" as const, align: "center" as const } },
+          { element: "#lot-section-details", popover: { title: "Set quantity and price", description: "Enter how much you need and your target price.", side: "bottom" as const, align: "center" as const } },
+        ]
+    const d = driver({ showProgress: true, allowClose: true, steps })
+    const t = setTimeout(() => d.drive(), 1500)
+    return () => clearTimeout(t)
+  }, [intent])
+
   const [mainImage, setMainImage] = useState<{ img: { id: string; src: string } } | null>(null)
   const [extraImages, setExtraImages] = useState<{ img: { id: string; src: string } }[]>([])
 
@@ -189,7 +213,7 @@ export function PostLotForm({ intent }: { intent?: "sell" | "request" } = {}) {
 
         {/* Section 1: Photos — only for sell lots */}
         {lotType === "sell" && (
-        <div className="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-border pb-12 md:grid-cols-3">
+        <div id="lot-section-photos" className="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-border pb-12 md:grid-cols-3">
           <div>
             <h2 className="text-base font-semibold text-foreground">Photos</h2>
             <p className="mt-1 text-sm text-muted-foreground">Main photo and up to 5 additional images.</p>
@@ -254,7 +278,7 @@ export function PostLotForm({ intent }: { intent?: "sell" | "request" } = {}) {
         )}
 
         {/* Section 3: Produce */}
-        <div className="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-border pb-12 md:grid-cols-3">
+        <div id="lot-section-produce" className="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-border pb-12 md:grid-cols-3">
           <div>
             <h2 className="text-base font-semibold text-foreground">Produce</h2>
             <p className="mt-1 text-sm text-muted-foreground">Select the produce and variety you are listing.</p>
@@ -345,7 +369,7 @@ export function PostLotForm({ intent }: { intent?: "sell" | "request" } = {}) {
         </div>
 
         {/* Section 4: Lot Details */}
-        <div className="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-border pb-12 md:grid-cols-3">
+        <div id="lot-section-details" className="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-border pb-12 md:grid-cols-3">
           <div>
             <h2 className="text-base font-semibold text-foreground">Lot Details</h2>
             <p className="mt-1 text-sm text-muted-foreground">Quantity, unit, and price of your lot.</p>
