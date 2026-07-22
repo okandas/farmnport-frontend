@@ -25,29 +25,17 @@ function capitalize(s: string) {
 
 export const preorderColumns: ColumnDef<any>[] = [
   {
-    accessorKey: "title",
-    header: "Title",
-    cell: ({ row }) => (
-      <Link
-        href={`/dashboard/farmnport/orders/booking-preorders/${row.original.id}`}
-        className="font-medium text-sm hover:text-primary transition-colors"
-      >
-        {row.original.title}
-      </Link>
-    ),
-  },
-  {
     accessorKey: "supplier",
     header: "Supplier",
     cell: ({ row }) => (
-      <span className="text-muted-foreground">{row.original.brand_name || row.original.client_name || "—"}</span>
+      <span className="text-foreground">{row.original.brand_name || row.original.client_name || "—"}</span>
     ),
   },
   {
     accessorKey: "produce_name",
     header: "Produce",
     cell: ({ row }) => (
-      <span className="text-muted-foreground capitalize">
+      <span className="text-foreground capitalize">
         {[row.original.produce_name, row.original.breed_name].filter(Boolean).join(" · ") || "—"}
       </span>
     ),
@@ -59,7 +47,7 @@ export const preorderColumns: ColumnDef<any>[] = [
       const close = row.original.close_date
       const isOpenEnded = !close || close === "0001-01-01T00:00:00Z"
       return (
-        <span className="text-xs text-muted-foreground whitespace-nowrap">
+        <span className="text-xs text-foreground whitespace-nowrap">
           {formatDate(row.original.open_date)} → {isOpenEnded ? "Always open" : formatDate(close)}
         </span>
       )
