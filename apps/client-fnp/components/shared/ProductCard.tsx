@@ -94,7 +94,7 @@ export function ProductCard({
           <div className="space-y-2">
             {!hasVariants && (salePrice ?? 0) > 0 && (
               <div className="flex items-baseline gap-2">
-                <span className="text-lg font-bold">{centsToDollars(salePrice ?? 0)}</span>
+                <span className="text-lg font-semibold">{centsToDollars(salePrice ?? 0)}</span>
                 {showWasPrice && wasPrice && wasPrice > 0 && wasPrice > (salePrice ?? 0) && (
                   <span className="text-xs text-muted-foreground line-through">{centsToDollars(wasPrice)}</span>
                 )}
@@ -103,7 +103,7 @@ export function ProductCard({
             {hasVariants ? (
               <>
                 {variantPriceLabel && (
-                  <p className="text-lg text-muted-foreground">{variantPriceLabel}</p>
+                  <p className="text-lg font-semibold">{variantPriceLabel}</p>
                 )}
                 <Link href={href} className="block mt-3">
                   <Button variant="outline" className="w-full" size="sm">Choose Options</Button>

@@ -6,6 +6,7 @@ import { ArrowRight } from "lucide-react"
 import { useQuery } from "@tanstack/react-query"
 import { Button } from "@/components/ui/button"
 import { listPreOrders } from "@/lib/query"
+import { centsToDollars } from "@/lib/utilities"
 import { ProductCard } from "@/components/shared/ProductCard"
 import { BuyCategoriesNavClient } from "@/components/generic/BuyCategoriesNavClient"
 
@@ -13,7 +14,7 @@ import { BuyCategoriesNavClient } from "@/components/generic/BuyCategoriesNavCli
 // ── Document card ─────────────────────────────────────────────────────────────
 
 function DocumentCard({ doc }: { doc: any }) {
-  const price = doc.price_cents ? `$${(doc.price_cents / 100).toFixed(2)}` : "Free"
+  const price = doc.price_cents ? centsToDollars(doc.price_cents) : "Free"
   const preview = doc.main_image
   const href = `/buy-documents/${doc.slug}`
   return (
@@ -31,8 +32,8 @@ function DocumentCard({ doc }: { doc: any }) {
         <Link href={href}>
           <h3 className="font-semibold text-sm leading-tight line-clamp-2 group-hover:text-primary transition-colors">{doc.title}</h3>
         </Link>
-        <div className="flex items-center gap-4 text-xs pt-2 border-t">
-          <span className="font-semibold text-primary">{price}</span>
+        <div className="flex items-center gap-4 pt-2 border-t">
+          <span className="text-lg font-semibold">{price}</span>
         </div>
         <Link href={href} className="block">
           <Button variant="outline" className="w-full" size="sm">Buy Document</Button>
@@ -42,7 +43,7 @@ function DocumentCard({ doc }: { doc: any }) {
   )
 }
 
-// ── Pre-orders section ────────────────────────────────────────────────────────
+// ── Pre Orders section ───────────────────────────────────────────────────────
 
 function PreOrdersSection() {
   const { data, isLoading } = useQuery({
@@ -57,7 +58,7 @@ function PreOrdersSection() {
     <section>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <h2 className="text-xl font-bold">Pre-Orders</h2>
+          <h2 className="text-xl font-bold">Pre Orders</h2>
           <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">{events.length} open</span>
         </div>
         <Link href="/bookings" className="flex items-center gap-1 text-sm font-medium text-primary hover:underline">
@@ -65,17 +66,36 @@ function PreOrdersSection() {
         </Link>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-        {events.slice(0, 4).map((event: any) => (
-          <ProductCard
-            key={event.id}
-            href={`/bookings/${event.slug}`}
-            imageSrc={event.image_src}
-            name={event.name}
-            meta={event.unit_price > 0 ? `$${(event.unit_price / 100).toFixed(2)}` : undefined}
-            mode="guide"
-            buttonLabel="Pre-order"
-          />
-        ))}
+        {events.slice(0, 4).map((event: any) => {
+          const href = `/bookings/${event.slug}`
+          const price = event.unit_price > 0 ? centsToDollars(event.unit_price) : undefined
+          return (
+            <div key={event.id} className="bg-card border border-border rounded-lg overflow-hidden transition-all duration-200 hover:shadow-lg hover:border-primary/50 group">
+              <Link href={href} className="block">
+                <div className="relative aspect-square bg-muted/20">
+                  {event.image_src ? (
+                    <Image src={event.image_src} alt={event.name} fill className="object-cover" sizes="25vw" />
+                  ) : (
+                    <div className="absolute inset-0 bg-muted/30" />
+                  )}
+                </div>
+              </Link>
+              <div className="p-4 space-y-3 border-t">
+                <Link href={href}>
+                  <h3 className="font-semibold text-sm leading-tight line-clamp-2 group-hover:text-primary transition-colors">{event.name}</h3>
+                </Link>
+                {price && (
+                  <div className="pt-2 border-t">
+                    <span className="text-lg font-semibold">{price}</span>
+                  </div>
+                )}
+                <Link href={href} className="block">
+                  <Button variant="outline" className="w-full" size="sm">Pre Order</Button>
+                </Link>
+              </div>
+            </div>
+          )
+        })}
       </div>
     </section>
   )
@@ -84,7 +104,7 @@ function PreOrdersSection() {
 // ── Lot card ─────────────────────────────────────────────────────────────────
 
 function LotCard({ lot }: { lot: any }) {
-  const price = lot.price_per_unit_cents ? `$${(lot.price_per_unit_cents / 100).toFixed(2)}/${lot.unit}` : "Negotiable"
+  const price = lot.price_per_unit_cents ? centsToDollars(lot.price_per_unit_cents) : "Negotiable"
   const href = `/lots/${lot.slug}`
   const name = lot.farm_produce?.name ?? "Lot"
   const variety = lot.breed?.name
@@ -106,15 +126,20 @@ function LotCard({ lot }: { lot: any }) {
           </span>
         </div>
       </Link>
-      <div className="p-4 space-y-2 border-t">
+      <div className="p-4 space-y-3 border-t">
         <Link href={href}>
           <h3 className="font-semibold text-sm leading-tight line-clamp-2 group-hover:text-primary transition-colors">{name}</h3>
         </Link>
         {meta && <p className="text-xs text-muted-foreground">{meta}</p>}
-        <div className="flex items-center justify-between text-xs pt-2 border-t">
-          <span className="font-semibold text-primary">{price}</span>
-          <span className="text-muted-foreground">{lot.quantity?.toLocaleString()} {lot.unit}</span>
+        <div className="flex items-center justify-between pt-2 border-t">
+          <span className="text-lg font-semibold">{price}</span>
+          <span className="text-xs text-muted-foreground">{lot.quantity?.toLocaleString()} {lot.unit}</span>
         </div>
+        <Link href={href} className="block">
+          <Button variant="outline" className="w-full" size="sm">
+            {lot.type === "sell" ? "Place Bid" : "Offer Supply"}
+          </Button>
+        </Link>
       </div>
     </div>
   )
