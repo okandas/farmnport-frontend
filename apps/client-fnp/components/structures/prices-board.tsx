@@ -615,23 +615,22 @@ export function PricesBoard({ mode = "kg" }: { mode?: Mode }) {
           )}
           {!pricesLoading && rawEntries.length > 0 && (
             <div className="mt-2 px-4 md:px-8 py-4">
-              <div className="overflow-x-auto">
+              <div className="overflow-auto max-h-[70vh]">
                 <table className="w-full min-w-[800px] text-sm">
                   <thead>
                     <tr className="border-b text-xs text-muted-foreground">
-                      <th className="text-left py-2 pr-4 font-medium w-8 tabular-nums">#</th>
-                      <th className="text-left py-2 font-medium">Code</th>
-                      <th className="text-left py-2 pl-2 font-medium">{mode === "head" ? "Breed · Grade" : "Produce · Grade"}</th>
-                      <th className="text-left py-2 pl-2 font-medium">
+                      <th className="text-left py-2 pr-4 font-medium w-8 tabular-nums sticky top-0 bg-background z-20">#</th>
+                      <th className="text-left py-2 pr-4 font-medium sticky top-0 bg-background z-20">Code</th>
+                      <th className="text-left py-2 pl-2 pr-4 font-medium sticky top-0 left-0 bg-background z-30 max-w-[140px] after:absolute after:right-0 after:top-0 after:bottom-0 after:w-px after:bg-border/50">{mode === "head" ? "Breed · Grade" : "Produce · Grade"}</th>
+                      <th className="text-left py-2 pl-2 font-medium sticky top-0 bg-background z-20">
                         <button id="prices-trade-btn" onClick={() => { setCtaGrade(""); setCtaOpen(true) }} className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold border border-primary text-primary hover:bg-primary/10 transition-colors">Trade</button>
                       </th>
-                      <th className="text-left py-2 pl-2 font-medium">{mode === "head" ? "Avg/Head" : "Average"}</th>
-                      {mode === "head" && <th className="text-left py-2 pl-2 font-medium ">Avg Weight</th>}
-                      <th className="text-left py-2 pl-2 font-medium">Change</th>
-                      <th className="text-left py-2 pl-2 font-medium">High</th>
-                      <th className="text-left py-2 pl-2 font-medium">Low</th>
-                      <th className="text-left py-2 pl-2 font-medium">Trend</th>
-                      {mode === "head" && <th className="text-left py-2 pl-2 font-medium"></th>}
+                      <th className="text-left py-2 pl-4 font-medium whitespace-nowrap sticky top-0 bg-background z-20">{mode === "head" ? "Avg/Head" : "Average"}</th>
+                      {mode === "head" && <th className="text-left py-2 pl-4 font-medium whitespace-nowrap sticky top-0 bg-background z-20">Avg Weight</th>}
+                      <th className="text-left py-2 pl-4 font-medium whitespace-nowrap sticky top-0 bg-background z-20">Change</th>
+                      <th className="text-left py-2 pl-4 font-medium whitespace-nowrap sticky top-0 bg-background z-20">High</th>
+                      <th className="text-left py-2 pl-4 font-medium whitespace-nowrap sticky top-0 bg-background z-20">Low</th>
+                      <th className="text-left py-2 pl-4 font-medium whitespace-nowrap sticky top-0 bg-background z-20">Trend</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -652,25 +651,25 @@ export function PricesBoard({ mode = "kg" }: { mode?: Mode }) {
                         return (
                           <tr key={`${entry.template_type}_${entry.category}_${entry.code}_${entry.name}`} className="border-b border-border/50 last:border-0 hover:bg-muted/40 transition-colors">
                             <td className="py-3 pr-4 text-muted-foreground tabular-nums text-xs">{idx + 1}</td>
-                            <td className="py-3">
+                            <td className="py-3 pr-4">
                               <span className={`inline-flex items-center justify-center rounded-md px-2 py-0.5 text-xs font-bold ring-1 ring-inset min-w-[36px] shrink-0 ${color}`}>{entry.code}</span>
                             </td>
-                            <td className="py-3 pl-2 font-medium text-foreground">
+                            <td className="py-3 pl-2 pr-4 font-medium text-foreground sticky left-0 bg-background z-10 max-w-[140px]">
                               <Link href={href} className="hover:underline">
-                                <p className="font-semibold leading-tight">{entry.name}</p>
-                                <p className="text-xs text-muted-foreground font-normal leading-tight mt-0.5">{produce}</p>
+                                <p className="font-semibold leading-tight truncate">{entry.name}</p>
+                                <p className="text-xs text-muted-foreground font-normal leading-tight mt-0.5 truncate">{produce}</p>
                               </Link>
                             </td>
                             <td className="py-3 pl-2" />
-                            <td className="py-3 pl-2 tabular-nums font-semibold">
+                            <td className="py-3 pl-4 tabular-nums font-semibold whitespace-nowrap">
                               ${toDollars(entry.avg)}<span className="text-xs font-normal text-muted-foreground">{unit}</span>
                             </td>
                             {mode === "head" && (
-                              <td className="py-3 pl-2 tabular-nums text-muted-foreground ">
+                              <td className="py-3 pl-4 tabular-nums text-muted-foreground">
                                 {gramsToKg((entry as HeadEntry).avg_weight_grams)}
                               </td>
                             )}
-                            <td className="py-3 pl-2 tabular-nums font-medium ">
+                            <td className="py-3 pl-4 tabular-nums font-medium whitespace-nowrap">
                               {(() => {
                                 const t = entry.trend ?? []
                                 if (t.length < 2) return <span className="text-muted-foreground">—</span>
@@ -681,25 +680,15 @@ export function PricesBoard({ mode = "kg" }: { mode?: Mode }) {
                                 return <span className={up ? "text-green-600 dark:text-green-400" : "text-red-500 dark:text-red-400"}>{up ? "▲" : "▼"} {up ? "+" : ""}{pct.toFixed(2)}%</span>
                               })()}
                             </td>
-                            <td className="py-3 pl-2 tabular-nums font-medium text-green-600 dark:text-green-400 ">
+                            <td className="py-3 pl-4 tabular-nums font-medium text-green-600 dark:text-green-400">
                               {entry.high ? `$${toDollars(entry.high)}` : <span className="text-muted-foreground font-normal">—</span>}
                             </td>
-                            <td className="py-3 pl-2 tabular-nums font-medium text-red-500 dark:text-red-400 ">
+                            <td className="py-3 pl-4 tabular-nums font-medium text-red-500 dark:text-red-400">
                               {entry.low ? `$${toDollars(entry.low)}` : <span className="text-muted-foreground font-normal">—</span>}
                             </td>
-                            <td className="py-3 pl-2 ">
+                            <td className="py-3 pl-4">
                               <MiniSparkline values={entry.trend ?? []} />
                             </td>
-                            {mode === "head" && (
-                              <td className="py-3 pl-2">
-                                <Link
-                                  href="/lots/new"
-                                  className="text-[11px] font-medium text-primary hover:underline"
-                                >
-                                  Sell
-                                </Link>
-                              </td>
-                            )}
                           </tr>
                         )
                       })}
