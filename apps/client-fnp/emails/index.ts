@@ -20,6 +20,11 @@ export { default as BookingConfirmedEmail } from "./templates/bookings/booking-c
 export { default as BookingStatusEmail } from "./templates/bookings/booking-status"
 export { default as BookingAdminAlertEmail } from "./templates/bookings/booking-admin-alert"
 
+// Lot bid templates
+export { default as LotBidReceivedEmail } from "./templates/lots/lot-bid-received"
+export { default as LotBidAcceptedEmail } from "./templates/lots/lot-bid-accepted"
+export { default as LotBidRejectedEmail } from "./templates/lots/lot-bid-rejected"
+
 // Pre-order templates
 export { default as PreorderRequestReceivedEmail } from "./templates/bookings/preorder-request-received"
 export { default as PreorderRequestAdminEmail } from "./templates/bookings/preorder-request-admin"

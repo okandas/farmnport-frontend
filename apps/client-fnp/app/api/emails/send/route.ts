@@ -23,6 +23,9 @@ import {
   PreorderCollectedEmail,
   PreorderExpiredEmail,
   MarketingLaunchEmail,
+  LotBidReceivedEmail,
+  LotBidAcceptedEmail,
+  LotBidRejectedEmail,
 } from "@/emails"
 
 const FROM = "farmnport <noreply@farmnport.com>"
@@ -164,6 +167,21 @@ export async function POST(req: NextRequest) {
     case "preorder-expired":
       subject = `Booking Expired — ${(props as { bookingRef?: string }).bookingRef ?? ""}`
       html = await render(PreorderExpiredEmail(props as Parameters<typeof PreorderExpiredEmail>[0]))
+      break
+
+    case "lot-bid-received":
+      subject = "New offer on your lot"
+      html = await render(LotBidReceivedEmail(props as Parameters<typeof LotBidReceivedEmail>[0]))
+      break
+
+    case "lot-bid-accepted":
+      subject = "Your offer was accepted"
+      html = await render(LotBidAcceptedEmail(props as Parameters<typeof LotBidAcceptedEmail>[0]))
+      break
+
+    case "lot-bid-rejected":
+      subject = "Your offer was not accepted"
+      html = await render(LotBidRejectedEmail(props as Parameters<typeof LotBidRejectedEmail>[0]))
       break
 
     default:
