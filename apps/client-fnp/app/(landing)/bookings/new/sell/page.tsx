@@ -24,6 +24,8 @@ export default async function SellBookingPage() {
             <span className="mx-2">/</span>
             <Link href="/bookings" className="hover:text-foreground transition-colors">Bookings</Link>
             <span className="mx-2">/</span>
+            <Link href="/bookings/new" className="hover:text-foreground transition-colors">New</Link>
+            <span className="mx-2">/</span>
             <span className="text-foreground font-medium">Sell</span>
           </nav>
         </div>

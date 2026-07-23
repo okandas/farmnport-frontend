@@ -118,7 +118,7 @@ const Schema = z.object({
   unit: z.string().min(1, "Select a unit"),
   price_per_unit: z.coerce.number().min(0.01, "Price is required"),
   notes: z.string().optional(),
-  expires_days: z.coerce.number().min(1).max(180).default(30),
+  expires_days: z.coerce.number().min(1).max(180).default(7),
 })
 
 type FormModel = z.infer<typeof Schema>
@@ -129,7 +129,7 @@ export function PostLotForm({ intent }: { intent?: "sell" | "request" } = {}) {
   const user = session?.user as any
 
   useEffect(() => {
-    const key = "fnp_lot_form_tour_seen"
+    const key = intent === "sell" ? "fnp_lot_form_tour_seen_sell" : "fnp_lot_form_tour_seen_buy"
     if (typeof window === "undefined") return
     if (localStorage.getItem(key)) return
     const el = document.getElementById("lot-section-produce")
@@ -139,11 +139,11 @@ export function PostLotForm({ intent }: { intent?: "sell" | "request" } = {}) {
       ? [
           { element: "#lot-section-photos", popover: { title: "Add photos", description: "Good photos get more bids. Upload your best produce shots.", side: "bottom" as const, align: "center" as const } },
           { element: "#lot-section-produce", popover: { title: "Select your produce", description: "Choose what you're selling and the variety.", side: "bottom" as const, align: "center" as const } },
-          { element: "#lot-section-details", popover: { title: "Set quantity and price", description: "Enter how much you have, the price per unit, and how long the listing stays live.", side: "bottom" as const, align: "center" as const } },
+          { element: "#lot-section-details", popover: { title: "Set quantity and price", description: "Enter how much you have, the price per unit, and how many days the listing stays live (e.g. 2 days, 30 days).", side: "bottom" as const, align: "center" as const } },
         ]
       : [
           { element: "#lot-section-produce", popover: { title: "What do you need?", description: "Select the produce you're looking for.", side: "bottom" as const, align: "center" as const } },
-          { element: "#lot-section-details", popover: { title: "Set quantity and price", description: "Enter how much you need and your target price.", side: "bottom" as const, align: "center" as const } },
+          { element: "#lot-section-details", popover: { title: "Set quantity and price", description: "Enter how much you need, your target price, and how many days the request stays open.", side: "bottom" as const, align: "center" as const } },
         ]
     const d = driver({ showProgress: true, allowClose: true, steps })
     const t = setTimeout(() => d.drive(), 1500)
@@ -169,7 +169,7 @@ export function PostLotForm({ intent }: { intent?: "sell" | "request" } = {}) {
     formState: { errors },
   } = useForm<FormModel>({
     resolver: zodResolver(Schema),
-    defaultValues: { type: intent ?? "sell", expires_days: 30, unit: "kg" },
+    defaultValues: { type: intent ?? "sell", expires_days: 7, unit: "kg" },
   })
 
   const lotType = watch("type")
@@ -444,7 +444,7 @@ export function PostLotForm({ intent }: { intent?: "sell" | "request" } = {}) {
                   type="number"
                   min="1"
                   max="180"
-                  defaultValue={30}
+                  defaultValue={7}
                   {...register("expires_days")}
                 />
               </div>

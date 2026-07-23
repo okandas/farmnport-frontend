@@ -24,7 +24,9 @@ export default async function BuyLotPage() {
             <span className="mx-2">/</span>
             <Link href="/lots" className="hover:text-foreground">Lots</Link>
             <span className="mx-2">/</span>
-            <span className="text-foreground">Request Produce</span>
+            <Link href="/lots/new" className="hover:text-foreground">New</Link>
+            <span className="mx-2">/</span>
+            <span className="text-foreground">Buy</span>
           </nav>
         </div>
       </div>

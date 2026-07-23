@@ -166,7 +166,7 @@ export function CreateBookingForm({ intent }: { intent?: "supply" | "demand" } =
   const [selectedLocations, setSelectedLocations] = useState<SelectedLocation[]>([])
 
   useEffect(() => {
-    const key = "fnp_booking_form_tour_seen"
+    const key = intent === "supply" ? "fnp_booking_form_tour_seen_sell" : "fnp_booking_form_tour_seen_buy"
     if (typeof window === "undefined") return
     if (localStorage.getItem(key)) return
     const el = document.getElementById("booking-section-details")
@@ -176,9 +176,11 @@ export function CreateBookingForm({ intent }: { intent?: "supply" | "demand" } =
       showProgress: true,
       allowClose: true,
       steps: [
-        { element: "#booking-section-details", popover: { title: "Start here", description: "Add a title and description. Upload your logo or product photo.", side: "bottom" as const, align: "center" as const } },
-        { element: "#booking-section-produce", popover: { title: "What are you selling or buying?", description: "Select your produce, variety, and unit.", side: "bottom" as const, align: "center" as const } },
-        { element: "#booking-section-pricing", popover: { title: "Set your price", description: "Enter the price per unit, deposit, and how much is available.", side: "bottom" as const, align: "center" as const } },
+        { element: "#booking-section-details h2", popover: { title: "Event Details", description: "Add a title and description. Upload your logo or product photo.", side: "bottom" as const, align: "start" as const } },
+        { element: "#booking-section-produce h2", popover: { title: "What are you selling or buying?", description: "Select your produce, variety, and unit.", side: "bottom" as const, align: "start" as const } },
+        { element: "#booking-section-pricing h2", popover: { title: "Set your price", description: "Enter the price per unit, deposit, and how much is available.", side: "bottom" as const, align: "start" as const } },
+        { element: "#booking-section-window h2", popover: { title: "When are you available?", description: "Set when bookings open. Leave close date empty if you supply throughout the year.", side: "bottom" as const, align: "start" as const } },
+        { element: "#booking-section-settings h2", popover: { title: "Booking settings", description: "Choose your market side, payment deadline, and delivery dates.", side: "bottom" as const, align: "start" as const } },
       ],
     })
     const t = setTimeout(() => d.drive(), 1500)
@@ -496,7 +498,7 @@ export function CreateBookingForm({ intent }: { intent?: "supply" | "demand" } =
       </div>
 
       {/* Booking Window */}
-      <div className="grid grid-cols-1 gap-x-8 gap-y-10 py-10 md:grid-cols-3">
+      <div id="booking-section-window" className="grid grid-cols-1 gap-x-8 gap-y-10 py-10 md:grid-cols-3">
         <div>
           <h2 className="text-base/7 font-semibold text-foreground">Booking Window</h2>
           <p className="mt-1 text-sm/6 text-muted-foreground">When customers can place their bookings.</p>
@@ -519,7 +521,7 @@ export function CreateBookingForm({ intent }: { intent?: "supply" | "demand" } =
       </div>
 
       {/* Booking Settings */}
-      <div className="grid grid-cols-1 gap-x-8 gap-y-10 py-10 md:grid-cols-3">
+      <div id="booking-section-settings" className="grid grid-cols-1 gap-x-8 gap-y-10 py-10 md:grid-cols-3">
         <div>
           <h2 className="text-base/7 font-semibold text-foreground">Booking Settings</h2>
           <p className="mt-1 text-sm/6 text-muted-foreground">Payment deadline, cancellation, and buyer preferences.</p>
@@ -547,25 +549,11 @@ export function CreateBookingForm({ intent }: { intent?: "supply" | "demand" } =
             <p className="mt-1 text-xs text-muted-foreground">Hours buyer has to pay after confirmation. Default 48.</p>
           </div>
           <div className="sm:col-span-3">
-            <label className={labelCls}>Cancellation Fee (%)</label>
-            <div className="mt-2">
-              <input type="number" min="0" max="100" value={form.cancellation_fee} onChange={(e) => set("cancellation_fee", e.target.value)} placeholder="0" className={inputCls} />
-            </div>
-            <p className="mt-1 text-xs text-muted-foreground">Handling fee on cancellations before deadline. 0 = no fee.</p>
-          </div>
-          <div className="sm:col-span-3">
             <label className="flex items-center gap-2 cursor-pointer">
               <input type="checkbox" checked={form.buyer_notes} onChange={(e) => setForm((f) => ({ ...f, buyer_notes: e.target.checked }))} className="rounded border-border" />
               <span className={labelCls}>Allow buyer notes</span>
             </label>
             <p className="mt-1 text-xs text-muted-foreground">Show a notes field for preferences (e.g. seed size).</p>
-          </div>
-          <div className="sm:col-span-3">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" checked={form.transferable} onChange={(e) => setForm((f) => ({ ...f, transferable: e.target.checked }))} className="rounded border-border" />
-              <span className={labelCls}>Transferable bookings</span>
-            </label>
-            <p className="mt-1 text-xs text-muted-foreground">Allow bookings to be transferred to another buyer or variety.</p>
           </div>
           {!form.close_date && (
             <div className="col-span-full">
