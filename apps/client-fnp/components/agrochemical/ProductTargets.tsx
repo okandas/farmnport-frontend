@@ -11,7 +11,7 @@ interface ProductTargetsProps {
 
 export function ProductTargets({ title, targets, emptyMessage }: ProductTargetsProps) {
     return (
-        <div className="rounded-xl border bg-card p-4">
+        <div className="rounded-xl border bg-card p-4 overflow-y-auto">
             <h2 className="text-sm font-semibold uppercase tracking-wide text-green-700 dark:text-green-400 mb-3">
                 {title}
             </h2>

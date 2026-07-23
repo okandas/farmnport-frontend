@@ -263,10 +263,10 @@ export default async function AgroChemicalGuidePage({ params }: GuidePageProps) 
                         <AdSenseInFeed />
 
                         {/* Used On & Targets Grid */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:h-[315px]">
                             {/* Used On Section */}
                             {chemical.dosage_rates && chemical.dosage_rates.length > 0 && (
-                                <div className="rounded-xl border bg-card p-4">
+                                <div className="rounded-xl border bg-card p-4 overflow-y-auto">
                                     <h2 className="text-sm font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-400 mb-3">
                                         Used On
                                     </h2>
