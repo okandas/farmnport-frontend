@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const product = res?.ok ? await res.json() : null
 
   if (!product) {
-    return { title: 'Plant Nutrition Guide | farmnport.com' }
+    return { title: 'Plant Nutrition Guide | farmnport.com', robots: { index: false } }
   }
 
   const categoryName = product.plant_nutrition_category?.name || category.replace(/-/g, ' ')

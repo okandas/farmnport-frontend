@@ -46,6 +46,8 @@ export default async function BuyPlantNutritionProductPage({ params }: BuyPlantN
             "priceCurrency": "USD",
             "price": product.sale_price > 0 ? (product.sale_price / 100).toFixed(2) : "0.00",
             "availability": product.available_for_sale ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+            "itemCondition": "https://schema.org/NewCondition",
+            "priceValidUntil": new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
             "seller": { "@type": "Organization", "name": "farmnport" }
         }
     }

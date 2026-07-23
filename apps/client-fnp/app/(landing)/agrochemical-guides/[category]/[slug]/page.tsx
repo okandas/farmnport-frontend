@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const chemical = await serverFetch(`/agrochemical/${slug}`).catch(() => null)
 
   if (!chemical) {
-    return { title: 'Agrochemical Guide | farmnport.com' }
+    return { title: 'Agrochemical Guide | farmnport.com', robots: { index: false } }
   }
 
   const categoryName = chemical.agrochemical_category?.name || category.replace(/-/g, ' ')

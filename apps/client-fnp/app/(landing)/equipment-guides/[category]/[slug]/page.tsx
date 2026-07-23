@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const product = res?.ok ? await res.json() : null
 
   if (!product) {
-    return { title: 'Equipment Guide | farmnport.com' }
+    return { title: 'Equipment Guide | farmnport.com', robots: { index: false } }
   }
 
   const categoryName = product.equipment_category?.name || category.replace(/-/g, ' ')

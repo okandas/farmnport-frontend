@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const product = res?.ok ? await res.json() : null
 
   if (!product) {
-    return { title: 'Animal Health Product Guide | farmnport.com' }
+    return { title: 'Animal Health Product Guide | farmnport.com', robots: { index: false } }
   }
 
   const categoryName = product.animal_health_category?.name || category.replace(/-/g, ' ')

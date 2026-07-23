@@ -22,7 +22,7 @@ type Props = {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const { slug } = await params
     const lot = await fetchLot(slug)
-    if (!lot) return {}
+    if (!lot) return { title: 'Lot | farmnport.com', robots: { index: false } }
 
     const produce = lot.farm_produce?.name ?? "Farm Produce"
     const breed = lot.breed?.name ? ` — ${lot.breed.name}` : ""

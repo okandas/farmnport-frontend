@@ -14,7 +14,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         const { slug } = await params
         const res = await serverFetch(`/booking/preorders/${slug}`).catch(() => null)
         const p = res?.preorder
-        if (!p) return {}
+        if (!p) return { title: 'Booking | farmnport.com', robots: { index: false } }
 
         const supplier = p.client_name || p.brand_name || ""
         const produce = p.produce_name || ""
@@ -47,7 +47,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
             },
         }
     } catch {
-        return {}
+        return { robots: { index: false } }
     }
 }
 
