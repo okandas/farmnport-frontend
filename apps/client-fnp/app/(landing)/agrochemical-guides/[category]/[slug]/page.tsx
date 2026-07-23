@@ -279,7 +279,12 @@ export default async function AgroChemicalGuidePage({ params }: GuidePageProps) 
                                         Used On
                                     </h2>
                                     <ul className="space-y-1.5">
-                                        {Array.from(new Set(chemical.dosage_rates.map((rate: any) => rate.crop_group || rate.crop).filter(Boolean))).map((crop: any, idx: number) => (
+                                        {Array.from(new Set(chemical.dosage_rates.flatMap((rate: any) => {
+                                            if (rate.crop_group_items?.length > 0) return rate.crop_group_items
+                                            if (rate.crop) return [rate.crop]
+                                            if (rate.crop_group) return [rate.crop_group]
+                                            return []
+                                        }))).map((crop: any, idx: number) => (
                                             <li key={idx} className="flex items-center gap-2 text-sm text-foreground">
                                                 <span className="h-1.5 w-1.5 rounded-full bg-amber-500 dark:bg-amber-400 flex-shrink-0" />
                                                 <span className="capitalize">{crop}</span>
