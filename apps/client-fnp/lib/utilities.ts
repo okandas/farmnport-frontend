@@ -153,6 +153,12 @@ export function buildGuideMetadata(
       siteName: 'farmnport',
       type: 'website' as const,
     },
+    twitter: {
+      card: 'summary_large_image' as const,
+      title: `${name}${brandInTitle} – ${categorySingularTitle} Guide`,
+      description,
+      images: ['/og-image.png'],
+    },
   }
 }
 
@@ -175,6 +181,12 @@ export function buildBuyMetadata(
       description,
       siteName: 'farmnport',
       type: 'website' as const,
+    },
+    twitter: {
+      card: 'summary_large_image' as const,
+      title: `${name}${brand} – ${category} | farmnport.com`,
+      description,
+      images: ['/og-image.png'],
     },
   }
 }
