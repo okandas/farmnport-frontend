@@ -353,6 +353,9 @@ export default async function AgroChemicalGuidePage({ params }: GuidePageProps) 
                                 Always read and follow label directions. Wear appropriate personal protective equipment (PPE) when handling agrochemicals.
                                 Store in original containers in a secure location away from children and animals. Dispose of containers properly according to local regulations.
                             </p>
+                            <p className="text-xs text-black dark:text-white mt-2">
+                                Disclaimer: The information provided on this page, including active ingredients, dosage rates, application methods, and safety guidelines, has been compiled from publicly available product labels, manufacturer datasheets, and other third-party sources. Farmnport does not manufacture, formulate, or independently verify the accuracy, completeness, or currency of this information. Product formulations, registrations, and label directions may change without notice. Always refer to the official product label accompanying the purchased product for the most up-to-date and legally binding instructions. Farmnport accepts no liability for any loss, damage, crop injury, or adverse outcome arising from the use of, or reliance on, the information presented here. Use of any agrochemical product is entirely at the user&#39;s own risk.
+                            </p>
                         </div>
                     </div>
                 </div>
