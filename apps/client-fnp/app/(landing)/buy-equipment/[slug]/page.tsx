@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: BuyEquipmentProductPageProps)
     const { slug } = await params
     const product = await serverFetch(`/equipment/${slug}`).catch(() => null)
     if (!product) return { title: 'Farm Equipment | farmnport.com', robots: { index: false } }
-    return buildBuyMetadata(product, product.equipment_category?.name || 'Farm Equipment', `/buy-equipment/${slug}`, 'farmers in Zimbabwe')
+    return buildBuyMetadata(product, product.equipment_category?.name || 'Farm Equipment', `/buy-equipment/${slug}`, 'farmers in Zimbabwe', product.images?.[0]?.img?.src)
 }
 
 export default async function BuyEquipmentProductPage({ params }: BuyEquipmentProductPageProps) {

@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const categoryName = product.equipment_category?.name || category.replace(/-/g, ' ')
   const description = `${product.name}${product.brand?.name ? ` by ${product.brand.name}` : ''} — ${categoryName} equipment guide. View specifications and usage information on farmnport.com.`
 
-  return buildGuideMetadata(product, categoryName, 'Specifications & Guide', description, `/equipment-guides/${category}/${slug}`)
+  return buildGuideMetadata(product, categoryName, 'Specifications & Guide', description, `/equipment-guides/${category}/${slug}`, product.images?.[0]?.img?.src)
 }
 
 interface GuidePageProps {

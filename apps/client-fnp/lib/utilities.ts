@@ -139,10 +139,12 @@ export function buildGuideMetadata(
   categorySingularTitle: string,
   titleSuffix: string,
   description: string,
-  route: string
+  route: string,
+  imageUrl?: string
 ) {
   const name = formatProductName(product.name)
   const brandInTitle = product.brand?.name ? ` ${formatProductName(product.brand.name)}` : ''
+  const ogImage = imageUrl || '/og-image.png'
   return {
     title: `${name}${brandInTitle} – ${categorySingularTitle} ${titleSuffix} | farmnport.com`,
     description,
@@ -152,12 +154,13 @@ export function buildGuideMetadata(
       description,
       siteName: 'farmnport',
       type: 'website' as const,
+      images: [ogImage],
     },
     twitter: {
       card: 'summary_large_image' as const,
       title: `${name}${brandInTitle} – ${categorySingularTitle} Guide`,
       description,
-      images: ['/og-image.png'],
+      images: [ogImage],
     },
   }
 }
@@ -166,10 +169,12 @@ export function buildBuyMetadata(
   product: { name: string; description?: string; brand?: { name: string } | null },
   category: string,
   route: string,
-  descriptionContext: string = 'Zimbabwe farmers'
+  descriptionContext: string = 'Zimbabwe farmers',
+  imageUrl?: string
 ) {
   const name = formatProductName(product.name)
   const brand = product.brand?.name ? ` ${formatProductName(product.brand.name)}` : ''
+  const ogImage = imageUrl || '/og-image.png'
   const description = product.description ||
     `Buy ${name}${brand}. ${category} for ${descriptionContext}. View pricing and order online at farmnport.com.`
   return {
@@ -181,12 +186,13 @@ export function buildBuyMetadata(
       description,
       siteName: 'farmnport',
       type: 'website' as const,
+      images: [ogImage],
     },
     twitter: {
       card: 'summary_large_image' as const,
       title: `${name}${brand} – ${category} | farmnport.com`,
       description,
-      images: ['/og-image.png'],
+      images: [ogImage],
     },
   }
 }

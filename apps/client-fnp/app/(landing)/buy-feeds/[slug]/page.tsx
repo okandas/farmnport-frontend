@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: BuyFeedPageProps): Promise<Me
     const { slug } = await params
     const product = await getFeedProduct(slug)
     if (!product) return { title: 'Livestock Feed | farmnport.com', robots: { index: false } }
-    return buildBuyMetadata(product, product.feed_category?.name || 'Livestock Feed', `/buy-feeds/${slug}`)
+    return buildBuyMetadata(product, product.feed_category?.name || 'Livestock Feed', `/buy-feeds/${slug}`, undefined, product.images?.[0]?.img?.src)
 }
 
 export default async function BuyFeedPage({ params }: BuyFeedPageProps) {

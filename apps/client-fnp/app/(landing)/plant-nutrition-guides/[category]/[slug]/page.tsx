@@ -39,7 +39,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     'View application rates and usage guidelines on farmnport.com.',
   ].filter(Boolean).join('. ')
 
-  return buildGuideMetadata(product, categorySingularTitle, 'Application Rates & Guide', description, `/plant-nutrition-guides/${category}/${slug}`)
+  return buildGuideMetadata(product, categorySingularTitle, 'Application Rates & Guide', description, `/plant-nutrition-guides/${category}/${slug}`, product.images?.[0]?.img?.src)
 }
 
 interface GuidePageProps {

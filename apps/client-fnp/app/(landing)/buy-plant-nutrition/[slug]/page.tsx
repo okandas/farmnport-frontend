@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: BuyPlantNutritionProductPageP
     const { slug } = await params
     const product = await serverFetch(`/plantnutrition/${slug}`).catch(() => null)
     if (!product) return { title: 'Plant Nutrition Product | farmnport.com', robots: { index: false } }
-    return buildBuyMetadata(product, product.plant_nutrition_category?.name || 'Plant Nutrition', `/buy-plant-nutrition/${slug}`, 'Zimbabwe crops')
+    return buildBuyMetadata(product, product.plant_nutrition_category?.name || 'Plant Nutrition', `/buy-plant-nutrition/${slug}`, 'Zimbabwe crops', product.images?.[0]?.img?.src)
 }
 
 export default async function BuyPlantNutritionProductPage({ params }: BuyPlantNutritionProductPageProps) {

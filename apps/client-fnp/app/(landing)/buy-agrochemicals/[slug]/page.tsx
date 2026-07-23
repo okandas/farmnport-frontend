@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: BuyAgroChemicalPageProps): Pr
     const { slug } = await params
     const chemical = await serverFetch(`/agrochemical/${slug}`).catch(() => null)
     if (!chemical) return { title: 'Agrochemical | farmnport.com', robots: { index: false } }
-    return buildBuyMetadata(chemical, chemical.agrochemical_category?.name || 'Agrochemical', `/buy-agrochemicals/${slug}`)
+    return buildBuyMetadata(chemical, chemical.agrochemical_category?.name || 'Agrochemical', `/buy-agrochemicals/${slug}`, undefined, chemical.images?.[0]?.img?.src)
 }
 
 export default async function BuyAgroChemicalPage({ params }: BuyAgroChemicalPageProps) {
