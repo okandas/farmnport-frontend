@@ -1,13 +1,10 @@
 import {
   Body,
-  Button,
-  Column,
   Container,
   Head,
-  Hr,
   Html,
+  Link,
   Preview,
-  Row,
   Section,
   Text,
 } from "@react-email/components"
@@ -44,74 +41,39 @@ export default function OrderDocumentConfirmationEmail({
   paymentRef = "FNP-DOC-PREVIEW",
   downloadsUrl = "https://farmnport.com/account/documents",
 }: OrderDocumentConfirmationEmailProps) {
+  const itemLines = items.map((item) => item.product_name).join("\n")
+
   return (
     <Html lang="en">
       <Head />
       <Preview>Your document is ready to download — order {orderNumber} confirmed.</Preview>
       <Body style={body}>
         <Container style={container}>
-
-          {/* Header */}
-          <Section style={header}>
-            <Text style={brandName}>farmnport</Text>
-            <Text style={brandTagline}>getting you to market</Text>
-          </Section>
-
-          <Hr style={headerDivider} />
-
-          {/* Body */}
           <Section style={content}>
-
-            {/* Status pill */}
-            <Section style={pillWrapper}>
-              <Text style={pill}>✓ &nbsp;Document Ready</Text>
-            </Section>
+            <Text style={brand}>farmnport</Text>
 
             <Text style={greeting}>Your document is ready, {name}.</Text>
             <Text style={paragraph}>
               Payment confirmed. You can now download your document from your account at any time.
             </Text>
 
-            {/* Order number card */}
-            <Section style={orderCard}>
-              <Text style={orderCardLabel}>Order number</Text>
-              <Text style={orderCardNumber}>{orderNumber}</Text>
-            </Section>
+            <Text style={paragraph}>Order number: <strong>{orderNumber}</strong></Text>
 
-            {/* Items */}
-            <Text style={sectionLabel}>Documents purchased</Text>
-            {items.map((item, i) => (
-              <Row key={i} style={itemRow}>
-                <Column>
-                  <Text style={itemName}>{item.product_name}</Text>
-                </Column>
-                <Column style={itemPriceCol}>
-                  <Text style={itemPrice}>{fmt(item.line_total)}</Text>
-                </Column>
-              </Row>
-            ))}
+            <Text style={paragraph}>
+              Documents purchased:{"\n"}{itemLines}
+            </Text>
 
-            <Hr style={thinDivider} />
+            <Text style={paragraph}>Total paid: {fmt(total)}</Text>
 
-            <Row style={totalRow}>
-              <Column><Text style={grandLabel}>Total paid</Text></Column>
-              <Column style={amountCol}><Text style={grandAmount}>{fmt(total)}</Text></Column>
-            </Row>
+            <Text style={paragraph}>Payment ref: {paymentRef}</Text>
 
-            <Hr style={thinDivider} />
+            <Text style={paragraph}>
+              <Link href={downloadsUrl} style={link}>Download your document</Link>
+            </Text>
 
-            <Text style={sectionLabel}>Payment</Text>
-            <Text style={refText}>Ref: {paymentRef}</Text>
-
-            <Section style={buttonWrapper}>
-              <Button href={downloadsUrl} style={button}>Download your document</Button>
-            </Section>
-
-            <Hr style={divider} />
             <Text style={signoff}>the farmnport team</Text>
           </Section>
 
-          {/* Footer */}
           <Section style={footer}>
             <Text style={footerText}>
               farmnport &nbsp;·&nbsp; 13 Grace Rd, Winston Park, Marondera, Zimbabwe
@@ -120,215 +82,19 @@ export default function OrderDocumentConfirmationEmail({
               © {new Date().getFullYear()} farmnport. All rights reserved.
             </Text>
           </Section>
-
         </Container>
       </Body>
     </Html>
   )
 }
 
-const body: React.CSSProperties = {
-  backgroundColor: "#f8fafc",
-  fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-  margin: 0,
-  padding: "40px 0",
-}
-
-const container: React.CSSProperties = {
-  backgroundColor: "#ffffff",
-  margin: "0 auto",
-  maxWidth: "580px",
-  borderRadius: "8px",
-  overflow: "hidden",
-  boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
-}
-
-const header: React.CSSProperties = {
-  backgroundColor: "#ffffff",
-  padding: "28px 40px 20px",
-}
-
-const brandName: React.CSSProperties = {
-  fontSize: "22px",
-  fontWeight: "600",
-  color: "#0f172a",
-  margin: "0 0 2px",
-  letterSpacing: "-0.3px",
-}
-
-const brandTagline: React.CSSProperties = {
-  fontSize: "12px",
-  color: "#94a3b8",
-  margin: 0,
-  letterSpacing: "0.05em",
-  textTransform: "uppercase",
-}
-
-const headerDivider: React.CSSProperties = {
-  borderColor: "#f1f5f9",
-  margin: 0,
-}
-
-const content: React.CSSProperties = {
-  padding: "32px 40px 24px",
-}
-
-const pillWrapper: React.CSSProperties = {
-  marginBottom: "24px",
-}
-
-const pill: React.CSSProperties = {
-  display: "inline-block",
-  fontSize: "12px",
-  fontWeight: "600",
-  letterSpacing: "0.04em",
-  color: "#16a34a",
-  border: "1px solid #16a34a",
-  borderRadius: "999px",
-  padding: "4px 12px",
-  margin: 0,
-}
-
-const greeting: React.CSSProperties = {
-  fontSize: "22px",
-  fontWeight: "600",
-  color: "#0f172a",
-  margin: "0 0 12px",
-}
-
-const paragraph: React.CSSProperties = {
-  fontSize: "15px",
-  lineHeight: "1.7",
-  color: "#475569",
-  margin: "0 0 24px",
-}
-
-const orderCard: React.CSSProperties = {
-  backgroundColor: "#f8fafc",
-  borderRadius: "6px",
-  padding: "14px 18px",
-  marginBottom: "28px",
-}
-
-const orderCardLabel: React.CSSProperties = {
-  fontSize: "11px",
-  color: "#94a3b8",
-  textTransform: "uppercase",
-  letterSpacing: "0.06em",
-  margin: "0 0 4px",
-}
-
-const orderCardNumber: React.CSSProperties = {
-  fontSize: "20px",
-  fontWeight: "600",
-  color: "#0f172a",
-  margin: 0,
-}
-
-const sectionLabel: React.CSSProperties = {
-  fontSize: "11px",
-  fontWeight: "600",
-  textTransform: "uppercase",
-  letterSpacing: "0.08em",
-  color: "#94a3b8",
-  margin: "20px 0 10px",
-}
-
-const itemRow: React.CSSProperties = {
-  marginBottom: "10px",
-}
-
-const itemName: React.CSSProperties = {
-  fontSize: "14px",
-  fontWeight: "600",
-  color: "#0f172a",
-  margin: 0,
-}
-
-const itemPriceCol: React.CSSProperties = {
-  textAlign: "right",
-  width: "80px",
-  verticalAlign: "top",
-}
-
-const itemPrice: React.CSSProperties = {
-  fontSize: "14px",
-  color: "#0f172a",
-  margin: 0,
-  textAlign: "right",
-}
-
-const thinDivider: React.CSSProperties = {
-  borderColor: "#f1f5f9",
-  margin: "14px 0",
-}
-
-const totalRow: React.CSSProperties = {
-  marginBottom: "6px",
-}
-
-const amountCol: React.CSSProperties = {
-  textAlign: "right",
-  width: "80px",
-}
-
-const grandLabel: React.CSSProperties = {
-  fontSize: "15px",
-  fontWeight: "600",
-  color: "#0f172a",
-  margin: 0,
-}
-
-const grandAmount: React.CSSProperties = {
-  fontSize: "15px",
-  fontWeight: "600",
-  color: "#ea580c",
-  margin: 0,
-  textAlign: "right",
-}
-
-const refText: React.CSSProperties = {
-  fontSize: "13px",
-  color: "#94a3b8",
-  margin: 0,
-}
-
-const buttonWrapper: React.CSSProperties = {
-  margin: "28px 0 8px",
-}
-
-const button: React.CSSProperties = {
-  backgroundColor: "#ea580c",
-  borderRadius: "6px",
-  color: "#ffffff",
-  fontSize: "14px",
-  fontWeight: "600",
-  textDecoration: "none",
-  textAlign: "center",
-  display: "inline-block",
-  padding: "13px 24px",
-}
-
-const divider: React.CSSProperties = {
-  borderColor: "#e2e8f0",
-  margin: "24px 0",
-}
-
-const signoff: React.CSSProperties = {
-  fontSize: "14px",
-  color: "#64748b",
-  margin: 0,
-}
-
-const footer: React.CSSProperties = {
-  backgroundColor: "#f8fafc",
-  borderTop: "1px solid #e2e8f0",
-  padding: "20px 40px",
-}
-
-const footerText: React.CSSProperties = {
-  fontSize: "12px",
-  color: "#94a3b8",
-  margin: "0 0 4px",
-  textAlign: "center",
-}
+const body: React.CSSProperties = { backgroundColor: "#ffffff", fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", margin: 0, padding: "40px 0" }
+const container: React.CSSProperties = { backgroundColor: "#ffffff", margin: "0 auto", maxWidth: "580px" }
+const content: React.CSSProperties = { padding: "32px 40px 24px" }
+const brand: React.CSSProperties = { fontSize: "20px", fontWeight: "600", color: "#0f172a", margin: "0 0 20px" }
+const greeting: React.CSSProperties = { fontSize: "18px", fontWeight: "600", color: "#0f172a", margin: "0 0 12px" }
+const paragraph: React.CSSProperties = { fontSize: "15px", lineHeight: "1.7", color: "#475569", margin: "0 0 16px", whiteSpace: "pre-wrap" }
+const link: React.CSSProperties = { color: "#ea580c", textDecoration: "underline" }
+const signoff: React.CSSProperties = { fontSize: "14px", color: "#64748b", margin: 0 }
+const footer: React.CSSProperties = { padding: "0 40px 32px" }
+const footerText: React.CSSProperties = { fontSize: "12px", color: "#94a3b8", margin: 0, textAlign: "center" }

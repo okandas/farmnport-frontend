@@ -69,8 +69,29 @@ export default async function LotDetailPage({ params }: Props) {
         ? new Date(`${lot.expires_date}T${lot.expires_time}:00Z`).getTime() < Date.now()
         : false
 
+    const structuredData = {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        "name": `${produce}${breed ? ` — ${breed}` : ""}`,
+        "image": lot.images?.[0]?.img?.src ? [lot.images[0].img.src] : [`${AppURL}/og-image.png`],
+        "description": lot.notes || `${isSelling ? "Selling" : "Buying"} ${produce} in Zimbabwe`,
+        "sku": lot.id || slug,
+        "category": "Farm Lots",
+        "offers": {
+            "@type": "Offer",
+            "url": `${AppURL}/lots/${slug}`,
+            "priceCurrency": "USD",
+            "price": lot.price_per_unit_cents > 0 ? (lot.price_per_unit_cents / 100).toFixed(2) : "0.00",
+            "availability": isExpired ? "https://schema.org/SoldOut" : "https://schema.org/InStock",
+            "itemCondition": "https://schema.org/NewCondition",
+            "priceValidUntil": lot.expires_at || new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+            "seller": { "@type": "Organization", "name": "farmnport" },
+        },
+    }
+
     return (
         <main>
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
             <div className="border-b">
                 <div className="mx-auto max-w-7xl px-6 lg:px-8 py-3">
                     <nav className="flex text-sm text-muted-foreground">

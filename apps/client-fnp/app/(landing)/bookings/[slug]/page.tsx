@@ -63,5 +63,32 @@ export default async function PreOrderDetailPage({ params }: Props) {
 
     const depositEnabled = await preorderDepositEnabled()
 
-    return <PreOrderDetailClient preorder={preorder} depositEnabled={depositEnabled} />
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://farmnport.com"
+    const isBuyer = preorder.market_side === "demand"
+    const structuredData = {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        "name": `${preorder.client_name || preorder.brand_name || "Supplier"} — ${preorder.produce_name || "Farm Produce"}`,
+        "image": preorder.image_src ? [preorder.image_src] : [`${baseUrl}/og-image.png`],
+        "description": preorder.description || `${isBuyer ? "Buying" : "Selling"} ${preorder.produce_name || "farm produce"} on farmnport.com`,
+        "sku": preorder.id || slug,
+        "category": "Farm Bookings",
+        "offers": {
+            "@type": "Offer",
+            "url": `${baseUrl}/bookings/${slug}`,
+            "priceCurrency": "USD",
+            "price": preorder.deposit_cents ? (preorder.deposit_cents / 100).toFixed(2) : "0.00",
+            "availability": preorder.status === "active" ? "https://schema.org/InStock" : "https://schema.org/SoldOut",
+            "itemCondition": "https://schema.org/NewCondition",
+            "priceValidUntil": new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+            "seller": { "@type": "Organization", "name": "farmnport" },
+        },
+    }
+
+    return (
+        <>
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
+            <PreOrderDetailClient preorder={preorder} depositEnabled={depositEnabled} />
+        </>
+    )
 }
