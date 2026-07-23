@@ -50,6 +50,7 @@ export default function MyLotDetailPage({ params }: { params: Promise<{ slug: st
 
   const bids: any[] = data?.data ?? []
   const total: number = data?.total ?? 0
+  const lot: any = data?.lot ?? null
   const accepted = bids.find((b) => ["accepted", "paid", "completed"].includes(b.status))
 
   if (isLoading) {
@@ -70,13 +71,41 @@ export default function MyLotDetailPage({ params }: { params: Promise<{ slug: st
         <span className="text-foreground font-medium font-mono">{slug}</span>
       </nav>
 
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-base font-bold font-mono">{slug}</h1>
-        <Link href="/account/lots" className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
-          <ChevronLeft className="w-4 h-4" />
-          My Lots
-        </Link>
-      </div>
+      {lot && (
+        <div className="flex gap-4 mb-6">
+          {lot.main_image?.img?.src ? (
+            <img src={lot.main_image.img.src} alt={lot.farm_produce?.name ?? "Lot"} className="w-24 h-24 rounded-lg object-cover shrink-0" />
+          ) : (
+            <div className="w-24 h-24 rounded-lg bg-muted/30 shrink-0" />
+          )}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center justify-between">
+              <h1 className="text-lg font-bold">{lot.farm_produce?.name ?? slug}</h1>
+              <Link href="/account/lots" className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
+                <ChevronLeft className="w-4 h-4" />
+                My Lots
+              </Link>
+            </div>
+            {lot.breed?.name && <p className="text-sm text-muted-foreground">{lot.breed.name}</p>}
+            <p className="text-sm text-muted-foreground mt-1">
+              {lot.quantity?.toLocaleString()} {lot.unit} · {centsToDollars(lot.price_per_unit_cents)}/{lot.unit}
+            </p>
+            <span className={`inline-flex items-center text-xs px-2 py-0.5 rounded-md font-medium mt-1 ${lot.type === "sell" ? "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400" : "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"}`}>
+              {lot.type === "sell" ? "Selling" : "Buying"}
+            </span>
+          </div>
+        </div>
+      )}
+
+      {!lot && (
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-base font-bold font-mono">{slug}</h1>
+          <Link href="/account/lots" className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
+            <ChevronLeft className="w-4 h-4" />
+            My Lots
+          </Link>
+        </div>
+      )}
 
       {accepted && (
         <div className="flex gap-6 mb-8">

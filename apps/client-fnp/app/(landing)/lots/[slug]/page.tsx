@@ -129,22 +129,26 @@ export default async function LotDetailPage({ params }: Props) {
                                             <p className="text-xs font-mono font-semibold text-foreground">Lot #{slug.split("-").pop()}</p>
                                         </div>
                                     </div>
-                                    <div className="mt-3"><ShareBar name={breed ?? produce} /></div>
-                                    {isSelling ? (
-                                        (lot.city || lot.province) && (
-                                            <p className="text-sm text-muted-foreground mt-0.5 capitalize">
-                                                {lot.city ? `${capitalizeFirstLetter(lot.city)}, ` : ""}
-                                                {capitalizeFirstLetter(lot.province)}
-                                            </p>
-                                        )
-                                    ) : (
-                                        <p className="text-sm text-muted-foreground mt-1">
-                                            Lot for buyer looking for {produce}{breed ? ` ${breed}` : ""}
-                                            {(lot.city || lot.province) && (
-                                                <span className="capitalize"> in {lot.city ? `${capitalizeFirstLetter(lot.city)}, ` : ""}{capitalizeFirstLetter(lot.province)}</span>
+                                    <div className="mt-3 flex items-center justify-between gap-4">
+                                        <div>
+                                            {isSelling ? (
+                                                (lot.city || lot.province) && (
+                                                    <p className="text-sm text-muted-foreground capitalize">
+                                                        {lot.city ? `${capitalizeFirstLetter(lot.city)}, ` : ""}
+                                                        {capitalizeFirstLetter(lot.province)}
+                                                    </p>
+                                                )
+                                            ) : (
+                                                <p className="text-sm text-muted-foreground">
+                                                    Lot for buyer looking for {produce}{breed ? ` ${breed}` : ""}
+                                                    {(lot.city || lot.province) && (
+                                                        <span className="capitalize"> in {lot.city ? `${capitalizeFirstLetter(lot.city)}, ` : ""}{capitalizeFirstLetter(lot.province)}</span>
+                                                    )}
+                                                </p>
                                             )}
-                                        </p>
-                                    )}
+                                        </div>
+                                        <ShareBar name={breed ?? produce} />
+                                    </div>
                                 </div>
 
                                 {(lot.main_image || lot.images?.length > 0 || bidsData?.accepted?.supply_images) && (
@@ -210,9 +214,15 @@ export default async function LotDetailPage({ params }: Props) {
                                                 <p className="text-xs text-muted-foreground">This lot is not yet open for bidding — check back shortly.</p>
                                             </div>
                                         ) : user && (user as any).id === lot.client_id ? (
-                                            <div className="space-y-1">
+                                            <div className="space-y-3">
                                                 <p className="text-sm font-semibold text-foreground">This is your lot</p>
-                                                <p className="text-xs text-muted-foreground">You cannot place an offer on your own listing.</p>
+                                                <p className="text-xs text-muted-foreground">Review and respond to offers from your account.</p>
+                                                <Link
+                                                    href={`/account/lots/${slug}`}
+                                                    className="inline-flex items-center justify-center w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
+                                                >
+                                                    Manage Offers
+                                                </Link>
                                             </div>
                                         ) : bidsData?.accepted ? (
                                             <div className="space-y-2">

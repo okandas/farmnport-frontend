@@ -93,7 +93,7 @@ export function LotBidsPanel({ slug, lotType, myBidId, myBidMainImage, myBidImag
         )}
       </div>
 
-      <div ref={listRef} className="max-h-64 overflow-y-auto pr-1">
+      <div ref={listRef} className="min-h-[282px] max-h-[282px] overflow-y-auto pr-1">
         {bids.slice(0, visible).map((bid) => {
           const isMe = myBidId === bid.id
           return (
