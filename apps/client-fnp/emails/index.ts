@@ -6,6 +6,9 @@ export { default as ScheduleEmail } from "./templates/auth/schedule"
 // Blast template
 export { default as BlastEmail } from "./templates/blast"
 
+// Marketing templates
+export { default as MarketingLaunchEmail } from "./templates/marketing-launch"
+
 // Order templates
 export { default as OrderConfirmationEmail } from "./templates/orders/order-confirmation"
 export { default as OrderDispatchEmail } from "./templates/orders/order-dispatch"

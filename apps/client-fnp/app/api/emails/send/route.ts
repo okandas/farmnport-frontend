@@ -22,6 +22,7 @@ import {
   PreorderReadyEmail,
   PreorderCollectedEmail,
   PreorderExpiredEmail,
+  MarketingLaunchEmail,
 } from "@/emails"
 
 const FROM = "farmnport <noreply@farmnport.com>"
@@ -90,6 +91,13 @@ export async function POST(req: NextRequest) {
       const p = props as Parameters<typeof BlastEmail>[0]
       subject = (props as { subject?: string }).subject ?? "Message from farmnport"
       html = await render(BlastEmail(p))
+      break
+    }
+
+    case "marketing-launch": {
+      const p = props as Parameters<typeof MarketingLaunchEmail>[0]
+      subject = "New ways to trade on farmnport — bookings and lots"
+      html = await render(MarketingLaunchEmail(p))
       break
     }
 
