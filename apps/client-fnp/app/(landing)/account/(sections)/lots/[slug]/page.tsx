@@ -74,11 +74,11 @@ export default function MyLotDetailPage({ params }: { params: Promise<{ slug: st
       {lot && (
         <div className="flex gap-4 mb-6">
           {lot.main_image?.img?.src ? (
-            <img src={lot.main_image.img.src} alt={lot.farm_produce?.name ?? "Lot"} className="w-24 h-24 rounded-lg object-cover shrink-0" />
+            <img src={lot.main_image.img.src} alt={lot.farm_produce?.name ?? "Lot"} className="w-80 h-80 rounded-lg object-cover shrink-0" />
           ) : (
-            <div className="w-24 h-24 rounded-lg bg-muted/30 shrink-0" />
+            <div className="w-80 h-80 rounded-lg bg-muted/30 shrink-0" />
           )}
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 flex flex-col">
             <div className="flex items-center justify-between">
               <h1 className="text-lg font-bold">{lot.farm_produce?.name ?? slug}</h1>
               <Link href="/account/lots" className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
@@ -87,12 +87,22 @@ export default function MyLotDetailPage({ params }: { params: Promise<{ slug: st
               </Link>
             </div>
             {lot.breed?.name && <p className="text-sm text-muted-foreground">{lot.breed.name}</p>}
-            <p className="text-sm text-muted-foreground mt-1">
-              {lot.quantity?.toLocaleString()} {lot.unit} · {centsToDollars(lot.price_per_unit_cents)}/{lot.unit}
+            {lot.produce_condition?.name && (
+              <p className="text-sm text-muted-foreground mt-1">Condition: {lot.produce_condition.name}</p>
+            )}
+            <p className="text-sm text-muted-foreground mt-2">
+              Your lot has {lot.quantity?.toLocaleString()} {lot.farm_produce?.name ?? "items"} and {lot.type === "sell" ? "selling" : "buying"} at {centsToDollars(lot.price_per_unit_cents)} per {capitalize(lot.unit)}
             </p>
-            <span className={`inline-flex items-center text-xs px-2 py-0.5 rounded-md font-medium mt-1 ${lot.type === "sell" ? "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400" : "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"}`}>
-              {lot.type === "sell" ? "Selling" : "Buying"}
-            </span>
+            {lot.expires_at && (
+              <p className="text-xs text-muted-foreground mt-1">
+                Expires {new Date(lot.expires_at).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}
+              </p>
+            )}
+            <div className="mt-auto pt-2">
+              <span className={`inline-flex items-center text-xs px-2 py-0.5 rounded-md font-medium ${lot.type === "sell" ? "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400" : "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"}`}>
+                {lot.type === "sell" ? "Selling" : "Buying"}
+              </span>
+            </div>
           </div>
         </div>
       )}
