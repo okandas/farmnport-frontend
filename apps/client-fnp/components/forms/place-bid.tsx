@@ -153,6 +153,7 @@ export function PlaceBidForm({ lot, topBidCents, onSuccess }: Props) {
     onSuccess: () => {
       setPendingData(null)
       setShowForm(false)
+      setModalOpen(false)
       qc.invalidateQueries({ queryKey: ["my-bid-on-lot", lot.slug, username] })
       qc.invalidateQueries({ queryKey: ["bid-images", lot.slug, username] })
       qc.invalidateQueries({ queryKey: ["lot-bids", lot.slug] })
@@ -168,6 +169,7 @@ export function PlaceBidForm({ lot, topBidCents, onSuccess }: Props) {
 
   const [pendingData, setPendingData] = useState<FormModel | null>(null)
   const [showForm, setShowForm] = useState(false)
+  const [modalOpen, setModalOpen] = useState(false)
   const [galleryOpen, setGalleryOpen] = useState(false)
   const [localMainImage, setLocalMainImage] = useState<{ img: { id: string; src: string } } | null>(null)
   const [localImages, setLocalImages] = useState<{ img: { id: string; src: string } }[]>([])
@@ -195,6 +197,7 @@ export function PlaceBidForm({ lot, topBidCents, onSuccess }: Props) {
 
   return (
     <>
+    {/* Confirmation dialog */}
     <Dialog open={!!pendingData} onOpenChange={(open) => { if (!open) setPendingData(null) }}>
       <DialogContent className="max-w-sm">
         <DialogHeader>
@@ -236,11 +239,16 @@ export function PlaceBidForm({ lot, topBidCents, onSuccess }: Props) {
         </DialogFooter>
       </DialogContent>
     </Dialog>
+
+    {/* Offer form modal */}
+    <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+      <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>{existingBid ? "Update Offer" : isSelling ? "Place Offer" : "Submit Supply Offer"}</DialogTitle>
+        </DialogHeader>
     <div className="space-y-5">
       <div className="flex items-center justify-between">
-        <h3 className="text-base font-semibold">
-          {isSelling ? "Place an Offer to Buy" : "Submit a Supply Offer"}
-        </h3>
+        <div />
         {showSummary && (
           <button type="button" onClick={() => setShowForm(true)} className="text-xs text-primary underline hover:no-underline">
             Update offer
@@ -403,11 +411,32 @@ export function PlaceBidForm({ lot, topBidCents, onSuccess }: Props) {
         )}
         <Button type="submit" disabled={isPending || (isSupplyLot && !hasSupplyImages)} className="w-full">
           {isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-          {isSelling ? "Submit Offer to Buy" : "Submit Supply Offer"}
+          {existingBid ? "Update Offer" : isSelling ? "Place Offer" : "Submit Supply Offer"}
         </Button>
       </form>
       </>
       )}
+    </div>
+      </DialogContent>
+    </Dialog>
+
+    {/* Trigger button */}
+    <div className="space-y-3">
+      {existingBid && (
+        <div className="rounded-lg bg-muted/50 px-4 py-3 space-y-1 text-sm">
+          <div className="flex justify-between">
+            <span className="text-muted-foreground">Your current offer</span>
+            <span className="font-semibold">{centsToDollars(existingBid.offered_price_per_unit_cents)}/{lot.unit}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-muted-foreground">Quantity</span>
+            <span className="font-semibold">{existingBid.quantity} {lot.unit}</span>
+          </div>
+        </div>
+      )}
+      <Button onClick={() => setModalOpen(true)} className="w-full">
+        {existingBid ? "Update Offer" : isSelling ? "Place Offer" : "Submit Supply Offer"}
+      </Button>
     </div>
     </>
   )
