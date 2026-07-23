@@ -3,6 +3,24 @@ import { serverFetch } from "@/lib/serverFetch"
 import { BuyPlantNutritionClient } from "./BuyPlantNutritionClient"
 import { getBuyCategories } from "@/components/generic/BuyCategoriesNav"
 
+export const metadata = {
+    title: "Buy Plant Nutrition & Fertilizers Zimbabwe – Prices & Guides | farmnport.com",
+    description: "Shop foliar feeds, soil amendments and crop nutrition products. Compare prices, view application rates and order online.",
+    alternates: { canonical: "https://farmnport.com/buy-plant-nutrition" },
+    openGraph: {
+        title: "Buy Plant Nutrition & Fertilizers Zimbabwe – Prices & Guides",
+        description: "Shop foliar feeds, soil amendments and crop nutrition products. Compare prices, view application rates and order online.",
+        siteName: "farmnport",
+        type: "website" as const,
+        url: "https://farmnport.com/buy-plant-nutrition",
+    },
+    twitter: {
+        card: "summary_large_image" as const,
+        title: "Buy Plant Nutrition & Fertilizers Zimbabwe – Prices & Guides",
+        description: "Shop foliar feeds, soil amendments and crop nutrition products. Compare prices, view application rates and order online.",
+    },
+}
+
 export default async function BuyPlantNutritionPage() {
     let initialProducts: any[] = []
     let initialTotal = 0

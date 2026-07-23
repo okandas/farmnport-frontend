@@ -15,6 +15,24 @@ const breadcrumbJsonLd = {
   ],
 }
 
+export const metadata = {
+    title: "Farm Bookings & Pre-Orders Zimbabwe – Prices & Availability | farmnport.com",
+    description: "Book day-old chicks, livestock and seasonal farm produce in advance. View prices and secure your order with a deposit.",
+    alternates: { canonical: "https://farmnport.com/bookings" },
+    openGraph: {
+        title: "Farm Bookings & Pre-Orders Zimbabwe – Prices & Availability",
+        description: "Book day-old chicks, livestock and seasonal farm produce in advance. View prices and secure your order with a deposit.",
+        siteName: "farmnport",
+        type: "website" as const,
+        url: "https://farmnport.com/bookings",
+    },
+    twitter: {
+        card: "summary_large_image" as const,
+        title: "Farm Bookings & Pre-Orders Zimbabwe – Prices & Availability",
+        description: "Book day-old chicks, livestock and seasonal farm produce in advance. View prices and secure your order with a deposit.",
+    },
+}
+
 export default async function PreOrdersPage() {
   const showBookings = await bookingsEnabled()
   if (!showBookings) notFound()

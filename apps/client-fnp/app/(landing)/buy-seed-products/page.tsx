@@ -3,6 +3,24 @@ import { serverFetch } from "@/lib/serverFetch"
 import { BuySeedProductsClient } from "./BuySeedProductsClient"
 import { getBuyCategories } from "@/components/generic/BuyCategoriesNav"
 
+export const metadata = {
+    title: "Buy Seed Products Zimbabwe – Prices & Varieties | farmnport.com",
+    description: "Shop maize seed, vegetable seed and pasture seed from certified suppliers. Compare prices, view varieties and order online.",
+    alternates: { canonical: "https://farmnport.com/buy-seed-products" },
+    openGraph: {
+        title: "Buy Seed Products Zimbabwe – Prices & Varieties",
+        description: "Shop maize seed, vegetable seed and pasture seed from certified suppliers. Compare prices, view varieties and order online.",
+        siteName: "farmnport",
+        type: "website" as const,
+        url: "https://farmnport.com/buy-seed-products",
+    },
+    twitter: {
+        card: "summary_large_image" as const,
+        title: "Buy Seed Products Zimbabwe – Prices & Varieties",
+        description: "Shop maize seed, vegetable seed and pasture seed from certified suppliers. Compare prices, view varieties and order online.",
+    },
+}
+
 export default async function BuySeedProductsPage() {
     let initialProducts: any[] = []
     let initialTotal = 0

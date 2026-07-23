@@ -3,6 +3,24 @@ import { serverFetch } from "@/lib/serverFetch"
 import { BuyAgroChemicalsClient } from "./BuyAgroChemicalsClient"
 import { getBuyCategories } from "@/components/generic/BuyCategoriesNav"
 
+export const metadata = {
+    title: "Buy Agrochemicals Zimbabwe – Prices & Dosage Guides | farmnport.com",
+    description: "Browse herbicides, fungicides, insecticides and plant growth regulators. Compare prices, view dosage guides and spray programs for Zimbabwe crops.",
+    alternates: { canonical: "https://farmnport.com/buy-agrochemicals" },
+    openGraph: {
+        title: "Buy Agrochemicals Zimbabwe – Prices & Dosage Guides",
+        description: "Browse herbicides, fungicides, insecticides and plant growth regulators. Compare prices, view dosage guides and spray programs for Zimbabwe crops.",
+        siteName: "farmnport",
+        type: "website" as const,
+        url: "https://farmnport.com/buy-agrochemicals",
+    },
+    twitter: {
+        card: "summary_large_image" as const,
+        title: "Buy Agrochemicals Zimbabwe – Prices & Dosage Guides",
+        description: "Browse herbicides, fungicides, insecticides and plant growth regulators. Compare prices, view dosage guides and spray programs for Zimbabwe crops.",
+    },
+}
+
 export default async function BuyAgroChemicalsPage() {
     let initialChemicals: any[] = []
     let initialTotal = 0
