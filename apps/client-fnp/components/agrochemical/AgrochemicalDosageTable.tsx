@@ -132,7 +132,7 @@ export function AgrochemicalDosageTable({ dosageRates }: AgrochemicalDosageTable
                                 <div>
                                     <div className="font-semibold text-sm text-blue-700 dark:text-blue-300">{firstRate.crop_group}</div>
                                     <div className="mt-1 space-y-0.5">
-                                        {rates.map((r: any, idx: number) => (
+                                        {rates.filter((r: any) => r.crop).map((r: any, idx: number) => (
                                             <div key={idx} className="text-xs text-muted-foreground capitalize flex items-start gap-1">
                                                 <span className="h-1 w-1 mt-1.5 rounded-full bg-blue-400 flex-shrink-0" />
                                                 <span className="flex-1">{r.crop}</span>
