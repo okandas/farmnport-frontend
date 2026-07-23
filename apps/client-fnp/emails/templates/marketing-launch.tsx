@@ -96,6 +96,17 @@ export default function MarketingLaunchEmail({ name = "Member" }: MarketingLaunc
             <Text style={paragraph}>
               Both are free to use. Both work for sellers and buyers.
             </Text>
+
+            <Text style={subheading}>Manage your account</Text>
+            <Text style={paragraph}>
+              Once you create a booking or list a lot, you can manage everything from your account:
+            </Text>
+            <Text style={linkList}>
+              <Link href={`https://farmnport.com/account/booking-preorders?utm_source=blast&utm_medium=email&utm_campaign=bookings_lots_launch&utm_content=manage_bookings`} style={inlineLink}>My Bookings</Link> — view, edit, and manage your booking listings{"\n"}
+              <Link href={`https://farmnport.com/account/lots?utm_source=blast&utm_medium=email&utm_campaign=bookings_lots_launch&utm_content=manage_lots`} style={inlineLink}>My Lots</Link> — track your lots, view bids, accept offers{"\n"}
+              <Link href={`https://farmnport.com/account/incoming-bookings?utm_source=blast&utm_medium=email&utm_campaign=bookings_lots_launch&utm_content=manage_incoming`} style={inlineLink}>Incoming Bookings</Link> — review and confirm booking requests from buyers
+            </Text>
+
             <Text style={signoff}>Happy trading,{"\n"}the farmnport team</Text>
           </Section>
 
@@ -128,6 +139,8 @@ const subheading: React.CSSProperties = { fontSize: "15px", fontWeight: "600", c
 const buttonWrapper: React.CSSProperties = { margin: "8px 0 24px" }
 const buttonPrimary: React.CSSProperties = { backgroundColor: "#ea580c", borderRadius: "6px", color: "#ffffff", fontSize: "15px", fontWeight: "600", textDecoration: "none", textAlign: "center", display: "inline-block", padding: "14px 28px" }
 const buttonOutline: React.CSSProperties = { backgroundColor: "#ffffff", borderRadius: "6px", color: "#0f172a", fontSize: "15px", fontWeight: "600", textDecoration: "none", textAlign: "center", display: "inline-block", padding: "12px 26px", border: "2px solid #e2e8f0" }
+const linkList: React.CSSProperties = { fontSize: "14px", lineHeight: "2", color: "#475569", margin: "0 0 16px", whiteSpace: "pre-wrap" }
+const inlineLink: React.CSSProperties = { color: "#ea580c", fontWeight: "600", textDecoration: "none" }
 const divider: React.CSSProperties = { borderColor: "#e2e8f0", margin: "8px 40px" }
 const signoff: React.CSSProperties = { fontSize: "14px", color: "#64748b", lineHeight: "1.6", whiteSpace: "pre-wrap" }
 const footer: React.CSSProperties = { padding: "16px 40px 32px" }
