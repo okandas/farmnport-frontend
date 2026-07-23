@@ -8,7 +8,7 @@ export function PricesTabNav() {
   const isHead = pathname === "/prices/head"
 
   return (
-    <nav className="border-b bg-background sticky top-0 z-10">
+    <nav>
       <div className="px-4 sm:px-6 lg:px-8 flex items-center gap-0">
         <Link
           href="/prices"

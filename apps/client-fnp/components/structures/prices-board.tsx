@@ -5,7 +5,11 @@ import { useState, useEffect, useRef } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { queryProducerPriceLists, queryCdmPrices, querySeriesSummary, queryHeadSummary, queryMarketNews } from "@/lib/query"
 import { PricesTabNav } from "@/components/structures/prices-tab-nav"
+import { Dialog, DialogContent } from "@/components/ui/dialog"
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover"
 import { Sheet, SheetContent, SheetClose } from "@/components/ui/sheet"
+import { driver } from "driver.js"
+import "driver.js/dist/driver.css"
 
 type Mode = "kg" | "head"
 
@@ -278,6 +282,11 @@ function InsightsTimeline() {
 // ── Main board ────────────────────────────────────────────────────────────────
 
 export function PricesBoard({ mode = "kg" }: { mode?: Mode }) {
+  const [ctaOpen, setCtaOpen] = useState(false)
+  const [ctaGrade, setCtaGrade] = useState("")
+  const [speciesFilter, setSpeciesFilter] = useState<string>("all")
+  const [filterOpen, setFilterOpen] = useState(false)
+
   const { data: cdmData } = useQuery({
     queryKey: ["cdm-board"],
     queryFn: () => queryCdmPrices({ p: 1, limit: 15 } as any),
@@ -322,6 +331,36 @@ export function PricesBoard({ mode = "kg" }: { mode?: Mode }) {
     .slice(0, 3)
 
   const initialLoading = !cdmData && !seriesSummaryData && !headSummaryData
+
+  useEffect(() => {
+    if (initialLoading) return
+    const key = "fnp_prices_trade_seen"
+    if (typeof window === "undefined") return
+    if (localStorage.getItem(key)) return
+
+    const t = setTimeout(() => {
+      const el = document.getElementById("prices-trade-btn")
+      if (!el) return
+      localStorage.setItem(key, "1")
+
+      const d = driver({
+        allowClose: true,
+        steps: [
+          {
+            element: "#prices-trade-btn",
+            popover: {
+              title: "Trade on farmnport",
+              description: "Buy or sell livestock and produce directly through the platform.",
+              side: "bottom",
+              align: "start",
+            },
+          },
+        ],
+      })
+      d.drive()
+    }, 1500)
+    return () => clearTimeout(t)
+  }, [initialLoading])
 
   if (initialLoading) {
     return (
@@ -383,6 +422,19 @@ export function PricesBoard({ mode = "kg" }: { mode?: Mode }) {
   }
 
   return (
+    <>
+    <Dialog open={ctaOpen} onOpenChange={setCtaOpen}>
+      <DialogContent className="max-w-md p-6 w-[calc(100%-2rem)] rounded-lg">
+        <p className="text-lg font-bold text-foreground">Buy or Sell</p>
+        <p className="text-sm text-muted-foreground mb-5">Trade livestock and produce online through farmnport.</p>
+        <div className="grid grid-cols-2 gap-3">
+          <Link href="/lots/new/buy" className="flex items-center justify-center px-4 py-2.5 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors">I Want Stock →</Link>
+          <Link href="/lots/new/sell" className="flex items-center justify-center px-4 py-2.5 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors">I Am Selling →</Link>
+          <Link href="/bookings/new/buy" className="flex items-center justify-center px-4 py-2.5 rounded-md border border-border text-sm font-semibold hover:bg-muted transition-colors">Book Regular Supply →</Link>
+          <Link href="/bookings/new/sell" className="flex items-center justify-center px-4 py-2.5 rounded-md border border-border text-sm font-semibold hover:bg-muted transition-colors">Supply Regularly →</Link>
+        </div>
+      </DialogContent>
+    </Dialog>
     <main className="min-h-screen">
 
       {/* ── top stat strip — full width ── */}
@@ -527,7 +579,27 @@ export function PricesBoard({ mode = "kg" }: { mode?: Mode }) {
           </ul>
 
           {/* ── Price table ── */}
-          <PricesTabNav />
+          <div className="border-b bg-background sticky top-0 z-10 flex items-center justify-between">
+            <PricesTabNav />
+            <div className="px-4 sm:px-6 lg:px-8">
+              <Popover open={filterOpen} onOpenChange={setFilterOpen}>
+                <PopoverTrigger asChild>
+                  <button className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" x2="4" y1="21" y2="14"/><line x1="4" x2="4" y1="10" y2="3"/><line x1="12" x2="12" y1="21" y2="12"/><line x1="12" x2="12" y1="8" y2="3"/><line x1="20" x2="20" y1="21" y2="16"/><line x1="20" x2="20" y1="12" y2="3"/><line x1="2" x2="6" y1="14" y2="14"/><line x1="10" x2="14" y1="8" y2="8"/><line x1="18" x2="22" y1="16" y2="16"/></svg>
+                    {speciesFilter === "all" ? "Filter" : speciesFilter.charAt(0).toUpperCase() + speciesFilter.slice(1)}
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent align="end" className="w-36 p-1">
+                  {["all", "cattle", "sheep", "chicken"].map(s => (
+                    <button key={s} onClick={() => { setSpeciesFilter(s); setFilterOpen(false) }}
+                      className={`w-full text-left px-3 py-1.5 rounded text-xs font-medium transition-colors ${speciesFilter === s ? "bg-muted text-foreground" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"}`}>
+                      {s === "all" ? "All" : s.charAt(0).toUpperCase() + s.slice(1)}
+                    </button>
+                  ))}
+                </PopoverContent>
+              </Popover>
+            </div>
+          </div>
           {pricesLoading && (
             <div className="mt-2 px-4 md:px-8 py-4 space-y-4">
               {Array.from({ length: 8 }).map((_, i) => (
@@ -544,12 +616,15 @@ export function PricesBoard({ mode = "kg" }: { mode?: Mode }) {
           {!pricesLoading && rawEntries.length > 0 && (
             <div className="mt-2 px-4 md:px-8 py-4">
               <div className="overflow-x-auto">
-                <table className="w-full text-sm">
+                <table className="w-full min-w-[800px] text-sm">
                   <thead>
                     <tr className="border-b text-xs text-muted-foreground">
                       <th className="text-left py-2 pr-4 font-medium w-8 tabular-nums">#</th>
                       <th className="text-left py-2 font-medium">Code</th>
                       <th className="text-left py-2 pl-2 font-medium">{mode === "head" ? "Breed · Grade" : "Produce · Grade"}</th>
+                      <th className="text-left py-2 pl-2 font-medium">
+                        <button id="prices-trade-btn" onClick={() => { setCtaGrade(""); setCtaOpen(true) }} className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold border border-primary text-primary hover:bg-primary/10 transition-colors">Trade</button>
+                      </th>
                       <th className="text-left py-2 pl-2 font-medium">{mode === "head" ? "Avg/Head" : "Average"}</th>
                       {mode === "head" && <th className="text-left py-2 pl-2 font-medium ">Avg Weight</th>}
                       <th className="text-left py-2 pl-2 font-medium">Change</th>
@@ -561,6 +636,12 @@ export function PricesBoard({ mode = "kg" }: { mode?: Mode }) {
                   </thead>
                   <tbody>
                     {[...rawEntries]
+                      .filter(e => {
+                        if (speciesFilter === "all") return true
+                        const cat = (e.category ?? "").toLowerCase()
+                        if (speciesFilter === "chicken") return cat === "chicken" || cat === "chickens"
+                        return cat === speciesFilter
+                      })
                       .sort((a, b) => (b.latest_date ?? "").localeCompare(a.latest_date ?? ""))
                       .map((entry, idx) => {
                         const color = gradeColor((entry.category ?? "").toLowerCase())
@@ -580,6 +661,7 @@ export function PricesBoard({ mode = "kg" }: { mode?: Mode }) {
                                 <p className="text-xs text-muted-foreground font-normal leading-tight mt-0.5">{produce}</p>
                               </Link>
                             </td>
+                            <td className="py-3 pl-2" />
                             <td className="py-3 pl-2 tabular-nums font-semibold">
                               ${toDollars(entry.avg)}<span className="text-xs font-normal text-muted-foreground">{unit}</span>
                             </td>
@@ -646,5 +728,6 @@ export function PricesBoard({ mode = "kg" }: { mode?: Mode }) {
 
       </div>{/* end flex below strip */}
     </main>
+    </>
   )
 }
