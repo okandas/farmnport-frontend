@@ -227,21 +227,13 @@ export default async function AgroChemicalGuidePage({ params }: GuidePageProps) 
                     <div className="space-y-6">
                         {/* Product Name */}
                         <GuideProductTitle name={chemical.name} brand={chemical.brand?.name} />
-                        <div className="mt-3"><ShareBar name={chemical.name} /></div>
-
-                        {/* Category Badge & Buy Link */}
-                        <div className="flex items-center gap-3 flex-wrap">
+                        <div className="mt-3 flex items-center flex-wrap gap-3">
                             {chemical.agrochemical_category && (
-                                <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                                <div className="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
                                     {chemical.agrochemical_category.name}
                                 </div>
                             )}
-                            {/* <Link
-                                href={`/buy-agrochemicals/${slug}`}
-                                className="inline-flex items-center px-4 py-1.5 rounded-full text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
-                            >
-                                Ready to Buy
-                            </Link> */}
+                            <ShareBar name={chemical.name} />
                         </div>
 
                         {/* Divider */}
