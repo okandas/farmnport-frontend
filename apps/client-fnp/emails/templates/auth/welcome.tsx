@@ -34,6 +34,29 @@ export default function WelcomeEmail({
 
           <Hr style={divider} />
 
+          {/* Value props */}
+          <Section style={content}>
+            <Text style={sectionLabel}>WHAT YOU GET</Text>
+            <Text style={sectionTitle}>Everything you need to trade directly</Text>
+
+            <Text style={subheading}>List your produce for sale</Text>
+            <Text style={paragraph}>
+              Create bookings for regular supply, or list lots for immediate one-time sales — both free to use.
+            </Text>
+
+            <Text style={subheading}>Connect with buyers across Zimbabwe</Text>
+            <Text style={paragraph}>
+              Join a growing network of agricultural businesses trading directly without middlemen.
+            </Text>
+
+            <Text style={subheading}>Get price updates and market news</Text>
+            <Text style={paragraph}>
+              Stay up to date with livestock prices, produce market trends, and spray program guides.
+            </Text>
+          </Section>
+
+          <Hr style={divider} />
+
           {/* CTA */}
           <Section style={content}>
             <Section style={buttonWrapper}>
@@ -74,6 +97,9 @@ const brand: React.CSSProperties = { fontSize: "22px", fontWeight: "700", color:
 const content: React.CSSProperties = { padding: "16px 40px" }
 const greeting: React.CSSProperties = { fontSize: "18px", fontWeight: "600", color: "#0f172a", margin: "0 0 12px" }
 const paragraph: React.CSSProperties = { fontSize: "15px", lineHeight: "1.7", color: "#475569", margin: "0 0 16px", whiteSpace: "pre-wrap" }
+const sectionLabel: React.CSSProperties = { fontSize: "11px", fontWeight: "700", color: "#ea580c", letterSpacing: "1px", textTransform: "uppercase", margin: "0 0 4px" }
+const sectionTitle: React.CSSProperties = { fontSize: "20px", fontWeight: "700", color: "#0f172a", margin: "0 0 12px", lineHeight: "1.3" }
+const subheading: React.CSSProperties = { fontSize: "15px", fontWeight: "600", color: "#0f172a", margin: "0 0 8px" }
 const buttonWrapper: React.CSSProperties = { margin: "8px 0 24px" }
 const buttonPrimary: React.CSSProperties = { backgroundColor: "#ea580c", borderRadius: "6px", color: "#ffffff", fontSize: "15px", fontWeight: "600", textDecoration: "none", textAlign: "center", display: "inline-block", padding: "14px 28px" }
 const divider: React.CSSProperties = { borderColor: "#e2e8f0", margin: "8px 40px" }

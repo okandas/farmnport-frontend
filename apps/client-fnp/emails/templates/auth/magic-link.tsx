@@ -23,8 +23,7 @@ export default function MagicLinkEmail({
 
           {/* Greeting */}
           <Section style={content}>
-            <Text style={greeting}>Password reset</Text>
-            <Text style={paragraph}>Hi {name},</Text>
+            <Text style={greeting}>Hi {name},</Text>
             <Text style={paragraph}>
               We received a request to reset the password for your farmnport account.
             </Text>
@@ -34,6 +33,8 @@ export default function MagicLinkEmail({
 
           {/* CTA */}
           <Section style={content}>
+            <Text style={sectionLabel}>PASSWORD RESET</Text>
+            <Text style={sectionTitle}>Choose a new password</Text>
             <Section style={buttonWrapper}>
               <Button href={resetUrl} style={buttonPrimary}>Choose a New Password</Button>
             </Section>
@@ -75,6 +76,9 @@ const brand: React.CSSProperties = { fontSize: "22px", fontWeight: "700", color:
 const content: React.CSSProperties = { padding: "16px 40px" }
 const greeting: React.CSSProperties = { fontSize: "18px", fontWeight: "600", color: "#0f172a", margin: "0 0 12px" }
 const paragraph: React.CSSProperties = { fontSize: "15px", lineHeight: "1.7", color: "#475569", margin: "0 0 16px", whiteSpace: "pre-wrap" }
+const sectionLabel: React.CSSProperties = { fontSize: "11px", fontWeight: "700", color: "#ea580c", letterSpacing: "1px", textTransform: "uppercase", margin: "0 0 4px" }
+const sectionTitle: React.CSSProperties = { fontSize: "20px", fontWeight: "700", color: "#0f172a", margin: "0 0 12px", lineHeight: "1.3" }
+const subheading: React.CSSProperties = { fontSize: "15px", fontWeight: "600", color: "#0f172a", margin: "0 0 8px" }
 const buttonWrapper: React.CSSProperties = { margin: "8px 0 24px" }
 const buttonPrimary: React.CSSProperties = { backgroundColor: "#ea580c", borderRadius: "6px", color: "#ffffff", fontSize: "15px", fontWeight: "600", textDecoration: "none", textAlign: "center", display: "inline-block", padding: "14px 28px" }
 const divider: React.CSSProperties = { borderColor: "#e2e8f0", margin: "8px 40px" }
