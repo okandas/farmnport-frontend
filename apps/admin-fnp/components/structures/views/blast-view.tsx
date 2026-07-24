@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import Link from "next/link"
 import { useQuery, useMutation } from "@tanstack/react-query"
 import { Icons } from "@/components/icons/lucide"
 import { authorizedHTTPClient } from "@/lib/axios"
@@ -165,9 +166,9 @@ export function BlastView() {
 
   const canSend = selected.size > 0 && template.trim().length > 0
 
-  // ── Results view ───────────────────────────────────────────────────────────
+  // ── Results view (custom blasts only — verify shows inline) ────────────────
 
-  if (results) {
+  if (results && blastTemplate === "custom") {
     return (
       <div className="rounded-lg border bg-white overflow-hidden shadow-sm">
         <div className="flex items-center justify-between px-5 py-3.5 border-b bg-white">
@@ -236,6 +237,9 @@ export function BlastView() {
                 : null}
           </div>
           <div className="flex items-center gap-2">
+            <Link href="/dashboard/farmnport/blast/sent" className="h-8 px-3 rounded-md border text-xs font-medium text-muted-foreground hover:bg-muted/50 flex items-center gap-1.5">
+              Sent blasts
+            </Link>
             {blastTemplate === "custom" ? (
               <>
                 <button onClick={() => setShowPreview((v) => !v)} disabled={!template.trim()}
@@ -286,7 +290,51 @@ export function BlastView() {
           )}
         </div>
 
-        {/* ── Filters row (full width) ── */}
+        {/* ── Verify Reminder mode ── */}
+        {blastTemplate === "verify-reminder" && (
+          <div className="p-6 space-y-4">
+            <div className="flex items-center gap-6">
+              {results && (
+                <div className="flex items-center gap-4 text-sm">
+                  <span className="text-green-600 font-semibold">{results.sent} sent</span>
+                  {results.failed > 0 && <span className="text-red-500 font-semibold">{results.failed} failed</span>}
+                  {results.remaining !== undefined && <span className="text-muted-foreground">{results.remaining} unverified remaining</span>}
+                </div>
+              )}
+            </div>
+            {results && results.results.length > 0 && (
+              <div className="rounded-md border overflow-hidden">
+                <table className="min-w-full text-sm">
+                  <thead>
+                    <tr className="bg-muted/20 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      <th className="px-4 py-2 text-left w-10">#</th>
+                      <th className="px-4 py-2 text-left">Name</th>
+                      <th className="px-4 py-2 text-left">Email</th>
+                      <th className="px-4 py-2 text-left">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y">
+                    {results.results.map((r, i) => (
+                      <tr key={i} className="hover:bg-muted/50">
+                        <td className="px-4 py-2 text-muted-foreground">{i + 1}</td>
+                        <td className="px-4 py-2 font-medium">{r.name}</td>
+                        <td className="px-4 py-2 text-muted-foreground">{r.to}</td>
+                        <td className="px-4 py-2">
+                          {r.ok
+                            ? <span className="text-green-600 font-medium">Sent</span>
+                            : <span className="text-red-500">{r.error ?? "Failed"}</span>}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── Custom message mode ── */}
+        {blastTemplate === "custom" && <>
         <div className="flex items-center gap-2 px-4 py-2.5 border-b bg-muted/10 shrink-0 flex-wrap">
           <Select value={typeFilter} onValueChange={setTypeFilter}>
             <SelectTrigger className="h-8 text-xs w-28 bg-white shadow-none"><SelectValue /></SelectTrigger>
@@ -457,6 +505,7 @@ export function BlastView() {
             )}
           </div>
         </div>
+        </>}
       </div>
 
       {/* ── Per-recipient message overrides ── */}
