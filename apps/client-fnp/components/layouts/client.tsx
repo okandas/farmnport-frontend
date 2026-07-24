@@ -163,14 +163,8 @@ export function Client({ slug, type, user, latestPrices }: ClientPageProps) {
               </div>
 
               {/* Contact row */}
-              {(client.phone || client.email || !user || (client.type === 'buyer' && client.branches)) && (
+              {(client.phone || client.email || !user) && (
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4">
-                  {client.type === 'buyer' && client.branches > 0 && (
-                    <div>
-                      <p className="text-sm font-semibold">{client.branches === 1 ? '1 Branch' : `${client.branches} Branches`}</p>
-                      <p className="text-xs text-muted-foreground">{client.branches === 1 ? 'Branch' : 'Branches'}</p>
-                    </div>
-                  )}
                   {(client.phone || !user) && (
                     <div>
                       {!user ? (

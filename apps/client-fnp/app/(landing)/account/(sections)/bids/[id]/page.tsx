@@ -3,7 +3,7 @@
 import { use, useState, useEffect } from "react"
 import { useSession } from "next-auth/react"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
-import { Loader2, Gavel, ChevronLeft } from "lucide-react"
+import { Loader2, ChevronLeft } from "lucide-react"
 import Link from "next/link"
 import { myBidByID, initiateBidPayment, pollBidPayment } from "@/lib/query"
 import { trackPurchase } from "@/lib/analytics"
@@ -54,9 +54,11 @@ export default function BidDetailPage({ params }: { params: Promise<{ id: string
     refetchOnMount: "always",
   })
 
-  // Poll Paynow every 4s while bid is accepted and awaiting payment
+  // Poll Paynow only after buyer clicks Pay Now (not for suppliers)
+  const [polling, setPolling] = useState(false)
+
   useEffect(() => {
-    if (!bid || bid.status !== "accepted") return
+    if (!polling || !bid || bid.status !== "accepted" || bid.lot_type === "request") return
     const interval = setInterval(async () => {
       try {
         const res = await pollBidPayment(id)
@@ -74,15 +76,17 @@ export default function BidDetailPage({ params }: { params: Promise<{ id: string
             }],
           })
           qc.invalidateQueries({ queryKey: ["my-bids"] })
+          setPolling(false)
           clearInterval(interval)
         } else if (["Cancelled", "Disputed", "Refunded"].includes(res.data?.status)) {
           qc.invalidateQueries({ queryKey: ["my-bids"] })
+          setPolling(false)
           clearInterval(interval)
         }
       } catch {}
-    }, 60000)
+    }, 5000)
     return () => clearInterval(interval)
-  }, [bid?.status, id])
+  }, [polling, bid?.status, id])
 
   if (status === "loading" || isLoading) {
     return (
@@ -121,102 +125,141 @@ export default function BidDetailPage({ params }: { params: Promise<{ id: string
 
   const isAccepted = bid.status === "accepted"
   const isPaid = bid.status === "paid" || bid.status === "completed"
+  const isSupplier = bid.lot_type === "request"
+  const isBuyer = bid.lot_type === "sell"
 
   return (
     <div>
       <nav className="flex items-center gap-1.5 text-sm text-muted-foreground mb-4">
         <Link href="/account" className="hover:text-foreground transition-colors">Account</Link>
         <span>/</span>
-        <Link href="/account/bids" className="hover:text-foreground transition-colors">My Bids</Link>
+        <Link href="/account/bids" className="hover:text-foreground transition-colors">My Offers</Link>
         <span>/</span>
-        <span className="text-foreground font-medium font-mono">{bid.lot_slug}</span>
+        <span className="text-foreground font-medium">{bid.lot_slug}</span>
       </nav>
 
-      <p className="text-sm text-muted-foreground mb-6">
-        {bid.lot_type === "request"
-          ? <>Your supply offer on lot <Link href={`/lots/${bid.lot_slug}`} className="text-primary hover:underline font-mono">{bid.lot_slug}</Link> was accepted — you have been selected to supply.</>
-          : isPaid
-            ? <>Your bid on lot <Link href={`/lots/${bid.lot_slug}`} className="text-primary hover:underline font-mono">{bid.lot_slug}</Link> was accepted and payment confirmed.</>
-            : isAccepted
-              ? <>Your bid on lot <Link href={`/lots/${bid.lot_slug}`} className="text-primary hover:underline font-mono">{bid.lot_slug}</Link> was accepted — complete payment to secure this lot.</>
-              : <>You placed a bid on lot <Link href={`/lots/${bid.lot_slug}`} className="text-primary hover:underline font-mono">{bid.lot_slug}</Link>.</>
-        }
-      </p>
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <Link href={`/lots/${bid.lot_slug}`} className="text-base font-bold font-mono hover:text-primary transition-colors">{bid.lot_slug}</Link>
-          <span className={`text-xs px-2.5 py-1 rounded-md font-medium ${STATUS_STYLES[bid.status] ?? "bg-muted text-muted-foreground"}`}>
+      {/* Header */}
+      <div className="flex items-start justify-between mb-8">
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold">
+            {isSupplier ? "Your Supply Offer" : "Your Buy Offer"}
+          </h1>
+          <span className={`inline-flex text-xs px-2.5 py-1 rounded-md font-medium ${STATUS_STYLES[bid.status] ?? "bg-muted text-muted-foreground"}`}>
             {capitalize(bid.status)}
           </span>
+          <p className="text-sm text-muted-foreground max-w-xl leading-relaxed">
+            {isSupplier && isAccepted
+              ? `You offered to supply ${bid.quantity} ${bid.unit} at ${centsToDollars(bid.offered_price_per_unit_cents)} per ${bid.unit}. The buyer accepted your offer. You will receive ${centsToDollars(bid.offered_price_per_unit_cents * bid.quantity)} once payment is confirmed. Please prepare your supply for delivery within 2 days of payment confirmation.`
+              : isSupplier && isPaid
+              ? `You supplied ${bid.quantity} ${bid.unit} at ${centsToDollars(bid.offered_price_per_unit_cents)} per ${bid.unit}. Payment of ${centsToDollars(bid.offered_price_per_unit_cents * bid.quantity)} has been confirmed. Arrange delivery and provide proof of delivery.`
+              : isSupplier
+              ? `You offered to supply ${bid.quantity} ${bid.unit} at ${centsToDollars(bid.offered_price_per_unit_cents)} per ${bid.unit}. Waiting for the buyer to review your offer.`
+              : isBuyer && isAccepted
+              ? `Your offer to buy ${bid.quantity} ${bid.unit} at ${centsToDollars(bid.offered_price_per_unit_cents)} per ${bid.unit} was accepted. Complete payment of ${centsToDollars(bid.offered_price_per_unit_cents * bid.quantity)} to secure this lot.`
+              : isBuyer && isPaid
+              ? `You bought ${bid.quantity} ${bid.unit} at ${centsToDollars(bid.offered_price_per_unit_cents)} per ${bid.unit}. Payment of ${centsToDollars(bid.offered_price_per_unit_cents * bid.quantity)} confirmed. The seller will arrange delivery within 2 days.`
+              : `You offered to buy ${bid.quantity} ${bid.unit} at ${centsToDollars(bid.offered_price_per_unit_cents)} per ${bid.unit}. Waiting for the seller to review your offer.`
+            }
+          </p>
+          <Link href={`/lots/${bid.lot_slug}`} className="text-sm text-primary hover:underline">
+            View lot →
+          </Link>
+          {bid.payment_deadline && isAccepted && (
+            <div className="mt-2">
+              <p className="text-lg font-bold text-amber-700 dark:text-amber-400">
+                Payment deadline: <Countdown deadline={bid.payment_deadline} />
+              </p>
+              <p className="text-xs text-muted-foreground">If payment is not received in time, your offer will be automatically rejected.</p>
+            </div>
+          )}
         </div>
-        <Link href="/account/bids" className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
+        <Link href="/account/bids" className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground shrink-0">
           <ChevronLeft className="w-4 h-4" />
-          All Bids
+          My Offers
         </Link>
       </div>
 
-      <div className="flex gap-6">
-        {/* Image */}
+      {/* Image + Details */}
+      <div className="flex flex-col sm:flex-row gap-6 mb-8">
         {(bid.lot_main_image || bid.lot_images?.length > 0) && (
-          <div className="w-2/3 shrink-0">
+          <div className="w-full sm:w-80 shrink-0">
             <LotImageGallery mainImage={bid.lot_main_image} images={bid.lot_images} />
           </div>
         )}
 
-        {/* Details */}
-        <div className="flex-1 flex flex-col gap-5">
-          <div className="grid grid-cols-2 gap-x-6 gap-y-4">
-            <div>
-              <p className="text-xs text-muted-foreground mb-1">Your Bid</p>
-              <p className="font-semibold text-lg">{centsToDollars(bid.offered_price_per_unit_cents)}</p>
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground mb-1">Quantity</p>
-              <p className="font-semibold">{bid.quantity} {bid.unit}</p>
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground mb-1">Placed</p>
-              <p className="font-semibold text-sm">{formatDate(bid.created)}</p>
-            </div>
-            {bid.reviewed_at && (
+        <div className="flex-1 space-y-6">
+          {/* Invoice-style details */}
+          <div className="border-t border-b py-6 space-y-5">
+            <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-muted-foreground mb-1">Accepted</p>
-                <p className="font-semibold text-sm">{formatDate(bid.reviewed_at)}</p>
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Offer Summary</p>
+                <div className="flex items-center gap-4 mt-1 text-xs text-muted-foreground">
+                  <span>Placed: <span className="font-medium text-foreground">{formatDate(bid.created)}</span></span>
+                  {bid.reviewed_at && <span>{isAccepted || isPaid ? "Accepted" : "Reviewed"}: <span className="font-medium text-foreground">{formatDate(bid.reviewed_at)}</span></span>}
+                </div>
               </div>
-            )}
+              <div className="text-right">
+                <p className="text-xs text-muted-foreground">Lot No.</p>
+                <Link href={`/lots/${bid.lot_slug}`} className="text-sm font-bold text-foreground hover:text-primary">{bid.lot_slug}</Link>
+              </div>
+            </div>
+
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b text-xs text-muted-foreground uppercase tracking-wide">
+                  <th className="text-left py-2 font-medium">Lot Description</th>
+                  <th className="text-right py-2 font-medium">Quantity</th>
+                  <th className="text-right py-2 font-medium">Price</th>
+                  <th className="text-right py-2 font-medium">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="border-b">
+                  <td className="py-3 font-medium">{bid.farm_produce_name || bid.lot_slug}</td>
+                  <td className="py-3 text-right">{bid.quantity} {bid.unit}</td>
+                  <td className="py-3 text-right">{centsToDollars(bid.offered_price_per_unit_cents)}/{bid.unit}</td>
+                  <td className="py-3 text-right font-semibold">{centsToDollars(bid.offered_price_per_unit_cents * bid.quantity)}</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colSpan={3} className="py-3 text-right font-semibold text-muted-foreground">Total</td>
+                  <td className="py-3 text-right text-lg font-bold">{centsToDollars(bid.offered_price_per_unit_cents * bid.quantity)}</td>
+                </tr>
+              </tfoot>
+            </table>
+
             {bid.notes && (
-              <div className="col-span-2">
-                <p className="text-xs text-muted-foreground mb-1">Notes</p>
-                <p className="text-sm">{bid.notes}</p>
+              <div className="pt-3 border-t text-xs">
+                <p className="text-muted-foreground">Notes</p>
+                <p className="text-sm mt-1">{bid.notes}</p>
               </div>
             )}
             {bid.delivery_location && (
-              <div className="col-span-2">
-                <p className="text-xs text-muted-foreground mb-1">Delivery Location</p>
-                <p className="text-sm">{bid.delivery_location}</p>
+              <div className="pt-3 border-t text-xs">
+                <p className="text-muted-foreground">Delivery Location</p>
+                <p className="text-sm mt-1">{bid.delivery_location}</p>
               </div>
             )}
           </div>
 
+          {/* Status action */}
           {isPaid && (
-            <div className="border-l-2 border-green-500 pl-3">
-              <p className="text-sm font-semibold text-green-700 dark:text-green-400">Payment received — lot secured</p>
-              <p className="text-xs text-muted-foreground mt-0.5">We will be in touch to arrange delivery.</p>
+            <div className="rounded-lg bg-green-50 dark:bg-green-900/20 p-4 space-y-1">
+              <p className="text-sm font-semibold text-green-800 dark:text-green-300">Payment confirmed</p>
+              <p className="text-xs text-green-700 dark:text-green-400">Lot secured. We will be in touch to arrange delivery.</p>
+              {bid.payment_ref && <p className="text-xs font-mono text-green-800 dark:text-green-300">Ref: {bid.payment_ref}</p>}
             </div>
           )}
 
-          {isAccepted && bid.lot_type === "request" && (
-            <div className="border-l-2 border-green-500 pl-3">
-              <p className="text-sm font-semibold text-green-700 dark:text-green-400">You have been selected to supply</p>
-              <p className="text-xs text-muted-foreground mt-0.5">The buyer will arrange payment and logistics shortly.</p>
-            </div>
-          )}
 
-          {isAccepted && bid.lot_type !== "request" && bid.payment_deadline && (
+          {isAccepted && isBuyer && bid.payment_deadline && (
             <div className="space-y-3">
-              <div className="border-l-2 border-amber-500 pl-3">
-                <p className="text-sm font-semibold text-amber-700 dark:text-amber-400">Bid accepted — payment required</p>
-                <p className="text-xs text-muted-foreground mt-0.5"><Countdown deadline={bid.payment_deadline} /></p>
+              <div className="rounded-lg bg-amber-50 dark:bg-amber-900/20 p-4 space-y-1">
+                <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">Offer accepted — payment required</p>
+                <p className="text-xs text-amber-700 dark:text-amber-400">
+                  Complete payment to secure this lot. Time remaining: <Countdown deadline={bid.payment_deadline} />
+                </p>
               </div>
               <div className="flex items-center gap-2">
                 <button
@@ -226,14 +269,17 @@ export default function BidDetailPage({ params }: { params: Promise<{ id: string
                     try {
                       const res = await initiateBidPayment(bid.id, {})
                       const redirectUrl = res.data?.redirect_url
-                      if (redirectUrl) window.open(redirectUrl, "_blank")
+                      if (redirectUrl) {
+                        window.open(redirectUrl, "_blank")
+                        setPolling(true)
+                      }
                     } catch {
                       // silent
                     } finally {
                       setPaying(false)
                     }
                   }}
-                  className="inline-flex items-center gap-2 rounded-md bg-primary text-primary-foreground text-sm font-semibold px-4 py-1.5 hover:bg-primary/90 transition-colors disabled:opacity-50"
+                  className="inline-flex items-center gap-2 rounded-md bg-primary text-primary-foreground text-sm font-semibold px-5 py-2.5 hover:bg-primary/90 transition-colors disabled:opacity-50"
                 >
                   {paying ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
                   Pay Now
@@ -242,6 +288,7 @@ export default function BidDetailPage({ params }: { params: Promise<{ id: string
                   disabled={checking}
                   onClick={async () => {
                     setChecking(true)
+                    setPolling(true)
                     try {
                       await pollBidPayment(id)
                       await refetch()
@@ -251,7 +298,7 @@ export default function BidDetailPage({ params }: { params: Promise<{ id: string
                       setChecking(false)
                     }
                   }}
-                  className="inline-flex items-center gap-2 rounded-md border text-sm font-semibold px-4 py-1.5 hover:bg-muted transition-colors disabled:opacity-50"
+                  className="inline-flex items-center gap-2 rounded-md border text-sm font-semibold px-5 py-2.5 hover:bg-muted transition-colors disabled:opacity-50"
                 >
                   {checking ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
                   I have paid
