@@ -3,6 +3,7 @@ import { Resend } from "resend"
 import { render } from "@react-email/render"
 import {
   WelcomeEmail,
+  VerifyReminderEmail,
   MagicLinkEmail,
   ScheduleEmail,
   OrderConfirmationEmail,
@@ -51,6 +52,11 @@ export async function POST(req: NextRequest) {
     case "welcome":
       subject = "Welcome to farmnport"
       html = await render(WelcomeEmail(props as Parameters<typeof WelcomeEmail>[0]))
+      break
+
+    case "verify-reminder":
+      subject = (props as { subject?: string }).subject ?? "Verify your farmnport account to start trading"
+      html = await render(VerifyReminderEmail(props as Parameters<typeof VerifyReminderEmail>[0]))
       break
 
     case "magic-link":
