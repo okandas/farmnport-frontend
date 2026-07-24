@@ -239,13 +239,13 @@ export function Client({ slug, type, user, latestPrices }: ClientPageProps) {
       {/* Main Content */}
       <div className="mt-8 space-y-6">
 
-        {client.type === 'buyer' && latestPrices && latestPrices.length > 0 && (
+        {client.type === 'buyer' && latestPrices && latestPrices.entries?.length > 0 && (
           <div id="price-history">
             <BuyerPriceUploads clientName={client.name} latestPrices={latestPrices} />
           </div>
         )}
 
-        <div id="activity" className="px-4 sm:px-6 lg:px-8">
+        <div id="activity">
           <ClientActivity slug={slug} />
         </div>
       </div>

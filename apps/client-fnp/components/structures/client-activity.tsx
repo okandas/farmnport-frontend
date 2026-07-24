@@ -22,7 +22,7 @@ function LotCard({ lot }: { lot: any }) {
       href={`/lots/${lot.slug}`}
       className="shrink-0 w-80 bg-card border border-border rounded-lg overflow-hidden hover:shadow-lg hover:border-primary/50 transition-all duration-200 group flex flex-col"
     >
-      <div className="relative h-80 bg-muted/30">
+      <div className="relative h-64 bg-muted/30">
         {lot.main_image?.img?.src ? (
           <img src={lot.main_image.img.src} alt={name} className="absolute inset-0 w-full h-full object-cover" />
         ) : (
@@ -52,7 +52,7 @@ function PreOrderCard({ event }: { event: any }) {
       href={`/bookings/${event.slug}`}
       className="shrink-0 w-80 bg-card border border-border rounded-lg overflow-hidden hover:shadow-lg hover:border-primary/50 transition-all duration-200 group flex flex-col"
     >
-      <div className="relative h-80 bg-muted/30">
+      <div className="relative h-64 bg-muted/30">
         {event.image_src && (
           <img src={event.image_src} alt={event.name} className="absolute inset-0 w-full h-full object-cover" />
         )}
