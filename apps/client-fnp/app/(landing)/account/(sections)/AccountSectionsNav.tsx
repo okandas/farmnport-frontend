@@ -41,8 +41,8 @@ export default function AccountSectionsNav({
                   href={href}
                   className={`shrink-0 px-4 py-2 rounded-lg border text-sm font-medium transition-colors whitespace-nowrap inline-flex items-center gap-1.5 ${
                     active
-                      ? "bg-primary text-primary-foreground border-primary"
-                      : "text-muted-foreground border-border hover:bg-primary hover:text-primary-foreground hover:border-primary"
+                      ? "text-primary border-primary"
+                      : "text-muted-foreground border-border hover:text-foreground hover:border-foreground"
                   }`}
                 >
                   {label}

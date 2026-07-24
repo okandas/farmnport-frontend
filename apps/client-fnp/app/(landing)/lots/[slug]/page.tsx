@@ -224,7 +224,7 @@ export default async function LotDetailPage({ params }: Props) {
                                                     Manage Offers
                                                 </Link>
                                             </div>
-                                        ) : bidsData?.accepted ? (
+                                        ) : user && bidsData?.accepted ? (
                                             <div className="space-y-2">
                                                 <p className="text-sm font-semibold text-foreground">Offer accepted</p>
                                                 <p className="text-xs text-muted-foreground">This lot has an accepted offer and is no longer accepting new bids.</p>
@@ -247,6 +247,21 @@ export default async function LotDetailPage({ params }: Props) {
                                                     className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline"
                                                 >
                                                     Manage your bid →
+                                                </Link>
+                                            </div>
+                                        ) : !user && bidsData?.accepted ? (
+                                            <div className="text-center space-y-4">
+                                                <div className="space-y-1">
+                                                    <p className="text-base font-semibold">This lot is no longer accepting offers</p>
+                                                    <p className="text-sm text-muted-foreground">
+                                                        An offer has already been accepted on this lot.
+                                                    </p>
+                                                </div>
+                                                <Link
+                                                    href="/lots"
+                                                    className="inline-flex items-center justify-center w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
+                                                >
+                                                    Browse open lots
                                                 </Link>
                                             </div>
                                         ) : !user ? (
