@@ -61,11 +61,17 @@ export const dashboardConfig: DashboardConfig = {
     },
     {
       label: "Communications",
+      alwaysOpen: true,
       items: [
         {
-          title: "Blast",
+          title: "Blasts",
           href: "/dashboard/farmnport/blast",
           icon: "send",
+        },
+        {
+          title: "Sent Blasts",
+          href: "/dashboard/farmnport/blast/sent",
+          icon: "messageSquare",
         },
       ],
     },
