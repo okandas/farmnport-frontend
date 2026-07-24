@@ -15,6 +15,7 @@ import { Icons } from "@/components/icons/lucide"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { BuyerPriceUploads } from "@/components/structures/buyer-price-uploads"
+import { ClientActivity } from "@/components/structures/client-activity"
 import { ShareBar } from "@/components/shared/ShareBar"
 
 
@@ -164,10 +165,10 @@ export function Client({ slug, type, user, latestPrices }: ClientPageProps) {
               {/* Contact row */}
               {(client.phone || client.email || !user || (client.type === 'buyer' && client.branches)) && (
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4">
-                  {client.type === 'buyer' && (
+                  {client.type === 'buyer' && client.branches > 0 && (
                     <div>
-                      <p className="text-sm font-semibold">{client.branches <= 1 ? '1 Branch' : `${client.branches} Branches`}</p>
-                      <p className="text-xs text-muted-foreground">{client.branches <= 1 ? 'Branch' : 'Branches'}</p>
+                      <p className="text-sm font-semibold">{client.branches === 1 ? '1 Branch' : `${client.branches} Branches`}</p>
+                      <p className="text-xs text-muted-foreground">{client.branches === 1 ? 'Branch' : 'Branches'}</p>
                     </div>
                   )}
                   {(client.phone || !user) && (
@@ -238,11 +239,15 @@ export function Client({ slug, type, user, latestPrices }: ClientPageProps) {
       {/* Main Content */}
       <div className="mt-8 space-y-6">
 
-        {client.type === 'buyer' && (
+        {client.type === 'buyer' && latestPrices && latestPrices.length > 0 && (
           <div id="price-history">
             <BuyerPriceUploads clientName={client.name} latestPrices={latestPrices} />
           </div>
         )}
+
+        <div id="activity" className="px-4 sm:px-6 lg:px-8">
+          <ClientActivity slug={slug} />
+        </div>
       </div>
     </div>
   )
