@@ -247,6 +247,17 @@ export function BlastView() {
                   <Icons.eye className="w-3.5 h-3.5" />
                   {showPreview ? "Hide preview" : "Preview"}
                 </button>
+                <button
+                  onClick={() => {
+                    const msg = template.replace(/\{name\}/gi, "Okandas")
+                    blastMutation.mutate([{ id: "", name: "Okandas", phone: "", email: "okandas@farmnport.com", message: msg, email_subject: emailSubject || "Message from farmnport", channel: "email" }])
+                  }}
+                  disabled={!template.trim() || blastMutation.isPending}
+                  className="h-8 px-3 rounded-md border text-xs font-medium text-orange-600 border-orange-200 hover:bg-orange-50 disabled:opacity-40 flex items-center gap-1.5">
+                  {blastMutation.isPending
+                    ? <><Icons.spinner className="w-3.5 h-3.5 animate-spin" /> Sending test…</>
+                    : <><Icons.send className="w-3.5 h-3.5" /> Send test to me</>}
+                </button>
                 <button onClick={handleSend} disabled={!canSend || blastMutation.isPending}
                   className="h-8 px-4 rounded-md bg-primary text-white text-xs font-bold hover:bg-primary/90 disabled:opacity-40 flex items-center gap-1.5 shadow-sm">
                   {blastMutation.isPending
