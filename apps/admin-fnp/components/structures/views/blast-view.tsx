@@ -455,11 +455,14 @@ export function BlastView() {
 
             {/* Subject (email only) */}
             {channel === "email" && (
-              <div className="flex items-center gap-3 px-5 border-b shrink-0">
+              <div className={`flex items-center gap-3 px-5 border-b shrink-0 ${!emailSubject.trim() && template.trim() ? "bg-red-50/50" : ""}`}>
                 <span className="text-xs font-bold text-slate-500 uppercase tracking-wide w-14 shrink-0">Subject</span>
-                <input type="text" placeholder="e.g. New prices this week"
+                <input type="text" placeholder="e.g. New prices this week — required"
                   value={emailSubject} onChange={(e) => setEmailSubject(e.target.value)}
                   className="flex-1 h-10 text-sm bg-transparent outline-none placeholder:text-muted-foreground/40" />
+                {!emailSubject.trim() && template.trim() && (
+                  <span className="text-xs text-red-500 font-medium shrink-0">Required</span>
+                )}
               </div>
             )}
 
