@@ -200,7 +200,7 @@ export default function BidDetailPage({ params }: { params: Promise<{ id: string
               </div>
               <div className="text-right">
                 <p className="text-xs text-muted-foreground">Lot No.</p>
-                <Link href={`/lots/${bid.lot_slug}`} className="text-sm font-bold text-foreground hover:text-primary">{bid.lot_slug}</Link>
+                <Link href={`/lots/${bid.lot_slug}`} className="text-sm font-bold text-foreground hover:text-primary font-mono">{bid.lot_short_id?.toUpperCase() || bid.lot_slug.split("-").pop()?.toUpperCase()}</Link>
               </div>
             </div>
 
@@ -209,21 +209,27 @@ export default function BidDetailPage({ params }: { params: Promise<{ id: string
                 <tr className="border-b text-xs text-muted-foreground uppercase tracking-wide">
                   <th className="text-left py-2 font-medium">Lot Description</th>
                   <th className="text-right py-2 font-medium">Quantity</th>
+                  <th className="text-right py-2 font-medium">Unit</th>
                   <th className="text-right py-2 font-medium">Price</th>
                   <th className="text-right py-2 font-medium">Amount</th>
                 </tr>
               </thead>
               <tbody>
                 <tr className="border-b">
-                  <td className="py-3 font-medium">{bid.farm_produce_name || bid.lot_slug}</td>
-                  <td className="py-3 text-right">{bid.quantity} {bid.unit}</td>
-                  <td className="py-3 text-right">{centsToDollars(bid.offered_price_per_unit_cents)}/{bid.unit}</td>
+                  <td className="py-3">
+                    <p className="font-medium">{bid.farm_produce_name || bid.lot_slug}</p>
+                    {bid.breed_name && <p className="text-xs text-muted-foreground">Breed: {bid.breed_name}</p>}
+                    {bid.produce_condition_name && <p className="text-xs text-muted-foreground">State: {bid.produce_condition_name}</p>}
+                  </td>
+                  <td className="py-3 text-right">{bid.quantity}</td>
+                  <td className="py-3 text-right capitalize">{bid.unit}</td>
+                  <td className="py-3 text-right">{centsToDollars(bid.offered_price_per_unit_cents)}</td>
                   <td className="py-3 text-right font-semibold">{centsToDollars(bid.offered_price_per_unit_cents * bid.quantity)}</td>
                 </tr>
               </tbody>
               <tfoot>
                 <tr>
-                  <td colSpan={3} className="py-3 text-right font-semibold text-muted-foreground">Total</td>
+                  <td colSpan={4} className="py-3 text-right font-semibold text-muted-foreground">Total</td>
                   <td className="py-3 text-right text-lg font-bold">{centsToDollars(bid.offered_price_per_unit_cents * bid.quantity)}</td>
                 </tr>
               </tfoot>
