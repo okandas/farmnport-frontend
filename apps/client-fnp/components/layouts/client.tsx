@@ -9,13 +9,11 @@ import Link from "next/link"
 
 import { queryClient, recordContactView } from "@/lib/query"
 import { ApplicationUser, AuthenticatedUser } from "@/lib/schemas"
-import { capitalizeFirstLetter, makeAbbveriation, titleCase, plural, formatDate } from "@/lib/utilities"
+import { capitalizeFirstLetter, makeAbbveriation, titleCase, formatDate } from "@/lib/utilities"
 import { Icons } from "@/components/icons/lucide"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { BuyerContacts } from "@/components/structures/buyer-contacts"
-import { ProductResources } from "@/components/monetization/product-resources"
 import { BuyerPriceUploads } from "@/components/structures/buyer-price-uploads"
 import { ShareBar } from "@/components/shared/ShareBar"
 
@@ -38,9 +36,6 @@ export function Client({ slug, type, user, latestPrices }: ClientPageProps) {
   const [showPhone, setShowPhone] = useState(false)
   const [showWhatsapp, setShowWhatsapp] = useState(false)
   const [showEmail, setShowEmail] = useState(false)
-
-  const paywallEnabled = process.env.NEXT_PUBLIC_ENABLE_PAYWALL === "true"
-  const isSubscribed = !paywallEnabled || user?.subscription_active === true
 
   const { data, isError, isFetching } = useQuery({
     queryKey: [`result-client-${slug}`, slug, type],
@@ -65,7 +60,7 @@ export function Client({ slug, type, user, latestPrices }: ClientPageProps) {
 
 
   return (
-    <div className="w-full bg-gradient-to-br from-background via-background to-muted/20 min-h-screen pb-12">
+    <div className="w-full bg-background min-h-screen pb-12">
       {/* Back */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-3">
         <button
@@ -134,155 +129,117 @@ export function Client({ slug, type, user, latestPrices }: ClientPageProps) {
               )}
 
               {/* Stats Row */}
-              <div className="flex flex-wrap gap-6 mt-4">
-                <div className="flex items-center gap-2">
-                  <Icons.calender className="h-4 w-4 text-muted-foreground" />
-                  <div>
-                    <p className="text-sm font-semibold">{formatDate(client.created)}</p>
-                    <p className="text-xs text-muted-foreground">Date Joined</p>
-                  </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4">
+                <div>
+                  <p className="text-sm font-semibold">{formatDate(client.created)}</p>
+                  <p className="text-xs text-muted-foreground">Date Joined</p>
                 </div>
-                {client.type === 'buyer' && (
-                  <div className="flex items-center gap-2">
-                    <Icons.building className="h-4 w-4 text-muted-foreground" />
+                <div>
+                  <p className="text-sm font-semibold">
+                    {client.address
+                      ? client.address.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+                      : client.city && client.province
+                      ? client.city.toLowerCase() === client.province.toLowerCase() ? capitalizeFirstLetter(client.city) : `${capitalizeFirstLetter(client.city)}, ${capitalizeFirstLetter(client.province)}`
+                      : 'Location N/A'}
+                  </p>
+                  {client.address && client.city && client.province && (
+                    <p className="text-xs text-muted-foreground">{client.city?.toLowerCase() === client.province?.toLowerCase() ? capitalizeFirstLetter(client.city) : `${capitalizeFirstLetter(client.city)}, ${capitalizeFirstLetter(client.province)}`}</p>
+                  )}
+                  <p className="text-xs text-muted-foreground">Location</p>
+                </div>
+                {client.primary_category && (
+                  <div>
+                    <p className="text-sm font-semibold">{capitalizeFirstLetter(client.primary_category.name)}</p>
+                    <p className="text-xs text-muted-foreground">Primary Category</p>
+                  </div>
+                )}
+                {client.main_produce && (
+                  <div>
+                    <p className="text-sm font-semibold">{capitalizeFirstLetter(client.main_produce.name)}</p>
+                    <p className="text-xs text-muted-foreground">Primary Product</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Contact row */}
+              {(client.phone || client.email || !user || (client.type === 'buyer' && client.branches)) && (
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4">
+                  {client.type === 'buyer' && (
                     <div>
                       <p className="text-sm font-semibold">{client.branches <= 1 ? '1 Branch' : `${client.branches} Branches`}</p>
                       <p className="text-xs text-muted-foreground">{client.branches <= 1 ? 'Branch' : 'Branches'}</p>
                     </div>
-                  </div>
-                )}
-                <div className="flex items-center gap-2">
-                  <Icons.mapPin className="h-4 w-4 text-muted-foreground" />
-                  <div>
-                    <p className="text-sm font-semibold">
-                      {client.address
-                        ? client.address.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
-                        : client.city && client.province
-                        ? client.city.toLowerCase() === client.province.toLowerCase() ? capitalizeFirstLetter(client.city) : `${capitalizeFirstLetter(client.city)}, ${capitalizeFirstLetter(client.province)}`
-                        : 'Location N/A'}
-                    </p>
-                    {client.address && client.city && client.province && (
-                      <p className="text-xs text-muted-foreground">{client.city?.toLowerCase() === client.province?.toLowerCase() ? capitalizeFirstLetter(client.city) : `${capitalizeFirstLetter(client.city)}, ${capitalizeFirstLetter(client.province)}`}</p>
-                    )}
-                    <p className="text-xs text-muted-foreground">Location</p>
-                  </div>
-                </div>
-                {client.main_produce && (
-                  <div className="flex items-center gap-2">
-                    <Icons.tag className="h-4 w-4 text-muted-foreground" />
+                  )}
+                  {(client.phone || !user) && (
                     <div>
-                      <p className="text-sm font-semibold">{capitalizeFirstLetter(client.main_produce.name)}</p>
-                      <p className="text-xs text-muted-foreground">Primary Product</p>
+                      {!user ? (
+                        <button onClick={() => { sendGTMEvent({ event: 'login_prompt', reason: 'view_phone', client_name: client.name }); router.push(`/login?entity=${client.type}&wantToSee=${slug}`) }} className="text-sm font-semibold hover:text-primary transition-colors">
+                          See Number →
+                        </button>
+                      ) : showPhone ? (
+                        <a href={`tel:${client.phone}`} className="text-sm font-semibold hover:text-primary transition-colors">{client.phone}</a>
+                      ) : (
+                        <button onClick={() => { sendGTMEvent({ event: 'phone_reveal', client_name: client.name }); if (user?.id) recordContactView(user.id, client.id, "phone").catch(() => {}); setShowPhone(true) }} className="text-sm font-semibold hover:text-primary transition-colors">
+                          Show Number →
+                        </button>
+                      )}
+                      <p className="text-xs text-muted-foreground">Phone</p>
                     </div>
-                  </div>
-                )}
-              </div>
+                  )}
+                  {(client.phone || !user) && (
+                    <div>
+                      {!user ? (
+                        <button onClick={() => { sendGTMEvent({ event: 'login_prompt', reason: 'view_whatsapp', client_name: client.name }); router.push(`/login?entity=${client.type}&wantToSee=${slug}`) }} className="text-sm font-semibold hover:text-primary transition-colors">
+                          See WhatsApp →
+                        </button>
+                      ) : showWhatsapp ? (
+                        <a href={`https://wa.me/263${client.phone.replace(/^0/, '')}`} target="_blank" rel="noopener noreferrer" onClick={() => sendGTMEvent({ event: 'whatsapp_click', client_name: client.name })} className="text-sm font-semibold hover:text-primary transition-colors">
+                          Open WhatsApp →
+                        </a>
+                      ) : (
+                        <button onClick={() => { sendGTMEvent({ event: 'whatsapp_reveal', client_name: client.name }); if (user?.id) recordContactView(user.id, client.id, "whatsapp").catch(() => {}); setShowWhatsapp(true) }} className="text-sm font-semibold hover:text-primary transition-colors">
+                          Show WhatsApp →
+                        </button>
+                      )}
+                      <p className="text-xs text-muted-foreground">WhatsApp</p>
+                    </div>
+                  )}
+                  {(client.email || !user) && (
+                    <div>
+                      {!user ? (
+                        <button onClick={() => { sendGTMEvent({ event: 'login_prompt', reason: 'view_email', client_name: client.name }); router.push(`/login?entity=${client.type}&wantToSee=${slug}`) }} className="text-sm font-semibold hover:text-primary transition-colors">
+                          See Email →
+                        </button>
+                      ) : showEmail ? (
+                        <a href={`mailto:${client.email}`} className="text-sm font-semibold hover:text-primary transition-colors">{client.email}</a>
+                      ) : (
+                        <button onClick={() => { sendGTMEvent({ event: 'email_reveal', client_name: client.name }); if (user?.id) recordContactView(user.id, client.id, "email").catch(() => {}); setShowEmail(true) }} className="text-sm font-semibold hover:text-primary transition-colors">
+                          Show Email →
+                        </button>
+                      )}
+                      <p className="text-xs text-muted-foreground">Email</p>
+                    </div>
+                  )}
+                  {(client.has_booking || client.has_pickup) && client.type === 'buyer' && (
+                    <div>
+                      <Link href={`/book/${slug}`} className="text-sm font-semibold hover:text-primary transition-colors">
+                        Book a Sale →
+                      </Link>
+                      <p className="text-xs text-muted-foreground">Sell to {titleCase(client.name)}</p>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 space-y-6">
-        <div className="flex flex-col sm:flex-row gap-4">
-
-            {/* Phone + Email CTAs */}
-              <div className="flex-1 bg-card border rounded-xl p-4 space-y-3">
-                <div>
-                  <p className="font-semibold text-sm">Phone</p>
-                  <p className="text-xs text-muted-foreground mt-1 leading-relaxed">Call directly.</p>
-                </div>
-                {!user ? (
-                  <button onClick={() => { sendGTMEvent({ event: 'login_prompt', reason: 'view_phone', client_name: client.name }); router.push(`/login?entity=${client.type}&wantToSee=${slug}`) }} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
-                    See Number →
-                  </button>
-                ) : !isSubscribed ? (
-                  <button onClick={() => { sendGTMEvent({ event: 'paywall_hit', reason: 'view_phone', client_name: client.name }); router.push('/pricing') }} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
-                    Unlock →
-                  </button>
-                ) : showPhone ? (
-                  <a href={`tel:${client.phone}`} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
-                    {client.phone}
-                  </a>
-                ) : (
-                  <button onClick={() => { sendGTMEvent({ event: 'phone_reveal', client_name: client.name }); if (user?.id) recordContactView(user.id, client.id, "phone").catch(() => {}); setShowPhone(true) }} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
-                    Show Number →
-                  </button>
-                )}
-              </div>
-
-              <div className="flex-1 bg-card border rounded-xl p-4 space-y-3">
-                <div>
-                  <p className="font-semibold text-sm">WhatsApp</p>
-                  <p className="text-xs text-muted-foreground mt-1 leading-relaxed">Message on WhatsApp.</p>
-                </div>
-                {!user ? (
-                  <button onClick={() => { sendGTMEvent({ event: 'login_prompt', reason: 'view_whatsapp', client_name: client.name }); router.push(`/login?entity=${client.type}&wantToSee=${slug}`) }} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
-                    See WhatsApp →
-                  </button>
-                ) : !isSubscribed ? (
-                  <button onClick={() => { sendGTMEvent({ event: 'paywall_hit', reason: 'view_whatsapp', client_name: client.name }); router.push('/pricing') }} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
-                    Unlock →
-                  </button>
-                ) : showWhatsapp ? (
-                  <a href={`https://wa.me/263${client.phone.replace(/^0/, '')}`} target="_blank" rel="noopener noreferrer" onClick={() => sendGTMEvent({ event: 'whatsapp_click', client_name: client.name })} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
-                    Open WhatsApp →
-                  </a>
-                ) : (
-                  <button onClick={() => { sendGTMEvent({ event: 'whatsapp_reveal', client_name: client.name }); if (user?.id) recordContactView(user.id, client.id, "whatsapp").catch(() => {}); setShowWhatsapp(true) }} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
-                    Show WhatsApp →
-                  </button>
-                )}
-              </div>
-
-              {client.email && <div className="flex-1 bg-card border rounded-xl p-4 space-y-3">
-                <div>
-                  <p className="font-semibold text-sm">Email</p>
-                  <p className="text-xs text-muted-foreground mt-1 leading-relaxed">Send an email.</p>
-                </div>
-                {!user ? (
-                  <button onClick={() => { sendGTMEvent({ event: 'login_prompt', reason: 'view_email', client_name: client.name }); router.push(`/login?entity=${client.type}&wantToSee=${slug}`) }} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
-                    See Email →
-                  </button>
-                ) : !isSubscribed ? (
-                  <button onClick={() => { sendGTMEvent({ event: 'paywall_hit', reason: 'view_email', client_name: client.name }); router.push('/pricing') }} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
-                    Unlock →
-                  </button>
-                ) : showEmail ? (
-                  <a href={`mailto:${client.email}`} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
-                    {client.email}
-                  </a>
-                ) : (
-                  <button onClick={() => { sendGTMEvent({ event: 'email_reveal', client_name: client.name }); if (user?.id) recordContactView(user.id, client.id, "email").catch(() => {}); setShowEmail(true) }} className="block w-full text-center border border-border text-sm font-semibold px-3 py-2 rounded-lg hover:bg-muted transition-colors">
-                    Show Email →
-                  </button>
-                )}
-              </div>}
-
-            {(client.has_booking || client.has_pickup) && client.type === 'buyer' && (
-              <div className="flex-1 bg-blue-50 border border-blue-200 rounded-xl p-4 space-y-3">
-                <div>
-                  <p className="font-semibold text-sm text-blue-900">Sell to {titleCase(client.name)}</p>
-                  <p className="text-xs text-blue-700 mt-1 leading-relaxed">
-                    {client.has_booking && client.has_pickup
-                      ? "Select a drop-off location or request pickup, and pick a date to reserve your slot."
-                      : client.has_booking
-                      ? "Reserve a drop-off slot directly from the platform."
-                      : "Request this buyer to collect goods directly from your farm."}
-                  </p>
-                </div>
-                <Link
-                  href={`/book/${slug}`}
-                  className="block w-full text-center bg-blue-700 text-white text-sm font-semibold px-4 py-2.5 rounded-lg hover:bg-blue-800 transition-colors"
-                >
-                  Book a Sale →
-                </Link>
-              </div>
-            )}
-        </div>
+      <div className="mt-8 space-y-6">
 
         {client.type === 'buyer' && (
-          <div id="price-history">
+          <div id="price-history" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <BuyerPriceUploads clientName={client.name} latestPrices={latestPrices} />
           </div>
         )}
