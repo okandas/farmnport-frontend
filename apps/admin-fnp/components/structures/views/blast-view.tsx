@@ -237,9 +237,6 @@ export function BlastView() {
                 : null}
           </div>
           <div className="flex items-center gap-2">
-            <Link href="/dashboard/farmnport/blast/sent" className="h-8 px-3 rounded-md border text-xs font-medium text-muted-foreground hover:bg-muted/50 flex items-center gap-1.5">
-              Sent blasts
-            </Link>
             {blastTemplate === "custom" ? (
               <>
                 <button onClick={() => setShowPreview((v) => !v)} disabled={!template.trim()}
