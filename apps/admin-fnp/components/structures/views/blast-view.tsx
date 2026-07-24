@@ -80,9 +80,10 @@ export function BlastView() {
   const [emailSubject, setEmailSubject] = useState("")
   const [overrides, setOverrides] = useState<Record<string, string>>({})
   const [showPreview, setShowPreview] = useState(false)
+  const [blastTemplate, setBlastTemplate] = useState<"custom" | "verify-reminder">("custom")
 
   // Results
-  const [results, setResults] = useState<{ sent: number; failed: number; results: BlastResult[] } | null>(null)
+  const [results, setResults] = useState<{ sent: number; failed: number; remaining?: number; results: BlastResult[] } | null>(null)
 
   // ── Clients query — auto-runs on debounced filter change ───────────────────
 
@@ -116,6 +117,12 @@ export function BlastView() {
   const blastMutation = useMutation({
     mutationFn: (recipients: BlastRecipient[]) =>
       authorizedHTTPClient.post<{ sent: number; failed: number; results: BlastResult[] }>("/v1/blast/send", recipients),
+    onSuccess: (res) => setResults(res.data),
+  })
+
+  const verifyMutation = useMutation({
+    mutationFn: (payload: { test_email?: string; limit?: number }) =>
+      authorizedHTTPClient.post<{ sent: number; failed: number; remaining: number; results: BlastResult[] }>("/v1/blast/verify-reminder", payload),
     onSuccess: (res) => setResults(res.data),
   })
 
@@ -229,18 +236,54 @@ export function BlastView() {
                 : null}
           </div>
           <div className="flex items-center gap-2">
-            <button onClick={() => setShowPreview((v) => !v)} disabled={!template.trim()}
-              className="h-8 px-3 rounded-md border text-xs font-medium text-muted-foreground hover:bg-muted/50 disabled:opacity-40 flex items-center gap-1.5">
-              <Icons.eye className="w-3.5 h-3.5" />
-              {showPreview ? "Hide preview" : "Preview"}
-            </button>
-            <button onClick={handleSend} disabled={!canSend || blastMutation.isPending}
-              className="h-8 px-4 rounded-md bg-primary text-white text-xs font-bold hover:bg-primary/90 disabled:opacity-40 flex items-center gap-1.5 shadow-sm">
-              {blastMutation.isPending
-                ? <><Icons.spinner className="w-3.5 h-3.5 animate-spin" /> Sending…</>
-                : <><Icons.send className="w-3.5 h-3.5" /> Send to {selected.size || "…"}</>}
-            </button>
+            {blastTemplate === "custom" ? (
+              <>
+                <button onClick={() => setShowPreview((v) => !v)} disabled={!template.trim()}
+                  className="h-8 px-3 rounded-md border text-xs font-medium text-muted-foreground hover:bg-muted/50 disabled:opacity-40 flex items-center gap-1.5">
+                  <Icons.eye className="w-3.5 h-3.5" />
+                  {showPreview ? "Hide preview" : "Preview"}
+                </button>
+                <button onClick={handleSend} disabled={!canSend || blastMutation.isPending}
+                  className="h-8 px-4 rounded-md bg-primary text-white text-xs font-bold hover:bg-primary/90 disabled:opacity-40 flex items-center gap-1.5 shadow-sm">
+                  {blastMutation.isPending
+                    ? <><Icons.spinner className="w-3.5 h-3.5 animate-spin" /> Sending…</>
+                    : <><Icons.send className="w-3.5 h-3.5" /> Send to {selected.size || "…"}</>}
+                </button>
+              </>
+            ) : (
+              <>
+                <button onClick={() => verifyMutation.mutate({ test_email: "okandas@farmnport.com" })}
+                  disabled={verifyMutation.isPending}
+                  className="h-8 px-3 rounded-md border text-xs font-medium text-orange-600 border-orange-200 hover:bg-orange-50 disabled:opacity-40 flex items-center gap-1.5">
+                  {verifyMutation.isPending
+                    ? <><Icons.spinner className="w-3.5 h-3.5 animate-spin" /> Sending test…</>
+                    : <><Icons.send className="w-3.5 h-3.5" /> Send test to me</>}
+                </button>
+                <button onClick={() => verifyMutation.mutate({ limit: 100 })}
+                  disabled={verifyMutation.isPending}
+                  className="h-8 px-4 rounded-md bg-primary text-white text-xs font-bold hover:bg-primary/90 disabled:opacity-40 flex items-center gap-1.5 shadow-sm">
+                  {verifyMutation.isPending
+                    ? <><Icons.spinner className="w-3.5 h-3.5 animate-spin" /> Sending batch…</>
+                    : <><Icons.send className="w-3.5 h-3.5" /> Send next 100</>}
+                </button>
+              </>
+            )}
           </div>
+        </div>
+
+        {/* ── Template selector ── */}
+        <div className="flex items-center gap-3 px-4 py-2.5 border-b bg-white shrink-0">
+          <span className="text-xs font-bold text-slate-500 uppercase tracking-wide w-16 shrink-0">Template</span>
+          <Select value={blastTemplate} onValueChange={(v) => setBlastTemplate(v as typeof blastTemplate)}>
+            <SelectTrigger className="h-8 text-xs w-52 bg-white shadow-none"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="custom">Custom message</SelectItem>
+              <SelectItem value="verify-reminder">Verify account reminder</SelectItem>
+            </SelectContent>
+          </Select>
+          {blastTemplate === "verify-reminder" && results?.remaining !== undefined && (
+            <span className="text-xs text-muted-foreground">{results.remaining} unverified remaining</span>
+          )}
         </div>
 
         {/* ── Filters row (full width) ── */}
