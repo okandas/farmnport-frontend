@@ -224,31 +224,24 @@ export default async function LotDetailPage({ params }: Props) {
                                                     Manage Offers
                                                 </Link>
                                             </div>
+                                        ) : user && bidsData?.accepted && ["accepted", "paid", "completed"].includes((myBid as any)?.status) && (myBid as any)?.id ? (
+                                            <div className="space-y-3">
+                                                <p className="text-sm font-semibold text-green-700 dark:text-green-400">Your offer was accepted</p>
+                                                <p className="text-xs text-muted-foreground">Complete payment to secure this lot.</p>
+                                                <Link
+                                                    href={`/account/bids/${(myBid as any).id}`}
+                                                    className="inline-flex items-center justify-center w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
+                                                >
+                                                    Pay Now →
+                                                </Link>
+                                            </div>
                                         ) : user && bidsData?.accepted ? (
                                             <div className="space-y-2">
                                                 <p className="text-sm font-semibold text-foreground">Offer accepted</p>
                                                 <p className="text-xs text-muted-foreground">This lot has an accepted offer and is no longer accepting new bids.</p>
-                                                {["accepted", "paid", "completed"].includes((myBid as any)?.status) && (myBid as any)?.id && (
-                                                    <Link
-                                                        href={`/account/bids/${(myBid as any).id}`}
-                                                        className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline"
-                                                    >
-                                                        Manage your bid →
-                                                    </Link>
-                                                )}
                                             </div>
                                         ) : user && !lot.has_accepted_bid ? (
                                             <PlaceBidForm lot={lot} topBidCents={bidsData?.top_bid?.offered_price_per_unit_cents} />
-                                        ) : user && lot.has_accepted_bid && ["accepted", "paid", "completed"].includes((myBid as any)?.status) && (myBid as any)?.id ? (
-                                            <div className="space-y-2">
-                                                <p className="text-sm font-semibold text-green-700 dark:text-green-400">Your bid won</p>
-                                                <Link
-                                                    href={`/account/bids/${(myBid as any).id}`}
-                                                    className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline"
-                                                >
-                                                    Manage your bid →
-                                                </Link>
-                                            </div>
                                         ) : !user && bidsData?.accepted ? (
                                             <div className="text-center space-y-4">
                                                 <div className="space-y-1">

@@ -81,8 +81,14 @@ export default function MyLotDetailPage({ params }: { params: Promise<{ slug: st
           <div className="flex-1 min-w-0 flex flex-col gap-3">
             <div className="flex items-start justify-between">
               <div>
-                <h1 className="text-xl font-bold leading-tight">{lot.farm_produce?.name ?? slug}</h1>
-                {lot.breed?.name && <p className="text-sm text-muted-foreground mt-0.5">{lot.breed.name}</p>}
+                <h1 className="text-xl font-bold leading-tight">
+                  {lot.type === "sell" ? "Your Sell Lot" : "Your Supply Request Lot"} {lot.short_id || slug.split("-").pop()}
+                </h1>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {lot.type === "sell"
+                    ? `You are selling to buyers.`
+                    : `You requested other farmers supply you with.`}
+                </p>
               </div>
               <Link href="/account/lots" className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground shrink-0">
                 <ChevronLeft className="w-4 h-4" />
@@ -93,6 +99,7 @@ export default function MyLotDetailPage({ params }: { params: Promise<{ slug: st
               <p className="text-sm font-medium">
                 {lot.quantity?.toLocaleString()} {lot.farm_produce?.name ?? "items"} · {centsToDollars(lot.price_per_unit_cents)} per {capitalize(lot.unit)}
               </p>
+              {lot.breed?.name && <p className="text-xs text-muted-foreground">Variety: {lot.breed.name}</p>}
               {lot.produce_condition?.name && (
                 <p className="text-xs text-muted-foreground">Condition: {lot.produce_condition.name}</p>
               )}

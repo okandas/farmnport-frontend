@@ -96,8 +96,7 @@ export default function BidDetailPage({ params }: { params: Promise<{ id: string
     return (
       <div className="flex items-center justify-center py-24">
         <div className="text-center space-y-4">
-          <Gavel className="w-12 h-12 mx-auto text-muted-foreground/40" />
-          <p className="font-semibold">Sign in to view this bid</p>
+          <p className="font-semibold">Sign in to view this offer</p>
           <Link
             href={`/login?next=/account/bids/${id}`}
             className="inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground text-sm font-semibold px-6 py-2.5 hover:bg-primary/90 transition-colors"
@@ -113,9 +112,8 @@ export default function BidDetailPage({ params }: { params: Promise<{ id: string
     return (
       <div className="flex items-center justify-center py-24">
         <div className="text-center space-y-3">
-          <Gavel className="w-12 h-12 mx-auto text-muted-foreground/40" />
-          <p className="font-semibold">Bid not found</p>
-          <Link href="/account/bids" className="text-sm text-primary hover:underline">Back to bids</Link>
+          <p className="font-semibold">Offer not found</p>
+          <Link href="/account/bids" className="text-sm text-primary hover:underline">Back to my offers</Link>
         </div>
       </div>
     )

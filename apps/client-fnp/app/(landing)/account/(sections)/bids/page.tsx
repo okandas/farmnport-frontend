@@ -2,7 +2,7 @@
 
 import { useSession } from "next-auth/react"
 import { useQuery } from "@tanstack/react-query"
-import { Loader2, Gavel } from "lucide-react"
+import { Loader2 } from "lucide-react"
 import Link from "next/link"
 import { myBids } from "@/lib/query"
 import { centsToDollars } from "@/lib/utilities"
@@ -40,12 +40,15 @@ interface Bid {
 export default function MyBidsPage() {
   const { data: session, status } = useSession()
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["my-bids"],
     queryFn: () => myBids().then((r) => r.data),
     enabled: !!session,
     refetchOnMount: "always",
+    retry: false,
   })
+
+  const isImpersonating = !!(session?.user as any)?.impersonated_by
 
   if (status === "loading" || isLoading) {
     return (
@@ -55,11 +58,21 @@ export default function MyBidsPage() {
     )
   }
 
+  if (isError && isImpersonating) {
+    return (
+      <div className="flex items-center justify-center py-24">
+        <div className="text-center space-y-3">
+          <p className="font-semibold">Impersonation session expired</p>
+          <p className="text-sm text-muted-foreground">Please re-impersonate this user from the admin panel.</p>
+        </div>
+      </div>
+    )
+  }
+
   if (!session) {
     return (
       <div className="flex items-center justify-center py-24">
         <div className="text-center space-y-4">
-          <Gavel className="w-12 h-12 mx-auto text-muted-foreground/40" />
           <p className="font-semibold">Sign in to view your bids</p>
           <Link
             href="/login?next=/account/bids"
@@ -85,7 +98,6 @@ export default function MyBidsPage() {
 
       {bids.length === 0 ? (
         <div className="text-center py-16 space-y-4">
-          <Gavel className="w-12 h-12 mx-auto text-muted-foreground/40" />
           <p className="font-semibold">No bids yet</p>
           <p className="text-sm text-muted-foreground">When you place a bid on a lot, it will appear here.</p>
           <Link
