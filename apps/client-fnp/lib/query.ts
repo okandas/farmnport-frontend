@@ -1228,6 +1228,6 @@ export function queryMarketNews(page: number = 1, limit: number = 20) {
   return api.get(`${BaseURL}/market-news/?page=${page}&limit=${limit}`)
 }
 
-export function recordProductInterest(productType: string, slug: string) {
-  return api.post(`${BaseURL}/interest/${productType}/${slug}`, {})
+export function recordProductInterest(productType: string, slug: string, reason: string = "interest") {
+  return api.post(`${BaseURL}/interest/${productType}/${slug}?reason=${reason}`, {})
 }

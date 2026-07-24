@@ -11,12 +11,13 @@ interface Props {
     productType: string
     slug: string
     name: string
+    reason: string
     loginRedirect: string
 }
 
 type State = "idle" | "done" | "repeat" | "error"
 
-export function InterestClient({ productType, slug, name, loginRedirect }: Props) {
+export function InterestClient({ productType, slug, name, reason, loginRedirect }: Props) {
     const { data: session, status } = useSession()
     const [state, setState] = useState<State>("idle")
 
@@ -26,7 +27,7 @@ export function InterestClient({ productType, slug, name, loginRedirect }: Props
 
         sendGTMEvent({ event: "product_interest", product_type: productType, slug, item_name: name })
 
-        recordProductInterest(productType, slug)
+        recordProductInterest(productType, slug, reason)
             .then((res: any) => {
                 if (res?.data?.status === "already_registered") {
                     setState("repeat")
