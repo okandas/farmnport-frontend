@@ -57,11 +57,11 @@ export default function IncomingBookingsPage() {
       <nav className="flex items-center gap-1.5 text-sm text-muted-foreground mb-4">
         <Link href="/account" className="hover:text-foreground transition-colors">Account</Link>
         <span>/</span>
-        <span className="text-foreground font-medium">Incoming Bookings</span>
+        <span className="text-foreground font-medium">Received</span>
       </nav>
 
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-bold">Incoming Bookings</h1>
+        <h1 className="text-xl font-bold">Received</h1>
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}

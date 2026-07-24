@@ -79,9 +79,9 @@ export default function MyBidsPage() {
       <nav className="flex items-center gap-1.5 text-sm text-muted-foreground mb-4">
         <Link href="/account" className="hover:text-foreground transition-colors">Account</Link>
         <span>/</span>
-        <span className="text-foreground font-medium">My Bids</span>
+        <span className="text-foreground font-medium">My Offers</span>
       </nav>
-      <h1 className="text-xl font-bold mb-6">My Bids</h1>
+      <h1 className="text-xl font-bold mb-6">My Offers</h1>
 
       {bids.length === 0 ? (
         <div className="text-center py-16 space-y-4">

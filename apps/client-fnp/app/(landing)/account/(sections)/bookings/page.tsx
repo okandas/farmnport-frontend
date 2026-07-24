@@ -102,10 +102,10 @@ export default function BookingsPage() {
       <nav className="flex items-center gap-1.5 text-sm text-muted-foreground mb-4">
         <Link href="/account" className="hover:text-foreground transition-colors">Account</Link>
         <span>/</span>
-        <span className="text-foreground font-medium">My Booking Orders</span>
+        <span className="text-foreground font-medium">Booked</span>
       </nav>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-bold">My Booking Orders</h1>
+        <h1 className="text-xl font-bold">Booked</h1>
         <Link href="/bookings" className="text-sm text-primary hover:underline">View available bookings</Link>
       </div>
 

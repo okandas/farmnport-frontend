@@ -148,9 +148,9 @@ export default function MyPreOrdersPage() {
       <nav className="flex items-center gap-1.5 text-sm text-muted-foreground mb-4">
         <Link href="/account" className="hover:text-foreground transition-colors">Account</Link>
         <span>/</span>
-        <span className="text-foreground font-medium">Booking Events</span>
+        <span className="text-foreground font-medium">My Bookings</span>
       </nav>
-      <h1 className="text-xl font-bold mb-6">My Booking Events</h1>
+      <h1 className="text-xl font-bold mb-6">My Bookings</h1>
 
       <DataTable
         columns={columns}
