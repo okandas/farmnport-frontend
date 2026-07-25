@@ -453,7 +453,7 @@ export function BlastView() {
             )}
 
             {/* Body or Preview */}
-            <div className="flex-1 overflow-y-auto">
+            <div className="flex-1 overflow-hidden">
               {showPreview && template.trim() ? (
                 <div className="p-6">
                   <p className="text-[11px] text-muted-foreground mb-3">
