@@ -115,16 +115,26 @@ export function BlastView() {
 
   // ── Blast mutation ─────────────────────────────────────────────────────────
 
+  const [showSuccess, setShowSuccess] = useState(false)
+
+  function handleBlastSuccess(data: any) {
+    setShowSuccess(true)
+    setTimeout(() => {
+      setResults(data)
+      setShowSuccess(false)
+    }, 2000)
+  }
+
   const blastMutation = useMutation({
     mutationFn: (recipients: BlastRecipient[]) =>
       authorizedHTTPClient.post<{ sent: number; failed: number; results: BlastResult[] }>("/v1/blast/send", recipients),
-    onSuccess: (res) => setResults(res.data),
+    onSuccess: (res) => handleBlastSuccess(res.data),
   })
 
   const verifyMutation = useMutation({
     mutationFn: (payload: { test_email?: string; limit?: number }) =>
       authorizedHTTPClient.post<{ sent: number; failed: number; remaining: number; results: BlastResult[] }>("/v1/blast/verify-reminder", payload),
-    onSuccess: (res) => setResults(res.data),
+    onSuccess: (res) => handleBlastSuccess(res.data),
   })
 
   // ── Helpers ────────────────────────────────────────────────────────────────
@@ -297,6 +307,19 @@ export function BlastView() {
             <span className="text-xs text-muted-foreground">{results.remaining} unverified remaining</span>
           )}
         </div>
+
+        {/* ── Success banner ── */}
+        {showSuccess && (
+          <div className="flex items-center gap-3 px-5 py-4 bg-green-50 border-b border-green-200 animate-in fade-in duration-300">
+            <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center text-green-600 text-sm font-bold">
+              ✓
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-green-800">Blast sent successfully</p>
+              <p className="text-xs text-green-600">Check your inbox or view results below</p>
+            </div>
+          </div>
+        )}
 
         {/* ── Verify Reminder mode ── */}
         {blastTemplate === "verify-reminder" && (
