@@ -119,10 +119,13 @@ export function BlastView() {
 
   function handleBlastSuccess(data: any) {
     setShowSuccess(true)
+    setTemplate("")
+    setEmailSubject("")
+    setOverrides({})
     setTimeout(() => {
       setResults(data)
       setShowSuccess(false)
-    }, 2000)
+    }, 3000)
   }
 
   const blastMutation = useMutation({
@@ -235,8 +238,17 @@ export function BlastView() {
         {/* ── Toolbar ── */}
         <div className="flex items-center justify-between px-5 py-3 border-b bg-white shrink-0">
           <div className="flex items-center gap-3">
-            <Icons.messageSquare className="w-4 h-4 text-muted-foreground" />
-            <span className="text-sm font-semibold">New Blast</span>
+            {showSuccess ? (
+              <>
+                <span className="h-5 w-5 rounded-full bg-green-100 flex items-center justify-center text-green-600 text-xs font-bold">✓</span>
+                <span className="text-sm font-semibold text-green-700">Blast sent</span>
+              </>
+            ) : (
+              <>
+                <Icons.messageSquare className="w-4 h-4 text-muted-foreground" />
+                <span className="text-sm font-semibold">New Blast</span>
+              </>
+            )}
             {clientsQuery.isFetching
               ? <span className="text-xs text-muted-foreground flex items-center gap-1"><Icons.spinner className="w-3 h-3 animate-spin" /> loading…</span>
               : clients.length > 0
@@ -487,13 +499,7 @@ export function BlastView() {
             </div>
 
             {/* Footer */}
-            <div className="px-5 py-3 border-t bg-muted/10 shrink-0 space-y-2.5">
-              {showSuccess && (
-                <div className="flex items-center gap-2 text-sm text-green-700 font-medium">
-                  <span className="h-5 w-5 rounded-full bg-green-100 flex items-center justify-center text-green-600 text-xs font-bold">✓</span>
-                  Blast sent — check your inbox
-                </div>
-              )}
+            <div className="px-5 py-3 border-t bg-muted/10 shrink-0">
               <div className="flex items-center justify-between">
                 <span className="text-xs text-muted-foreground">
                   Use <code className="bg-muted px-1 py-0.5 rounded text-[11px] font-mono">{"{name}"}</code> to personalise
