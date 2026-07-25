@@ -247,6 +247,7 @@ export function BlastView() {
                 : null}
           </div>
           <div className="flex items-center gap-2">
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wide">Template</span>
             <Select value={blastTemplate} onValueChange={(v) => setBlastTemplate(v as typeof blastTemplate)}>
               <SelectTrigger className="h-8 text-xs w-48 bg-white shadow-none"><SelectValue /></SelectTrigger>
               <SelectContent>
