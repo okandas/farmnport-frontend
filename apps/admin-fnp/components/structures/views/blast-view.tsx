@@ -247,6 +247,13 @@ export function BlastView() {
                 : null}
           </div>
           <div className="flex items-center gap-2">
+            <Select value={blastTemplate} onValueChange={(v) => setBlastTemplate(v as typeof blastTemplate)}>
+              <SelectTrigger className="h-8 text-xs w-48 bg-white shadow-none"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="custom">Custom message</SelectItem>
+                <SelectItem value="verify-reminder">Verify account reminder</SelectItem>
+              </SelectContent>
+            </Select>
             {blastTemplate === "custom" ? (
               <>
                 <button onClick={() => setShowPreview((v) => !v)} disabled={!template.trim()}
@@ -274,21 +281,6 @@ export function BlastView() {
               </>
             )}
           </div>
-        </div>
-
-        {/* ── Template selector ── */}
-        <div className="flex items-center gap-3 px-4 py-2.5 border-b bg-white shrink-0">
-          <span className="text-xs font-bold text-slate-500 uppercase tracking-wide w-16 shrink-0">Template</span>
-          <Select value={blastTemplate} onValueChange={(v) => setBlastTemplate(v as typeof blastTemplate)}>
-            <SelectTrigger className="h-8 text-xs w-52 bg-white shadow-none"><SelectValue /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="custom">Custom message</SelectItem>
-              <SelectItem value="verify-reminder">Verify account reminder</SelectItem>
-            </SelectContent>
-          </Select>
-          {blastTemplate === "verify-reminder" && results?.remaining !== undefined && (
-            <span className="text-xs text-muted-foreground">{results.remaining} unverified remaining</span>
-          )}
         </div>
 
         {/* ── Verify Reminder mode ── */}
