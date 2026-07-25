@@ -254,23 +254,6 @@ export function BlastView() {
                   <Icons.eye className="w-3.5 h-3.5" />
                   {showPreview ? "Hide preview" : "Preview"}
                 </button>
-                <button
-                  onClick={() => {
-                    const msg = template.replace(/\{name\}/gi, "Okandas")
-                    blastMutation.mutate([{ id: "", name: "Okandas", phone: "", email: "okandas@farmnport.com", message: msg, email_subject: emailSubject || "Message from farmnport", channel: "email" }])
-                  }}
-                  disabled={!template.trim() || !emailSubject.trim() || blastMutation.isPending}
-                  className="h-8 px-3 rounded-md border text-xs font-medium text-orange-600 border-orange-200 hover:bg-orange-50 disabled:opacity-40 flex items-center gap-1.5">
-                  {blastMutation.isPending
-                    ? <><Icons.spinner className="w-3.5 h-3.5 animate-spin" /> Sending test…</>
-                    : <><Icons.send className="w-3.5 h-3.5" /> Send test to me</>}
-                </button>
-                <button onClick={handleSend} disabled={!canSend || blastMutation.isPending}
-                  className="h-8 px-4 rounded-md bg-primary text-white text-xs font-bold hover:bg-primary/90 disabled:opacity-40 flex items-center gap-1.5 shadow-sm">
-                  {blastMutation.isPending
-                    ? <><Icons.spinner className="w-3.5 h-3.5 animate-spin" /> Sending…</>
-                    : <><Icons.send className="w-3.5 h-3.5" /> Send to {selected.size || "…"}</>}
-                </button>
               </>
             ) : (
               <>
@@ -307,19 +290,6 @@ export function BlastView() {
             <span className="text-xs text-muted-foreground">{results.remaining} unverified remaining</span>
           )}
         </div>
-
-        {/* ── Success banner ── */}
-        {showSuccess && (
-          <div className="flex items-center gap-3 px-5 py-4 bg-green-50 border-b border-green-200 animate-in fade-in duration-300">
-            <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center text-green-600 text-sm font-bold">
-              ✓
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-green-800">Blast sent successfully</p>
-              <p className="text-xs text-green-600">Check your inbox or view results below</p>
-            </div>
-          </div>
-        )}
 
         {/* ── Verify Reminder mode ── */}
         {blastTemplate === "verify-reminder" && (
@@ -524,14 +494,37 @@ export function BlastView() {
             </div>
 
             {/* Footer */}
-            <div className="flex items-center justify-between px-5 py-2.5 border-t bg-muted/10 shrink-0">
-              <span className="text-xs text-muted-foreground">
-                Use <code className="bg-muted px-1 py-0.5 rounded text-[11px] font-mono">{"{name}"}</code> to personalise
-              </span>
-              <button onClick={applyTemplate} disabled={selected.size === 0 || !template.trim()}
-                className="text-xs font-medium text-primary hover:underline disabled:opacity-40 disabled:no-underline">
-                Apply to {selected.size} selected
-              </button>
+            <div className="px-5 py-3 border-t bg-muted/10 shrink-0 space-y-2.5">
+              {showSuccess && (
+                <div className="flex items-center gap-2 text-sm text-green-700 font-medium">
+                  <span className="h-5 w-5 rounded-full bg-green-100 flex items-center justify-center text-green-600 text-xs font-bold">✓</span>
+                  Blast sent — check your inbox
+                </div>
+              )}
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-muted-foreground">
+                  Use <code className="bg-muted px-1 py-0.5 rounded text-[11px] font-mono">{"{name}"}</code> to personalise
+                </span>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => {
+                      const msg = template.replace(/\{name\}/gi, "Okandas")
+                      blastMutation.mutate([{ id: "", name: "Okandas", phone: "", email: "okandas@farmnport.com", message: msg, email_subject: emailSubject || "Message from farmnport", channel: "email" }])
+                    }}
+                    disabled={!template.trim() || (channel === "email" && !emailSubject.trim()) || blastMutation.isPending}
+                    className="h-8 px-3 rounded-md border text-xs font-medium text-orange-600 border-orange-200 hover:bg-orange-50 disabled:opacity-40 flex items-center gap-1.5">
+                    {blastMutation.isPending
+                      ? <><Icons.spinner className="w-3.5 h-3.5 animate-spin" /> Sending test…</>
+                      : <><Icons.send className="w-3.5 h-3.5" /> Send test to me</>}
+                  </button>
+                  <button onClick={handleSend} disabled={!canSend || blastMutation.isPending}
+                    className="h-8 px-4 rounded-md bg-primary text-white text-xs font-bold hover:bg-primary/90 disabled:opacity-40 flex items-center gap-1.5 shadow-sm">
+                    {blastMutation.isPending
+                      ? <><Icons.spinner className="w-3.5 h-3.5 animate-spin" /> Sending…</>
+                      : <><Icons.send className="w-3.5 h-3.5" /> Send to {selected.size || "…"}</>}
+                  </button>
+                </div>
+              </div>
             </div>
 
             {blastMutation.isError && (
