@@ -552,46 +552,6 @@ export function BlastView() {
         </div>
       )}
 
-      {/* ── Inline results for custom email blasts ── */}
-      {results && blastTemplate === "custom" && channel === "email" && (
-        <div className="rounded-lg border bg-white shadow-sm overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-3.5 border-b bg-white">
-            <div className="flex items-center gap-3">
-              <span className="text-sm font-semibold">Blast sent</span>
-              <span className="text-xs px-2.5 py-0.5 rounded-full bg-green-100 text-green-700 font-semibold">{results.sent} sent</span>
-              {results.failed > 0 && <span className="text-xs px-2.5 py-0.5 rounded-full bg-red-100 text-red-600 font-semibold">{results.failed} failed</span>}
-            </div>
-            <button onClick={() => setResults(null)} className="text-xs text-muted-foreground hover:text-foreground hover:underline">
-              Clear
-            </button>
-          </div>
-          <table className="min-w-full text-sm">
-            <thead>
-              <tr className="bg-muted/20 text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                <th className="px-5 py-2.5 text-left w-10">#</th>
-                <th className="px-5 py-2.5 text-left">Name</th>
-                <th className="px-5 py-2.5 text-left">Email</th>
-                <th className="px-5 py-2.5 text-left">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y">
-              {results.results.map((r, i) => (
-                <tr key={i} className="hover:bg-muted/50">
-                  <td className="px-5 py-2.5 text-muted-foreground">{i + 1}</td>
-                  <td className="px-5 py-2.5 font-medium">{r.name}</td>
-                  <td className="px-5 py-2.5 text-muted-foreground">{r.to}</td>
-                  <td className="px-5 py-2.5">
-                    {r.ok
-                      ? <span className="text-green-600 font-medium">Sent</span>
-                      : <span className="text-red-500">{r.error ?? "Failed"}</span>}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-
     </div>
   )
 }
