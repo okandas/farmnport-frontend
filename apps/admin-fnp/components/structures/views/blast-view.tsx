@@ -375,7 +375,7 @@ export function BlastView() {
         </div>
 
         {/* ── Body: left recipients + right compose ── */}
-        <div className="flex min-h-0 h-[560px]">
+        <div className="flex min-h-0 h-[360px]">
 
           {/* Left: recipient list */}
           <div className="w-72 shrink-0 border-r flex flex-col">
