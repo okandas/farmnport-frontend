@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 import { myLotBids, initiateLotOwnerBidPayment, pollLotOwnerBidPayment, respondToBid } from "@/lib/query"
 import { centsToDollars } from "@/lib/utilities"
 import { LotImageGallery } from "@/components/ui/lot-image-gallery"
+import { AcceptedOfferCard } from "@/components/lots/AcceptedOfferCard"
 import { formatDistanceToNow } from "date-fns"
 
 const STATUS_STYLES: Record<string, string> = {
@@ -25,8 +26,6 @@ function capitalize(s: string) {
 export default function MyLotDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params)
   const { data: session } = useSession()
-  const [paying, setPaying] = useState(false)
-  const [checking, setChecking] = useState(false)
   const [responding, setResponding] = useState<string | null>(null)
 
   async function handleRespond(bidId: string, action: "accept" | "reject") {
@@ -129,106 +128,15 @@ export default function MyLotDetailPage({ params }: { params: Promise<{ slug: st
       )}
 
       {accepted && (
-        <div className="rounded-xl border p-5 mb-8">
-          <div className="flex items-center gap-3 mb-4">
-            {accepted.supply_images?.main_image && (
-              <Dialog>
-                <DialogTrigger asChild>
-                  <img src={accepted.supply_images.main_image.img.src} alt="Supply" className="w-14 h-14 rounded-lg object-cover cursor-pointer hover:opacity-80 transition-opacity shrink-0" />
-                </DialogTrigger>
-                <DialogContent className="max-w-2xl">
-                  <LotImageGallery mainImage={accepted.supply_images.main_image} images={accepted.supply_images.images ?? []} />
-                </DialogContent>
-              </Dialog>
-            )}
-            <div className="flex-1 min-w-0">
-              <p className="font-semibold capitalize">{accepted.bidder_name}</p>
-              <p className="text-xs text-muted-foreground">{lot?.type === "sell" ? "Buyer" : "Supplier"}</p>
-            </div>
-            <span className={`text-xs px-2.5 py-1 rounded-full font-medium shrink-0 ${STATUS_STYLES[accepted.status]}`}>
-              {capitalize(accepted.status)}
-            </span>
-          </div>
-
-          <div className="grid grid-cols-3 gap-3 py-3 mb-4 text-center">
-            <div>
-              <p className="text-[11px] text-muted-foreground uppercase tracking-wide">Quantity</p>
-              <p className="text-sm font-semibold mt-0.5">{accepted.quantity} {accepted.unit}</p>
-            </div>
-            <div>
-              <p className="text-[11px] text-muted-foreground uppercase tracking-wide">Price</p>
-              <p className="text-sm font-semibold mt-0.5">{centsToDollars(accepted.offered_price_per_unit_cents)}/{accepted.unit}</p>
-            </div>
-            <div>
-              <p className="text-[11px] text-muted-foreground uppercase tracking-wide">Total</p>
-              <p className="text-sm font-semibold mt-0.5">{centsToDollars(accepted.offered_price_per_unit_cents * accepted.quantity)}</p>
-            </div>
-          </div>
-
-          {["paid", "completed"].includes(accepted.status) ? (
-            <div className="rounded-lg bg-green-50 dark:bg-green-900/20 p-3 space-y-1">
-              <p className="text-xs font-semibold text-green-800 dark:text-green-300">Payment confirmed</p>
-              <p className="text-xs text-green-700 dark:text-green-400">
-                {lot?.type === "sell" ? "Payment received from buyer. Arrange delivery." : "Held securely — released to supplier on delivery."}
-              </p>
-              {accepted.payment_ref && (
-                <p className="text-xs font-mono text-green-800 dark:text-green-300">Ref: {accepted.payment_ref}</p>
-              )}
-            </div>
-          ) : lot?.type === "sell" ? (
-            <div className="rounded-lg bg-amber-50 dark:bg-amber-900/20 p-3 space-y-1">
-              <p className="text-xs font-semibold text-amber-800 dark:text-amber-300">Waiting for buyer to pay</p>
-              <p className="text-xs text-amber-700 dark:text-amber-400">
-                {accepted.bidder_name} has 24 hours to complete payment. You will be notified once payment is received.
-              </p>
-            </div>
-          ) : (
-            <>
-              <div className="rounded-lg bg-muted/50 p-3 space-y-1 mb-3">
-                <p className="text-xs font-semibold">Ready to pay?</p>
-                <p className="text-xs text-muted-foreground">Your payment is held securely by Farmnport and only released to the supplier once delivery is confirmed.</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  disabled={paying}
-                  onClick={async () => {
-                    setPaying(true)
-                    try {
-                      const res = await initiateLotOwnerBidPayment(accepted.id, {})
-                      const redirectUrl = res.data?.redirect_url
-                      if (redirectUrl) window.open(redirectUrl, "_blank")
-                    } catch (e) {
-                      console.error("pay error", e)
-                    } finally {
-                      setPaying(false)
-                    }
-                  }}
-                  className="inline-flex items-center justify-center gap-2 rounded-md bg-primary text-primary-foreground text-sm font-semibold px-4 py-2 hover:bg-primary/90 transition-colors disabled:opacity-50"
-                >
-                  {paying ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-                  Pay Now
-                </button>
-                <button
-                  disabled={checking}
-                  onClick={async () => {
-                    setChecking(true)
-                    try {
-                      await pollLotOwnerBidPayment(accepted.id)
-                      await refetch()
-                    } catch {
-                      // silent
-                    } finally {
-                      setChecking(false)
-                    }
-                  }}
-                  className="inline-flex items-center justify-center gap-2 rounded-md border text-sm font-semibold px-4 py-2 hover:bg-muted transition-colors disabled:opacity-50"
-                >
-                  {checking ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-                  I have paid
-                </button>
-              </div>
-            </>
-          )}
+        <div className="mb-8">
+          <AcceptedOfferCard
+            bid={accepted}
+            lot={lot}
+            viewAs="owner"
+            onPay={(bidId) => initiateLotOwnerBidPayment(bidId, {})}
+            onPoll={(bidId) => pollLotOwnerBidPayment(bidId)}
+            onRefetch={() => refetch()}
+          />
         </div>
       )}
 

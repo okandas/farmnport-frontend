@@ -9,6 +9,7 @@ import { myBidByID, initiateBidPayment, pollBidPayment } from "@/lib/query"
 import { trackPurchase } from "@/lib/analytics"
 import { centsToDollars } from "@/lib/utilities"
 import { LotImageGallery } from "@/components/ui/lot-image-gallery"
+import { AcceptedOfferCard } from "@/components/lots/AcceptedOfferCard"
 
 const STATUS_STYLES: Record<string, string> = {
   pending:   "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400",
@@ -42,9 +43,6 @@ function Countdown({ deadline }: { deadline: string }) {
 export default function BidDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const { data: session, status } = useSession()
-  const [paying, setPaying] = useState(false)
-  const [checking, setChecking] = useState(false)
-
   const qc = useQueryClient()
 
   const { data: bid, isLoading, refetch } = useQuery({
@@ -187,131 +185,21 @@ export default function BidDetailPage({ params }: { params: Promise<{ id: string
           </div>
         )}
 
-        <div className="flex-1 space-y-6">
-          {/* Invoice-style details */}
-          <div className="border-t border-b py-6 space-y-5">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Offer Summary</p>
-                <div className="flex items-center gap-4 mt-1 text-xs text-muted-foreground">
-                  <span>Placed: <span className="font-medium text-foreground">{formatDate(bid.created)}</span></span>
-                  {bid.reviewed_at && <span>{isAccepted || isPaid ? "Accepted" : "Reviewed"}: <span className="font-medium text-foreground">{formatDate(bid.reviewed_at)}</span></span>}
-                </div>
-              </div>
-              <div className="text-right">
-                <p className="text-xs text-muted-foreground">Lot No.</p>
-                <Link href={`/lots/${bid.lot_slug}`} className="text-sm font-bold text-foreground hover:text-primary font-mono">{bid.lot_short_id?.toUpperCase() || bid.lot_slug.split("-").pop()?.toUpperCase()}</Link>
-              </div>
-            </div>
-
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b text-xs text-muted-foreground uppercase tracking-wide">
-                  <th className="text-left py-2 font-medium">Lot Description</th>
-                  <th className="text-right py-2 font-medium">Quantity</th>
-                  <th className="text-right py-2 font-medium">Unit</th>
-                  <th className="text-right py-2 font-medium">Price</th>
-                  <th className="text-right py-2 font-medium">Amount</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="border-b">
-                  <td className="py-3">
-                    <p className="font-medium">{bid.farm_produce_name || bid.lot_slug}</p>
-                    {bid.breed_name && <p className="text-xs text-muted-foreground">Breed: {bid.breed_name}</p>}
-                    {bid.produce_condition_name && <p className="text-xs text-muted-foreground">State: {bid.produce_condition_name}</p>}
-                  </td>
-                  <td className="py-3 text-right">{bid.quantity}</td>
-                  <td className="py-3 text-right capitalize">{bid.unit}</td>
-                  <td className="py-3 text-right">{centsToDollars(bid.offered_price_per_unit_cents)}</td>
-                  <td className="py-3 text-right font-semibold">{centsToDollars(bid.offered_price_per_unit_cents * bid.quantity)}</td>
-                </tr>
-              </tbody>
-              <tfoot>
-                <tr>
-                  <td colSpan={4} className="py-3 text-right font-semibold text-muted-foreground">Total</td>
-                  <td className="py-3 text-right text-lg font-bold">{centsToDollars(bid.offered_price_per_unit_cents * bid.quantity)}</td>
-                </tr>
-              </tfoot>
-            </table>
-
-            {bid.notes && (
-              <div className="pt-3 border-t text-xs">
-                <p className="text-muted-foreground">Notes</p>
-                <p className="text-sm mt-1">{bid.notes}</p>
-              </div>
-            )}
-            {bid.delivery_location && (
-              <div className="pt-3 border-t text-xs">
-                <p className="text-muted-foreground">Delivery Location</p>
-                <p className="text-sm mt-1">{bid.delivery_location}</p>
-              </div>
-            )}
-          </div>
-
-          {/* Status action */}
-          {isPaid && (
-            <div className="rounded-lg bg-green-50 dark:bg-green-900/20 p-4 space-y-1">
-              <p className="text-sm font-semibold text-green-800 dark:text-green-300">Payment confirmed</p>
-              <p className="text-xs text-green-700 dark:text-green-400">Lot secured. We will be in touch to arrange delivery.</p>
-              {bid.payment_ref && <p className="text-xs font-mono text-green-800 dark:text-green-300">Ref: {bid.payment_ref}</p>}
-            </div>
-          )}
-
-
-          {isAccepted && isBuyer && bid.payment_deadline && (
-            <div className="space-y-3">
-              <div className="rounded-lg bg-amber-50 dark:bg-amber-900/20 p-4 space-y-1">
-                <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">Offer accepted — payment required</p>
-                <p className="text-xs text-amber-700 dark:text-amber-400">
-                  Complete payment to secure this lot. Time remaining: <Countdown deadline={bid.payment_deadline} />
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  disabled={paying}
-                  onClick={async () => {
-                    setPaying(true)
-                    try {
-                      const res = await initiateBidPayment(bid.id, {})
-                      const redirectUrl = res.data?.redirect_url
-                      if (redirectUrl) {
-                        window.open(redirectUrl, "_blank")
-                        setPolling(true)
-                      }
-                    } catch {
-                      // silent
-                    } finally {
-                      setPaying(false)
-                    }
-                  }}
-                  className="inline-flex items-center gap-2 rounded-md bg-primary text-primary-foreground text-sm font-semibold px-5 py-2.5 hover:bg-primary/90 transition-colors disabled:opacity-50"
-                >
-                  {paying ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-                  Pay Now
-                </button>
-                <button
-                  disabled={checking}
-                  onClick={async () => {
-                    setChecking(true)
-                    setPolling(true)
-                    try {
-                      await pollBidPayment(id)
-                      await refetch()
-                    } catch {
-                      // silent
-                    } finally {
-                      setChecking(false)
-                    }
-                  }}
-                  className="inline-flex items-center gap-2 rounded-md border text-sm font-semibold px-5 py-2.5 hover:bg-muted transition-colors disabled:opacity-50"
-                >
-                  {checking ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-                  I have paid
-                </button>
-              </div>
-            </div>
-          )}
+        <div className="flex-1">
+          <AcceptedOfferCard
+            bid={bid}
+            viewAs="bidder"
+            onPay={async (bidId) => {
+              const res = await initiateBidPayment(bidId, {})
+              if (res.data?.redirect_url) setPolling(true)
+              return res
+            }}
+            onPoll={async (bidId) => {
+              setPolling(true)
+              return pollBidPayment(bidId)
+            }}
+            onRefetch={() => refetch()}
+          />
         </div>
       </div>
     </div>
