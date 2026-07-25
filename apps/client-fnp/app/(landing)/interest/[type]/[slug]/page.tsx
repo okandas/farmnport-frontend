@@ -5,6 +5,7 @@ import { InterestClient } from "./InterestClient"
 
 interface Props {
     params: Promise<{ type: string; slug: string }>
+    searchParams: Promise<{ reason?: string }>
 }
 
 // Map URL type → API path + name field extractor
@@ -35,8 +36,10 @@ const TYPE_CONFIG: Record<string, { fetch: (slug: string) => Promise<any>; getNa
     },
 }
 
-export default async function InterestPage({ params }: Props) {
+export default async function InterestPage({ params, searchParams }: Props) {
     const { type, slug } = await params
+    const { reason: reasonParam } = await searchParams
+    const reason = reasonParam === "restock" ? "restock" : "interest"
 
     const config = TYPE_CONFIG[type]
     if (!config) notFound()
@@ -49,7 +52,7 @@ export default async function InterestPage({ params }: Props) {
         // fallback to slug if product not found
     }
 
-    const loginRedirect = `/interest/${type}/${slug}`
+    const loginRedirect = `/interest/${type}/${slug}?reason=${reason}`
 
     return (
         <div className="min-h-screen bg-background">
@@ -74,6 +77,7 @@ export default async function InterestPage({ params }: Props) {
                     productType={type}
                     slug={slug}
                     name={name}
+                    reason={reason}
                     loginRedirect={loginRedirect}
                 />
             </div>

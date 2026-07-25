@@ -1,14 +1,4 @@
-import {
-  Body,
-  Button,
-  Container,
-  Head,
-  Hr,
-  Html,
-  Preview,
-  Section,
-  Text,
-} from "@react-email/components"
+import { Body, Button, Container, Head, Hr, Html, Link, Preview, Section, Text } from "@react-email/components"
 
 interface WelcomeEmailProps {
   name?: string
@@ -28,37 +18,69 @@ export default function WelcomeEmail({
 
           {/* Header */}
           <Section style={header}>
-            <Text style={brandName}>farmnport</Text>
-            <Text style={brandTagline}>getting you to market</Text>
+            <Text style={brand}>farmnport</Text>
           </Section>
 
-          {/* Body */}
+          {/* Greeting */}
           <Section style={content}>
             <Text style={greeting}>Welcome, {name}.</Text>
             <Text style={paragraph}>
-              You've taken the first step into a new frontier for agribusiness. We're excited to have
-              you on board and will follow up with a short call to verify you and your business.
+              You've taken the first step into a new frontier for agribusiness. We're excited to have you on board and will follow up with a short call to verify you and your business.
             </Text>
             <Text style={paragraph}>
-              To get started, please confirm your email address:
+              To get started, please confirm your email address.
             </Text>
+          </Section>
+
+          <Hr style={divider} />
+
+          {/* Value props */}
+          <Section style={content}>
+            <Text style={sectionLabel}>WHAT YOU GET</Text>
+            <Text style={sectionTitle}>Everything you need to trade directly</Text>
+
+            <Text style={subheading}>List your produce for sale</Text>
+            <Text style={paragraph}>
+              Create bookings for regular supply, or list lots for immediate one-time sales — both free to use.
+            </Text>
+
+            <Text style={subheading}>Connect with buyers across Zimbabwe</Text>
+            <Text style={paragraph}>
+              Join a growing network of agricultural businesses trading directly without middlemen.
+            </Text>
+
+            <Text style={subheading}>Get price updates and market news</Text>
+            <Text style={paragraph}>
+              Stay up to date with livestock prices, produce market trends, and spray program guides.
+            </Text>
+          </Section>
+
+          <Hr style={divider} />
+
+          {/* CTA */}
+          <Section style={content}>
             <Section style={buttonWrapper}>
-              <Button href={confirmUrl} style={button}>Confirm Email</Button>
+              <Button href={confirmUrl} style={buttonPrimary}>Confirm Email Address</Button>
             </Section>
             <Text style={paragraph}>
               If you didn't create this account you can safely ignore this email.
             </Text>
-            <Hr style={divider} />
-            <Text style={signoff}>Welcome to business,<br />the farmnport team</Text>
+          </Section>
+
+          <Hr style={divider} />
+
+          {/* Sign off */}
+          <Section style={content}>
+            <Text style={signoff}>Welcome to business,{"\n"}the farmnport team</Text>
           </Section>
 
           {/* Footer */}
           <Section style={footer}>
             <Text style={footerText}>
-              farmnport &nbsp;·&nbsp; 13 Grace Rd, Winston Park, Marondera, Zimbabwe
+              farmnport &nbsp;&middot;&nbsp; 13 Grace Rd, Winston Park, Marondera, Zimbabwe
             </Text>
             <Text style={footerText}>
-              © {new Date().getFullYear()} farmnport. All rights reserved.
+              &copy; {new Date().getFullYear()} <Link href="https://farmnport.com" style={footerLink}>farmnport.com</Link>. All rights reserved.
             </Text>
           </Section>
 
@@ -68,102 +90,20 @@ export default function WelcomeEmail({
   )
 }
 
-const body: React.CSSProperties = {
-  backgroundColor: "#f8fafc",
-  fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-  margin: 0,
-  padding: "40px 0",
-}
-
-const container: React.CSSProperties = {
-  backgroundColor: "#ffffff",
-  margin: "0 auto",
-  maxWidth: "580px",
-  borderRadius: "8px",
-  overflow: "hidden",
-  boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
-}
-
-const header: React.CSSProperties = {
-  backgroundColor: "#ffffff",
-  padding: "28px 40px 20px",
-}
-
-const brandName: React.CSSProperties = {
-  fontSize: "22px",
-  fontWeight: "600",
-  color: "#0f172a",
-  margin: "0 0 2px",
-  letterSpacing: "-0.3px",
-}
-
-const amp: React.CSSProperties = {
-  color: "#ea580c",
-}
-
-const brandTagline: React.CSSProperties = {
-  fontSize: "12px",
-  color: "#94a3b8",
-  margin: 0,
-  letterSpacing: "0.05em",
-  textTransform: "uppercase",
-}
-
-const content: React.CSSProperties = {
-  padding: "36px 40px 24px",
-}
-
-const greeting: React.CSSProperties = {
-  fontSize: "24px",
-  fontWeight: "600",
-  color: "#0f172a",
-  margin: "0 0 20px",
-}
-
-const paragraph: React.CSSProperties = {
-  fontSize: "15px",
-  lineHeight: "1.7",
-  color: "#475569",
-  margin: "0 0 16px",
-}
-
-const buttonWrapper: React.CSSProperties = {
-  margin: "28px 0",
-}
-
-const button: React.CSSProperties = {
-  backgroundColor: "#ea580c",
-  borderRadius: "6px",
-  color: "#ffffff",
-  fontSize: "15px",
-  fontWeight: "600",
-  textDecoration: "none",
-  textAlign: "center",
-  display: "inline-block",
-  padding: "14px 28px",
-}
-
-const divider: React.CSSProperties = {
-  borderColor: "#e2e8f0",
-  margin: "24px 0",
-}
-
-const signoff: React.CSSProperties = {
-  fontSize: "14px",
-  color: "#64748b",
-  lineHeight: "1.6",
-  margin: 0,
-}
-
-const footer: React.CSSProperties = {
-  backgroundColor: "#f8fafc",
-  borderTop: "1px solid #e2e8f0",
-  padding: "20px 40px",
-}
-
-const footerText: React.CSSProperties = {
-  fontSize: "12px",
-  color: "#94a3b8",
-  margin: "0 0 4px",
-  textAlign: "center",
-}
+const body: React.CSSProperties = { backgroundColor: "#f8fafc", fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", margin: 0, padding: "40px 0" }
+const container: React.CSSProperties = { backgroundColor: "#ffffff", margin: "0 auto", maxWidth: "580px", borderRadius: "8px", overflow: "hidden" }
+const header: React.CSSProperties = { padding: "32px 40px 0" }
+const brand: React.CSSProperties = { fontSize: "22px", fontWeight: "700", color: "#0f172a", margin: 0 }
+const content: React.CSSProperties = { padding: "16px 40px" }
+const greeting: React.CSSProperties = { fontSize: "18px", fontWeight: "600", color: "#0f172a", margin: "0 0 12px" }
+const paragraph: React.CSSProperties = { fontSize: "15px", lineHeight: "1.7", color: "#475569", margin: "0 0 16px", whiteSpace: "pre-wrap" }
+const sectionLabel: React.CSSProperties = { fontSize: "11px", fontWeight: "700", color: "#ea580c", letterSpacing: "1px", textTransform: "uppercase", margin: "0 0 4px" }
+const sectionTitle: React.CSSProperties = { fontSize: "20px", fontWeight: "700", color: "#0f172a", margin: "0 0 12px", lineHeight: "1.3" }
+const subheading: React.CSSProperties = { fontSize: "15px", fontWeight: "600", color: "#0f172a", margin: "0 0 8px" }
+const buttonWrapper: React.CSSProperties = { margin: "8px 0 24px" }
+const buttonPrimary: React.CSSProperties = { backgroundColor: "#ea580c", borderRadius: "6px", color: "#ffffff", fontSize: "15px", fontWeight: "600", textDecoration: "none", textAlign: "center", display: "inline-block", padding: "14px 28px" }
+const divider: React.CSSProperties = { borderColor: "#e2e8f0", margin: "8px 40px" }
+const signoff: React.CSSProperties = { fontSize: "14px", color: "#64748b", lineHeight: "1.6", whiteSpace: "pre-wrap" }
+const footer: React.CSSProperties = { padding: "16px 40px 32px" }
+const footerText: React.CSSProperties = { fontSize: "12px", color: "#94a3b8", margin: "0 0 4px", textAlign: "center" }
+const footerLink: React.CSSProperties = { color: "#94a3b8", textDecoration: "underline" }

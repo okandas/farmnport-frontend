@@ -86,7 +86,8 @@ export default function AccountDocumentsPage() {
                 <span>/</span>
                 <span className="text-foreground font-medium">My Documents</span>
             </nav>
-            <h1 className="text-xl font-bold mb-6">My Documents</h1>
+            <h1 className="text-2xl font-bold">My Documents</h1>
+            <p className="text-sm text-muted-foreground mb-6">Documents you purchased.</p>
 
             {downloads.length === 0 ? (
                 <div className="text-center py-16 space-y-4">
@@ -101,40 +102,40 @@ export default function AccountDocumentsPage() {
                     </Link>
                 </div>
             ) : (
-                <div className="divide-y">
+                <div className="space-y-4">
                     {downloads.map((item: any) => {
                         const doc = item.document
                         const purchase = item.purchase
                         return (
-                            <div key={purchase.id} className="py-4 flex items-start justify-between gap-4">
-                                <div className="flex items-start gap-3 min-w-0">
-                                    <Link href={`/buy-documents/${doc?.slug}`} className="shrink-0">
-                                        {doc?.main_image ? (
-                                            <img src={doc.main_image} alt={doc.title} className="w-12 h-16 rounded object-cover border border-border hover:opacity-80 transition-opacity" />
-                                        ) : (
-                                            <div className="w-12 h-16 rounded bg-muted/30 flex items-center justify-center border border-border">
-                                                <FileText className="w-5 h-5 text-muted-foreground/40" />
-                                            </div>
-                                        )}
-                                    </Link>
-                                    <div className="space-y-1 min-w-0">
-                                        <Link href={`/buy-documents/${doc?.slug}`} className="font-semibold text-sm truncate hover:text-primary transition-colors block">{doc?.title}</Link>
-                                        {doc?.category && (
-                                            <p className="text-xs text-muted-foreground capitalize">{doc.category.replace("-", " ")}</p>
-                                        )}
-                                        <p className="text-xs text-muted-foreground">
-                                            Purchased {formatDate(purchase.created)} · {purchase.download_count ?? 0} download{purchase.download_count !== 1 ? "s" : ""}
-                                        </p>
-                                        {purchase.license_serial && (
-                                            <p className="text-xs text-muted-foreground flex items-center gap-1">
-                                                <KeyRound className="w-3 h-3" />
-                                                {purchase.license_serial}
+                            <div key={purchase.id} className="rounded-xl border p-4 sm:p-5">
+                                <div className="flex items-start justify-between gap-4">
+                                    <div className="flex items-start gap-3 min-w-0">
+                                        <Link href={`/buy-documents/${doc?.slug}`} className="shrink-0">
+                                            {doc?.main_image ? (
+                                                <img src={doc.main_image} alt={doc.title} className="w-14 h-18 rounded-lg object-cover border border-border hover:opacity-80 transition-opacity" />
+                                            ) : (
+                                                <div className="w-14 h-18 rounded-lg bg-muted/30 flex items-center justify-center border border-border">
+                                                    <FileText className="w-5 h-5 text-muted-foreground/40" />
+                                                </div>
+                                            )}
+                                        </Link>
+                                        <div className="space-y-1.5 min-w-0">
+                                            <Link href={`/buy-documents/${doc?.slug}`} className="font-bold text-base truncate hover:text-primary transition-colors block">{doc?.title}</Link>
+                                            <p className="text-sm text-muted-foreground">
+                                                {doc?.category ? `${doc.category.replace("-", " ")} · ` : ""}
+                                                Purchased {formatDate(purchase.created)} · {purchase.download_count ?? 0} download{purchase.download_count !== 1 ? "s" : ""}
                                             </p>
-                                        )}
+                                            {purchase.license_serial && (
+                                                <p className="text-xs text-muted-foreground flex items-center gap-1">
+                                                    <KeyRound className="w-3 h-3" />
+                                                    {purchase.license_serial}
+                                                </p>
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="shrink-0">
-                                    <DownloadButton token={purchase.download_token} slug={doc?.slug} />
+                                    <div className="shrink-0">
+                                        <DownloadButton token={purchase.download_token} slug={doc?.slug} />
+                                    </div>
                                 </div>
                             </div>
                         )

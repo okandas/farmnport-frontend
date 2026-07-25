@@ -142,15 +142,15 @@ export function MobileNav({ user }: MobileNavProps) {
                    </Link>
 
                    <Link
-                     href="/market"
+                     href="/buy"
                      onClick={() => {
-                       sendGTMEvent({ event: 'nav_click', link_name: 'market' })
+                       sendGTMEvent({ event: 'nav_click', link_name: 'buy' })
                        setIsOpen(false)
                      }}
                      className="flex items-center gap-3 px-3 py-2 text-base font-medium rounded-md hover:bg-accent transition-colors"
                    >
                      <Icons.dollar className="h-5 w-5" />
-                     <span>Market</span>
+                     <span>Buy</span>
                    </Link>
 
                    <Link

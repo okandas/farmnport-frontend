@@ -1,12 +1,14 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useSession } from "next-auth/react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useRouter, useParams } from "next/navigation"
 import { Loader2, CalendarDays, Package, Users, Clock } from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner"
+import { driver } from "driver.js"
+import "driver.js/dist/driver.css"
 
 import { createBooking, queryClient as queryClientProfile } from "@/lib/query"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -104,6 +106,68 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
     !!phone &&
     (fulfillment === "collection" ? !!selectedCollectionPoint : true) &&
     (fulfillment === "delivery" ? !!selectedDeliveryDate : true)
+
+  useEffect(() => {
+    const key = `fnp_booking_detail_tour_${slug}`
+    if (typeof window === "undefined") return
+    if (localStorage.getItem(key)) return
+
+    localStorage.setItem(key, "1")
+
+    const steps: any[] = [
+      {
+        element: "#booking-how-it-works",
+        popover: {
+          title: "How It Works",
+          description: "Read how the booking process works — submit, confirm, pay, collect.",
+          side: "bottom",
+          align: "start",
+        },
+      },
+    ]
+
+    if (session) {
+      steps.push(
+        {
+          element: "#booking-quantity",
+          popover: {
+            title: "Select Quantity",
+            description: "Use the + and − buttons to choose how many you want to book.",
+            side: "left",
+            align: "start",
+          },
+        },
+        {
+          element: "#booking-submit",
+          popover: {
+            title: "Submit Your Booking",
+            description: "Once you're happy with the quantity, click here to submit your booking request.",
+            side: "top",
+            align: "start",
+          },
+        },
+      )
+    } else {
+      steps.push({
+        element: "#booking-widget",
+        popover: {
+          title: "Sign In to Book",
+          description: "Create a free account or sign in to place your booking.",
+          side: "left",
+          align: "start",
+        },
+      })
+    }
+
+    const d = driver({
+      showProgress: true,
+      allowClose: true,
+      steps,
+    })
+
+    const t = setTimeout(() => d.drive(), 1000)
+    return () => clearTimeout(t)
+  }, [session])
 
   return (
     <div className="min-h-screen bg-background">
@@ -262,7 +326,7 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
 
 
             {/* How it works */}
-            <div className="bg-muted/40 rounded-xl p-5 space-y-3">
+            <div id="booking-how-it-works" className="bg-muted/40 rounded-xl p-5 space-y-3">
               <h3 className="font-semibold text-sm">{event.market_side === "demand" ? "How Bookings Work" : "How Pre-Orders Work"}</h3>
               <ol className="space-y-2 text-sm text-muted-foreground list-decimal list-inside">
                 <li>Submit your booking request</li>
@@ -277,7 +341,7 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
           </div>
 
           {/* ── Column 3: Booking widget ── */}
-          <div className="lg:sticky lg:top-6 space-y-4">
+          <div id="booking-widget" className="lg:sticky lg:top-6 space-y-4">
             {!session ? (
               <div className="border rounded-xl p-6 text-center space-y-4">
                 <CalendarDays className="w-10 h-10 mx-auto text-muted-foreground/40" />
@@ -299,7 +363,7 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
               <div className="border rounded-xl p-5 space-y-4">
                 <h2 className="font-semibold">Place Your Booking</h2>
 
-                <div className="space-y-1.5">
+                <div id="booking-quantity" className="space-y-1.5">
                   <label className="text-xs font-medium text-muted-foreground">
                     Quantity *{step > 1 ? ` (multiples of ${step})` : event.max_quantity > 0 ? ` (${minQty}–${event.max_quantity})` : ` (min ${minQty})`}
                   </label>
@@ -472,6 +536,7 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
                 )}
 
                 <button
+                  id="booking-submit"
                   onClick={() => mutation.mutate()}
                   disabled={mutation.isPending || !canSubmit}
                   className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground font-semibold py-2.5 rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-50 text-sm"

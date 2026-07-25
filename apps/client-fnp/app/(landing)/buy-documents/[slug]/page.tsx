@@ -186,6 +186,14 @@ export default async function BuyDocumentDetailPage({ params }: Props) {
                             price={price}
                         />
 
+                        <Link
+                            href={`/documents/${slug}`}
+                            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                            <FileText className="w-4 h-4" />
+                            Read the full guide before buying
+                        </Link>
+
                         {/* File meta */}
                         <div className="space-y-4 pt-2">
                             <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">

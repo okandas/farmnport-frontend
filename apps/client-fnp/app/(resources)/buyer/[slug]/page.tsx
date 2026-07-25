@@ -3,7 +3,6 @@ import { retrieveUser } from "@/lib/actions"
 import { AppURL } from "@/lib/schemas"
 import { fetchLatestBuyerPrices } from "@/lib/serverFetch"
 import { QuickLinks } from "@/components/generic/quick-links"
-
 import type { Metadata, ResolvingMetadata } from 'next'
 
 import { unSlug } from "@/lib/utilities"
@@ -50,7 +49,7 @@ type BuyerPageProps ={
     <h1 className="sr-only">{name} - Buyer in Zimbabwe</h1>
 <div className="mx-auto max-w-7xl min-h-[70lvh]">
         <div className="lg:flex lg:space-x-10">
-          <Client slug={slug} user={user} latestPrices={latestPrices}/>
+          <Client slug={slug} type="buyer" user={user} latestPrices={latestPrices}/>
           <div className="hidden lg:block lg:w-44 shrink-0 px-6 pt-6">
             <QuickLinks />
           </div>

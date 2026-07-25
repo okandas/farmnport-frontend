@@ -1,6 +1,7 @@
 import { Lots } from "@/components/layouts/lots"
-import { LotsSidebar } from "@/components/layouts/lots-sidebar"
+import { MarketBuySidebar } from "@/components/layouts/market-buy-sidebar"
 import { QuickLinks } from "@/components/generic/quick-links"
+import { getBuyCategories } from "@/components/generic/BuyCategoriesNav"
 
 export const metadata = {
     title: 'Upcoming Lots – Awaiting Review | farmnport.com',
@@ -8,13 +9,14 @@ export const metadata = {
     alternates: { canonical: `/lots/upcoming` },
 }
 
-export default function UpcomingLotsPage() {
+export default async function UpcomingLotsPage() {
+    const categories = await getBuyCategories()
     return (
         <main>
             <div className="mx-auto max-w-7xl px-6 lg:px-8 min-h-[70lvh] py-8">
                 <div className="lg:flex lg:space-x-10">
                     <div className="hidden lg:block lg:w-44 relative">
-                        <LotsSidebar />
+                        <MarketBuySidebar categories={categories} />
                     </div>
                     <div className="flex-1 min-w-0">
                         <Lots mode="pending" />

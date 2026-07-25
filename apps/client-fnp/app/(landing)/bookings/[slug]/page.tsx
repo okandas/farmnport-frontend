@@ -14,7 +14,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         const { slug } = await params
         const res = await serverFetch(`/booking/preorders/${slug}`).catch(() => null)
         const p = res?.preorder
-        if (!p) return {}
+        if (!p) return { title: 'Booking | farmnport.com', robots: { index: false } }
 
         const supplier = p.client_name || p.brand_name || ""
         const produce = p.produce_name || ""
@@ -31,6 +31,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         return {
             title,
             description,
+            alternates: { canonical: `/bookings/${slug}` },
             openGraph: {
                 title,
                 description,
@@ -39,9 +40,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
                 siteName: "farmnport",
                 type: "website",
             },
+            twitter: {
+                card: "summary_large_image",
+                title,
+                description,
+                images: ["/og-image.png"],
+            },
         }
     } catch {
-        return {}
+        return { robots: { index: false } }
     }
 }
 
@@ -57,5 +64,32 @@ export default async function PreOrderDetailPage({ params }: Props) {
 
     const depositEnabled = await preorderDepositEnabled()
 
-    return <PreOrderDetailClient preorder={preorder} depositEnabled={depositEnabled} />
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://farmnport.com"
+    const isBuyer = preorder.market_side === "demand"
+    const structuredData = {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        "name": `${preorder.client_name || preorder.brand_name || "Supplier"} — ${preorder.produce_name || "Farm Produce"}`,
+        "image": preorder.image_src ? [preorder.image_src] : [`${baseUrl}/og-image.png`],
+        "description": preorder.description || `${isBuyer ? "Buying" : "Selling"} ${preorder.produce_name || "farm produce"} on farmnport.com`,
+        "sku": preorder.id || slug,
+        "category": "Farm Bookings",
+        "offers": {
+            "@type": "Offer",
+            "url": `${baseUrl}/bookings/${slug}`,
+            "priceCurrency": "USD",
+            "price": preorder.deposit_cents ? (preorder.deposit_cents / 100).toFixed(2) : "0.00",
+            "availability": preorder.status === "active" ? "https://schema.org/InStock" : "https://schema.org/SoldOut",
+            "itemCondition": "https://schema.org/NewCondition",
+            "priceValidUntil": new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+            "seller": { "@type": "Organization", "name": "farmnport" },
+        },
+    }
+
+    return (
+        <>
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
+            <PreOrderDetailClient preorder={preorder} depositEnabled={depositEnabled} />
+        </>
+    )
 }

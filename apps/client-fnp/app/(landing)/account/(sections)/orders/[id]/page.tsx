@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useParams } from "next/navigation"
 import { useSession } from "next-auth/react"
 import { useQuery } from "@tanstack/react-query"
-import { Loader2, Package, Truck, Store, CheckCircle2, XCircle, Clock, CreditCard, ChevronLeft, ExternalLink } from "lucide-react"
+import { Loader2, Package, Truck, Store, CheckCircle2, XCircle, Clock, CreditCard, ExternalLink } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { getOrder, retryOrderPayment, pollOrderStatus } from "@/lib/query"
@@ -167,23 +167,20 @@ export default function OrderDetailPage() {
         {/* Header */}
         <div className="flex items-start justify-between gap-4">
           <div>
-            <div className="flex items-center gap-3 flex-wrap">
-              <h1 className="text-2xl font-bold">{order.order_number}</h1>
-              <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${STATUS_STYLES[order.status] ?? "bg-muted text-muted-foreground"}`}>
-                {capitalize(order.status)}
-              </span>
-            </div>
-            <p className="text-sm text-muted-foreground mt-1">{formatDate(order.created)}</p>
+            <p className="text-sm text-muted-foreground">{formatDate(order.created)}</p>
+            <h1 className="text-2xl font-bold mt-1">{order.order_number}</h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              {order.items.length} {order.items.length === 1 ? "item" : "items"} · {centsToDollars(order.total)} · {order.fulfillment === "click_collect" ? "Pickup" : "Delivery"}
+            </p>
           </div>
-          <Link href="/account/orders" className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground shrink-0">
-            <ChevronLeft className="w-4 h-4" />
-            All Orders
-          </Link>
+          <span className={`text-xs px-3 py-1.5 rounded-full font-medium shrink-0 ${STATUS_STYLES[order.status] ?? "bg-muted text-muted-foreground"}`}>
+            {capitalize(order.status)}
+          </span>
         </div>
 
         {/* Pending payment banner */}
         {order.status === "pending" && (
-          <div className="border border-yellow-200 bg-yellow-50 dark:bg-yellow-900/20 dark:border-yellow-800 rounded-xl p-5 space-y-3">
+          <div className="border-y border-yellow-200 bg-yellow-50 dark:bg-yellow-900/20 dark:border-yellow-800 py-5 space-y-3">
             <p className="font-semibold text-sm">Payment pending</p>
             <p className="text-sm text-muted-foreground">
               Your order is awaiting payment. Click below to complete your payment.
@@ -234,7 +231,7 @@ export default function OrderDetailPage() {
 
         {/* Status Stepper */}
         {order.status !== "cancelled" && !isDigitalOrder && (
-          <div className="border rounded-xl p-5">
+          <div className="border-y py-5">
             <h2 className="text-sm font-semibold mb-4">Order Progress</h2>
             <div className="flex items-center justify-between">
               {steps.map((step, i) => {
@@ -265,9 +262,9 @@ export default function OrderDetailPage() {
         )}
 
         {/* Items */}
-        <div className="border rounded-xl overflow-hidden">
+        <div className="border-y overflow-hidden">
           <div className="px-5 py-4 border-b bg-muted/30">
-            <h2 className="font-semibold text-sm">Items ({order.items.length})</h2>
+            <h2 className="font-semibold text-base">Items ({order.items.length})</h2>
           </div>
           <div className="divide-y">
             {order.items.map((item, i) => (
@@ -309,10 +306,10 @@ export default function OrderDetailPage() {
         <div className="grid sm:grid-cols-2 gap-4">
           {/* Fulfillment */}
           {isDigitalOrder && order.status !== "cancelled" ? (
-            <div className="border rounded-xl p-5 space-y-3">
+            <div className="border-y py-5 space-y-3">
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-primary" />
-                <h2 className="font-semibold text-sm">Digital Delivery</h2>
+                <h2 className="font-semibold text-base">Digital Delivery</h2>
               </div>
               <ul className="space-y-1.5 text-xs text-muted-foreground">
                 <li className="flex items-start gap-1.5"><span className="text-primary font-bold">✓</span> Sent to your email address</li>
@@ -327,14 +324,14 @@ export default function OrderDetailPage() {
               </Link>
             </div>
           ) : (
-            <div className="border rounded-xl p-5 space-y-3">
+            <div className="border-y py-5 space-y-3">
               <div className="flex items-center gap-2">
                 {order.fulfillment === "click_collect" ? (
                   <Store className="w-4 h-4 text-muted-foreground" />
                 ) : (
                   <Truck className="w-4 h-4 text-muted-foreground" />
                 )}
-                <h2 className="font-semibold text-sm">
+                <h2 className="font-semibold text-base">
                   {order.fulfillment === "click_collect" ? "Click & Collect" : "Delivery"}
                 </h2>
               </div>
@@ -363,10 +360,10 @@ export default function OrderDetailPage() {
           )}
 
           {/* Payment */}
-          <div className="border rounded-xl p-5 space-y-3">
+          <div className="border-y py-5 space-y-3">
             <div className="flex items-center gap-2">
               <CreditCard className="w-4 h-4 text-muted-foreground" />
-              <h2 className="font-semibold text-sm">Payment</h2>
+              <h2 className="font-semibold text-base">Payment</h2>
             </div>
             <div className="text-sm space-y-1 text-muted-foreground">
               <p className="text-foreground capitalize">{order.payment_provider}</p>
@@ -381,7 +378,7 @@ export default function OrderDetailPage() {
 
         {/* Timeline */}
         {order.status_history && order.status_history.length > 0 && (
-          <div className="border rounded-xl p-5">
+          <div className="border-y py-5">
             <h2 className="font-semibold text-sm mb-4">Timeline</h2>
             <div className="space-y-4">
               {(isDigitalOrder

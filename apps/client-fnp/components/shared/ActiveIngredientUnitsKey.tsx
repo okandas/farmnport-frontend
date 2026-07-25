@@ -33,8 +33,8 @@ export function ActiveIngredientsList({ activeIngredients }: { activeIngredients
             <div className="grid grid-cols-2 gap-1 mt-2">
                 {activeIngredients.map((ai, idx) => (
                     <div key={idx} className="flex items-center justify-between px-2.5 py-1.5 rounded-md bg-muted/50 border border-border">
-                        <span className="capitalize text-sm text-foreground">{ai.name}</span>
-                        <span className="text-xs font-semibold text-primary ml-2 shrink-0">{ai.dosage_value} {ai.dosage_unit}</span>
+                        <span className="capitalize text-base font-medium text-foreground">{ai.name}</span>
+                        <span className="text-sm font-semibold text-primary ml-2 shrink-0">{ai.dosage_value} {ai.dosage_unit}</span>
                     </div>
                 ))}
             </div>

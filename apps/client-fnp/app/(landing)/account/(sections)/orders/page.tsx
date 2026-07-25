@@ -25,13 +25,20 @@ function formatDate(d: string) {
   return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })
 }
 
+interface OrderItem {
+  product_name: string
+  image_src?: string
+  quantity: number
+  unit_price: number
+}
+
 interface Order {
   id: string
   order_number: string
   status: string
   total: number
   currency: string
-  items: { product_name: string }[]
+  items: OrderItem[]
   fulfillment: string
   created: string
 }
@@ -79,7 +86,8 @@ export default function OrdersPage() {
         <span>/</span>
         <span className="text-foreground font-medium">My Orders</span>
       </nav>
-      <h1 className="text-xl font-bold mb-6">My Orders</h1>
+      <h1 className="text-2xl font-bold">My Orders</h1>
+      <p className="text-sm text-muted-foreground mb-6">Items you bought from the farmnport shop.</p>
 
         {orders.length === 0 ? (
           <div className="text-center py-16 space-y-4">
@@ -94,33 +102,48 @@ export default function OrdersPage() {
             </Link>
           </div>
         ) : (
-          <div className="divide-y">
-            {orders.map((order) => (
-              <Link key={order.id} href={`/account/orders/${order.order_number}`} className="flex items-start justify-between gap-3 py-4 hover:bg-muted/50 transition-colors px-1">
-                <div className="space-y-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-semibold text-sm">{order.order_number}</span>
-                    <span className={`text-xs px-2 py-0.5 rounded-md font-medium ${STATUS_STYLES[order.status] ?? "bg-muted text-muted-foreground"}`}>
-                      {capitalize(order.status)}
-                    </span>
-                    <span className="text-xs text-muted-foreground capitalize">
-                      {order.fulfillment === "click_collect" ? "Pickup" : "Delivery"}
-                    </span>
+          <div className="space-y-4">
+            {orders.map((order) => {
+              const thumbs = order.items.filter((i) => i.image_src)
+              const maxThumbs = 5
+              const extra = thumbs.length - maxThumbs
+
+              return (
+                <div key={order.id} className="rounded-xl border p-4 sm:p-5 space-y-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="space-y-1.5">
+                      <p className="text-base font-bold">
+                        {capitalize(order.status)} — {formatDate(order.created)}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {order.items.length} {order.items.length === 1 ? "item" : "items"} · ${(order.total / 100).toFixed(2)} · {order.fulfillment === "click_collect" ? "Pickup" : "Delivery"}
+                      </p>
+                    </div>
+                    <Link
+                      href={`/account/orders/${order.order_number}`}
+                      className="shrink-0 text-sm font-medium px-4 py-2 rounded-lg border hover:bg-muted transition-colors"
+                    >
+                      Order Details
+                    </Link>
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    {formatDate(order.created)} · {order.items.length} {order.items.length === 1 ? "item" : "items"}
-                  </p>
-                  <p className="text-xs text-muted-foreground truncate">
-                    {order.items.slice(0, 2).map(i => i.product_name).join(", ")}
-                    {order.items.length > 2 ? ` +${order.items.length - 2} more` : ""}
-                  </p>
+
+                  {thumbs.length > 0 && (
+                    <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide">
+                      {thumbs.slice(0, maxThumbs).map((item, i) => (
+                        <div key={i} className="shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-lg border bg-background overflow-hidden">
+                          <img src={item.image_src} alt={item.product_name} className="w-full h-full object-contain p-1" />
+                        </div>
+                      ))}
+                      {extra > 0 && (
+                        <div className="shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-lg border bg-background flex items-center justify-center">
+                          <span className="text-sm font-semibold text-muted-foreground">+{extra}</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
-                <div className="text-right shrink-0">
-                  <p className="font-semibold">${(order.total / 100).toFixed(2)}</p>
-                  <p className="text-xs text-muted-foreground">{order.currency}</p>
-                </div>
-              </Link>
-            ))}
+              )
+            })}
           </div>
         )}
     </div>

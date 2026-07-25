@@ -10,9 +10,27 @@ const breadcrumbJsonLd = {
   "@type": "BreadcrumbList",
   "itemListElement": [
     { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://farmnport.com" },
-    { "@type": "ListItem", "position": 2, "name": "Market", "item": "https://farmnport.com/market" },
+    { "@type": "ListItem", "position": 2, "name": "Buy", "item": "https://farmnport.com/buy" },
     { "@type": "ListItem", "position": 3, "name": "Pre-Orders", "item": "https://farmnport.com/bookings" },
   ],
+}
+
+export const metadata = {
+    title: "Farm Bookings & Pre-Orders Zimbabwe – Prices & Availability | farmnport.com",
+    description: "Book day-old chicks, livestock and seasonal farm produce in advance. View prices and secure your order with a deposit.",
+    alternates: { canonical: "https://farmnport.com/bookings" },
+    openGraph: {
+        title: "Farm Bookings & Pre-Orders Zimbabwe – Prices & Availability",
+        description: "Book day-old chicks, livestock and seasonal farm produce in advance. View prices and secure your order with a deposit.",
+        siteName: "farmnport",
+        type: "website" as const,
+        url: "https://farmnport.com/bookings",
+    },
+    twitter: {
+        card: "summary_large_image" as const,
+        title: "Farm Bookings & Pre-Orders Zimbabwe – Prices & Availability",
+        description: "Book day-old chicks, livestock and seasonal farm produce in advance. View prices and secure your order with a deposit.",
+    },
 }
 
 export default async function PreOrdersPage() {
@@ -26,12 +44,12 @@ export default async function PreOrdersPage() {
         <nav className="flex items-center gap-1.5 text-xs text-muted-foreground mb-6">
           <Link href="/" className="hover:text-foreground transition-colors">Home</Link>
           <span>/</span>
-          <Link href="/market" className="hover:text-foreground transition-colors">Market</Link>
+          <Link href="/buy" className="hover:text-foreground transition-colors">Buy</Link>
           <span>/</span>
           <span className="text-foreground font-medium">Pre-Orders</span>
         </nav>
 
-        <div className="mb-8">
+        <div id="bookings-heading" className="mb-8">
           <h1 className="text-4xl font-bold tracking-tight font-heading mb-2">Pre-Orders</h1>
           <p className="text-lg text-muted-foreground">Book and reserve produce directly from suppliers. Confirm availability, pay, and collect.</p>
         </div>

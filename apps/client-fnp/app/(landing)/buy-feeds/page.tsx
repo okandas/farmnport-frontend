@@ -3,6 +3,24 @@ import { serverFetch } from "@/lib/serverFetch"
 import { BuyFeedsClient } from "./BuyFeedsClient"
 import { getBuyCategories } from "@/components/generic/BuyCategoriesNav"
 
+export const metadata = {
+    title: "Buy Animal Feeds Zimbabwe – Prices & Product Range | farmnport.com",
+    description: "Shop poultry feeds, cattle feeds, pig feeds and pet food from top brands. Compare prices and order online.",
+    alternates: { canonical: "https://farmnport.com/buy-feeds" },
+    openGraph: {
+        title: "Buy Animal Feeds Zimbabwe – Prices & Product Range",
+        description: "Shop poultry feeds, cattle feeds, pig feeds and pet food from top brands. Compare prices and order online.",
+        siteName: "farmnport",
+        type: "website" as const,
+        url: "https://farmnport.com/buy-feeds",
+    },
+    twitter: {
+        card: "summary_large_image" as const,
+        title: "Buy Animal Feeds Zimbabwe – Prices & Product Range",
+        description: "Shop poultry feeds, cattle feeds, pig feeds and pet food from top brands. Compare prices and order online.",
+    },
+}
+
 export default async function BuyFeedsPage() {
     let initialProducts: any[] = []
     let initialTotal = 0

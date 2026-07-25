@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useQuery, useMutation } from "@tanstack/react-query"
+import { useToast } from "@/components/ui/use-toast"
 import { Icons } from "@/components/icons/lucide"
 import { authorizedHTTPClient } from "@/lib/axios"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -55,6 +56,8 @@ const CHANNEL_CONFIG = {
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export function BlastView() {
+  const { toast } = useToast()
+
   // Filters
   const [typeFilter, setTypeFilter] = useState("all")
   const [provinceFilter, setProvinceFilter] = useState("all")
@@ -80,9 +83,10 @@ export function BlastView() {
   const [emailSubject, setEmailSubject] = useState("")
   const [overrides, setOverrides] = useState<Record<string, string>>({})
   const [showPreview, setShowPreview] = useState(false)
+  const [blastTemplate, setBlastTemplate] = useState<"custom" | "verify-reminder">("custom")
 
   // Results
-  const [results, setResults] = useState<{ sent: number; failed: number; results: BlastResult[] } | null>(null)
+  const [results, setResults] = useState<{ sent: number; failed: number; remaining?: number; results: BlastResult[] } | null>(null)
 
   // ── Clients query — auto-runs on debounced filter change ───────────────────
 
@@ -113,10 +117,27 @@ export function BlastView() {
 
   // ── Blast mutation ─────────────────────────────────────────────────────────
 
+  function handleBlastSuccess(data: any) {
+    setResults(data)
+    setTemplate("")
+    setEmailSubject("")
+    setOverrides({})
+    toast({
+      title: `Blast sent — ${data.sent} delivered`,
+      description: data.failed > 0 ? `${data.failed} failed` : "Check your inbox",
+    })
+  }
+
   const blastMutation = useMutation({
     mutationFn: (recipients: BlastRecipient[]) =>
       authorizedHTTPClient.post<{ sent: number; failed: number; results: BlastResult[] }>("/v1/blast/send", recipients),
-    onSuccess: (res) => setResults(res.data),
+    onSuccess: (res) => handleBlastSuccess(res.data),
+  })
+
+  const verifyMutation = useMutation({
+    mutationFn: (payload: { test_email?: string; limit?: number }) =>
+      authorizedHTTPClient.post<{ sent: number; failed: number; remaining: number; results: BlastResult[] }>("/v1/blast/verify-reminder", payload),
+    onSuccess: (res) => handleBlastSuccess(res.data),
   })
 
   // ── Helpers ────────────────────────────────────────────────────────────────
@@ -156,11 +177,11 @@ export function BlastView() {
     setChannel("sms"); setTemplate(""); setEmailSubject(""); setOverrides({}); setResults(null)
   }
 
-  const canSend = selected.size > 0 && template.trim().length > 0
+  const canSend = selected.size > 0 && template.trim().length > 0 && (channel !== "email" || emailSubject.trim().length > 0)
 
-  // ── Results view ───────────────────────────────────────────────────────────
+  // ── Results view (only for non-email custom — email shows inline) ──────────
 
-  if (results) {
+  if (results && blastTemplate === "custom" && channel !== "email") {
     return (
       <div className="rounded-lg border bg-white overflow-hidden shadow-sm">
         <div className="flex items-center justify-between px-5 py-3.5 border-b bg-white">
@@ -229,21 +250,88 @@ export function BlastView() {
                 : null}
           </div>
           <div className="flex items-center gap-2">
-            <button onClick={() => setShowPreview((v) => !v)} disabled={!template.trim()}
-              className="h-8 px-3 rounded-md border text-xs font-medium text-muted-foreground hover:bg-muted/50 disabled:opacity-40 flex items-center gap-1.5">
-              <Icons.eye className="w-3.5 h-3.5" />
-              {showPreview ? "Hide preview" : "Preview"}
-            </button>
-            <button onClick={handleSend} disabled={!canSend || blastMutation.isPending}
-              className="h-8 px-4 rounded-md bg-primary text-white text-xs font-bold hover:bg-primary/90 disabled:opacity-40 flex items-center gap-1.5 shadow-sm">
-              {blastMutation.isPending
-                ? <><Icons.spinner className="w-3.5 h-3.5 animate-spin" /> Sending…</>
-                : <><Icons.send className="w-3.5 h-3.5" /> Send to {selected.size || "…"}</>}
-            </button>
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wide">Template</span>
+            <Select value={blastTemplate} onValueChange={(v) => setBlastTemplate(v as typeof blastTemplate)}>
+              <SelectTrigger className="h-8 text-xs w-48 bg-white shadow-none"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="custom">Custom message</SelectItem>
+                <SelectItem value="verify-reminder">Verify account reminder</SelectItem>
+              </SelectContent>
+            </Select>
+            {blastTemplate === "custom" ? (
+              <>
+                <button onClick={() => setShowPreview((v) => !v)} disabled={!template.trim()}
+                  className="h-8 px-3 rounded-md border text-xs font-medium text-muted-foreground hover:bg-muted/50 disabled:opacity-40 flex items-center gap-1.5">
+                  <Icons.eye className="w-3.5 h-3.5" />
+                  {showPreview ? "Hide preview" : "Preview"}
+                </button>
+              </>
+            ) : (
+              <>
+                <button onClick={() => verifyMutation.mutate({ test_email: "okandas@farmnport.com" })}
+                  disabled={verifyMutation.isPending}
+                  className="h-8 px-3 rounded-md border text-xs font-medium text-orange-600 border-orange-200 hover:bg-orange-50 disabled:opacity-40 flex items-center gap-1.5">
+                  {verifyMutation.isPending
+                    ? <><Icons.spinner className="w-3.5 h-3.5 animate-spin" /> Sending test…</>
+                    : <><Icons.send className="w-3.5 h-3.5" /> Send test to me</>}
+                </button>
+                <button onClick={() => verifyMutation.mutate({ limit: 100 })}
+                  disabled={verifyMutation.isPending}
+                  className="h-8 px-4 rounded-md bg-primary text-white text-xs font-bold hover:bg-primary/90 disabled:opacity-40 flex items-center gap-1.5 shadow-sm">
+                  {verifyMutation.isPending
+                    ? <><Icons.spinner className="w-3.5 h-3.5 animate-spin" /> Sending batch…</>
+                    : <><Icons.send className="w-3.5 h-3.5" /> Send next 100</>}
+                </button>
+              </>
+            )}
           </div>
         </div>
 
-        {/* ── Filters row (full width) ── */}
+        {/* ── Verify Reminder mode ── */}
+        {blastTemplate === "verify-reminder" && (
+          <div className="p-6 space-y-4">
+            <div className="flex items-center gap-6">
+              {results && (
+                <div className="flex items-center gap-4 text-sm">
+                  <span className="text-green-600 font-semibold">{results.sent} sent</span>
+                  {results.failed > 0 && <span className="text-red-500 font-semibold">{results.failed} failed</span>}
+                  {results.remaining !== undefined && <span className="text-muted-foreground">{results.remaining} unverified remaining</span>}
+                </div>
+              )}
+            </div>
+            {results && results.results.length > 0 && (
+              <div className="rounded-md border overflow-hidden">
+                <table className="min-w-full text-sm">
+                  <thead>
+                    <tr className="bg-muted/20 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      <th className="px-4 py-2 text-left w-10">#</th>
+                      <th className="px-4 py-2 text-left">Name</th>
+                      <th className="px-4 py-2 text-left">Email</th>
+                      <th className="px-4 py-2 text-left">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y">
+                    {results.results.map((r, i) => (
+                      <tr key={i} className="hover:bg-muted/50">
+                        <td className="px-4 py-2 text-muted-foreground">{i + 1}</td>
+                        <td className="px-4 py-2 font-medium">{r.name}</td>
+                        <td className="px-4 py-2 text-muted-foreground">{r.to}</td>
+                        <td className="px-4 py-2">
+                          {r.ok
+                            ? <span className="text-green-600 font-medium">Sent</span>
+                            : <span className="text-red-500">{r.error ?? "Failed"}</span>}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── Custom message mode ── */}
+        {blastTemplate === "custom" && <>
         <div className="flex items-center gap-2 px-4 py-2.5 border-b bg-muted/10 shrink-0 flex-wrap">
           <Select value={typeFilter} onValueChange={setTypeFilter}>
             <SelectTrigger className="h-8 text-xs w-28 bg-white shadow-none"><SelectValue /></SelectTrigger>
@@ -290,7 +378,7 @@ export function BlastView() {
         </div>
 
         {/* ── Body: left recipients + right compose ── */}
-        <div className="flex min-h-0 h-[560px]">
+        <div className="flex min-h-0 h-[360px]">
 
           {/* Left: recipient list */}
           <div className="w-72 shrink-0 border-r flex flex-col">
@@ -356,16 +444,19 @@ export function BlastView() {
 
             {/* Subject (email only) */}
             {channel === "email" && (
-              <div className="flex items-center gap-3 px-5 border-b shrink-0">
+              <div className={`flex items-center gap-3 px-5 border-b shrink-0 ${!emailSubject.trim() && template.trim() ? "bg-red-50/50" : ""}`}>
                 <span className="text-xs font-bold text-slate-500 uppercase tracking-wide w-14 shrink-0">Subject</span>
-                <input type="text" placeholder="e.g. New prices this week"
+                <input type="text" placeholder="e.g. New prices this week — required"
                   value={emailSubject} onChange={(e) => setEmailSubject(e.target.value)}
                   className="flex-1 h-10 text-sm bg-transparent outline-none placeholder:text-muted-foreground/40" />
+                {!emailSubject.trim() && template.trim() && (
+                  <span className="text-xs text-red-500 font-medium shrink-0">Required</span>
+                )}
               </div>
             )}
 
             {/* Body or Preview */}
-            <div className="flex-1 overflow-y-auto">
+            <div className="flex-1 overflow-hidden">
               {showPreview && template.trim() ? (
                 <div className="p-6">
                   <p className="text-[11px] text-muted-foreground mb-3">
@@ -399,14 +490,31 @@ export function BlastView() {
             </div>
 
             {/* Footer */}
-            <div className="flex items-center justify-between px-5 py-2.5 border-t bg-muted/10 shrink-0">
-              <span className="text-xs text-muted-foreground">
-                Use <code className="bg-muted px-1 py-0.5 rounded text-[11px] font-mono">{"{name}"}</code> to personalise
-              </span>
-              <button onClick={applyTemplate} disabled={selected.size === 0 || !template.trim()}
-                className="text-xs font-medium text-primary hover:underline disabled:opacity-40 disabled:no-underline">
-                Apply to {selected.size} selected
-              </button>
+            <div className="px-5 py-3 border-t bg-muted/10 shrink-0">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-muted-foreground">
+                  Use <code className="bg-muted px-1 py-0.5 rounded text-[11px] font-mono">{"{name}"}</code> to personalise
+                </span>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => {
+                      const msg = template.replace(/\{name\}/gi, "Okandas")
+                      blastMutation.mutate([{ id: "", name: "Okandas", phone: "", email: "okandas@farmnport.com", message: msg, email_subject: emailSubject || "Message from farmnport", channel: "email" }])
+                    }}
+                    disabled={!template.trim() || (channel === "email" && !emailSubject.trim()) || blastMutation.isPending}
+                    className="h-8 px-3 rounded-md border text-xs font-medium text-orange-600 border-orange-200 hover:bg-orange-50 disabled:opacity-40 flex items-center gap-1.5">
+                    {blastMutation.isPending
+                      ? <><Icons.spinner className="w-3.5 h-3.5 animate-spin" /> Sending test…</>
+                      : <><Icons.send className="w-3.5 h-3.5" /> Send test to me</>}
+                  </button>
+                  <button onClick={handleSend} disabled={!canSend || blastMutation.isPending}
+                    className="h-8 px-4 rounded-md bg-primary text-white text-xs font-bold hover:bg-primary/90 disabled:opacity-40 flex items-center gap-1.5 shadow-sm">
+                    {blastMutation.isPending
+                      ? <><Icons.spinner className="w-3.5 h-3.5 animate-spin" /> Sending…</>
+                      : <><Icons.send className="w-3.5 h-3.5" /> Send to {selected.size || "…"}</>}
+                  </button>
+                </div>
+              </div>
             </div>
 
             {blastMutation.isError && (
@@ -414,6 +522,7 @@ export function BlastView() {
             )}
           </div>
         </div>
+        </>}
       </div>
 
       {/* ── Per-recipient message overrides ── */}

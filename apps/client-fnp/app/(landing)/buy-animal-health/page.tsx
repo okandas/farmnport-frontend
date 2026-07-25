@@ -3,6 +3,24 @@ import { serverFetch } from "@/lib/serverFetch"
 import { BuyAnimalHealthClient } from "./BuyAnimalHealthClient"
 import { getBuyCategories } from "@/components/generic/BuyCategoriesNav"
 
+export const metadata = {
+    title: "Buy Animal Health Products Zimbabwe – Prices & Guides | farmnport.com",
+    description: "Shop dips, dewormers, vaccines and veterinary supplements for cattle, poultry and livestock. Compare prices, view dosage rates and order online.",
+    alternates: { canonical: "https://farmnport.com/buy-animal-health" },
+    openGraph: {
+        title: "Buy Animal Health Products Zimbabwe – Prices & Guides",
+        description: "Shop dips, dewormers, vaccines and veterinary supplements for cattle, poultry and livestock. Compare prices, view dosage rates and order online.",
+        siteName: "farmnport",
+        type: "website" as const,
+        url: "https://farmnport.com/buy-animal-health",
+    },
+    twitter: {
+        card: "summary_large_image" as const,
+        title: "Buy Animal Health Products Zimbabwe – Prices & Guides",
+        description: "Shop dips, dewormers, vaccines and veterinary supplements for cattle, poultry and livestock. Compare prices, view dosage rates and order online.",
+    },
+}
+
 export default async function BuyAnimalHealthPage() {
     let initialProducts: any[] = []
     let initialTotal = 0

@@ -4,12 +4,9 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 
 const LINKS = [
-  { label: "List a Lot", href: "/lots/new" },
-  { label: "Buy Lots", href: "/lots/buying" },
+  { label: "Bookings", href: "/bookings" },
   { label: "Lots", href: "/lots" },
   { label: "Prices", href: "/prices" },
-  { label: "Find Buyers", href: "/buyers" },
-  { label: "Browse Farmers", href: "/farmers" },
 ]
 
 export function QuickLinks() {

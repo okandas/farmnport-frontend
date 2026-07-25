@@ -8,8 +8,9 @@ import { Package } from "lucide-react"
 
 import { Pagination } from "@/components/generic/pagination"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { queryLots } from "@/lib/query"
-import { capitalizeFirstLetter, formatDate, withPlatformFeeDisplay } from "@/lib/utilities"
+import { capitalizeFirstLetter, centsToDollars, formatDate } from "@/lib/utilities"
 
 interface FarmLot {
   _id: string
@@ -113,22 +114,46 @@ export function Lots({ mode }: LotsProps) {
 
       {/* Empty state */}
       {!isFetching && lots.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-16 px-6 text-center border rounded-lg bg-muted/30">
-          <Package className="h-12 w-12 text-muted-foreground/40 mb-4" />
-          <h3 className="text-lg font-semibold mb-1">{isPendingView ? "No Pending Lots" : "No Lots Available"}</h3>
-          <p className="text-sm text-muted-foreground max-w-md">
-            {isPendingView
-              ? "All submitted lots have been reviewed."
-              : mode === "selling"
-                ? "No selling lots active right now. Check back soon."
-                : mode === "buying"
-                  ? "No buying lots active right now. Check back soon."
-                  : "No active lots right now. Check back soon or be the first to list."}
-          </p>
+        <div className="space-y-6">
+          <div className="flex flex-col items-center justify-center py-2 px-4 text-center border rounded-lg bg-muted/30">
+            <Package className="h-6 w-6 text-muted-foreground/40 mb-1" />
+            <h3 className="text-lg font-semibold mb-1">{isPendingView ? "No Pending Lots" : "No Lots Available Yet"}</h3>
+            <p className="text-sm text-muted-foreground max-w-md">
+              {isPendingView
+                ? "All submitted lots have been reviewed."
+                : "Be the first to list. Set your price, your timeline, and accept offers on your terms."}
+            </p>
+            {!isPendingView && (
+              <Link href="/lots/new" className="mt-4 inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors">
+                List a Lot Now
+              </Link>
+            )}
+          </div>
+
           {!isPendingView && (
-            <Link href="/sell" className="mt-4 text-sm text-primary hover:underline">
-              List your produce
-            </Link>
+            <div className="rounded-xl border border-primary/20 bg-primary/5 p-6 space-y-4">
+              <h3 className="font-semibold text-base">Sell at the price you want, not the price you're given</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Been to a live auction and didn't get the price you wanted? With timed lots, you set your own asking price and timeline. Buyers come to you with offers — accept when the price is right.
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+                <div className="rounded-lg border bg-card p-3 space-y-1">
+                  <p className="font-medium">Set your price</p>
+                  <p className="text-xs text-muted-foreground">List at the price you want — no auctioneer deciding for you</p>
+                </div>
+                <div className="rounded-lg border bg-card p-3 space-y-1">
+                  <p className="font-medium">Set your timeline</p>
+                  <p className="text-xs text-muted-foreground">Choose when bidding closes — 3 days, 7 days, or longer</p>
+                </div>
+                <div className="rounded-lg border bg-card p-3 space-y-1">
+                  <p className="font-medium">Accept on your terms</p>
+                  <p className="text-xs text-muted-foreground">Review offers and accept when you're happy with the price</p>
+                </div>
+              </div>
+              <Link href="/lots/new" className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline">
+                Create your first lot →
+              </Link>
+            </div>
           )}
         </div>
       )}
@@ -181,46 +206,53 @@ export function Lots({ mode }: LotsProps) {
 
       {/* Active lot cards */}
       {!isFetching && !isPendingView && lots.length > 0 && (
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {lots.map((lot) => (
-            <Link
-              key={lot._id}
-              href={`/lots/${lot.slug}`}
-              className="bg-card border border-border rounded-lg overflow-hidden transition-all duration-200 hover:shadow-lg hover:border-primary/50 group"
-            >
-              <div className="relative aspect-square bg-muted/30">
-                {lot.main_image?.img?.src ? (
-                  <img
-                    src={lot.main_image.img.src}
-                    alt={lot.farm_produce?.name ?? "Lot"}
-                    className="object-cover w-full h-full transition-transform duration-200 group-hover:scale-105"
-                  />
-                ) : (
-                  <div className="absolute inset-0 bg-muted/30" />
-                )}
-                <span className={`absolute top-2 left-2 text-[10px] font-semibold px-2 py-0.5 rounded-full border ${lot.type === "sell" ? "bg-orange-50 text-orange-700 border-orange-200" : "bg-green-50 text-green-700 border-green-200"}`}>
-                  {lot.type === "sell" ? "Selling" : "Buying"}
-                </span>
-                {lot.is_test && (
-                  <span className="absolute top-2 right-2 bg-orange-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">TEST</span>
-                )}
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+          {lots.map((lot) => {
+            const price = lot.price_per_unit_cents ? centsToDollars(lot.price_per_unit_cents) : "Negotiable"
+            const name = lot.farm_produce?.name ?? "Lot"
+            const variety = lot.breed?.name
+            const condition = (lot as any).produce_condition?.name
+            const meta = [variety, condition].filter(Boolean).join(" · ")
+
+            return (
+              <div
+                key={lot._id}
+                className="bg-card border border-border rounded-lg overflow-hidden transition-all duration-200 hover:shadow-lg hover:border-primary/50 group"
+              >
+                <Link href={`/lots/${lot.slug}`} className="block">
+                  <div className="relative aspect-square bg-muted/20">
+                    {lot.main_image?.img?.src ? (
+                      <img
+                        src={lot.main_image.img.src}
+                        alt={name}
+                        className="object-cover w-full h-full"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 bg-muted/30" />
+                    )}
+                    <span className={`absolute top-2 left-2 inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium ${lot.type === "sell" ? "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400" : "bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400"}`}>
+                      {lot.type === "sell" ? "Selling" : "Buying"}
+                    </span>
+                  </div>
+                </Link>
+                <div className="p-4 space-y-3 border-t">
+                  <Link href={`/lots/${lot.slug}`}>
+                    <h3 className="font-semibold text-sm leading-tight line-clamp-2 group-hover:text-primary transition-colors">{name}</h3>
+                  </Link>
+                  {meta && <p className="text-xs text-muted-foreground">{meta}</p>}
+                  <div className="flex items-center justify-between pt-2 border-t">
+                    <span className="text-lg font-semibold">{price}</span>
+                    <span className="text-xs text-muted-foreground">{lot.quantity?.toLocaleString()} {lot.unit}</span>
+                  </div>
+                  <Link href={`/lots/${lot.slug}`} className="block">
+                    <Button variant="outline" className="w-full" size="sm">
+                      {lot.type === "sell" ? "Place Bid" : "Offer Supply"}
+                    </Button>
+                  </Link>
+                </div>
               </div>
-              <div className="p-3 space-y-1.5 border-t">
-                <h3 className="font-semibold text-sm leading-tight group-hover:text-primary transition-colors">
-                  {lot.farm_produce?.name ?? lot.breed?.name ?? "Produce"}
-                </h3>
-                {lot.breed && (
-                  <p className="text-xs text-muted-foreground">{lot.breed.name}</p>
-                )}
-                <p className="text-xs text-muted-foreground capitalize">
-                  {lot.quantity.toLocaleString()} {lot.unit}{lot.province ? ` · ${capitalizeFirstLetter(lot.province)}` : ""}
-                </p>
-                <p className="text-base font-bold">
-                  {withPlatformFeeDisplay(lot.price_per_unit_cents)}<span className="text-xs font-normal text-muted-foreground">/{lot.unit}</span>
-                </p>
-              </div>
-            </Link>
-          ))}
+            )
+          })}
         </div>
       )}
 

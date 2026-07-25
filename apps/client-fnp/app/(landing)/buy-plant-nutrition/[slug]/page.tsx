@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: BuyPlantNutritionProductPageP
     const { slug } = await params
     const product = await serverFetch(`/plantnutrition/${slug}`).catch(() => null)
     if (!product) return { title: 'Plant Nutrition Product | farmnport.com', robots: { index: false } }
-    return buildBuyMetadata(product, product.plant_nutrition_category?.name || 'Plant Nutrition', `/buy-plant-nutrition/${slug}`, 'Zimbabwe crops')
+    return buildBuyMetadata(product, product.plant_nutrition_category?.name || 'Plant Nutrition', `/buy-plant-nutrition/${slug}`, 'Zimbabwe crops', product.images?.[0]?.img?.src)
 }
 
 export default async function BuyPlantNutritionProductPage({ params }: BuyPlantNutritionProductPageProps) {
@@ -46,6 +46,8 @@ export default async function BuyPlantNutritionProductPage({ params }: BuyPlantN
             "priceCurrency": "USD",
             "price": product.sale_price > 0 ? (product.sale_price / 100).toFixed(2) : "0.00",
             "availability": product.available_for_sale ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+            "itemCondition": "https://schema.org/NewCondition",
+            "priceValidUntil": new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
             "seller": { "@type": "Organization", "name": "farmnport" }
         }
     }

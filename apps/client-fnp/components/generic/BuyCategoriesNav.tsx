@@ -3,6 +3,7 @@ import { BuyCategoriesNavClient } from "./BuyCategoriesNavClient"
 
 const ALL_CATEGORIES: { label: string; href: string; flag?: () => Promise<boolean> }[] = [
   { label: "Bookings", href: "/bookings", flag: bookingsEnabled },
+  { label: "Lots", href: "/lots" },
   { label: "Agrochemicals", href: "/buy-agrochemicals" },
   { label: "Animal Health", href: "/buy-animal-health" },
   { label: "Animal Feed", href: "/buy-feeds" },

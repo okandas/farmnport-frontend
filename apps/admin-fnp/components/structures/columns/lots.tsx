@@ -40,13 +40,6 @@ export const lotColumns: ColumnDef<any>[] = [
     ),
   },
   {
-    accessorKey: "breed",
-    header: "Variety",
-    cell: ({ row }) => (
-      <span className="capitalize">{row.original.breed?.name ?? "—"}</span>
-    ),
-  },
-  {
     accessorKey: "type",
     header: "Type",
     cell: ({ row }) => (
@@ -57,9 +50,23 @@ export const lotColumns: ColumnDef<any>[] = [
     ),
   },
   {
-    accessorKey: "form",
-    header: "State",
-    cell: ({ row }) => <span className="capitalize">{capitalizeFirst(row.original.form)}</span>,
+    accessorKey: "farm_produce",
+    header: "Produce",
+    cell: ({ row }) => (
+      <span className="capitalize">{row.original.farm_produce?.name ?? "—"}</span>
+    ),
+  },
+  {
+    accessorKey: "breed",
+    header: "Variety",
+    cell: ({ row }) => (
+      <span className="capitalize">{row.original.breed?.name ?? "—"}</span>
+    ),
+  },
+  {
+    accessorKey: "produce_condition",
+    header: "Condition",
+    cell: ({ row }) => <span className="capitalize">{row.original.produce_condition?.name ?? "—"}</span>,
   },
   {
     accessorKey: "quantity",

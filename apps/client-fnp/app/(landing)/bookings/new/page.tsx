@@ -1,11 +1,11 @@
 import Link from "next/link"
-import { CreateBookingForm } from "./CreateBookingForm"
 import { retrieveUser } from "@/lib/actions"
 import { redirect } from "next/navigation"
+import { SplitPageTour } from "@/components/shared/SplitPageTour"
 
 export const metadata = {
-  title: "Create a Booking | farmnport.com",
-  description: "List your produce for sale or post a buying request on farmnport.com.",
+  title: "New Booking | farmnport.com",
+  description: "Create a booking to sell or buy produce on farmnport.com.",
 }
 
 export default async function NewBookingPage() {
@@ -28,14 +28,36 @@ export default async function NewBookingPage() {
           </nav>
         </div>
       </div>
-
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-2">
-          <h1 className="text-2xl font-bold tracking-tight">New Booking Event</h1>
-          <p className="text-sm text-muted-foreground mt-1">Create a pre-order batch for customers to book.</p>
+      <div className="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8 py-16">
+        <div className="text-center mb-10">
+          <h1 className="text-3xl font-bold tracking-tight">Create a Booking</h1>
+          <p className="mt-2 text-sm text-muted-foreground">Use bookings for produce you supply or buy on a regular basis — daily, weekly, monthly, throughout the year.</p>
         </div>
-
-        <CreateBookingForm />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <Link
+            id="booking-new-sell"
+            href="/bookings/new/sell"
+            className="group flex flex-col items-center gap-3 rounded-xl border border-border p-8 hover:border-primary hover:bg-primary/5 transition-colors"
+          >
+            <h2 className="text-lg font-semibold group-hover:text-primary">I Supply</h2>
+            <p className="text-sm text-muted-foreground text-center">You have produce available regularly and want buyers to book from you</p>
+          </Link>
+          <Link
+            id="booking-new-buy"
+            href="/bookings/new/buy"
+            className="group flex flex-col items-center gap-3 rounded-xl border border-border p-8 hover:border-primary hover:bg-primary/5 transition-colors"
+          >
+            <h2 className="text-lg font-semibold group-hover:text-primary">I Buy</h2>
+            <p className="text-sm text-muted-foreground text-center">You need produce on a regular basis and want farmers to supply you</p>
+          </Link>
+        </div>
+        <SplitPageTour
+          storageKey="fnp_bookings_new_tour_seen"
+          steps={[
+            { element: "#booking-new-sell", title: "Supply produce regularly?", description: "Create a pre-order so buyers can book from you on a schedule." },
+            { element: "#booking-new-buy", title: "Need produce?", description: "Post what you want and let farmers come to you." },
+          ]}
+        />
       </div>
     </div>
   )

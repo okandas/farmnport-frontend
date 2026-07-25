@@ -1,7 +1,7 @@
 import Link from "next/link"
-import { PostLotForm } from "@/components/forms/post-lot"
 import { retrieveUser } from "@/lib/actions"
 import { redirect } from "next/navigation"
+import { SplitPageTour } from "@/components/shared/SplitPageTour"
 
 export const metadata = {
   title: "Post a Lot | farmnport.com",
@@ -22,22 +22,42 @@ export default async function PostLotPage() {
           <nav className="flex text-sm text-muted-foreground">
             <Link href="/" className="hover:text-foreground">Home</Link>
             <span className="mx-2">/</span>
-            <Link href="/market" className="hover:text-foreground">Market</Link>
-            <span className="mx-2">/</span>
             <Link href="/lots" className="hover:text-foreground">Lots</Link>
             <span className="mx-2">/</span>
-            <span className="text-foreground">Post a Lot</span>
+            <span className="text-foreground">New</span>
           </nav>
         </div>
       </div>
-      <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-10">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight">Post a Lot</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Your lot will be reviewed before going live. We'll notify you once approved.
-          </p>
+      <div className="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8 py-16">
+        <div className="text-center mb-10">
+          <h1 className="text-3xl font-bold tracking-tight">List a Lot</h1>
+          <p className="mt-2 text-sm text-muted-foreground">Use lots for produce you have ready now or need immediately — a one-time listing with a set expiry.</p>
         </div>
-        <PostLotForm />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <Link
+            id="lot-new-sell"
+            href="/lots/new/sell"
+            className="group flex flex-col items-center gap-3 rounded-xl border border-border p-8 hover:border-primary hover:bg-primary/5 transition-colors"
+          >
+            <h2 className="text-lg font-semibold group-hover:text-primary">I Have Stock</h2>
+            <p className="text-sm text-muted-foreground text-center">List your available produce for buyers to bid or buy directly</p>
+          </Link>
+          <Link
+            id="lot-new-buy"
+            href="/lots/new/buy"
+            className="group flex flex-col items-center gap-3 rounded-xl border border-border p-8 hover:border-primary hover:bg-primary/5 transition-colors"
+          >
+            <h2 className="text-lg font-semibold group-hover:text-primary">I Need Stock</h2>
+            <p className="text-sm text-muted-foreground text-center">Post what you need and let farmers offer their produce to you</p>
+          </Link>
+        </div>
+        <SplitPageTour
+          storageKey="fnp_lots_new_tour_seen"
+          steps={[
+            { element: "#lot-new-sell", title: "Have stock ready now?", description: "List it and buyers can bid or buy immediately." },
+            { element: "#lot-new-buy", title: "Looking for specific produce?", description: "Post a request and let farmers offer." },
+          ]}
+        />
       </div>
     </main>
   )

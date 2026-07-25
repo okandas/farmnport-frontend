@@ -5,8 +5,13 @@ import { useQuery } from "@tanstack/react-query"
 import Link from "next/link"
 
 import { queryLots } from "@/lib/query"
+import { BuyCategoriesNavClient } from "@/components/generic/BuyCategoriesNavClient"
 
-export function LotsSidebar() {
+interface MarketBuySidebarProps {
+  categories: { label: string; href: string }[]
+}
+
+export function MarketBuySidebar({ categories }: MarketBuySidebarProps) {
   const pathname = usePathname()
 
   const { data } = useQuery({
@@ -46,6 +51,7 @@ export function LotsSidebar() {
         </div>
       </div>
 
+      <BuyCategoriesNavClient categories={categories} />
     </div>
   )
 }

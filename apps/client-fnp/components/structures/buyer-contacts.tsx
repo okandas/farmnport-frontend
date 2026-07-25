@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { sendGTMEvent } from "@next/third-parties/google"
 import Link from "next/link"
-import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 
 import { queryBuyerContacts } from "@/lib/query"
 import { AuthenticatedUser } from "@/lib/schemas"
@@ -22,7 +22,6 @@ interface BuyerContact {
   email?: string
   position?: string
   status: string
-  subscribed?: boolean
 }
 
 interface BuyerContactsProps {
@@ -74,9 +73,8 @@ function ShowEmail({ email, buyerName, contactName }: { email: string, buyerName
   )
 }
 
-export function BuyerContacts({ clientId, clientName, user, product }: BuyerContactsProps) {
+export function BuyerContacts({ clientId, clientName, user }: BuyerContactsProps) {
   const router = useRouter()
-  const pathname = usePathname()
   const searchParams = useSearchParams()
 
   const { data, isLoading } = useQuery({
@@ -90,8 +88,9 @@ export function BuyerContacts({ clientId, clientName, user, product }: BuyerCont
 
   if (isLoading || contacts.length === 0) return null
 
-  const paywallEnabled = process.env.NEXT_PUBLIC_ENABLE_PAYWALL === "true"
-  const isSubscribed = !paywallEnabled || contacts[0]?.subscribed === true
+  const hasAnyContact = contacts.some((c) => c.phone || c.email)
+  if (!hasAnyContact) return null
+
   const nameSlug = slug(clientName)
   const queryString = new URLSearchParams(searchParams?.toString())
   queryString.set('entity', 'buyer')
@@ -104,76 +103,59 @@ export function BuyerContacts({ clientId, clientName, user, product }: BuyerCont
         Buyer Contacts
       </h2>
       <div className="space-y-4">
-        {contacts.map((contact) => (
-          <div key={contact.id} className="border-b last:border-b-0 pb-3 last:pb-0">
-            <div className="flex items-center gap-2 mb-1">
-              <p className="text-sm font-semibold">{capitalizeFirstLetter(contact.name)}</p>
-              {contact.position && (
-                <span className="text-xs text-muted-foreground">— {capitalizeFirstLetter(contact.position)}</span>
-              )}
-            </div>
-            <div className="flex flex-col gap-1 ml-0.5">
-              <div className="flex items-center gap-2">
-                <Icons.phone className="h-3.5 w-3.5 text-muted-foreground" />
-                {!user ? (
-                  <Button
-                    className="p-0 h-[22px]"
-                    variant="link"
-                    onClick={() => {
-                      sendGTMEvent({ event: 'login_prompt', reason: 'view_phone', client_name: clientName })
-                      router.push(`/login?${queryString.toString()}`)
-                    }}
-                  >
-                    Login to view
-                  </Button>
-                ) : isSubscribed && contact.phone ? (
-                  <ShowPhone phone={contact.phone} buyerName={clientName} contactName={contact.name} />
-                ) : (
-                  <Button
-                    className="p-0 h-[22px]"
-                    variant="link"
-                    onClick={() => {
-                      sendGTMEvent({ event: 'paywall_hit', reason: 'view_phone', client_name: clientName })
-                      router.push('/pricing')
-                    }}
-                  >
-                    Subscribe to view
-                  </Button>
+        {contacts.map((contact) => {
+          if (!contact.phone && !contact.email) return null
+          return (
+            <div key={contact.id} className="border-b last:border-b-0 pb-3 last:pb-0">
+              <div className="flex items-center gap-2 mb-1">
+                <p className="text-sm font-semibold">{capitalizeFirstLetter(contact.name)}</p>
+                {contact.position && (
+                  <span className="text-xs text-muted-foreground">— {capitalizeFirstLetter(contact.position)}</span>
                 )}
               </div>
-              {(contact.email || !isSubscribed) && (
-                <div className="flex items-center gap-2">
-                  <Icons.mail className="h-3.5 w-3.5 text-muted-foreground" />
-                  {!user ? (
-                    <Button
-                      className="p-0 h-[22px]"
-                      variant="link"
-                      onClick={() => {
-                        sendGTMEvent({ event: 'login_prompt', reason: 'view_email', client_name: clientName })
-                        router.push(`/login?${queryString.toString()}`)
-                      }}
-                    >
-                      Login to view
-                    </Button>
-                  ) : isSubscribed && contact.email ? (
-                    <ShowEmail email={contact.email} buyerName={clientName} contactName={contact.name} />
-                  ) : (
-                    <Button
-                      className="p-0 h-[22px]"
-                      variant="link"
-                      onClick={() => {
-                        sendGTMEvent({ event: 'paywall_hit', reason: 'view_email', client_name: clientName })
-                        router.push('/pricing')
-                      }}
-                    >
-                      Subscribe to view
-                    </Button>
-                  )}
-                </div>
-              )}
+              <div className="flex flex-col gap-1 ml-0.5">
+                {contact.phone && (
+                  <div className="flex items-center gap-2">
+                    <Icons.phone className="h-3.5 w-3.5 text-muted-foreground" />
+                    {!user ? (
+                      <Button
+                        className="p-0 h-[22px]"
+                        variant="link"
+                        onClick={() => {
+                          sendGTMEvent({ event: 'login_prompt', reason: 'view_phone', client_name: clientName })
+                          router.push(`/login?${queryString.toString()}`)
+                        }}
+                      >
+                        Login to view
+                      </Button>
+                    ) : (
+                      <ShowPhone phone={contact.phone} buyerName={clientName} contactName={contact.name} />
+                    )}
+                  </div>
+                )}
+                {contact.email && (
+                  <div className="flex items-center gap-2">
+                    <Icons.mail className="h-3.5 w-3.5 text-muted-foreground" />
+                    {!user ? (
+                      <Button
+                        className="p-0 h-[22px]"
+                        variant="link"
+                        onClick={() => {
+                          sendGTMEvent({ event: 'login_prompt', reason: 'view_email', client_name: clientName })
+                          router.push(`/login?${queryString.toString()}`)
+                        }}
+                      >
+                        Login to view
+                      </Button>
+                    ) : (
+                      <ShowEmail email={contact.email} buyerName={clientName} contactName={contact.name} />
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
     </div>
   )

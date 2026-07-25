@@ -1,10 +1,14 @@
 // Auth templates
 export { default as WelcomeEmail } from "./templates/auth/welcome"
+export { default as VerifyReminderEmail } from "./templates/auth/verify-reminder"
 export { default as MagicLinkEmail } from "./templates/auth/magic-link"
 export { default as ScheduleEmail } from "./templates/auth/schedule"
 
 // Blast template
 export { default as BlastEmail } from "./templates/blast"
+
+// Marketing templates
+export { default as MarketingLaunchEmail } from "./templates/marketing-launch"
 
 // Order templates
 export { default as OrderConfirmationEmail } from "./templates/orders/order-confirmation"
@@ -16,6 +20,11 @@ export { default as OrderDocumentConfirmationEmail } from "./templates/orders/or
 export { default as BookingConfirmedEmail } from "./templates/bookings/booking-confirmed"
 export { default as BookingStatusEmail } from "./templates/bookings/booking-status"
 export { default as BookingAdminAlertEmail } from "./templates/bookings/booking-admin-alert"
+
+// Lot bid templates
+export { default as LotBidReceivedEmail } from "./templates/lots/lot-bid-received"
+export { default as LotBidAcceptedEmail } from "./templates/lots/lot-bid-accepted"
+export { default as LotBidRejectedEmail } from "./templates/lots/lot-bid-rejected"
 
 // Pre-order templates
 export { default as PreorderRequestReceivedEmail } from "./templates/bookings/preorder-request-received"

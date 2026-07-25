@@ -159,42 +159,66 @@ const [mounted, setMounted] = useState(false)
         <div className="sticky top-20">
           <div className="border rounded-xl bg-card overflow-hidden">
             <div className="p-4 border-b">
-              {displayPrice !== null ? (
-                <>
-                  {displayWasPrice && (
-                    <p className="text-xs text-muted-foreground leading-none mb-0.5">
-                      Was <span className="line-through">${displayWasPrice.toFixed(2)}</span>
-                      {discount && <span className="ml-1 text-green-700 dark:text-green-400">-{discount}%</span>}
-                    </p>
-                  )}
-                  <div className="flex items-baseline gap-1.5">
-                    <span className="text-3xl font-bold leading-none">${displayPrice.toFixed(2)}</span>
-                    {selectedVariant && <span className="text-xs text-muted-foreground">{selectedVariant.name}</span>}
-                  </div>
-                  <p className="text-[11px] text-muted-foreground mt-2">Price when purchased online</p>
-                  {savings && <p className="text-xs text-green-700 dark:text-green-400 font-medium mt-0.5">You save ${savings.toFixed(2)}</p>}
-                </>
-              ) : (
-                <p className="text-sm text-muted-foreground">Price on request</p>
-              )}
-              {!inStock && (
-                <div className="flex items-center gap-1.5 mt-1">
-                  <div className="h-1.5 w-1.5 rounded-full bg-red-500" />
-                  <span className="text-xs font-medium text-red-700 dark:text-red-400">Out of stock</span>
+              {!inStock && displayPrice === null ? (
+                <div className="space-y-3">
+                  <p className="text-sm font-medium text-foreground">Price coming soon</p>
+                  <p className="text-xs text-muted-foreground">We're finalising pricing for this product. We'll notify you when it's available to buy.</p>
+                  <Link
+                    href={`/interest/${productType}/${slug}?reason=${!inStock && displayPrice !== null ? "restock" : "interest"}`}
+                    className="block w-full text-center text-sm font-semibold bg-primary/10 hover:bg-primary/15 text-foreground rounded-lg py-2.5 transition-colors"
+                  >
+                    Let me know when available
+                  </Link>
                 </div>
-              )}
-              {ctaSlot ?? (
-                <AddToCartButton
-                  productId={product.id}
-                  sku={selectedVariant?.sku}
-                  productType={productType}
-                  productName={selectedVariant ? `${product.name} - ${selectedVariant.name}` : product.name}
-                  productSlug={slug}
-                  imageSrc={product.images?.[0]?.img?.src}
-                  unitPrice={selectedVariant?.sale_price || product.sale_price || 0}
-                  available={inStock}
-                  loginRedirect={loginRedirect}
-                />
+              ) : (
+                <>
+                  {displayPrice !== null ? (
+                    <>
+                      {displayWasPrice && (
+                        <p className="text-xs text-muted-foreground leading-none mb-0.5">
+                          Was <span className="line-through">${displayWasPrice.toFixed(2)}</span>
+                          {discount && <span className="ml-1 text-green-700 dark:text-green-400">-{discount}%</span>}
+                        </p>
+                      )}
+                      <div className="flex items-baseline gap-1.5">
+                        <span className="text-3xl font-bold leading-none">${displayPrice.toFixed(2)}</span>
+                        {selectedVariant && <span className="text-xs text-muted-foreground">{selectedVariant.name}</span>}
+                      </div>
+                      <p className="text-[11px] text-muted-foreground mt-2">Price when purchased online</p>
+                      {savings && <p className="text-xs text-green-700 dark:text-green-400 font-medium mt-0.5">You save ${savings.toFixed(2)}</p>}
+                    </>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">Price on request</p>
+                  )}
+                  {!inStock ? (
+                    <div className="space-y-2.5 mt-1">
+                      <div className="flex items-center gap-1.5">
+                        <div className="h-1.5 w-1.5 rounded-full bg-red-500" />
+                        <span className="text-xs font-medium text-red-700 dark:text-red-400">Out of stock</span>
+                      </div>
+                      <Link
+                        href={`/interest/${productType}/${slug}?reason=${!inStock && displayPrice !== null ? "restock" : "interest"}`}
+                        className="block w-full text-center text-sm font-semibold bg-primary/10 hover:bg-primary/15 text-foreground rounded-lg py-2.5 transition-colors"
+                      >
+                        Alert me when back in stock
+                      </Link>
+                    </div>
+                  ) : (
+                    ctaSlot ?? (
+                      <AddToCartButton
+                        productId={product.id}
+                        sku={selectedVariant?.sku}
+                        productType={productType}
+                        productName={selectedVariant ? `${product.name} - ${selectedVariant.name}` : product.name}
+                        productSlug={slug}
+                        imageSrc={product.images?.[0]?.img?.src}
+                        unitPrice={selectedVariant?.sale_price || product.sale_price || 0}
+                        available={inStock}
+                        loginRedirect={loginRedirect}
+                      />
+                    )
+                  )}
+                </>
               )}
             </div>
 
@@ -217,17 +241,28 @@ const [mounted, setMounted] = useState(false)
         <div className="lg:hidden fixed bottom-0 left-0 right-0 z-[999] bg-background border-t px-4 py-3 flex items-center gap-3">
           <div className="flex-1 min-w-0">
             <p className="text-xs text-muted-foreground truncate">{product.name}{selectedVariant ? ` · ${selectedVariant.name}` : ""}</p>
-            {displayPrice !== null
-              ? <p className="text-base font-bold leading-tight">${displayPrice.toFixed(2)}</p>
-              : <p className="text-sm text-muted-foreground">Price on request</p>
+            {!inStock && displayPrice === null
+              ? <p className="text-sm text-muted-foreground">Price coming soon</p>
+              : displayPrice !== null
+                ? <p className="text-base font-bold leading-tight">${displayPrice.toFixed(2)}</p>
+                : <p className="text-sm text-muted-foreground">Price on request</p>
             }
           </div>
-          <Link
-            href={`/contact?subject=Enquiry: ${encodeURIComponent(product.name)}${selectedVariant ? ` - ${selectedVariant.name}` : ""}&utm_source=farmnport&utm_medium=buy-page&utm_content=${slug}`}
-            className="shrink-0 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-sm px-5 py-2.5 rounded-full transition-colors"
-          >
-            Want to buy
-          </Link>
+          {!inStock ? (
+            <Link
+              href={`/interest/${productType}/${slug}?reason=${!inStock && displayPrice !== null ? "restock" : "interest"}`}
+              className="shrink-0 bg-primary/10 hover:bg-primary/15 text-primary font-semibold text-sm px-5 py-2.5 rounded-full transition-colors"
+            >
+              {displayPrice === null ? "Register interest" : "Alert me"}
+            </Link>
+          ) : (
+            <Link
+              href={`/contact?subject=Enquiry: ${encodeURIComponent(product.name)}${selectedVariant ? ` - ${selectedVariant.name}` : ""}&utm_source=farmnport&utm_medium=buy-page&utm_content=${slug}`}
+              className="shrink-0 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-sm px-5 py-2.5 rounded-full transition-colors"
+            >
+              Want to buy
+            </Link>
+          )}
         </div>,
         document.body
       )}

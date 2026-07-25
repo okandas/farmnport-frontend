@@ -20,7 +20,7 @@ export default function PricesPage() {
     "@type": "BreadcrumbList",
     "itemListElement": [
       { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://farmnport.com" },
-      { "@type": "ListItem", "position": 2, "name": "Market", "item": "https://farmnport.com/market" },
+      { "@type": "ListItem", "position": 2, "name": "Buy", "item": "https://farmnport.com/buy" },
       { "@type": "ListItem", "position": 3, "name": "Prices", "item": "https://farmnport.com/prices" },
     ],
   }
@@ -32,7 +32,7 @@ export default function PricesPage() {
         <nav className="flex items-center gap-1.5 text-xs text-muted-foreground mb-4">
           <Link href="/" className="hover:text-foreground transition-colors">Home</Link>
           <span>/</span>
-          <Link href="/market" className="hover:text-foreground transition-colors">Market</Link>
+          <Link href="/buy" className="hover:text-foreground transition-colors">Buy</Link>
           <span>/</span>
           <span className="text-foreground font-medium">Prices</span>
         </nav>

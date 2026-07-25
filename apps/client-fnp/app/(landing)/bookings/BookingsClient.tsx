@@ -1,6 +1,9 @@
 "use client"
 
+import { useEffect } from "react"
 import Link from "next/link"
+import { driver } from "driver.js"
+import "driver.js/dist/driver.css"
 
 import { BuyCategoriesNavClient } from "@/components/generic/BuyCategoriesNavClient"
 
@@ -66,7 +69,7 @@ function EventCard({ event }: { event: any }) {
         </div>
 
         <div className="mt-auto pt-1">
-          <div className="w-full text-center text-sm font-medium py-2 rounded-md border hover:bg-muted transition-colors">
+          <div id="booking-card-cta" className="w-full text-center text-sm font-medium py-2 rounded-md border hover:bg-muted transition-colors">
             {event.market_side === "demand" ? "Supply Now" : "Book Now"}
           </div>
         </div>
@@ -82,6 +85,55 @@ interface BookingsClientProps {
 
 export function BookingsClient({ categories, initialPreOrders }: BookingsClientProps) {
   const events = initialPreOrders
+
+  useEffect(() => {
+    const key = "fnp_bookings_tour_seen"
+    if (typeof window === "undefined") return
+    if (localStorage.getItem(key)) return
+    if (events.length === 0) return
+
+    const el = document.getElementById("bookings-grid")
+    if (!el) return
+
+    localStorage.setItem(key, "1")
+
+    const d = driver({
+      showProgress: true,
+      allowClose: true,
+      steps: [
+        {
+          element: "#bookings-heading",
+          popover: {
+            title: "Pre-Order Bookings",
+            description: "Reserve produce directly from suppliers before it sells out.",
+            side: "bottom",
+            align: "start",
+          },
+        },
+        {
+          element: "#bookings-grid > a:first-child",
+          popover: {
+            title: "Available Batches",
+            description: "Each card shows the price, available stock, and closing date. Click one to view details.",
+            side: "bottom",
+            align: "start",
+          },
+        },
+        {
+          element: "#booking-card-cta",
+          popover: {
+            title: "Book Now",
+            description: "Click here to view the full listing and place your booking.",
+            side: "top",
+            align: "start",
+          },
+        },
+      ],
+    })
+
+    const t = setTimeout(() => d.drive(), 1000)
+    return () => clearTimeout(t)
+  }, [events.length])
 
   return (
     <div className="flex flex-col lg:flex-row gap-8">
@@ -102,7 +154,7 @@ export function BookingsClient({ categories, initialPreOrders }: BookingsClientP
         )}
 
         {events.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div id="bookings-grid" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {events.map((event: any) => (
               <EventCard key={event.id} event={event} />
             ))}

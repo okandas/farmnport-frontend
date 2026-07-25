@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query"
 import { queryAllPlantNutritionProducts } from "@/lib/query"
 import { Button } from "@/components/ui/button"
 import { PlantNutritionFilterSidebar } from "@/components/generic/plantNutritionFilterSidebar"
+import { GuidesSidebarNav } from "@/components/generic/GuidesSidebarNav"
 import { ProductCard } from "@/components/shared/ProductCard"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
 
@@ -50,6 +51,7 @@ export function AllPlantNutritionClient({ initialProducts, initialTotal }: AllPl
     return (
         <div className="flex flex-col lg:flex-row gap-8">
             <aside className="w-full lg:w-64 flex-shrink-0">
+                <GuidesSidebarNav />
                 <PlantNutritionFilterSidebar />
             </aside>
 

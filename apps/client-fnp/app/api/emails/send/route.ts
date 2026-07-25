@@ -3,6 +3,7 @@ import { Resend } from "resend"
 import { render } from "@react-email/render"
 import {
   WelcomeEmail,
+  VerifyReminderEmail,
   MagicLinkEmail,
   ScheduleEmail,
   OrderConfirmationEmail,
@@ -22,6 +23,10 @@ import {
   PreorderReadyEmail,
   PreorderCollectedEmail,
   PreorderExpiredEmail,
+  MarketingLaunchEmail,
+  LotBidReceivedEmail,
+  LotBidAcceptedEmail,
+  LotBidRejectedEmail,
 } from "@/emails"
 
 const FROM = "farmnport <noreply@farmnport.com>"
@@ -47,6 +52,11 @@ export async function POST(req: NextRequest) {
     case "welcome":
       subject = "Welcome to farmnport"
       html = await render(WelcomeEmail(props as Parameters<typeof WelcomeEmail>[0]))
+      break
+
+    case "verify-reminder":
+      subject = (props as { subject?: string }).subject ?? "Verify your farmnport account to start trading"
+      html = await render(VerifyReminderEmail(props as Parameters<typeof VerifyReminderEmail>[0]))
       break
 
     case "magic-link":
@@ -90,6 +100,13 @@ export async function POST(req: NextRequest) {
       const p = props as Parameters<typeof BlastEmail>[0]
       subject = (props as { subject?: string }).subject ?? "Message from farmnport"
       html = await render(BlastEmail(p))
+      break
+    }
+
+    case "marketing-launch": {
+      const p = props as Parameters<typeof MarketingLaunchEmail>[0]
+      subject = "New ways to trade on farmnport — bookings and lots"
+      html = await render(MarketingLaunchEmail(p))
       break
     }
 
@@ -156,6 +173,21 @@ export async function POST(req: NextRequest) {
     case "preorder-expired":
       subject = `Booking Expired — ${(props as { bookingRef?: string }).bookingRef ?? ""}`
       html = await render(PreorderExpiredEmail(props as Parameters<typeof PreorderExpiredEmail>[0]))
+      break
+
+    case "lot-bid-received":
+      subject = "New offer on your lot"
+      html = await render(LotBidReceivedEmail(props as Parameters<typeof LotBidReceivedEmail>[0]))
+      break
+
+    case "lot-bid-accepted":
+      subject = "Your offer was accepted"
+      html = await render(LotBidAcceptedEmail(props as Parameters<typeof LotBidAcceptedEmail>[0]))
+      break
+
+    case "lot-bid-rejected":
+      subject = "Your offer was not accepted"
+      html = await render(LotBidRejectedEmail(props as Parameters<typeof LotBidRejectedEmail>[0]))
       break
 
     default:

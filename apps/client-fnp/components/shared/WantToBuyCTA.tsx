@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { ShoppingCart, Bell } from "lucide-react"
+import { ShoppingCart } from "lucide-react"
 
 interface WantToBuyCTAProps {
     available_for_sale: boolean
@@ -9,39 +9,21 @@ interface WantToBuyCTAProps {
     interestHref: string
 }
 
-export function WantToBuyCTA({ available_for_sale, name, brand, href, interestHref }: WantToBuyCTAProps) {
-    if (available_for_sale) {
-        const label = brand ? `${name} ${brand}` : name
-        return (
-            <Link
-                href={href}
-                className="flex items-center gap-3 rounded-xl border-2 border-primary/20 bg-primary/5 hover:bg-primary/10 hover:border-primary/40 transition-colors px-4 py-3"
-            >
-                <div className="flex items-center justify-center w-9 h-9 rounded-full bg-primary/10 shrink-0">
-                    <ShoppingCart className="w-4 h-4 text-primary" />
-                </div>
-                <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-foreground">Buy {label} online</p>
-                    <p className="text-xs text-muted-foreground">Only at Farmnport · shop now</p>
-                </div>
-                <span className="text-xs font-medium text-primary shrink-0">View →</span>
-            </Link>
-        )
-    }
-
+export function WantToBuyCTA({ name, brand, href }: WantToBuyCTAProps) {
+    const label = brand ? `${name} ${brand}` : name
     return (
         <Link
-            href={interestHref}
-            className="flex items-center gap-3 rounded-xl border-2 border-orange-300 bg-orange-50 hover:bg-orange-100 hover:border-orange-400 dark:border-orange-700 dark:bg-orange-950/30 dark:hover:bg-orange-950/50 dark:hover:border-orange-600 transition-colors px-4 py-3"
+            href={href}
+            className="flex items-center gap-3 rounded-xl border-2 border-primary/20 bg-primary/5 hover:bg-primary/10 hover:border-primary/40 transition-colors px-4 py-3"
         >
-            <div className="flex items-center justify-center w-9 h-9 rounded-full bg-orange-100 dark:bg-orange-900/40 shrink-0">
-                <Bell className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+            <div className="flex items-center justify-center w-9 h-9 rounded-full bg-primary/10 shrink-0">
+                <ShoppingCart className="w-4 h-4 text-primary" />
             </div>
             <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-foreground">Want to buy this?</p>
-                <p className="text-xs text-orange-700 dark:text-orange-400">Sign in and register your interest</p>
+                <p className="text-sm font-semibold text-foreground">Buy {label} online</p>
+                <p className="text-xs text-muted-foreground">View price and purchase on Farmnport</p>
             </div>
-            <span className="text-xs font-medium text-orange-700 dark:text-orange-400 shrink-0">Notify me →</span>
+            <span className="text-xs font-medium text-primary shrink-0">Buy now →</span>
         </Link>
     )
 }

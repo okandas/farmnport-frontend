@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: BuyFeedPageProps): Promise<Me
     const { slug } = await params
     const product = await getFeedProduct(slug)
     if (!product) return { title: 'Livestock Feed | farmnport.com', robots: { index: false } }
-    return buildBuyMetadata(product, product.feed_category?.name || 'Livestock Feed', `/buy-feeds/${slug}`)
+    return buildBuyMetadata(product, product.feed_category?.name || 'Livestock Feed', `/buy-feeds/${slug}`, undefined, product.images?.[0]?.img?.src)
 }
 
 export default async function BuyFeedPage({ params }: BuyFeedPageProps) {
@@ -61,6 +61,8 @@ export default async function BuyFeedPage({ params }: BuyFeedPageProps) {
             "priceCurrency": "USD",
             "price": product.sale_price > 0 ? (product.sale_price / 100).toFixed(2) : "0.00",
             "availability": product.available_for_sale ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+            "itemCondition": "https://schema.org/NewCondition",
+            "priceValidUntil": new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
             "seller": { "@type": "Organization", "name": "farmnport" }
         }
     }

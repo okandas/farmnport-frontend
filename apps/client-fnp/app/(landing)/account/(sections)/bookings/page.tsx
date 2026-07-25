@@ -2,24 +2,11 @@
 
 import { useSession } from "next-auth/react"
 import { useQuery } from "@tanstack/react-query"
-import { Loader2, CalendarDays, Truck } from "lucide-react"
+import { Loader2, CalendarDays } from "lucide-react"
 import Link from "next/link"
 
 import { myBookings } from "@/lib/query"
 
-const STATUS_STYLES: Record<string, string> = {
-  pending:          "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400",
-  confirmed:        "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
-  pending_payment:  "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400",
-  paid:             "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
-  approved:         "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400",
-  ready:            "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400",
-  collected:        "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
-  completed:        "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
-  rejected:         "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
-  expired:          "bg-muted text-muted-foreground",
-  cancelled:        "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
-}
 
 const STATUS_LABELS: Record<string, string> = {
   pending:          "Pending Approval",
@@ -102,11 +89,14 @@ export default function BookingsPage() {
       <nav className="flex items-center gap-1.5 text-sm text-muted-foreground mb-4">
         <Link href="/account" className="hover:text-foreground transition-colors">Account</Link>
         <span>/</span>
-        <span className="text-foreground font-medium">My Booking Orders</span>
+        <span className="text-foreground font-medium">Booked</span>
       </nav>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-bold">My Booking Orders</h1>
-        <Link href="/bookings" className="text-sm text-primary hover:underline">View available bookings</Link>
+      <div className="flex items-start justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold">Booked</h1>
+          <p className="text-sm text-muted-foreground">Bookings you made as a customer from other sellers.</p>
+        </div>
+        <Link href="/bookings" className="text-sm text-primary hover:underline shrink-0">View available bookings</Link>
       </div>
 
         {bookings.length === 0 ? (
@@ -118,56 +108,39 @@ export default function BookingsPage() {
             </p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {bookings.map((booking) => (
-              <Link
+              <div
                 key={booking.id}
-                href={`/account/bookings/${booking.id}`}
-                className="block border rounded-xl p-4 hover:bg-muted/30 transition-colors"
+                className="rounded-xl border p-4 sm:p-5 space-y-3"
               >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="space-y-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-bold text-sm">{booking.booking_ref}</span>
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_STYLES[booking.status] ?? "bg-muted text-muted-foreground"}`}>
-                        {STATUS_LABELS[booking.status] ?? booking.status}
-                      </span>
-                      <span className="text-xs text-muted-foreground capitalize flex items-center gap-1">
-                        {booking.type === "delivery" ? <Truck className="w-3 h-3" /> : booking.type === "pickup" ? <Truck className="w-3 h-3" /> : <CalendarDays className="w-3 h-3" />}
-                        {booking.type === "pre-order" ? "Pre-Order" : booking.type}
-                      </span>
-                    </div>
-
-                    {booking.type === "pre-order" && booking.pre_order && (
-                      <p className="text-xs text-muted-foreground">
-                        {booking.pre_order.event_title} · {booking.pre_order.quantity} {booking.pre_order.unit || "units"}
-                      </p>
-                    )}
-
-                    {booking.type === "delivery" && booking.delivery && (
-                      <p className="text-xs text-muted-foreground">
-                        {booking.delivery.delivery_location_name} · {booking.delivery.goods}
-                      </p>
-                    )}
-
-                    <p className="text-xs text-muted-foreground">
-                      {formatDate(booking.booking_date)}
-                      {booking.time_slot ? ` · ${booking.time_slot}` : ""}
-                    </p>
-                  </div>
-
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-base font-bold min-w-0">
+                    {STATUS_LABELS[booking.status] ?? booking.status}, {formatDate(booking.booking_date)}
+                  </p>
+                  <Link
+                    href={`/account/bookings/${booking.id}`}
+                    className="shrink-0 text-sm font-medium px-4 py-2 rounded-lg border hover:bg-muted transition-colors"
+                  >
+                    Booking Details
+                  </Link>
+                </div>
+                <div className="space-y-1 text-sm text-muted-foreground">
+                  <p>
+                    {booking.booking_ref} · {booking.type === "pre-order" ? "Pre-Order" : booking.type}
+                    {booking.time_slot ? ` · ${booking.time_slot}` : ""}
+                  </p>
                   {booking.type === "pre-order" && booking.pre_order && (
-                    <div className="text-right shrink-0">
-                      <p className="font-bold text-sm">
-                        ${(Math.round(booking.pre_order.deposit_amount * 1.069) / 100).toFixed(2)}
-                      </p>
-                      <p className={`text-xs ${booking.pre_order.deposit_paid ? "text-green-700" : ["cancelled", "rejected", "expired"].includes(booking.status) ? "text-red-600" : "text-muted-foreground"}`}>
-                        {booking.pre_order.deposit_paid ? "Paid" : ["cancelled", "rejected", "expired"].includes(booking.status) ? booking.status.charAt(0).toUpperCase() + booking.status.slice(1) : "Not yet paid"}
-                      </p>
-                    </div>
+                    <p>
+                      {booking.pre_order.event_title} · {booking.pre_order.quantity} {booking.pre_order.unit || "units"}
+                      {booking.pre_order.deposit_paid ? " · Paid" : ""}
+                    </p>
+                  )}
+                  {booking.type === "delivery" && booking.delivery && (
+                    <p>{booking.delivery.delivery_location_name} · {booking.delivery.goods}</p>
                   )}
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
         )}

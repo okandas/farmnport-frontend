@@ -2,19 +2,11 @@
 
 import { useSession } from "next-auth/react"
 import { useQuery } from "@tanstack/react-query"
-import { Loader2, Gavel } from "lucide-react"
+import { Loader2 } from "lucide-react"
 import Link from "next/link"
 import { myBids } from "@/lib/query"
 import { centsToDollars } from "@/lib/utilities"
 
-const STATUS_STYLES: Record<string, string> = {
-  pending:   "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400",
-  accepted:  "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
-  rejected:  "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
-  paid:      "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
-  completed: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
-  expired:   "bg-muted text-muted-foreground",
-}
 
 function capitalize(s: string) {
   return s.charAt(0).toUpperCase() + s.slice(1)
@@ -40,12 +32,15 @@ interface Bid {
 export default function MyBidsPage() {
   const { data: session, status } = useSession()
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["my-bids"],
     queryFn: () => myBids().then((r) => r.data),
     enabled: !!session,
     refetchOnMount: "always",
+    retry: false,
   })
+
+  const isImpersonating = !!(session?.user as any)?.impersonated_by
 
   if (status === "loading" || isLoading) {
     return (
@@ -55,11 +50,21 @@ export default function MyBidsPage() {
     )
   }
 
+  if (isError && isImpersonating) {
+    return (
+      <div className="flex items-center justify-center py-24">
+        <div className="text-center space-y-3">
+          <p className="font-semibold">Impersonation session expired</p>
+          <p className="text-sm text-muted-foreground">Please re-impersonate this user from the admin panel.</p>
+        </div>
+      </div>
+    )
+  }
+
   if (!session) {
     return (
       <div className="flex items-center justify-center py-24">
         <div className="text-center space-y-4">
-          <Gavel className="w-12 h-12 mx-auto text-muted-foreground/40" />
           <p className="font-semibold">Sign in to view your bids</p>
           <Link
             href="/login?next=/account/bids"
@@ -79,13 +84,13 @@ export default function MyBidsPage() {
       <nav className="flex items-center gap-1.5 text-sm text-muted-foreground mb-4">
         <Link href="/account" className="hover:text-foreground transition-colors">Account</Link>
         <span>/</span>
-        <span className="text-foreground font-medium">My Bids</span>
+        <span className="text-foreground font-medium">My Offers</span>
       </nav>
-      <h1 className="text-xl font-bold mb-6">My Bids</h1>
+      <h1 className="text-2xl font-bold">My Offers</h1>
+      <p className="text-sm text-muted-foreground mb-6">Offers you placed on lots posted by other users.</p>
 
       {bids.length === 0 ? (
         <div className="text-center py-16 space-y-4">
-          <Gavel className="w-12 h-12 mx-auto text-muted-foreground/40" />
           <p className="font-semibold">No bids yet</p>
           <p className="text-sm text-muted-foreground">When you place a bid on a lot, it will appear here.</p>
           <Link
@@ -96,19 +101,22 @@ export default function MyBidsPage() {
           </Link>
         </div>
       ) : (
-        <div className="divide-y">
+        <div className="space-y-4">
           {bids.map((bid) => (
-            <Link key={bid.id} href={`/account/bids/${bid.id}`} className="flex items-start justify-between gap-3 py-4 hover:bg-muted/50 transition-colors px-1">
-              <div className="space-y-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold text-sm font-mono">{bid.lot_slug}</span>
-                  <span className={`text-xs px-2 py-0.5 rounded-md font-medium ${STATUS_STYLES[bid.status] ?? "bg-muted text-muted-foreground"}`}>
-                    {capitalize(bid.status)}
-                  </span>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  {formatDate(bid.created)} · {bid.quantity} {bid.unit}
+            <div key={bid.id} className="rounded-xl border p-4 sm:p-5 space-y-3">
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-base font-bold min-w-0">
+                  {capitalize(bid.status)}, {formatDate(bid.created)}
                 </p>
+                <Link
+                  href={`/account/bids/${bid.id}`}
+                  className="shrink-0 text-sm font-medium px-4 py-2 rounded-lg border hover:bg-muted transition-colors"
+                >
+                  Offer Details
+                </Link>
+              </div>
+              <div className="space-y-1 text-sm text-muted-foreground">
+                <p>{bid.lot_slug} · {bid.quantity} {bid.unit} · {centsToDollars(bid.total_cents)} · {bid.lot_type === "sell" ? "Selling" : "Buying"}</p>
                 {bid.status === "accepted" && bid.lot_type === "request" && (
                   <p className="text-xs text-green-700 dark:text-green-400 font-medium">You have been selected to supply</p>
                 )}
@@ -116,12 +124,7 @@ export default function MyBidsPage() {
                   <p className="text-xs text-amber-700 dark:text-amber-400 font-medium">Pay by {formatDate(bid.payment_deadline)}</p>
                 )}
               </div>
-              <div className="text-right shrink-0 space-y-1">
-                <p className="text-xs text-muted-foreground">{centsToDollars(bid.offered_price_per_unit_cents)}/{bid.unit}</p>
-                <p className="font-semibold text-sm">{centsToDollars(bid.total_cents)}</p>
-                <p className="text-xs text-muted-foreground">{bid.lot_type === "sell" ? "Selling" : "Buying"}</p>
-              </div>
-            </Link>
+            </div>
           ))}
         </div>
       )}

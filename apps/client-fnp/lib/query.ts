@@ -43,9 +43,9 @@ api.interceptors.response.use(
     }
 )
 
-export function queryClient(slug: string) {
+export function queryClient(slug: string, type?: "buyer" | "farmer") {
 
-  let url = `${BaseURL}/client/${slug}`
+  let url = type ? `${BaseURL}/client/${type}/${slug}` : `${BaseURL}/client/${slug}`
 
   return api.get(url)
 }
@@ -88,7 +88,7 @@ export function queryClients(slug: string, pagination?: PaginationModel & { prov
 }
 
 
-export function queryClientsByProduct(slug: string, product: string, pagination?: PaginationModel & { province?: string[], verified?: string[] }) {
+export function queryClientsByProduct(slug: string, product: string, pagination?: PaginationModel & { province?: string[], verified?: string[], has_booking?: string }) {
   const params = new URLSearchParams()
 
   if (pagination?.p !== undefined && pagination.p >= 2) {
@@ -101,6 +101,10 @@ export function queryClientsByProduct(slug: string, product: string, pagination?
 
   if (pagination?.verified && pagination.verified.length > 0) {
     params.set('verified', pagination.verified[0])
+  }
+
+  if (pagination?.has_booking) {
+    params.set('has_booking', pagination.has_booking)
   }
 
   const queryString = params.toString()
@@ -214,11 +218,19 @@ export function queryBreedsByFarmProduce({ farmProduceId, p, search }: { farmPro
   return api.get(url)
 }
 
+export function queryProduceConditions({ farmProduceId, p, search }: { farmProduceId: string; p: number; search: string }) {
+  const params = new URLSearchParams()
+  params.set("p", String(p))
+  if (search) params.set("q", search)
+  if (farmProduceId) params.set("farm_produce_id", farmProduceId)
+  return api.get(`${BaseURL}/produce-conditions?${params.toString()}`)
+}
+
 export function postLot(data: {
   type: string
   farm_produce_id: string
   breed_id?: string
-  form: string
+  produce_condition_id?: string
   quantity: number
   unit: string
   price_per_unit_cents: number
@@ -230,12 +242,13 @@ export function postLot(data: {
   return api.post(`${BaseURL}/lots/`, data)
 }
 
-export function queryLots({ p, type, farm_produce_id, pending }: { p: number; type?: string; farm_produce_id?: string; pending?: boolean }) {
+export function queryLots({ p, type, farm_produce_id, pending, owner_slug }: { p: number; type?: string; farm_produce_id?: string; pending?: boolean; owner_slug?: string }) {
   const params = new URLSearchParams()
   if (p > 1) params.set("p", String(p))
   if (type) params.set("type", type)
   if (farm_produce_id) params.set("farm_produce_id", farm_produce_id)
   if (pending) params.set("pending", "true")
+  if (owner_slug) params.set("owner_slug", owner_slug)
   const qs = params.toString()
   return api.get(`${BaseURL}/lots/${qs ? `?${qs}` : ""}`)
 }
@@ -980,10 +993,11 @@ export function getLotBids(slug: string) {
 }
 
 // Bookings
-export function listPreOrders(options?: { product_id?: string; status?: string }) {
+export function listPreOrders(options?: { product_id?: string; status?: string; client_slug?: string }) {
   const params = new URLSearchParams()
   if (options?.product_id) params.set("product_id", options.product_id)
   if (options?.status) params.set("status", options.status)
+  if (options?.client_slug) params.set("client_slug", options.client_slug)
   const qs = params.toString()
   return api.get(`${BaseURL}/booking/preorders${qs ? `?${qs}` : ""}`)
 }
@@ -1214,6 +1228,6 @@ export function queryMarketNews(page: number = 1, limit: number = 20) {
   return api.get(`${BaseURL}/market-news/?page=${page}&limit=${limit}`)
 }
 
-export function recordProductInterest(productType: string, slug: string) {
-  return api.post(`${BaseURL}/interest/${productType}/${slug}`, {})
+export function recordProductInterest(productType: string, slug: string, reason: string = "interest") {
+  return api.post(`${BaseURL}/interest/${productType}/${slug}?reason=${reason}`, {})
 }

@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { ArrowRight, Users } from "lucide-react"
+import { ArrowRight } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { notFound } from "next/navigation"
 import type { Metadata, ResolvingMetadata } from "next"
@@ -27,7 +27,6 @@ interface FarmProduce {
 const COMMODITY_GUIDES: Record<string, CommodityGuide> = {
   chillies: {
     name: "Chillies",
-    buyerQueryProduce: "chillies",
     title: "Sell Your Chillies Directly to Buyers in Zimbabwe",
     description:
       "List your chilli lot on Farmnport and connect with processors, exporters, restaurants, and spice traders across Zimbabwe.",
@@ -40,11 +39,55 @@ const COMMODITY_GUIDES: Record<string, CommodityGuide> = {
     ],
     cta: "List Your Chilli Lot",
   },
+  maize: {
+    name: "Maize",
+    title: "Sell Your Maize Directly to Buyers in Zimbabwe",
+    description:
+      "List your maize lot on Farmnport and connect with millers, stockfeed manufacturers, and traders across Zimbabwe.",
+    intro:
+      "Maize is Zimbabwe's staple grain crop. Buyers include millers, stockfeed producers, commodity traders, and the Grain Marketing Board. Listing your lot on Farmnport gives you direct access to buyers who are actively sourcing — set your price and let them come to you.",
+    states: ["Grain (Dry)", "Green Mealies", "Stockfeed Grade"],
+    tips: [
+      "State the moisture content — buyers need to know if the grain is dry enough for storage.",
+      "Specify white or yellow maize — they trade at different prices.",
+      "Include your location — transport costs affect buyer decisions significantly.",
+    ],
+    cta: "List Your Maize Lot",
+  },
+  cattle: {
+    name: "Cattle",
+    title: "Sell Your Cattle Directly to Buyers in Zimbabwe",
+    description:
+      "List your cattle lot on Farmnport and connect with abattoirs, feedlots, and private buyers across Zimbabwe.",
+    intro:
+      "Selling cattle at auction doesn't always get you the price your animals deserve. On Farmnport, you set the price and timeline. Abattoirs, feedlots, and private buyers browse available lots and make offers — you accept when the price is right.",
+    states: ["Live", "On the Hoof"],
+    tips: [
+      "Specify the breed — buyers pay premiums for known breeds like Brahman, Hereford, and Sussex.",
+      "Include weight estimates — buyers calculate price per kilogram live weight.",
+      "Add photos — lots with photos get significantly more interest than those without.",
+    ],
+    cta: "List Your Cattle Lot",
+  },
+  chicken: {
+    name: "Chicken",
+    title: "Sell Your Chickens Directly to Buyers in Zimbabwe",
+    description:
+      "List your chicken lot on Farmnport and connect with abattoirs, restaurants, and wholesale buyers across Zimbabwe.",
+    intro:
+      "Whether you're selling broilers, layers, road runners, or day-old chicks, Farmnport connects you with buyers who are actively looking. Set your price per bird, specify the type and age, and let buyers come to you.",
+    states: ["Live", "Dressed", "Day-Old Chicks", "Point of Lay"],
+    tips: [
+      "Specify the type — broilers, layers, road runners, and day-old chicks sell to very different buyers.",
+      "Include the age or weight — buyers need this to calculate value.",
+      "State minimum order quantity — some buyers need volume, others buy small batches.",
+    ],
+    cta: "List Your Chicken Lot",
+  },
 }
 
 interface CommodityGuide {
   name: string
-  buyerQueryProduce: string
   title: string
   description: string
   intro: string
@@ -74,15 +117,6 @@ export async function generateMetadata({ params }: Props, _parent: ResolvingMeta
   }
 }
 
-async function getBuyerCount(produce: string): Promise<number> {
-  try {
-    const res = await serverFetch<{ total: number }>(`/buyer/all?produce=${produce}&limit=1`)
-    return res?.total ?? 0
-  } catch {
-    return 0
-  }
-}
-
 async function getBreeds(commodity: string): Promise<Breed[]> {
   try {
     const produce = await serverFetch<FarmProduce>(`/farmproduce/${commodity}`)
@@ -100,10 +134,7 @@ export default async function SellCommodityPage({ params }: Props) {
 
   if (!guide) notFound()
 
-  const [buyerCount, breeds] = await Promise.all([
-    getBuyerCount(guide.buyerQueryProduce),
-    getBreeds(commodity),
-  ])
+  const breeds = await getBreeds(commodity)
 
   return (
     <main>
@@ -120,12 +151,6 @@ export default async function SellCommodityPage({ params }: Props) {
         <div className="space-y-4">
           <div className="flex items-center gap-3 flex-wrap">
             <Badge>Lots Open</Badge>
-            {buyerCount > 0 && (
-              <span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
-                <Users className="h-4 w-4" />
-                {buyerCount} registered {guide.name.toLowerCase()} buyers on Farmnport
-              </span>
-            )}
           </div>
           <h1 className="text-3xl font-bold tracking-tight">{guide.title}</h1>
           <p className="text-lg text-muted-foreground">{guide.description}</p>
@@ -138,12 +163,6 @@ export default async function SellCommodityPage({ params }: Props) {
             >
               {guide.cta}
               <ArrowRight className="h-4 w-4" />
-            </Link>
-            <Link
-              href={`/buyers/${commodity}`}
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              See {guide.name.toLowerCase()} buyers →
             </Link>
           </div>
         </div>

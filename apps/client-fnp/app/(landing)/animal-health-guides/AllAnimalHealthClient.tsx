@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query"
 import { queryAllAnimalHealthProducts } from "@/lib/query"
 import { Button } from "@/components/ui/button"
 import { AnimalHealthFilterSidebar } from "@/components/generic/animalHealthFilterSidebar"
+import { GuidesSidebarNav } from "@/components/generic/GuidesSidebarNav"
 import { ProductCard } from "@/components/shared/ProductCard"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
 
@@ -51,6 +52,7 @@ export function AllAnimalHealthClient({ initialProducts, initialTotal }: AllAnim
     return (
         <div className="flex flex-col lg:flex-row gap-8">
             <aside className="w-full lg:w-64 flex-shrink-0">
+                <GuidesSidebarNav />
                 <AnimalHealthFilterSidebar />
             </aside>
 

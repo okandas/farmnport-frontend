@@ -48,7 +48,7 @@ export default async function BuyerPage({ params }:  BuyerPageProps) {
       <h1 className="sr-only">{name} - Farmer in Zimbabwe</h1>
       <div className="mx-auto max-w-7xl min-h-[70lvh]">
         <div className="lg:flex lg:space-x-10">
-          <Client slug={slug} user={user}/>
+          <Client slug={slug} type="farmer" user={user}/>
           <div className="hidden lg:block lg:w-44 shrink-0 px-6 pt-6">
             <QuickLinks />
           </div>

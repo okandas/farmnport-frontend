@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: BuyEquipmentProductPageProps)
     const { slug } = await params
     const product = await serverFetch(`/equipment/${slug}`).catch(() => null)
     if (!product) return { title: 'Farm Equipment | farmnport.com', robots: { index: false } }
-    return buildBuyMetadata(product, product.equipment_category?.name || 'Farm Equipment', `/buy-equipment/${slug}`, 'farmers in Zimbabwe')
+    return buildBuyMetadata(product, product.equipment_category?.name || 'Farm Equipment', `/buy-equipment/${slug}`, 'farmers in Zimbabwe', product.images?.[0]?.img?.src)
 }
 
 export default async function BuyEquipmentProductPage({ params }: BuyEquipmentProductPageProps) {
@@ -44,6 +44,8 @@ export default async function BuyEquipmentProductPage({ params }: BuyEquipmentPr
             "priceCurrency": "USD",
             "price": product.sale_price > 0 ? (product.sale_price / 100).toFixed(2) : "0.00",
             "availability": product.available_for_sale ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+            "itemCondition": "https://schema.org/NewCondition",
+            "priceValidUntil": new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
             "seller": { "@type": "Organization", "name": "farmnport" }
         }
     } : null

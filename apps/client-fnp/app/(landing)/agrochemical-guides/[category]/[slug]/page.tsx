@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const chemical = await serverFetch(`/agrochemical/${slug}`).catch(() => null)
 
   if (!chemical) {
-    return { title: 'Agrochemical Guide | farmnport.com' }
+    return { title: 'Agrochemical Guide | farmnport.com', robots: { index: false } }
   }
 
   const categoryName = chemical.agrochemical_category?.name || category.replace(/-/g, ' ')
@@ -42,7 +42,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     'View dosage rates, label information, and application guidelines on farmnport.com.',
   ].filter(Boolean).join('. ')
 
-  return buildGuideMetadata(chemical, categorySingularTitle, 'Dosage, Label & Guide', description, `/agrochemical-guides/${category}/${slug}`)
+  return buildGuideMetadata(chemical, categorySingularTitle, 'Dosage, Label & Guide', description, `/agrochemical-guides/${category}/${slug}`, chemical.images?.[0]?.img?.src)
 }
 
 interface GuidePageProps {
@@ -227,21 +227,13 @@ export default async function AgroChemicalGuidePage({ params }: GuidePageProps) 
                     <div className="space-y-6">
                         {/* Product Name */}
                         <GuideProductTitle name={chemical.name} brand={chemical.brand?.name} />
-                        <div className="mt-3"><ShareBar name={chemical.name} /></div>
-
-                        {/* Category Badge & Buy Link */}
-                        <div className="flex items-center gap-3 flex-wrap">
+                        <div className="mt-3 flex items-center flex-wrap gap-3">
                             {chemical.agrochemical_category && (
-                                <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                                <div className="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
                                     {chemical.agrochemical_category.name}
                                 </div>
                             )}
-                            {/* <Link
-                                href={`/buy-agrochemicals/${slug}`}
-                                className="inline-flex items-center px-4 py-1.5 rounded-full text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
-                            >
-                                Ready to Buy
-                            </Link> */}
+                            <ShareBar name={chemical.name} />
                         </div>
 
                         {/* Divider */}
@@ -271,15 +263,20 @@ export default async function AgroChemicalGuidePage({ params }: GuidePageProps) 
                         <AdSenseInFeed />
 
                         {/* Used On & Targets Grid */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:h-[315px]">
                             {/* Used On Section */}
                             {chemical.dosage_rates && chemical.dosage_rates.length > 0 && (
-                                <div className="rounded-xl border bg-card p-4">
+                                <div className="rounded-xl border bg-card p-4 overflow-y-auto">
                                     <h2 className="text-sm font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-400 mb-3">
                                         Used On
                                     </h2>
                                     <ul className="space-y-1.5">
-                                        {Array.from(new Set(chemical.dosage_rates.map((rate: any) => rate.crop))).map((crop: any, idx: number) => (
+                                        {Array.from(new Set(chemical.dosage_rates.flatMap((rate: any) => {
+                                            if (rate.crop_group_items?.length > 0) return rate.crop_group_items
+                                            if (rate.crop) return [rate.crop]
+                                            if (rate.crop_group) return [rate.crop_group]
+                                            return []
+                                        }))).map((crop: any, idx: number) => (
                                             <li key={idx} className="flex items-center gap-2 text-sm text-foreground">
                                                 <span className="h-1.5 w-1.5 rounded-full bg-amber-500 dark:bg-amber-400 flex-shrink-0" />
                                                 <span className="capitalize">{crop}</span>
@@ -355,6 +352,9 @@ export default async function AgroChemicalGuidePage({ params }: GuidePageProps) 
                             <p className="text-sm text-yellow-800 dark:text-yellow-200">
                                 Always read and follow label directions. Wear appropriate personal protective equipment (PPE) when handling agrochemicals.
                                 Store in original containers in a secure location away from children and animals. Dispose of containers properly according to local regulations.
+                            </p>
+                            <p className="text-xs text-black dark:text-white mt-2">
+                                Disclaimer: The information provided on this page, including active ingredients, dosage rates, application methods, and safety guidelines, has been compiled from publicly available product labels, manufacturer datasheets, and other third-party sources. Farmnport does not manufacture, formulate, or independently verify the accuracy, completeness, or currency of this information. Product formulations, registrations, and label directions may change without notice. Always refer to the official product label accompanying the purchased product for the most up-to-date and legally binding instructions. Farmnport accepts no liability for any loss, damage, crop injury, or adverse outcome arising from the use of, or reliance on, the information presented here. Use of any agrochemical product is entirely at the user&#39;s own risk.
                             </p>
                         </div>
                     </div>

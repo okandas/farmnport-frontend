@@ -16,7 +16,7 @@ interface Props {
 export function LotImageGallery({ mainImage, images = [] }: Props) {
   const all = [
     ...(mainImage ? [mainImage] : []),
-    ...images,
+    ...(images ?? []),
   ]
 
   const [selected, setSelected] = useState(0)
