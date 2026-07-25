@@ -1,8 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import Link from "next/link"
 import { useQuery, useMutation } from "@tanstack/react-query"
+import { useToast } from "@/components/ui/use-toast"
 import { Icons } from "@/components/icons/lucide"
 import { authorizedHTTPClient } from "@/lib/axios"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -56,6 +56,8 @@ const CHANNEL_CONFIG = {
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export function BlastView() {
+  const { toast } = useToast()
+
   // Filters
   const [typeFilter, setTypeFilter] = useState("all")
   const [provinceFilter, setProvinceFilter] = useState("all")
@@ -115,17 +117,15 @@ export function BlastView() {
 
   // ── Blast mutation ─────────────────────────────────────────────────────────
 
-  const [showSuccess, setShowSuccess] = useState(false)
-
   function handleBlastSuccess(data: any) {
-    setShowSuccess(true)
+    setResults(data)
     setTemplate("")
     setEmailSubject("")
     setOverrides({})
-    setTimeout(() => {
-      setResults(data)
-      setShowSuccess(false)
-    }, 3000)
+    toast({
+      title: `Blast sent — ${data.sent} delivered`,
+      description: data.failed > 0 ? `${data.failed} failed` : "Check your inbox",
+    })
   }
 
   const blastMutation = useMutation({
@@ -238,17 +238,8 @@ export function BlastView() {
         {/* ── Toolbar ── */}
         <div className="flex items-center justify-between px-5 py-3 border-b bg-white shrink-0">
           <div className="flex items-center gap-3">
-            {showSuccess ? (
-              <>
-                <span className="h-5 w-5 rounded-full bg-green-100 flex items-center justify-center text-green-600 text-xs font-bold">✓</span>
-                <span className="text-sm font-semibold text-green-700">Blast sent</span>
-              </>
-            ) : (
-              <>
-                <Icons.messageSquare className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm font-semibold">New Blast</span>
-              </>
-            )}
+            <Icons.messageSquare className="w-4 h-4 text-muted-foreground" />
+            <span className="text-sm font-semibold">New Blast</span>
             {clientsQuery.isFetching
               ? <span className="text-xs text-muted-foreground flex items-center gap-1"><Icons.spinner className="w-3 h-3 animate-spin" /> loading…</span>
               : clients.length > 0
