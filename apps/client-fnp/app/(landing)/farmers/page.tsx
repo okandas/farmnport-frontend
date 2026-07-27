@@ -56,8 +56,6 @@ export default async function FarmersPage() {
         <nav className="flex items-center gap-1.5 text-xs text-muted-foreground mb-4">
           <Link href="/" className="hover:text-foreground transition-colors">Home</Link>
           <span>/</span>
-          <Link href="/buy" className="hover:text-foreground transition-colors">Buy</Link>
-          <span>/</span>
           <span className="text-foreground font-medium">Farmers</span>
         </nav>
       </div>
