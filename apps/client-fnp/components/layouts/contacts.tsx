@@ -212,22 +212,6 @@ export function Contacts({ user, client, quickOverview }: ContactPageProps) {
                         }
                     </div>}
 
-                    {quickOverview && (client.main_produce || (client.other_produce && client.other_produce.length > 0)) && (
-                        <div className="flex gap-x-4 py-1">
-                            <dt className="flex items-center gap-1 text-xs text-muted-foreground w-24 shrink-0">
-                                <Icons.info className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-                                Produces
-                            </dt>
-                            <ul className="space-y-0.5">
-                                {client.main_produce?.name && (
-                                    <li className="text-sm text-foreground">{capitalizeFirstLetter(client.main_produce.name)}</li>
-                                )}
-                                {client.other_produce?.map((p: any, i: number) => (
-                                    <li key={i} className="text-sm text-foreground">{capitalizeFirstLetter(p.name)}</li>
-                                ))}
-                            </ul>
-                        </div>
-                    )}
 
                 </dl>
             </div>
