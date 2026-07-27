@@ -1,65 +1,92 @@
 import Link from "next/link"
-import { Sprout } from "lucide-react"
+import { serverFetch } from "@/lib/serverFetch"
+import { ProgramsCarousel } from "./ProgramsCarousel"
 
-const sections = [
+export const metadata = {
+    title: "Farm Programs Zimbabwe — Spray, Feeding & Rearing Schedules | farmnport.com",
+    description: "Browse structured spray, feeding, and rearing programs to manage crop protection and livestock nutrition in Zimbabwe.",
+    alternates: { canonical: "https://farmnport.com/programs" },
+}
+
+const REARING_PROGRAMS = [
     {
-        title: "Spray Programs",
-        description: "Structured agrochemical spray schedules for crop protection — by crop type, growth stage, and target pest or disease.",
-        href: "/spray-programs",
-    },
-    {
-        title: "Feed Programs",
-        description: "Complete livestock feeding programs by animal type and production phase — formulations, schedules, and nutritional targets.",
-        href: "/feeding-programs",
-    },
-    {
-        title: "Rearing Programs",
-        description: "Structured rearing guides for livestock and poultry — brooding, housing, nutrition, biosecurity, and management from arrival to maturity.",
-        href: "/rearing-programs",
+        slug: "brooding-101",
+        title: "Brooding 101",
+        tag: "Ross 308 Broilers",
+        description: "Warmth, water, feed, ventilation, and daily observation — a complete guide to day-old chick management.",
+        sections: 7,
     },
 ]
 
-export default function ProgramsPage() {
-    return (
-        <main className="bg-gradient-to-b from-background to-muted/20">
-            <section className="py-6 lg:py-8 relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-green-50/60 via-transparent to-emerald-50/40 dark:from-green-950/20 dark:to-emerald-950/10" />
-                <div className="mx-auto max-w-7xl px-6 lg:px-8 relative">
-                    <div className="text-center max-w-3xl mx-auto">
-                        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 text-sm font-medium mb-3">
-                            <Sprout className="h-4 w-4" />
-                            Farming Programs
-                        </div>
-                        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl font-heading mb-3">
-                            Farm <span className="text-primary">Programs</span>
-                        </h1>
-                        <p className="text-lg text-muted-foreground leading-7 max-w-2xl mx-auto">
-                            Structured spray and feeding programs to help you manage crop protection and livestock nutrition effectively.
-                        </p>
-                    </div>
-                </div>
-            </section>
+const CATEGORIES = [
+    { title: "Spray Programs", href: "/spray-programs", api: "/sprayprograms/", slugBase: "/spray-programs" },
+    { title: "Feeding Programs", href: "/feeding-programs", api: "/feedingprograms/", slugBase: "/feeding-programs" },
+    { title: "Rearing Programs", href: "/rearing-programs", api: null, slugBase: "/rearing-programs" },
+]
 
-            <section className="py-10 lg:py-14">
-                <div className="mx-auto max-w-7xl px-6 lg:px-8">
-                    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                        {sections.map(({ title, description, href }) => (
-                            <Link
-                                key={href}
-                                href={href}
-                                className="flex flex-col gap-3 p-6 rounded-xl bg-card border border-border hover:border-primary hover:shadow-md transition-all group"
-                            >
-                                <h2 className="text-base font-semibold text-foreground group-hover:text-primary transition-colors">
-                                    {title}
-                                </h2>
-                                <p className="text-sm text-muted-foreground leading-relaxed">
-                                    {description}
-                                </p>
-                            </Link>
+export default async function ProgramsPage() {
+    const results = await Promise.all(
+        CATEGORIES.map(async (cat) => {
+            if (!cat.api) {
+                return { ...cat, programs: REARING_PROGRAMS }
+            }
+            try {
+                const res = await serverFetch(cat.api)
+                return { ...cat, programs: (res?.data ?? []).slice(0, 8) }
+            } catch {
+                return { ...cat, programs: [] }
+            }
+        })
+    )
+
+    return (
+        <div className="min-h-screen">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
+                <nav className="flex items-center gap-1.5 text-xs text-muted-foreground mb-6">
+                    <Link href="/" className="hover:text-foreground transition-colors">Home</Link>
+                    <span>/</span>
+                    <span className="text-foreground font-medium">Programs</span>
+                </nav>
+
+                <h1 className="text-2xl sm:text-3xl font-bold tracking-tight mb-8">Farm Programs</h1>
+
+                <div className="flex gap-8">
+                    {/* Sidebar */}
+                    <aside className="hidden lg:block w-56 shrink-0">
+                        <nav className="flex flex-col gap-0.5">
+                            {CATEGORIES.map((cat) => (
+                                <Link
+                                    key={cat.href}
+                                    href={cat.href}
+                                    className="px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                                >
+                                    {cat.title}
+                                </Link>
+                            ))}
+                        </nav>
+                    </aside>
+
+                    {/* Main content */}
+                    <div className="flex-1 min-w-0 space-y-10">
+                        {results.map((cat) => (
+                            cat.programs.length > 0 && (
+                                <section key={cat.href}>
+                                    <div className="flex items-center justify-between mb-4">
+                                        <h2 className="text-lg font-bold">{cat.title}</h2>
+                                        <Link
+                                            href={cat.href}
+                                            className="text-sm font-medium px-4 py-1.5 rounded-lg border hover:bg-muted transition-colors"
+                                        >
+                                            View All
+                                        </Link>
+                                    </div>
+                                    <ProgramsCarousel programs={cat.programs} slugBase={cat.slugBase} />
+                                </section>
+                            )
                         ))}
                     </div>
                 </div>
-            </section>
-        </main>
+            </div>
+        </div>
     )
 }

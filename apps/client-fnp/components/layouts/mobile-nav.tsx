@@ -3,24 +3,182 @@
 import * as React from "react"
 import Link from "next/link"
 
-
 import { siteConfig } from "@/config/site"
 
-import {Button, buttonVariants} from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetHeader } from "@/components/ui/sheet"
 import { Icons } from "@/components/icons/lucide"
-import {AppURL, AuthenticatedUser} from "@/lib/schemas";
+import { AppURL, AuthenticatedUser } from "@/lib/schemas"
 
-import {sendGTMEvent} from "@next/third-parties/google";
-import {ThemeSwitcher} from "@/components/ui/theme-switcher";
-import {signOut} from "next-auth/react";
-import { ShoppingCart } from "lucide-react";
-import { useCart } from "@/contexts/cart-context";
-import { useQuery } from "@tanstack/react-query";
+import { sendGTMEvent } from "@next/third-parties/google"
+import { ThemeSwitcher } from "@/components/ui/theme-switcher"
+import { signOut } from "next-auth/react"
+import { ShoppingCart } from "lucide-react"
+import { useCart } from "@/contexts/cart-context"
+import { useQuery } from "@tanstack/react-query"
 import { getCart, countBookingNotifications } from "@/lib/query"
-import { centsToDollars } from "@/lib/utilities";
+import { centsToDollars } from "@/lib/utilities"
 
+// Matches desktop mega menu — ordered by GA4 engagement (last 30 days, pulled 2026-07-27)
+const CATEGORIES: { name: string; href: string; subcategories: { name: string; href: string; bold?: boolean }[] }[] = [
+  {
+    name: "Buyers",
+    href: "/buyers",
+    subcategories: [
+      { name: "All Buyers", href: "/buyers", bold: true },
+      { name: "Chicken Buyers", href: "/buyers/chicken" },
+      { name: "Maize Buyers", href: "/buyers/maize" },
+      { name: "Pork Buyers", href: "/buyers/pork" },
+      { name: "Cattle Buyers", href: "/buyers/cattle" },
+      { name: "Onion Buyers", href: "/buyers/onions" },
+      { name: "Goat Buyers", href: "/buyers/goats" },
+      { name: "Tomato Buyers", href: "/buyers/tomatoes" },
+      { name: "Chilli Buyers", href: "/buyers/chilli" },
+      { name: "Watermelon Buyers", href: "/buyers/watermelons" },
+    ],
+  },
+  {
+    name: "Guides",
+    href: "/guides",
+    subcategories: [
+      { name: "All Guides", href: "/guides", bold: true },
+      { name: "Agrochemical Guides", href: "/agrochemical-guides" },
+      { name: "Animal Health Guides", href: "/animal-health-guides" },
+      { name: "Animal Nutrition", href: "/feed-guides" },
+      { name: "Plant Nutrition Guides", href: "/plant-nutrition-guides" },
+      { name: "Seed Guides", href: "/seed-guides" },
+    ],
+  },
+  {
+    name: "Market Prices",
+    href: "/prices",
+    subcategories: [
+      { name: "All Prices", href: "/prices", bold: true },
+      { name: "Cattle Prices", href: "/prices/cattle" },
+      { name: "Beef Prices", href: "/prices/beef" },
+      { name: "Chicken Prices", href: "/prices/chicken" },
+      { name: "Pork Prices", href: "/prices/pork" },
+      { name: "Goat Prices", href: "/prices/goat" },
+      { name: "Lamb Prices", href: "/prices/lamb" },
+      { name: "Head Prices", href: "/prices/head" },
+    ],
+  },
+  {
+    name: "Programs",
+    href: "/programs",
+    subcategories: [
+      { name: "All Programs", href: "/programs", bold: true },
+      { name: "Spray Programs", href: "/spray-programs" },
+      { name: "Feeding Programs", href: "/feeding-programs" },
+      { name: "Rearing Programs", href: "/rearing-programs" },
+    ],
+  },
+  {
+    name: "Farmers",
+    href: "/farmers",
+    subcategories: [
+      { name: "All Farmers", href: "/farmers", bold: true },
+      { name: "Chicken Farmers", href: "/farmers/chicken" },
+      { name: "Maize Farmers", href: "/farmers/maize" },
+      { name: "Pork Farmers", href: "/farmers/pork" },
+      { name: "Cattle Farmers", href: "/farmers/cattle" },
+      { name: "Onion Farmers", href: "/farmers/onions" },
+      { name: "Goat Farmers", href: "/farmers/goats" },
+      { name: "Tomato Farmers", href: "/farmers/tomatoes" },
+    ],
+  },
+  {
+    name: "Bookings",
+    href: "/bookings",
+    subcategories: [
+      { name: "Browse Bookings", href: "/bookings", bold: true },
+      { name: "Create a Booking", href: "/bookings/new" },
+      { name: "I Supply", href: "/bookings/new/sell" },
+      { name: "I Buy", href: "/bookings/new/buy" },
+    ],
+  },
+  {
+    name: "Plans & Documents",
+    href: "/buy-documents",
+    subcategories: [
+      { name: "Shop All Documents", href: "/buy-documents", bold: true },
+    ],
+  },
+  {
+    name: "Lots & Auctions",
+    href: "/lots",
+    subcategories: [
+      { name: "Browse Lots", href: "/lots", bold: true },
+      { name: "List a Lot", href: "/lots/new" },
+    ],
+  },
+  {
+    name: "Agrochemicals",
+    href: "/buy-agrochemicals",
+    subcategories: [
+      { name: "Shop All Agrochemicals", href: "/buy-agrochemicals", bold: true },
+      { name: "Insecticides", href: "/agrochemical-guides/insecticides" },
+      { name: "Fungicides", href: "/agrochemical-guides/fungicides" },
+      { name: "Herbicides", href: "/agrochemical-guides/herbicides" },
+      { name: "Acaricides", href: "/agrochemical-guides/acaricides" },
+      { name: "Nematicides", href: "/agrochemical-guides/nematicides" },
+      { name: "Seed Treatments", href: "/agrochemical-guides/seed-treatments" },
+      { name: "Spray Programs", href: "/spray-programs", bold: true },
+    ],
+  },
+  {
+    name: "Plant Nutrition",
+    href: "/buy-plant-nutrition",
+    subcategories: [
+      { name: "Shop All Plant Nutrition", href: "/buy-plant-nutrition", bold: true },
+      { name: "Fertilizers", href: "/plant-nutrition-guides/fertilizers" },
+      { name: "Foliar Feeds", href: "/plant-nutrition-guides/foliar-feeds" },
+      { name: "Biostimulants", href: "/plant-nutrition-guides/biostimulants" },
+      { name: "Plant Growth Regulators", href: "/plant-nutrition-guides/plant-growth-regulators" },
+    ],
+  },
+  {
+    name: "Animal Feed",
+    href: "/buy-feeds",
+    subcategories: [
+      { name: "Shop All Feeds", href: "/buy-feeds", bold: true },
+      { name: "Feed Guides", href: "/feed-guides" },
+      { name: "Feeding Programs", href: "/feeding-programs", bold: true },
+    ],
+  },
+  {
+    name: "Animal Health",
+    href: "/buy-animal-health",
+    subcategories: [
+      { name: "Shop All Animal Health", href: "/buy-animal-health", bold: true },
+      { name: "Antibiotics", href: "/animal-health-guides/antibiotics" },
+      { name: "Vaccines", href: "/animal-health-guides/vaccines" },
+      { name: "Tick & Flea Control", href: "/animal-health-guides/tick-flea-control" },
+      { name: "Worm & Fluke Control", href: "/animal-health-guides/worm-fluke-control" },
+      { name: "Nutrition & Supplements", href: "/animal-health-guides/nutrition-supplements" },
+      { name: "Wound Remedies", href: "/animal-health-guides/wound-remedies" },
+      { name: "Biosecurity & Disinfectants", href: "/animal-health-guides/biosecurity-disinfectants" },
+      { name: "Rearing Programs", href: "/rearing-programs", bold: true },
+    ],
+  },
+  {
+    name: "Seeds",
+    href: "/buy-seed-products",
+    subcategories: [
+      { name: "Shop All Seeds", href: "/buy-seed-products", bold: true },
+      { name: "Seed Guides", href: "/seed-guides" },
+    ],
+  },
+  {
+    name: "Equipment",
+    href: "/buy-equipment",
+    subcategories: [
+      { name: "Shop All Equipment", href: "/buy-equipment", bold: true },
+      { name: "Equipment Guides", href: "/equipment-guides" },
+    ],
+  },
+]
 
 interface MobileNavProps {
   user: AuthenticatedUser | null
@@ -28,6 +186,7 @@ interface MobileNavProps {
 
 export function MobileNav({ user }: MobileNavProps) {
     const [isOpen, setIsOpen] = React.useState(false)
+    const [activeCategory, setActiveCategory] = React.useState<number | null>(null)
     const { openCart } = useCart()
     const { data: cartData } = useQuery({
       queryKey: ["cart"],
@@ -48,17 +207,13 @@ export function MobileNav({ user }: MobileNavProps) {
     })
     const notifCount: number = pollingEnabled ? ((notifData as any)?.count ?? 0) : 0
 
+    function handleClose() {
+      setIsOpen(false)
+      setActiveCategory(null)
+    }
 
     return (
-      <div className="flex flex-1 md:hidden">
-        <Link href="/" className="items-center space-x-2 flex md:hidden">
-          <span className="font-bold lg:inline-block">
-                    {siteConfig.name}
-                </span>
-          <span className="sr-only">Home</span>
-        </Link>
-
-       <div className="flex flex-1 justify-end items-center gap-1">
+      <div className="flex lg:hidden items-center gap-1">
          {user && notifCount > 0 && (
            <Link
              href="/account/notifications"
@@ -89,7 +244,7 @@ export function MobileNav({ user }: MobileNavProps) {
              <ShoppingCart className="w-5 h-5" />
            </button>
          )}
-         <Sheet open={isOpen} onOpenChange={setIsOpen}>
+         <Sheet open={isOpen} onOpenChange={(open) => { setIsOpen(open); if (!open) setActiveCategory(null) }}>
            <SheetTrigger asChild>
              <Button
                variant="ghost"
@@ -99,141 +254,161 @@ export function MobileNav({ user }: MobileNavProps) {
                <span>Menu</span>
              </Button>
            </SheetTrigger>
-           <SheetContent side="left" className="pl-1 pr-0">
-             <SheetHeader>
-                <SheetTitle></SheetTitle>
+           <SheetContent side="left" className="p-0 w-[300px]">
+             <SheetHeader className="sr-only">
+                <SheetTitle>Menu</SheetTitle>
              </SheetHeader>
-             <div className="px-7">
-               <Link
-                 href="/"
-                 className="flex items-center"
-                 onClick={() => setIsOpen(false)}
-               >
-                 <span className="font-bold">{siteConfig.name}</span>
-                 <span className="sr-only">Home</span>
-               </Link>
+
+             {/* Header */}
+             <div className="flex items-center justify-between px-5 py-4 border-b">
+               {activeCategory !== null ? (
+                 <div>
+                   <button
+                     onClick={() => setActiveCategory(activeCategory === -1 ? null : -1)}
+                     className="flex items-center gap-1 text-xs text-primary mb-0.5"
+                   >
+                     <Icons.chevronLeft className="h-3 w-3" />
+                     {activeCategory === -1 ? "Main Menu" : "Shop by Category"}
+                   </button>
+                   <h2 className="text-lg font-bold">{activeCategory === -1 ? "Shop by Category" : CATEGORIES[activeCategory].name}</h2>
+                 </div>
+               ) : (
+                 <div>
+                   {!user && <p className="text-sm text-muted-foreground mb-1">Sign in for a better experience</p>}
+                   <Link href="/" onClick={handleClose} className="font-bold text-lg">{siteConfig.name}</Link>
+                 </div>
+               )}
              </div>
-             <ScrollArea className="my-4 h-[calc(100vh-8rem)] pb-10 pl-6">
-               <div className="pl-1 pr-7">
-                 {/* Main Navigation */}
-                 <nav className="space-y-3 mb-6">
-                   <Link
-                     href="/guides"
-                     onClick={() => {
-                       sendGTMEvent({ event: 'nav_click', link_name: 'guides' })
-                       setIsOpen(false)
-                     }}
-                     className="flex items-center gap-3 px-3 py-2 text-base font-medium rounded-md hover:bg-accent transition-colors"
-                   >
-                     <Icons.bookOpen className="h-5 w-5" />
-                     <span>Guides</span>
-                   </Link>
 
-                   <Link
-                     href="/programs"
-                     onClick={() => {
-                       sendGTMEvent({ event: 'nav_click', link_name: 'programs' })
-                       setIsOpen(false)
-                     }}
-                     className="flex items-center gap-3 px-3 py-2 text-base font-medium rounded-md hover:bg-accent transition-colors"
-                   >
-                     <Icons.sprout className="h-5 w-5" />
-                     <span>Programs</span>
-                   </Link>
+             {/* Auth prompt for logged-out users */}
+             {!user && activeCategory === null && (
+               <div className="px-5 py-4 border-b space-y-2">
+                 <Link
+                   href="/login"
+                   onClick={handleClose}
+                   className={`${buttonVariants({ size: "lg" })} w-full justify-center font-medium`}
+                 >
+                   Login
+                 </Link>
+                 <p className="text-center text-sm text-muted-foreground">
+                   New to farmnport?{" "}
+                   <Link href="/signup" onClick={handleClose} className="text-primary font-medium">Register</Link>
+                 </p>
+               </div>
+             )}
 
-                   <Link
-                     href="/buy"
-                     onClick={() => {
-                       sendGTMEvent({ event: 'nav_click', link_name: 'buy' })
-                       setIsOpen(false)
-                     }}
-                     className="flex items-center gap-3 px-3 py-2 text-base font-medium rounded-md hover:bg-accent transition-colors"
-                   >
-                     <Icons.dollar className="h-5 w-5" />
-                     <span>Buy</span>
-                   </Link>
-
-                   <Link
-                     href="/buy"
-                     onClick={() => {
-                       sendGTMEvent({ event: 'nav_click', link_name: 'buy' })
-                       setIsOpen(false)
-                     }}
-                     className="flex items-center gap-3 px-3 py-2 text-base font-medium rounded-md hover:bg-accent transition-colors"
-                   >
-                     <Icons.shoppingBag className="h-5 w-5" />
-                     <span>Buy</span>
-                   </Link>
-                 </nav>
-
-                 {/* Account Section */}
-                 <div className="pt-6 mt-6 border-t space-y-3">
-                   <Link
-                     href={user ? "/lots/new" : "/login?next=/lots/new"}
-                     onClick={() => {
-                       sendGTMEvent({ event: 'nav_click', link_name: 'post_lot' })
-                       setIsOpen(false)
-                     }}
-                     className="flex items-center gap-3 px-3 py-2 text-base font-semibold rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
-                   >
-                     <Icons.tag className="h-5 w-5" />
-                     <span>List a Lot</span>
-                   </Link>
-                   { user ? (
-                     <>
+             <ScrollArea className="h-[calc(100vh-5rem)]">
+               <div className="py-2">
+                 {activeCategory === null ? (
+                   <>
+                     {/* Main menu items */}
+                     <nav>
                        <Link
-                         href="/account"
-                         onClick={() => setIsOpen(false)}
-                         className="flex items-center gap-3 px-3 py-2 text-base font-medium rounded-md hover:bg-accent transition-colors"
+                         href="/"
+                         onClick={handleClose}
+                         className="flex items-center px-5 py-3 text-[15px] font-medium hover:bg-accent transition-colors"
                        >
-                         <Icons.user className="h-5 w-5" />
-                         <span>Account</span>
+                         Home
                        </Link>
 
+                       {/* Browse All — drill-down into categories */}
                        <button
-                         onClick={() => {
-                           signOut({ redirectTo: AppURL })
-                           setIsOpen(false)
-                         }}
-                         className="flex items-center gap-3 px-3 py-2 text-base font-medium rounded-md hover:bg-accent transition-colors w-full text-left"
+                         onClick={() => setActiveCategory(-1)}
+                         className="flex items-center justify-between w-full px-5 py-3 text-[15px] font-medium hover:bg-accent transition-colors"
                        >
-                         <Icons.arrowRight className="h-5 w-5" />
-                         <span>Logout</span>
+                         <span>Browse All</span>
+                         <Icons.chevronRight className="h-4 w-4 text-muted-foreground" />
                        </button>
-                     </>
-                   ) : (
-                     <>
-                       <Link
-                         href="/login"
-                         onClick={() => setIsOpen(false)}
-                         className={`${buttonVariants({ size: "lg", variant: "outline" })} w-full justify-center font-medium`}
-                       >
-                         Login
-                       </Link>
-                       <Link
-                         href="/signup"
-                         onClick={() => setIsOpen(false)}
-                         className={`${buttonVariants({ size: "lg" })} w-full justify-center font-medium`}
-                       >
-                         Sign Up
-                       </Link>
-                     </>
-                   )}
-                 </div>
+                     </nav>
 
-                 {/* Theme Switcher */}
-                 <div className="pt-6 mt-6 border-t">
-                   <div className="flex items-center justify-between px-3 py-2">
-                     <span className="text-sm font-medium">Theme</span>
-                     <ThemeSwitcher />
-                   </div>
-                 </div>
+                     {/* Actions */}
+                     <div className="border-t mt-2 pt-2">
+                       <Link
+                         href={user ? "/lots/new" : "/login?next=/lots/new"}
+                         onClick={() => { sendGTMEvent({ event: 'nav_click', link_name: 'post_lot' }); handleClose() }}
+                         className="flex items-center px-5 py-3 text-[15px] font-semibold text-primary hover:bg-accent transition-colors"
+                       >
+                         List a Lot
+                       </Link>
 
+                       <Link
+                         href={user ? "/bookings/new" : "/login?next=/bookings/new"}
+                         onClick={() => { sendGTMEvent({ event: 'nav_click', link_name: 'create_booking' }); handleClose() }}
+                         className="flex items-center px-5 py-3 text-[15px] font-semibold text-primary hover:bg-accent transition-colors"
+                       >
+                         Create a Booking
+                       </Link>
+                     </div>
+
+                     {/* Account */}
+                     {user && (
+                       <div className="border-t mt-2 pt-2">
+                         <Link
+                           href="/account"
+                           onClick={handleClose}
+                           className="flex items-center px-5 py-3 text-[15px] font-medium hover:bg-accent transition-colors"
+                         >
+                           My Account
+                         </Link>
+
+                         <Link
+                           href="/orders"
+                           onClick={handleClose}
+                           className="flex items-center px-5 py-3 text-[15px] font-medium hover:bg-accent transition-colors"
+                         >
+                           Orders
+                         </Link>
+
+                         <button
+                           onClick={() => { signOut({ redirectTo: AppURL }); handleClose() }}
+                           className="flex items-center px-5 py-3 text-[15px] font-medium hover:bg-accent transition-colors w-full text-left"
+                         >
+                           Logout
+                         </button>
+                       </div>
+                     )}
+
+                     {/* Theme */}
+                     <div className="border-t mt-2 pt-2 px-5 py-3">
+                       <div className="flex items-center justify-between">
+                         <span className="text-sm font-medium">Theme</span>
+                         <ThemeSwitcher />
+                       </div>
+                     </div>
+                   </>
+                 ) : activeCategory === -1 ? (
+                   /* Category list */
+                   <nav>
+                     {CATEGORIES.map((cat, i) => (
+                       <button
+                         key={cat.name}
+                         onClick={() => setActiveCategory(i)}
+                         className="flex items-center justify-between w-full px-5 py-3 text-[15px] font-medium hover:bg-accent transition-colors"
+                       >
+                         <span>{cat.name}</span>
+                         <Icons.chevronRight className="h-4 w-4 text-muted-foreground" />
+                       </button>
+                     ))}
+                   </nav>
+                 ) : (
+                   /* Subcategory list */
+                   <nav>
+                     {CATEGORIES[activeCategory].subcategories.map((sub) => (
+                       <Link
+                         key={sub.name}
+                         href={sub.href}
+                         onClick={handleClose}
+                         className={`block px-5 py-3 text-[15px] hover:bg-accent transition-colors ${sub.bold ? "font-semibold" : "text-muted-foreground"}`}
+                       >
+                         {sub.name}
+                       </Link>
+                     ))}
+                   </nav>
+                 )}
                </div>
              </ScrollArea>
            </SheetContent>
          </Sheet>
-       </div>
       </div>
     )
 }
