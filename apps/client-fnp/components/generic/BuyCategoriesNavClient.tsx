@@ -22,25 +22,40 @@ export function BuyCategoriesNavClient({ categories }: BuyCategoriesNavClientPro
   }
 
   return (
-    <div className="mb-6 lg:mb-6">
+    <div className="mb-6 lg:mb-0">
       {/* Desktop: vertical sidebar */}
-      <nav className="hidden lg:flex flex-col gap-0.5">
-        {categories.map(({ label, href }) => {
-          const isActive = pathname.startsWith(href)
-          return (
-            <Link
-              key={href}
-              href={href}
-              className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                isActive
-                  ? "bg-primary/10 text-primary"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
-              }`}
-            >
-              {label}
-            </Link>
-          )
-        })}
+      <nav className="hidden lg:block">
+        <h3 className="text-sm font-bold mb-3">Refine by Category</h3>
+        <Link
+          href="/buy"
+          className={`flex items-center gap-1.5 px-3 py-2 text-sm transition-colors ${
+            pathname === "/buy"
+              ? "font-semibold text-primary border-l-2 border-primary bg-primary/5"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          {pathname !== "/buy" && <ChevronLeft className="h-3 w-3" />}
+          All Categories
+        </Link>
+        <div className="mt-1 space-y-0.5">
+          {categories.map(({ label, href }) => {
+            const isActive = pathname.startsWith(href)
+            return (
+              <Link
+                key={href}
+                href={href}
+                className={`block px-3 py-1.5 text-sm transition-colors ${
+                  isActive
+                    ? "font-semibold text-primary border-l-2 border-primary bg-primary/5"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                }`}
+              >
+                {label}
+              </Link>
+            )
+          })}
+        </div>
+        <div className="mt-4 border-t" />
       </nav>
 
       {/* Mobile: horizontal scroll with chevron buttons */}
@@ -81,8 +96,6 @@ export function BuyCategoriesNavClient({ categories }: BuyCategoriesNavClientPro
           <ChevronRight className="h-4 w-4 text-muted-foreground" />
         </button>
       </div>
-
-      <div className="mt-4 border-t max-lg:hidden" />
     </div>
   )
 }
