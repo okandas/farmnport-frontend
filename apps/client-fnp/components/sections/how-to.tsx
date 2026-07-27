@@ -22,7 +22,10 @@ export function HowToSection() {
   return (
     <section className="py-8 bg-muted/20">
       <div className="container">
-        <h2 className="text-2xl font-bold text-center mb-8">How To</h2>
+        <div className="flex items-center justify-between mb-8">
+          <h2 className="text-2xl font-bold">How To</h2>
+          <Link href="/resources" className="text-sm font-medium text-primary hover:underline">View all resources</Link>
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {GUIDES.map((guide) => (
             <Link
