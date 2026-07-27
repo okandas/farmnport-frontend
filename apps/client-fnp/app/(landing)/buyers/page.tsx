@@ -53,7 +53,7 @@ export default async function BuyersPage() {
     return (
         <main>
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
-            <div className="mx-auto max-w-7xl px-6 lg:px-8 pt-4">
+            <div className="container pt-4">
                 <nav className="flex items-center gap-1.5 text-xs text-muted-foreground mb-4">
                     <Link href="/" className="hover:text-foreground transition-colors">Home</Link>
                     <span>/</span>
@@ -61,21 +61,21 @@ export default async function BuyersPage() {
                     <span>/</span>
                     <span className="text-foreground font-medium">Buyers</span>
                 </nav>
-
             </div>
-            <div className="mx-auto max-w-7xl px-6 lg:px-8 min-h-[70lvh] py-8">
-                <div className="lg:flex lg:space-x-10">
-
-                    <div className="hidden lg:block lg:w-44 relative">
-                        <FilterSidebar clientType="buyers" />
-                    </div>
-
+            <div className="container min-h-[70lvh] pb-8">
+                <BookingCTA produce="" />
+                <div className="lg:flex lg:gap-8 mt-4">
+                    <aside className="hidden lg:block lg:w-64 shrink-0">
+                        <div className="sticky top-20">
+                            <h3 className="text-sm font-bold mb-3">Refine by Category</h3>
+                            <FilterSidebar clientType="buyers" />
+                            <div className="mt-6">
+                                <QuickLinks />
+                            </div>
+                        </div>
+                    </aside>
                     <div className="flex-1 min-w-0">
-                        <BookingCTA produce="" />
                         <Buyers user={user} />
-                    </div>
-                    <div className="hidden lg:block lg:w-44 shrink-0">
-                        <QuickLinks />
                     </div>
                 </div>
             </div>
