@@ -5,37 +5,56 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 
-const CATEGORIES = [
-  {
-    label: "Bookings",
-    href: "/bookings",
-    subs: [],
-  },
-  {
-    label: "Lots",
-    href: "/lots",
-    subs: [],
-  },
+interface Category {
+  label: string
+  href: string
+  paths?: string[]
+  subs: { label: string; href: string }[]
+}
+
+const BUY_CATEGORIES: Category[] = [
+  { label: "Bookings", href: "/bookings", subs: [] },
+  { label: "Lots", href: "/lots", subs: [] },
+  { label: "Agrochemicals", href: "/buy-agrochemicals", subs: [] },
+  { label: "Animal Health", href: "/buy-animal-health", subs: [] },
+  { label: "Animal Feed", href: "/buy-feeds", subs: [] },
+  { label: "Equipment", href: "/buy-equipment", subs: [] },
+  { label: "Plant Nutrition", href: "/buy-plant-nutrition", subs: [] },
+  { label: "Seeds", href: "/buy-seed-products", subs: [] },
+  { label: "Plans & Documents", href: "/buy-documents", subs: [] },
+  { label: "Prices", href: "/prices", subs: [] },
+  { label: "Buyers", href: "/buyers", subs: [] },
+  { label: "Farmers", href: "/farmers", subs: [] },
+]
+
+const GUIDE_CATEGORIES: Category[] = [
   {
     label: "Agrochemicals",
-    paths: ["/buy-agrochemicals", "/agrochemical-guides"],
-    href: "/buy-agrochemicals",
+    href: "/agrochemical-guides",
     subs: [
-      { label: "Insecticides", href: "/agrochemical-guides/insecticides" },
+      { label: "Acaricides", href: "/agrochemical-guides/acaricides" },
       { label: "Fungicides", href: "/agrochemical-guides/fungicides" },
       { label: "Herbicides", href: "/agrochemical-guides/herbicides" },
-      { label: "Acaricides", href: "/agrochemical-guides/acaricides" },
-      { label: "Nematicides", href: "/agrochemical-guides/nematicides" },
-      { label: "Seed Treatments", href: "/agrochemical-guides/seed-treatments" },
+      { label: "Insecticides", href: "/agrochemical-guides/insecticides" },
       { label: "Foliar Feeds", href: "/agrochemical-guides/foliar-feeds" },
+      { label: "Seed Treatments", href: "/agrochemical-guides/seed-treatments" },
       { label: "Fertilizers", href: "/agrochemical-guides/fertilizers" },
-      { label: "Spray Programs", href: "/spray-programs" },
+      { label: "Nematicides", href: "/agrochemical-guides/nematicides" },
+    ],
+  },
+  {
+    label: "Plant Nutrition",
+    href: "/plant-nutrition-guides",
+    subs: [
+      { label: "Fertilizers", href: "/plant-nutrition-guides/fertilizers" },
+      { label: "Foliar Feeds", href: "/plant-nutrition-guides/foliar-feeds" },
+      { label: "Biostimulants", href: "/plant-nutrition-guides/biostimulants" },
+      { label: "Plant Growth Regulators", href: "/plant-nutrition-guides/plant-growth-regulators" },
     ],
   },
   {
     label: "Animal Health",
-    paths: ["/buy-animal-health", "/animal-health-guides"],
-    href: "/buy-animal-health",
+    href: "/animal-health-guides",
     subs: [
       { label: "Antibiotics", href: "/animal-health-guides/antibiotics" },
       { label: "Vaccines", href: "/animal-health-guides/vaccines" },
@@ -45,76 +64,12 @@ const CATEGORIES = [
       { label: "Wound Remedies", href: "/animal-health-guides/wound-remedies" },
       { label: "Fly Control", href: "/animal-health-guides/fly-control" },
       { label: "Biosecurity & Disinfectants", href: "/animal-health-guides/biosecurity-disinfectants" },
-      { label: "Rearing Programs", href: "/rearing-programs" },
     ],
   },
-  {
-    label: "Animal Feed",
-    paths: ["/buy-feeds", "/feed-guides"],
-    href: "/buy-feeds",
-    subs: [
-      { label: "Feed Guides", href: "/feed-guides" },
-      { label: "Feeding Programs", href: "/feeding-programs" },
-    ],
-  },
-  {
-    label: "Equipment",
-    paths: ["/buy-equipment", "/equipment-guides"],
-    href: "/buy-equipment",
-    subs: [
-      { label: "Equipment Guides", href: "/equipment-guides" },
-    ],
-  },
-  {
-    label: "Plant Nutrition",
-    paths: ["/buy-plant-nutrition", "/plant-nutrition-guides"],
-    href: "/buy-plant-nutrition",
-    subs: [
-      { label: "Fertilizers", href: "/plant-nutrition-guides/fertilizers" },
-      { label: "Foliar Feeds", href: "/plant-nutrition-guides/foliar-feeds" },
-      { label: "Biostimulants", href: "/plant-nutrition-guides/biostimulants" },
-      { label: "Plant Growth Regulators", href: "/plant-nutrition-guides/plant-growth-regulators" },
-    ],
-  },
-  {
-    label: "Seeds",
-    paths: ["/buy-seed-products", "/seed-guides"],
-    href: "/buy-seed-products",
-    subs: [
-      { label: "Seed Guides", href: "/seed-guides" },
-    ],
-  },
-  {
-    label: "Plans & Documents",
-    href: "/buy-documents",
-    subs: [],
-  },
-  {
-    label: "Prices",
-    href: "/prices",
-    subs: [],
-  },
-  {
-    label: "Buyers",
-    href: "/buyers",
-    subs: [],
-  },
-  {
-    label: "Farmers",
-    href: "/farmers",
-    subs: [],
-  },
+  { label: "Animal Nutrition", href: "/feed-guides", subs: [] },
+  { label: "Seeds", href: "/seed-guides", subs: [] },
+  { label: "Equipment", href: "/equipment-guides", subs: [] },
 ]
-
-function isActiveCategory(pathname: string, cat: typeof CATEGORIES[0]): boolean {
-  if (pathname.startsWith(cat.href)) return true
-  if ("paths" in cat && cat.paths) {
-    return cat.paths.some((p) => pathname.startsWith(p))
-  }
-  return false
-}
-
-const BUY_ONLY_LABELS = new Set(["Bookings", "Lots", "Plans & Documents", "Prices", "Buyers", "Farmers"])
 
 function isGuidePage(pathname: string): boolean {
   return pathname.includes("-guides") || pathname.startsWith("/spray-programs") || pathname.startsWith("/feeding-programs") || pathname.startsWith("/rearing-programs")
@@ -122,7 +77,7 @@ function isGuidePage(pathname: string): boolean {
 
 export function ProductSidebarNav() {
   const pathname = usePathname()
-  const onGuidePage = isGuidePage(pathname)
+  const categories = isGuidePage(pathname) ? GUIDE_CATEGORIES : BUY_CATEGORIES
   const scrollRef = useRef<HTMLDivElement>(null)
 
   const scroll = (direction: "left" | "right") => {
@@ -135,10 +90,9 @@ export function ProductSidebarNav() {
 
   return (
     <div className="mb-6 lg:mb-6">
-      {/* Desktop: vertical sidebar with subcategories */}
       <nav className="hidden lg:flex flex-col gap-0.5">
-        {CATEGORIES.filter((cat) => !onGuidePage || !BUY_ONLY_LABELS.has(cat.label)).map((cat) => {
-          const isActive = isActiveCategory(pathname, cat)
+        {categories.map((cat) => {
+          const isActive = pathname.startsWith(cat.href)
           return (
             <div key={cat.label}>
               <Link
@@ -153,22 +107,19 @@ export function ProductSidebarNav() {
               </Link>
               {isActive && cat.subs.length > 0 && (
                 <div className="ml-3 mt-0.5 flex flex-col gap-0.5">
-                  {cat.subs.map((sub) => {
-                    const isSubActive = pathname.startsWith(sub.href)
-                    return (
-                      <Link
-                        key={sub.href}
-                        href={sub.href}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors block ${
-                          isSubActive
-                            ? "text-primary bg-primary/5"
-                            : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                        }`}
-                      >
-                        {sub.label}
-                      </Link>
-                    )
-                  })}
+                  {cat.subs.map((sub) => (
+                    <Link
+                      key={sub.href}
+                      href={sub.href}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors block ${
+                        pathname.startsWith(sub.href)
+                          ? "text-primary bg-primary/5"
+                          : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                      }`}
+                    >
+                      {sub.label}
+                    </Link>
+                  ))}
                 </div>
               )}
             </div>
@@ -176,7 +127,6 @@ export function ProductSidebarNav() {
         })}
       </nav>
 
-      {/* Mobile: horizontal scroll */}
       <div className="lg:hidden relative flex items-center">
         <button
           onClick={() => scroll("left")}
@@ -188,22 +138,19 @@ export function ProductSidebarNav() {
           ref={scrollRef}
           className="flex items-center gap-1 overflow-x-auto scrollbar-hide py-3 px-8"
         >
-          {CATEGORIES.filter((cat) => !onGuidePage || !BUY_ONLY_LABELS.has(cat.label)).map((cat) => {
-            const isActive = isActiveCategory(pathname, cat)
-            return (
-              <Link
-                key={cat.label}
-                href={cat.href}
-                className={`shrink-0 px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors ${
-                  isActive
-                    ? "bg-primary/10 text-primary"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                }`}
-              >
-                {cat.label}
-              </Link>
-            )
-          })}
+          {categories.map((cat) => (
+            <Link
+              key={cat.label}
+              href={cat.href}
+              className={`shrink-0 px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors ${
+                pathname.startsWith(cat.href)
+                  ? "bg-primary/10 text-primary"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
+              }`}
+            >
+              {cat.label}
+            </Link>
+          ))}
         </div>
         <button
           onClick={() => scroll("right")}
