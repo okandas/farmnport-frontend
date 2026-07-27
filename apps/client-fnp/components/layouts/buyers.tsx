@@ -22,7 +22,7 @@ interface BuyersPageProps {
   queryBy?: string
 }
 
-export function Buyers({queryBy}: BuyersPageProps) {
+export function Buyers({user, queryBy}: BuyersPageProps) {
 
   const router = useRouter()
   const pathname = usePathname()
@@ -180,7 +180,7 @@ export function Buyers({queryBy}: BuyersPageProps) {
         {buyers.map((buyer, buyerIndex) => (
           <div key={buyerIndex}>
             {buyerIndex > 0 && buyerIndex % 3 === 0 && <AdSenseInFeed />}
-            <BuyerContactsCard buyer={buyer} />
+            <BuyerContactsCard buyer={buyer} user={user} />
           </div>
         ))}
       </div>
