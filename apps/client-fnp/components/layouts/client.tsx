@@ -7,7 +7,7 @@ import { useQuery } from "@tanstack/react-query"
 import { sendGTMEvent } from "@next/third-parties/google"
 import Link from "next/link"
 
-import { queryClient, recordContactView } from "@/lib/query"
+import { queryClient, recordContactView, listPreOrders } from "@/lib/query"
 import { ApplicationUser, AuthenticatedUser } from "@/lib/schemas"
 import { capitalizeFirstLetter, makeAbbveriation, titleCase, formatDate } from "@/lib/utilities"
 import { Icons } from "@/components/icons/lucide"
@@ -45,9 +45,17 @@ export function Client({ slug, type, user, latestPrices }: ClientPageProps) {
     refetchOnWindowFocus: false
   })
 
+  const { data: preordersData } = useQuery({
+    queryKey: ["client-preorders-sidebar", slug],
+    queryFn: () => listPreOrders({ client_slug: slug }).then((r) => r.data),
+  })
+
+  const preorders: any[] = preordersData?.preorders ?? []
   const client = data?.data as ApplicationUser
 
   if (isError || isFetching || client === undefined) return null
+
+  const hasActiveBookings = (client.has_booking || client.has_active_booking) && preorders.length > 0
 
   const name = titleCase(client.name)
   const city = client.city ? capitalizeFirstLetter(client.city) : ""
@@ -197,70 +205,92 @@ export function Client({ slug, type, user, latestPrices }: ClientPageProps) {
           {/* Right — Sticky sidebar */}
           <aside className="hidden lg:block lg:w-72 shrink-0">
             <div className="sticky top-20 space-y-4 pt-4">
-              {/* Contact card */}
-              <div className="rounded-lg border bg-card p-5 space-y-3">
-                <h3 className="text-sm font-bold">Contact {name}</h3>
-                {(client.phone || !user) && (
-                  <div>
-                    {!user ? (
-                      <Button variant="outline" className="w-full justify-start gap-2 text-sm" onClick={() => { sendGTMEvent({ event: 'login_prompt', reason: 'view_phone', client_name: client.name }); router.push(`/login?entity=${client.type}&wantToSee=${slug}`) }}>
-                        <Phone className="h-4 w-4" />Log in to see number
-                      </Button>
-                    ) : showPhone ? (
-                      <a href={`tel:${client.phone}`} className="flex items-center gap-2 w-full px-4 py-2 rounded-md border text-sm font-medium hover:bg-muted transition-colors">
-                        <Phone className="h-4 w-4 text-primary" />{client.phone}
-                      </a>
-                    ) : (
-                      <Button variant="outline" className="w-full justify-start gap-2 text-sm" onClick={() => { sendGTMEvent({ event: 'phone_reveal', client_name: client.name }); if (user?.id) recordContactView(user.id, client.id, "phone").catch(() => {}); setShowPhone(true) }}>
-                        <Phone className="h-4 w-4" />Show Phone Number
-                      </Button>
-                    )}
-                  </div>
-                )}
-                {(client.phone || !user) && (
-                  <div>
-                    {!user ? (
-                      <Button variant="outline" className="w-full justify-start gap-2 text-sm" onClick={() => { sendGTMEvent({ event: 'login_prompt', reason: 'view_whatsapp', client_name: client.name }); router.push(`/login?entity=${client.type}&wantToSee=${slug}`) }}>
-                        <MessageCircle className="h-4 w-4" />Log in to see WhatsApp
-                      </Button>
-                    ) : showWhatsapp ? (
-                      <a href={`https://wa.me/263${client.phone.replace(/^0/, '')}`} target="_blank" rel="noopener noreferrer" onClick={() => sendGTMEvent({ event: 'whatsapp_click', client_name: client.name })} className="flex items-center gap-2 w-full px-4 py-2 rounded-md border text-sm font-medium hover:bg-muted transition-colors bg-green-50 border-green-200 text-green-800">
-                        <MessageCircle className="h-4 w-4" />Open WhatsApp<ExternalLink className="h-3 w-3 ml-auto" />
-                      </a>
-                    ) : (
-                      <Button variant="outline" className="w-full justify-start gap-2 text-sm" onClick={() => { sendGTMEvent({ event: 'whatsapp_reveal', client_name: client.name }); if (user?.id) recordContactView(user.id, client.id, "whatsapp").catch(() => {}); setShowWhatsapp(true) }}>
-                        <MessageCircle className="h-4 w-4" />Show WhatsApp
-                      </Button>
-                    )}
-                  </div>
-                )}
-                {(client.email || !user) && (
-                  <div>
-                    {!user ? (
-                      <Button variant="outline" className="w-full justify-start gap-2 text-sm" onClick={() => { sendGTMEvent({ event: 'login_prompt', reason: 'view_email', client_name: client.name }); router.push(`/login?entity=${client.type}&wantToSee=${slug}`) }}>
-                        <Mail className="h-4 w-4" />Log in to see email
-                      </Button>
-                    ) : showEmail ? (
-                      <a href={`mailto:${client.email}`} className="flex items-center gap-2 w-full px-4 py-2 rounded-md border text-sm font-medium hover:bg-muted transition-colors">
-                        <Mail className="h-4 w-4 text-primary" />{client.email}
-                      </a>
-                    ) : (
-                      <Button variant="outline" className="w-full justify-start gap-2 text-sm" onClick={() => { sendGTMEvent({ event: 'email_reveal', client_name: client.name }); if (user?.id) recordContactView(user.id, client.id, "email").catch(() => {}); setShowEmail(true) }}>
-                        <Mail className="h-4 w-4" />Show Email
-                      </Button>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {/* Booking CTA (buyers only) */}
-              {(client.has_booking || client.has_pickup) && client.type === 'buyer' && (
-                <Link href={`/book/${slug}`} className="block">
-                  <div className="rounded-lg border-2 border-primary bg-primary/5 p-5 text-center hover:bg-primary/10 transition-colors">
-                    <p className="text-sm font-bold text-primary">Book a Sale</p>
-                    <p className="text-xs text-muted-foreground mt-1">Sell your produce to {name}</p>
-                  </div>
-                </Link>
+              {/* Bookings replace contact when buyer has active bookings */}
+              {hasActiveBookings ? (
+                <div className="rounded-lg border bg-card p-5 space-y-3">
+                  <h3 className="text-sm font-bold">Book from {name}</h3>
+                  {preorders.map((event: any) => {
+                    const available = event.total_available - event.total_booked
+                    return (
+                      <Link
+                        key={event.id}
+                        href={`/bookings/${event.slug}`}
+                        className="block rounded-lg border p-3 hover:border-primary/40 hover:shadow-sm transition-all"
+                      >
+                        <p className="text-sm font-semibold">{event.name}</p>
+                        {event.subtitle && <p className="text-xs text-muted-foreground mt-0.5">{event.subtitle}</p>}
+                        <div className="text-xs text-muted-foreground mt-2 space-y-0.5">
+                          {event.unit_price > 0 && (
+                            <div className="flex justify-between">
+                              <span>Price</span>
+                              <span className="font-semibold text-foreground">${(event.unit_price / 100 * 1.069).toFixed(2)}</span>
+                            </div>
+                          )}
+                          <div className="flex justify-between">
+                            <span>Available</span>
+                            <span className="font-medium text-foreground">{available} of {event.total_available}</span>
+                          </div>
+                        </div>
+                      </Link>
+                    )
+                  })}
+                </div>
+              ) : (
+                /* Contact card — only when no active bookings */
+                <div className="rounded-lg border bg-card p-5 space-y-3">
+                  <h3 className="text-sm font-bold">Contact {name}</h3>
+                  {(client.phone || !user) && (
+                    <div>
+                      {!user ? (
+                        <Button variant="outline" className="w-full justify-start gap-2 text-sm" onClick={() => { sendGTMEvent({ event: 'login_prompt', reason: 'view_phone', client_name: client.name }); router.push(`/login?entity=${client.type}&wantToSee=${slug}`) }}>
+                          <Phone className="h-4 w-4" />Log in to see number
+                        </Button>
+                      ) : showPhone ? (
+                        <a href={`tel:${client.phone}`} className="flex items-center gap-2 w-full px-4 py-2 rounded-md border text-sm font-medium hover:bg-muted transition-colors">
+                          <Phone className="h-4 w-4 text-primary" />{client.phone}
+                        </a>
+                      ) : (
+                        <Button variant="outline" className="w-full justify-start gap-2 text-sm" onClick={() => { sendGTMEvent({ event: 'phone_reveal', client_name: client.name }); if (user?.id) recordContactView(user.id, client.id, "phone").catch(() => {}); setShowPhone(true) }}>
+                          <Phone className="h-4 w-4" />Show Phone Number
+                        </Button>
+                      )}
+                    </div>
+                  )}
+                  {(client.phone || !user) && (
+                    <div>
+                      {!user ? (
+                        <Button variant="outline" className="w-full justify-start gap-2 text-sm" onClick={() => { sendGTMEvent({ event: 'login_prompt', reason: 'view_whatsapp', client_name: client.name }); router.push(`/login?entity=${client.type}&wantToSee=${slug}`) }}>
+                          <MessageCircle className="h-4 w-4" />Log in to see WhatsApp
+                        </Button>
+                      ) : showWhatsapp ? (
+                        <a href={`https://wa.me/263${client.phone.replace(/^0/, '')}`} target="_blank" rel="noopener noreferrer" onClick={() => sendGTMEvent({ event: 'whatsapp_click', client_name: client.name })} className="flex items-center gap-2 w-full px-4 py-2 rounded-md border text-sm font-medium hover:bg-muted transition-colors bg-green-50 border-green-200 text-green-800">
+                          <MessageCircle className="h-4 w-4" />Open WhatsApp<ExternalLink className="h-3 w-3 ml-auto" />
+                        </a>
+                      ) : (
+                        <Button variant="outline" className="w-full justify-start gap-2 text-sm" onClick={() => { sendGTMEvent({ event: 'whatsapp_reveal', client_name: client.name }); if (user?.id) recordContactView(user.id, client.id, "whatsapp").catch(() => {}); setShowWhatsapp(true) }}>
+                          <MessageCircle className="h-4 w-4" />Show WhatsApp
+                        </Button>
+                      )}
+                    </div>
+                  )}
+                  {(client.email || !user) && (
+                    <div>
+                      {!user ? (
+                        <Button variant="outline" className="w-full justify-start gap-2 text-sm" onClick={() => { sendGTMEvent({ event: 'login_prompt', reason: 'view_email', client_name: client.name }); router.push(`/login?entity=${client.type}&wantToSee=${slug}`) }}>
+                          <Mail className="h-4 w-4" />Log in to see email
+                        </Button>
+                      ) : showEmail ? (
+                        <a href={`mailto:${client.email}`} className="flex items-center gap-2 w-full px-4 py-2 rounded-md border text-sm font-medium hover:bg-muted transition-colors">
+                          <Mail className="h-4 w-4 text-primary" />{client.email}
+                        </a>
+                      ) : (
+                        <Button variant="outline" className="w-full justify-start gap-2 text-sm" onClick={() => { sendGTMEvent({ event: 'email_reveal', client_name: client.name }); if (user?.id) recordContactView(user.id, client.id, "email").catch(() => {}); setShowEmail(true) }}>
+                          <Mail className="h-4 w-4" />Show Email
+                        </Button>
+                      )}
+                    </div>
+                  )}
+                </div>
               )}
 
               <Link href="/bookings/new" className="block">
