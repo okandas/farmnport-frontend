@@ -1,12 +1,13 @@
 import Link from "next/link"
+import Image from "next/image"
 
 const CATEGORIES = [
-  { name: "Chicken Buyers", href: "/buyers/chicken" },
-  { name: "Market Prices", href: "/prices" },
-  { name: "Agrochemicals", href: "/agrochemical-guides" },
-  { name: "Spray Programs", href: "/spray-programs" },
-  { name: "Feeding Programs", href: "/feeding-programs" },
-  { name: "Maize Buyers", href: "/buyers/maize" },
+  { name: "Chicken Buyers", href: "/buyers/chicken", image: "" },
+  { name: "Market Prices", href: "/prices", image: "/images/market-price.webp" },
+  { name: "Agrochemicals", href: "/agrochemical-guides", image: "" },
+  { name: "Spray Programs", href: "/spray-programs", image: "" },
+  { name: "Feeding Programs", href: "/feeding-programs", image: "/images/feed.webp" },
+  { name: "Maize Buyers", href: "/buyers/maize", image: "" },
 ]
 
 export function CategoriesSection() {
@@ -21,10 +22,21 @@ export function CategoriesSection() {
               href={cat.href}
               className="group flex flex-col items-center gap-3"
             >
-              <div className="w-full aspect-square bg-muted/30 group-hover:bg-muted/50 transition-colors" />
-              <span className="text-sm font-medium text-center group-hover:text-primary transition-colors">
-                {cat.name}
-              </span>
+              <div className="w-full aspect-square rounded-md overflow-hidden relative bg-muted/30 group-hover:shadow-md transition-all">
+                {cat.image && (
+                  <Image
+                    src={cat.image}
+                    alt={cat.name}
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 16vw"
+                  />
+                )}
+                <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors" />
+                <span className="absolute inset-0 flex items-center justify-center text-sm font-semibold text-white drop-shadow-md">
+                  {cat.name}
+                </span>
+              </div>
             </Link>
           ))}
         </div>
