@@ -114,8 +114,15 @@ function isActiveCategory(pathname: string, cat: typeof CATEGORIES[0]): boolean 
   return false
 }
 
+const BUY_ONLY_LABELS = new Set(["Bookings", "Lots", "Plans & Documents", "Prices", "Buyers", "Farmers"])
+
+function isGuidePage(pathname: string): boolean {
+  return pathname.includes("-guides") || pathname.startsWith("/spray-programs") || pathname.startsWith("/feeding-programs") || pathname.startsWith("/rearing-programs")
+}
+
 export function ProductSidebarNav() {
   const pathname = usePathname()
+  const onGuidePage = isGuidePage(pathname)
   const scrollRef = useRef<HTMLDivElement>(null)
 
   const scroll = (direction: "left" | "right") => {
@@ -130,7 +137,7 @@ export function ProductSidebarNav() {
     <div className="mb-6 lg:mb-6">
       {/* Desktop: vertical sidebar with subcategories */}
       <nav className="hidden lg:flex flex-col gap-0.5">
-        {CATEGORIES.map((cat) => {
+        {CATEGORIES.filter((cat) => !onGuidePage || !BUY_ONLY_LABELS.has(cat.label)).map((cat) => {
           const isActive = isActiveCategory(pathname, cat)
           return (
             <div key={cat.label}>
@@ -181,7 +188,7 @@ export function ProductSidebarNav() {
           ref={scrollRef}
           className="flex items-center gap-1 overflow-x-auto scrollbar-hide py-3 px-8"
         >
-          {CATEGORIES.map((cat) => {
+          {CATEGORIES.filter((cat) => !onGuidePage || !BUY_ONLY_LABELS.has(cat.label)).map((cat) => {
             const isActive = isActiveCategory(pathname, cat)
             return (
               <Link
