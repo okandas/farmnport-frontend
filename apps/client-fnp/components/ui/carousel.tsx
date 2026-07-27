@@ -135,7 +135,7 @@ function CarouselPrevious({ className }: { className?: string }) {
       onClick={scrollPrev}
       disabled={!canScrollPrev}
       className={cn(
-        "absolute left-3 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-background/80 shadow border border-input hover:bg-background transition-colors disabled:opacity-30",
+        "absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 flex h-7 w-7 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-background/80 shadow border border-input hover:bg-background transition-colors disabled:opacity-30",
         className
       )}
       aria-label="Previous slide"
@@ -154,7 +154,7 @@ function CarouselNext({ className }: { className?: string }) {
       onClick={scrollNext}
       disabled={!canScrollNext}
       className={cn(
-        "absolute right-3 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-background/80 shadow border border-input hover:bg-background transition-colors disabled:opacity-30",
+        "absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 flex h-7 w-7 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-background/80 shadow border border-input hover:bg-background transition-colors disabled:opacity-30",
         className
       )}
       aria-label="Next slide"

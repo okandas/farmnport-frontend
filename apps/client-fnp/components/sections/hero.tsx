@@ -41,13 +41,13 @@ export function HeroSection() {
               <CarouselContent>
                 {SLIDES.map((slide) => (
                   <CarouselItem key={slide.href}>
-                    <div className="aspect-[16/9] lg:aspect-auto lg:h-[420px] rounded-md bg-muted/30 overflow-hidden flex items-end p-8">
-                      <div>
-                        <p className="text-sm text-muted-foreground mb-1">{slide.label}</p>
-                        <h2 className="text-3xl sm:text-4xl font-bold leading-tight mb-2 whitespace-pre-line">
+                    <div className="aspect-[4/3] sm:aspect-[16/9] lg:aspect-auto lg:h-[420px] rounded-md bg-muted/30 overflow-hidden flex items-end p-5 sm:p-8">
+                      <div className="max-w-[85%] sm:max-w-none">
+                        <p className="text-xs sm:text-sm text-muted-foreground mb-1">{slide.label}</p>
+                        <h2 className="text-xl sm:text-3xl lg:text-4xl font-bold leading-tight mb-2 whitespace-pre-line">
                           {slide.title}
                         </h2>
-                        <p className="text-sm text-muted-foreground mb-4">
+                        <p className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4 line-clamp-2 sm:line-clamp-none">
                           {slide.description}
                         </p>
                         <a
