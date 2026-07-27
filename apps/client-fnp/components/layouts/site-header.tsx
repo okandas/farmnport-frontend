@@ -78,47 +78,61 @@ function BellIcon({ user }: { user: AuthenticatedUser | null }) {
   )
 }
 
-const CATEGORIES = [
+const CATEGORIES: { name: string; href: string; subcategories: { name: string; href: string; bold?: boolean }[] }[] = [
   {
     name: "Agrochemicals",
     href: "/buy-agrochemicals",
     subcategories: [
-      { name: "Shop All Agrochemicals", href: "/buy-agrochemicals" },
-      { name: "Agrochemical Guides", href: "/agrochemical-guides" },
-      { name: "Spray Programs", href: "/spray-programs" },
+      { name: "Shop All Agrochemicals", href: "/buy-agrochemicals", bold: true },
+      { name: "Insecticides", href: "/agrochemical-guides/insecticides" },
+      { name: "Fungicides", href: "/agrochemical-guides/fungicides" },
+      { name: "Herbicides", href: "/agrochemical-guides/herbicides" },
+      { name: "Acaricides", href: "/agrochemical-guides/acaricides" },
+      { name: "Nematicides", href: "/agrochemical-guides/nematicides" },
+      { name: "Seed Treatments", href: "/agrochemical-guides/seed-treatments" },
+      { name: "Spray Programs", href: "/spray-programs", bold: true },
     ],
   },
   {
     name: "Animal Health",
     href: "/buy-animal-health",
     subcategories: [
-      { name: "Shop All Animal Health", href: "/buy-animal-health" },
-      { name: "Animal Health Guides", href: "/animal-health-guides/all" },
-      { name: "Rearing Programs", href: "/rearing-programs" },
+      { name: "Shop All Animal Health", href: "/buy-animal-health", bold: true },
+      { name: "Antibiotics", href: "/animal-health-guides/antibiotics" },
+      { name: "Vaccines", href: "/animal-health-guides/vaccines" },
+      { name: "Tick & Flea Control", href: "/animal-health-guides/tick-flea-control" },
+      { name: "Worm & Fluke Control", href: "/animal-health-guides/worm-fluke-control" },
+      { name: "Nutrition & Supplements", href: "/animal-health-guides/nutrition-supplements" },
+      { name: "Wound Remedies", href: "/animal-health-guides/wound-remedies" },
+      { name: "Biosecurity & Disinfectants", href: "/animal-health-guides/biosecurity-disinfectants" },
+      { name: "Rearing Programs", href: "/rearing-programs", bold: true },
     ],
   },
   {
     name: "Animal Feed",
     href: "/buy-feeds",
     subcategories: [
-      { name: "Shop All Feeds", href: "/buy-feeds" },
+      { name: "Shop All Feeds", href: "/buy-feeds", bold: true },
       { name: "Feed Guides", href: "/feed-guides" },
-      { name: "Feeding Programs", href: "/feeding-programs" },
+      { name: "Feeding Programs", href: "/feeding-programs", bold: true },
     ],
   },
   {
     name: "Plant Nutrition",
     href: "/buy-plant-nutrition",
     subcategories: [
-      { name: "Shop All Plant Nutrition", href: "/buy-plant-nutrition" },
-      { name: "Plant Nutrition Guides", href: "/plant-nutrition-guides" },
+      { name: "Shop All Plant Nutrition", href: "/buy-plant-nutrition", bold: true },
+      { name: "Fertilizers", href: "/plant-nutrition-guides/fertilizers" },
+      { name: "Foliar Feeds", href: "/plant-nutrition-guides/foliar-feeds" },
+      { name: "Biostimulants", href: "/plant-nutrition-guides/biostimulants" },
+      { name: "Plant Growth Regulators", href: "/plant-nutrition-guides/plant-growth-regulators" },
     ],
   },
   {
     name: "Seeds",
     href: "/buy-seed-products",
     subcategories: [
-      { name: "Shop All Seeds", href: "/buy-seed-products" },
+      { name: "Shop All Seeds", href: "/buy-seed-products", bold: true },
       { name: "Seed Guides", href: "/seed-guides" },
     ],
   },
@@ -126,7 +140,7 @@ const CATEGORIES = [
     name: "Equipment",
     href: "/buy-equipment",
     subcategories: [
-      { name: "Shop All Equipment", href: "/buy-equipment" },
+      { name: "Shop All Equipment", href: "/buy-equipment", bold: true },
       { name: "Equipment Guides", href: "/equipment-guides" },
     ],
   },
@@ -134,14 +148,44 @@ const CATEGORIES = [
     name: "Plans & Documents",
     href: "/buy-documents",
     subcategories: [
-      { name: "Shop All Documents", href: "/buy-documents" },
+      { name: "Shop All Documents", href: "/buy-documents", bold: true },
+    ],
+  },
+  {
+    name: "Buyers",
+    href: "/buyers",
+    subcategories: [
+      { name: "All Buyers", href: "/buyers", bold: true },
+      { name: "Chicken Buyers", href: "/buyers/chicken" },
+      { name: "Maize Buyers", href: "/buyers/maize" },
+      { name: "Pork Buyers", href: "/buyers/pork" },
+      { name: "Cattle Buyers", href: "/buyers/cattle" },
+      { name: "Onion Buyers", href: "/buyers/onions" },
+      { name: "Goat Buyers", href: "/buyers/goats" },
+      { name: "Tomato Buyers", href: "/buyers/tomatoes" },
+      { name: "Chilli Buyers", href: "/buyers/chilli" },
+      { name: "Watermelon Buyers", href: "/buyers/watermelons" },
+    ],
+  },
+  {
+    name: "Farmers",
+    href: "/farmers",
+    subcategories: [
+      { name: "All Farmers", href: "/farmers", bold: true },
+      { name: "Chicken Farmers", href: "/farmers/chicken" },
+      { name: "Maize Farmers", href: "/farmers/maize" },
+      { name: "Pork Farmers", href: "/farmers/pork" },
+      { name: "Cattle Farmers", href: "/farmers/cattle" },
+      { name: "Onion Farmers", href: "/farmers/onions" },
+      { name: "Goat Farmers", href: "/farmers/goats" },
+      { name: "Tomato Farmers", href: "/farmers/tomatoes" },
     ],
   },
   {
     name: "Lots & Auctions",
     href: "/lots",
     subcategories: [
-      { name: "Browse Lots", href: "/lots" },
+      { name: "Browse Lots", href: "/lots", bold: true },
       { name: "List a Lot", href: "/lots/new" },
     ],
   },
@@ -149,14 +193,24 @@ const CATEGORIES = [
     name: "Bookings",
     href: "/bookings",
     subcategories: [
-      { name: "Browse Bookings", href: "/bookings" },
+      { name: "Browse Bookings", href: "/bookings", bold: true },
+      { name: "Create a Booking", href: "/bookings/new" },
+      { name: "I Supply", href: "/bookings/new/sell" },
+      { name: "I Buy", href: "/bookings/new/buy" },
     ],
   },
   {
     name: "Market Prices",
     href: "/prices",
     subcategories: [
-      { name: "View Prices", href: "/prices" },
+      { name: "All Prices", href: "/prices", bold: true },
+      { name: "Cattle Prices", href: "/prices/cattle" },
+      { name: "Beef Prices", href: "/prices/beef" },
+      { name: "Chicken Prices", href: "/prices/chicken" },
+      { name: "Pork Prices", href: "/prices/pork" },
+      { name: "Goat Prices", href: "/prices/goat" },
+      { name: "Lamb Prices", href: "/prices/lamb" },
+      { name: "Head Prices", href: "/prices/head" },
     ],
   },
 ]
@@ -217,7 +271,7 @@ function ShopByCategory() {
                       key={sub.name}
                       href={sub.href}
                       onClick={() => setOpen(false)}
-                      className="block text-sm text-muted-foreground hover:text-foreground transition-colors py-1"
+                      className={`block text-sm hover:text-foreground transition-colors py-1 ${sub.bold ? "font-semibold text-foreground" : "text-muted-foreground"}`}
                     >
                       {sub.name}
                     </Link>
