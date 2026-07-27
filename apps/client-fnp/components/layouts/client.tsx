@@ -205,38 +205,8 @@ export function Client({ slug, type, user, latestPrices }: ClientPageProps) {
           {/* Right — Sticky sidebar */}
           <aside className="hidden lg:block lg:w-72 shrink-0">
             <div className="sticky top-20 space-y-4 pt-4">
-              {/* Bookings replace contact when buyer has active bookings */}
-              {hasActiveBookings ? (
-                <div className="rounded-lg border bg-card p-5 space-y-3">
-                  <h3 className="text-sm font-bold">Book from {name}</h3>
-                  {preorders.map((event: any) => {
-                    const available = event.total_available - event.total_booked
-                    return (
-                      <Link
-                        key={event.id}
-                        href={`/bookings/${event.slug}`}
-                        className="block rounded-lg border p-3 hover:border-primary/40 hover:shadow-sm transition-all"
-                      >
-                        <p className="text-sm font-semibold">{event.name}</p>
-                        {event.subtitle && <p className="text-xs text-muted-foreground mt-0.5">{event.subtitle}</p>}
-                        <div className="text-xs text-muted-foreground mt-2 space-y-0.5">
-                          {event.unit_price > 0 && (
-                            <div className="flex justify-between">
-                              <span>Price</span>
-                              <span className="font-semibold text-foreground">${(event.unit_price / 100 * 1.069).toFixed(2)}</span>
-                            </div>
-                          )}
-                          <div className="flex justify-between">
-                            <span>Available</span>
-                            <span className="font-medium text-foreground">{available} of {event.total_available}</span>
-                          </div>
-                        </div>
-                      </Link>
-                    )
-                  })}
-                </div>
-              ) : (
-                /* Contact card — only when no active bookings */
+              {/* Contact card — hidden when buyer has active bookings */}
+              {!hasActiveBookings && (
                 <div className="rounded-lg border bg-card p-5 space-y-3">
                   <h3 className="text-sm font-bold">Contact {name}</h3>
                   {(client.phone || !user) && (
