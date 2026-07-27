@@ -52,7 +52,7 @@ export default async function FarmersPage() {
   return (
     <main>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
-      <div className="container pt-4">
+      <div className="container pt-6">
         <nav className="flex items-center gap-1.5 text-xs text-muted-foreground mb-4">
           <Link href="/" className="hover:text-foreground transition-colors">Home</Link>
           <span>/</span>
