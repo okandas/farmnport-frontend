@@ -1,11 +1,13 @@
 "use client"
 
+import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { queryAllDocuments } from "@/lib/query"
 import { parseAsInteger, parseAsString, useQueryStates } from "nuqs"
 import { FileText } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ProductCard } from "@/components/shared/ProductCard"
+import { ViewToggle } from "@/components/shared/ViewToggle"
 import { BuyCategoriesNavClient } from "@/components/generic/BuyCategoriesNavClient"
 import { DocumentFilterSidebar } from "@/components/generic/documentFilterSidebar"
 
@@ -37,6 +39,7 @@ function DocumentCardSkeleton() {
 }
 
 export function BuyDocumentsClient({ initialDocuments, initialTotal, categories }: BuyDocumentsClientProps) {
+    const [view, setView] = useState<"grid" | "list">("grid")
     const [queryState, setQueryState] = useQueryStates({
         category: parseAsString.withDefault(""),
         p: parseAsInteger.withDefault(1),
@@ -76,11 +79,12 @@ export function BuyDocumentsClient({ initialDocuments, initialTotal, categories 
                     </div>
                 ) : (
                     <>
-                        <div className="mb-4 text-sm text-muted-foreground">
-                            Showing {documents.length} of {total} documents
+                        <div className="flex items-center justify-between mb-4"><span className="text-sm text-muted-foreground">
+                            Showing {documents.length} of {total} documents</span>
+                            <ViewToggle view={view} onViewChange={setView} />
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                        <div className={view === "list" ? "flex flex-col gap-3" : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"}>
                             {documents.map((doc: any) => (
                                 <ProductCard
                                     key={doc.id}
@@ -98,6 +102,7 @@ export function BuyDocumentsClient({ initialDocuments, initialTotal, categories 
                                     isTest={doc.is_test}
                                     singleUnit
                                     imageFill={doc.image_fill}
+                                    layout={view}
                                 />
                             ))}
                         </div>

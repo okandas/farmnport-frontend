@@ -1,10 +1,13 @@
 "use client"
 
+import { useState } from "react"
+
 import { useQuery } from "@tanstack/react-query"
 import { queryBuyAgroChemicals } from "@/lib/query"
 import { Button } from "@/components/ui/button"
 import { AgroChemicalFilterSidebar } from "@/components/generic/agroChemicalFilterSidebar"
 import { ProductCard } from "@/components/shared/ProductCard"
+import { ViewToggle } from "@/components/shared/ViewToggle"
 import { BuyCategoriesNavClient } from "@/components/generic/BuyCategoriesNavClient"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
 import { Beaker } from "lucide-react"
@@ -16,6 +19,7 @@ interface BuyAgroChemicalsClientProps {
 }
 
 export function BuyAgroChemicalsClient({ initialChemicals, initialTotal, categories }: BuyAgroChemicalsClientProps) {
+    const [view, setView] = useState<"grid" | "list">("grid")
     const [queryState, setQueryState] = useQueryStates({
         brand: parseAsArrayOf(parseAsString),
         target: parseAsArrayOf(parseAsString),
@@ -92,12 +96,14 @@ export function BuyAgroChemicalsClient({ initialChemicals, initialTotal, categor
                     </div>
                 ) : (
                     <>
-                        {/* Results count */}
-                        <div className="mb-4 text-sm text-muted-foreground">
-                            Showing {chemicals.length} of {chemicalsData?.data?.total || 0} products
+                        <div className="flex items-center justify-between mb-4">
+                            <span className="text-sm text-muted-foreground">
+                                Showing {chemicals.length} of {chemicalsData?.data?.total || 0} products
+                            </span>
+                            <ViewToggle view={view} onViewChange={setView} />
                         </div>
 
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+                        <div className={view === "list" ? "flex flex-col gap-3" : "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5"}>
                             {chemicals.map((chemical: any) => (
                                 <ProductCard
                                     key={chemical.id}
@@ -120,6 +126,7 @@ export function BuyAgroChemicalsClient({ initialChemicals, initialTotal, categor
                                     variantPriceRange={chemical.variant_price_range}
                                     pickupOnly={chemical.pickup_location_ids?.length > 0 && !chemical.delivery_available && !(chemical.delivery_location_ids?.length > 0)}
                                     isTest={chemical.is_test}
+                                    layout={view}
                                 />
                             ))}
                         </div>

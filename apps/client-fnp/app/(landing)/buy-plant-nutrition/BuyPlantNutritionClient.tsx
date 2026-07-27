@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { queryBuyPlantNutritionProducts } from "@/lib/query"
 import { Button } from "@/components/ui/button"
@@ -7,6 +8,7 @@ import { PlantNutritionBuyFilterSidebar } from "@/components/generic/plantNutrit
 import { BuyCategoriesNavClient } from "@/components/generic/BuyCategoriesNavClient"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
 import { ProductCard } from "@/components/shared/ProductCard"
+import { ViewToggle } from "@/components/shared/ViewToggle"
 
 interface BuyPlantNutritionClientProps {
     initialProducts: any[]
@@ -15,6 +17,7 @@ interface BuyPlantNutritionClientProps {
 }
 
 export function BuyPlantNutritionClient({ initialProducts, initialTotal, categories }: BuyPlantNutritionClientProps) {
+    const [view, setView] = useState<"grid" | "list">("grid")
     const [queryState, setQueryState] = useQueryStates({
         brand: parseAsArrayOf(parseAsString),
         category: parseAsArrayOf(parseAsString),
@@ -85,11 +88,12 @@ export function BuyPlantNutritionClient({ initialProducts, initialTotal, categor
                     </div>
                 ) : (
                     <>
-                        <div className="mb-4 text-sm text-muted-foreground">
-                            Showing {products.length} of {productsData?.data?.total || 0} products
+                        <div className="flex items-center justify-between mb-4"><span className="text-sm text-muted-foreground">
+                            Showing {products.length} of {productsData?.data?.total || 0} products</span>
+                            <ViewToggle view={view} onViewChange={setView} />
                         </div>
 
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+                        <div className={view === "list" ? "flex flex-col gap-3" : "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5"}>
                             {products.map((product: any) => (
                                 <ProductCard
                                     key={product.id}
@@ -112,6 +116,7 @@ export function BuyPlantNutritionClient({ initialProducts, initialTotal, categor
                                     variantPriceRange={product.variant_price_range}
                                     pickupOnly={product.pickup_location_ids?.length > 0 && !product.delivery_available && !(product.delivery_location_ids?.length > 0)}
                                     isTest={product.is_test}
+                                    layout={view}
                                 />
                             ))}
                         </div>

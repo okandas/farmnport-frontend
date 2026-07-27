@@ -1,9 +1,11 @@
 "use client"
 
+import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { Button } from "@/components/ui/button"
 import { queryBuySeedProducts } from "@/lib/query"
 import { ProductCard } from "@/components/shared/ProductCard"
+import { ViewToggle } from "@/components/shared/ViewToggle"
 import { BuyCategoriesNavClient } from "@/components/generic/BuyCategoriesNavClient"
 import { SeedBuyFilterSidebar } from "@/components/generic/seedFilterSidebar"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
@@ -16,6 +18,7 @@ interface BuySeedProductsClientProps {
 }
 
 export function BuySeedProductsClient({ initialProducts, initialTotal, bookingEvents, categories }: BuySeedProductsClientProps) {
+  const [view, setView] = useState<"grid" | "list">("grid")
   const [queryState, setQueryState] = useQueryStates({
     brand: parseAsArrayOf(parseAsString),
     p: parseAsInteger.withDefault(1),
@@ -70,10 +73,11 @@ export function BuySeedProductsClient({ initialProducts, initialTotal, bookingEv
           </div>
         ) : (
           <>
-            <div className="mb-4 text-sm text-muted-foreground">
-              Showing {products.length} of {productsData?.data?.total || 0} products
+            <div className="flex items-center justify-between mb-4"><span className="text-sm text-muted-foreground">
+              Showing {products.length} of {productsData?.data?.total || 0} products</span>
+              <ViewToggle view={view} onViewChange={setView} />
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+            <div className={view === "list" ? "flex flex-col gap-3" : "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5"}>
               {products.map((product: any) => {
                 const bookingEvent = bookingEvents.find((e: any) => e.product_id === product.id)
                 return (
@@ -98,6 +102,7 @@ export function BuySeedProductsClient({ initialProducts, initialTotal, bookingEv
                     preorderHref={bookingEvent ? `/bookings/${bookingEvent.slug}` : undefined}
                     pickupOnly={product.pickup_location_ids?.length > 0 && !product.delivery_available && !(product.delivery_location_ids?.length > 0)}
                     isTest={product.is_test}
+                    layout={view}
                   />
                 )
               })}
