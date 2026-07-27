@@ -1,9 +1,11 @@
 "use client"
 
+import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { queryAllEquipmentProducts } from "@/lib/query"
 import { Button } from "@/components/ui/button"
 import { ProductCard } from "@/components/shared/ProductCard"
+import { ViewToggle } from "@/components/shared/ViewToggle"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
 
 interface AllEquipmentClientProps {
@@ -12,6 +14,7 @@ interface AllEquipmentClientProps {
 }
 
 export function AllEquipmentClient({ initialProducts, initialTotal }: AllEquipmentClientProps) {
+    const [view, setView] = useState<"grid" | "list">("grid")
     const [queryState, setQueryState] = useQueryStates({
         brand: parseAsArrayOf(parseAsString),
         p: parseAsInteger.withDefault(1),
@@ -66,7 +69,10 @@ export function AllEquipmentClient({ initialProducts, initialTotal }: AllEquipme
                     </div>
                 ) : (
                     <>
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+                        <div className="flex justify-end mb-4">
+                            <ViewToggle view={view} onViewChange={setView} />
+                        </div>
+                        <div className={view === "list" ? "flex flex-col gap-3" : "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5"}>
                             {products.map((product: any) => (
                                 <ProductCard
                                     key={product.id}
@@ -77,6 +83,7 @@ export function AllEquipmentClient({ initialProducts, initialTotal }: AllEquipme
                                     meta={product.equipment_category?.name}
                                     mode="guide"
                                     isTest={product.is_test}
+                                    layout={view}
                                 />
                             ))}
                         </div>

@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { queryAllAgroChemicals } from "@/lib/query"
 import { Button } from "@/components/ui/button"
@@ -7,6 +8,7 @@ import { Beaker } from "lucide-react"
 import { AgroChemicalFilterSidebar } from "@/components/generic/agroChemicalFilterSidebar"
 import { GuidesSidebarNav } from "@/components/generic/GuidesSidebarNav"
 import { ProductCard } from "@/components/shared/ProductCard"
+import { ViewToggle } from "@/components/shared/ViewToggle"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
 
 interface AllAgroChemicalsClientProps {
@@ -15,6 +17,7 @@ interface AllAgroChemicalsClientProps {
 }
 
 export function AllAgroChemicalsClient({ initialChemicals, initialTotal }: AllAgroChemicalsClientProps) {
+    const [view, setView] = useState<"grid" | "list">("grid")
     const [queryState, setQueryState] = useQueryStates({
         search: parseAsString.withDefault(""),
         brand: parseAsArrayOf(parseAsString),
@@ -86,7 +89,10 @@ export function AllAgroChemicalsClient({ initialChemicals, initialTotal }: AllAg
                     </div>
                 ) : (
                     <>
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+                        <div className="flex justify-end mb-4">
+                            <ViewToggle view={view} onViewChange={setView} />
+                        </div>
+                        <div className={view === "list" ? "flex flex-col gap-3" : "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5"}>
                             {chemicals.map((chemical: any) => (
                                 <ProductCard
                                     key={chemical.id}
@@ -97,6 +103,7 @@ export function AllAgroChemicalsClient({ initialChemicals, initialTotal }: AllAg
                                     meta={chemical.agrochemical_category?.name}
                                     mode="guide"
                                     isTest={chemical.is_test}
+                                    layout={view}
                                 />
                             ))}
                         </div>

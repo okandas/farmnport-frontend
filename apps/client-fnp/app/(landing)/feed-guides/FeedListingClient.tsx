@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { queryAllFeedProducts } from "@/lib/query"
 import { Button } from "@/components/ui/button"
@@ -7,6 +8,7 @@ import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "n
 import { FeedFilterSidebar } from "@/components/generic/feedFilterSidebar"
 import { GuidesSidebarNav } from "@/components/generic/GuidesSidebarNav"
 import { ProductCard } from "@/components/shared/ProductCard"
+import { ViewToggle } from "@/components/shared/ViewToggle"
 
 interface FeedListingClientProps {
     initialData: any[]
@@ -14,6 +16,7 @@ interface FeedListingClientProps {
 }
 
 export function FeedListingClient({ initialData, initialTotal }: FeedListingClientProps) {
+    const [view, setView] = useState<"grid" | "list">("grid")
     const [queryState, setQueryState] = useQueryStates({
         category: parseAsArrayOf(parseAsString),
         brand: parseAsArrayOf(parseAsString),
@@ -92,11 +95,14 @@ export function FeedListingClient({ initialData, initialTotal }: FeedListingClie
                 ) : (
                     <>
                         {/* Results count */}
-                        <div className="mb-4 text-sm text-muted-foreground">
-                            Showing {products.length} of {productsData?.data?.total || 0} products
+                        <div className="mb-4 flex items-center justify-between">
+                            <span className="text-sm text-muted-foreground">
+                                Showing {products.length} of {productsData?.data?.total || 0} products
+                            </span>
+                            <ViewToggle view={view} onViewChange={setView} />
                         </div>
 
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+                        <div className={view === "list" ? "flex flex-col gap-3" : "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5"}>
                             {products.map((product: any) => (
                                 <ProductCard
                                     key={product.id}
@@ -107,6 +113,7 @@ export function FeedListingClient({ initialData, initialTotal }: FeedListingClie
                                     meta={product.animal}
                                     mode="guide"
                                     isTest={product.is_test}
+                                    layout={view}
                                 />
                             ))}
                         </div>
