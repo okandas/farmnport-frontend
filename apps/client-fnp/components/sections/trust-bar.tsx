@@ -19,7 +19,7 @@ export function TrustBar() {
               </svg>
             </div>
             <h3 className="text-sm font-semibold">Quality Support</h3>
-            <p className="text-xs text-muted-foreground mt-1">Always online feedback and support when you need it.</p>
+            <p className="text-xs text-muted-foreground mt-1">Responsive support when you need it.</p>
           </div>
           <div>
             <div className="flex justify-center mb-2">

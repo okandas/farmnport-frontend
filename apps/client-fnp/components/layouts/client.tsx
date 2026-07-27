@@ -81,16 +81,17 @@ export function Client({ slug, type, user, latestPrices }: ClientPageProps) {
           {/* Left — Main content */}
           <div className="flex-1 min-w-0 space-y-6">
             {/* Profile header */}
-            <div className="flex items-start gap-4 pt-4">
-              <Avatar className="h-20 w-20 shrink-0 ring-2 ring-border shadow">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 pt-4">
+              <Avatar className="h-16 w-16 sm:h-20 sm:w-20 shrink-0 ring-2 ring-border shadow">
                 <AvatarImage />
-                <AvatarFallback className="text-xl font-bold bg-primary/10 text-primary">
+                <AvatarFallback className="text-lg sm:text-xl font-bold bg-primary/10 text-primary">
                   {makeAbbveriation(client.name)}
                 </AvatarFallback>
               </Avatar>
-              <div className="flex-1 min-w-0">
-                <div className="flex flex-wrap items-center gap-2 mb-1">
-                  <h1 className="text-2xl font-bold tracking-tight">{name}</h1>
+              <div className="flex-1 min-w-0 text-center sm:text-left">
+                <h1 className="text-xl sm:text-2xl font-bold tracking-tight mb-1">{name}</h1>
+                <div className="flex flex-wrap items-center justify-center sm:justify-start gap-1.5 mb-2">
+                  <Badge variant="secondary" className="text-[10px]">{capitalizeFirstLetter(client.type)}</Badge>
                   {client.verified ? (
                     <Badge className="bg-green-100 text-green-800 hover:bg-green-100 border-green-200 text-[10px]">
                       <Icons.verified className="h-3 w-3 mr-1" />Verified
@@ -100,14 +101,11 @@ export function Client({ slug, type, user, latestPrices }: ClientPageProps) {
                       <Icons.unverified className="h-3 w-3 mr-1" />Unverified
                     </Badge>
                   )}
-                </div>
-                <div className="flex flex-wrap items-center gap-2 mb-2">
-                  <Badge variant="secondary" className="text-[10px]">{capitalizeFirstLetter(client.type)}</Badge>
                   {client.has_booking && (
-                    <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100 border-blue-200 text-[10px]">Accepts Online Bookings</Badge>
+                    <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100 border-blue-200 text-[10px]">Bookings</Badge>
                   )}
                   {client.has_prices && (
-                    <Badge className="bg-green-50 text-green-700 border-green-200 hover:bg-green-50 text-[10px]">Pricing Available</Badge>
+                    <Badge className="bg-green-50 text-green-700 border-green-200 hover:bg-green-50 text-[10px]">Prices</Badge>
                   )}
                 </div>
                 {client.short_description && (
