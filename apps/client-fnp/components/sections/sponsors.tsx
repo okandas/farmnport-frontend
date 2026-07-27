@@ -27,7 +27,7 @@ export function SponsorsSection() {
                 alt={sponsor.name}
                 width={120}
                 height={48}
-                className="max-h-10 w-auto object-contain"
+                className="max-h-10 w-auto object-contain dark:invert"
               />
             </Link>
           ))}

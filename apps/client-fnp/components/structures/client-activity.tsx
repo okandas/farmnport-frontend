@@ -20,9 +20,9 @@ function LotCard({ lot }: { lot: any }) {
   return (
     <Link
       href={`/lots/${lot.slug}`}
-      className="shrink-0 w-80 bg-card border border-border rounded-lg overflow-hidden hover:shadow-lg hover:border-primary/50 transition-all duration-200 group flex flex-col"
+      className="shrink-0 w-64 sm:w-72 bg-card border border-border rounded-lg overflow-hidden hover:shadow-lg hover:border-primary/50 transition-all duration-200 group flex flex-col"
     >
-      <div className="relative h-64 bg-muted/30">
+      <div className="relative h-40 sm:h-48 bg-muted/30">
         {lot.main_image?.img?.src ? (
           <img src={lot.main_image.img.src} alt={name} className="absolute inset-0 w-full h-full object-cover" />
         ) : (
@@ -50,9 +50,9 @@ function PreOrderCard({ event }: { event: any }) {
   return (
     <Link
       href={`/bookings/${event.slug}`}
-      className="shrink-0 w-80 bg-card border border-border rounded-lg overflow-hidden hover:shadow-lg hover:border-primary/50 transition-all duration-200 group flex flex-col"
+      className="shrink-0 w-64 sm:w-72 bg-card border border-border rounded-lg overflow-hidden hover:shadow-lg hover:border-primary/50 transition-all duration-200 group flex flex-col"
     >
-      <div className="relative h-64 bg-muted/30">
+      <div className="relative h-40 sm:h-48 bg-muted/30">
         {event.image_src && (
           <img src={event.image_src} alt={event.name} className="absolute inset-0 w-full h-full object-cover" />
         )}
@@ -94,7 +94,7 @@ function ScrollableRow({ children }: { children: React.ReactNode }) {
     <div className="relative">
       <button
         onClick={() => scroll("left")}
-        className="absolute -left-3 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center h-8 w-8 rounded-full border bg-background shadow-sm hover:bg-muted transition-colors"
+        className="absolute -left-3 top-1/2 -translate-y-1/2 z-10 hidden sm:flex items-center justify-center h-8 w-8 rounded-full border bg-background shadow-sm hover:bg-muted transition-colors"
       >
         <ChevronLeft className="h-4 w-4 text-muted-foreground" />
       </button>
@@ -103,7 +103,7 @@ function ScrollableRow({ children }: { children: React.ReactNode }) {
       </div>
       <button
         onClick={() => scroll("right")}
-        className="absolute -right-3 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center h-8 w-8 rounded-full border bg-background shadow-sm hover:bg-muted transition-colors"
+        className="absolute -right-3 top-1/2 -translate-y-1/2 z-10 hidden sm:flex items-center justify-center h-8 w-8 rounded-full border bg-background shadow-sm hover:bg-muted transition-colors"
       >
         <ChevronRight className="h-4 w-4 text-muted-foreground" />
       </button>
@@ -138,21 +138,19 @@ export function ClientActivity({ slug }: { slug: string }) {
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <div>
-          <h2 className="text-base font-semibold">Activity</h2>
-        </div>
-        <div className="flex items-center gap-4">
+        <h2 className="text-base font-semibold">Activity</h2>
+        <div className="flex items-center gap-3">
           {session && (
-            <div className="flex items-center gap-2">
+            <>
               <Link href="/lots/new" className="text-xs font-medium text-primary hover:underline">
                 New Lot
               </Link>
               <Link href="/bookings/new" className="text-xs font-medium text-primary hover:underline">
                 New Booking
               </Link>
-            </div>
+            </>
           )}
-          <Link href={tab === "lots" ? "/lots" : "/bookings"} className="text-sm text-muted-foreground hover:text-foreground">
+          <Link href={tab === "lots" ? "/lots" : "/bookings"} className="text-xs text-muted-foreground hover:text-foreground">
             Show all
           </Link>
         </div>
