@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button"
 import { BuyerPriceUploads } from "@/components/structures/buyer-price-uploads"
 import { ClientActivity } from "@/components/structures/client-activity"
 import { ShareBar } from "@/components/shared/ShareBar"
+import { QuickLinks } from "@/components/generic/quick-links"
 
 interface LatestPrices {
   date: string
@@ -194,7 +195,7 @@ export function Client({ slug, type, user, latestPrices }: ClientPageProps) {
           </div>
 
           {/* Right — Sticky sidebar */}
-          <aside className="hidden lg:block lg:w-80 shrink-0">
+          <aside className="hidden lg:block lg:w-72 shrink-0">
             <div className="sticky top-20 space-y-4 pt-4">
               {/* Contact card */}
               <div className="rounded-lg border bg-card p-5 space-y-3">
@@ -275,6 +276,8 @@ export function Client({ slug, type, user, latestPrices }: ClientPageProps) {
                   <p className="text-xs text-muted-foreground mt-1">Post your harvest and receive bids</p>
                 </div>
               </Link>
+
+              <QuickLinks />
             </div>
           </aside>
         </div>

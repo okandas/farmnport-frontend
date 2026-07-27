@@ -46,17 +46,10 @@ type BuyerPageProps ={
 
     return(
     <main className="min-h-[70lvh]">
-    <h1 className="sr-only">{name} - Buyer in Zimbabwe</h1>
-<div className="mx-auto max-w-7xl min-h-[70lvh]">
-        <div className="lg:flex lg:space-x-10">
-          <Client slug={slug} type="buyer" user={user} latestPrices={latestPrices}/>
-          <div className="hidden lg:block lg:w-44 shrink-0 px-6 pt-6">
-            <QuickLinks />
-          </div>
-        </div>
-    </div>
-</main>
-)
+      <h1 className="sr-only">{name} - Buyer in Zimbabwe</h1>
+      <Client slug={slug} type="buyer" user={user} latestPrices={latestPrices}/>
+    </main>
+    )
   }
 
 
