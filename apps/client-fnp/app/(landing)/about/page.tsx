@@ -55,7 +55,7 @@ export default function AboutPage() {
               </div>
               <div className="rounded-lg border p-4">
                 <p className="text-sm font-semibold mb-1">Direct connections</p>
-                <p className="text-sm text-muted-foreground">Reach out to farmers and buyers directly through the platform. No middlemen, no hidden fees on produce transactions.</p>
+                <p className="text-sm text-muted-foreground">Reach out to farmers and buyers directly through the platform. No hidden fees on produce transactions.</p>
               </div>
             </div>
           </section>

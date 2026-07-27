@@ -6,7 +6,7 @@ import type { Metadata } from "next"
 export const metadata: Metadata = {
   title: "Sell Your Farm Produce Directly to Buyers | farmnport.com",
   description:
-    "List lots, create bookings, and connect directly with buyers across Zimbabwe. Sell chillies, maize, cattle, eggs, chicks and more — no middlemen, fairer prices.",
+    "List lots, create bookings, and connect directly with buyers across Zimbabwe. Sell chillies, maize, cattle, eggs, chicks and more — fairer prices.",
   alternates: { canonical: "/sell" },
   openGraph: {
     type: "website",
@@ -31,7 +31,7 @@ export default function SellPage() {
             Two Ways to Sell on Farmnport
           </h1>
           <p className="mt-4 text-lg text-muted-foreground">
-            List a lot for immediate sale, or create a booking for regular supply. Both connect you directly with verified buyers — no middlemen.
+            List a lot for immediate sale, or create a booking for regular supply. Both connect you directly with verified buyers.
           </p>
         </div>
 
