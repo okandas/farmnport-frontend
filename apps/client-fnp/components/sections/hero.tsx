@@ -71,8 +71,9 @@ export function HeroSection() {
           {/* Right side — 2 stacked revenue banners */}
           <div className="flex flex-col gap-4">
             {/* Documents — 100% margin */}
-            <div className="flex-1 rounded-md bg-muted/30 overflow-hidden flex items-end p-6">
-              <div>
+            <div className="flex-1 rounded-md bg-muted/30 overflow-hidden flex items-end p-6 relative" style={{ backgroundImage: "url(/images/plan.webp)", backgroundSize: "cover", backgroundPosition: "center" }}>
+              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent" />
+              <div className="relative">
                 <p className="text-xs text-muted-foreground mb-1">Farm Plans</p>
                 <p className="text-base font-bold leading-snug mb-1">
                   Pig Sty Plans,<br />Poultry Houses & More
