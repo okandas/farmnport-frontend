@@ -62,20 +62,20 @@ export function BookingCTA({ produce }: BookingCTAProps) {
     }, [displayName])
 
     return (
-        <div id="booking-cta" className="flex items-center gap-3 rounded-xl border border-primary/20 bg-primary/5 px-5 py-3 mt-4 mb-6">
-            <p className="text-sm font-semibold text-foreground shrink-0">Sell or buy {displayName} in Zimbabwe</p>
-            <div className="flex gap-3 ml-auto">
+        <div id="booking-cta" className="flex flex-col sm:flex-row sm:items-center gap-3 rounded-xl border border-primary/20 bg-primary/5 px-4 sm:px-5 py-3 mt-4 mb-6">
+            <p className="text-sm font-semibold text-foreground">Sell or buy {displayName} in Zimbabwe</p>
+            <div className="flex gap-2 sm:gap-3 sm:ml-auto">
                 <Link
                     id="booking-cta-sell"
                     href="/bookings/new"
-                    className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+                    className="inline-flex items-center gap-2 rounded-lg bg-primary px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
                 >
                     Create Booking
                 </Link>
                 <Link
                     id="booking-cta-lot"
                     href="/lots/new"
-                    className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted/50 transition-colors"
+                    className="inline-flex items-center gap-2 rounded-lg border border-border px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-foreground hover:bg-muted/50 transition-colors"
                 >
                     List a Lot
                 </Link>
