@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query"
 import { queryAgroChemicalsByCategory } from "@/lib/query"
 import { Button } from "@/components/ui/button"
 import { AgroChemicalFilterSidebar } from "@/components/generic/agroChemicalFilterSidebar"
-import { GuidesSidebarNav } from "@/components/generic/GuidesSidebarNav"
+import { ProductSidebarNav } from "@/components/generic/ProductSidebarNav"
 import { ProductCard } from "@/components/shared/ProductCard"
 import { ViewToggle } from "@/components/shared/ViewToggle"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
@@ -57,7 +57,7 @@ export function AgroCategoryClient({ category, categoryName, initialChemicals, i
         <div className="flex flex-col lg:flex-row gap-8">
             {/* Sidebar Filters */}
             <aside className="w-full lg:w-64 flex-shrink-0">
-                <GuidesSidebarNav />
+                <ProductSidebarNav />
                 <AgroChemicalFilterSidebar hideCategory={true} categorySlug={category} />
             </aside>
 

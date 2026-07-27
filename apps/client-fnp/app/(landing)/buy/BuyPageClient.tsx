@@ -10,7 +10,7 @@ import { listPreOrders } from "@/lib/query"
 import { centsToDollars } from "@/lib/utilities"
 import { ProductCard } from "@/components/shared/ProductCard"
 import { ViewToggle } from "@/components/shared/ViewToggle"
-import { BuyCategoriesNavClient } from "@/components/generic/BuyCategoriesNavClient"
+import { ProductSidebarNav } from "@/components/generic/ProductSidebarNav"
 
 
 // ── Document card ─────────────────────────────────────────────────────────────
@@ -220,7 +220,7 @@ export function BuyPageClient({
 
         {/* ── Sidebar ── */}
         <aside className="hidden lg:flex flex-col w-56 flex-shrink-0">
-          <BuyCategoriesNavClient categories={categories} />
+          <ProductSidebarNav />
         </aside>
 
         {/* ── Main content ── */}

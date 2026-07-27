@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query"
 import { queryBuyPlantNutritionProducts } from "@/lib/query"
 import { Button } from "@/components/ui/button"
 import { PlantNutritionBuyFilterSidebar } from "@/components/generic/plantNutritionFilterSidebar"
-import { BuyCategoriesNavClient } from "@/components/generic/BuyCategoriesNavClient"
+import { ProductSidebarNav } from "@/components/generic/ProductSidebarNav"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
 import { ProductCard } from "@/components/shared/ProductCard"
 import { ViewToggle } from "@/components/shared/ViewToggle"
@@ -57,7 +57,7 @@ export function BuyPlantNutritionClient({ initialProducts, initialTotal, categor
     return (
         <div className="flex flex-col lg:flex-row gap-8">
             <aside className="w-full lg:w-64 flex-shrink-0">
-                <BuyCategoriesNavClient categories={categories} />
+                <ProductSidebarNav />
                 <PlantNutritionBuyFilterSidebar />
             </aside>
 

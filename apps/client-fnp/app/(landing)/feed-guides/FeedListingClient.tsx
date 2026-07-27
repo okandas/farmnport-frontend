@@ -6,7 +6,7 @@ import { queryAllFeedProducts } from "@/lib/query"
 import { Button } from "@/components/ui/button"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
 import { FeedFilterSidebar } from "@/components/generic/feedFilterSidebar"
-import { GuidesSidebarNav } from "@/components/generic/GuidesSidebarNav"
+import { ProductSidebarNav } from "@/components/generic/ProductSidebarNav"
 import { ProductCard } from "@/components/shared/ProductCard"
 import { ViewToggle } from "@/components/shared/ViewToggle"
 
@@ -58,7 +58,7 @@ export function FeedListingClient({ initialData, initialTotal }: FeedListingClie
     return (
         <div className="lg:flex lg:space-x-10">
             <div className="hidden lg:block lg:w-64 relative">
-                <GuidesSidebarNav />
+                <ProductSidebarNav />
                 <FeedFilterSidebar />
             </div>
 

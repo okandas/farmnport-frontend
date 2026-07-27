@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { AgroChemicalFilterSidebar } from "@/components/generic/agroChemicalFilterSidebar"
 import { ProductCard } from "@/components/shared/ProductCard"
 import { ViewToggle } from "@/components/shared/ViewToggle"
-import { BuyCategoriesNavClient } from "@/components/generic/BuyCategoriesNavClient"
+import { ProductSidebarNav } from "@/components/generic/ProductSidebarNav"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
 import { Beaker } from "lucide-react"
 
@@ -60,7 +60,7 @@ export function BuyAgroChemicalsClient({ initialChemicals, initialTotal, categor
         <div className="flex flex-col lg:flex-row gap-8">
             {/* Sidebar Filters */}
             <aside className="w-full lg:w-64 flex-shrink-0">
-                <BuyCategoriesNavClient categories={categories} />
+                <ProductSidebarNav />
                 <AgroChemicalFilterSidebar />
             </aside>
 

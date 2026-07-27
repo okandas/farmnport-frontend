@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query"
 import { queryAllSeedProducts } from "@/lib/query"
 import { Button } from "@/components/ui/button"
 import { SeedFilterSidebar } from "@/components/generic/seedFilterSidebar"
-import { GuidesSidebarNav } from "@/components/generic/GuidesSidebarNav"
+import { ProductSidebarNav } from "@/components/generic/ProductSidebarNav"
 import { ProductCard } from "@/components/shared/ProductCard"
 import { ViewToggle } from "@/components/shared/ViewToggle"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
@@ -44,7 +44,7 @@ export function AllSeedGuidesClient({ initialProducts, initialTotal }: AllSeedGu
     return (
         <div className="flex flex-col lg:flex-row gap-8">
             <aside className="w-full lg:w-64 flex-shrink-0">
-                <GuidesSidebarNav />
+                <ProductSidebarNav />
                 <SeedFilterSidebar />
             </aside>
 
