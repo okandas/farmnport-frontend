@@ -2,12 +2,12 @@ import Link from "next/link"
 import Image from "next/image"
 
 const CATEGORIES = [
-  { name: "Chicken Buyers", href: "/buyers/chicken", image: "" },
+  { name: "Chicken Buyers", href: "/buyers/chicken", image: "/images/chicken.webp" },
   { name: "Market Prices", href: "/prices", image: "/images/market-price.webp" },
-  { name: "Agrochemicals", href: "/agrochemical-guides", image: "" },
-  { name: "Spray Programs", href: "/spray-programs", image: "" },
+  { name: "Agrochemicals", href: "/agrochemical-guides", image: "/images/chemicals.webp" },
+  { name: "Spray Programs", href: "/spray-programs", image: "/images/spray.webp" },
   { name: "Feeding Programs", href: "/feeding-programs", image: "/images/feed.webp" },
-  { name: "Maize Buyers", href: "/buyers/maize", image: "" },
+  { name: "Maize Buyers", href: "/buyers/maize", image: "/images/maize.webp" },
 ]
 
 export function CategoriesSection() {
