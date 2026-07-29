@@ -351,7 +351,7 @@ export function SiteHeader() {
               sendGTMEvent({ event: "search_open", method: "click" })
               setSearchOpen(true)
             }}
-            className="relative w-full rounded-sm bg-zinc-100 p-0.5 text-left"
+            className="relative w-full rounded-sm bg-muted p-0.5 text-left"
           >
             <div className="flex items-center w-full h-8 pl-3 pr-10 text-sm text-muted-foreground/60">
               Search for products, guides, programs...
