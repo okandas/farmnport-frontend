@@ -271,6 +271,32 @@ export function BlastView({ source }: { source?: "farmnport" | "menus" } = {}) {
                   {showPreview ? "Hide preview" : "Preview"}
                 </button>
               </>
+            ) : blastTemplate === "menus-reviews-favourites" ? (
+              <>
+                <button
+                  onClick={() => blastMutation.mutate([{ id: "", name: "Okandas", phone: "", email: "okandas@farmnport.com", message: "", email_subject: "Leave a review, save your favourites — menus.co.zw", email_template: "menus-reviews-favourites", channel: "email" }])}
+                  disabled={blastMutation.isPending}
+                  className="h-8 px-3 rounded-md border text-xs font-medium text-orange-600 border-orange-200 hover:bg-orange-50 disabled:opacity-40 flex items-center gap-1.5">
+                  {blastMutation.isPending
+                    ? <><Icons.spinner className="w-3.5 h-3.5 animate-spin" /> Sending test…</>
+                    : <><Icons.send className="w-3.5 h-3.5" /> Send test to me</>}
+                </button>
+                <button
+                  onClick={() => {
+                    const recipients = selectedClients.map((c) => ({
+                      id: c.id, name: c.name, phone: c.phone, email: c.email,
+                      message: "", email_subject: "Leave a review, save your favourites — menus.co.zw",
+                      email_template: "menus-reviews-favourites", channel: "email" as const,
+                    }))
+                    blastMutation.mutate(recipients)
+                  }}
+                  disabled={selected.size === 0 || blastMutation.isPending}
+                  className="h-8 px-4 rounded-md bg-primary text-white text-xs font-bold hover:bg-primary/90 disabled:opacity-40 flex items-center gap-1.5 shadow-sm">
+                  {blastMutation.isPending
+                    ? <><Icons.spinner className="w-3.5 h-3.5 animate-spin" /> Sending…</>
+                    : <><Icons.send className="w-3.5 h-3.5" /> Send to {selected.size || "…"}</>}
+                </button>
+              </>
             ) : (
               <>
                 <button onClick={() => verifyMutation.mutate({ test_email: "okandas@farmnport.com" })}
@@ -335,8 +361,8 @@ export function BlastView({ source }: { source?: "farmnport" | "menus" } = {}) {
           </div>
         )}
 
-        {/* ── Custom message mode ── */}
-        {blastTemplate === "custom" && <>
+        {/* ── Custom message / Marketing template mode ── */}
+        {(blastTemplate === "custom" || blastTemplate === "menus-reviews-favourites") && <>
         {!isMenus && (
         <div className="flex items-center gap-2 px-4 py-2.5 border-b bg-muted/10 shrink-0 flex-wrap">
           <Select value={typeFilter} onValueChange={setTypeFilter}>
@@ -431,8 +457,8 @@ export function BlastView({ source }: { source?: "farmnport" | "menus" } = {}) {
             </div>
           </div>
 
-          {/* Right: compose */}
-          <div className="flex-1 flex flex-col min-w-0">
+          {/* Right: compose (hidden for marketing templates) */}
+          <div className={`flex-1 flex flex-col min-w-0 ${blastTemplate === "menus-reviews-favourites" ? "hidden" : ""}`}>
 
             {/* Via */}
             <div className="flex items-center gap-3 px-5 py-2.5 border-b shrink-0">
