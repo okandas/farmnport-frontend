@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from "next/link"
 import { BaseURL } from "@/lib/schemas"
 import { EquipmentCategoryClient } from "./EquipmentCategoryClient"
+import { ProductSidebarNav } from "@/components/generic/ProductSidebarNav"
 
 type Props = { params: Promise<{ category: string }> }
 
@@ -63,12 +64,19 @@ export default async function EquipmentCategoryPage({ params }: CategoryPageProp
             </div>
 
             <div className="mx-auto max-w-7xl px-6 lg:px-8 py-6">
-                <EquipmentCategoryClient
-                    category={category}
-                    categoryName={categoryName}
-                    initialProducts={products}
-                    initialTotal={total}
-                />
+                <div className="flex gap-8">
+                    <aside className="hidden lg:block w-56 shrink-0">
+                        <ProductSidebarNav />
+                    </aside>
+                    <div className="flex-1 min-w-0">
+                        <EquipmentCategoryClient
+                            category={category}
+                            categoryName={categoryName}
+                            initialProducts={products}
+                            initialTotal={total}
+                        />
+                    </div>
+                </div>
             </div>
         </div>
     )
