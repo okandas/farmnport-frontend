@@ -54,7 +54,7 @@ export default async function BuyEquipmentProductPage({ params }: BuyEquipmentPr
 
     const tabs = [
         "overview",
-        ...(product.specifications?.length > 0 ? ["specifications"] : []),
+        ...(product.spec_groups?.length > 0 ? ["specifications"] : []),
         ...(product.features?.length > 0 ? ["features"] : []),
     ]
 
@@ -74,16 +74,25 @@ export default async function BuyEquipmentProductPage({ params }: BuyEquipmentPr
                         : `${product.name} is a farm equipment product.`)}
                 </p>
             </TabsContent>
-            {product.specifications?.length > 0 && (
+            {product.spec_groups?.length > 0 && (
                 <TabsContent value="specifications" className="mt-4">
-                    <dl className="space-y-2">
-                        {product.specifications.map((spec: any, idx: number) => (
-                            <div key={idx} className="flex justify-between gap-4 py-2 text-sm border-b last:border-0">
-                                <dt className="text-muted-foreground">{spec.name}</dt>
-                                <dd className="font-semibold">{spec.value}</dd>
+                    <div className="border overflow-hidden">
+                        {product.spec_groups.map((group: any, gIdx: number) => (
+                            <div key={gIdx}>
+                                <div className="bg-muted px-4 py-2 text-xs font-bold uppercase tracking-wider border-b">
+                                    {group.name}
+                                </div>
+                                <dl className="divide-y divide-border">
+                                    {group.specs.map((spec: any, sIdx: number) => (
+                                        <div key={sIdx} className="flex justify-between gap-4 px-4 py-2 text-sm">
+                                            <dt className="text-muted-foreground">{spec.name}</dt>
+                                            <dd className="font-medium text-foreground text-right">{spec.value}</dd>
+                                        </div>
+                                    ))}
+                                </dl>
                             </div>
                         ))}
-                    </dl>
+                    </div>
                 </TabsContent>
             )}
             {product.features?.length > 0 && (

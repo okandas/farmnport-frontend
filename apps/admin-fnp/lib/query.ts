@@ -1957,6 +1957,10 @@ export function adminCreateResourceTopic(data: any) {
   return api.post(`${baseUrl}/resource-topics/admin`, data)
 }
 
+export function adminGetResourceTopic(id: string) {
+  return api.get(`${baseUrl}/resource-topics/admin/${id}`)
+}
+
 export function adminUpdateResourceTopic(id: string, data: any) {
   return api.put(`${baseUrl}/resource-topics/admin/${id}`, data)
 }
