@@ -11,7 +11,6 @@ import { guardTestItem } from "@/lib/guardTestItem"
 import { ProductNotFound } from "@/components/shared/ProductNotFound"
 import { SidebarPromo } from "@/components/ads/SidebarPromo"
 
-import { SparePartsSection } from "@/components/shared/SparePartsSection"
 
 type Props = { params: Promise<{ category: string; slug: string }> }
 
@@ -224,8 +223,6 @@ export default async function EquipmentGuidePage({ params }: GuidePageProps) {
                             </div>
                         )}
 
-                        {/* Spare parts */}
-                        <SparePartsSection slug={slug} />
                     </div>
                 </div>
             </div>

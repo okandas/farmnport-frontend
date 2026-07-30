@@ -127,6 +127,7 @@ export default async function BuyEquipmentProductPage({ params }: BuyEquipmentPr
                     brandHref={product.brand ? `/buy-equipment?brand=${product.brand.id}` : undefined}
                     shopHref="/buy-equipment"
                     guideHref={`/equipment-guides/${categorySlug}/${slug}`}
+                    guideLinkLabel="View Product Guide & Specs"
                     loginRedirect={`/buy-equipment/${slug}`}
                     tabsContent={tabsContent}
                 />
