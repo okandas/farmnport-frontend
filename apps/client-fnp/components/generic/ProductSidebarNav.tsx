@@ -40,6 +40,8 @@ const GUIDE_CATEGORIES: Category[] = [
       { label: "Seed Treatments", href: "/agrochemical-guides/seed-treatments" },
       { label: "Fertilizers", href: "/agrochemical-guides/fertilizers" },
       { label: "Nematicides", href: "/agrochemical-guides/nematicides" },
+      { label: "Rodenticides", href: "/agrochemical-guides/rodenticides" },
+      { label: "Suckercides", href: "/agrochemical-guides/suckercides" },
     ],
   },
   {
@@ -50,6 +52,7 @@ const GUIDE_CATEGORIES: Category[] = [
       { label: "Foliar Feeds", href: "/plant-nutrition-guides/foliar-feeds" },
       { label: "Biostimulants", href: "/plant-nutrition-guides/biostimulants" },
       { label: "Plant Growth Regulators", href: "/plant-nutrition-guides/plant-growth-regulators" },
+      { label: "Adjuvants", href: "/plant-nutrition-guides/adjuvants" },
     ],
   },
   {
