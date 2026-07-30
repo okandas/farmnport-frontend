@@ -134,7 +134,7 @@ export default async function BuyAgroChemicalPage({ params }: BuyAgroChemicalPag
                     shopHref="/buy-agrochemicals"
                     guideHref={`/agrochemical-guides/${chemical.agrochemical_category?.slug || ""}/${slug}?from=buy-agrochemicals/${slug}`}
                     loginRedirect={`/buy-agrochemicals/${slug}`}
-                    fallbackIcon={<Beaker className="w-28 h-28 text-muted-foreground/20" />}
+                    fallbackIcon={null}
                     tabsContent={tabsContent}
                 />
             </div>

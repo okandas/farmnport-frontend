@@ -17,7 +17,7 @@ type Props = { params: Promise<{ category: string; slug: string }> }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { category, slug } = await params
-  const res = await fetch(`${BaseURL}/plantnutrition/${slug}`, { next: { revalidate: 3600 } }).catch(() => null)
+  const res = await fetch(`${BaseURL}/plantnutrition/${slug}`, { cache: "no-store" }).catch(() => null)
   const product = res?.ok ? await res.json() : null
 
   if (!product) {
@@ -49,9 +49,7 @@ interface GuidePageProps {
     }>
 }
 
-const fetchOptions: RequestInit = process.env.NODE_ENV === "production"
-    ? { next: { revalidate: 3600 } } as RequestInit
-    : { cache: "no-store" }
+const fetchOptions: RequestInit = { cache: "no-store" }
 
 export default async function PlantNutritionGuidePage({ params }: GuidePageProps) {
     const { category, slug } = await params
@@ -141,7 +139,7 @@ export default async function PlantNutritionGuidePage({ params }: GuidePageProps
                 <div className="grid lg:grid-cols-[450px,1fr] gap-12 mb-16">
                     {/* Left - Image + Precautions */}
                     <div className="flex flex-col gap-4">
-                        <div className="relative aspect-square bg-white rounded-xl border overflow-hidden shadow-sm">
+                        <div className="relative aspect-square bg-muted/30 dark:bg-white rounded-xl border overflow-hidden shadow-sm">
                             {product.images && product.images[0] && product.images[0].img?.src ? (
                                 <Image
                                     src={product.images[0].img.src}
@@ -160,7 +158,7 @@ export default async function PlantNutritionGuidePage({ params }: GuidePageProps
                         {product.images && product.images.length > 1 && (
                             <div className="grid grid-cols-4 gap-3">
                                 {product.images.slice(0, 4).map((img: any, idx: number) => (
-                                    <div key={idx} className="relative aspect-square bg-white rounded-lg border hover:border-primary transition-colors">
+                                    <div key={idx} className="relative aspect-square bg-muted/30 dark:bg-white rounded-lg border hover:border-primary transition-colors">
                                         {img.img?.src && (
                                             <Image
                                                 src={img.img.src}

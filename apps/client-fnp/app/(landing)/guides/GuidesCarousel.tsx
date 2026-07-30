@@ -14,7 +14,7 @@ function ProductCard({ product, slugBase }: { product: any; slugBase: string }) 
             href={`${slugBase}/${product.slug}`}
             className="shrink-0 w-44 sm:w-48 rounded-lg border bg-card overflow-hidden hover:shadow-lg hover:border-primary/50 transition-all duration-200 group flex flex-col"
         >
-            <div className="aspect-square bg-white relative">
+            <div className="aspect-square bg-muted/30 dark:bg-white relative">
                 {image ? (
                     <img src={image} alt={name} className="absolute inset-0 w-full h-full object-contain p-3" />
                 ) : (

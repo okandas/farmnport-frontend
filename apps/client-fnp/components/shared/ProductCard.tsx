@@ -135,7 +135,7 @@ export function ProductCard({
   return (
     <div className="bg-card border border-border rounded-lg overflow-hidden transition-all duration-200 hover:shadow-lg hover:border-primary/50 group">
       <Link href={href} className="block">
-        <div className="relative aspect-square bg-white">
+        <div className="relative aspect-square bg-muted/30 dark:bg-white">
           {imageSrc ? (
             <Image
               src={imageSrc}

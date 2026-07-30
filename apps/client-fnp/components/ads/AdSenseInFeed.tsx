@@ -47,7 +47,7 @@ export function AdSenseInFeed() {
     if (!isProduction) return null
 
     return (
-        <div className={`my-4 min-h-[100px] ${isDark ? "rounded-lg overflow-hidden bg-white p-1" : ""}`}>
+        <div className={`my-4 transition-all duration-300 ${adFilled ? (isDark ? "rounded-lg overflow-hidden bg-white p-1" : "") : "min-h-0"}`}>
             <Script
                 async
                 src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9685248262342396"

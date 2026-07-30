@@ -14,9 +14,7 @@ interface FeedDetailPageProps {
     params: Promise<{ slug: string }>
 }
 
-const fetchOptions: RequestInit = process.env.NODE_ENV === "production"
-    ? { next: { revalidate: 3600 } } as RequestInit
-    : { cache: "no-store" }
+const fetchOptions: RequestInit = { cache: "no-store" }
 
 async function getFeedProduct(slug: string) {
     try {
@@ -77,7 +75,7 @@ export default async function FeedDetailPage({ params }: FeedDetailPageProps) {
 
                     {/* Left - Image */}
                     <div className="flex flex-col gap-4">
-                        <div className="relative aspect-square bg-white rounded-xl border overflow-hidden shadow-sm">
+                        <div className="relative aspect-square bg-muted/30 dark:bg-white rounded-xl border overflow-hidden shadow-sm">
                             {product.images?.[0]?.img?.src ? (
                                 <Image
                                     src={product.images[0].img.src}
@@ -95,7 +93,7 @@ export default async function FeedDetailPage({ params }: FeedDetailPageProps) {
                         {product.images && product.images.length > 1 && (
                             <div className="grid grid-cols-4 gap-3">
                                 {product.images.slice(0, 4).map((img: any, idx: number) => (
-                                    <div key={idx} className="relative aspect-square bg-white rounded-lg border hover:border-primary transition-colors">
+                                    <div key={idx} className="relative aspect-square bg-muted/30 dark:bg-white rounded-lg border hover:border-primary transition-colors">
                                         {img.img?.src && (
                                             <Image
                                                 src={img.img.src}

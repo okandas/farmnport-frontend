@@ -159,7 +159,7 @@ export default async function AgroChemicalGuidePage({ params }: GuidePageProps) 
                 <div className="grid lg:grid-cols-[450px,1fr] gap-12 mb-16">
                     {/* Left - Image */}
                     <div className="flex flex-col gap-4">
-                        <div className="relative aspect-square bg-white rounded-xl border overflow-hidden shadow-sm">
+                        <div className="relative aspect-square bg-muted/30 dark:bg-white rounded-xl border overflow-hidden shadow-sm">
                             {chemical.images && chemical.images[0] && chemical.images[0].img?.src ? (
                                 <Image
                                     src={chemical.images[0].img.src}
@@ -180,7 +180,7 @@ export default async function AgroChemicalGuidePage({ params }: GuidePageProps) 
                                 {chemical.images.slice(0, 4).map((img: any, idx: number) => (
                                     <div
                                         key={idx}
-                                        className="relative aspect-square bg-white rounded-lg border hover:border-primary transition-colors"
+                                        className="relative aspect-square bg-muted/30 dark:bg-white rounded-lg border hover:border-primary transition-colors"
                                     >
                                         {img.img?.src && (
                                             <Image

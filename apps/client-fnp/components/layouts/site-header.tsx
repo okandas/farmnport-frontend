@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
 import { signOut } from "next-auth/react"
 import { sendGTMEvent } from "@next/third-parties/google"
@@ -25,7 +26,6 @@ import { makeAbbveriation } from "@/lib/utilities"
 import { useQuery } from "@tanstack/react-query"
 import { useCart } from "@/contexts/cart-context"
 import { getCart, countBookingNotifications } from "@/lib/query"
-import { SearchModal } from "@/components/structures/search-modal"
 
 function CartIcon({ user }: { user: AuthenticatedUser | null }) {
   const { openCart } = useCart()
@@ -314,23 +314,79 @@ function ShopByCategory() {
   )
 }
 
+const SEARCH_CATEGORIES = [
+  { value: "all", label: "All" },
+  { value: "agro_chemicals", label: "Agrochemicals" },
+  { value: "animal_health", label: "Animal Health" },
+  { value: "plant_nutrition", label: "Plant Nutrition" },
+  { value: "feed_products", label: "Animal Feed" },
+  { value: "seed_products", label: "Seeds" },
+  { value: "equipment", label: "Equipment" },
+  { value: "guides", label: "Guides" },
+  { value: "buyers", label: "Buyers" },
+  { value: "prices", label: "Prices" },
+  { value: "bookings", label: "Pre-Orders" },
+  { value: "lots", label: "Lots" },
+]
+
+function NavSearchBar({ router }: { router: ReturnType<typeof useRouter> }) {
+  const [category, setCategory] = useState("all")
+
+  return (
+    <form
+      className="hidden lg:flex flex-1 items-center px-6"
+      onSubmit={(e) => {
+        e.preventDefault()
+        const input = e.currentTarget.querySelector("input[type=text]") as HTMLInputElement
+        const q = input?.value?.trim()
+        if (q) {
+          sendGTMEvent({ event: "search_open", method: "submit" })
+          const params = new URLSearchParams({ q })
+          if (category !== "all") params.set("category", category)
+          router.push(`/search?${params.toString()}`)
+        }
+      }}
+    >
+      <div className="relative w-full flex items-center rounded-sm bg-muted p-0.5">
+        <select
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          className="h-8 pl-2 pr-1 text-xs font-medium bg-transparent border-r border-border/40 outline-none text-muted-foreground cursor-pointer shrink-0"
+        >
+          {SEARCH_CATEGORIES.map((c) => (
+            <option key={c.value} value={c.value}>{c.label}</option>
+          ))}
+        </select>
+        <input
+          type="text"
+          placeholder="Search for products, guides, programs..."
+          className="flex-1 h-8 pl-3 pr-12 text-sm bg-transparent outline-none placeholder:text-muted-foreground/60"
+        />
+        <button type="submit" className="absolute right-0.5 top-1/2 -translate-y-1/2 h-8 w-9 flex items-center justify-center rounded-sm bg-primary text-primary-foreground hover:bg-primary/90 transition-colors">
+          <Search className="h-4 w-4" />
+        </button>
+      </div>
+    </form>
+  )
+}
+
 export function SiteHeader() {
   const { data: session } = useSession()
   const user = (session?.user as AuthenticatedUser) ?? undefined
-  const [searchOpen, setSearchOpen] = useState(false)
+  const router = useRouter()
 
-  // Cmd+K keyboard shortcut
+  // Cmd+K navigates to search
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         e.preventDefault()
         sendGTMEvent({ event: "search_open", method: "keyboard" })
-        setSearchOpen(true)
+        router.push("/search")
       }
     }
     document.addEventListener("keydown", handleKeyDown)
     return () => document.removeEventListener("keydown", handleKeyDown)
-  }, [])
+  }, [router])
 
   return (
     <header className="sticky top-0 z-50 w-full bg-background border-b">
@@ -345,27 +401,7 @@ export function SiteHeader() {
         <ShopByCategory />
 
         {/* Search bar — takes remaining space */}
-        <div className="hidden lg:flex flex-1 items-center px-6">
-          <button
-            onClick={() => {
-              sendGTMEvent({ event: "search_open", method: "click" })
-              setSearchOpen(true)
-            }}
-            className="relative w-full rounded-sm bg-muted p-0.5 text-left"
-          >
-            <div className="flex items-center w-full h-8 pl-3 pr-10 text-sm text-muted-foreground/60">
-              Search for products, guides, programs...
-            </div>
-            <div className="absolute right-12 top-1/2 -translate-y-1/2 hidden sm:flex items-center gap-0.5">
-              <kbd className="h-5 select-none items-center rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground inline-flex">⌘K</kbd>
-            </div>
-            <div className="absolute right-0.5 top-1/2 -translate-y-1/2 h-8 w-9 flex items-center justify-center rounded-sm bg-primary text-primary-foreground">
-              <Search className="h-4 w-4" />
-            </div>
-          </button>
-        </div>
-
-        <SearchModal open={searchOpen} onOpenChange={setSearchOpen} />
+        <NavSearchBar router={router} />
 
         {/* Right side actions */}
         <div className="hidden lg:flex items-center gap-2">
@@ -417,7 +453,7 @@ export function SiteHeader() {
         <button
           onClick={() => {
             sendGTMEvent({ event: "search_open", method: "mobile_icon" })
-            setSearchOpen(true)
+            router.push("/search")
           }}
           className="lg:hidden p-2 rounded-lg hover:bg-muted transition-colors"
           aria-label="Search"

@@ -1,6 +1,6 @@
 {
   "name": "client-farmnport",
-  "version": "6.0.0",
+  "version": "6.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev --port 3001",
@@ -55,7 +55,7 @@
     "jwt-decode": "^3.1.2",
     "libphonenumber": "^0.0.10",
     "lucide-react": "^0.279.0",
-    "next": "16.2.9",
+    "next": "^16.2.12",
     "next-auth": "^5.0.0-beta.31",
     "next-themes": "^0.2.1",
     "nextjs-toploader": "^3.9.17",

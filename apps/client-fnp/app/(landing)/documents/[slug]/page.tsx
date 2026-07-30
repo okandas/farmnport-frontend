@@ -98,7 +98,7 @@ export default async function DocumentGuidePage({ params }: Props) {
 
                     {/* Left — Image */}
                     <div className="space-y-4">
-                        <div className="relative aspect-square bg-white rounded-xl border overflow-hidden shadow-sm">
+                        <div className="relative aspect-square bg-muted/30 dark:bg-white rounded-xl border overflow-hidden shadow-sm">
                             {doc.main_image ? (
                                 <Image
                                     src={doc.main_image}

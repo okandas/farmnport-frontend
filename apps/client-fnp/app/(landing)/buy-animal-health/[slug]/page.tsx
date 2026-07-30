@@ -133,7 +133,7 @@ export default async function BuyAnimalHealthProductPage({ params }: BuyAnimalHe
                     shopHref="/buy-animal-health"
                     guideHref={`/animal-health-guides/${categorySlug}/${slug}`}
                     loginRedirect={`/buy-animal-health/${slug}`}
-                    fallbackIcon={<Beaker className="w-28 h-28 text-muted-foreground/20" />}
+                    fallbackIcon={null}
                     tabsContent={tabsContent}
                 />
             </div>
