@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { useQuery } from "@tanstack/react-query"
@@ -46,7 +47,7 @@ const FALLBACK_SECTIONS = [
       { title: "How to browse bookings", href: "/resources/article/how-to-browse-bookings", image: "" },
       { title: "How to bid on lots", href: "/resources/article/how-to-bid-on-lots", image: "" },
       { title: "How to find farmers", href: "/resources/article/how-to-find-farmers", image: "" },
-      { title: "Buying plant nutrition", href: "/resources/article/buying-plant-nutrition", image: "" },
+      { title: "How to use guides to buy", href: "/resources/article/how-to-use-guides-to-buy", image: "" },
     ],
   },
 ]
@@ -74,7 +75,11 @@ function ResourceCard({ title, href, image }: { title: string; href: string; ima
   )
 }
 
+const TAGS = ["Selling", "Buying", "Bookings", "Lots", "Prices", "Programs"]
+
 export default function ResourcesPage() {
+  const [activeTag, setActiveTag] = useState<string | null>(null)
+
   const { data: topics } = useQuery({
     queryKey: ["resource-topics"],
     queryFn: fetchTopics,
@@ -90,10 +95,18 @@ export default function ResourcesPage() {
         <div className="text-center mb-10">
           <h1 className="text-3xl sm:text-4xl font-bold tracking-tight mb-6">Resource Center</h1>
           <div className="flex flex-wrap items-center justify-center gap-2">
-            {["Selling", "Buying", "Bookings", "Lots", "Prices", "Programs"].map((tag) => (
-              <span key={tag} className="px-4 py-1.5 rounded-full border text-sm font-medium text-muted-foreground hover:text-foreground hover:border-foreground cursor-pointer transition-colors">
+            {TAGS.map((tag) => (
+              <button
+                key={tag}
+                onClick={() => setActiveTag(activeTag === tag.toLowerCase() ? null : tag.toLowerCase())}
+                className={`px-4 py-1.5 rounded-full border text-sm font-medium transition-colors ${
+                  activeTag === tag.toLowerCase()
+                    ? "bg-foreground text-background border-foreground"
+                    : "text-muted-foreground hover:text-foreground hover:border-foreground"
+                }`}
+              >
                 {tag}
-              </span>
+              </button>
             ))}
           </div>
         </div>
@@ -101,7 +114,7 @@ export default function ResourcesPage() {
         <div className="space-y-14">
           {hasTopics ? (
             topics.map((topic: any) => (
-              <TopicSection key={topic.id} topic={topic} />
+              <TopicSection key={topic.id} topic={topic} activeTag={activeTag} />
             ))
           ) : (
             FALLBACK_SECTIONS.map((section) => (
@@ -123,14 +136,19 @@ export default function ResourcesPage() {
   )
 }
 
-function TopicSection({ topic }: { topic: any }) {
+function TopicSection({ topic, activeTag }: { topic: any; activeTag: string | null }) {
   const { data } = useQuery({
     queryKey: ["resource-topic", topic.slug],
     queryFn: () => fetchTopicWithArticles(topic.slug),
     staleTime: 60000,
   })
 
-  const articles = data?.articles ?? []
+  const allArticles = data?.articles ?? []
+  const articles = activeTag
+    ? allArticles.filter((a: any) => a.tags?.includes(activeTag))
+    : allArticles
+
+  if (activeTag && articles.length === 0) return null
 
   return (
     <section>
