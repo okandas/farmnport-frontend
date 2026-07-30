@@ -15,7 +15,7 @@ type Props = { params: Promise<{ category: string; slug: string }> }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { category, slug } = await params
-  const res = await fetch(`${BaseURL}/animalhealth/${slug}`, { next: { revalidate: 3600 } }).catch(() => null)
+  const res = await fetch(`${BaseURL}/animalhealth/${slug}`, { cache: "no-store" }).catch(() => null)
   const product = res?.ok ? await res.json() : null
 
   if (!product) {
@@ -55,9 +55,7 @@ const overviewDesc: Record<string, string> = {
     "biosecurity-disinfectants": "a biosecurity disinfectant designed for cleaning and sanitizing poultry and livestock housing. It helps eliminate pathogens and maintain a healthy environment.",
 }
 
-const fetchOptions: RequestInit = process.env.NODE_ENV === "production"
-    ? { next: { revalidate: 3600 } } as RequestInit
-    : { cache: "no-store" }
+const fetchOptions: RequestInit = { cache: "no-store" }
 
 export default async function AnimalHealthGuidePage({ params }: GuidePageProps) {
     const { category, slug } = await params

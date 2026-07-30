@@ -14,9 +14,7 @@ interface FeedDetailPageProps {
     params: Promise<{ slug: string }>
 }
 
-const fetchOptions: RequestInit = process.env.NODE_ENV === "production"
-    ? { next: { revalidate: 3600 } } as RequestInit
-    : { cache: "no-store" }
+const fetchOptions: RequestInit = { cache: "no-store" }
 
 async function getFeedProduct(slug: string) {
     try {

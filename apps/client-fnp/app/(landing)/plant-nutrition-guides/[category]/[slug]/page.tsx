@@ -17,7 +17,7 @@ type Props = { params: Promise<{ category: string; slug: string }> }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { category, slug } = await params
-  const res = await fetch(`${BaseURL}/plantnutrition/${slug}`, { next: { revalidate: 3600 } }).catch(() => null)
+  const res = await fetch(`${BaseURL}/plantnutrition/${slug}`, { cache: "no-store" }).catch(() => null)
   const product = res?.ok ? await res.json() : null
 
   if (!product) {
@@ -49,9 +49,7 @@ interface GuidePageProps {
     }>
 }
 
-const fetchOptions: RequestInit = process.env.NODE_ENV === "production"
-    ? { next: { revalidate: 3600 } } as RequestInit
-    : { cache: "no-store" }
+const fetchOptions: RequestInit = { cache: "no-store" }
 
 export default async function PlantNutritionGuidePage({ params }: GuidePageProps) {
     const { category, slug } = await params

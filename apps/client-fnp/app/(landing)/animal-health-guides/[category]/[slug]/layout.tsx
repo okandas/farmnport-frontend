@@ -14,9 +14,7 @@ export async function generateMetadata({ params }: LayoutProps): Promise<Metadat
   const { category, slug } = await params
 
   try {
-    const fetchOptions: RequestInit = process.env.NODE_ENV === "production"
-      ? { next: { revalidate: 3600 } } as RequestInit
-      : { cache: "no-store" }
+    const fetchOptions: RequestInit = { cache: "no-store" }
     const res = await fetch(`${BaseURL}/animalhealth/${slug}`, fetchOptions)
     const product = res.ok ? await res.json() : null
 
