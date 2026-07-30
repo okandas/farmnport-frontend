@@ -15,6 +15,7 @@ const CATEGORIES = [
     { title: "Animal Nutrition", href: "/feed-guides", api: "/feed/all", slugBase: "/feed-guides", flag: true },
     { title: "Plant Nutrition Guides", href: "/plant-nutrition-guides", api: "/plantnutrition/all", slugBase: "/plant-nutrition-guides", flag: true },
     { title: "Seed Guides", href: "/seed-guides", api: "/seed-products/all", slugBase: "/seed-guides", flag: true },
+    { title: "Equipment Guides", href: "/equipment-guides", api: "/equipment/all", slugBase: "/equipment-guides", flag: true },
     { title: "Plans & Documents", href: "/documents", api: "/document/all", slugBase: "/buy-documents", flag: false, image: "/images/plan.webp" },
 ]
 

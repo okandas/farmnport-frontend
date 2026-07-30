@@ -169,15 +169,6 @@ export default async function EquipmentGuidePage({ params }: GuidePageProps) {
                             </div>
                         )}
 
-                        {product.brand && (
-                            <div className="rounded-xl border bg-card p-4">
-                                <h2 className="text-sm font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-400 mb-2">Brand</h2>
-                                <p className="text-sm text-foreground font-medium">{product.brand.name}</p>
-                                {product.brand.country && (
-                                    <p className="text-xs text-muted-foreground mt-1">{product.brand.country}</p>
-                                )}
-                            </div>
-                        )}
 
                         <AdSenseInFeed />
 
