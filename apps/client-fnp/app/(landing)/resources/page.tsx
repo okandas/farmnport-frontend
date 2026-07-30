@@ -25,28 +25,28 @@ const FALLBACK_SECTIONS = [
   {
     heading: "Get started as a farmer",
     resources: [
-      { title: "How to list a lot", href: "/sell", image: "" },
-      { title: "How to create a booking", href: "/bookings/new", image: "" },
-      { title: "How to find buyers", href: "/buyers", image: "" },
-      { title: "How to check market prices", href: "/prices", image: "" },
+      { title: "How to list a lot", href: "/resources/article/how-to-list-a-lot", image: "" },
+      { title: "How to create a booking", href: "/resources/article/how-to-create-a-booking", image: "" },
+      { title: "How to find buyers", href: "/resources/article/how-to-find-buyers", image: "" },
+      { title: "How to check market prices", href: "/resources/article/how-to-check-market-prices", image: "" },
     ],
   },
   {
     heading: "Grow your farm business",
     resources: [
-      { title: "Using spray programs", href: "/spray-programs", image: "" },
-      { title: "Using feeding programs", href: "/feeding-programs", image: "" },
-      { title: "Buying farm plans", href: "/buy-documents", image: "" },
-      { title: "Browsing agrochemical guides", href: "/agrochemical-guides", image: "" },
+      { title: "Using spray programs", href: "/resources/article/using-spray-programs", image: "" },
+      { title: "Using feeding programs", href: "/resources/article/using-feeding-programs", image: "" },
+      { title: "Buying farm plans", href: "/resources/article/buying-farm-plans", image: "" },
+      { title: "Browsing agrochemical guides", href: "/resources/article/browsing-agrochemical-guides", image: "" },
     ],
   },
   {
     heading: "Buying on Farmnport",
     resources: [
-      { title: "How to browse bookings", href: "/bookings", image: "" },
-      { title: "How to bid on lots", href: "/lots", image: "" },
-      { title: "How to find farmers", href: "/farmers", image: "" },
-      { title: "Buying plant nutrition", href: "/buy-plant-nutrition", image: "" },
+      { title: "How to browse bookings", href: "/resources/article/how-to-browse-bookings", image: "" },
+      { title: "How to bid on lots", href: "/resources/article/how-to-bid-on-lots", image: "" },
+      { title: "How to find farmers", href: "/resources/article/how-to-find-farmers", image: "" },
+      { title: "Buying plant nutrition", href: "/resources/article/buying-plant-nutrition", image: "" },
     ],
   },
 ]

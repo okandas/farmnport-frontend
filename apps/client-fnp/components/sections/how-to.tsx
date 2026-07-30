@@ -4,17 +4,17 @@ const GUIDES = [
   {
     title: "How to Sell on Farmnport",
     description: "Create your farm profile, list your produce as a lot, and receive bids from verified buyers.",
-    href: "/sell",
+    href: "/resources/article/how-to-list-a-lot",
   },
   {
     title: "How to Create a Booking",
     description: "Set up a pre-order for eggs, chicks or harvests — buyers book directly from you on a schedule.",
-    href: "/bookings/new",
+    href: "/resources/article/how-to-create-a-booking",
   },
   {
     title: "How to Find Buyers",
     description: "Browse buyer profiles by produce type and connect with verified buyers across Zimbabwe.",
-    href: "/buyers",
+    href: "/resources/article/how-to-find-buyers",
   },
 ]
 
