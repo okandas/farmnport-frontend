@@ -25,7 +25,7 @@ const TRENDING_ITEMS = [
     name: "Alpha Chickens Eggs",
     description: "Bulk tray eggs — order directly from verified suppliers",
     price: "$3.80 per tray",
-    href: "/bookings/alpha-chickens-eggs",
+    href: "/bookings/alpha-chickens-eggs-fnp-pre-703f118c",
     image: "",
   },
   {

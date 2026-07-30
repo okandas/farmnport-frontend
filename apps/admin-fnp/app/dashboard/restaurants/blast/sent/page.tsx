@@ -8,7 +8,7 @@ export default function MenusSentBlastsPage() {
   return (
     <DashboardShell>
       <DashboardHeader heading="Sent Blasts" text="History of all blast messages sent to menus.co.zw users." />
-      <SentBlastsView />
+      <SentBlastsView source="menus" />
     </DashboardShell>
   )
 }

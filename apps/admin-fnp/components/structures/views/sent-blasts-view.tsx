@@ -33,10 +33,11 @@ function formatDate(d: string) {
   return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })
 }
 
-export function SentBlastsView() {
+export function SentBlastsView({ source }: { source?: "farmnport" | "menus" } = {}) {
+  const isMenus = source === "menus"
   const { data, isLoading } = useQuery({
-    queryKey: ["blast-logs"],
-    queryFn: () => authorizedHTTPClient.get<{ data: BlastLog[]; total: number }>("/v1/blast/logs"),
+    queryKey: ["blast-logs", source],
+    queryFn: () => authorizedHTTPClient.get<{ data: BlastLog[]; total: number }>(`/v1/blast/logs${isMenus ? "?source=menus" : ""}`),
     select: (res) => (res.data?.data ?? []) as BlastLog[],
   })
 
@@ -50,7 +51,7 @@ export function SentBlastsView() {
           <span className="text-sm font-semibold">Blast History</span>
           <span className="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground font-medium">{logs.length} records</span>
         </div>
-        <Link href="/dashboard/farmnport/blast" className="text-xs font-medium text-primary hover:underline flex items-center gap-1">
+        <Link href={isMenus ? "/dashboard/restaurants/blast" : "/dashboard/farmnport/blast"} className="text-xs font-medium text-primary hover:underline flex items-center gap-1">
           ← Back to Blast
         </Link>
       </div>
