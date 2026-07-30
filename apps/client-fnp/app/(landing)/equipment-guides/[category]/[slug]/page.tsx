@@ -140,10 +140,11 @@ export default async function EquipmentGuidePage({ params }: GuidePageProps) {
                             </div>
                         )}
 
-                        <WantToBuyCTA available_for_sale={product.available_for_sale} name={product.name} brand={product.brand?.name} href={`/buy-equipment/${slug}`} interestHref={`/interest/equipment/${slug}`} />
+                        <div className="hidden lg:block">
+                            <WantToBuyCTA available_for_sale={product.available_for_sale} name={product.name} brand={product.brand?.name} href={`/buy-equipment/${slug}`} interestHref={`/interest/equipment/${slug}`} />
+                        </div>
 
-                        {/* Promo - fills remaining sidebar space */}
-                        <div className="flex-1">
+                        <div className="hidden lg:block flex-1">
                             <SidebarPromo />
                         </div>
                     </div>
@@ -160,6 +161,10 @@ export default async function EquipmentGuidePage({ params }: GuidePageProps) {
                                 </div>
                             </div>
                         )}
+
+                        <div className="lg:hidden">
+                            <WantToBuyCTA available_for_sale={product.available_for_sale} name={product.name} brand={product.brand?.name} href={`/buy-equipment/${slug}`} interestHref={`/interest/equipment/${slug}`} />
+                        </div>
 
                         <div className="h-px bg-border" />
 
