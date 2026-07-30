@@ -1,4 +1,4 @@
-import { Body, Button, Container, Head, Hr, Html, Link, Preview, Section, Text } from "@react-email/components"
+import { Body, Button, Container, Head, Hr, Html, Img, Link, Preview, Section, Text } from "@react-email/components"
 
 interface MenusReviewsFavouritesEmailProps {
   name?: string
@@ -35,6 +35,7 @@ export default function MenusReviewsFavouritesEmail({ name = "there" }: MenusRev
 
           {/* Section 1: Reviews */}
           <Section style={content}>
+            <Img src="https://menus.co.zw/images/reviews/review.png" alt="Leave a review on menus.co.zw" width="520" style={image} />
             <Text style={sectionLabel}>YOUR VOICE MATTERS</Text>
             <Text style={sectionTitle}>Leave a review for a restaurant you have visited</Text>
             <Text style={paragraph}>
@@ -49,6 +50,7 @@ export default function MenusReviewsFavouritesEmail({ name = "there" }: MenusRev
 
           {/* Section 2: Favourites */}
           <Section style={content}>
+            <Img src="https://menus.co.zw/images/reviews/favourites.png" alt="Save your favourite restaurants on menus.co.zw" width="520" style={image} />
             <Text style={sectionLabel}>SAVE YOUR SPOTS</Text>
             <Text style={sectionTitle}>Favourite the restaurants you love</Text>
             <Text style={paragraph}>
@@ -61,13 +63,17 @@ export default function MenusReviewsFavouritesEmail({ name = "there" }: MenusRev
 
           <Hr style={divider} />
 
-          {/* Section 3: Coming soon */}
+          {/* Section 3: Reservations */}
           <Section style={content}>
-            <Text style={sectionLabel}>COMING SOON</Text>
-            <Text style={sectionTitle}>Online reservations</Text>
+            <Img src="https://menus.co.zw/images/reviews/reservations.png" alt="Book a table online on menus.co.zw" width="520" style={image} />
+            <Text style={sectionLabel}>NOW LIVE</Text>
+            <Text style={sectionTitle}>Book a table online</Text>
             <Text style={paragraph}>
-              We are working on letting you book a table directly from menus.co.zw — no phone call needed. Your reviews and favourites help us prioritise which restaurants to launch this with first.
+              You can now book a table directly from menus.co.zw — no phone call needed. Look for the "Bookable" badge on restaurants that accept online reservations.
             </Text>
+            <Section style={buttonWrapper}>
+              <Button href={`https://menus.co.zw/reservations${UTM}&utm_content=cta_reservations`} style={buttonPrimary}>Browse Bookable Restaurants</Button>
+            </Section>
           </Section>
 
           <Hr style={divider} />
@@ -109,6 +115,7 @@ const sectionTitle: React.CSSProperties = { fontSize: "20px", fontWeight: "700",
 const buttonWrapper: React.CSSProperties = { margin: "8px 0 24px" }
 const buttonPrimary: React.CSSProperties = { backgroundColor: "#ea580c", borderRadius: "6px", color: "#ffffff", fontSize: "15px", fontWeight: "600", textDecoration: "none", textAlign: "center", display: "inline-block", padding: "14px 28px" }
 const buttonOutline: React.CSSProperties = { backgroundColor: "#ffffff", borderRadius: "6px", color: "#0f172a", fontSize: "15px", fontWeight: "600", textDecoration: "none", textAlign: "center", display: "inline-block", padding: "12px 26px", border: "2px solid #e2e8f0" }
+const image: React.CSSProperties = { width: "100%", borderRadius: "6px", margin: "0 0 16px" }
 const divider: React.CSSProperties = { borderColor: "#e2e8f0", margin: "8px 40px" }
 const signoff: React.CSSProperties = { fontSize: "14px", color: "#64748b", lineHeight: "1.6", whiteSpace: "pre-wrap" }
 const muted: React.CSSProperties = { fontSize: "12px", color: "#94a3b8", margin: "8px 0 0" }

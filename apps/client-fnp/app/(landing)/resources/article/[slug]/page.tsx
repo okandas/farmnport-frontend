@@ -30,53 +30,21 @@ function TopicNav({ currentSlug, topicTitle }: { currentSlug: string; topicTitle
   const topics = topicsData ?? []
 
   return (
-    <nav className="space-y-1">
+    <nav className="space-y-3">
       {topics.map((topic: any) => (
-        <TopicGroup key={topic.id} topic={topic} currentSlug={currentSlug} isCurrentTopic={topic.title === topicTitle} />
+        <Link
+          key={topic.id}
+          href={`/resources/topic/${topic.slug}`}
+          className={`block text-sm font-semibold py-2 px-3 rounded transition-colors ${
+            topic.title === topicTitle
+              ? "bg-muted text-foreground"
+              : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+          }`}
+        >
+          {topic.title}
+        </Link>
       ))}
     </nav>
-  )
-}
-
-function TopicGroup({ topic, currentSlug, isCurrentTopic }: { topic: any; currentSlug: string; isCurrentTopic: boolean }) {
-  const { data } = useQuery({
-    queryKey: ["resource-topic-articles", topic.slug],
-    queryFn: async () => {
-      const res = await fetch(`${BaseURL}/resource-topics/${topic.slug}`, { cache: "no-store" })
-      if (!res.ok) return []
-      const data = await res.json()
-      return data.articles ?? []
-    },
-    staleTime: 60000,
-    enabled: isCurrentTopic,
-  })
-
-  const articles = data ?? []
-
-  return (
-    <div className="border-b border-border pb-2 mb-2">
-      <div className="flex items-center gap-2 py-2">
-        <span className="text-xs text-muted-foreground">{isCurrentTopic ? "▾" : "›"}</span>
-        <span className="text-sm font-semibold">{topic.title}</span>
-      </div>
-      {isCurrentTopic && articles.length > 0 && (
-        <div className="space-y-0.5 ml-4">
-          {articles.map((a: any) => (
-            <Link
-              key={a.id}
-              href={`/resources/article/${a.slug}`}
-              className={`block text-sm py-1.5 px-3 rounded transition-colors ${
-                a.slug === currentSlug
-                  ? "bg-muted font-medium text-foreground"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {a.title}
-            </Link>
-          ))}
-        </div>
-      )}
-    </div>
   )
 }
 
