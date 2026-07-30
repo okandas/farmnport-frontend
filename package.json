@@ -20,6 +20,7 @@
     "@flags-sdk/growthbook": "^0.2.0",
     "@growthbook/growthbook-react": "^1.6.5",
     "flags": "^4.2.0",
+    "next": "",
     "react-markdown": "^10.1.0"
   }
 }
