@@ -29,7 +29,7 @@ export function SparePartsSection({ slug }: { slug: string }) {
         {parts.map((part: any) => (
           <div key={part.id} className="rounded-lg border p-3 hover:border-primary/40 hover:shadow-sm transition-all">
             {part.images?.[0]?.img?.src ? (
-              <div className="relative aspect-square bg-white rounded-md overflow-hidden mb-2">
+              <div className="relative aspect-square bg-muted/30 dark:bg-white rounded-md overflow-hidden mb-2">
                 <Image src={part.images[0].img.src} alt={part.name} fill className="object-contain p-2" sizes="150px" />
               </div>
             ) : (

@@ -139,7 +139,7 @@ export default async function PlantNutritionGuidePage({ params }: GuidePageProps
                 <div className="grid lg:grid-cols-[450px,1fr] gap-12 mb-16">
                     {/* Left - Image + Precautions */}
                     <div className="flex flex-col gap-4">
-                        <div className="relative aspect-square bg-white rounded-xl border overflow-hidden shadow-sm">
+                        <div className="relative aspect-square bg-muted/30 dark:bg-white rounded-xl border overflow-hidden shadow-sm">
                             {product.images && product.images[0] && product.images[0].img?.src ? (
                                 <Image
                                     src={product.images[0].img.src}
@@ -158,7 +158,7 @@ export default async function PlantNutritionGuidePage({ params }: GuidePageProps
                         {product.images && product.images.length > 1 && (
                             <div className="grid grid-cols-4 gap-3">
                                 {product.images.slice(0, 4).map((img: any, idx: number) => (
-                                    <div key={idx} className="relative aspect-square bg-white rounded-lg border hover:border-primary transition-colors">
+                                    <div key={idx} className="relative aspect-square bg-muted/30 dark:bg-white rounded-lg border hover:border-primary transition-colors">
                                         {img.img?.src && (
                                             <Image
                                                 src={img.img.src}

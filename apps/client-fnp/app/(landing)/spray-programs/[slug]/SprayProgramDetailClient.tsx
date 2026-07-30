@@ -438,9 +438,7 @@ export function SprayProgramDetailClient({ program, slug }: SprayProgramDetailCl
                                                             className="object-contain p-0.5"
                                                         />
                                                     ) : (
-                                                        <div className="absolute inset-0 flex items-center justify-center">
-                                                            <Beaker className="w-4 h-4 text-muted-foreground/40" />
-                                                        </div>
+                                                        <div className="absolute inset-0 bg-muted/30" />
                                                     )}
                                                 </button>
 
@@ -536,7 +534,7 @@ export function SprayProgramDetailClient({ program, slug }: SprayProgramDetailCl
 
                         <div className="flex gap-5 p-5">
                             {/* Product Image */}
-                            <div className="relative w-32 h-32 sm:w-40 sm:h-40 bg-white dark:bg-gray-900 rounded-lg border overflow-hidden flex-shrink-0">
+                            <div className="relative w-32 h-32 sm:w-40 sm:h-40 bg-muted/30 dark:bg-white rounded-lg border overflow-hidden flex-shrink-0">
                                 {quickViewProduct.agrochemical?.images?.[0]?.img?.src ? (
                                     <Image
                                         src={quickViewProduct.agrochemical.images[0].img.src}
@@ -546,9 +544,7 @@ export function SprayProgramDetailClient({ program, slug }: SprayProgramDetailCl
                                         className="object-contain p-3"
                                     />
                                 ) : (
-                                    <div className="absolute inset-0 flex items-center justify-center">
-                                        <Beaker className="w-12 h-12 text-muted-foreground/30" />
-                                    </div>
+                                    <div className="absolute inset-0 bg-muted/30" />
                                 )}
                             </div>
 

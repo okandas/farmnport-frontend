@@ -100,7 +100,7 @@ export default async function EquipmentGuidePage({ params }: GuidePageProps) {
                 <div className="grid lg:grid-cols-[450px,1fr] gap-6 lg:gap-12 mb-16">
                     {/* Left - Image */}
                     <div className="flex flex-col gap-4">
-                        <div className="relative aspect-square bg-white rounded-xl border overflow-hidden shadow-sm">
+                        <div className="relative aspect-square bg-muted/30 dark:bg-white rounded-xl border overflow-hidden shadow-sm">
                             {product.images && product.images[0] && product.images[0].img?.src ? (
                                 <Image
                                     src={product.images[0].img.src}
@@ -120,7 +120,7 @@ export default async function EquipmentGuidePage({ params }: GuidePageProps) {
                                 {product.images.slice(0, 4).map((img: any, idx: number) => (
                                     <button
                                         key={idx}
-                                        className="relative aspect-square bg-white rounded-lg border hover:border-primary transition-colors"
+                                        className="relative aspect-square bg-muted/30 dark:bg-white rounded-lg border hover:border-primary transition-colors"
                                     >
                                         {img.img?.src ? (
                                             <Image

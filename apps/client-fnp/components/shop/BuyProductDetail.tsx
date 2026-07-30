@@ -82,7 +82,7 @@ export function BuyProductDetail({
         <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
           {/* Left Column — Images */}
           <div className="space-y-4">
-            <div className="relative aspect-square bg-white rounded-lg border overflow-hidden">
+            <div className="relative aspect-square bg-muted/30 dark:bg-white rounded-lg border overflow-hidden">
               {images[0]?.img?.src ? (
                 <Image
                   src={images[0].img.src}
@@ -104,7 +104,7 @@ export function BuyProductDetail({
                 {images.map((img, idx) => (
                   <div
                     key={idx}
-                    className="relative aspect-square bg-white rounded border hover:border-primary"
+                    className="relative aspect-square bg-muted/30 dark:bg-white rounded border hover:border-primary"
                   >
                     {img.img?.src && (
                       <Image
