@@ -24,17 +24,17 @@ function RenderBlock({ block }: { block: any }) {
   switch (block.type) {
     case "header": {
       const level = block.data.level || 2
-      const cls = level === 2 ? "text-2xl sm:text-3xl font-bold mt-10 mb-4" : "text-xl font-bold mt-8 mb-3"
+      const cls = level === 2 ? "text-lg sm:text-xl font-bold mt-8 mb-3" : "text-base sm:text-lg font-bold mt-6 mb-2"
       return <div className={cls} dangerouslySetInnerHTML={{ __html: block.data.text }} />
     }
     case "paragraph":
-      return <p className="text-base sm:text-lg leading-relaxed mb-4" dangerouslySetInnerHTML={{ __html: block.data.text }} />
+      return <p className="text-sm sm:text-base leading-relaxed mb-4" dangerouslySetInnerHTML={{ __html: block.data.text }} />
     case "list": {
       const Tag = block.data.style === "ordered" ? "ol" : "ul"
       return (
         <Tag className={`mb-6 pl-6 space-y-2 ${block.data.style === "ordered" ? "list-decimal" : "list-disc"}`}>
           {block.data.items.map((item: string, i: number) => (
-            <li key={i} className="text-base sm:text-lg leading-relaxed" dangerouslySetInnerHTML={{ __html: item }} />
+            <li key={i} className="text-sm sm:text-base leading-relaxed" dangerouslySetInnerHTML={{ __html: item }} />
           ))}
         </Tag>
       )
@@ -75,6 +75,17 @@ function RenderBlock({ block }: { block: any }) {
         <div className="my-8">
           <iframe src={block.data.embed} className="w-full aspect-video" allowFullScreen />
           {block.data.caption && <p className="text-sm text-muted-foreground mt-3 italic">{block.data.caption}</p>}
+        </div>
+      )
+    case "cta":
+      return (
+        <div className="my-6">
+          <Link
+            href={block.data.href || "/"}
+            className="inline-flex items-center gap-2 rounded-lg bg-foreground text-background px-5 py-2.5 text-sm font-semibold hover:bg-foreground/90 transition-colors"
+          >
+            {block.data.text}
+          </Link>
         </div>
       )
     default:
