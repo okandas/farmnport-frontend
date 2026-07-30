@@ -85,7 +85,7 @@ export function BlastView({ source }: { source?: "farmnport" | "menus" } = {}) {
   const [emailSubject, setEmailSubject] = useState("")
   const [overrides, setOverrides] = useState<Record<string, string>>({})
   const [showPreview, setShowPreview] = useState(false)
-  const [blastTemplate, setBlastTemplate] = useState<"custom" | "verify-reminder">("custom")
+  const [blastTemplate, setBlastTemplate] = useState<"custom" | "verify-reminder" | "menus-reviews-favourites">("custom")
 
   // Results
   const [results, setResults] = useState<{ sent: number; failed: number; remaining?: number; results: BlastResult[] } | null>(null)
@@ -259,7 +259,8 @@ export function BlastView({ source }: { source?: "farmnport" | "menus" } = {}) {
               <SelectTrigger className="h-8 text-xs w-48 bg-white shadow-none"><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="custom">Custom message</SelectItem>
-                <SelectItem value="verify-reminder">Verify account reminder</SelectItem>
+                {!isMenus && <SelectItem value="verify-reminder">Verify account reminder</SelectItem>}
+                {isMenus && <SelectItem value="menus-reviews-favourites">Reviews & Favourites</SelectItem>}
               </SelectContent>
             </Select>
             {blastTemplate === "custom" ? (
