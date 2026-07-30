@@ -76,35 +76,16 @@ export default async function BuyEquipmentProductPage({ params }: BuyEquipmentPr
             </TabsContent>
             {product.spec_groups?.length > 0 && (
                 <TabsContent value="specifications" className="mt-4">
-                    <div className="border overflow-hidden">
-                        {product.spec_groups.map((group: any, gIdx: number) => (
-                            <div key={gIdx}>
-                                <div className="bg-muted px-4 py-2 text-xs font-bold uppercase tracking-wider border-b">
-                                    {group.name}
-                                </div>
-                                <dl className="divide-y divide-border">
-                                    {group.specs.map((spec: any, sIdx: number) => (
-                                        <div key={sIdx} className="flex justify-between gap-4 px-4 py-2 text-sm">
-                                            <dt className="text-muted-foreground">{spec.name}</dt>
-                                            <dd className="font-medium text-foreground text-right">{spec.value}</dd>
-                                        </div>
-                                    ))}
-                                </dl>
-                            </div>
-                        ))}
-                    </div>
+                    <p className="text-sm text-muted-foreground">
+                        Full specifications are available on the product using the link below.
+                    </p>
                 </TabsContent>
             )}
             {product.features?.length > 0 && (
                 <TabsContent value="features" className="mt-4">
-                    <ul className="space-y-1.5">
-                        {product.features.map((feature: string, idx: number) => (
-                            <li key={idx} className="flex items-start gap-2 text-sm">
-                                <span className="h-1.5 w-1.5 rounded-full bg-blue-500 flex-shrink-0 mt-1.5" />
-                                <span>{feature}</span>
-                            </li>
-                        ))}
-                    </ul>
+                    <p className="text-sm text-muted-foreground">
+                        Full features list is available on the product using the link below.
+                    </p>
                 </TabsContent>
             )}
         </Tabs>
