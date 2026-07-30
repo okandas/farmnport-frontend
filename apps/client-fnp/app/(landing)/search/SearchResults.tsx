@@ -212,7 +212,7 @@ export function SearchResults() {
               return (
                 <div
                   key={`${item.collection}-${item.doc.id}-${i}`}
-                  className="group flex flex-col rounded-lg border bg-card hover:border-primary/40 hover:shadow-md transition-all overflow-hidden"
+                  className="group flex flex-col rounded-lg border bg-card hover:border-primary/40 hover:shadow-md transition-all overflow-hidden cursor-pointer"
                 >
                   {/* Image */}
                   <div className="aspect-square bg-muted/30 dark:bg-white relative">

@@ -92,7 +92,7 @@ export function TrendingSection() {
                 >
                   <Link
                     href={item.href}
-                    className="group flex flex-col rounded-lg border bg-card hover:border-primary/40 hover:shadow-md transition-all overflow-hidden h-full"
+                    className="group flex flex-col rounded-lg border bg-card hover:border-primary/40 hover:shadow-md transition-all overflow-hidden h-full cursor-pointer"
                   >
                     <div className="aspect-square bg-muted/30 dark:bg-white relative">
                       {item.image && (
