@@ -15,6 +15,71 @@ async function fetchArticle(slug: string) {
   return data.article
 }
 
+function TopicNav({ currentSlug, topicTitle }: { currentSlug: string; topicTitle: string }) {
+  const { data: topicsData } = useQuery({
+    queryKey: ["resource-topics-nav"],
+    queryFn: async () => {
+      const res = await fetch(`${BaseURL}/resource-topics/`, { cache: "no-store" })
+      if (!res.ok) return []
+      const data = await res.json()
+      return data.topics ?? []
+    },
+    staleTime: 60000,
+  })
+
+  const topics = topicsData ?? []
+
+  return (
+    <nav className="space-y-1">
+      {topics.map((topic: any) => (
+        <TopicGroup key={topic.id} topic={topic} currentSlug={currentSlug} isCurrentTopic={topic.title === topicTitle} />
+      ))}
+    </nav>
+  )
+}
+
+function TopicGroup({ topic, currentSlug, isCurrentTopic }: { topic: any; currentSlug: string; isCurrentTopic: boolean }) {
+  const { data } = useQuery({
+    queryKey: ["resource-topic-articles", topic.slug],
+    queryFn: async () => {
+      const res = await fetch(`${BaseURL}/resource-topics/${topic.slug}`, { cache: "no-store" })
+      if (!res.ok) return []
+      const data = await res.json()
+      return data.articles ?? []
+    },
+    staleTime: 60000,
+    enabled: isCurrentTopic,
+  })
+
+  const articles = data ?? []
+
+  return (
+    <div className="border-b border-border pb-2 mb-2">
+      <div className="flex items-center gap-2 py-2">
+        <span className="text-xs text-muted-foreground">{isCurrentTopic ? "▾" : "›"}</span>
+        <span className="text-sm font-semibold">{topic.title}</span>
+      </div>
+      {isCurrentTopic && articles.length > 0 && (
+        <div className="space-y-0.5 ml-4">
+          {articles.map((a: any) => (
+            <Link
+              key={a.id}
+              href={`/resources/article/${a.slug}`}
+              className={`block text-sm py-1.5 px-3 rounded transition-colors ${
+                a.slug === currentSlug
+                  ? "bg-muted font-medium text-foreground"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {a.title}
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 function formatDate(d: string) {
   return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })
 }
@@ -190,16 +255,9 @@ export default function ArticlePage() {
           )}
 
           {/* Editor.js content blocks */}
-          {(() => {
-            let h2Index = 0
-            return blocks.map((block: any, i: number) => {
-              if (block.type === "header" && block.data.level === 2) {
-                const idx = h2Index++
-                return <div key={i} id={`section-${idx}`}><RenderBlock block={block} /></div>
-              }
-              return <RenderBlock key={i} block={block} />
-            })
-          })()}
+          {blocks.map((block: any, i: number) => (
+            <RenderBlock key={i} block={block} />
+          ))}
 
           {/* Tags */}
           {article.tags?.length > 0 && (
@@ -211,20 +269,10 @@ export default function ArticlePage() {
           )}
         </div>
 
-        {/* Right — sticky TOC sidebar */}
-        <aside className="hidden lg:block lg:w-56 shrink-0">
+        {/* Right — topic navigation sidebar */}
+        <aside className="hidden lg:block lg:w-64 shrink-0">
           <div className="sticky top-20">
-            <nav className="space-y-1">
-              {blocks.filter((b: any) => b.type === "header" && b.data.level === 2).map((b: any, i: number) => (
-                <a
-                  key={i}
-                  href={`#section-${i}`}
-                  className="block text-sm text-muted-foreground hover:text-foreground transition-colors py-1"
-                >
-                  {b.data.text.replace(/<[^>]*>/g, "")}
-                </a>
-              ))}
-            </nav>
+            <TopicNav currentSlug={slug} topicTitle={article.topic_title} />
           </div>
         </aside>
         </div>
