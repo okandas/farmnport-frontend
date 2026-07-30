@@ -174,34 +174,24 @@ export default async function EquipmentGuidePage({ params }: GuidePageProps) {
 
                         <AdSenseInFeed />
 
-                        {/* GSMArena-style grouped specs */}
+                        {/* Grouped specs */}
                         {product.spec_groups && product.spec_groups.length > 0 && (
-                            <div className="rounded-xl border overflow-hidden">
-                                {product.spec_groups.map((group: any, gIdx: number) => {
-                                    const colours = [
-                                        "bg-red-700 text-white",
-                                        "bg-blue-700 text-white",
-                                        "bg-green-700 text-white",
-                                        "bg-amber-700 text-white",
-                                        "bg-purple-700 text-white",
-                                        "bg-zinc-700 text-white",
-                                    ]
-                                    return (
-                                        <div key={gIdx}>
-                                            <div className={`px-4 py-2 text-xs font-bold uppercase tracking-wider ${colours[gIdx % colours.length]}`}>
-                                                {group.name}
-                                            </div>
-                                            <dl className="divide-y">
-                                                {group.specs.map((spec: any, sIdx: number) => (
-                                                    <div key={sIdx} className="flex justify-between gap-4 px-4 py-2 text-sm">
-                                                        <dt className="text-muted-foreground">{spec.name}</dt>
-                                                        <dd className="font-medium text-foreground text-right">{spec.value}</dd>
-                                                    </div>
-                                                ))}
-                                            </dl>
+                            <div className="border overflow-hidden">
+                                {product.spec_groups.map((group: any, gIdx: number) => (
+                                    <div key={gIdx}>
+                                        <div className="bg-muted px-4 py-2 text-xs font-bold uppercase tracking-wider border-b">
+                                            {group.name}
                                         </div>
-                                    )
-                                })}
+                                        <dl className="divide-y divide-border">
+                                            {group.specs.map((spec: any, sIdx: number) => (
+                                                <div key={sIdx} className="flex justify-between gap-4 px-4 py-2 text-sm">
+                                                    <dt className="text-muted-foreground">{spec.name}</dt>
+                                                    <dd className="font-medium text-foreground text-right">{spec.value}</dd>
+                                                </div>
+                                            ))}
+                                        </dl>
+                                    </div>
+                                ))}
                             </div>
                         )}
 
