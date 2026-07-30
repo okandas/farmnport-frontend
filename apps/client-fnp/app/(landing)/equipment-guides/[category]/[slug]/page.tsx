@@ -86,20 +86,20 @@ export default async function EquipmentGuidePage({ params }: GuidePageProps) {
 
             <div className="border-b">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-                    <nav className="flex text-sm text-muted-foreground">
+                    <nav className="flex flex-wrap text-sm text-muted-foreground">
                         <Link href="/" className="hover:text-foreground">Home</Link>
                         <span className="mx-2">/</span>
-                        <Link href="/equipment-guides" className="hover:text-foreground">Equipment Guides</Link>
+                        <Link href="/equipment-guides" className="hover:text-foreground">Guides</Link>
                         <span className="mx-2">/</span>
                         <Link href={`/equipment-guides/${category}`} className="hover:text-foreground capitalize">{product.equipment_category?.name || category}</Link>
                         <span className="mx-2">/</span>
-                        <span className="text-foreground capitalize">{product.name}</span>
+                        <span className="text-foreground capitalize truncate max-w-[200px] sm:max-w-none">{product.name}</span>
                     </nav>
                 </div>
             </div>
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div className="grid lg:grid-cols-[450px,1fr] gap-12 mb-16">
+                <div className="grid lg:grid-cols-[450px,1fr] gap-6 lg:gap-12 mb-16">
                     {/* Left - Image */}
                     <div className="flex flex-col gap-4">
                         <div className="relative aspect-square bg-white rounded-xl border overflow-hidden shadow-sm">
