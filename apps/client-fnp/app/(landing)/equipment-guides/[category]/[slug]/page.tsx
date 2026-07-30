@@ -11,6 +11,8 @@ import { guardTestItem } from "@/lib/guardTestItem"
 import { ProductNotFound } from "@/components/shared/ProductNotFound"
 import { SidebarPromo } from "@/components/ads/SidebarPromo"
 
+import { SparePartsSection } from "@/components/shared/SparePartsSection"
+
 type Props = { params: Promise<{ category: string; slug: string }> }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -172,14 +174,46 @@ export default async function EquipmentGuidePage({ params }: GuidePageProps) {
 
                         <AdSenseInFeed />
 
-                        {product.specifications && product.specifications.length > 0 && (
+                        {/* GSMArena-style grouped specs */}
+                        {product.spec_groups && product.spec_groups.length > 0 && (
+                            <div className="rounded-xl border overflow-hidden">
+                                {product.spec_groups.map((group: any, gIdx: number) => {
+                                    const colours = [
+                                        "bg-red-700 text-white",
+                                        "bg-blue-700 text-white",
+                                        "bg-green-700 text-white",
+                                        "bg-amber-700 text-white",
+                                        "bg-purple-700 text-white",
+                                        "bg-zinc-700 text-white",
+                                    ]
+                                    return (
+                                        <div key={gIdx}>
+                                            <div className={`px-4 py-2 text-xs font-bold uppercase tracking-wider ${colours[gIdx % colours.length]}`}>
+                                                {group.name}
+                                            </div>
+                                            <dl className="divide-y">
+                                                {group.specs.map((spec: any, sIdx: number) => (
+                                                    <div key={sIdx} className="flex justify-between gap-4 px-4 py-2 text-sm">
+                                                        <dt className="text-muted-foreground">{spec.name}</dt>
+                                                        <dd className="font-medium text-foreground text-right">{spec.value}</dd>
+                                                    </div>
+                                                ))}
+                                            </dl>
+                                        </div>
+                                    )
+                                })}
+                            </div>
+                        )}
+
+                        {/* Fallback: flat specs for backward compat */}
+                        {(!product.spec_groups || product.spec_groups.length === 0) && product.specifications && product.specifications.length > 0 && (
                             <div className="rounded-xl border bg-card p-4">
                                 <h2 className="text-sm font-semibold uppercase tracking-wide text-green-700 dark:text-green-400 mb-3">Specifications</h2>
                                 <dl className="space-y-2">
                                     {product.specifications.map((spec: any, idx: number) => (
                                         <div key={idx} className="flex justify-between gap-4 text-sm">
-                                            <dt className="text-muted-foreground flex-shrink-0">{spec.name}</dt>
-                                            <dd className="font-medium text-foreground text-right">{spec.value}</dd>
+                                            <dt className="text-muted-foreground flex-shrink-0">{typeof spec === "string" ? spec : spec.name}</dt>
+                                            <dd className="font-medium text-foreground text-right">{typeof spec === "string" ? "" : spec.value}</dd>
                                         </div>
                                     ))}
                                 </dl>
@@ -199,6 +233,9 @@ export default async function EquipmentGuidePage({ params }: GuidePageProps) {
                                 </ul>
                             </div>
                         )}
+
+                        {/* Spare parts */}
+                        <SparePartsSection slug={slug} />
                     </div>
                 </div>
             </div>
