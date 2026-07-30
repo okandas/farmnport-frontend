@@ -131,7 +131,9 @@ export default function ArticlePage() {
           <span className="text-muted-foreground">{article.title}</span>
         </nav>
 
-        <div className="max-w-3xl">
+        <div className="lg:flex lg:gap-12">
+        {/* Left — article content */}
+        <div className="flex-1 min-w-0 max-w-2xl">
           {/* Title */}
           <h1 className="text-4xl sm:text-5xl font-bold tracking-tight leading-tight mb-4">
             {article.title}
@@ -188,9 +190,16 @@ export default function ArticlePage() {
           )}
 
           {/* Editor.js content blocks */}
-          {blocks.map((block: any, i: number) => (
-            <RenderBlock key={i} block={block} />
-          ))}
+          {(() => {
+            let h2Index = 0
+            return blocks.map((block: any, i: number) => {
+              if (block.type === "header" && block.data.level === 2) {
+                const idx = h2Index++
+                return <div key={i} id={`section-${idx}`}><RenderBlock block={block} /></div>
+              }
+              return <RenderBlock key={i} block={block} />
+            })
+          })()}
 
           {/* Tags */}
           {article.tags?.length > 0 && (
@@ -200,6 +209,24 @@ export default function ArticlePage() {
               ))}
             </div>
           )}
+        </div>
+
+        {/* Right — sticky TOC sidebar */}
+        <aside className="hidden lg:block lg:w-56 shrink-0">
+          <div className="sticky top-20">
+            <nav className="space-y-1">
+              {blocks.filter((b: any) => b.type === "header" && b.data.level === 2).map((b: any, i: number) => (
+                <a
+                  key={i}
+                  href={`#section-${i}`}
+                  className="block text-sm text-muted-foreground hover:text-foreground transition-colors py-1"
+                >
+                  {b.data.text.replace(/<[^>]*>/g, "")}
+                </a>
+              ))}
+            </nav>
+          </div>
+        </aside>
         </div>
       </div>
     </div>
