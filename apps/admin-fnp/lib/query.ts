@@ -1946,3 +1946,34 @@ export function adminUpdateDocument(id: string, data: {
 export function adminDocumentPurchases(id: string) {
   return api.get(`${baseUrl}/documents/admin/${id}/purchases`)
 }
+
+// ── Resources ────────────────────────────────────────────────────────────────
+
+export function adminListResourceTopics() {
+  return api.get(`${baseUrl}/resource-topics/admin`)
+}
+
+export function adminCreateResourceTopic(data: any) {
+  return api.post(`${baseUrl}/resource-topics/admin`, data)
+}
+
+export function adminUpdateResourceTopic(id: string, data: any) {
+  return api.put(`${baseUrl}/resource-topics/admin/${id}`, data)
+}
+
+export function adminListResourceArticles(topicId?: string) {
+  const params = topicId ? `?topic_id=${topicId}` : ""
+  return api.get(`${baseUrl}/resource-articles/admin${params}`)
+}
+
+export function adminGetResourceArticle(id: string) {
+  return api.get(`${baseUrl}/resource-articles/admin/${id}`)
+}
+
+export function adminCreateResourceArticle(data: any) {
+  return api.post(`${baseUrl}/resource-articles/admin`, data)
+}
+
+export function adminUpdateResourceArticle(id: string, data: any) {
+  return api.put(`${baseUrl}/resource-articles/admin/${id}`, data)
+}

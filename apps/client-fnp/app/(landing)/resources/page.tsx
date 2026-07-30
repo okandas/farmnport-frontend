@@ -2,15 +2,26 @@
 
 import Link from "next/link"
 import Image from "next/image"
+import { useQuery } from "@tanstack/react-query"
 import { sendGTMEvent } from "@next/third-parties/google"
 
-interface Resource {
-  title: string
-  href: string
-  image: string
+const BASE = (process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3744") + "/v1"
+
+async function fetchTopics() {
+  const res = await fetch(`${BASE}/resource-topics/`, { cache: "no-store" })
+  if (!res.ok) return []
+  const data = await res.json()
+  return data.topics ?? []
 }
 
-const SECTIONS = [
+async function fetchTopicWithArticles(slug: string) {
+  const res = await fetch(`${BASE}/resource-topics/${slug}`, { cache: "no-store" })
+  if (!res.ok) return null
+  return res.json()
+}
+
+// Fallback hardcoded sections when no topics exist yet
+const FALLBACK_SECTIONS = [
   {
     heading: "Get started as a farmer",
     resources: [
@@ -40,7 +51,7 @@ const SECTIONS = [
   },
 ]
 
-function ResourceCard({ title, href, image }: Resource) {
+function ResourceCard({ title, href, image }: { title: string; href: string; image: string }) {
   return (
     <Link
       href={href}
@@ -64,11 +75,18 @@ function ResourceCard({ title, href, image }: Resource) {
 }
 
 export default function ResourcesPage() {
+  const { data: topics } = useQuery({
+    queryKey: ["resource-topics"],
+    queryFn: fetchTopics,
+    staleTime: 60000,
+  })
+
+  const hasTopics = topics && topics.length > 0
+
   return (
     <div className="min-h-screen">
       <div className="container py-10">
 
-        {/* Header */}
         <div className="text-center mb-10">
           <h1 className="text-3xl sm:text-4xl font-bold tracking-tight mb-6">Resource Center</h1>
           <div className="flex flex-wrap items-center justify-center gap-2">
@@ -80,24 +98,62 @@ export default function ResourcesPage() {
           </div>
         </div>
 
-        {/* Sections */}
         <div className="space-y-14">
-          {SECTIONS.map((section) => (
-            <section key={section.heading}>
-              <div className="flex items-center justify-between mb-4 border-b pb-2">
-                <h2 className="text-xl sm:text-2xl font-bold">{section.heading}</h2>
-                <span className="text-sm font-medium text-muted-foreground hover:text-foreground cursor-pointer transition-colors">Show all</span>
-              </div>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
-                {section.resources.map((resource) => (
-                  <ResourceCard key={resource.href} {...resource} />
-                ))}
-              </div>
-            </section>
-          ))}
+          {hasTopics ? (
+            topics.map((topic: any) => (
+              <TopicSection key={topic.id} topic={topic} />
+            ))
+          ) : (
+            FALLBACK_SECTIONS.map((section) => (
+              <section key={section.heading}>
+                <div className="flex items-center justify-between mb-4 border-b pb-2">
+                  <h2 className="text-xl sm:text-2xl font-bold">{section.heading}</h2>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
+                  {section.resources.map((resource) => (
+                    <ResourceCard key={resource.href} {...resource} />
+                  ))}
+                </div>
+              </section>
+            ))
+          )}
         </div>
-
       </div>
     </div>
+  )
+}
+
+function TopicSection({ topic }: { topic: any }) {
+  const { data } = useQuery({
+    queryKey: ["resource-topic", topic.slug],
+    queryFn: () => fetchTopicWithArticles(topic.slug),
+    staleTime: 60000,
+  })
+
+  const articles = data?.articles ?? []
+
+  return (
+    <section>
+      <div className="flex items-center justify-between mb-4 border-b pb-2">
+        <h2 className="text-xl sm:text-2xl font-bold">{topic.title}</h2>
+        <Link href={`/resources/topic/${topic.slug}`} className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+          Show all
+        </Link>
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
+        {articles.length > 0 ? (
+          articles.slice(0, 4).map((article: any) => (
+            <ResourceCard
+              key={article.id}
+              title={article.title}
+              href={`/resources/article/${article.slug}`}
+              image={article.cover_image || ""}
+            />
+          ))
+        ) : (
+          <p className="text-sm text-muted-foreground col-span-4">No articles yet</p>
+        )}
+      </div>
+    </section>
   )
 }

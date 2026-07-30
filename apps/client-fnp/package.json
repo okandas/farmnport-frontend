@@ -46,6 +46,7 @@
     "d3-transition": "^3.0.1",
     "date-fns": "^4.1.0",
     "driver.js": "^1.7.0",
+    "editorjs-react-renderer": "^3.5.1",
     "embla-carousel-autoplay": "^8.6.0",
     "embla-carousel-react": "^8.6.0",
     "flags": "^4.2.0",
