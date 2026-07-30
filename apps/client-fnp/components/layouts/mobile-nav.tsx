@@ -251,7 +251,7 @@ export function MobileNav({ user }: MobileNavProps) {
                className="px-0 text-base hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 lg:hidden"
              >
                <Icons.menu className="h-6 w-6" aria-hidden="true" />
-               <span>Menu</span>
+               <span className="sr-only">Menu</span>
              </Button>
            </SheetTrigger>
            <SheetContent side="left" className="p-0 w-[300px]">

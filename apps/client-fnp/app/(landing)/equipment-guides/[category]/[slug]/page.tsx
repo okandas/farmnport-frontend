@@ -150,20 +150,22 @@ export default async function EquipmentGuidePage({ params }: GuidePageProps) {
                     </div>
 
                     {/* Right - Product Info */}
-                    <div className="space-y-6">
-                        <GuideProductTitle name={product.name} brand={product.brand?.name} />
-                        <div className="mt-3"><ShareBar name={product.name} /></div>
-
-                        {product.equipment_category && (
-                            <div className="flex items-center gap-3 flex-wrap">
-                                <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
-                                    {product.equipment_category.name}
-                                </div>
+                    <div className="space-y-4 lg:space-y-6">
+                        <div>
+                            <GuideProductTitle name={product.name} brand={product.brand?.name} />
+                            <div className="flex items-center gap-2 mt-2">
+                                {product.equipment_category && (
+                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                                        {product.equipment_category.name}
+                                    </span>
+                                )}
+                                <ShareBar name={product.name} />
                             </div>
-                        )}
+                        </div>
 
-                        <div className="lg:hidden">
+                        <div className="lg:hidden space-y-4">
                             <WantToBuyCTA available_for_sale={product.available_for_sale} name={product.name} brand={product.brand?.name} href={`/buy-equipment/${slug}`} interestHref={`/interest/equipment/${slug}`} />
+                            <SidebarPromo />
                         </div>
 
                         <div className="h-px bg-border" />
