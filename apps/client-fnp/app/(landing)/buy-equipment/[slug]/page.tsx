@@ -54,7 +54,7 @@ export default async function BuyEquipmentProductPage({ params }: BuyEquipmentPr
 
     const tabs = [
         "overview",
-        ...(product.specifications?.length > 0 ? ["specifications"] : []),
+        ...(product.spec_groups?.length > 0 ? ["specifications"] : []),
         ...(product.features?.length > 0 ? ["features"] : []),
     ]
 
@@ -74,28 +74,18 @@ export default async function BuyEquipmentProductPage({ params }: BuyEquipmentPr
                         : `${product.name} is a farm equipment product.`)}
                 </p>
             </TabsContent>
-            {product.specifications?.length > 0 && (
+            {product.spec_groups?.length > 0 && (
                 <TabsContent value="specifications" className="mt-4">
-                    <dl className="space-y-2">
-                        {product.specifications.map((spec: any, idx: number) => (
-                            <div key={idx} className="flex justify-between gap-4 py-2 text-sm border-b last:border-0">
-                                <dt className="text-muted-foreground">{spec.name}</dt>
-                                <dd className="font-semibold">{spec.value}</dd>
-                            </div>
-                        ))}
-                    </dl>
+                    <p className="text-sm text-muted-foreground">
+                        Full specifications are available on the product using the link below.
+                    </p>
                 </TabsContent>
             )}
             {product.features?.length > 0 && (
                 <TabsContent value="features" className="mt-4">
-                    <ul className="space-y-1.5">
-                        {product.features.map((feature: string, idx: number) => (
-                            <li key={idx} className="flex items-start gap-2 text-sm">
-                                <span className="h-1.5 w-1.5 rounded-full bg-blue-500 flex-shrink-0 mt-1.5" />
-                                <span>{feature}</span>
-                            </li>
-                        ))}
-                    </ul>
+                    <p className="text-sm text-muted-foreground">
+                        Full features list is available on the product using the link below.
+                    </p>
                 </TabsContent>
             )}
         </Tabs>
@@ -127,6 +117,7 @@ export default async function BuyEquipmentProductPage({ params }: BuyEquipmentPr
                     brandHref={product.brand ? `/buy-equipment?brand=${product.brand.id}` : undefined}
                     shopHref="/buy-equipment"
                     guideHref={`/equipment-guides/${categorySlug}/${slug}`}
+                    guideLabel="View Product Guide & Specs →"
                     loginRedirect={`/buy-equipment/${slug}`}
                     tabsContent={tabsContent}
                 />

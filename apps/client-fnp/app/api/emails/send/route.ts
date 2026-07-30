@@ -10,6 +10,8 @@ import {
   OrderDispatchEmail,
   OrderStatusEmail,
   BlastEmail,
+  MenusBlastEmail,
+  MenusReviewsFavouritesEmail,
   BookingConfirmedEmail,
   BookingStatusEmail,
   BookingAdminAlertEmail,
@@ -100,6 +102,20 @@ export async function POST(req: NextRequest) {
       const p = props as Parameters<typeof BlastEmail>[0]
       subject = (props as { subject?: string }).subject ?? "Message from farmnport"
       html = await render(BlastEmail(p))
+      break
+    }
+
+    case "menus-blast": {
+      const p = props as Parameters<typeof MenusBlastEmail>[0]
+      subject = (props as { subject?: string }).subject ?? "Message from menus.co.zw"
+      html = await render(MenusBlastEmail(p))
+      break
+    }
+
+    case "menus-reviews-favourites": {
+      const p = props as Parameters<typeof MenusReviewsFavouritesEmail>[0]
+      subject = "Leave a review, save your favourites — menus.co.zw"
+      html = await render(MenusReviewsFavouritesEmail(p))
       break
     }
 

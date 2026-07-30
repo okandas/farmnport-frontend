@@ -100,21 +100,35 @@ export function Farmers({user, queryBy}: FarmersPageProps) {
             <h2 className="text-lg font-medium">{total} { capitalizeFirstLetter(plural(queryBy)) } Produce Sellers.</h2>
           </div>
       }
-      <ul role="list" className="divide-y">
+      <div className="space-y-3">
         {farmers.map((farmer, farmerIndex) => (
-          <li key={farmerIndex} className="py-4 first:pt-2">
-
-            <div>
-              <h4 className="text-lg hover:underline hover:decoration-2">
+          <div key={farmerIndex} className="flex gap-4 rounded-lg border bg-card p-4 hover:border-primary/30 hover:shadow-sm transition-all">
+            <div className="hidden sm:flex h-16 w-16 shrink-0 items-center justify-center rounded-lg bg-muted/30 text-muted-foreground text-lg font-bold">
+              {farmer.name?.charAt(0)?.toUpperCase()}
+            </div>
+            <div className="flex-1 min-w-0">
+              <h4 className="text-sm font-semibold hover:text-primary transition-colors">
                 <Link href={`/farmer/${slug(farmer.name)}`}>{capitalizeFirstLetter(farmer.name)}</Link>
               </h4>
-              {farmer.short_description.length > 0 ? <h4
-                className="text-muted-foreground text-sm">{capitalizeFirstLetter(farmer.short_description)}</h4> : null}
+              {farmer.short_description && farmer.short_description.length > 0 && (
+                <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                  {capitalizeFirstLetter(farmer.short_description)}
+                </p>
+              )}
               <Contacts user={user} client={farmer} quickOverview={true}/>
+              {(farmer.main_produce || (farmer.other_produce ?? []).length > 0) && (
+                <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-7 gap-1.5 mt-2 pt-2 border-t">
+                  {[farmer.main_produce, ...(farmer.other_produce ?? [])].filter(Boolean).map((p: any) => (
+                    <span key={p.name} className="text-[10px] px-2 py-1 rounded-md bg-muted/50 text-muted-foreground text-center truncate">
+                      {capitalizeFirstLetter(p.name)}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
-          </li>
+          </div>
         ))}
-      </ul>
+      </div>
 
       <div>
         <Pagination

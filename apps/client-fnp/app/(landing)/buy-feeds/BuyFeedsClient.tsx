@@ -1,12 +1,14 @@
 "use client"
 
+import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { queryBuyFeedProducts } from "@/lib/query"
 import { Button } from "@/components/ui/button"
 import { FeedBuyFilterSidebar } from "@/components/generic/feedFilterSidebar"
-import { BuyCategoriesNavClient } from "@/components/generic/BuyCategoriesNavClient"
+import { ProductSidebarNav } from "@/components/generic/ProductSidebarNav"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
 import { ProductCard } from "@/components/shared/ProductCard"
+import { ViewToggle } from "@/components/shared/ViewToggle"
 
 interface BuyFeedsClientProps {
     initialProducts: any[]
@@ -15,6 +17,7 @@ interface BuyFeedsClientProps {
 }
 
 export function BuyFeedsClient({ initialProducts, initialTotal, categories }: BuyFeedsClientProps) {
+    const [view, setView] = useState<"grid" | "list">("grid")
     const [queryState, setQueryState] = useQueryStates({
         brand: parseAsArrayOf(parseAsString),
         animal: parseAsArrayOf(parseAsString),
@@ -54,7 +57,7 @@ export function BuyFeedsClient({ initialProducts, initialTotal, categories }: Bu
     return (
         <div className="flex flex-col lg:flex-row gap-8">
             <aside className="w-full lg:w-64 flex-shrink-0">
-                <BuyCategoriesNavClient categories={categories} />
+                <ProductSidebarNav />
                 <FeedBuyFilterSidebar />
             </aside>
 
@@ -85,11 +88,12 @@ export function BuyFeedsClient({ initialProducts, initialTotal, categories }: Bu
                     </div>
                 ) : (
                     <>
-                        <div className="mb-4 text-sm text-muted-foreground">
-                            Showing {products.length} of {productsData?.data?.total || 0} products
+                        <div className="flex items-center justify-between mb-4"><span className="text-sm text-muted-foreground">
+                            Showing {products.length} of {productsData?.data?.total || 0} products</span>
+                            <ViewToggle view={view} onViewChange={setView} />
                         </div>
 
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+                        <div className={view === "list" ? "flex flex-col gap-3" : "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5"}>
                             {products.map((product: any) => (
                                 <ProductCard
                                     key={product.id}
@@ -111,6 +115,7 @@ export function BuyFeedsClient({ initialProducts, initialTotal, categories }: Bu
                                     variantPriceRange={product.variant_price_range}
                                     pickupOnly={product.pickup_location_ids?.length > 0 && !product.delivery_available && !(product.delivery_location_ids?.length > 0)}
                                     isTest={product.is_test}
+                                    layout={view}
                                 />
                             ))}
                         </div>

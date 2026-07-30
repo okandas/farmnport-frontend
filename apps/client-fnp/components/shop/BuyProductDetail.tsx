@@ -27,6 +27,7 @@ interface BuyProductDetailProps {
   // Navigation
   breadcrumb: { href: string; label: string }
   guideHref?: string
+  guideLinkLabel?: string
   loginRedirect: string
   shareUrl?: string
   // Slots
@@ -50,6 +51,7 @@ export function BuyProductDetail({
   availableForSale,
   breadcrumb,
   guideHref,
+  guideLinkLabel,
   loginRedirect,
   shareUrl,
   extraStats,
@@ -212,7 +214,7 @@ export function BuyProductDetail({
                 href={guideHref}
                 className="text-sm text-primary hover:underline inline-flex items-center gap-2"
               >
-                View Application Guide &amp; Dosage Information <span>→</span>
+                {guideLinkLabel || "View Application Guide & Dosage Information"} <span>→</span>
               </Link>
             )}
 

@@ -1,6 +1,6 @@
 {
   "name": "admin-farmnport",
-  "version": "3.4.0",
+  "version": "3.5.0",
   "private": true,
   "scripts": {
     "dev": "next dev --port 3000",
@@ -9,6 +9,14 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@editorjs/checklist": "^1.6.0",
+    "@editorjs/delimiter": "^1.4.2",
+    "@editorjs/editorjs": "^2.31.6",
+    "@editorjs/embed": "^2.8.0",
+    "@editorjs/header": "^2.8.9",
+    "@editorjs/image": "^2.10.3",
+    "@editorjs/list": "^2.0.9",
+    "@editorjs/quote": "^2.7.6",
     "@flags-sdk/growthbook": "^0.2.0",
     "@hookform/resolvers": "^3.10.0",
     "@logtail/node": "^0.4.17",

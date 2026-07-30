@@ -11,6 +11,7 @@ import { guardTestItem } from "@/lib/guardTestItem"
 import { ProductNotFound } from "@/components/shared/ProductNotFound"
 import { SidebarPromo } from "@/components/ads/SidebarPromo"
 
+
 type Props = { params: Promise<{ category: string; slug: string }> }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -85,20 +86,20 @@ export default async function EquipmentGuidePage({ params }: GuidePageProps) {
 
             <div className="border-b">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-                    <nav className="flex text-sm text-muted-foreground">
+                    <nav className="flex flex-wrap text-sm text-muted-foreground">
                         <Link href="/" className="hover:text-foreground">Home</Link>
                         <span className="mx-2">/</span>
-                        <Link href="/equipment-guides" className="hover:text-foreground">Equipment Guides</Link>
+                        <Link href="/equipment-guides" className="hover:text-foreground">Guides</Link>
                         <span className="mx-2">/</span>
                         <Link href={`/equipment-guides/${category}`} className="hover:text-foreground capitalize">{product.equipment_category?.name || category}</Link>
                         <span className="mx-2">/</span>
-                        <span className="text-foreground capitalize">{product.name}</span>
+                        <span className="text-foreground capitalize truncate max-w-[200px] sm:max-w-none">{product.name}</span>
                     </nav>
                 </div>
             </div>
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div className="grid lg:grid-cols-[450px,1fr] gap-12 mb-16">
+                <div className="grid lg:grid-cols-[450px,1fr] gap-6 lg:gap-12 mb-16">
                     {/* Left - Image */}
                     <div className="flex flex-col gap-4">
                         <div className="relative aspect-square bg-white rounded-xl border overflow-hidden shadow-sm">
@@ -139,26 +140,33 @@ export default async function EquipmentGuidePage({ params }: GuidePageProps) {
                             </div>
                         )}
 
-                        <WantToBuyCTA available_for_sale={product.available_for_sale} name={product.name} brand={product.brand?.name} href={`/buy-equipment/${slug}`} interestHref={`/interest/equipment/${slug}`} />
+                        <div className="hidden lg:block">
+                            <WantToBuyCTA available_for_sale={product.available_for_sale} name={product.name} brand={product.brand?.name} href={`/buy-equipment/${slug}`} interestHref={`/interest/equipment/${slug}`} />
+                        </div>
 
-                        {/* Promo - fills remaining sidebar space */}
-                        <div className="flex-1">
+                        <div className="hidden lg:block flex-1">
                             <SidebarPromo />
                         </div>
                     </div>
 
                     {/* Right - Product Info */}
-                    <div className="space-y-6">
-                        <GuideProductTitle name={product.name} brand={product.brand?.name} />
-                        <div className="mt-3"><ShareBar name={product.name} /></div>
-
-                        {product.equipment_category && (
-                            <div className="flex items-center gap-3 flex-wrap">
-                                <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
-                                    {product.equipment_category.name}
-                                </div>
+                    <div className="space-y-4 lg:space-y-6">
+                        <div>
+                            <GuideProductTitle name={product.name} brand={product.brand?.name} />
+                            <div className="flex items-center gap-2 mt-2">
+                                {product.equipment_category && (
+                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                                        {product.equipment_category.name}
+                                    </span>
+                                )}
+                                <ShareBar name={product.name} />
                             </div>
-                        )}
+                        </div>
+
+                        <div className="lg:hidden space-y-4">
+                            <WantToBuyCTA available_for_sale={product.available_for_sale} name={product.name} brand={product.brand?.name} href={`/buy-equipment/${slug}`} interestHref={`/interest/equipment/${slug}`} />
+                            <SidebarPromo />
+                        </div>
 
                         <div className="h-px bg-border" />
 
@@ -169,26 +177,39 @@ export default async function EquipmentGuidePage({ params }: GuidePageProps) {
                             </div>
                         )}
 
-                        {product.brand && (
-                            <div className="rounded-xl border bg-card p-4">
-                                <h2 className="text-sm font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-400 mb-2">Brand</h2>
-                                <p className="text-sm text-foreground font-medium">{product.brand.name}</p>
-                                {product.brand.country && (
-                                    <p className="text-xs text-muted-foreground mt-1">{product.brand.country}</p>
-                                )}
-                            </div>
-                        )}
 
                         <AdSenseInFeed />
 
-                        {product.specifications && product.specifications.length > 0 && (
+                        {/* Grouped specs */}
+                        {product.spec_groups && product.spec_groups.length > 0 && (
+                            <div className="border overflow-hidden">
+                                {product.spec_groups.map((group: any, gIdx: number) => (
+                                    <div key={gIdx}>
+                                        <div className="bg-muted px-4 py-2 text-xs font-bold uppercase tracking-wider border-b">
+                                            {group.name}
+                                        </div>
+                                        <dl className="divide-y divide-border">
+                                            {group.specs.map((spec: any, sIdx: number) => (
+                                                <div key={sIdx} className="flex justify-between gap-4 px-4 py-2 text-sm">
+                                                    <dt className="text-muted-foreground">{spec.name}</dt>
+                                                    <dd className="font-medium text-foreground text-right">{spec.value}</dd>
+                                                </div>
+                                            ))}
+                                        </dl>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                        {/* Fallback: flat specs for backward compat */}
+                        {(!product.spec_groups || product.spec_groups.length === 0) && product.specifications && product.specifications.length > 0 && (
                             <div className="rounded-xl border bg-card p-4">
                                 <h2 className="text-sm font-semibold uppercase tracking-wide text-green-700 dark:text-green-400 mb-3">Specifications</h2>
                                 <dl className="space-y-2">
                                     {product.specifications.map((spec: any, idx: number) => (
                                         <div key={idx} className="flex justify-between gap-4 text-sm">
-                                            <dt className="text-muted-foreground flex-shrink-0">{spec.name}</dt>
-                                            <dd className="font-medium text-foreground text-right">{spec.value}</dd>
+                                            <dt className="text-muted-foreground flex-shrink-0">{typeof spec === "string" ? spec : spec.name}</dt>
+                                            <dd className="font-medium text-foreground text-right">{typeof spec === "string" ? "" : spec.value}</dd>
                                         </div>
                                     ))}
                                 </dl>
@@ -208,6 +229,7 @@ export default async function EquipmentGuidePage({ params }: GuidePageProps) {
                                 </ul>
                             </div>
                         )}
+
                     </div>
                 </div>
             </div>

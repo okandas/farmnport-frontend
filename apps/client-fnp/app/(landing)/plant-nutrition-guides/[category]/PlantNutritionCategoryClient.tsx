@@ -1,13 +1,15 @@
 "use client"
 
+import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { queryPlantNutritionProductsByCategory } from "@/lib/query"
 import { Button } from "@/components/ui/button"
 import { ProductCard } from "@/components/shared/ProductCard"
+import { ViewToggle } from "@/components/shared/ViewToggle"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
 import Link from "next/link"
 import { PlantNutritionFilterSidebar } from "@/components/generic/plantNutritionFilterSidebar"
-import { GuidesSidebarNav } from "@/components/generic/GuidesSidebarNav"
+import { ProductSidebarNav } from "@/components/generic/ProductSidebarNav"
 
 interface PlantNutritionCategoryClientProps {
     category: string
@@ -17,6 +19,7 @@ interface PlantNutritionCategoryClientProps {
 }
 
 export function PlantNutritionCategoryClient({ category, categoryName, initialProducts, initialTotal }: PlantNutritionCategoryClientProps) {
+    const [view, setView] = useState<"grid" | "list">("grid")
     const [queryState, setQueryState] = useQueryStates({
         brand: parseAsArrayOf(parseAsString),
         p: parseAsInteger.withDefault(1),
@@ -44,14 +47,17 @@ export function PlantNutritionCategoryClient({ category, categoryName, initialPr
                 <h1 className="text-4xl font-bold tracking-tight font-heading mb-4 capitalize">
                     {categoryName}
                 </h1>
-                <p className="text-muted-foreground">
-                    {productsData?.data?.total || initialTotal} product{(productsData?.data?.total || initialTotal) !== 1 ? 's' : ''} found
-                </p>
+                <div className="flex items-center justify-between">
+                    <p className="text-muted-foreground">
+                        {productsData?.data?.total || initialTotal} product{(productsData?.data?.total || initialTotal) !== 1 ? 's' : ''} found
+                    </p>
+                    <ViewToggle view={view} onViewChange={setView} />
+                </div>
             </div>
 
             <div className="flex flex-col lg:flex-row gap-8">
                 <aside className="w-full lg:w-64 flex-shrink-0">
-                    <GuidesSidebarNav />
+                    <ProductSidebarNav />
                     <PlantNutritionFilterSidebar hideCategory={true} categorySlug={category} />
                 </aside>
 
@@ -83,7 +89,7 @@ export function PlantNutritionCategoryClient({ category, categoryName, initialPr
                             </Link>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+                        <div className={view === "list" ? "flex flex-col gap-3" : "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5"}>
                             {products.map((product: any) => (
                                 <ProductCard
                                     key={product.id}
@@ -93,6 +99,7 @@ export function PlantNutritionCategoryClient({ category, categoryName, initialPr
                                     brand={product.brand?.name}
                                     meta={product.plant_nutrition_category?.name}
                                     mode="guide"
+                                    layout={view}
                                 />
                             ))}
                         </div>

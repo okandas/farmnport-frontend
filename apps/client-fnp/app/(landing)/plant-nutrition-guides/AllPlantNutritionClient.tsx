@@ -1,11 +1,13 @@
 "use client"
 
+import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { queryAllPlantNutritionProducts } from "@/lib/query"
 import { Button } from "@/components/ui/button"
 import { PlantNutritionFilterSidebar } from "@/components/generic/plantNutritionFilterSidebar"
-import { GuidesSidebarNav } from "@/components/generic/GuidesSidebarNav"
+import { ProductSidebarNav } from "@/components/generic/ProductSidebarNav"
 import { ProductCard } from "@/components/shared/ProductCard"
+import { ViewToggle } from "@/components/shared/ViewToggle"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
 
 interface AllPlantNutritionClientProps {
@@ -14,6 +16,7 @@ interface AllPlantNutritionClientProps {
 }
 
 export function AllPlantNutritionClient({ initialProducts, initialTotal }: AllPlantNutritionClientProps) {
+    const [view, setView] = useState<"grid" | "list">("grid")
     const [queryState, setQueryState] = useQueryStates({
         brand: parseAsArrayOf(parseAsString),
         category: parseAsArrayOf(parseAsString),
@@ -51,7 +54,7 @@ export function AllPlantNutritionClient({ initialProducts, initialTotal }: AllPl
     return (
         <div className="flex flex-col lg:flex-row gap-8">
             <aside className="w-full lg:w-64 flex-shrink-0">
-                <GuidesSidebarNav />
+                <ProductSidebarNav />
                 <PlantNutritionFilterSidebar />
             </aside>
 
@@ -81,7 +84,10 @@ export function AllPlantNutritionClient({ initialProducts, initialTotal }: AllPl
                 </div>
             ) : (
                 <>
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+                    <div className="flex justify-end mb-4">
+                        <ViewToggle view={view} onViewChange={setView} />
+                    </div>
+                    <div className={view === "list" ? "flex flex-col gap-3" : "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5"}>
                         {products.map((product: any) => (
                             <ProductCard
                                 key={product.id}
@@ -91,6 +97,7 @@ export function AllPlantNutritionClient({ initialProducts, initialTotal }: AllPl
                                 brand={product.brand?.name}
                                 meta={product.plant_nutrition_category?.name}
                                 mode="guide"
+                                layout={view}
                             />
                         ))}
                     </div>

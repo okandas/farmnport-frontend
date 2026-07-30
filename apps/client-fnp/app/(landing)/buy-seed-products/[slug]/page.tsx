@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { serverFetch } from "@/lib/serverFetch"
-import { formatProductName } from "@/lib/utilities"
+import { formatProductName, buildBuyMetadata } from "@/lib/utilities"
 import Link from "next/link"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { BuyProductInteractive } from "@/components/shop/BuyProductInteractive"
@@ -15,20 +15,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const { slug } = await params
     const product = await serverFetch(`/seed-products/${slug}`).catch(() => null)
     if (!product) return { title: 'Seed Product | farmnport.com', robots: { index: false } }
-    const variety = product.variety ? ` — ${product.variety}` : ""
-    const name = formatProductName(product.name)
-    const brand = formatProductName(product.brand.name)
-    return {
-        title: `${name} ${brand}${variety} – Buy Seeds | farmnport.com`,
-        description: product.description || `Buy ${name} ${brand}${variety} seeds. Certified seed variety. View planting guide, yield potential, and order online.`,
-        alternates: { canonical: `/buy-seed-products/${slug}` },
-        openGraph: {
-            title: `${name} ${brand} – Buy Seeds`,
-            description: product.description || `${name} ${brand}${variety} certified seed variety.`,
-            siteName: 'farmnport',
-            type: 'website',
-        },
-    }
+    return buildBuyMetadata(product, 'Seeds', `/buy-seed-products/${slug}`, 'Zimbabwe farmers', product.images?.[0]?.img?.src)
 }
 
 export default async function BuySeedProductPage({ params }: Props) {

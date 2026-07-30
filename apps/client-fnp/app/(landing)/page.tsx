@@ -1,6 +1,9 @@
-import { auth } from "@/auth"
-import { LoggedOutLanding } from "@/components/layouts/logged-out-landing"
-import { LoggedInDashboard } from "@/components/layouts/logged-in-dashboard"
+import { HeroSection } from "@/components/sections/hero"
+import { SponsorsSection } from "@/components/sections/sponsors"
+import { CategoriesSection } from "@/components/sections/categories"
+import { TrendingSection } from "@/components/sections/trending"
+import { TrustBar } from "@/components/sections/trust-bar"
+import { HowToSection } from "@/components/sections/how-to"
 
 export const metadata = {
   title: 'Farmnport — Buy & Sell Farm Produce Directly in Zimbabwe',
@@ -16,14 +19,13 @@ export const metadata = {
   },
 }
 
-
-export default async function LandingPage() {
-  const session = await auth()
-  const user = session?.user
-
-  if (user) {
-    return <LoggedInDashboard user={user} />
-  }
-
-  return <LoggedOutLanding />
+export default function LandingPage() {
+  return <main>
+    <HeroSection />
+    <SponsorsSection />
+    <CategoriesSection />
+    <TrendingSection />
+    <TrustBar />
+    <HowToSection />
+  </main>
 }

@@ -2,6 +2,7 @@ import Link from "next/link"
 import { BaseURL } from "@/lib/schemas"
 import { AllEquipmentClient } from "./AllEquipmentClient"
 import { OtherGuidesLinks } from "@/components/shared/OtherGuidesLinks"
+import { ProductSidebarNav } from "@/components/generic/ProductSidebarNav"
 
 export const metadata = {
   title: 'Farm Equipment & Machinery Guides | farmnport.com',
@@ -53,7 +54,14 @@ export default async function EquipmentGuidesPage() {
                         </div>
                         <OtherGuidesLinks current="equipment" />
                     </div>
-                    <AllEquipmentClient initialProducts={products} initialTotal={total} />
+                    <div className="flex gap-8">
+                        <aside className="hidden lg:block w-56 shrink-0">
+                            <ProductSidebarNav />
+                        </aside>
+                        <div className="flex-1 min-w-0">
+                            <AllEquipmentClient initialProducts={products} initialTotal={total} />
+                        </div>
+                    </div>
                 </div>
             </section>
         </main>

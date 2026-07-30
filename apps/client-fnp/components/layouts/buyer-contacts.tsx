@@ -3,90 +3,57 @@
 import Link from "next/link"
 import { BadgeCheck } from "lucide-react"
 
-import { ApplicationUser } from "@/lib/schemas"
-import { capitalizeFirstLetter, slug, titleCase, formatDate } from "@/lib/utilities"
-import { Icons } from "@/components/icons/lucide"
+import { ApplicationUser, AuthenticatedUser } from "@/lib/schemas"
+import { capitalizeFirstLetter, slug, titleCase } from "@/lib/utilities"
 import { Badge } from "@/components/ui/badge"
+import { Contacts } from "@/components/layouts/contacts"
 
 interface BuyerContactsCardProps {
   buyer: ApplicationUser
+  user: AuthenticatedUser | null
 }
 
-export function BuyerContactsCard({ buyer }: BuyerContactsCardProps) {
+export function BuyerContactsCard({ buyer, user }: BuyerContactsCardProps) {
   return (
-    <div>
-      <div className="flex items-center gap-2 flex-wrap">
-        <h4 className="text-lg hover:underline hover:decoration-2">
-          <Link href={`/buyer/${slug(buyer.name)}`}>{titleCase(buyer.name)}</Link>
-        </h4>
-        {buyer.verified && (
-          <BadgeCheck className="h-4 w-4 flex-shrink-0 text-green-700" aria-hidden="true" />
+    <div className="flex gap-4 rounded-lg border bg-card p-4 hover:border-primary/30 hover:shadow-sm transition-all">
+      <div className="hidden sm:flex h-16 w-16 shrink-0 items-center justify-center rounded-lg bg-muted/30 text-muted-foreground text-lg font-bold">
+        {buyer.name?.charAt(0)?.toUpperCase()}
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2 flex-wrap">
+          <h4 className="text-sm font-semibold hover:text-primary transition-colors">
+            <Link href={`/buyer/${slug(buyer.name)}`}>{titleCase(buyer.name)}</Link>
+          </h4>
+          {buyer.verified && (
+            <BadgeCheck className="h-4 w-4 flex-shrink-0 text-green-700" aria-hidden="true" />
+          )}
+          {buyer.has_prices && (
+            <Badge variant="secondary" className="bg-green-50 text-green-700 border-green-200 hover:bg-green-50 text-[10px] rounded-md">
+              Pricing Available
+            </Badge>
+          )}
+          {buyer.has_booking && (
+            <Badge variant="secondary" className="bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-50 text-[10px] rounded-md">
+              Online Bookings
+            </Badge>
+          )}
+        </div>
+        {buyer.short_description && buyer.short_description.length > 0 && (
+          <p className={`text-xs text-muted-foreground mt-1 line-clamp-2 ${buyer.short_description.toLowerCase().startsWith('note:') ? 'text-lime-700 dark:text-lime-500' : ''}`}>
+            {capitalizeFirstLetter(buyer.short_description)}
+          </p>
         )}
-        {buyer.has_prices && (
-          <Badge variant="secondary" className="bg-green-50 text-green-700 border-green-200 hover:bg-green-50 text-xs rounded-md">
-            Pricing Available
-          </Badge>
-        )}
-        {buyer.has_booking && (
-          <Badge variant="secondary" className="bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-50 text-xs rounded-md">
-            Online Bookings
-          </Badge>
+        <Contacts user={user} client={buyer} quickOverview={true} />
+        {(buyer.main_produce || (buyer.other_produce ?? []).length > 0) && (
+          <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-7 gap-1.5 mt-2 pt-2 border-t">
+            {[buyer.main_produce, ...(buyer.other_produce ?? [])].filter(Boolean).map((p: any) => (
+              <span key={p.name} className="text-[10px] px-2 py-1 rounded-md bg-muted/50 text-muted-foreground text-center truncate">
+                {capitalizeFirstLetter(p.name)}
+              </span>
+            ))}
+          </div>
         )}
       </div>
-
-      {buyer.short_description && buyer.short_description.length > 0 && (
-        <p className={`text-sm text-muted-foreground mt-0.5 ${buyer.short_description.toLowerCase().startsWith('note:') ? 'text-lime-700 dark:text-lime-500' : ''}`}>
-          {capitalizeFirstLetter(buyer.short_description)}
-        </p>
-      )}
-
-      <dl className="grid grid-cols-1 lg:grid-cols-2 text-sm leading-6 mt-1">
-        {buyer.created && (
-          <div className="flex gap-x-4 py-1 items-start self-start">
-            <dt className="flex items-center gap-1 text-xs text-muted-foreground w-24 shrink-0 pt-0.5">
-              <Icons.calender className="h-3.5 w-3.5 shrink-0" />
-              Date Joined
-            </dt>
-            <dd className="text-sm font-medium leading-6">{formatDate(buyer.created)}</dd>
-          </div>
-        )}
-
-        {buyer.primary_category && (
-          <div className="flex gap-x-4 py-1 items-start self-start">
-            <dt className="flex items-center gap-1 text-xs text-muted-foreground w-24 shrink-0 pt-0.5">
-              <Icons.info className="h-3.5 w-3.5 shrink-0" />
-              Category
-            </dt>
-            <dd className="text-sm font-medium leading-6">{capitalizeFirstLetter(buyer.primary_category.name)}</dd>
-          </div>
-        )}
-
-        <div className="flex gap-x-4 py-1 items-start self-start">
-          <dt className="flex items-center gap-1 text-xs text-muted-foreground w-24 shrink-0 pt-0.5">
-            <Icons.map className="h-3.5 w-3.5 shrink-0" />
-            Location
-          </dt>
-          <dd className="text-sm font-medium leading-6">
-            {(() => {
-              const city = buyer.city?.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
-              const province = buyer.province?.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
-              return city?.toLowerCase() === province?.toLowerCase() ? city : `${city}, ${province}`
-            })()}
-          </dd>
-        </div>
-
-        {(buyer.main_produce || (buyer.other_produce ?? []).length > 0) && (
-          <div className="flex gap-x-4 py-1 items-start self-start">
-            <dt className="flex items-center gap-1 text-xs text-muted-foreground w-24 shrink-0 pt-0.5">
-              <Icons.tag className="h-3.5 w-3.5 shrink-0" />
-              Buys
-            </dt>
-            <dd className="text-sm font-medium leading-6">
-              {[buyer.main_produce, ...(buyer.other_produce ?? [])].filter(Boolean).map((p: any) => capitalizeFirstLetter(p.name)).join(', ')}
-            </dd>
-          </div>
-        )}
-      </dl>
     </div>
   )
 }

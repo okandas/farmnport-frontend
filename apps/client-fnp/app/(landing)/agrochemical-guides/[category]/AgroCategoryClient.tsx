@@ -1,11 +1,13 @@
 "use client"
 
+import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { queryAgroChemicalsByCategory } from "@/lib/query"
 import { Button } from "@/components/ui/button"
 import { AgroChemicalFilterSidebar } from "@/components/generic/agroChemicalFilterSidebar"
-import { GuidesSidebarNav } from "@/components/generic/GuidesSidebarNav"
+import { ProductSidebarNav } from "@/components/generic/ProductSidebarNav"
 import { ProductCard } from "@/components/shared/ProductCard"
+import { ViewToggle } from "@/components/shared/ViewToggle"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
 import Link from "next/link"
 
@@ -17,6 +19,7 @@ interface AgroCategoryClientProps {
 }
 
 export function AgroCategoryClient({ category, categoryName, initialChemicals, initialTotal }: AgroCategoryClientProps) {
+    const [view, setView] = useState<"grid" | "list">("grid")
     const [queryState, setQueryState] = useQueryStates({
         brand: parseAsArrayOf(parseAsString),
         target: parseAsArrayOf(parseAsString),
@@ -54,7 +57,7 @@ export function AgroCategoryClient({ category, categoryName, initialChemicals, i
         <div className="flex flex-col lg:flex-row gap-8">
             {/* Sidebar Filters */}
             <aside className="w-full lg:w-64 flex-shrink-0">
-                <GuidesSidebarNav />
+                <ProductSidebarNav />
                 <AgroChemicalFilterSidebar hideCategory={true} categorySlug={category} />
             </aside>
 
@@ -89,7 +92,10 @@ export function AgroCategoryClient({ category, categoryName, initialChemicals, i
                     </div>
                 ) : (
                     <>
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+                        <div className="flex justify-end mb-4">
+                            <ViewToggle view={view} onViewChange={setView} />
+                        </div>
+                        <div className={view === "list" ? "flex flex-col gap-3" : "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5"}>
                             {chemicals.map((chemical: any) => (
                                 <ProductCard
                                     key={chemical.id}
@@ -100,6 +106,7 @@ export function AgroCategoryClient({ category, categoryName, initialChemicals, i
                                     meta={chemical.agrochemical_category?.name}
                                     mode="guide"
                                     isTest={chemical.is_test}
+                                    layout={view}
                                 />
                             ))}
                         </div>

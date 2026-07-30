@@ -5,7 +5,7 @@ import Link from "next/link"
 import { driver } from "driver.js"
 import "driver.js/dist/driver.css"
 
-import { BuyCategoriesNavClient } from "@/components/generic/BuyCategoriesNavClient"
+import { ProductSidebarNav } from "@/components/generic/ProductSidebarNav"
 
 function formatDate(d: string) {
   return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
@@ -138,7 +138,7 @@ export function BookingsClient({ categories, initialPreOrders }: BookingsClientP
   return (
     <div className="flex flex-col lg:flex-row gap-8">
       <aside className="w-full lg:w-64 flex-shrink-0">
-        <BuyCategoriesNavClient categories={categories} />
+        <ProductSidebarNav />
       </aside>
 
       <main className="flex-1">

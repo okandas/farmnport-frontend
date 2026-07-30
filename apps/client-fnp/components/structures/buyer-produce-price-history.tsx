@@ -1,10 +1,13 @@
 "use client"
 
 import Link from "next/link"
-import { useState, useEffect, useRef } from "react"
 import { useQuery } from "@tanstack/react-query"
-import { querySeriesClientHistory, querySeriesClientDates } from "@/lib/query"
-import { capitalizeFirstLetter, slug } from "@/lib/utilities"
+import { querySeriesClientHistory } from "@/lib/query"
+import { capitalizeFirstLetter, slug, makeAbbveriation } from "@/lib/utilities"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
+import { ShareBar } from "@/components/shared/ShareBar"
+import { QuickLinks } from "@/components/generic/quick-links"
 
 interface SeriesEntry {
   id?: string
@@ -25,14 +28,6 @@ interface SeriesEntry {
   avg_amount_head?: number
   max_amount_head?: number
   min_amount_head?: number
-}
-
-interface DateEntry {
-  date: string
-  count: number
-  categories: string[]
-  types: string[]
-  has_head: boolean
 }
 
 const codeColors = [
@@ -64,12 +59,6 @@ function weightDisplay(minG?: number, maxG?: number): string {
   const max = maxG != null ? maxG / 1000 : null
   return max != null ? `${min}–${max} kg` : `${min}+ kg`
 }
-const typeLabel = (t: string) => {
-  if (t === "cdm") return "Cold Dress Mass"
-  if (t === "lwt") return "Liveweight"
-  return t.toUpperCase()
-}
-
 function GradePanel({ clientSlug, produce, date }: { clientSlug: string; produce: string; date: string }) {
   const { data, isLoading } = useQuery({
     queryKey: ["series-client-history", clientSlug, produce, date],
@@ -193,155 +182,90 @@ export function BuyerProducePriceHistory({
 }) {
   const nameSlug = slug(clientName)
   const produceName = capitalizeFirstLetter(produce)
-
-  const [page, setPage] = useState(1)
-  const [allDates, setAllDates] = useState<DateEntry[]>([])
-  const [total, setTotal] = useState(0)
-  const [selectedDate, setSelectedDate] = useState<string | null>(effectiveDate)
-  const sentinelRef = useRef<HTMLDivElement>(null)
-
-  const { data, isFetching } = useQuery({
-    queryKey: ["series-client-dates", clientSlug, produce, page],
-    queryFn: () => querySeriesClientDates(clientSlug, produce, page),
-    refetchOnWindowFocus: false,
-  })
-
-  // Accumulate pages
-  useEffect(() => {
-    const incoming: DateEntry[] = data?.data?.data ?? []
-    const t: number = data?.data?.total ?? 0
-    if (incoming.length === 0) return
-    setTotal(t)
-    setAllDates(prev => {
-      const existingDates = new Set(prev.map(d => d.date))
-      const fresh = incoming.filter(d => !existingDates.has(d.date))
-      return [...prev, ...fresh]
-    })
-  }, [data])
-
-  const resolvedDate = selectedDate ?? effectiveDate ?? ""
-
-  // Auto-select first date if none from URL
-  useEffect(() => {
-    if (!selectedDate && allDates.length > 0) {
-      setSelectedDate(allDates[0].date)
-    }
-  }, [allDates, selectedDate])
-
-  // Update document title on date change
-  useEffect(() => {
-    if (!resolvedDate) return
-    const dateLabel = new Date(resolvedDate).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })
-    document.title = `${clientName} ${capitalizeFirstLetter(produce)} Prices ${dateLabel} | farmnport.com`
-  }, [resolvedDate, clientName, produce])
-
-  // Infinite scroll sentinel
-  useEffect(() => {
-    const el = sentinelRef.current
-    if (!el) return
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !isFetching && allDates.length < total) {
-          setPage(p => p + 1)
-        }
-      },
-      { threshold: 0.1 }
-    )
-    observer.observe(el)
-    return () => observer.disconnect()
-  }, [isFetching, allDates.length, total])
+  const resolvedDate = effectiveDate ?? ""
 
   return (
-    <main className="min-h-screen">
-      <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-5xl mx-auto space-y-6">
-
-        {/* Breadcrumb */}
-        <p className="text-sm text-muted-foreground flex items-center gap-1.5 flex-wrap">
-          <Link href="/prices" className="hover:text-foreground">Prices</Link>
+    <div className="w-full bg-background min-h-screen pb-12">
+      <div className="container pt-4 pb-2">
+        <nav className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <Link href="/" className="hover:text-foreground transition-colors">Home</Link>
           <span>/</span>
-          <Link href={`/buyer/${nameSlug}`} className="hover:text-foreground">{clientName}</Link>
-          {resolvedDate && (
-            <>
-              <span>/</span>
-              <span className="text-foreground">{new Date(resolvedDate).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}</span>
-            </>
-          )}
+          <Link href="/prices" className="hover:text-foreground transition-colors">Prices</Link>
           <span>/</span>
-          <span className="text-foreground font-semibold">{produceName}</span>
-        </p>
+          <Link href={`/buyer/${nameSlug}`} className="hover:text-foreground transition-colors">{clientName}</Link>
+          <span>/</span>
+          <span className="text-foreground font-medium">{produceName}</span>
+        </nav>
+      </div>
 
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">{clientName} {produceName} Prices Zimbabwe</h1>
-          <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
-            {clientName} is a {produceName.toLowerCase()} buyer in Zimbabwe. View their latest buying prices per grade, including liveweight and per-head rates, to know what your {produceName.toLowerCase()} is worth before you sell.
-          </p>
-        </div>
-
-        {/* Mobile: stacked cards. Desktop: two-panel side by side */}
-        <div className="flex flex-col lg:flex-row gap-4 lg:gap-0 lg:rounded-md lg:border lg:bg-card lg:shadow-sm lg:overflow-hidden" style={{ height: undefined }}>
-
-          {/* Left sidebar — date selector */}
-          <div className="rounded-md border bg-card shadow-sm lg:rounded-none lg:border-0 lg:border-r lg:shadow-none flex flex-col min-h-0 lg:w-[280px] lg:shrink-0">
-            <div className="px-4 py-3 border-b flex items-center justify-between shrink-0">
-              <h4 className="text-sm font-semibold text-foreground">Select a Date</h4>
-              <span className="text-xs text-muted-foreground">{total} upload{total !== 1 ? "s" : ""}</span>
+      <div className="container">
+        <div className="lg:flex lg:gap-8">
+          {/* Left — Main content */}
+          <div className="flex-1 min-w-0 space-y-6">
+            {/* Profile header */}
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 pt-4">
+              <Avatar className="h-16 w-16 sm:h-20 sm:w-20 shrink-0 ring-2 ring-border shadow">
+                <AvatarFallback className="text-lg sm:text-xl font-bold bg-primary/10 text-primary">
+                  {makeAbbveriation(clientName)}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1 min-w-0 text-center sm:text-left">
+                <h1 className="text-xl sm:text-2xl font-bold tracking-tight mb-1">{clientName}</h1>
+                <div className="flex flex-wrap items-center justify-center sm:justify-start gap-1.5 mb-2">
+                  <Badge variant="secondary" className="text-[10px]">Buyer</Badge>
+                  <Badge className="bg-green-50 text-green-700 border-green-200 hover:bg-green-50 text-[10px]">{produceName} Prices</Badge>
+                  {resolvedDate && (
+                    <Badge variant="outline" className="text-[10px]">
+                      {new Date(resolvedDate).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+                    </Badge>
+                  )}
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Grade-by-grade {produceName.toLowerCase()} buying prices from {clientName} in Zimbabwe.
+                </p>
+              </div>
             </div>
 
-            <div className="overflow-y-auto max-h-60 lg:max-h-[520px]">
-              {allDates.map(d => {
-                const isActive = d.date === resolvedDate
-                return (
-                  <button
-                    key={d.date}
-                    onClick={() => setSelectedDate(d.date)}
-                    className={`w-full text-left px-4 py-3 border-b last:border-b-0 transition-colors border-l-2 ${
-                      isActive
-                        ? "bg-muted border-l-foreground"
-                        : "border-l-transparent hover:bg-muted/50"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-1">
-                      <span className={`text-sm tabular-nums ${isActive ? "font-semibold text-foreground" : "font-medium text-foreground"}`}>
-                        {new Date(d.date).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}
-                      </span>
-                      <span className="text-xs text-muted-foreground">{d.count} grade{d.count !== 1 ? "s" : ""}</span>
-                    </div>
-                    <p className="text-[11px] text-muted-foreground">
-                      {[...d.types.map(typeLabel), ...(d.has_head ? ["Per Head"] : [])].join(" · ")}
-                    </p>
-                  </button>
-                )
-              })}
+            <ShareBar name={`${clientName} ${produceName} Prices`} />
 
-              {/* Infinite scroll sentinel */}
-              <div ref={sentinelRef} className="h-4" />
-              {isFetching && (
-                <div className="px-4 py-3 space-y-2">
-                  {Array.from({ length: 3 }).map((_, i) => (
-                    <div key={i} className="h-12 bg-muted/40 rounded-lg animate-pulse" />
-                  ))}
+            {/* Grade table */}
+            <div className="rounded-lg border bg-card overflow-hidden">
+              {resolvedDate ? (
+                <GradePanel
+                  clientSlug={clientSlug}
+                  produce={produce}
+                  date={resolvedDate}
+                />
+              ) : (
+                <div className="flex items-center justify-center p-8">
+                  <p className="text-sm text-muted-foreground">No price data available</p>
                 </div>
               )}
             </div>
           </div>
 
-          {/* Right panel — grade data */}
-          <div className="rounded-md border bg-card shadow-sm lg:rounded-none lg:border-0 lg:shadow-none flex flex-col flex-1 overflow-hidden lg:h-[560px]">
-            {resolvedDate ? (
-              <GradePanel
-                clientSlug={clientSlug}
-                produce={produce}
-                date={resolvedDate}
-              />
-            ) : (
-              <div className="flex-1 flex items-center justify-center p-8">
-                <p className="text-sm text-muted-foreground">Select a date to view prices</p>
-              </div>
-            )}
-          </div>
-        </div>
+          {/* Right — Sticky sidebar */}
+          <aside className="hidden lg:block lg:w-72 shrink-0">
+            <div className="sticky top-20 space-y-4 pt-4">
+              <Link href={`/buyer/${nameSlug}`} className="block">
+                <div className="rounded-lg border p-5 text-center hover:border-primary/40 hover:shadow-sm transition-all">
+                  <p className="text-sm font-semibold">View {clientName} Profile</p>
+                  <p className="text-xs text-muted-foreground mt-1">See all products, contact info, and activity</p>
+                </div>
+              </Link>
 
+              <Link href="/prices" className="block">
+                <div className="rounded-lg border p-5 text-center hover:border-primary/40 hover:shadow-sm transition-all">
+                  <p className="text-sm font-semibold">All Market Prices</p>
+                  <p className="text-xs text-muted-foreground mt-1">Compare prices across all buyers</p>
+                </div>
+              </Link>
+
+              <QuickLinks />
+            </div>
+          </aside>
+        </div>
       </div>
-    </main>
+    </div>
   )
 }

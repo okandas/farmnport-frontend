@@ -32,12 +32,13 @@ interface ProductCardProps {
   isTest?: boolean
   singleUnit?: boolean
   imageFill?: boolean
+  layout?: "grid" | "list"
 }
 
 export function ProductCard({
   href, imageSrc, name, brand, meta, mode, buttonLabel = "View Guide",
   salePrice, wasPrice, showWasPrice, availableForSale,
-  productId, productType, productSlug, loginRedirect, preorderHref, stockLevel, hasVariants, variantPriceRange, pickupOnly, isTest, singleUnit, imageFill,
+  productId, productType, productSlug, loginRedirect, preorderHref, stockLevel, hasVariants, variantPriceRange, pickupOnly, isTest, singleUnit, imageFill, layout = "grid",
 }: ProductCardProps) {
   const inStock = availableForSale && (stockLevel === undefined || stockLevel > 0)
 
@@ -46,6 +47,90 @@ export function ProductCard({
       ? `$${(variantPriceRange.min / 100).toFixed(2)}`
       : `$${(variantPriceRange.min / 100).toFixed(2)} – $${(variantPriceRange.max / 100).toFixed(2)}`
     : null
+
+  if (layout === "list") {
+    return (
+      <div className="bg-card border border-border rounded-lg overflow-hidden transition-all duration-200 hover:shadow-lg hover:border-primary/50 group flex">
+        <Link href={href} className="block shrink-0">
+          <div className="relative w-40 h-40 sm:w-48 sm:h-48 bg-white">
+            {imageSrc ? (
+              <Image
+                src={imageSrc}
+                alt={name}
+                fill
+                sizes="200px"
+                className={`${imageFill ? "object-cover p-2" : "object-contain"}`}
+              />
+            ) : (
+              <div className="absolute inset-0 bg-muted/30" />
+            )}
+            {pickupOnly && (
+              <span className="absolute top-2 left-2 bg-background/90 text-foreground text-[10px] font-medium px-2 py-0.5 rounded-full border border-border">
+                Pickup only
+              </span>
+            )}
+          </div>
+        </Link>
+        <div className="flex-1 p-4 flex flex-col justify-between min-w-0">
+          <div>
+            <Link href={href} onClick={mode === "guide" ? () => sendGTMEvent({ event: 'view_guide', value: name }) : undefined}>
+              <h3 className="font-semibold text-sm leading-tight line-clamp-2 group-hover:text-primary transition-colors">
+                {formatProductName(name)}
+              </h3>
+            </Link>
+            {brand && <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium mt-1">{brand}</p>}
+            {meta && <p className="text-xs text-muted-foreground mt-2">{meta}</p>}
+          </div>
+          <div className="flex items-center justify-between gap-4 mt-3">
+            {mode === "buy" ? (
+              <div className="flex items-center gap-4">
+                {!hasVariants && (salePrice ?? 0) > 0 && (
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-lg font-semibold">{centsToDollars(salePrice ?? 0)}</span>
+                    {showWasPrice && wasPrice && wasPrice > 0 && wasPrice > (salePrice ?? 0) && (
+                      <span className="text-xs text-muted-foreground line-through">{centsToDollars(wasPrice)}</span>
+                    )}
+                  </div>
+                )}
+                {hasVariants && variantPriceRange && (
+                  <span className="text-lg font-semibold">
+                    {variantPriceRange.min === variantPriceRange.max
+                      ? `$${(variantPriceRange.min / 100).toFixed(2)}`
+                      : `$${(variantPriceRange.min / 100).toFixed(2)} – $${(variantPriceRange.max / 100).toFixed(2)}`}
+                  </span>
+                )}
+              </div>
+            ) : null}
+            <div className="shrink-0">
+              {mode === "buy" ? (
+                hasVariants ? (
+                  <Link href={href}><Button variant="outline" size="sm">Choose Options</Button></Link>
+                ) : !inStock && preorderHref ? (
+                  <Link href={preorderHref}><Button variant="outline" size="sm">Pre-order</Button></Link>
+                ) : (
+                  <AddToCartButton
+                    productId={productId!}
+                    productType={productType!}
+                    productName={name}
+                    productSlug={productSlug!}
+                    imageSrc={imageSrc}
+                    unitPrice={salePrice && salePrice > 0 ? salePrice : null}
+                    available={inStock}
+                    loginRedirect={loginRedirect ?? href}
+                    singleUnit={singleUnit}
+                  />
+                )
+              ) : (
+                <Link href={href} onClick={() => sendGTMEvent({ event: 'view_guide', value: name })}>
+                  <Button variant="outline" size="sm">{buttonLabel}</Button>
+                </Link>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="bg-card border border-border rounded-lg overflow-hidden transition-all duration-200 hover:shadow-lg hover:border-primary/50 group">

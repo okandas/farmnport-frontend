@@ -43,11 +43,13 @@ export const metadata = {
     siteName: 'farmnport',
     locale: 'en_US',
     type: 'website',
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Farmnport — Buy & Sell Farm Produce Directly in Zimbabwe' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Farmnport - Buy & Sell Farm Produce Directly in Zimbabwe',
     description: 'Connect farmers and buyers across Zimbabwe. Browse produce prices, find buyers and sellers, and access agrochemical guides.',
+    images: ['/og-image.png'],
   },
   other: {
     'google-adsense-account': 'ca-pub-9685248262342396'

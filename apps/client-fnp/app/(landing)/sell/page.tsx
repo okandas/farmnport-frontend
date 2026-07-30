@@ -1,12 +1,12 @@
 import Link from "next/link"
-import { ArrowRight, Package, Users, Banknote } from "lucide-react"
+import { ArrowRight, Package, Users, Banknote, CalendarCheck, Repeat } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
   title: "Sell Your Farm Produce Directly to Buyers | farmnport.com",
   description:
-    "List your farm produce on Farmnport and connect directly with buyers across Zimbabwe. Sell chillies, maize, cattle and more — no middlemen, fairer prices.",
+    "List lots, create bookings, and connect directly with buyers across Zimbabwe. Sell chillies, maize, cattle, eggs, chicks and more — fairer prices.",
   alternates: { canonical: "/sell" },
   openGraph: {
     type: "website",
@@ -15,88 +15,53 @@ export const metadata: Metadata = {
     siteName: "Farmnport",
     title: "Sell Your Farm Produce Directly to Buyers | farmnport.com",
     description:
-      "List your farm produce on Farmnport and connect directly with buyers across Zimbabwe. Sell chillies, maize, cattle and more — no middlemen, fairer prices.",
+      "List lots, create bookings, and connect directly with buyers across Zimbabwe.",
     images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Sell Farm Produce on Farmnport" }],
   },
-  twitter: {
-    card: "summary_large_image",
-    title: "Sell Your Farm Produce Directly to Buyers | farmnport.com",
-    description:
-      "List your farm produce on Farmnport and connect directly with buyers across Zimbabwe. Sell chillies, maize, cattle and more — no middlemen, fairer prices.",
-    images: ["/og-image.png"],
-  },
 }
-
-const STEPS = [
-  {
-    icon: Package,
-    title: "Set Your Price & Timeline",
-    description:
-      "Choose your produce, set your asking price, and pick when bidding closes. Your listing goes live once reviewed — usually within 24 hours.",
-  },
-  {
-    icon: Users,
-    title: "Buyers Come to You",
-    description:
-      "Verified buyers across Zimbabwe browse active lots and place offers. No cold calls, no middlemen, no auctioneer deciding your price.",
-  },
-  {
-    icon: Banknote,
-    title: "Accept When You're Ready",
-    description:
-      "Review offers at your own pace. Accept the price that works for you — not the price someone else decided.",
-  },
-]
-
-const ENABLED_COMMODITIES = [
-  {
-    slug: "chillies",
-    name: "Chillies",
-    description: "Bird's Eye, Black Dombo, Cayenne, Scotch Bonnet and more varieties.",
-    badge: "Now Open",
-    badgeVariant: "default" as const,
-  },
-  {
-    slug: "maize",
-    name: "Maize",
-    description: "White and yellow maize — grain, green mealies, and stockfeed.",
-    badge: "Now Open",
-    badgeVariant: "default" as const,
-  },
-  {
-    slug: "cattle",
-    name: "Cattle",
-    description: "Bulls, heifers, cows, and calves — all breeds.",
-    badge: "Now Open",
-    badgeVariant: "default" as const,
-  },
-  {
-    slug: "chicken",
-    name: "Chicken",
-    description: "Broilers, layers, road runners, and day-old chicks.",
-    badge: "Now Open",
-    badgeVariant: "default" as const,
-  },
-]
-
-const COMING_SOON = [
-  { name: "Soya Beans", slug: "soybeans" },
-]
 
 export default function SellPage() {
   return (
     <main>
-      <div className="mx-auto max-w-7xl px-6 lg:px-8 py-12 space-y-16">
+      <div className="container py-12 space-y-16">
 
         {/* Hero */}
         <div className="max-w-2xl">
           <h1 className="text-3xl font-bold tracking-tight">
-            Sell at the Price You Want, Not the Price You're Given
+            Two Ways to Sell on Farmnport
           </h1>
           <p className="mt-4 text-lg text-muted-foreground">
-            Been to a live auction and didn't get the price you wanted? List your produce as a timed lot — set your own price, your own deadline, and accept offers on your terms.
+            List a lot for immediate sale, or create a booking for regular supply. Both connect you directly with verified buyers.
           </p>
-          <div className="mt-6">
+        </div>
+
+        {/* Two paths */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          {/* List a Lot */}
+          <div className="rounded-xl border bg-card p-8 space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+                <Package className="h-5 w-5 text-primary" />
+              </div>
+              <h2 className="text-xl font-bold">List a Lot</h2>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Have stock ready now? Post your harvest, set your price, and let buyers bid. Accept when you are ready.
+            </p>
+            <div className="space-y-2 text-sm">
+              <div className="flex items-start gap-2">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold shrink-0 mt-0.5">1</span>
+                <span>Set your price and bidding deadline</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold shrink-0 mt-0.5">2</span>
+                <span>Buyers browse and place offers</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold shrink-0 mt-0.5">3</span>
+                <span>Accept the offer that works for you</span>
+              </div>
+            </div>
             <Link
               href="/lots/new"
               className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
@@ -105,64 +70,66 @@ export default function SellPage() {
               <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
-        </div>
 
-        {/* How it works */}
-        <div>
-          <h2 className="text-xl font-semibold mb-8">How It Works</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            {STEPS.map((step, i) => (
-              <div key={i} className="rounded-xl border bg-card p-6 space-y-3">
-                <div className="flex items-center gap-3">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary text-sm font-bold">
-                    {i + 1}
-                  </span>
-                  <step.icon className="h-5 w-5 text-muted-foreground" />
-                </div>
-                <h3 className="font-semibold">{step.title}</h3>
-                <p className="text-sm text-muted-foreground">{step.description}</p>
+          {/* Create a Booking */}
+          <div className="rounded-xl border bg-card p-8 space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
+                <CalendarCheck className="h-5 w-5 text-blue-700" />
               </div>
-            ))}
+              <h2 className="text-xl font-bold">Create a Booking</h2>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Supply or buy on a regular basis? Set up recurring pre-orders for eggs, chicks, seeds, harvests and more.
+            </p>
+            <div className="space-y-2 text-sm">
+              <div className="flex items-start gap-2">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-white text-xs font-bold shrink-0 mt-0.5">1</span>
+                <span>Choose if you supply or buy</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-white text-xs font-bold shrink-0 mt-0.5">2</span>
+                <span>Set your produce, quantity and schedule</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-white text-xs font-bold shrink-0 mt-0.5">3</span>
+                <span>Customers book directly from you</span>
+              </div>
+            </div>
+            <Link
+              href="/bookings/new"
+              className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 transition-colors"
+            >
+              Create a Booking
+              <ArrowRight className="h-4 w-4" />
+            </Link>
           </div>
         </div>
 
-        {/* Enabled commodities */}
+        {/* Commodities open */}
         <div>
           <h2 className="text-xl font-semibold mb-2">Commodities Open for Lots</h2>
           <p className="text-sm text-muted-foreground mb-6">
             Read the seller guide for each commodity — what buyers want, varieties, and how to price your lot.
           </p>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {ENABLED_COMMODITIES.map((c) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              { slug: "chillies", name: "Chillies", description: "Bird's Eye, Black Dombo, Cayenne, Scotch Bonnet and more." },
+              { slug: "maize", name: "Maize", description: "White and yellow maize — grain, green mealies, and stockfeed." },
+              { slug: "cattle", name: "Cattle", description: "Bulls, heifers, cows, and calves — all breeds." },
+              { slug: "chicken", name: "Chicken", description: "Broilers, layers, road runners, and day-old chicks." },
+            ].map((c) => (
               <Link
                 key={c.slug}
                 href={`/sell/${c.slug}`}
-                className="group rounded-xl border bg-card p-6 hover:shadow-md hover:border-primary/40 transition-all space-y-3"
+                className="group rounded-xl border bg-card p-5 hover:shadow-md hover:border-primary/40 transition-all"
               >
-                <div className="flex items-start justify-between gap-2">
-                  <h3 className="text-lg font-semibold group-hover:text-primary transition-colors">{c.name}</h3>
-                  <Badge>{c.badge}</Badge>
+                <div className="flex items-start justify-between gap-2 mb-2">
+                  <h3 className="text-sm font-semibold group-hover:text-primary transition-colors">{c.name}</h3>
+                  <Badge className="text-[10px]">Open</Badge>
                 </div>
-                <p className="text-sm text-muted-foreground">{c.description}</p>
-                <div className="flex items-center gap-1 text-sm font-medium text-primary">
-                  View seller guide
-                  <ArrowRight className="h-3.5 w-3.5" />
-                </div>
+                <p className="text-xs text-muted-foreground">{c.description}</p>
               </Link>
-            ))}
-
-            {COMING_SOON.map((c) => (
-              <div
-                key={c.slug}
-                className="rounded-xl border bg-muted/30 p-6 space-y-3 opacity-60"
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <h3 className="text-lg font-semibold text-muted-foreground">{c.name}</h3>
-                  <Badge variant="secondary">Coming Soon</Badge>
-                </div>
-                <p className="text-sm text-muted-foreground">Lot listings for {c.name.toLowerCase()} are coming soon.</p>
-              </div>
             ))}
           </div>
         </div>
@@ -170,33 +137,40 @@ export default function SellPage() {
         {/* Bottom CTA */}
         <div className="rounded-xl border bg-primary/5 border-primary/20 p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
           <div>
-            <h3 className="text-lg font-semibold">Ready to sell on your terms?</h3>
+            <h3 className="text-lg font-semibold">Ready to start?</h3>
             <p className="text-sm text-muted-foreground mt-1">
-              Create your lot in minutes. Set your price, set your deadline, and let buyers come to you.
+              List a lot for immediate sale or create a booking for regular supply.
             </p>
           </div>
-          <Link
-            href="/lots/new"
-            className="flex-shrink-0 inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
-          >
-            List a Lot
-            <ArrowRight className="h-4 w-4" />
-          </Link>
+          <div className="flex gap-3">
+            <Link
+              href="/lots/new"
+              className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
+            >
+              List a Lot
+            </Link>
+            <Link
+              href="/bookings/new"
+              className="inline-flex items-center gap-2 rounded-lg border border-border px-5 py-2.5 text-sm font-semibold text-foreground hover:bg-muted/50 transition-colors"
+            >
+              Create Booking
+            </Link>
+          </div>
         </div>
 
-        {/* Also useful */}
+        {/* Links */}
         <div className="text-sm text-muted-foreground space-y-1">
           <p>
             Looking to find buyers directly?{" "}
-            <Link href="/buyers" className="text-primary hover:underline">
-              Browse all buyers on Farmnport →
-            </Link>
+            <Link href="/buyers" className="text-primary hover:underline">Browse all buyers →</Link>
           </p>
           <p>
-            Want to see what lots are available to buy?{" "}
-            <Link href="/lots" className="text-primary hover:underline">
-              Browse active lots →
-            </Link>
+            Want to see what lots are available?{" "}
+            <Link href="/lots" className="text-primary hover:underline">Browse active lots →</Link>
+          </p>
+          <p>
+            Need help getting started?{" "}
+            <Link href="/resources" className="text-primary hover:underline">View resources →</Link>
           </p>
         </div>
 

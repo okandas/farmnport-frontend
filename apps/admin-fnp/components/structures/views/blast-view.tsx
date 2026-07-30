@@ -28,6 +28,7 @@ interface BlastRecipient {
   email: string
   message: string
   email_subject: string
+  email_template?: string
   channel: string
 }
 
@@ -55,7 +56,8 @@ const CHANNEL_CONFIG = {
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
-export function BlastView() {
+export function BlastView({ source }: { source?: "farmnport" | "menus" } = {}) {
+  const isMenus = source === "menus"
   const { toast } = useToast()
 
   // Filters
@@ -83,7 +85,7 @@ export function BlastView() {
   const [emailSubject, setEmailSubject] = useState("")
   const [overrides, setOverrides] = useState<Record<string, string>>({})
   const [showPreview, setShowPreview] = useState(false)
-  const [blastTemplate, setBlastTemplate] = useState<"custom" | "verify-reminder">("custom")
+  const [blastTemplate, setBlastTemplate] = useState<"custom" | "verify-reminder" | "menus-reviews-favourites">("custom")
 
   // Results
   const [results, setResults] = useState<{ sent: number; failed: number; remaining?: number; results: BlastResult[] } | null>(null)
@@ -91,9 +93,10 @@ export function BlastView() {
   // ── Clients query — auto-runs on debounced filter change ───────────────────
 
   const clientsQuery = useQuery({
-    queryKey: ["blast-clients", debouncedFilters],
+    queryKey: ["blast-clients", debouncedFilters, source],
     queryFn: () => {
       const p = new URLSearchParams()
+      if (isMenus) p.set("source", "menus")
       if (debouncedFilters.typeFilter !== "all") p.set("type", debouncedFilters.typeFilter)
       if (debouncedFilters.provinceFilter !== "all") p.set("province", debouncedFilters.provinceFilter)
       if (debouncedFilters.produceFilter !== "all") p.set("produce", debouncedFilters.produceFilter)
@@ -165,7 +168,8 @@ export function BlastView() {
     const recipients: BlastRecipient[] = selectedClients.map((c) => ({
       id: c.id, name: c.name, phone: c.phone, email: c.email,
       message: overrides[c.id] ?? template.replace(/\{name\}/gi, c.name),
-      email_subject: emailSubject || "Message from farmnport",
+      email_subject: emailSubject || (isMenus ? "Message from menus.co.zw" : "Message from farmnport"),
+      email_template: isMenus ? "menus-blast" : "",
       channel,
     }))
     blastMutation.mutate(recipients)
@@ -255,7 +259,8 @@ export function BlastView() {
               <SelectTrigger className="h-8 text-xs w-48 bg-white shadow-none"><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="custom">Custom message</SelectItem>
-                <SelectItem value="verify-reminder">Verify account reminder</SelectItem>
+                {!isMenus && <SelectItem value="verify-reminder">Verify account reminder</SelectItem>}
+                {isMenus && <SelectItem value="menus-reviews-favourites">Reviews & Favourites</SelectItem>}
               </SelectContent>
             </Select>
             {blastTemplate === "custom" ? (
@@ -264,6 +269,32 @@ export function BlastView() {
                   className="h-8 px-3 rounded-md border text-xs font-medium text-muted-foreground hover:bg-muted/50 disabled:opacity-40 flex items-center gap-1.5">
                   <Icons.eye className="w-3.5 h-3.5" />
                   {showPreview ? "Hide preview" : "Preview"}
+                </button>
+              </>
+            ) : blastTemplate === "menus-reviews-favourites" ? (
+              <>
+                <button
+                  onClick={() => blastMutation.mutate([{ id: "", name: "Okandas", phone: "", email: "okandas@farmnport.com", message: "", email_subject: "Leave a review, save your favourites — menus.co.zw", email_template: "menus-reviews-favourites", channel: "email" }])}
+                  disabled={blastMutation.isPending}
+                  className="h-8 px-3 rounded-md border text-xs font-medium text-orange-600 border-orange-200 hover:bg-orange-50 disabled:opacity-40 flex items-center gap-1.5">
+                  {blastMutation.isPending
+                    ? <><Icons.spinner className="w-3.5 h-3.5 animate-spin" /> Sending test…</>
+                    : <><Icons.send className="w-3.5 h-3.5" /> Send test to me</>}
+                </button>
+                <button
+                  onClick={() => {
+                    const recipients = selectedClients.map((c) => ({
+                      id: c.id, name: c.name, phone: c.phone, email: c.email,
+                      message: "", email_subject: "Leave a review, save your favourites — menus.co.zw",
+                      email_template: "menus-reviews-favourites", channel: "email" as const,
+                    }))
+                    blastMutation.mutate(recipients)
+                  }}
+                  disabled={selected.size === 0 || blastMutation.isPending}
+                  className="h-8 px-4 rounded-md bg-primary text-white text-xs font-bold hover:bg-primary/90 disabled:opacity-40 flex items-center gap-1.5 shadow-sm">
+                  {blastMutation.isPending
+                    ? <><Icons.spinner className="w-3.5 h-3.5 animate-spin" /> Sending…</>
+                    : <><Icons.send className="w-3.5 h-3.5" /> Send to {selected.size || "…"}</>}
                 </button>
               </>
             ) : (
@@ -330,8 +361,9 @@ export function BlastView() {
           </div>
         )}
 
-        {/* ── Custom message mode ── */}
-        {blastTemplate === "custom" && <>
+        {/* ── Custom message / Marketing template mode ── */}
+        {(blastTemplate === "custom" || blastTemplate === "menus-reviews-favourites") && <>
+        {!isMenus && (
         <div className="flex items-center gap-2 px-4 py-2.5 border-b bg-muted/10 shrink-0 flex-wrap">
           <Select value={typeFilter} onValueChange={setTypeFilter}>
             <SelectTrigger className="h-8 text-xs w-28 bg-white shadow-none"><SelectValue /></SelectTrigger>
@@ -376,6 +408,7 @@ export function BlastView() {
             className="h-8 text-xs w-36"
           />
         </div>
+        )}
 
         {/* ── Body: left recipients + right compose ── */}
         <div className="flex min-h-0 h-[360px]">
@@ -424,8 +457,8 @@ export function BlastView() {
             </div>
           </div>
 
-          {/* Right: compose */}
-          <div className="flex-1 flex flex-col min-w-0">
+          {/* Right: compose (hidden for marketing templates) */}
+          <div className={`flex-1 flex flex-col min-w-0 ${blastTemplate === "menus-reviews-favourites" ? "hidden" : ""}`}>
 
             {/* Via */}
             <div className="flex items-center gap-3 px-5 py-2.5 border-b shrink-0">
@@ -499,7 +532,7 @@ export function BlastView() {
                   <button
                     onClick={() => {
                       const msg = template.replace(/\{name\}/gi, "Okandas")
-                      blastMutation.mutate([{ id: "", name: "Okandas", phone: "", email: "okandas@farmnport.com", message: msg, email_subject: emailSubject || "Message from farmnport", channel: "email" }])
+                      blastMutation.mutate([{ id: "", name: "Okandas", phone: "", email: "okandas@farmnport.com", message: msg, email_subject: emailSubject || (isMenus ? "Message from menus.co.zw" : "Message from farmnport"), email_template: isMenus ? "menus-blast" : "", channel: "email" }])
                     }}
                     disabled={!template.trim() || (channel === "email" && !emailSubject.trim()) || blastMutation.isPending}
                     className="h-8 px-3 rounded-md border text-xs font-medium text-orange-600 border-orange-200 hover:bg-orange-50 disabled:opacity-40 flex items-center gap-1.5">

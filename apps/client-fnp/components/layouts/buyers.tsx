@@ -22,7 +22,7 @@ interface BuyersPageProps {
   queryBy?: string
 }
 
-export function Buyers({queryBy}: BuyersPageProps) {
+export function Buyers({user, queryBy}: BuyersPageProps) {
 
   const router = useRouter()
   const pathname = usePathname()
@@ -176,14 +176,14 @@ export function Buyers({queryBy}: BuyersPageProps) {
         </form>
       </div> */}
 
-      <ul role="list" className="divide-y">
+      <div className="space-y-3">
         {buyers.map((buyer, buyerIndex) => (
-          <li key={buyerIndex} className="py-4 first:pt-2">
+          <div key={buyerIndex}>
             {buyerIndex > 0 && buyerIndex % 3 === 0 && <AdSenseInFeed />}
-            <BuyerContactsCard buyer={buyer} />
-          </li>
+            <BuyerContactsCard buyer={buyer} user={user} />
+          </div>
         ))}
-      </ul>
+      </div>
 
       <div>
         <Pagination

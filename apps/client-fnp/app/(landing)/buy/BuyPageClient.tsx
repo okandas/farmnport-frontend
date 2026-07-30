@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { ArrowRight } from "lucide-react"
@@ -8,7 +9,8 @@ import { Button } from "@/components/ui/button"
 import { listPreOrders } from "@/lib/query"
 import { centsToDollars } from "@/lib/utilities"
 import { ProductCard } from "@/components/shared/ProductCard"
-import { BuyCategoriesNavClient } from "@/components/generic/BuyCategoriesNavClient"
+import { ViewToggle } from "@/components/shared/ViewToggle"
+import { ProductSidebarNav } from "@/components/generic/ProductSidebarNav"
 
 
 // ── Document card ─────────────────────────────────────────────────────────────
@@ -147,11 +149,12 @@ function LotCard({ lot }: { lot: any }) {
 
 // ── Section wrapper ───────────────────────────────────────────────────────────
 
-function Section({ label, href, children, count }: {
+function Section({ label, href, children, count, view }: {
   label: string
   href: string
   children: React.ReactNode
   count?: number
+  view: "grid" | "list"
 }) {
   return (
     <section>
@@ -166,7 +169,7 @@ function Section({ label, href, children, count }: {
           View all <ArrowRight className="h-3.5 w-3.5" />
         </Link>
       </div>
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className={view === "list" ? "flex flex-col gap-3" : "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4"}>
         {children}
       </div>
     </section>
@@ -209,63 +212,69 @@ export function BuyPageClient({
   categories = [],
   lots = [], lotsTotal = 0,
 }: BuyPageClientProps) {
+  const [view, setView] = useState<"grid" | "list">("grid")
+
   return (
-    <div className="mx-auto max-w-7xl px-4 lg:px-8 py-8">
+    <div className="container py-8">
       <div className="flex gap-8">
 
         {/* ── Sidebar ── */}
         <aside className="hidden lg:flex flex-col w-56 flex-shrink-0">
-          <BuyCategoriesNavClient categories={categories} />
+          <ProductSidebarNav />
         </aside>
 
         {/* ── Main content ── */}
         <main className="flex-1 min-w-0 flex flex-col gap-12">
 
+          <div className="flex items-center justify-end">
+            <ViewToggle view={view} onViewChange={setView} />
+          </div>
+
           {agrochemicalTotal > 0 && (
-            <Section label="Agrochemicals" href="/buy-agrochemicals" count={agrochemicalTotal}>
+            <Section label="Agrochemicals" href="/buy-agrochemicals" count={agrochemicalTotal} view={view}>
               {agrochemicals.slice(0, 4).map((p) => (
-                <ProductCard key={p.id} mode="buy" href={`/buy-agrochemicals/${p.slug}`} imageSrc={p.images?.[0]?.img?.src} name={p.name} brand={p.brand?.name} meta={p.agrochemical_category?.name} productId={p.id} productType="agrochemical" productSlug={p.slug} salePrice={p.sale_price} wasPrice={p.was_price} showWasPrice={p.show_was_price} availableForSale={p.available_for_sale} stockLevel={p.stock_level} hasVariants={p.variants?.length > 0} variantPriceRange={p.variant_price_range} pickupOnly={p.pickup_location_ids?.length > 0 && !p.delivery_available && !(p.delivery_location_ids?.length > 0)} isTest={p.is_test} />
+                <ProductCard key={p.id} mode="buy" href={`/buy-agrochemicals/${p.slug}`} imageSrc={p.images?.[0]?.img?.src} name={p.name} brand={p.brand?.name} meta={p.agrochemical_category?.name} productId={p.id} productType="agrochemical" productSlug={p.slug} salePrice={p.sale_price} wasPrice={p.was_price} showWasPrice={p.show_was_price} availableForSale={p.available_for_sale} stockLevel={p.stock_level} hasVariants={p.variants?.length > 0} variantPriceRange={p.variant_price_range} pickupOnly={p.pickup_location_ids?.length > 0 && !p.delivery_available && !(p.delivery_location_ids?.length > 0)} isTest={p.is_test} layout={view} />
               ))}
             </Section>
           )}
 
           {animalHealthTotal > 0 && (
-            <Section label="Animal Health" href="/buy-animal-health" count={animalHealthTotal}>
+            <Section label="Animal Health" href="/buy-animal-health" count={animalHealthTotal} view={view}>
               {animalHealth.slice(0, 4).map((p) => (
-                <ProductCard key={p.id} mode="buy" href={`/buy-animal-health/${p.slug}`} imageSrc={p.images?.[0]?.img?.src} name={p.name} brand={p.brand?.name} meta={p.animal_health_category?.name} productId={p.id} productType="animal_health" productSlug={p.slug} salePrice={p.sale_price} wasPrice={p.was_price} showWasPrice={p.show_was_price} availableForSale={p.available_for_sale} stockLevel={p.stock_level} hasVariants={p.variants?.length > 0} variantPriceRange={p.variant_price_range} pickupOnly={p.pickup_location_ids?.length > 0 && !p.delivery_available && !(p.delivery_location_ids?.length > 0)} isTest={p.is_test} />
+                <ProductCard key={p.id} mode="buy" href={`/buy-animal-health/${p.slug}`} imageSrc={p.images?.[0]?.img?.src} name={p.name} brand={p.brand?.name} meta={p.animal_health_category?.name} productId={p.id} productType="animal_health" productSlug={p.slug} salePrice={p.sale_price} wasPrice={p.was_price} showWasPrice={p.show_was_price} availableForSale={p.available_for_sale} stockLevel={p.stock_level} hasVariants={p.variants?.length > 0} variantPriceRange={p.variant_price_range} pickupOnly={p.pickup_location_ids?.length > 0 && !p.delivery_available && !(p.delivery_location_ids?.length > 0)} isTest={p.is_test} layout={view} />
               ))}
             </Section>
           )}
 
           {feedsTotal > 0 && (
-            <Section label="Animal Feed" href="/buy-feeds" count={feedsTotal}>
+            <Section label="Animal Feed" href="/buy-feeds" count={feedsTotal} view={view}>
               {feeds.slice(0, 4).map((p) => (
-                <ProductCard key={p.id} mode="buy" href={`/buy-feeds/${p.slug}`} imageSrc={p.images?.[0]?.img?.src} name={p.name} brand={p.brand?.name} meta={p.animal ? `${p.animal}${p.phase ? ` · ${p.phase}` : ""}` : undefined} productId={p.id} productType="feed" productSlug={p.slug} salePrice={p.sale_price} wasPrice={p.was_price} showWasPrice={p.show_was_price} availableForSale={p.available_for_sale} stockLevel={p.stock_level} hasVariants={p.variants?.length > 0} variantPriceRange={p.variant_price_range} pickupOnly={p.pickup_location_ids?.length > 0 && !p.delivery_available && !(p.delivery_location_ids?.length > 0)} isTest={p.is_test} />
+                <ProductCard key={p.id} mode="buy" href={`/buy-feeds/${p.slug}`} imageSrc={p.images?.[0]?.img?.src} name={p.name} brand={p.brand?.name} meta={p.animal ? `${p.animal}${p.phase ? ` · ${p.phase}` : ""}` : undefined} productId={p.id} productType="feed" productSlug={p.slug} salePrice={p.sale_price} wasPrice={p.was_price} showWasPrice={p.show_was_price} availableForSale={p.available_for_sale} stockLevel={p.stock_level} hasVariants={p.variants?.length > 0} variantPriceRange={p.variant_price_range} pickupOnly={p.pickup_location_ids?.length > 0 && !p.delivery_available && !(p.delivery_location_ids?.length > 0)} isTest={p.is_test} layout={view} />
               ))}
             </Section>
           )}
 
           {plantNutritionTotal > 0 && (
-            <Section label="Plant Nutrition" href="/buy-plant-nutrition" count={plantNutritionTotal}>
+            <Section label="Plant Nutrition" href="/buy-plant-nutrition" count={plantNutritionTotal} view={view}>
               {plantNutrition.slice(0, 4).map((p) => (
-                <ProductCard key={p.id} mode="buy" href={`/buy-plant-nutrition/${p.slug}`} imageSrc={p.images?.[0]?.img?.src} name={p.name} brand={p.brand?.name} meta={p.plant_nutrition_category?.name} productId={p.id} productType="plant_nutrition" productSlug={p.slug} salePrice={p.sale_price} wasPrice={p.was_price} showWasPrice={p.show_was_price} availableForSale={p.available_for_sale} stockLevel={p.stock_level} hasVariants={p.variants?.length > 0} variantPriceRange={p.variant_price_range} pickupOnly={p.pickup_location_ids?.length > 0 && !p.delivery_available && !(p.delivery_location_ids?.length > 0)} isTest={p.is_test} />
+                <ProductCard key={p.id} mode="buy" href={`/buy-plant-nutrition/${p.slug}`} imageSrc={p.images?.[0]?.img?.src} name={p.name} brand={p.brand?.name} meta={p.plant_nutrition_category?.name} productId={p.id} productType="plant_nutrition" productSlug={p.slug} salePrice={p.sale_price} wasPrice={p.was_price} showWasPrice={p.show_was_price} availableForSale={p.available_for_sale} stockLevel={p.stock_level} hasVariants={p.variants?.length > 0} variantPriceRange={p.variant_price_range} pickupOnly={p.pickup_location_ids?.length > 0 && !p.delivery_available && !(p.delivery_location_ids?.length > 0)} isTest={p.is_test} layout={view} />
               ))}
             </Section>
           )}
 
           {seedsTotal > 0 && (
-            <Section label="Seeds" href="/buy-seed-products" count={seedsTotal}>
+            <Section label="Seeds" href="/buy-seed-products" count={seedsTotal} view={view}>
               {seeds.slice(0, 4).map((p) => {
                 const bookingEvent = bookingEvents.find((e: any) => e.product_id === p.id)
                 return (
-                  <ProductCard key={p.id} mode="buy" href={`/buy-seed-products/${p.slug}`} imageSrc={p.images?.[0]?.img?.src} name={p.name} brand={p.brand?.name} meta={p.variety ? `${p.variety}${p.type ? ` · ${p.type.replace("_", " ")}` : ""}` : undefined} productId={p.id} productType="seed_product" productSlug={p.slug} salePrice={p.sale_price} wasPrice={p.was_price} showWasPrice={p.show_was_price} availableForSale={p.available_for_sale} stockLevel={p.stock_level} hasVariants={p.variants && p.variants.length > 0} variantPriceRange={p.variant_price_range} preorderHref={bookingEvent ? `/bookings/${bookingEvent.slug}` : undefined} isTest={p.is_test} />
+                  <ProductCard key={p.id} mode="buy" href={`/buy-seed-products/${p.slug}`} imageSrc={p.images?.[0]?.img?.src} name={p.name} brand={p.brand?.name} meta={p.variety ? `${p.variety}${p.type ? ` · ${p.type.replace("_", " ")}` : ""}` : undefined} productId={p.id} productType="seed_product" productSlug={p.slug} salePrice={p.sale_price} wasPrice={p.was_price} showWasPrice={p.show_was_price} availableForSale={p.available_for_sale} stockLevel={p.stock_level} hasVariants={p.variants && p.variants.length > 0} variantPriceRange={p.variant_price_range} preorderHref={bookingEvent ? `/bookings/${bookingEvent.slug}` : undefined} isTest={p.is_test} layout={view} />
                 )
               })}
             </Section>
           )}
 
           {showDocuments && documents.length > 0 && (
-            <Section label="Plans & Documents" href="/buy-documents" count={documentsTotal}>
+            <Section label="Plans & Documents" href="/buy-documents" count={documentsTotal} view={view}>
               {documents.slice(0, 4).map((doc) => (
                 <DocumentCard key={doc.id} doc={doc} />
               ))}
@@ -275,7 +284,7 @@ export function BuyPageClient({
           {showBookings && bookingEvents.length > 0 && <PreOrdersSection />}
 
           {lotsTotal > 0 && (
-            <Section label="Lots" href="/lots" count={lotsTotal}>
+            <Section label="Lots" href="/lots" count={lotsTotal} view={view}>
               {lots.slice(0, 4).map((lot: any) => (
                 <LotCard key={lot.id} lot={lot} />
               ))}
