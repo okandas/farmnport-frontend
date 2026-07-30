@@ -15,38 +15,6 @@ async function fetchArticle(slug: string) {
   return data.article
 }
 
-function TopicNav({ currentSlug, topicTitle }: { currentSlug: string; topicTitle: string }) {
-  const { data: topicsData } = useQuery({
-    queryKey: ["resource-topics-nav"],
-    queryFn: async () => {
-      const res = await fetch(`${BaseURL}/resource-topics/`, { cache: "no-store" })
-      if (!res.ok) return []
-      const data = await res.json()
-      return data.topics ?? []
-    },
-    staleTime: 60000,
-  })
-
-  const topics = topicsData ?? []
-
-  return (
-    <nav className="space-y-3">
-      {topics.map((topic: any) => (
-        <Link
-          key={topic.id}
-          href={`/resources/topic/${topic.slug}`}
-          className={`block text-sm font-semibold py-2 px-3 rounded transition-colors ${
-            topic.title === topicTitle
-              ? "bg-muted text-foreground"
-              : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-          }`}
-        >
-          {topic.title}
-        </Link>
-      ))}
-    </nav>
-  )
-}
 
 function formatDate(d: string) {
   return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })
@@ -164,11 +132,9 @@ export default function ArticlePage() {
           <span className="text-muted-foreground">{article.title}</span>
         </nav>
 
-        <div className="lg:flex lg:gap-12">
-        {/* Left — article content */}
-        <div className="flex-1 min-w-0 max-w-2xl">
+        <div className="max-w-2xl">
           {/* Title */}
-          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight leading-tight mb-4">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight leading-tight mb-4">
             {article.title}
           </h1>
 
@@ -207,13 +173,6 @@ export default function ArticlePage() {
           )}
         </div>
 
-        {/* Right — topic navigation sidebar */}
-        <aside className="hidden lg:block lg:w-64 shrink-0">
-          <div className="sticky top-20">
-            <TopicNav currentSlug={slug} topicTitle={article.topic_title} />
-          </div>
-        </aside>
-        </div>
       </div>
     </div>
   )
