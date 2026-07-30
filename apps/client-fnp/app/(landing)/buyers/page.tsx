@@ -65,7 +65,6 @@ export default async function BuyersPage() {
                 <div className="lg:flex lg:gap-8 mt-4">
                     <aside className="hidden lg:block lg:w-64 shrink-0">
                         <div className="sticky top-20">
-                            <h3 className="text-sm font-bold mb-3">Refine by Category</h3>
                             <FilterSidebar clientType="buyers" />
                             <div className="mt-6">
                                 <QuickLinks />

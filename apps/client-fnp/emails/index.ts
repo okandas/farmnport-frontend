@@ -4,8 +4,10 @@ export { default as VerifyReminderEmail } from "./templates/auth/verify-reminder
 export { default as MagicLinkEmail } from "./templates/auth/magic-link"
 export { default as ScheduleEmail } from "./templates/auth/schedule"
 
-// Blast template
+// Blast templates
 export { default as BlastEmail } from "./templates/blast"
+export { default as MenusBlastEmail } from "./templates/menus-blast"
+export { default as MenusReviewsFavouritesEmail } from "./templates/menus-reviews-favourites"
 
 // Marketing templates
 export { default as MarketingLaunchEmail } from "./templates/marketing-launch"
