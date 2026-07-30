@@ -28,6 +28,7 @@ interface BlastRecipient {
   email: string
   message: string
   email_subject: string
+  email_template?: string
   channel: string
 }
 
@@ -55,7 +56,8 @@ const CHANNEL_CONFIG = {
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
-export function BlastView() {
+export function BlastView({ source }: { source?: "farmnport" | "menus" } = {}) {
+  const isMenus = source === "menus"
   const { toast } = useToast()
 
   // Filters
@@ -91,9 +93,10 @@ export function BlastView() {
   // ── Clients query — auto-runs on debounced filter change ───────────────────
 
   const clientsQuery = useQuery({
-    queryKey: ["blast-clients", debouncedFilters],
+    queryKey: ["blast-clients", debouncedFilters, source],
     queryFn: () => {
       const p = new URLSearchParams()
+      if (isMenus) p.set("source", "menus")
       if (debouncedFilters.typeFilter !== "all") p.set("type", debouncedFilters.typeFilter)
       if (debouncedFilters.provinceFilter !== "all") p.set("province", debouncedFilters.provinceFilter)
       if (debouncedFilters.produceFilter !== "all") p.set("produce", debouncedFilters.produceFilter)
@@ -165,7 +168,8 @@ export function BlastView() {
     const recipients: BlastRecipient[] = selectedClients.map((c) => ({
       id: c.id, name: c.name, phone: c.phone, email: c.email,
       message: overrides[c.id] ?? template.replace(/\{name\}/gi, c.name),
-      email_subject: emailSubject || "Message from farmnport",
+      email_subject: emailSubject || (isMenus ? "Message from menus.co.zw" : "Message from farmnport"),
+      email_template: isMenus ? "menus-blast" : "",
       channel,
     }))
     blastMutation.mutate(recipients)
@@ -332,6 +336,7 @@ export function BlastView() {
 
         {/* ── Custom message mode ── */}
         {blastTemplate === "custom" && <>
+        {!isMenus && (
         <div className="flex items-center gap-2 px-4 py-2.5 border-b bg-muted/10 shrink-0 flex-wrap">
           <Select value={typeFilter} onValueChange={setTypeFilter}>
             <SelectTrigger className="h-8 text-xs w-28 bg-white shadow-none"><SelectValue /></SelectTrigger>
@@ -376,6 +381,7 @@ export function BlastView() {
             className="h-8 text-xs w-36"
           />
         </div>
+        )}
 
         {/* ── Body: left recipients + right compose ── */}
         <div className="flex min-h-0 h-[360px]">
@@ -499,7 +505,7 @@ export function BlastView() {
                   <button
                     onClick={() => {
                       const msg = template.replace(/\{name\}/gi, "Okandas")
-                      blastMutation.mutate([{ id: "", name: "Okandas", phone: "", email: "okandas@farmnport.com", message: msg, email_subject: emailSubject || "Message from farmnport", channel: "email" }])
+                      blastMutation.mutate([{ id: "", name: "Okandas", phone: "", email: "okandas@farmnport.com", message: msg, email_subject: emailSubject || (isMenus ? "Message from menus.co.zw" : "Message from farmnport"), email_template: isMenus ? "menus-blast" : "", channel: "email" }])
                     }}
                     disabled={!template.trim() || (channel === "email" && !emailSubject.trim()) || blastMutation.isPending}
                     className="h-8 px-3 rounded-md border text-xs font-medium text-orange-600 border-orange-200 hover:bg-orange-50 disabled:opacity-40 flex items-center gap-1.5">

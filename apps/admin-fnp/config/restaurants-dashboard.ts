@@ -82,6 +82,22 @@ export const restaurantsDashboardConfig: DashboardConfig = {
       ],
     },
     {
+      label: "Marketing",
+      alwaysOpen: true,
+      items: [
+        {
+          title: "Blast",
+          href: "/dashboard/restaurants/blast",
+          icon: "send",
+        },
+        {
+          title: "Sent Blasts",
+          href: "/dashboard/restaurants/blast/sent",
+          icon: "mail",
+        },
+      ],
+    },
+    {
       label: "Subscriptions",
       alwaysOpen: true,
       items: [
