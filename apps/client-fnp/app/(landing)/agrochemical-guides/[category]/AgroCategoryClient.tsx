@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { AgroChemicalFilterSidebar } from "@/components/generic/agroChemicalFilterSidebar"
 import { ProductSidebarNav } from "@/components/generic/ProductSidebarNav"
 import { ProductCard } from "@/components/shared/ProductCard"
-import { ViewToggle } from "@/components/shared/ViewToggle"
+import { ListingToolbar } from "@/components/shared/ListingToolbar"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
 import Link from "next/link"
 
@@ -56,13 +56,14 @@ export function AgroCategoryClient({ category, categoryName, initialChemicals, i
     return (
         <div className="flex flex-col lg:flex-row gap-8">
             {/* Sidebar Filters */}
-            <aside className="w-full lg:w-64 flex-shrink-0">
+            <aside className="hidden lg:block w-64 flex-shrink-0">
                 <ProductSidebarNav />
                 <AgroChemicalFilterSidebar hideCategory={true} categorySlug={category} />
             </aside>
 
             {/* Main Content */}
             <main className="flex-1">
+                <ListingToolbar view={view} onViewChange={setView} filterSlot={<AgroChemicalFilterSidebar hideCategory={true} categorySlug={category} />} />
                 {chemicalsLoading ? (
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
                         {[...Array(8)].map((_, i) => (
@@ -92,9 +93,6 @@ export function AgroCategoryClient({ category, categoryName, initialChemicals, i
                     </div>
                 ) : (
                     <>
-                        <div className="flex justify-end mb-4">
-                            <ViewToggle view={view} onViewChange={setView} />
-                        </div>
                         <div className={view === "list" ? "flex flex-col gap-3" : "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5"}>
                             {chemicals.map((chemical: any) => (
                                 <ProductCard

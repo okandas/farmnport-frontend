@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query"
 import { queryAllEquipmentProducts } from "@/lib/query"
 import { Button } from "@/components/ui/button"
 import { ProductCard } from "@/components/shared/ProductCard"
-import { ViewToggle } from "@/components/shared/ViewToggle"
+import { ListingToolbar } from "@/components/shared/ListingToolbar"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
 
 interface AllEquipmentClientProps {
@@ -44,6 +44,7 @@ export function AllEquipmentClient({ initialProducts, initialTotal }: AllEquipme
     return (
         <div className="flex flex-col lg:flex-row gap-8">
             <main className="flex-1">
+                <ListingToolbar view={view} onViewChange={setView} />
                 {productsLoading ? (
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
                         {[...Array(8)].map((_, i) => (
@@ -69,9 +70,6 @@ export function AllEquipmentClient({ initialProducts, initialTotal }: AllEquipme
                     </div>
                 ) : (
                     <>
-                        <div className="flex justify-end mb-4">
-                            <ViewToggle view={view} onViewChange={setView} />
-                        </div>
                         <div className={view === "list" ? "flex flex-col gap-3" : "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5"}>
                             {products.map((product: any) => (
                                 <ProductCard

@@ -28,7 +28,8 @@ interface FileInputProps {
 
 
 export function FileInput({ id, value, fieldName = "images", entityType, onChange, thumbnailClassName, imageClassName, maxImages, showPlaceholders = false, compact = false }: FileInputProps) {
-    const [files, setFiles] = useState<ImageModel[]>(value ?? [])
+    const files = value ?? []
+    const setFiles = (next: ImageModel[]) => onChange(next)
     const [localPreviews, setLocalPreviews] = useState<Record<string, string>>({})
     const entity_id = id
     const logtail = new Logtail("qBaLFyhMa3oZsq86JuRmfwpo")
@@ -306,13 +307,30 @@ export function FileInput({ id, value, fieldName = "images", entityType, onChang
 
     return (
         <>
+            <div className="flex flex-wrap gap-4 items-start">
 
-            {!compact && !isDisabled && (
-                <div className="flex items-center justify-center w-full">
+                {/* Existing thumbnails */}
+                {thumbnails.length > 0 && thumbnails}
+
+                {/* Compact dropzone (inline add button) */}
+                {compactDropzone}
+
+                {/* Empty placeholders */}
+                {emptyPlaceholders}
+
+                {/* No image placeholder */}
+                {!compact && files.length === 0 && !mutationUploadImage.isPending && (
+                    <div className="flex flex-col items-center justify-center w-48 h-48 border border-gray-200 border-dashed rounded-lg bg-gray-50 dark:bg-white/5 dark:border-white/10">
+                        <Icons.image className="w-8 h-8 text-gray-300 dark:text-gray-600" />
+                        <p className="mt-2 text-xs text-gray-400 dark:text-gray-500">No image uploaded</p>
+                    </div>
+                )}
+
+                {/* Upload dropzone — same size as thumbnails, side by side */}
+                {!compact && !isDisabled && (
                     <label htmlFor={`dropzone-${fieldName}`}
-                        className="flex flex-col items-center justify-center w-full h-32 border border-gray-300 border-dashed rounded-lg cursor-pointer hover:bg-gray-50">
-                        <div className="flex flex-col items-center justify-center pt-3 pb-3" >
-
+                        className="flex flex-col items-center justify-center w-48 h-48 border border-gray-300 border-dashed rounded-lg cursor-pointer hover:bg-gray-50 dark:border-white/20 dark:hover:bg-white/5 transition-colors">
+                        <div className="flex flex-col items-center justify-center">
                             {mutationUploadImage.isPending ? (
                                 <>
                                     <Icons.spinner className="w-6 h-6 animate-spin text-gray-400" />
@@ -320,30 +338,16 @@ export function FileInput({ id, value, fieldName = "images", entityType, onChang
                                 </>
                             ) : (
                                 <>
-                                    <Icons.image className="w-8 h-8 text-gray-400" />
-                                    <p className="mt-2 text-xs text-gray-500">Click or drag to upload</p>
-                                </>)}
+                                    <Icons.image className="w-6 h-6 text-gray-400 dark:text-gray-500" />
+                                    <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">Click or drag</p>
+                                </>
+                            )}
                             <div {...getRootProps()}>
                                 <input id={`dropzone-${fieldName}`} type="file" className="hidden" {...getInputProps()} />
                             </div>
                         </div>
                     </label>
-                </div>
-            )}
-
-            <div className='flex flex-wrap mt-2'>
-
-                {
-                    thumbnails.length > 0 && thumbnails
-                }
-
-                {
-                    compactDropzone
-                }
-
-                {
-                    emptyPlaceholders
-                }
+                )}
 
             </div>
         </>

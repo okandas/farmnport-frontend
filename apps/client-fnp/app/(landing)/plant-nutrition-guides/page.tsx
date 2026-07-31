@@ -1,7 +1,6 @@
 import Link from "next/link"
 import { AllPlantNutritionClient } from "./AllPlantNutritionClient"
 import { serverFetch } from "@/lib/serverFetch"
-import { OtherGuidesLinks } from "@/components/shared/OtherGuidesLinks"
 
 export const metadata = {
   title: 'Plant Nutrition Guides Zimbabwe – Fertilizers, Foliar Feeds & Biostimulants | farmnport.com',
@@ -39,7 +38,6 @@ export default async function PlantNutritionGuidesPage() {
                                 Application rates, active ingredients, and usage guidelines for fertilizers, foliar feeds, biostimulants, and plant growth regulators.
                             </p>
                         </div>
-                        <OtherGuidesLinks current="plant-nutrition" />
                     </div>
                     <AllPlantNutritionClient initialProducts={initialProducts} initialTotal={initialTotal} />
                 </div>

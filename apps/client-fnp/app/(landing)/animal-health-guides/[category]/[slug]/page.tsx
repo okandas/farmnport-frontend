@@ -248,7 +248,7 @@ export default async function AnimalHealthGuidePage({ params }: GuidePageProps) 
                     <nav className="flex text-sm text-muted-foreground">
                         <Link href="/" className="hover:text-foreground">Home</Link>
                         <span className="mx-2">/</span>
-                        <Link href="/animal-health-guides" className="hover:text-foreground">Guides</Link>
+                        <Link href="/animal-health-guides" className="hover:text-foreground">Animal Health Guides</Link>
                         <span className="mx-2">/</span>
                         <Link href={`/animal-health-guides/${category}`} className="hover:text-foreground capitalize">{product.animal_health_category?.name || category}</Link>
                         <span className="mx-2">/</span>

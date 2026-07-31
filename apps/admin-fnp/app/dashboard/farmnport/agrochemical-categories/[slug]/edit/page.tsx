@@ -237,8 +237,7 @@ export default function EditAgroChemicalCategoryPage({ params }: { params: Promi
                                                             entityType="agrochemical_category"
                                                             maxImages={5}
                                                             value={field.value || []}
-                                                            onChange={field.onChange
-                                                            }}
+                                                            onChange={field.onChange}
                                                         />
                                                     </FormControl>
                                                     <FormMessage />

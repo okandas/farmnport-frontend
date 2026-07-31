@@ -7,7 +7,7 @@ import { parseAsInteger, parseAsString, useQueryStates } from "nuqs"
 import { FileText } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ProductCard } from "@/components/shared/ProductCard"
-import { ViewToggle } from "@/components/shared/ViewToggle"
+import { ListingToolbar } from "@/components/shared/ListingToolbar"
 import { ProductSidebarNav } from "@/components/generic/ProductSidebarNav"
 import { DocumentFilterSidebar } from "@/components/generic/documentFilterSidebar"
 
@@ -61,13 +61,14 @@ export function BuyDocumentsClient({ initialDocuments, initialTotal, categories 
     return (
         <div className="flex flex-col lg:flex-row gap-8">
             {/* Sidebar */}
-            <aside className="w-full lg:w-64 flex-shrink-0">
+            <aside className="hidden lg:block w-64 flex-shrink-0">
                 <ProductSidebarNav />
                 <DocumentFilterSidebar />
             </aside>
 
             {/* Main Content */}
             <main className="flex-1">
+                <ListingToolbar view={view} onViewChange={setView} filterSlot={<DocumentFilterSidebar />} />
                 {isLoading ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                         {[...Array(6)].map((_, i) => <DocumentCardSkeleton key={i} />)}
@@ -79,11 +80,6 @@ export function BuyDocumentsClient({ initialDocuments, initialTotal, categories 
                     </div>
                 ) : (
                     <>
-                        <div className="flex items-center justify-between mb-4"><span className="text-sm text-muted-foreground">
-                            Showing {documents.length} of {total} documents</span>
-                            <ViewToggle view={view} onViewChange={setView} />
-                        </div>
-
                         <div className={view === "list" ? "flex flex-col gap-3" : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"}>
                             {documents.map((doc: any) => (
                                 <ProductCard

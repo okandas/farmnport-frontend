@@ -8,7 +8,7 @@ import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "n
 import { FeedFilterSidebar } from "@/components/generic/feedFilterSidebar"
 import { ProductSidebarNav } from "@/components/generic/ProductSidebarNav"
 import { ProductCard } from "@/components/shared/ProductCard"
-import { ViewToggle } from "@/components/shared/ViewToggle"
+import { ListingToolbar } from "@/components/shared/ListingToolbar"
 
 interface FeedListingClientProps {
     initialData: any[]
@@ -56,18 +56,14 @@ export function FeedListingClient({ initialData, initialTotal }: FeedListingClie
     }
 
     return (
-        <div className="lg:flex lg:space-x-10">
-            <div className="hidden lg:block lg:w-64 relative">
+        <div className="flex flex-col lg:flex-row gap-8">
+            <aside className="hidden lg:block w-64 flex-shrink-0">
                 <ProductSidebarNav />
                 <FeedFilterSidebar />
-            </div>
+            </aside>
 
-            <div className="lg:flex-1">
-                <div className="lg:hidden mb-6">
-                    <FeedFilterSidebar />
-                </div>
-
-                {/* Main Content */}
+            <main className="flex-1">
+                <ListingToolbar view={view} onViewChange={setView} filterSlot={<FeedFilterSidebar />} />
                 {productsLoading ? (
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
                         {[...Array(8)].map((_, i) => (
@@ -94,14 +90,6 @@ export function FeedListingClient({ initialData, initialTotal }: FeedListingClie
                     </div>
                 ) : (
                     <>
-                        {/* Results count */}
-                        <div className="mb-4 flex items-center justify-between">
-                            <span className="text-sm text-muted-foreground">
-                                Showing {products.length} of {productsData?.data?.total || 0} products
-                            </span>
-                            <ViewToggle view={view} onViewChange={setView} />
-                        </div>
-
                         <div className={view === "list" ? "flex flex-col gap-3" : "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5"}>
                             {products.map((product: any) => (
                                 <ProductCard
@@ -153,7 +141,7 @@ export function FeedListingClient({ initialData, initialTotal }: FeedListingClie
                         )}
                     </>
                 )}
-            </div>
+            </main>
         </div>
     )
 }

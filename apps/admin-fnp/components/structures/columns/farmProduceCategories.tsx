@@ -27,6 +27,17 @@ export const farmProduceCategoriesColumns: ColumnDef<FarmProduceCategory>[] = [
     enableHiding: false,
   },
   {
+    id: "image",
+    header: "",
+    cell: ({ row }) => {
+      const images = row.original.images
+      const src = images?.[0]?.img?.src
+      if (!src) return <div className="w-10 h-10 rounded bg-muted" />
+      return <img src={src} alt="" className="w-10 h-10 rounded object-cover" />
+    },
+    enableSorting: false,
+  },
+  {
     accessorKey: "name",
     header: "Name",
   },

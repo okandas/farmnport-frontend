@@ -1,7 +1,6 @@
 import Link from "next/link"
 import { BaseURL } from "@/lib/schemas"
 import { AllEquipmentClient } from "./AllEquipmentClient"
-import { OtherGuidesLinks } from "@/components/shared/OtherGuidesLinks"
 import { ProductSidebarNav } from "@/components/generic/ProductSidebarNav"
 
 export const metadata = {
@@ -52,7 +51,6 @@ export default async function EquipmentGuidesPage() {
                                 Explore farm equipment and machinery by type. Each guide includes specifications, brand info, and usage information.
                             </p>
                         </div>
-                        <OtherGuidesLinks current="equipment" />
                     </div>
                     <div className="flex gap-8">
                         <aside className="hidden lg:block w-56 shrink-0">

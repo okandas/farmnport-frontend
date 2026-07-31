@@ -9,21 +9,12 @@ interface ViewToggleProps {
 
 export function ViewToggle({ view, onViewChange }: ViewToggleProps) {
   return (
-    <div className="flex items-center border rounded-md">
-      <button
-        onClick={() => onViewChange("grid")}
-        className={`p-1.5 transition-colors ${view === "grid" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
-        aria-label="Grid view"
-      >
-        <LayoutGrid className="h-4 w-4" />
-      </button>
-      <button
-        onClick={() => onViewChange("list")}
-        className={`p-1.5 transition-colors ${view === "list" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
-        aria-label="List view"
-      >
-        <List className="h-4 w-4" />
-      </button>
-    </div>
+    <button
+      onClick={() => onViewChange(view === "grid" ? "list" : "grid")}
+      className="p-1.5 border rounded-md text-muted-foreground hover:text-foreground transition-colors"
+      aria-label={view === "grid" ? "Switch to list view" : "Switch to grid view"}
+    >
+      {view === "grid" ? <List className="h-4 w-4" /> : <LayoutGrid className="h-4 w-4" />}
+    </button>
   )
 }

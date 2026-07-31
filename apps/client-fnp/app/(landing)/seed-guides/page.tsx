@@ -1,7 +1,6 @@
 import Link from "next/link"
 import { AllSeedGuidesClient } from "./AllSeedGuidesClient"
 import { serverFetch } from "@/lib/serverFetch"
-import { OtherGuidesLinks } from "@/components/shared/OtherGuidesLinks"
 
 export const metadata = {
   title: 'Seed Guides Zimbabwe – Potatoes, Maize, Tomatoes, Chillies & More | farmnport.com',
@@ -39,7 +38,6 @@ export default async function SeedGuidesPage() {
                                 Certified seed varieties — planting seasons, days to maturity, yield potential, and growing guides for potatoes, maize, tomatoes, chillies, and more.
                             </p>
                         </div>
-                        <OtherGuidesLinks current="seeds" />
                     </div>
                     <AllSeedGuidesClient initialProducts={initialProducts} initialTotal={initialTotal} />
                 </div>

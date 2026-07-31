@@ -125,7 +125,7 @@ export default async function PlantNutritionGuidePage({ params }: GuidePageProps
                     <nav className="flex text-sm text-muted-foreground">
                         <Link href="/" className="hover:text-foreground">Home</Link>
                         <span className="mx-2">/</span>
-                        <Link href="/plant-nutrition-guides" className="hover:text-foreground">Guides</Link>
+                        <Link href="/plant-nutrition-guides" className="hover:text-foreground">Plant Nutrition Guides</Link>
                         <span className="mx-2">/</span>
                         <Link href={`/plant-nutrition-guides/${categorySlug}`} className="hover:text-foreground capitalize">{product.plant_nutrition_category?.name || category}</Link>
                         <span className="mx-2">/</span>

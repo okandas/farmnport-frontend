@@ -63,7 +63,7 @@ export default async function SeedGuidePage({ params }: Props) {
                     <nav className="flex text-sm text-muted-foreground">
                         <Link href="/" className="hover:text-foreground">Home</Link>
                         <span className="mx-2">/</span>
-                        <Link href="/guides" className="hover:text-foreground">Guides</Link>
+                        <Link href="/seed-guides" className="hover:text-foreground">Seed Guides</Link>
                         <span className="mx-2">/</span>
                         <Link href="/seed-guides" className="hover:text-foreground">Seed Guides</Link>
                         <span className="mx-2">/</span>
