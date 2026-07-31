@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { SeedFilterSidebar } from "@/components/generic/seedFilterSidebar"
 import { ProductSidebarNav } from "@/components/generic/ProductSidebarNav"
 import { ProductCard } from "@/components/shared/ProductCard"
-import { ViewToggle } from "@/components/shared/ViewToggle"
+import { ListingToolbar } from "@/components/shared/ListingToolbar"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
 
 interface AllSeedGuidesClientProps {
@@ -43,12 +43,13 @@ export function AllSeedGuidesClient({ initialProducts, initialTotal }: AllSeedGu
 
     return (
         <div className="flex flex-col lg:flex-row gap-8">
-            <aside className="w-full lg:w-64 flex-shrink-0">
+            <aside className="hidden lg:block w-64 flex-shrink-0">
                 <ProductSidebarNav />
                 <SeedFilterSidebar />
             </aside>
 
             <main className="flex-1">
+                <ListingToolbar view={view} onViewChange={setView} filterSlot={<SeedFilterSidebar />} />
                 {isLoading ? (
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
                         {[...Array(8)].map((_, i) => (
@@ -70,9 +71,6 @@ export function AllSeedGuidesClient({ initialProducts, initialTotal }: AllSeedGu
                     </div>
                 ) : (
                     <>
-                        <div className="flex justify-end mb-4">
-                            <ViewToggle view={view} onViewChange={setView} />
-                        </div>
                         <div className={view === "list" ? "flex flex-col gap-3" : "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5"}>
                             {products.map((product: any) => (
                                 <ProductCard

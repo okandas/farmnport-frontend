@@ -7,10 +7,9 @@ import { queryBuyAgroChemicals } from "@/lib/query"
 import { Button } from "@/components/ui/button"
 import { AgroChemicalFilterSidebar } from "@/components/generic/agroChemicalFilterSidebar"
 import { ProductCard } from "@/components/shared/ProductCard"
-import { ViewToggle } from "@/components/shared/ViewToggle"
+import { ListingToolbar } from "@/components/shared/ListingToolbar"
 import { ProductSidebarNav } from "@/components/generic/ProductSidebarNav"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
-import { Beaker } from "lucide-react"
 
 interface BuyAgroChemicalsClientProps {
     initialChemicals: any[]
@@ -59,13 +58,14 @@ export function BuyAgroChemicalsClient({ initialChemicals, initialTotal, categor
     return (
         <div className="flex flex-col lg:flex-row gap-8">
             {/* Sidebar Filters */}
-            <aside className="w-full lg:w-64 flex-shrink-0">
+            <aside className="hidden lg:block w-64 flex-shrink-0">
                 <ProductSidebarNav />
                 <AgroChemicalFilterSidebar />
             </aside>
 
             {/* Main Content */}
             <main className="flex-1">
+                <ListingToolbar view={view} onViewChange={setView} filterSlot={<AgroChemicalFilterSidebar />} />
                 {activeBrandName && (
                     <h2 className="text-lg font-semibold mb-4 capitalize">{activeBrandName}</h2>
                 )}
@@ -96,13 +96,6 @@ export function BuyAgroChemicalsClient({ initialChemicals, initialTotal, categor
                     </div>
                 ) : (
                     <>
-                        <div className="flex items-center justify-between mb-4">
-                            <span className="text-sm text-muted-foreground">
-                                Showing {chemicals.length} of {chemicalsData?.data?.total || 0} products
-                            </span>
-                            <ViewToggle view={view} onViewChange={setView} />
-                        </div>
-
                         <div className={view === "list" ? "flex flex-col gap-3" : "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5"}>
                             {chemicals.map((chemical: any) => (
                                 <ProductCard

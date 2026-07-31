@@ -31,7 +31,8 @@ import {
   LotBidRejectedEmail,
 } from "@/emails"
 
-const FROM = "farmnport <noreply@farmnport.com>"
+const FROM_FARMNPORT = "farmnport <noreply@farmnport.com>"
+const FROM_MENUS = "menus <noreply@farmnport.com>"
 
 export async function POST(req: NextRequest) {
   const resend = new Resend(process.env.RESEND_API_KEY)
@@ -49,6 +50,7 @@ export async function POST(req: NextRequest) {
 
   let subject: string
   let html: string
+  let from = FROM_FARMNPORT
 
   switch (template) {
     case "welcome":
@@ -109,6 +111,7 @@ export async function POST(req: NextRequest) {
       const p = props as Parameters<typeof MenusBlastEmail>[0]
       subject = (props as { subject?: string }).subject ?? "Message from menus.co.zw"
       html = await render(MenusBlastEmail(p))
+      from = FROM_MENUS
       break
     }
 
@@ -116,6 +119,7 @@ export async function POST(req: NextRequest) {
       const p = props as Parameters<typeof MenusReviewsFavouritesEmail>[0]
       subject = "Leave a review, save your favourites — menus.co.zw"
       html = await render(MenusReviewsFavouritesEmail(p))
+      from = FROM_MENUS
       break
     }
 
@@ -210,7 +214,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: `Unknown template: ${template}` }, { status: 400 })
   }
 
-  const { data, error } = await resend.emails.send({ from: FROM, to, subject, html })
+  const { data, error } = await resend.emails.send({ from, to, subject, html })
 
   if (error) {
     console.error("[resend] send error:", error)

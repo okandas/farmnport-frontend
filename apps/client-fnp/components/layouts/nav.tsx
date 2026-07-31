@@ -88,7 +88,7 @@ function BellIcon({ user }: { user: AuthenticatedUser | null }) {
 
 export function Navigation({ user }: NavigationProps) {
   return (
-      <nav className="lg:flex lg:space-x-2">
+      <nav className="hidden lg:flex lg:space-x-2">
         <Link href="/buy" onClick={() => sendGTMEvent({ event: 'nav_click', link_name: 'buy' })}
               className={buttonVariants({ size: "sm", variant: "link" })}
         >

@@ -339,6 +339,7 @@ export const AgroChemicalCategorySchema = z.object({
   slug: z.string().optional(),
   short_description: z.string().max(100, "Short description cannot exceed 100 characters"),
   description: z.string().max(500, "Description cannot exceed 500 characters"),
+  images: z.array(z.any()).optional().default([]),
   created: z.string().optional(),
   updated: z.string().optional(),
 })
@@ -348,6 +349,7 @@ export const FormAgroChemicalCategorySchema = AgroChemicalCategorySchema.pick({
   name: true,
   short_description: true,
   description: true,
+  images: true,
 })
 
 export const AgroChemicalActiveIngredientSchema = z.object({
@@ -647,6 +649,7 @@ export const FarmProduceCategorySchema = z.object({
   name: z.string(),
   slug: z.string(),
   description: z.string(),
+  images: z.array(z.any()).optional().default([]),
 })
 
 export type FarmProduceCategory = z.infer<typeof FarmProduceCategorySchema>
@@ -654,6 +657,7 @@ export type FarmProduceCategory = z.infer<typeof FarmProduceCategorySchema>
 export const FormFarmProduceCategorySchema = z.object({
   name: z.string().min(1, "Name is required"),
   description: z.string().max(500, "Description must be 500 characters or less").optional().default(""),
+  images: z.array(z.any()).default([]),
 })
 
 export type FormFarmProduceCategoryModel = z.infer<typeof FormFarmProduceCategorySchema>
@@ -664,6 +668,7 @@ export const FormFarmProduceSchema = z.object({
   category_id: z.string().min(1, "Category is required"),
   category_slug: z.string().min(1, "Category is required"),
   lots_enabled: z.boolean().default(false),
+  images: z.array(z.any()).default([]),
 })
 
 export type FormFarmProduceModel = z.infer<typeof FormFarmProduceSchema>
@@ -676,6 +681,7 @@ export const FarmProduceSchema = z.object({
   category_id: z.string(),
   category_slug: z.string(),
   lots_enabled: z.boolean().optional().default(false),
+  images: z.array(z.any()).optional().default([]),
 })
 
 export type FarmProduce = z.infer<typeof FarmProduceSchema>
@@ -698,6 +704,7 @@ export const AnimalHealthCategorySchema = z.object({
   slug: z.string().optional(),
   short_description: z.string().max(100, "Short description cannot exceed 100 characters"),
   description: z.string().max(500, "Description cannot exceed 500 characters"),
+  images: z.array(z.any()).optional().default([]),
   created: z.string().optional(),
   updated: z.string().optional(),
 })
@@ -707,6 +714,7 @@ export const FormAnimalHealthCategorySchema = AnimalHealthCategorySchema.pick({
   name: true,
   short_description: true,
   description: true,
+  images: true,
 })
 
 export const AnimalHealthActiveIngredientSchema = z.object({
@@ -958,6 +966,7 @@ export const FeedCategorySchema = z.object({
   slug: z.string().optional(),
   short_description: z.string().max(100, "Short description cannot exceed 100 characters"),
   description: z.string().max(500, "Description cannot exceed 500 characters"),
+  images: z.array(z.any()).optional().default([]),
   created: z.string().optional(),
   updated: z.string().optional(),
 })
@@ -967,6 +976,7 @@ export const FormFeedCategorySchema = FeedCategorySchema.pick({
   name: true,
   short_description: true,
   description: true,
+  images: true,
 })
 
 export const FeedActiveIngredientSchema = z.object({

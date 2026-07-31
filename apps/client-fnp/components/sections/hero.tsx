@@ -33,7 +33,7 @@ const SLIDES = [
 export function HeroSection() {
   return (
     <section className="py-6">
-      <div className="container">
+      <div className="sm:container">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* Main carousel — left 2/3 */}
           <div className="lg:col-span-2 relative">
@@ -44,7 +44,7 @@ export function HeroSection() {
               <CarouselContent>
                 {SLIDES.map((slide) => (
                   <CarouselItem key={slide.href}>
-                    <div className="aspect-[4/3] sm:aspect-[16/9] lg:aspect-auto lg:h-[420px] rounded-md bg-muted/30 overflow-hidden flex items-end p-5 sm:p-8 relative" style={{ backgroundImage: `url(${slide.image})`, backgroundSize: "cover", backgroundPosition: "center" }}>
+                    <div className="aspect-[4/3] sm:aspect-[16/9] lg:aspect-auto lg:h-[420px] sm:rounded-md bg-muted/30 overflow-hidden flex items-end p-5 sm:p-8 relative" style={{ backgroundImage: `url(${slide.image})`, backgroundSize: "cover", backgroundPosition: "center" }}>
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10" />
                       <div className="max-w-[85%] sm:max-w-none relative">
                         <p className="text-xs sm:text-sm text-white/70 mb-1">{slide.label}</p>
@@ -75,7 +75,7 @@ export function HeroSection() {
           {/* Right side — 2 stacked revenue banners */}
           <div className="flex flex-col gap-4">
             {/* Documents — 100% margin */}
-            <div className="flex-1 rounded-md overflow-hidden flex items-end p-6 relative" style={{ backgroundImage: "url(/images/plan.webp)", backgroundSize: "cover", backgroundPosition: "center" }}>
+            <div className="flex-1 sm:rounded-md overflow-hidden flex items-end p-6 relative" style={{ backgroundImage: "url(/images/plan.webp)", backgroundSize: "cover", backgroundPosition: "center" }}>
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10" />
               <div className="relative">
                 <p className="text-xs text-white/70 mb-1">Farm Plans</p>
@@ -95,7 +95,7 @@ export function HeroSection() {
               </div>
             </div>
             {/* Plant Nutrition — highest engagement shop page */}
-            <div className="flex-1 rounded-md overflow-hidden flex items-end p-6 relative" style={{ backgroundImage: "url(/images/foliar.webp)", backgroundSize: "cover", backgroundPosition: "center" }}>
+            <div className="flex-1 sm:rounded-md overflow-hidden flex items-end p-6 relative" style={{ backgroundImage: "url(/images/foliar.webp)", backgroundSize: "cover", backgroundPosition: "center" }}>
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10" />
               <div className="relative">
                 <p className="text-xs text-white/70 mb-1">Shop</p>

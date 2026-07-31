@@ -172,7 +172,7 @@ export function AddToCartButton({
     <button
       onClick={handleAdd}
       disabled={addMutation.isPending || !available}
-      className="flex items-center justify-center gap-2 w-full border border-border hover:bg-muted disabled:opacity-60 text-foreground font-medium text-sm h-9 px-3 rounded-md transition-colors mt-3"
+      className={`flex items-center justify-center gap-2 w-full border font-medium text-sm h-9 px-3 rounded-md transition-colors ${available ? "border-border hover:bg-muted text-foreground" : "border-transparent text-destructive cursor-not-allowed"}`}
     >
       {addMutation.isPending && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
       {available ? "Add to Cart" : "Out of Stock"}

@@ -279,7 +279,7 @@ export function addAgroChemicalCategory(data: { name: string; short_description:
   return api.post(url, data)
 }
 
-export function updateAgroChemicalCategory(data: { id: string; name: string; short_description: string; description: string }) {
+export function updateAgroChemicalCategory(data: { id: string; name: string; short_description: string; description: string; images?: any[] }) {
   let url = `${baseUrl}/user/agrochemical-categories/update`
   return api.post(url, data)
 }
@@ -409,9 +409,9 @@ export function queryFarmProduceCategory(slug: string) {
   return api.get(url)
 }
 
-export function updateFarmProduceCategory(data: { slug: string; name: string; description: string }) {
+export function updateFarmProduceCategory(data: { slug: string; name: string; description: string; images?: any[] }) {
   const url = `${baseUrl}/farmproducecategories/${data.slug}`
-  return api.put(url, { name: data.name, description: data.description })
+  return api.put(url, { name: data.name, description: data.description, images: data.images || [] })
 }
 
 export function addFarmProduceCategory(data: { name: string; description: string }) {
@@ -456,7 +456,7 @@ export function addFarmProduce(data: { name: string; description: string; catego
   return api.post(`${baseUrl}/farmproduce`, data)
 }
 
-export function updateFarmProduce(data: { slug: string; name: string; description: string; category_id: string; category_slug: string; lots_enabled: boolean }) {
+export function updateFarmProduce(data: { slug: string; name: string; description: string; category_id: string; category_slug: string; lots_enabled: boolean; images?: any[] }) {
   return api.put(`${baseUrl}/farmproduce/${data.slug}`, data)
 }
 
@@ -616,7 +616,7 @@ export function addAnimalHealthCategory(data: { name: string; short_description:
   return api.post(url, data)
 }
 
-export function updateAnimalHealthCategory(data: { id: string; name: string; short_description: string; description: string }) {
+export function updateAnimalHealthCategory(data: { id: string; name: string; short_description: string; description: string; images?: any[] }) {
   let url = `${baseUrl}/user/animal-health-categories/update`
   return api.post(url, data)
 }
@@ -846,7 +846,7 @@ export function addFeedCategory(data: { name: string; short_description: string;
   return api.post(url, data)
 }
 
-export function updateFeedCategory(data: { id: string; name: string; short_description: string; description: string }) {
+export function updateFeedCategory(data: { id: string; name: string; short_description: string; description: string; images?: any[] }) {
   let url = `${baseUrl}/user/feed-categories/update`
   return api.post(url, data)
 }

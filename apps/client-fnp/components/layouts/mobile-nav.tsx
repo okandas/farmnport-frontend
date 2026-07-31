@@ -20,27 +20,39 @@ import { useQuery } from "@tanstack/react-query"
 import { getCart, countBookingNotifications } from "@/lib/query"
 import { centsToDollars } from "@/lib/utilities"
 
-// Matches desktop mega menu — ordered by GA4 engagement (last 30 days, pulled 2026-07-27)
-const CATEGORIES: { name: string; href: string; subcategories: { name: string; href: string; bold?: boolean }[] }[] = [
+// Grouped nav — matches desktop SelectCategory
+const NAV_GROUPS: { name: string; subcategories: { name: string; href: string; bold?: boolean }[] }[] = [
   {
-    name: "Buyers",
-    href: "/buyers",
+    name: "Buy",
     subcategories: [
-      { name: "All Buyers", href: "/buyers", bold: true },
-      { name: "Chicken Buyers", href: "/buyers/chicken" },
-      { name: "Maize Buyers", href: "/buyers/maize" },
-      { name: "Pork Buyers", href: "/buyers/pork" },
-      { name: "Cattle Buyers", href: "/buyers/cattle" },
-      { name: "Onion Buyers", href: "/buyers/onions" },
-      { name: "Goat Buyers", href: "/buyers/goats" },
-      { name: "Tomato Buyers", href: "/buyers/tomatoes" },
-      { name: "Chilli Buyers", href: "/buyers/chilli" },
-      { name: "Watermelon Buyers", href: "/buyers/watermelons" },
+      { name: "Agrochemicals", href: "/buy-agrochemicals", bold: true },
+      { name: "Plant Nutrition", href: "/buy-plant-nutrition", bold: true },
+      { name: "Animal Health", href: "/buy-animal-health", bold: true },
+      { name: "Animal Feed", href: "/buy-feeds", bold: true },
+      { name: "Seeds", href: "/buy-seed-products", bold: true },
+      { name: "Equipment", href: "/buy-equipment", bold: true },
+      { name: "Plans & Documents", href: "/buy-documents", bold: true },
     ],
   },
   {
-    name: "Guides",
-    href: "/guides",
+    name: "Sell",
+    subcategories: [
+      { name: "List a Lot", href: "/lots/new" },
+      { name: "Create a Booking", href: "/bookings/new" },
+      { name: "I Supply", href: "/bookings/new/sell" },
+    ],
+  },
+  {
+    name: "Marketplace",
+    subcategories: [
+      { name: "Buyers", href: "/buyers", bold: true },
+      { name: "Farmers", href: "/farmers", bold: true },
+      { name: "Lots & Auctions", href: "/lots", bold: true },
+      { name: "Bookings", href: "/bookings", bold: true },
+    ],
+  },
+  {
+    name: "Guides & Programs",
     subcategories: [
       { name: "All Guides", href: "/guides", bold: true },
       { name: "Agrochemical Guides", href: "/agrochemical-guides" },
@@ -48,134 +60,10 @@ const CATEGORIES: { name: string; href: string; subcategories: { name: string; h
       { name: "Animal Nutrition", href: "/feed-guides" },
       { name: "Plant Nutrition Guides", href: "/plant-nutrition-guides" },
       { name: "Seed Guides", href: "/seed-guides" },
-    ],
-  },
-  {
-    name: "Market Prices",
-    href: "/prices",
-    subcategories: [
-      { name: "All Prices", href: "/prices", bold: true },
-      { name: "Cattle Prices", href: "/prices/cattle" },
-      { name: "Beef Prices", href: "/prices/beef" },
-      { name: "Chicken Prices", href: "/prices/chicken" },
-      { name: "Pork Prices", href: "/prices/pork" },
-      { name: "Goat Prices", href: "/prices/goat" },
-      { name: "Lamb Prices", href: "/prices/lamb" },
-      { name: "Head Prices", href: "/prices/head" },
-    ],
-  },
-  {
-    name: "Programs",
-    href: "/programs",
-    subcategories: [
       { name: "All Programs", href: "/programs", bold: true },
       { name: "Spray Programs", href: "/spray-programs" },
       { name: "Feeding Programs", href: "/feeding-programs" },
       { name: "Rearing Programs", href: "/rearing-programs" },
-    ],
-  },
-  {
-    name: "Farmers",
-    href: "/farmers",
-    subcategories: [
-      { name: "All Farmers", href: "/farmers", bold: true },
-      { name: "Chicken Farmers", href: "/farmers/chicken" },
-      { name: "Maize Farmers", href: "/farmers/maize" },
-      { name: "Pork Farmers", href: "/farmers/pork" },
-      { name: "Cattle Farmers", href: "/farmers/cattle" },
-      { name: "Onion Farmers", href: "/farmers/onions" },
-      { name: "Goat Farmers", href: "/farmers/goats" },
-      { name: "Tomato Farmers", href: "/farmers/tomatoes" },
-    ],
-  },
-  {
-    name: "Bookings",
-    href: "/bookings",
-    subcategories: [
-      { name: "Browse Bookings", href: "/bookings", bold: true },
-      { name: "Create a Booking", href: "/bookings/new" },
-      { name: "I Supply", href: "/bookings/new/sell" },
-      { name: "I Buy", href: "/bookings/new/buy" },
-    ],
-  },
-  {
-    name: "Plans & Documents",
-    href: "/buy-documents",
-    subcategories: [
-      { name: "Shop All Documents", href: "/buy-documents", bold: true },
-    ],
-  },
-  {
-    name: "Lots & Auctions",
-    href: "/lots",
-    subcategories: [
-      { name: "Browse Lots", href: "/lots", bold: true },
-      { name: "List a Lot", href: "/lots/new" },
-    ],
-  },
-  {
-    name: "Agrochemicals",
-    href: "/buy-agrochemicals",
-    subcategories: [
-      { name: "Shop All Agrochemicals", href: "/buy-agrochemicals", bold: true },
-      { name: "Insecticides", href: "/agrochemical-guides/insecticides" },
-      { name: "Fungicides", href: "/agrochemical-guides/fungicides" },
-      { name: "Herbicides", href: "/agrochemical-guides/herbicides" },
-      { name: "Acaricides", href: "/agrochemical-guides/acaricides" },
-      { name: "Nematicides", href: "/agrochemical-guides/nematicides" },
-      { name: "Seed Treatments", href: "/agrochemical-guides/seed-treatments" },
-      { name: "Spray Programs", href: "/spray-programs", bold: true },
-    ],
-  },
-  {
-    name: "Plant Nutrition",
-    href: "/buy-plant-nutrition",
-    subcategories: [
-      { name: "Shop All Plant Nutrition", href: "/buy-plant-nutrition", bold: true },
-      { name: "Fertilizers", href: "/plant-nutrition-guides/fertilizers" },
-      { name: "Foliar Feeds", href: "/plant-nutrition-guides/foliar-feeds" },
-      { name: "Biostimulants", href: "/plant-nutrition-guides/biostimulants" },
-      { name: "Plant Growth Regulators", href: "/plant-nutrition-guides/plant-growth-regulators" },
-    ],
-  },
-  {
-    name: "Animal Feed",
-    href: "/buy-feeds",
-    subcategories: [
-      { name: "Shop All Feeds", href: "/buy-feeds", bold: true },
-      { name: "Feed Guides", href: "/feed-guides" },
-      { name: "Feeding Programs", href: "/feeding-programs", bold: true },
-    ],
-  },
-  {
-    name: "Animal Health",
-    href: "/buy-animal-health",
-    subcategories: [
-      { name: "Shop All Animal Health", href: "/buy-animal-health", bold: true },
-      { name: "Antibiotics", href: "/animal-health-guides/antibiotics" },
-      { name: "Vaccines", href: "/animal-health-guides/vaccines" },
-      { name: "Tick & Flea Control", href: "/animal-health-guides/tick-flea-control" },
-      { name: "Worm & Fluke Control", href: "/animal-health-guides/worm-fluke-control" },
-      { name: "Nutrition & Supplements", href: "/animal-health-guides/nutrition-supplements" },
-      { name: "Wound Remedies", href: "/animal-health-guides/wound-remedies" },
-      { name: "Biosecurity & Disinfectants", href: "/animal-health-guides/biosecurity-disinfectants" },
-      { name: "Rearing Programs", href: "/rearing-programs", bold: true },
-    ],
-  },
-  {
-    name: "Seeds",
-    href: "/buy-seed-products",
-    subcategories: [
-      { name: "Shop All Seeds", href: "/buy-seed-products", bold: true },
-      { name: "Seed Guides", href: "/seed-guides" },
-    ],
-  },
-  {
-    name: "Equipment",
-    href: "/buy-equipment",
-    subcategories: [
-      { name: "Shop All Equipment", href: "/buy-equipment", bold: true },
-      { name: "Equipment Guides", href: "/equipment-guides" },
     ],
   },
 ]
@@ -264,13 +152,13 @@ export function MobileNav({ user }: MobileNavProps) {
                {activeCategory !== null ? (
                  <div>
                    <button
-                     onClick={() => setActiveCategory(activeCategory === -1 ? null : -1)}
+                     onClick={() => setActiveCategory(null)}
                      className="flex items-center gap-1 text-xs text-primary mb-0.5"
                    >
                      <Icons.chevronLeft className="h-3 w-3" />
-                     {activeCategory === -1 ? "Main Menu" : "Shop by Category"}
+                     Main Menu
                    </button>
-                   <h2 className="text-lg font-bold">{activeCategory === -1 ? "Shop by Category" : CATEGORIES[activeCategory].name}</h2>
+                   <h2 className="text-lg font-bold">{NAV_GROUPS[activeCategory].name}</h2>
                  </div>
                ) : (
                  <div>
@@ -311,34 +199,27 @@ export function MobileNav({ user }: MobileNavProps) {
                          Home
                        </Link>
 
-                       {/* Browse All — drill-down into categories */}
-                       <button
-                         onClick={() => setActiveCategory(-1)}
-                         className="flex items-center justify-between w-full px-5 py-3 text-[15px] font-medium hover:bg-accent transition-colors"
+                       {/* Nav groups — Buy, Sell, Marketplace, Guides & Programs */}
+                       {NAV_GROUPS.map((group, i) => (
+                         <button
+                           key={group.name}
+                           onClick={() => setActiveCategory(i)}
+                           className="flex items-center justify-between w-full px-5 py-3 text-[15px] font-medium hover:bg-accent transition-colors"
+                         >
+                           <span>{group.name}</span>
+                           <Icons.chevronRight className="h-4 w-4 text-muted-foreground" />
+                         </button>
+                       ))}
+
+                       {/* Prices — direct link */}
+                       <Link
+                         href="/prices"
+                         onClick={() => { sendGTMEvent({ event: 'nav_click', link_name: 'prices' }); handleClose() }}
+                         className="flex items-center px-5 py-3 text-[15px] font-medium hover:bg-accent transition-colors"
                        >
-                         <span>Browse All</span>
-                         <Icons.chevronRight className="h-4 w-4 text-muted-foreground" />
-                       </button>
+                         Prices
+                       </Link>
                      </nav>
-
-                     {/* Actions */}
-                     <div className="border-t mt-2 pt-2">
-                       <Link
-                         href={user ? "/lots/new" : "/login?next=/lots/new"}
-                         onClick={() => { sendGTMEvent({ event: 'nav_click', link_name: 'post_lot' }); handleClose() }}
-                         className="flex items-center px-5 py-3 text-[15px] font-semibold text-primary hover:bg-accent transition-colors"
-                       >
-                         List a Lot
-                       </Link>
-
-                       <Link
-                         href={user ? "/bookings/new" : "/login?next=/bookings/new"}
-                         onClick={() => { sendGTMEvent({ event: 'nav_click', link_name: 'create_booking' }); handleClose() }}
-                         className="flex items-center px-5 py-3 text-[15px] font-semibold text-primary hover:bg-accent transition-colors"
-                       >
-                         Create a Booking
-                       </Link>
-                     </div>
 
                      {/* Account */}
                      {user && (
@@ -348,15 +229,7 @@ export function MobileNav({ user }: MobileNavProps) {
                            onClick={handleClose}
                            className="flex items-center px-5 py-3 text-[15px] font-medium hover:bg-accent transition-colors"
                          >
-                           My Account
-                         </Link>
-
-                         <Link
-                           href="/orders"
-                           onClick={handleClose}
-                           className="flex items-center px-5 py-3 text-[15px] font-medium hover:bg-accent transition-colors"
-                         >
-                           Orders
+                           Account
                          </Link>
 
                          <button
@@ -376,24 +249,10 @@ export function MobileNav({ user }: MobileNavProps) {
                        </div>
                      </div>
                    </>
-                 ) : activeCategory === -1 ? (
-                   /* Category list */
-                   <nav>
-                     {CATEGORIES.map((cat, i) => (
-                       <button
-                         key={cat.name}
-                         onClick={() => setActiveCategory(i)}
-                         className="flex items-center justify-between w-full px-5 py-3 text-[15px] font-medium hover:bg-accent transition-colors"
-                       >
-                         <span>{cat.name}</span>
-                         <Icons.chevronRight className="h-4 w-4 text-muted-foreground" />
-                       </button>
-                     ))}
-                   </nav>
                  ) : (
-                   /* Subcategory list */
+                   /* Subcategory list for selected group */
                    <nav>
-                     {CATEGORIES[activeCategory].subcategories.map((sub) => (
+                     {NAV_GROUPS[activeCategory].subcategories.map((sub) => (
                        <Link
                          key={sub.name}
                          href={sub.href}

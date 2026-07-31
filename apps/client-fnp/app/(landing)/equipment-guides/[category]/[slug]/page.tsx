@@ -87,7 +87,7 @@ export default async function EquipmentGuidePage({ params }: GuidePageProps) {
                     <nav className="flex flex-wrap text-sm text-muted-foreground">
                         <Link href="/" className="hover:text-foreground">Home</Link>
                         <span className="mx-2">/</span>
-                        <Link href="/equipment-guides" className="hover:text-foreground">Guides</Link>
+                        <Link href="/equipment-guides" className="hover:text-foreground">Equipment Guides</Link>
                         <span className="mx-2">/</span>
                         <Link href={`/equipment-guides/${category}`} className="hover:text-foreground capitalize">{product.equipment_category?.name || category}</Link>
                         <span className="mx-2">/</span>

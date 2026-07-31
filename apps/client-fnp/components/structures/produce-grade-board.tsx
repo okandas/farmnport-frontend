@@ -716,10 +716,17 @@ export function ProduceGradeBoard({
               <p className="text-sm text-muted-foreground">No buyers listed for this produce yet.</p>
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full text-sm">
+                <table className="w-full text-sm" style={{ tableLayout: "fixed" }}>
+                  <colgroup>
+                    <col style={{ width: 36 }} />
+                    <col />
+                    <col style={{ width: 90 }} />
+                    <col style={{ width: 72 }} />
+                    <col style={{ width: 120 }} />
+                  </colgroup>
                   <thead>
                     <tr className="border-b text-xs text-muted-foreground">
-                      <th className="text-left py-2 pr-4 font-medium w-8 tabular-nums">#</th>
+                      <th className="text-left py-2 pr-4 font-medium tabular-nums">#</th>
                       <th className="text-left py-2 font-medium">Buyer</th>
                       <th className="text-left py-2 pl-2 font-medium">Per kg</th>
                       <th className="text-left py-2 pl-2 font-medium">Change</th>
@@ -736,12 +743,12 @@ export function ProduceGradeBoard({
                       return (
                         <tr key={b.client_id} className="border-b border-border/50 last:border-0 hover:bg-muted/40 transition-colors">
                           <td className="py-3 pr-4 text-muted-foreground tabular-nums text-xs">{(buyersPage - 1) * 10 + i + 1}</td>
-                          <td className="py-3 font-medium text-foreground capitalize">
-                            <span className="inline-flex items-center gap-2">
+                          <td className="py-3 font-medium text-foreground capitalize overflow-hidden">
+                            <span className="inline-flex items-center gap-2 min-w-0">
                               <span className="inline-flex items-center justify-center border border-border text-xs font-mono text-muted-foreground w-7 h-6 rounded shrink-0">
                                 {makeAbbveriation(b.client_name).toUpperCase().slice(0, 2)}
                               </span>
-                              <Link href={`/buyer/${slug(b.client_name)}`} className="hover:underline">{b.client_name}</Link>
+                              <Link href={`/buyer/${slug(b.client_name)}`} className="hover:underline truncate">{b.client_name}</Link>
                             </span>
                           </td>
                           <td className="py-3 pl-2 tabular-nums text-sm font-semibold">

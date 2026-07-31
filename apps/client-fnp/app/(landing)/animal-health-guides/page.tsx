@@ -1,7 +1,6 @@
 import Link from "next/link"
 import { BaseURL } from "@/lib/schemas"
 import { AllAnimalHealthClient } from "./AllAnimalHealthClient"
-import { OtherGuidesLinks } from "@/components/shared/OtherGuidesLinks"
 
 export const metadata = {
   title: 'Animal Health Product Guides Zimbabwe – Vaccines, Antibiotics & Supplements | farmnport.com',
@@ -51,7 +50,6 @@ export default async function AnimalHealthGuidesPage() {
                                 Explore animal health products by type. Each guide includes active ingredients, targets, and usage information.
                             </p>
                         </div>
-                        <OtherGuidesLinks current="animal-health" />
                     </div>
                     <AllAnimalHealthClient initialProducts={products} initialTotal={total} />
                 </div>

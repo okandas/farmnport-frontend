@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query"
 import { queryPlantNutritionProductsByCategory } from "@/lib/query"
 import { Button } from "@/components/ui/button"
 import { ProductCard } from "@/components/shared/ProductCard"
-import { ViewToggle } from "@/components/shared/ViewToggle"
+import { ListingToolbar } from "@/components/shared/ListingToolbar"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
 import Link from "next/link"
 import { PlantNutritionFilterSidebar } from "@/components/generic/plantNutritionFilterSidebar"
@@ -47,21 +47,19 @@ export function PlantNutritionCategoryClient({ category, categoryName, initialPr
                 <h1 className="text-4xl font-bold tracking-tight font-heading mb-4 capitalize">
                     {categoryName}
                 </h1>
-                <div className="flex items-center justify-between">
-                    <p className="text-muted-foreground">
-                        {productsData?.data?.total || initialTotal} product{(productsData?.data?.total || initialTotal) !== 1 ? 's' : ''} found
-                    </p>
-                    <ViewToggle view={view} onViewChange={setView} />
-                </div>
+                <p className="text-muted-foreground">
+                    {productsData?.data?.total || initialTotal} product{(productsData?.data?.total || initialTotal) !== 1 ? 's' : ''} found
+                </p>
             </div>
 
             <div className="flex flex-col lg:flex-row gap-8">
-                <aside className="w-full lg:w-64 flex-shrink-0">
+                <aside className="hidden lg:block w-64 flex-shrink-0">
                     <ProductSidebarNav />
                     <PlantNutritionFilterSidebar hideCategory={true} categorySlug={category} />
                 </aside>
 
                 <main className="flex-1">
+                    <ListingToolbar view={view} onViewChange={setView} filterSlot={<PlantNutritionFilterSidebar hideCategory={true} categorySlug={category} />} />
                     {isLoading ? (
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
                             {[...Array(8)].map((_, i) => (

@@ -1,8 +1,6 @@
 import Link from "next/link"
 import { AllAgroChemicalsClient } from "./AllAgroChemicalsClient"
 import { serverFetch } from "@/lib/serverFetch"
-import { OtherGuidesLinks } from "@/components/shared/OtherGuidesLinks"
-
 
 export const metadata = {
   title: 'Agrochemical Guides Zimbabwe – Herbicides, Fungicides, Insecticides & More | farmnport.com',
@@ -41,7 +39,6 @@ export default async function AgrochemicalGuidesPage() {
                                 Explore agrochemical products by type. Each guide includes active ingredients, targets, and usage information.
                             </p>
                         </div>
-                        <OtherGuidesLinks current="agrochemical" />
                     </div>
                     <AllAgroChemicalsClient initialChemicals={initialChemicals} initialTotal={initialTotal} />
                 </div>

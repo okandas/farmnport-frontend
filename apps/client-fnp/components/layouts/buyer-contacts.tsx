@@ -46,8 +46,8 @@ export function BuyerContactsCard({ buyer, user }: BuyerContactsCardProps) {
         <Contacts user={user} client={buyer} quickOverview={true} />
         {(buyer.main_produce || (buyer.other_produce ?? []).length > 0) && (
           <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-7 gap-1.5 mt-2 pt-2 border-t">
-            {[buyer.main_produce, ...(buyer.other_produce ?? [])].filter(Boolean).map((p: any) => (
-              <span key={p.name} className="text-[10px] px-2 py-1 rounded-md bg-muted/50 text-muted-foreground text-center truncate">
+            {[buyer.main_produce, ...(buyer.other_produce ?? [])].filter(Boolean).map((p: any, i: number) => (
+              <span key={`${p.name}-${i}`} className="text-[10px] px-2 py-1 rounded-md bg-muted/50 text-muted-foreground text-center truncate">
                 {capitalizeFirstLetter(p.name)}
               </span>
             ))}

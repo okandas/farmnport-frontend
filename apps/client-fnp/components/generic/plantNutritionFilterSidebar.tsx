@@ -10,7 +10,7 @@ import { useQueryStates, parseAsArrayOf, parseAsString } from "nuqs"
 import { Filter, X, Search } from "lucide-react"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { useQuery } from "@tanstack/react-query"
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { queryPlantNutritionFilterAggregates, queryPlantNutritionBuyFilterAggregates } from "@/lib/query"
 import { sendGTMEvent } from "@next/third-parties/google"
 
@@ -44,14 +44,21 @@ function SearchableCheckboxList({
 }) {
   const [search, setSearch] = useState("")
 
+  const itemsWithSelected = useMemo(() => {
+    const keys = new Set(items.map(i => (i.name || i._id).toLowerCase()))
+    items.forEach(i => keys.add(i._id))
+    const missing = selectedItems.filter(v => !keys.has(v) && !keys.has(v.toLowerCase())).map(v => ({ _id: v, count: 0 }))
+    return [...items, ...missing]
+  }, [items, selectedItems])
+
   const filteredItems = useMemo(() => {
-    if (!search) return items
+    if (!search) return itemsWithSelected
     const searchLower = search.toLowerCase()
-    return items.filter(item => {
+    return itemsWithSelected.filter(item => {
       const displayName = item.name || item._id
       return displayName.toLowerCase().includes(searchLower)
     })
-  }, [items, search])
+  }, [itemsWithSelected, search])
 
   if (isLoading) {
     return <p className="text-sm text-muted-foreground py-2">Loading...</p>
@@ -210,7 +217,7 @@ function FilterContent({ onClearAll, hideCategory, categorySlug, fetchAggregates
 
 function PlantNutritionFilterSidebarBase({ hideCategory, categorySlug, fetchAggregates }: { hideCategory?: boolean; categorySlug?: string; fetchAggregates: typeof queryPlantNutritionFilterAggregates }) {
   const isDesktop = useMediaQuery("(min-width: 1024px)")
-  const [, setQueryState] = useQueryStates({
+  const [queryState, setQueryState] = useQueryStates({
     used_on: parseAsArrayOf(parseAsString),
     brand: parseAsArrayOf(parseAsString),
     category: parseAsArrayOf(parseAsString),
@@ -221,6 +228,9 @@ function PlantNutritionFilterSidebarBase({ hideCategory, categorySlug, fetchAggr
     setQueryState({ used_on: null, brand: null, category: null, active_ingredient: null })
   }
 
+  const [open, setOpen] = useState(false)
+  useEffect(() => { setOpen(false) }, [queryState.used_on, queryState.brand, queryState.category, queryState.active_ingredient])
+
   if (isDesktop) {
     return (
       <div>
@@ -230,9 +240,9 @@ function PlantNutritionFilterSidebarBase({ hideCategory, categorySlug, fetchAggr
   }
 
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button variant="outline" className="w-full mb-4">
+        <Button variant="outline" size="sm">
           <Filter className="mr-2 h-4 w-4" />
           Filters
         </Button>

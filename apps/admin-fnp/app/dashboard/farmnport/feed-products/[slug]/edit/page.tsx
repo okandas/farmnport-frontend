@@ -28,6 +28,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { SelectedLocation } from "@/components/ui/location-multi-select"
 import { ProductPricingSection } from "@/components/structures/forms/product-pricing-section"
 import { ProductFulfillmentSection } from "@/components/structures/forms/product-fulfillment-section"
+import { FileInput } from "@/components/structures/controls/file-input"
 import * as z from "zod"
 
 const EditFeedProductSchema = z.object({
@@ -547,6 +548,33 @@ export default function EditFeedProductPage({ params }: { params: Promise<{ slug
                                                     placeholder="e.g., 50 kg"
                                                     className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
                                                     {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="px-1">
+                            <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">
+                                Product Images
+                            </label>
+                            <div className="mt-2">
+                                <FormField
+                                    control={form.control}
+                                    name="images"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormControl>
+                                                <FileInput
+                                                    id={product?.id}
+                                                    fieldName="images"
+                                                    entityType="feed"
+                                                    maxImages={5}
+                                                    value={field.value || []}
+                                                    onChange={(images) => field.onChange(images)}
                                                 />
                                             </FormControl>
                                             <FormMessage />

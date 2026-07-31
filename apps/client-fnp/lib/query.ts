@@ -332,10 +332,11 @@ export function updateUserWantToPay(wantToPay: boolean) {
   return api.post(url, { wantToPay })
 }
 
-export function queryClientFilterAggregates(type: 'buyers' | 'farmers', filters?: { produce?: string[], province?: string[] }) {
+export function queryClientFilterAggregates(type: 'buyers' | 'farmers', filters?: { produce?: string[], province?: string[], category?: string[] }) {
   const params = new URLSearchParams({ type })
   filters?.produce?.forEach(p => params.append('produce', p))
   filters?.province?.forEach(p => params.append('province', p))
+  filters?.category?.forEach(c => params.append('category', c))
   return api.get(`${BaseURL}/client/aggregates/filters?${params.toString()}`)
 }
 

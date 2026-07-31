@@ -78,39 +78,39 @@ function BellIcon({ user }: { user: AuthenticatedUser | null }) {
   )
 }
 
-// Ordered by GA4 engagement (last 30 days, pulled 2026-07-27)
-const CATEGORIES: { name: string; href: string; subcategories: { name: string; href: string; bold?: boolean }[] }[] = [
+// Grouped nav — matches mobile NAV_GROUPS
+const NAV_GROUPS: { name: string; subcategories: { name: string; href: string; bold?: boolean }[] }[] = [
   {
-    name: "Buyers",
-    href: "/buyers",
+    name: "Buy",
     subcategories: [
-      { name: "All Buyers", href: "/buyers", bold: true },
-      { name: "Chicken Buyers", href: "/buyers/chicken" },
-      { name: "Maize Buyers", href: "/buyers/maize" },
-      { name: "Pork Buyers", href: "/buyers/pork" },
-      { name: "Cattle Buyers", href: "/buyers/cattle" },
-      { name: "Onion Buyers", href: "/buyers/onions" },
-      { name: "Goat Buyers", href: "/buyers/goats" },
-      { name: "Tomato Buyers", href: "/buyers/tomatoes" },
-      { name: "Chilli Buyers", href: "/buyers/chilli" },
-      { name: "Watermelon Buyers", href: "/buyers/watermelons" },
+      { name: "Agrochemicals", href: "/buy-agrochemicals", bold: true },
+      { name: "Plant Nutrition", href: "/buy-plant-nutrition", bold: true },
+      { name: "Animal Health", href: "/buy-animal-health", bold: true },
+      { name: "Animal Feed", href: "/buy-feeds", bold: true },
+      { name: "Seeds", href: "/buy-seed-products", bold: true },
+      { name: "Equipment", href: "/buy-equipment", bold: true },
+      { name: "Plans & Documents", href: "/buy-documents", bold: true },
     ],
   },
   {
-    name: "Guides",
-    href: "/guides",
+    name: "Sell",
     subcategories: [
-      { name: "All Guides", href: "/guides", bold: true },
-      { name: "Agrochemical Guides", href: "/agrochemical-guides" },
-      { name: "Animal Health Guides", href: "/animal-health-guides" },
-      { name: "Animal Nutrition", href: "/feed-guides" },
-      { name: "Plant Nutrition Guides", href: "/plant-nutrition-guides" },
-      { name: "Seed Guides", href: "/seed-guides" },
+      { name: "List a Lot", href: "/lots/new" },
+      { name: "Create a Booking", href: "/bookings/new" },
+      { name: "I Supply", href: "/bookings/new/sell" },
     ],
   },
   {
-    name: "Market Prices",
-    href: "/prices",
+    name: "Marketplace",
+    subcategories: [
+      { name: "Buyers", href: "/buyers", bold: true },
+      { name: "Farmers", href: "/farmers", bold: true },
+      { name: "Lots & Auctions", href: "/lots", bold: true },
+      { name: "Bookings", href: "/bookings", bold: true },
+    ],
+  },
+  {
+    name: "Prices",
     subcategories: [
       { name: "All Prices", href: "/prices", bold: true },
       { name: "Cattle Prices", href: "/prices/cattle" },
@@ -123,122 +123,23 @@ const CATEGORIES: { name: string; href: string; subcategories: { name: string; h
     ],
   },
   {
-    name: "Programs",
-    href: "/programs",
+    name: "Guides & Programs",
     subcategories: [
+      { name: "All Guides", href: "/guides", bold: true },
+      { name: "Agrochemical Guides", href: "/agrochemical-guides" },
+      { name: "Animal Health Guides", href: "/animal-health-guides" },
+      { name: "Animal Nutrition", href: "/feed-guides" },
+      { name: "Plant Nutrition Guides", href: "/plant-nutrition-guides" },
+      { name: "Seed Guides", href: "/seed-guides" },
       { name: "All Programs", href: "/programs", bold: true },
       { name: "Spray Programs", href: "/spray-programs" },
       { name: "Feeding Programs", href: "/feeding-programs" },
       { name: "Rearing Programs", href: "/rearing-programs" },
     ],
   },
-  {
-    name: "Farmers",
-    href: "/farmers",
-    subcategories: [
-      { name: "All Farmers", href: "/farmers", bold: true },
-      { name: "Chicken Farmers", href: "/farmers/chicken" },
-      { name: "Maize Farmers", href: "/farmers/maize" },
-      { name: "Pork Farmers", href: "/farmers/pork" },
-      { name: "Cattle Farmers", href: "/farmers/cattle" },
-      { name: "Onion Farmers", href: "/farmers/onions" },
-      { name: "Goat Farmers", href: "/farmers/goats" },
-      { name: "Tomato Farmers", href: "/farmers/tomatoes" },
-    ],
-  },
-  {
-    name: "Bookings",
-    href: "/bookings",
-    subcategories: [
-      { name: "Browse Bookings", href: "/bookings", bold: true },
-      { name: "Create a Booking", href: "/bookings/new" },
-      { name: "I Supply", href: "/bookings/new/sell" },
-      { name: "I Buy", href: "/bookings/new/buy" },
-    ],
-  },
-  {
-    name: "Plans & Documents",
-    href: "/buy-documents",
-    subcategories: [
-      { name: "Shop All Documents", href: "/buy-documents", bold: true },
-    ],
-  },
-  {
-    name: "Lots & Auctions",
-    href: "/lots",
-    subcategories: [
-      { name: "Browse Lots", href: "/lots", bold: true },
-      { name: "List a Lot", href: "/lots/new" },
-    ],
-  },
-  {
-    name: "Agrochemicals",
-    href: "/buy-agrochemicals",
-    subcategories: [
-      { name: "Shop All Agrochemicals", href: "/buy-agrochemicals", bold: true },
-      { name: "Insecticides", href: "/agrochemical-guides/insecticides" },
-      { name: "Fungicides", href: "/agrochemical-guides/fungicides" },
-      { name: "Herbicides", href: "/agrochemical-guides/herbicides" },
-      { name: "Acaricides", href: "/agrochemical-guides/acaricides" },
-      { name: "Nematicides", href: "/agrochemical-guides/nematicides" },
-      { name: "Seed Treatments", href: "/agrochemical-guides/seed-treatments" },
-      { name: "Spray Programs", href: "/spray-programs", bold: true },
-    ],
-  },
-  {
-    name: "Plant Nutrition",
-    href: "/buy-plant-nutrition",
-    subcategories: [
-      { name: "Shop All Plant Nutrition", href: "/buy-plant-nutrition", bold: true },
-      { name: "Fertilizers", href: "/plant-nutrition-guides/fertilizers" },
-      { name: "Foliar Feeds", href: "/plant-nutrition-guides/foliar-feeds" },
-      { name: "Biostimulants", href: "/plant-nutrition-guides/biostimulants" },
-      { name: "Plant Growth Regulators", href: "/plant-nutrition-guides/plant-growth-regulators" },
-    ],
-  },
-  {
-    name: "Animal Feed",
-    href: "/buy-feeds",
-    subcategories: [
-      { name: "Shop All Feeds", href: "/buy-feeds", bold: true },
-      { name: "Feed Guides", href: "/feed-guides" },
-      { name: "Feeding Programs", href: "/feeding-programs", bold: true },
-    ],
-  },
-  {
-    name: "Animal Health",
-    href: "/buy-animal-health",
-    subcategories: [
-      { name: "Shop All Animal Health", href: "/buy-animal-health", bold: true },
-      { name: "Antibiotics", href: "/animal-health-guides/antibiotics" },
-      { name: "Vaccines", href: "/animal-health-guides/vaccines" },
-      { name: "Tick & Flea Control", href: "/animal-health-guides/tick-flea-control" },
-      { name: "Worm & Fluke Control", href: "/animal-health-guides/worm-fluke-control" },
-      { name: "Nutrition & Supplements", href: "/animal-health-guides/nutrition-supplements" },
-      { name: "Wound Remedies", href: "/animal-health-guides/wound-remedies" },
-      { name: "Biosecurity & Disinfectants", href: "/animal-health-guides/biosecurity-disinfectants" },
-      { name: "Rearing Programs", href: "/rearing-programs", bold: true },
-    ],
-  },
-  {
-    name: "Seeds",
-    href: "/buy-seed-products",
-    subcategories: [
-      { name: "Shop All Seeds", href: "/buy-seed-products", bold: true },
-      { name: "Seed Guides", href: "/seed-guides" },
-    ],
-  },
-  {
-    name: "Equipment",
-    href: "/buy-equipment",
-    subcategories: [
-      { name: "Shop All Equipment", href: "/buy-equipment", bold: true },
-      { name: "Equipment Guides", href: "/equipment-guides" },
-    ],
-  },
 ]
 
-function ShopByCategory() {
+function SelectCategory() {
   const [open, setOpen] = useState(false)
   const [activeIndex, setActiveIndex] = useState(0)
 
@@ -250,7 +151,7 @@ function ShopByCategory() {
         className="shrink-0 rounded-none text-xs font-medium gap-1"
         onClick={() => setOpen(!open)}
       >
-        Shop by Category
+        Select Category
         <svg
           className={`h-3 w-3 transition-transform ${open ? "rotate-180" : ""}`}
           fill="none"
@@ -269,10 +170,9 @@ function ShopByCategory() {
             <div className="container flex min-h-[480px]">
               {/* Left sidebar */}
               <div className="w-[260px] border-r py-4">
-                <h3 className="px-4 pb-3 text-sm font-bold">All Categories</h3>
-                {CATEGORIES.map((cat, i) => (
+                {NAV_GROUPS.map((group, i) => (
                   <button
-                    key={cat.name}
+                    key={group.name}
                     className={`w-full text-left px-4 py-2 text-sm transition-colors ${
                       activeIndex === i
                         ? "bg-muted font-medium text-primary"
@@ -280,16 +180,16 @@ function ShopByCategory() {
                     }`}
                     onClick={() => setActiveIndex(i)}
                   >
-                    {cat.name}
+                    {group.name}
                   </button>
                 ))}
               </div>
 
               {/* Middle — subcategories */}
               <div className="flex-1 py-4 px-8">
-                <h3 className="pb-3 text-sm font-bold">{CATEGORIES[activeIndex].name}</h3>
+                <h3 className="pb-3 text-sm font-bold">{NAV_GROUPS[activeIndex].name}</h3>
                 <div className="space-y-1">
-                  {CATEGORIES[activeIndex].subcategories.map((sub) => (
+                  {NAV_GROUPS[activeIndex].subcategories.map((sub) => (
                     <Link
                       key={sub.name}
                       href={sub.href}
@@ -370,6 +270,65 @@ function NavSearchBar({ router }: { router: ReturnType<typeof useRouter> }) {
   )
 }
 
+function MobileSearch({ router }: { router: ReturnType<typeof useRouter> }) {
+  const [open, setOpen] = useState(false)
+  const [query, setQuery] = useState("")
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    const q = query.trim()
+    if (q) {
+      sendGTMEvent({ event: "search_open", method: "mobile_submit" })
+      router.push(`/search?q=${encodeURIComponent(q)}`)
+      setOpen(false)
+      setQuery("")
+    }
+  }
+
+  return (
+    <>
+      <button
+        onClick={() => {
+          sendGTMEvent({ event: "search_open", method: "mobile_icon" })
+          setOpen(true)
+        }}
+        className="lg:hidden p-2 rounded-lg hover:bg-muted transition-colors"
+        aria-label="Search"
+      >
+        <Search className="h-5 w-5" />
+      </button>
+
+      {open && (
+        <div className="fixed inset-0 z-[60] bg-background lg:hidden">
+          <div className="flex items-center gap-3 px-4 h-14 border-b">
+            <form onSubmit={handleSubmit} className="flex-1 flex items-center gap-2">
+              <div className="relative flex-1 flex items-center rounded-sm bg-muted p-0.5">
+                <input
+                  type="text"
+                  autoFocus
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Search for products, guides..."
+                  className="flex-1 h-9 pl-3 pr-10 text-sm bg-transparent outline-none placeholder:text-muted-foreground/60"
+                />
+                <button type="submit" className="absolute right-0.5 top-1/2 -translate-y-1/2 h-8 w-8 flex items-center justify-center rounded-sm bg-primary text-primary-foreground hover:bg-primary/90 transition-colors">
+                  <Search className="h-4 w-4" />
+                </button>
+              </div>
+            </form>
+            <button
+              onClick={() => { setOpen(false); setQuery("") }}
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors shrink-0"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+    </>
+  )
+}
+
 export function SiteHeader() {
   const { data: session } = useSession()
   const user = (session?.user as AuthenticatedUser) ?? undefined
@@ -397,8 +356,8 @@ export function SiteHeader() {
           {siteConfig.name}
         </Link>
 
-        {/* Shop by Category */}
-        <ShopByCategory />
+        {/* Select Category */}
+        <SelectCategory />
 
         {/* Search bar — takes remaining space */}
         <NavSearchBar router={router} />
@@ -436,7 +395,6 @@ export function SiteHeader() {
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
                   <DropdownMenuItem asChild><Link href="/account">Account</Link></DropdownMenuItem>
-                  <DropdownMenuItem asChild><Link href="/orders">Orders</Link></DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => signOut({ redirectTo: AppURL })}>
@@ -450,16 +408,7 @@ export function SiteHeader() {
 
         {/* Mobile nav */}
         <div className="flex-1 lg:hidden" />
-        <button
-          onClick={() => {
-            sendGTMEvent({ event: "search_open", method: "mobile_icon" })
-            router.push("/search")
-          }}
-          className="lg:hidden p-2 rounded-lg hover:bg-muted transition-colors"
-          aria-label="Search"
-        >
-          <Search className="h-5 w-5" />
-        </button>
+        <MobileSearch router={router} />
         <MobileNav user={user} />
       </div>
     </header>

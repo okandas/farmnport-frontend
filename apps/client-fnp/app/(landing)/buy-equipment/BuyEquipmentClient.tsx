@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query"
 import { queryBuyEquipmentProducts } from "@/lib/query"
 import { Button } from "@/components/ui/button"
 import { ProductCard } from "@/components/shared/ProductCard"
-import { ViewToggle } from "@/components/shared/ViewToggle"
+import { ListingToolbar } from "@/components/shared/ListingToolbar"
 import { ProductSidebarNav } from "@/components/generic/ProductSidebarNav"
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from "nuqs"
 
@@ -46,11 +46,12 @@ export function BuyEquipmentClient({ initialProducts, initialTotal, categories }
 
     return (
         <div className="flex flex-col lg:flex-row gap-8">
-            <aside className="w-full lg:w-64 flex-shrink-0">
+            <aside className="hidden lg:block w-64 flex-shrink-0">
                 <ProductSidebarNav />
             </aside>
 
             <main className="flex-1">
+                <ListingToolbar view={view} onViewChange={setView} />
                 {productsLoading ? (
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
                         {[...Array(6)].map((_, i) => (
@@ -77,11 +78,6 @@ export function BuyEquipmentClient({ initialProducts, initialTotal, categories }
                     </div>
                 ) : (
                     <>
-                        <div className="flex items-center justify-between mb-4"><span className="text-sm text-muted-foreground">
-                            Showing {products.length} of {productsData?.data?.total || 0} products</span>
-                            <ViewToggle view={view} onViewChange={setView} />
-                        </div>
-
                         <div className={view === "list" ? "flex flex-col gap-3" : "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5"}>
                             {products.map((product: any) => (
                                 <ProductCard
