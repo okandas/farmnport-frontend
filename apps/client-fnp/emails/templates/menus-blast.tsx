@@ -54,7 +54,7 @@ export default function MenusBlastEmail({ name = "there", message = "" }: MenusB
           {/* Footer */}
           <Section style={footer}>
             <Text style={footerText}>
-              menus &nbsp;&middot;&nbsp; Harare, Zimbabwe
+              menus &nbsp;&middot;&nbsp; Marondera, Zimbabwe
             </Text>
             <Text style={footerText}>
               &copy; {new Date().getFullYear()} <Link href="https://menus.co.zw" style={footerLink}>menus.co.zw</Link>. All rights reserved.

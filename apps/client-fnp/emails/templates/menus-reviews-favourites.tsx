@@ -42,7 +42,7 @@ export default function MenusReviewsFavouritesEmail({ name = "there" }: MenusRev
               Your honest review helps other diners decide where to eat — and it helps restaurants know what they are doing well. A few sentences is all it takes.
             </Text>
             <Section style={buttonWrapper}>
-              <Button href={`https://menus.co.zw${UTM}&utm_content=cta_browse_review`} style={buttonPrimary}>Browse Restaurants to Review</Button>
+              <Button href={`https://menus.co.zw/restaurants${UTM}&utm_content=cta_browse_review`} style={buttonPrimary}>Browse Restaurants to Review</Button>
             </Section>
           </Section>
 
@@ -57,7 +57,7 @@ export default function MenusReviewsFavouritesEmail({ name = "there" }: MenusRev
               Tap the heart on any restaurant to save it to your favourites. It helps you find them quickly next time — and it tells us which restaurants matter most to you.
             </Text>
             <Section style={buttonWrapper}>
-              <Button href={`https://menus.co.zw${UTM}&utm_content=cta_browse_favourite`} style={buttonOutline}>Browse Restaurants</Button>
+              <Button href={`https://menus.co.zw/favourites${UTM}&utm_content=cta_browse_favourite`} style={buttonOutline}>Browse Restaurants</Button>
             </Section>
           </Section>
 
@@ -89,7 +89,7 @@ export default function MenusReviewsFavouritesEmail({ name = "there" }: MenusRev
           {/* Footer */}
           <Section style={footer}>
             <Text style={footerText}>
-              menus &nbsp;&middot;&nbsp; Harare, Zimbabwe
+              menus &nbsp;&middot;&nbsp; Marondera, Zimbabwe
             </Text>
             <Text style={footerText}>
               &copy; {new Date().getFullYear()} <Link href="https://menus.co.zw" style={footerLink}>menus.co.zw</Link>. All rights reserved.
