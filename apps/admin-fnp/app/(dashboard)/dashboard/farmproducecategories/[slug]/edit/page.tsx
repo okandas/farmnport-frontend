@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import { FileInput } from "@/components/structures/controls/file-input"
 
 export default function EditFarmProduceCategoryPage({ params }: { params: Promise<{ slug: string }> }) {
     const router = useRouter()
@@ -52,17 +53,19 @@ export default function EditFarmProduceCategoryPage({ params }: { params: Promis
         defaultValues: {
             name: category?.name || "",
             description: category?.description || "",
+            image_src: category?.image_src || "",
         },
         values: category ? {
             name: category.name,
             description: category.description,
+            image_src: category.image_src || "",
         } : undefined,
         resolver: zodResolver(FormFarmProduceCategorySchema),
     })
 
     const { mutate, isPending } = useMutation({
         mutationFn: (data: FormFarmProduceCategoryModel) =>
-            updateFarmProduceCategory({ slug: category.slug, name: data.name, description: data.description }),
+            updateFarmProduceCategory({ slug: category.slug, name: data.name, description: data.description, image_src: data.image_src }),
         onSuccess: () => {
             toast({
                 description: "Category updated successfully",
@@ -190,6 +193,42 @@ export default function EditFarmProduceCategoryPage({ params }: { params: Promis
                                     </div>
                                     <p className="mt-3 text-sm/6 text-gray-600 dark:text-gray-400">
                                         Provide a brief description of this category (max 500 characters).
+                                    </p>
+                                </div>
+
+                                <div className="px-1">
+                                    <label
+                                        htmlFor="image_src"
+                                        className="block text-sm/6 font-medium text-gray-900 dark:text-white"
+                                    >
+                                        Category Image
+                                    </label>
+                                    <div className="mt-2">
+                                        <FormField
+                                            control={form.control}
+                                            name="image_src"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormControl>
+                                                        <FileInput
+                                                            id={category?.id}
+                                                            fieldName="images"
+                                                            entityType="farm_produce_category"
+                                                            maxImages={1}
+                                                            value={field.value ? [{ id: "", src: field.value }] : []}
+                                                            onChange={(images) => {
+                                                                const src = images?.[0]?.src || ""
+                                                                field.onChange(src)
+                                                            }}
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
+                                    <p className="mt-3 text-sm/6 text-gray-600 dark:text-gray-400">
+                                        Upload an image for this category.
                                     </p>
                                 </div>
 

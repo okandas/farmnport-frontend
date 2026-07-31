@@ -20,6 +20,7 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from "@/component
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { SearchSelect } from "@/components/ui/search-select"
+import { FileInput } from "@/components/structures/controls/file-input"
 
 const inputClass = "block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
 
@@ -35,13 +36,14 @@ export default function EditFarmProducePage({ params }: { params: Promise<{ slug
     const produce = data?.data
 
     const form = useForm<FormFarmProduceModel>({
-        defaultValues: { name: "", description: "", category_id: "", category_slug: "", lots_enabled: false },
+        defaultValues: { name: "", description: "", category_id: "", category_slug: "", lots_enabled: false, image_src: "" },
         values: produce ? {
             name: produce.name,
             description: produce.description ?? "",
             category_id: produce.category_id,
             category_slug: produce.category_slug,
             lots_enabled: produce.lots_enabled ?? false,
+            image_src: produce.image_src ?? "",
         } : undefined,
         resolver: zodResolver(FormFarmProduceSchema),
     })
@@ -148,6 +150,30 @@ export default function EditFarmProducePage({ params }: { params: Promise<{ slug
                                             <FormMessage />
                                         </FormItem>
                                     )} />
+                                </div>
+
+                                <div className="px-1">
+                                    <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Product Image</label>
+                                    <div className="mt-2">
+                                        <FormField control={form.control} name="image_src" render={({ field }) => (
+                                            <FormItem>
+                                                <FormControl>
+                                                    <FileInput
+                                                        id={produce?.id}
+                                                        fieldName="images"
+                                                        entityType="farm_produce"
+                                                        maxImages={1}
+                                                        value={field.value ? [{ id: "", src: field.value }] : []}
+                                                        onChange={(images) => {
+                                                            const src = images?.[0]?.src || ""
+                                                            field.onChange(src)
+                                                        }}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )} />
+                                    </div>
                                 </div>
 
                                 <div className="px-1">

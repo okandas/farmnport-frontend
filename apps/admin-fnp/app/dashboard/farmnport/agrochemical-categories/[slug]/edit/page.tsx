@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import { FileInput } from "@/components/structures/controls/file-input"
 
 export default function EditAgroChemicalCategoryPage({ params }: { params: Promise<{ slug: string }> }) {
     const router = useRouter()
@@ -44,12 +45,14 @@ export default function EditAgroChemicalCategoryPage({ params }: { params: Promi
             name: category?.name || "",
             short_description: category?.short_description || "",
             description: category?.description || "",
+            image_src: category?.image_src || "",
         },
         values: category ? {
             id: category.id,
             name: category.name,
             short_description: category.short_description,
             description: category.description,
+            image_src: category.image_src || "",
         } : undefined,
         resolver: zodResolver(FormAgroChemicalCategorySchema),
     })
@@ -215,6 +218,36 @@ export default function EditAgroChemicalCategoryPage({ params }: { params: Promi
                                     <p className="mt-3 text-sm/6 text-gray-600 dark:text-gray-400">
                                         Provide a brief description of this category (max 500 characters).
                                     </p>
+                                </div>
+
+                                <div className="px-1">
+                                    <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">
+                                        Category Image
+                                    </label>
+                                    <div className="mt-2">
+                                        <FormField
+                                            control={form.control}
+                                            name="image_src"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormControl>
+                                                        <FileInput
+                                                            id={category?.id}
+                                                            fieldName="images"
+                                                            entityType="agrochemical_category"
+                                                            maxImages={1}
+                                                            value={field.value ? [{ id: "", src: field.value }] : []}
+                                                            onChange={(images) => {
+                                                                const src = images?.[0]?.src || ""
+                                                                field.onChange(src)
+                                                            }}
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
                                 </div>
 
                                 <div className="px-1">

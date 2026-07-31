@@ -339,6 +339,7 @@ export const AgroChemicalCategorySchema = z.object({
   slug: z.string().optional(),
   short_description: z.string().max(100, "Short description cannot exceed 100 characters"),
   description: z.string().max(500, "Description cannot exceed 500 characters"),
+  image_src: z.string().optional().default(""),
   created: z.string().optional(),
   updated: z.string().optional(),
 })
@@ -348,6 +349,7 @@ export const FormAgroChemicalCategorySchema = AgroChemicalCategorySchema.pick({
   name: true,
   short_description: true,
   description: true,
+  image_src: true,
 })
 
 export const AgroChemicalActiveIngredientSchema = z.object({
@@ -666,6 +668,7 @@ export const FormFarmProduceSchema = z.object({
   category_id: z.string().min(1, "Category is required"),
   category_slug: z.string().min(1, "Category is required"),
   lots_enabled: z.boolean().default(false),
+  image_src: z.string().optional().default(""),
 })
 
 export type FormFarmProduceModel = z.infer<typeof FormFarmProduceSchema>
@@ -678,6 +681,7 @@ export const FarmProduceSchema = z.object({
   category_id: z.string(),
   category_slug: z.string(),
   lots_enabled: z.boolean().optional().default(false),
+  image_src: z.string().optional().default(""),
 })
 
 export type FarmProduce = z.infer<typeof FarmProduceSchema>
@@ -700,6 +704,7 @@ export const AnimalHealthCategorySchema = z.object({
   slug: z.string().optional(),
   short_description: z.string().max(100, "Short description cannot exceed 100 characters"),
   description: z.string().max(500, "Description cannot exceed 500 characters"),
+  image_src: z.string().optional().default(""),
   created: z.string().optional(),
   updated: z.string().optional(),
 })
@@ -709,6 +714,7 @@ export const FormAnimalHealthCategorySchema = AnimalHealthCategorySchema.pick({
   name: true,
   short_description: true,
   description: true,
+  image_src: true,
 })
 
 export const AnimalHealthActiveIngredientSchema = z.object({
@@ -960,6 +966,7 @@ export const FeedCategorySchema = z.object({
   slug: z.string().optional(),
   short_description: z.string().max(100, "Short description cannot exceed 100 characters"),
   description: z.string().max(500, "Description cannot exceed 500 characters"),
+  image_src: z.string().optional().default(""),
   created: z.string().optional(),
   updated: z.string().optional(),
 })
@@ -969,6 +976,7 @@ export const FormFeedCategorySchema = FeedCategorySchema.pick({
   name: true,
   short_description: true,
   description: true,
+  image_src: true,
 })
 
 export const FeedActiveIngredientSchema = z.object({
