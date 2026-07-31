@@ -43,44 +43,7 @@ export function BuyCategoriesNavClient({ categories }: BuyCategoriesNavClientPro
         })}
       </nav>
 
-      {/* Mobile: horizontal scroll with chevron buttons */}
-      <div className="lg:hidden relative flex items-center">
-        <button
-          onClick={() => scroll("left")}
-          className="absolute -left-1 z-10 flex items-center justify-center h-8 w-8 rounded-full bg-background shadow-sm hover:bg-muted transition-colors"
-        >
-          <ChevronLeft className="h-4 w-4 text-muted-foreground" />
-        </button>
-
-        <div
-          ref={scrollRef}
-          className="flex items-center gap-1 overflow-x-auto scrollbar-hide py-3 px-8"
-        >
-          {categories.map(({ label, href }) => {
-            const isActive = pathname.startsWith(href)
-            return (
-              <Link
-                key={href}
-                href={href}
-                className={`shrink-0 px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors ${
-                  isActive
-                    ? "bg-primary/10 text-primary"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                }`}
-              >
-                {label}
-              </Link>
-            )
-          })}
-        </div>
-
-        <button
-          onClick={() => scroll("right")}
-          className="absolute -right-1 z-10 flex items-center justify-center h-8 w-8 rounded-full bg-background shadow-sm hover:bg-muted transition-colors"
-        >
-          <ChevronRight className="h-4 w-4 text-muted-foreground" />
-        </button>
-      </div>
+      {/* Mobile: hidden — categories accessible via mobile nav Buy group */}
 
       <div className="mt-4 border-t max-lg:hidden" />
     </div>
