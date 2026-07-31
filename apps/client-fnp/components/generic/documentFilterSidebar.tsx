@@ -7,6 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { useQueryStates, parseAsString } from "nuqs"
 import { Filter, X } from "lucide-react"
 import { useMediaQuery } from "@/hooks/use-media-query"
+import { useState, useEffect } from "react"
 
 const DOCUMENT_CATEGORIES = [
   { value: "rural_infrastructure", label: "Rural Infrastructure" },
@@ -79,11 +80,14 @@ function FilterContent({ onClearAll }: { onClearAll: () => void }) {
 
 export function DocumentFilterSidebar() {
   const isDesktop = useMediaQuery("(min-width: 1024px)")
-  const [, setQueryState] = useQueryStates({ category: parseAsString })
+  const [queryState, setQueryState] = useQueryStates({ category: parseAsString })
 
   function handleClearAll() {
     setQueryState({ category: null })
   }
+
+  const [open, setOpen] = useState(false)
+  useEffect(() => { setOpen(false) }, [queryState.category])
 
   if (isDesktop) {
     return (
@@ -94,9 +98,9 @@ export function DocumentFilterSidebar() {
   }
 
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button variant="outline" className="w-full mb-4">
+        <Button variant="outline" size="sm">
           <Filter className="mr-2 h-4 w-4" />
           Filters
         </Button>

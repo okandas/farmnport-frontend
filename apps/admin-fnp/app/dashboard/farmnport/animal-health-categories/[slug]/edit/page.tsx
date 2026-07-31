@@ -45,14 +45,14 @@ export default function EditAnimalHealthCategoryPage({ params }: { params: Promi
             name: category?.name || "",
             short_description: category?.short_description || "",
             description: category?.description || "",
-            image_src: category?.image_src || "",
+            images: category?.images || [],
         },
         values: category ? {
             id: category.id,
             name: category.name,
             short_description: category.short_description,
             description: category.description,
-            image_src: category.image_src || "",
+            images: category.images || [],
         } : undefined,
         resolver: zodResolver(FormAnimalHealthCategorySchema),
     })
@@ -227,7 +227,7 @@ export default function EditAnimalHealthCategoryPage({ params }: { params: Promi
                                     <div className="mt-2">
                                         <FormField
                                             control={form.control}
-                                            name="image_src"
+                                            name="images"
                                             render={({ field }) => (
                                                 <FormItem>
                                                     <FormControl>
@@ -235,11 +235,9 @@ export default function EditAnimalHealthCategoryPage({ params }: { params: Promi
                                                             id={category?.id}
                                                             fieldName="images"
                                                             entityType="animal_health_category"
-                                                            maxImages={1}
-                                                            value={field.value ? [{ id: "", src: field.value }] : []}
-                                                            onChange={(images) => {
-                                                                const src = images?.[0]?.src || ""
-                                                                field.onChange(src)
+                                                            maxImages={5}
+                                                            value={field.value || []}
+                                                            onChange={field.onChange
                                                             }}
                                                         />
                                                     </FormControl>

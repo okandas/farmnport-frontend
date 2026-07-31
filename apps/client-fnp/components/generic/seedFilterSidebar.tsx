@@ -10,7 +10,7 @@ import { useQueryStates, parseAsArrayOf, parseAsString } from "nuqs"
 import { Filter, X, Search } from "lucide-react"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { useQuery } from "@tanstack/react-query"
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { querySeedProductFilterAggregates, querySeedProductBuyFilterAggregates } from "@/lib/query"
 
 interface FilterItem {
@@ -36,11 +36,18 @@ function SearchableCheckboxList({
 }) {
   const [search, setSearch] = useState("")
 
+  const itemsWithSelected = useMemo(() => {
+    const keys = new Set(items.map(i => (i.name || i._id).toLowerCase()))
+    items.forEach(i => keys.add(i._id))
+    const missing = selectedItems.filter(v => !keys.has(v) && !keys.has(v.toLowerCase())).map(v => ({ _id: v, count: 0 }))
+    return [...items, ...missing]
+  }, [items, selectedItems])
+
   const filteredItems = useMemo(() => {
-    if (!search) return items
+    if (!search) return itemsWithSelected
     const searchLower = search.toLowerCase()
-    return items.filter(item => (item.name || item._id).toLowerCase().includes(searchLower))
-  }, [items, search])
+    return itemsWithSelected.filter(item => (item.name || item._id).toLowerCase().includes(searchLower))
+  }, [itemsWithSelected, search])
 
   if (isLoading) return <p className="text-sm text-muted-foreground py-2">Loading...</p>
   if (!items || items.length === 0) return <p className="text-sm text-muted-foreground py-2">No {title.toLowerCase()} available</p>
@@ -153,9 +160,12 @@ function FilterContent({ onClearAll, fetchAggregates }: { onClearAll: () => void
 
 function SeedFilterSidebarBase({ fetchAggregates }: { fetchAggregates: typeof querySeedProductFilterAggregates }) {
   const isDesktop = useMediaQuery("(min-width: 1024px)")
-  const [, setQueryState] = useQueryStates({ brand: parseAsArrayOf(parseAsString) })
+  const [queryState, setQueryState] = useQueryStates({ brand: parseAsArrayOf(parseAsString) })
 
   const handleClearAll = () => setQueryState({ brand: null })
+
+  const [open, setOpen] = useState(false)
+  useEffect(() => { setOpen(false) }, [queryState.brand])
 
   if (isDesktop) {
     return (
@@ -166,9 +176,9 @@ function SeedFilterSidebarBase({ fetchAggregates }: { fetchAggregates: typeof qu
   }
 
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button variant="outline" className="w-full mb-4">
+        <Button variant="outline" size="sm">
           <Filter className="mr-2 h-4 w-4" />
           Filters
         </Button>

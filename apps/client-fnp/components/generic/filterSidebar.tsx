@@ -12,7 +12,7 @@ import { Filter, X, Search } from "lucide-react"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { useQuery } from "@tanstack/react-query"
 import { queryPriceFilterAggregates, queryClientFilterAggregates } from "@/lib/query"
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { QuickLinks } from "@/components/generic/quick-links"
 
 interface FilterItem {
@@ -38,14 +38,21 @@ function SearchableCheckboxList({
 }) {
   const [search, setSearch] = useState("")
 
+  const itemsWithSelected = useMemo(() => {
+    const keys = new Set(items.map(i => (i.name || i._id).toLowerCase()))
+    items.forEach(i => keys.add(i._id))
+    const missing = selectedItems.filter(v => !keys.has(v) && !keys.has(v.toLowerCase())).map(v => ({ _id: v, count: 0 }))
+    return [...items, ...missing]
+  }, [items, selectedItems])
+
   const filteredItems = useMemo(() => {
-    if (!search) return items
+    if (!search) return itemsWithSelected
     const searchLower = search.toLowerCase()
-    return items.filter(item => {
+    return itemsWithSelected.filter(item => {
       const displayName = item.name || item._id
       return displayName.toLowerCase().includes(searchLower)
     })
-  }, [items, search])
+  }, [itemsWithSelected, search])
 
   if (isLoading) {
     return <p className="text-sm text-muted-foreground py-2">Loading...</p>
@@ -112,9 +119,11 @@ function ClientFilterContent({
   })
 
   const { data: aggregateData, isLoading } = useQuery({
-    queryKey: ["client-filter-aggregates", clientType],
+    queryKey: ["client-filter-aggregates", clientType, queryState.category],
     queryFn: async () => {
-      const response = await queryClientFilterAggregates(clientType)
+      const response = await queryClientFilterAggregates(clientType, {
+        category: queryState.category ? [queryState.category] : [],
+      })
       return response.data
     },
   })
@@ -123,14 +132,19 @@ function ClientFilterContent({
   const categoryItems: FilterItem[] = useMemo(() => aggregateData?.categories || [], [aggregateData])
 
   const handleSelect = (filterKey: "produce" | "category", value: string) => {
-    setQueryState({ [filterKey]: queryState[filterKey] === value ? null : value })
+    const isDeselecting = queryState[filterKey] === value
+    if (filterKey === "category") {
+      setQueryState({ category: isDeselecting ? null : value, produce: null })
+    } else {
+      setQueryState({ [filterKey]: isDeselecting ? null : value })
+    }
   }
 
   const totalFilters = [queryState.produce, queryState.category].filter(Boolean).length
 
   const filterSections = [
-    ...(!hideProduce ? [{ name: "produce", key: "produce" as const, items: produceItems }] : []),
     { name: "category", key: "category" as const, items: categoryItems },
+    ...(!hideProduce ? [{ name: "produce", key: "produce" as const, items: produceItems }] : []),
   ]
 
   return (
@@ -268,11 +282,11 @@ function FilterContent({
 
 export function FilterSidebar({ hideProduce, clientType }: { hideProduce?: boolean, clientType?: "farmers" | "buyers" } = {}) {
   const isDesktop = useMediaQuery("(min-width: 1024px)")
-  const [, setPriceQueryState] = useQueryStates({
+  const [priceQueryState, setPriceQueryState] = useQueryStates({
     produce: parseAsArrayOf(parseAsString),
     clients: parseAsArrayOf(parseAsString),
   })
-  const [, setClientQueryState] = useQueryStates({
+  const [clientQueryState, setClientQueryState] = useQueryStates({
     produce: parseAsString,
     category: parseAsString,
   })
@@ -285,11 +299,13 @@ export function FilterSidebar({ hideProduce, clientType }: { hideProduce?: boole
     }
   }
 
+  const [open, setOpen] = useState(false)
+  useEffect(() => { setOpen(false) }, [priceQueryState.produce, priceQueryState.clients, clientQueryState.produce, clientQueryState.category])
+
   const content = clientType
     ? <ClientFilterContent onClearAll={handleClearAll} hideProduce={hideProduce} clientType={clientType} />
     : <FilterContent onClearAll={handleClearAll} hideProduce={hideProduce} />
 
-  // Desktop: Sticky sidebar
   if (isDesktop) {
     return (
       <div className="space-y-6">
@@ -298,11 +314,10 @@ export function FilterSidebar({ hideProduce, clientType }: { hideProduce?: boole
     )
   }
 
-  // Mobile: Sheet with trigger button
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button variant="outline" className="w-full mb-4">
+        <Button variant="outline" size="sm">
           <Filter className="mr-2 h-4 w-4" />
           Filters
         </Button>

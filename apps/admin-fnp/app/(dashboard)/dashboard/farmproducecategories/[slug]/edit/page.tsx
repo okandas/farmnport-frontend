@@ -53,19 +53,19 @@ export default function EditFarmProduceCategoryPage({ params }: { params: Promis
         defaultValues: {
             name: category?.name || "",
             description: category?.description || "",
-            image_src: category?.image_src || "",
+            images: category?.images || [],
         },
         values: category ? {
             name: category.name,
             description: category.description,
-            image_src: category.image_src || "",
+            images: category.images || [],
         } : undefined,
         resolver: zodResolver(FormFarmProduceCategorySchema),
     })
 
     const { mutate, isPending } = useMutation({
         mutationFn: (data: FormFarmProduceCategoryModel) =>
-            updateFarmProduceCategory({ slug: category.slug, name: data.name, description: data.description, image_src: data.image_src }),
+            updateFarmProduceCategory({ slug: category.slug, name: data.name, description: data.description, images: data.images }),
         onSuccess: () => {
             toast({
                 description: "Category updated successfully",
@@ -206,7 +206,7 @@ export default function EditFarmProduceCategoryPage({ params }: { params: Promis
                                     <div className="mt-2">
                                         <FormField
                                             control={form.control}
-                                            name="image_src"
+                                            name="images"
                                             render={({ field }) => (
                                                 <FormItem>
                                                     <FormControl>
@@ -214,12 +214,9 @@ export default function EditFarmProduceCategoryPage({ params }: { params: Promis
                                                             id={category?.id}
                                                             fieldName="images"
                                                             entityType="farm_produce_category"
-                                                            maxImages={1}
-                                                            value={field.value ? [{ id: "", src: field.value }] : []}
-                                                            onChange={(images) => {
-                                                                const src = images?.[0]?.src || ""
-                                                                field.onChange(src)
-                                                            }}
+                                                            maxImages={5}
+                                                            value={field.value || []}
+                                                            onChange={field.onChange}
                                                         />
                                                     </FormControl>
                                                     <FormMessage />

@@ -36,14 +36,14 @@ export default function EditFarmProducePage({ params }: { params: Promise<{ slug
     const produce = data?.data
 
     const form = useForm<FormFarmProduceModel>({
-        defaultValues: { name: "", description: "", category_id: "", category_slug: "", lots_enabled: false, image_src: "" },
+        defaultValues: { name: "", description: "", category_id: "", category_slug: "", lots_enabled: false, images: [] },
         values: produce ? {
             name: produce.name,
             description: produce.description ?? "",
             category_id: produce.category_id,
             category_slug: produce.category_slug,
             lots_enabled: produce.lots_enabled ?? false,
-            image_src: produce.image_src ?? "",
+            images: produce.images ?? [],
         } : undefined,
         resolver: zodResolver(FormFarmProduceSchema),
     })
@@ -155,19 +155,16 @@ export default function EditFarmProducePage({ params }: { params: Promise<{ slug
                                 <div className="px-1">
                                     <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Product Image</label>
                                     <div className="mt-2">
-                                        <FormField control={form.control} name="image_src" render={({ field }) => (
+                                        <FormField control={form.control} name="images" render={({ field }) => (
                                             <FormItem>
                                                 <FormControl>
                                                     <FileInput
                                                         id={produce?.id}
                                                         fieldName="images"
                                                         entityType="farm_produce"
-                                                        maxImages={1}
-                                                        value={field.value ? [{ id: "", src: field.value }] : []}
-                                                        onChange={(images) => {
-                                                            const src = images?.[0]?.src || ""
-                                                            field.onChange(src)
-                                                        }}
+                                                        maxImages={5}
+                                                        value={field.value || []}
+                                                        onChange={field.onChange}
                                                     />
                                                 </FormControl>
                                                 <FormMessage />
