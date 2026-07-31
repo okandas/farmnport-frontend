@@ -35,8 +35,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
-          context: .
-          file: apps/client-fnp/Dockerfile
+          context: apps/client-fnp
           platforms: linux/arm64
           push: true
           tags: |
