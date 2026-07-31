@@ -46,6 +46,7 @@ function forwardFill(values: number[], dates: string[]): { values: number[]; dat
   if (values.length !== dates.length || dates.length === 0) return { values, dates }
 
   const MS_PER_DAY = 86400000
+  const MAX_POINTS = 365
   const result: { value: number; date: string }[] = []
 
   for (let i = 0; i < values.length; i++) {
@@ -58,6 +59,20 @@ function forwardFill(values: number[], dates: string[]): { values: number[]; dat
     while (d <= end) {
       result.push({ value: values[i], date: d.toISOString() })
       d = new Date(d.getTime() + MS_PER_DAY)
+    }
+  }
+
+  // Downsample if too many points — keeps chart smooth on mobile
+  if (result.length > MAX_POINTS) {
+    const step = result.length / MAX_POINTS
+    const sampled: typeof result = []
+    for (let i = 0; i < MAX_POINTS; i++) {
+      sampled.push(result[Math.round(i * step)])
+    }
+    sampled.push(result[result.length - 1])
+    return {
+      values: sampled.map(r => r.value),
+      dates: sampled.map(r => r.date),
     }
   }
 

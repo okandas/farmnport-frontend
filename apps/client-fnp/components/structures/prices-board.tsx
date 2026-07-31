@@ -615,14 +615,14 @@ export function PricesBoard({ mode = "kg" }: { mode?: Mode }) {
           )}
           {!pricesLoading && rawEntries.length > 0 && (
             <div className="mt-2 px-4 md:px-8 py-4">
-              <div className="overflow-auto max-h-[70vh]">
-                <table className="w-full min-w-[800px] text-sm">
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[800px] text-sm border-collapse">
                   <thead>
                     <tr className="border-b text-xs text-muted-foreground">
                       <th className="text-left py-2 pr-4 font-medium w-8 tabular-nums sticky top-0 bg-background z-20">#</th>
-                      <th className="text-left py-2 pr-4 font-medium sticky top-0 bg-background z-20">Code</th>
-                      <th className="text-left py-2 pl-2 pr-4 font-medium sticky top-0 left-0 bg-background z-30 max-w-[140px] after:absolute after:right-0 after:top-0 after:bottom-0 after:w-px after:bg-border/50">{mode === "head" ? "Breed · Grade" : "Produce · Grade"}</th>
-                      <th className="text-left py-2 pl-2 font-medium sticky top-0 bg-background z-20">
+                      <th className="text-left py-2 pr-4 font-medium w-14 sticky top-0 bg-background z-20">Code</th>
+                      <th className="text-left py-2 pl-2 pr-4 font-medium max-w-[160px] sticky top-0 left-0 bg-background z-30">{mode === "head" ? "Breed · Grade" : "Produce · Grade"}</th>
+                      <th className="text-left py-2 pl-2 font-medium w-14 sticky top-0 bg-background z-20">
                         <button id="prices-trade-btn" onClick={() => { setCtaGrade(""); setCtaOpen(true) }} className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold border border-primary text-primary hover:bg-primary/10 transition-colors">Trade</button>
                       </th>
                       <th className="text-left py-2 pl-4 font-medium whitespace-nowrap sticky top-0 bg-background z-20">{mode === "head" ? "Avg/Head" : "Average"}</th>
@@ -654,8 +654,8 @@ export function PricesBoard({ mode = "kg" }: { mode?: Mode }) {
                             <td className="py-3 pr-4">
                               <span className={`inline-flex items-center justify-center rounded-md px-2 py-0.5 text-xs font-bold ring-1 ring-inset min-w-[36px] shrink-0 ${color}`}>{entry.code}</span>
                             </td>
-                            <td className="py-3 pl-2 pr-4 font-medium text-foreground sticky left-0 bg-background z-10 max-w-[140px]">
-                              <Link href={href} className="hover:underline">
+                            <td className="py-3 pl-2 pr-4 font-medium text-foreground max-w-[160px] sticky left-0 bg-background z-10">
+                              <Link href={href} className="hover:underline block">
                                 <p className="font-semibold leading-tight truncate">{entry.name}</p>
                                 <p className="text-xs text-muted-foreground font-normal leading-tight mt-0.5 truncate">{produce}</p>
                               </Link>
