@@ -45,7 +45,7 @@ function SearchableCheckboxList({
   const [search, setSearch] = useState("")
 
   // Ensure selected items always appear even if aggregates don't return them
-  const itemsWithSelected = useMemo(() => {
+  const itemsWithSelected: FilterItem[] = useMemo(() => {
     const keys = new Set(items.map(i => (i.name || i._id).toLowerCase()))
     items.forEach(i => keys.add(i._id))
     const missing = selectedItems.filter(v => !keys.has(v) && !keys.has(v.toLowerCase())).map(v => ({ _id: v, count: 0 }))
