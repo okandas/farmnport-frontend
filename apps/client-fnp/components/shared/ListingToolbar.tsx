@@ -5,7 +5,7 @@ import { ViewToggle } from "@/components/shared/ViewToggle"
 interface ListingToolbarProps {
   view: "grid" | "list"
   onViewChange: (view: "grid" | "list") => void
-  filterSlot: React.ReactNode
+  filterSlot?: React.ReactNode
   count?: { showing: number; total: number }
 }
 
