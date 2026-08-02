@@ -13,11 +13,13 @@ export const metadata = {
         siteName: "farmnport",
         type: "website" as const,
         url: "https://farmnport.com/buy-feeds",
+        images: [{ url: "https://farmnport.com/og-image.png", width: 1200, height: 630, alt: "farmnport" }],
     },
     twitter: {
         card: "summary_large_image" as const,
         title: "Buy Animal Feeds Zimbabwe – Prices & Product Range",
         description: "Shop poultry feeds, cattle feeds, pig feeds and pet food from top brands. Compare prices and order online.",
+        images: ["/og-image.png"],
     },
 }
 
