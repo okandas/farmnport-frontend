@@ -13,6 +13,13 @@ export const metadata = {
     url: 'https://farmnport.com/agrochemical-guides',
     siteName: 'farmnport',
     type: 'website',
+    images: [{ url: "https://farmnport.com/og-image.png", width: 1200, height: 630, alt: "farmnport" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Agrochemical Guides Zimbabwe",
+    description: "Browse agrochemical product guides for Zimbabwe farmers. Herbicides, fungicides, insecticides, acaricides — dosage rates and application guidelines.",
+    images: ["/og-image.png"],
   },
 }
 

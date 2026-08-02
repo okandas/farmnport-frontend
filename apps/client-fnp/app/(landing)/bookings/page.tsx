@@ -25,11 +25,13 @@ export const metadata = {
         siteName: "farmnport",
         type: "website" as const,
         url: "https://farmnport.com/bookings",
+        images: [{ url: "https://farmnport.com/og-image.png", width: 1200, height: 630, alt: "farmnport" }],
     },
     twitter: {
         card: "summary_large_image" as const,
         title: "Farm Bookings & Pre-Orders Zimbabwe – Prices & Availability",
         description: "Book day-old chicks, livestock and seasonal farm produce in advance. View prices and secure your order with a deposit.",
+        images: ["/og-image.png"],
     },
 }
 

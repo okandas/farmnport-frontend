@@ -13,11 +13,13 @@ export const metadata = {
         siteName: "farmnport",
         type: "website" as const,
         url: "https://farmnport.com/buy-agrochemicals",
+        images: [{ url: "https://farmnport.com/og-image.png", width: 1200, height: 630, alt: "farmnport" }],
     },
     twitter: {
         card: "summary_large_image" as const,
         title: "Buy Agrochemicals Zimbabwe – Prices & Dosage Guides",
         description: "Browse herbicides, fungicides, insecticides and plant growth regulators. Compare prices, view dosage guides and spray programs for Zimbabwe crops.",
+        images: ["/og-image.png"],
     },
 }
 

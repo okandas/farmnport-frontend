@@ -14,6 +14,13 @@ export const metadata: Metadata = {
         url: "https://farmnport.com/feed-guides",
         siteName: "farmnport",
         type: "website",
+        images: [{ url: "https://farmnport.com/og-image.png", width: 1200, height: 630, alt: "farmnport" }],
+    },
+    twitter: {
+        card: "summary_large_image",
+        title: "Livestock Feed Guides Zimbabwe — Animal Feed Products & Nutrition",
+        description: "Browse livestock feed product guides for Zimbabwe farmers. Compare feeds by animal type, phase, and nutritional specs.",
+        images: ["/og-image.png"],
     },
 }
 

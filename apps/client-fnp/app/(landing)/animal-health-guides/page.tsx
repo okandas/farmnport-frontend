@@ -13,6 +13,13 @@ export const metadata = {
     url: 'https://farmnport.com/animal-health-guides',
     siteName: 'farmnport',
     type: 'website',
+    images: [{ url: "https://farmnport.com/og-image.png", width: 1200, height: 630, alt: "farmnport" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Animal Health Product Guides Zimbabwe",
+    description: "Browse animal health product guides for poultry and livestock in Zimbabwe. Vaccines, antibiotics, supplements — dosage rates and usage guidelines.",
+    images: ["/og-image.png"],
   },
 }
 
