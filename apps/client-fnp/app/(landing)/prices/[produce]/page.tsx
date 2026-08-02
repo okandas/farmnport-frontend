@@ -8,41 +8,28 @@ interface ProducePageProps {
   searchParams: Promise<{ code?: string; type?: string }>
 }
 
-const CODE_NAMES: Record<string, string> = {
-  bull: "Bull",
-  cow: "Cow",
-  heifer: "Heifer",
-  steer: "Steer",
-  ox: "Ox",
-  weaners: "Weaners",
-  tollies: "Tollies",
-  sheep: "Sheep",
-  ewe: "Ewe",
-  ram: "Ram",
-  boar: "Boar",
-  sow: "Sow",
-  porker: "Porker",
-  baconer: "Baconer",
-  boran: "Boran",
-  brahman: "Brahman",
-  tuli: "Tuli",
-  nkone: "Nkone",
-  simbra: "Simbra",
-  simmental: "Simmental",
-  mashona: "Mashona",
-  bonsmara: "Bonsmara",
-  angus: "Angus",
-  sussex: "Sussex",
-  hereford: "Hereford",
-  crossbreed: "Crossbreed",
-  communal: "Communal",
-  dairy: "Dairy",
-}
+const BASE = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3744"
 
 const TYPE_NAMES: Record<string, string> = {
   lwt: "Liveweight",
   cdm: "Cold Dress Mass",
   ph: "Per Head",
+}
+
+async function getGradeName(produce: string, code: string): Promise<string> {
+  try {
+    const res = await fetch(`${BASE}/v1/prices/series/summary`, { next: { revalidate: 3600 } })
+    if (!res.ok) return capitalizeFirstLetter(code)
+    const data = await res.json()
+    const series = data?.data ?? []
+    const match = series.find((s: any) =>
+      s.code?.toLowerCase() === code.toLowerCase() &&
+      s.category?.toLowerCase() === produce.toLowerCase()
+    )
+    return match?.name ?? capitalizeFirstLetter(code)
+  } catch {
+    return capitalizeFirstLetter(code)
+  }
 }
 
 const PRODUCE_SEO: Record<string, { keywords: string; description: string }> = {
@@ -86,7 +73,7 @@ export async function generateMetadata({ params, searchParams }: ProducePageProp
   const produceName = capitalizeFirstLetter(produce.replace(/-/g, ' '))
   const seo = PRODUCE_SEO[produce.toLowerCase()]
 
-  const codeName = code ? CODE_NAMES[code.toLowerCase()] ?? capitalizeFirstLetter(code) : ""
+  const codeName = code ? await getGradeName(produce, code) : ""
   const typeName = type ? TYPE_NAMES[type.toLowerCase()] ?? "" : ""
 
   // Build SEO strings based on whether code/type filters are active
