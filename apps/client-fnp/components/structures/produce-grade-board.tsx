@@ -523,7 +523,12 @@ export function ProduceGradeBoard({
     } else if (codeParam) {
       match = gradeEntries.find(e => e.code.toLowerCase() === codeParam.toLowerCase())
     }
-    setSelectedKey((match ?? gradeEntries[0]).key)
+    const selected = match ?? gradeEntries[0]
+    setSelectedKey(selected.key)
+    if (!codeParam) {
+      setCodeParam(selected.code.toLowerCase())
+      setTypeParam(selected.price_type === "Cold Dress Mass" ? "cdm" : "lwt")
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [produce, gradeEntries.length])
 

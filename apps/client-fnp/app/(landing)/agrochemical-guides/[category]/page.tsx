@@ -25,10 +25,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${name} Zimbabwe – Products, Dosage Rates & Labels | farmnport.com`,
     description,
+    keywords: `${name.toLowerCase()} zimbabwe, ${name.toLowerCase()} products, ${name.toLowerCase()} dosage rates, agrochemical guides zimbabwe, crop protection ${name.toLowerCase()}`,
     alternates: { canonical: `/agrochemical-guides/${category}` },
     openGraph: {
       title: `${name} Zimbabwe – Agrochemical Guides`,
       description: `Browse ${name.toLowerCase()} products for Zimbabwe farmers. Compare active ingredients, dosage rates, and application guidelines.`,
+      url: `https://farmnport.com/agrochemical-guides/${category}`,
       siteName: 'farmnport',
       type: 'website',
     },
@@ -60,8 +62,19 @@ export default async function AgroChemicalCategoryPage({ params }: CategoryPageP
         .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
         .join(' ')
 
+    const breadcrumbJsonLd = {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://farmnport.com" },
+            { "@type": "ListItem", "position": 2, "name": "Agrochemical Guides", "item": "https://farmnport.com/agrochemical-guides" },
+            { "@type": "ListItem", "position": 3, "name": categoryName, "item": `https://farmnport.com/agrochemical-guides/${category}` },
+        ],
+    }
+
     return (
         <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
             {/* Breadcrumb */}
             <div className="border-b">
                 <div className="max-w-7xl mx-auto px-6 lg:px-8 py-3">

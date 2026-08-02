@@ -24,6 +24,14 @@ export async function generateMetadata({ params }: Props,  parent: ResolvingMeta
     },
     title: `${name} Farmers in Zimbabwe | farmnport.com`,
     description,
+    keywords: `${name.toLowerCase()} farmers zimbabwe, ${product.toLowerCase()} farmers, ${product.toLowerCase()} suppliers zimbabwe, buy ${product.toLowerCase()} zimbabwe, ${product.toLowerCase()} producers`,
+    openGraph: {
+      title: `${name} Farmers in Zimbabwe | farmnport.com`,
+      description,
+      url: `https://farmnport.com/farmers/${product.toLowerCase()}`,
+      siteName: 'farmnport',
+      type: 'website',
+    },
   }
 }
 
@@ -36,8 +44,19 @@ export default async function FarmersProductPage({ params }: FarmerProductPagePr
   const user = await retrieveUser()
   const { product } = await params
 
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://farmnport.com" },
+      { "@type": "ListItem", "position": 2, "name": "Farmers", "item": "https://farmnport.com/farmers" },
+      { "@type": "ListItem", "position": 3, "name": `${capitalizeFirstLetter(plural(product))} Farmers`, "item": `https://farmnport.com/farmers/${product}` },
+    ],
+  }
+
   return (
     <main>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <div className="container pt-6">
         <nav className="flex items-center gap-1.5 text-xs text-muted-foreground mb-4">
           <Link href="/" className="hover:text-foreground transition-colors">Home</Link>

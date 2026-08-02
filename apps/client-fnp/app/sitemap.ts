@@ -49,6 +49,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     feedingPrograms,
     sprayPrograms,
     clients,
+    seriesSummary,
   ] = await Promise.all([
     fetchFarmProduce(),
     fetchAgroChemicalCategories(),
@@ -59,6 +60,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     fetchFeedingPrograms(),
     fetchSprayPrograms(),
     fetchClients(),
+    fetchSeriesSummary(),
   ])
 
   // Farm produce → /buyers/{slug} and /farmers/{slug}
@@ -94,14 +96,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }))
 
-  // Produce price category routes
-  const producePriceCategories = ['beef', 'lamb', 'mutton', 'goat', 'chicken', 'pork']
-  const producePriceRoutes: MetadataRoute.Sitemap = producePriceCategories.map((slug) => ({
-    url: `${BASE_URL}/prices/${slug}`,
-    lastModified: new Date(),
-    changeFrequency: 'weekly' as const,
-    priority: 0.7,
-  }))
+  // Produce price routes — categories + individual grade pages
+  const priceCategories: string[] = [...new Set((seriesSummary as any[]).map((s: any) => s.category?.toLowerCase()).filter(Boolean))]
+  const producePriceRoutes: MetadataRoute.Sitemap = [
+    // Per-head prices page
+    { url: `${BASE_URL}/prices/head`, lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.7 },
+    // Category pages (e.g. /prices/cattle, /prices/beef)
+    ...priceCategories.map((slug: string) => ({
+      url: `${BASE_URL}/prices/${slug}`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.7,
+    })),
+    // Individual grade pages (e.g. /prices/cattle?code=bull&type=lwt)
+    ...seriesSummary.map((s: any) => ({
+      url: `${BASE_URL}/prices/${s.category?.toLowerCase()}?code=${s.code?.toLowerCase()}&type=lwt`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.6,
+    })),
+  ]
 
   // Farmer and buyer profile routes
   const clientRoutes: MetadataRoute.Sitemap = clients.flatMap((client: any) => {
@@ -211,6 +225,19 @@ async function fetchSimpleApi(endpoint: string) {
     return data.data || []
   } catch (error) {
     console.error(`Error fetching ${endpoint} for sitemap:`, error)
+    return []
+  }
+}
+
+async function fetchSeriesSummary() {
+  const apiUrl = getApiUrl()
+  if (!apiUrl) return []
+  try {
+    const response = await fetch(`${apiUrl}/prices/series/summary`, { next: { revalidate: 86400 } })
+    if (!response.ok) return []
+    const data = await response.json()
+    return data?.data || []
+  } catch {
     return []
   }
 }

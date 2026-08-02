@@ -11,10 +11,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${name} Zimbabwe – Animal Health Products & Guides | farmnport.com`,
     description: `Browse ${name.toLowerCase()} products for poultry and livestock in Zimbabwe. Compare dosage rates, active ingredients, and usage guidelines.`,
+    keywords: `${name.toLowerCase()} zimbabwe, ${name.toLowerCase()} products, animal health ${name.toLowerCase()}, veterinary ${name.toLowerCase()} zimbabwe, poultry ${name.toLowerCase()}`,
     alternates: { canonical: `/animal-health-guides/${category}` },
     openGraph: {
       title: `${name} Zimbabwe – Animal Health Guides`,
       description: `Browse ${name.toLowerCase()} products for poultry and livestock in Zimbabwe. Compare dosage rates and usage guidelines.`,
+      url: `https://farmnport.com/animal-health-guides/${category}`,
       siteName: 'farmnport',
       type: 'website',
     },
@@ -48,8 +50,19 @@ export default async function AnimalHealthCategoryPage({ params }: CategoryPageP
 
     const categoryName = products[0]?.animal_health_category?.name || category
 
+    const breadcrumbJsonLd = {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://farmnport.com" },
+            { "@type": "ListItem", "position": 2, "name": "Animal Health Guides", "item": "https://farmnport.com/animal-health-guides" },
+            { "@type": "ListItem", "position": 3, "name": categoryName, "item": `https://farmnport.com/animal-health-guides/${category}` },
+        ],
+    }
+
     return (
         <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
             {/* Breadcrumb */}
             <div className="border-b">
                 <div className="max-w-7xl mx-auto px-6 lg:px-8 py-3">

@@ -96,6 +96,7 @@ export default async function BuyDocumentDetailPage({ params }: Props) {
             "seller": { "@type": "Organization", "name": "farmnport" },
             "itemCondition": "https://schema.org/NewCondition",
             "priceValidUntil": new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+            "validFrom": new Date().toISOString().split('T')[0],
         },
         "additionalProperty": [
             { "@type": "PropertyValue", "name": "File Type", "value": doc.file_type?.toUpperCase() || "PDF" },
@@ -103,8 +104,20 @@ export default async function BuyDocumentDetailPage({ params }: Props) {
         ],
     }
 
+    const breadcrumbJsonLd = {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://farmnport.com" },
+            { "@type": "ListItem", "position": 2, "name": "Buy", "item": "https://farmnport.com/buy" },
+            { "@type": "ListItem", "position": 3, "name": "Documents", "item": "https://farmnport.com/buy-documents" },
+            { "@type": "ListItem", "position": 4, "name": doc.title, "item": `https://farmnport.com/buy-documents/${slug}` },
+        ],
+    }
+
     return (
         <div className="min-h-screen bg-background">
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
             <div className="border-b">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">

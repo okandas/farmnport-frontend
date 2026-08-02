@@ -42,7 +42,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     'View dosage rates, label information, and application guidelines on farmnport.com.',
   ].filter(Boolean).join('. ')
 
-  return buildGuideMetadata(chemical, categorySingularTitle, 'Dosage, Label & Guide', description, `/agrochemical-guides/${category}/${slug}`, chemical.images?.[0]?.img?.src)
+  const keywords = `${chemical.name.toLowerCase()}, ${categorySingular} zimbabwe, ${ingredients ? ingredients.toLowerCase() + ', ' : ''}${crops ? crops.toLowerCase() + ', ' : ''}agrochemical guide zimbabwe, ${category} dosage rates`
+
+  return buildGuideMetadata(chemical, categorySingularTitle, 'Dosage, Label & Guide', description, `/agrochemical-guides/${category}/${slug}`, chemical.images?.[0]?.img?.src, keywords)
 }
 
 interface GuidePageProps {
@@ -104,6 +106,17 @@ export default async function AgroChemicalGuidePage({ params }: GuidePageProps) 
         ? `Dosage rates available for ${chemical.dosage_rates.map((r: any) => r.crop).join(', ')}`
         : undefined
 
+    const breadcrumbJsonLd = {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://farmnport.com" },
+            { "@type": "ListItem", "position": 2, "name": "Agrochemical Guides", "item": "https://farmnport.com/agrochemical-guides" },
+            { "@type": "ListItem", "position": 3, "name": chemical.agrochemical_category?.name || category, "item": `https://farmnport.com/agrochemical-guides/${category}` },
+            { "@type": "ListItem", "position": 4, "name": chemical.name, "item": `https://farmnport.com/agrochemical-guides/${category}/${slug}` },
+        ],
+    }
+
     const structuredData = {
         "@context": "https://schema.org",
         "@type": "Product",
@@ -131,6 +144,7 @@ export default async function AgroChemicalGuidePage({ params }: GuidePageProps) 
     return (
         <div className="min-h-screen bg-background">
             {/* JSON-LD Structured Data */}
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
             <script
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}

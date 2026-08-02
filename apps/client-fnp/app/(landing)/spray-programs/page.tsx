@@ -1,6 +1,21 @@
 import Link from "next/link"
+import type { Metadata } from "next"
 import { serverFetch } from "@/lib/serverFetch"
 import { SprayProgramsClient } from "./SprayProgramsClient"
+
+export const metadata: Metadata = {
+    title: "Spray Programs Zimbabwe — Crop Protection Schedules | farmnport.com",
+    description: "Browse spray program schedules for Zimbabwe crops. Step-by-step agrochemical application timings for every growth stage, from planting to harvest.",
+    keywords: "spray programs zimbabwe, crop protection schedule, agrochemical spray program, crop spraying schedule zimbabwe, pest control program, fungicide spray schedule",
+    alternates: { canonical: "/spray-programs" },
+    openGraph: {
+        title: "Spray Programs Zimbabwe — Crop Protection Schedules",
+        description: "Browse spray program schedules for Zimbabwe crops. Step-by-step agrochemical application timings for every growth stage.",
+        url: "https://farmnport.com/spray-programs",
+        siteName: "farmnport",
+        type: "website",
+    },
+}
 
 export default async function SprayProgramsPage() {
     let programs: any[] = []
@@ -12,8 +27,19 @@ export default async function SprayProgramsPage() {
         console.error("Error fetching spray programs:", error)
     }
 
+    const breadcrumbJsonLd = {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://farmnport.com" },
+            { "@type": "ListItem", "position": 2, "name": "Programs", "item": "https://farmnport.com/programs" },
+            { "@type": "ListItem", "position": 3, "name": "Spray Programs", "item": "https://farmnport.com/spray-programs" },
+        ],
+    }
+
     return (
         <main>
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
             {/* Header */}
             <section className="border-b">
                 <div className="mx-auto max-w-7xl px-6 lg:px-8 pt-10 pb-8">

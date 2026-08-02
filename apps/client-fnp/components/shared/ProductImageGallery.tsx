@@ -51,8 +51,7 @@ export function ProductImageGallery({ images, name, height = 520, fallback }: Pr
                     </div>
                 )}
                 <button
-                    className="relative flex-1 bg-background rounded-xl overflow-hidden cursor-pointer group"
-                    style={{ height: `min(${height}px, 60vw)` }}
+                    className="relative flex-1 aspect-square bg-muted/30 dark:bg-white rounded-xl border overflow-hidden shadow-sm cursor-pointer group"
                     onClick={() => images[selected]?.img?.src && setOpen(true)}
                 >
                     {images[selected]?.img?.src ? (
@@ -60,8 +59,8 @@ export function ProductImageGallery({ images, name, height = 520, fallback }: Pr
                             src={images[selected].img.src}
                             alt={name}
                             fill
-                            sizes="(max-width: 1024px) 100vw, 480px"
-                            className="object-contain"
+                            sizes="(max-width: 1024px) 100vw, 450px"
+                            className="object-contain p-8"
                             priority
                         />
                     ) : (
