@@ -4,11 +4,12 @@ import { PricesBoard } from "@/components/structures/prices-board"
 export const metadata = {
   title: 'Agricultural Market Prices Zimbabwe – Livestock, Produce & More | farmnport.com',
   description: 'Compare current agricultural prices from verified buyers across Zimbabwe. Liveweight cattle, cold dress mass, beef, lamb, mutton, goat, chicken, pork — updated weekly in USD and ZiG.',
+  keywords: 'agricultural prices zimbabwe, livestock prices, cattle prices zimbabwe, beef prices, chicken prices, pork prices, goat prices, mutton prices, farm produce prices, market rates zimbabwe',
   alternates: { canonical: '/prices' },
   openGraph: {
-    title: 'Agricultural Market Prices Zimbabwe',
-    description: 'Compare current agricultural prices from verified buyers across Zimbabwe.',
-    url: '/prices',
+    title: 'Agricultural Market Prices Zimbabwe – Livestock, Produce & More',
+    description: 'Compare current agricultural prices from verified buyers across Zimbabwe. Liveweight cattle, cold dress mass, beef, lamb, mutton, goat, chicken, pork — updated weekly.',
+    url: 'https://farmnport.com/prices',
     siteName: 'farmnport',
     type: 'website',
   },
