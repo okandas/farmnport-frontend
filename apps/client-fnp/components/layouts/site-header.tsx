@@ -131,6 +131,7 @@ const NAV_GROUPS: { name: string; subcategories: { name: string; href: string; b
       { name: "Animal Nutrition", href: "/feed-guides" },
       { name: "Plant Nutrition Guides", href: "/plant-nutrition-guides" },
       { name: "Seed Guides", href: "/seed-guides" },
+      { name: "Equipment Guides", href: "/equipment-guides" },
       { name: "All Programs", href: "/programs", bold: true },
       { name: "Spray Programs", href: "/spray-programs" },
       { name: "Feeding Programs", href: "/feeding-programs" },
@@ -302,14 +303,14 @@ function MobileSearch({ router }: { router: ReturnType<typeof useRouter> }) {
         <div className="fixed inset-0 z-[60] bg-background lg:hidden">
           <div className="flex items-center gap-3 px-4 h-14 border-b">
             <form onSubmit={handleSubmit} className="flex-1 flex items-center gap-2">
-              <div className="relative flex-1 flex items-center rounded-sm bg-muted p-0.5">
+              <div className="relative flex-1 min-w-0 flex items-center rounded-sm bg-muted p-0.5">
                 <input
                   type="text"
                   autoFocus
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Search for products, guides..."
-                  className="flex-1 h-9 pl-3 pr-10 text-sm bg-transparent outline-none placeholder:text-muted-foreground/60"
+                  className="flex-1 min-w-0 h-9 pl-3 pr-10 text-sm bg-transparent outline-none placeholder:text-muted-foreground/60"
                 />
                 <button type="submit" className="absolute right-0.5 top-1/2 -translate-y-1/2 h-8 w-8 flex items-center justify-center rounded-sm bg-primary text-primary-foreground hover:bg-primary/90 transition-colors">
                   <Search className="h-4 w-4" />
@@ -350,7 +351,7 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 w-full bg-background border-b">
       {/* Main nav */}
-      <div className="container flex h-14 items-center gap-6">
+      <div className="container flex h-14 items-center gap-2 lg:gap-6">
         {/* Logo */}
         <Link href="/" className="shrink-0 font-bold text-lg">
           {siteConfig.name}

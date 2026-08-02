@@ -85,6 +85,7 @@ export default async function LotDetailPage({ params }: Props) {
             "availability": isExpired ? "https://schema.org/SoldOut" : "https://schema.org/InStock",
             "itemCondition": "https://schema.org/NewCondition",
             "priceValidUntil": lot.expires_at || new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+            "validFrom": new Date().toISOString().split('T')[0],
             "seller": { "@type": "Organization", "name": "farmnport" },
         },
     }

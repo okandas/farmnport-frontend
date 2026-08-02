@@ -1,3 +1,4 @@
+import type { Metadata } from "next"
 import Image from "next/image"
 import { AlertTriangle } from "lucide-react"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
@@ -9,9 +10,42 @@ import { WantToBuyCTA } from "@/components/shared/WantToBuyCTA"
 import { GuideProductTitle } from "@/components/shared/GuideProductTitle"
 import { ShareBar } from "@/components/shared/ShareBar"
 import { SidebarPromo } from "@/components/ads/SidebarPromo"
+import { capitalizeFirstLetter } from "@/lib/utilities"
 
 interface FeedDetailPageProps {
     params: Promise<{ slug: string }>
+}
+
+export async function generateMetadata({ params }: FeedDetailPageProps): Promise<Metadata> {
+    const { slug } = await params
+    let product: any = null
+    try {
+        const res = await fetch(`${BaseURL}/feed/${slug}`, { cache: "no-store" })
+        if (res.ok) product = await res.json()
+    } catch {}
+
+    if (!product) {
+        return { title: 'Feed Guide | farmnport.com', robots: { index: false } }
+    }
+
+    const name = product.name || capitalizeFirstLetter(slug.replace(/-/g, ' '))
+    const brand = product.brand?.name ? ` by ${product.brand.name}` : ''
+    const animal = product.animal ? ` for ${product.animal}` : ''
+    const description = `${name}${brand} — ${product.phase || 'livestock'} feed guide${animal}. View nutritional specs, feeding instructions, and mixing recommendations.`
+
+    return {
+        title: `${name} — Feed Guide Zimbabwe | farmnport.com`,
+        description,
+        keywords: `${name.toLowerCase()}, ${product.animal?.toLowerCase() || 'livestock'} feed zimbabwe, ${product.phase?.toLowerCase() || ''} feed, feed guide zimbabwe, ${slug}`.replace(/, ,/g, ','),
+        alternates: { canonical: `/feed-guides/${slug}` },
+        openGraph: {
+            title: `${name} — Feed Guide Zimbabwe`,
+            description,
+            url: `https://farmnport.com/feed-guides/${slug}`,
+            siteName: "farmnport",
+            type: "website",
+        },
+    }
 }
 
 const fetchOptions: RequestInit = { cache: "no-store" }
@@ -40,6 +74,16 @@ export default async function FeedDetailPage({ params }: FeedDetailPageProps) {
     const url = `${baseUrl}/feeds/${slug}`
     const imageUrl = product.images?.[0]?.img?.src || `${baseUrl}/default-feed.png`
 
+    const breadcrumbJsonLd = {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://farmnport.com" },
+            { "@type": "ListItem", "position": 2, "name": "Feed Guides", "item": "https://farmnport.com/feed-guides" },
+            { "@type": "ListItem", "position": 3, "name": product.name, "item": `https://farmnport.com/feed-guides/${slug}` },
+        ],
+    }
+
     const structuredData = {
         "@context": "https://schema.org",
         "@type": "Product",
@@ -58,6 +102,7 @@ export default async function FeedDetailPage({ params }: FeedDetailPageProps) {
 
     return (
         <div className="min-h-screen bg-background">
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
             <script
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}

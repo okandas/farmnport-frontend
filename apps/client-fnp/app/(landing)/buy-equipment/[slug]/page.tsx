@@ -46,6 +46,7 @@ export default async function BuyEquipmentProductPage({ params }: BuyEquipmentPr
             "availability": product.available_for_sale ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
             "itemCondition": "https://schema.org/NewCondition",
             "priceValidUntil": new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+            "validFrom": new Date().toISOString().split('T')[0],
             "seller": { "@type": "Organization", "name": "farmnport" }
         }
     } : null

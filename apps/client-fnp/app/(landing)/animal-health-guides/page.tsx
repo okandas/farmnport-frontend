@@ -5,10 +5,12 @@ import { AllAnimalHealthClient } from "./AllAnimalHealthClient"
 export const metadata = {
   title: 'Animal Health Product Guides Zimbabwe – Vaccines, Antibiotics & Supplements | farmnport.com',
   description: 'Browse animal health product guides for poultry and livestock in Zimbabwe. Vaccines, antibiotics, nutrition supplements, anti-protozoals, and biosecurity disinfectants — dosage rates and usage guidelines.',
+  keywords: 'animal health products zimbabwe, poultry vaccines zimbabwe, livestock antibiotics, veterinary products zimbabwe, animal health guides, poultry supplements zimbabwe',
   alternates: { canonical: '/animal-health-guides' },
   openGraph: {
     title: 'Animal Health Product Guides Zimbabwe',
     description: 'Browse animal health product guides for poultry and livestock in Zimbabwe. Vaccines, antibiotics, supplements — dosage rates and usage guidelines.',
+    url: 'https://farmnport.com/animal-health-guides',
     siteName: 'farmnport',
     type: 'website',
   },
@@ -32,8 +34,19 @@ async function getAllProducts() {
 export default async function AnimalHealthGuidesPage() {
     const { data: products, total } = await getAllProducts()
 
+    const breadcrumbJsonLd = {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://farmnport.com" },
+            { "@type": "ListItem", "position": 2, "name": "Guides", "item": "https://farmnport.com/guides" },
+            { "@type": "ListItem", "position": 3, "name": "Animal Health Guides", "item": "https://farmnport.com/animal-health-guides" },
+        ],
+    }
+
     return (
         <main className="bg-gradient-to-b from-background to-muted/20">
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
             <section className="py-6 lg:py-8 bg-muted/30">
                 <div className="mx-auto max-w-7xl px-6 lg:px-8">
                     <nav className="flex text-sm text-muted-foreground mb-6">

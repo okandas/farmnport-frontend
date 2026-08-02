@@ -60,6 +60,7 @@ const NAV_GROUPS: { name: string; subcategories: { name: string; href: string; b
       { name: "Animal Nutrition", href: "/feed-guides" },
       { name: "Plant Nutrition Guides", href: "/plant-nutrition-guides" },
       { name: "Seed Guides", href: "/seed-guides" },
+      { name: "Equipment Guides", href: "/equipment-guides" },
       { name: "All Programs", href: "/programs", bold: true },
       { name: "Spray Programs", href: "/spray-programs" },
       { name: "Feeding Programs", href: "/feeding-programs" },

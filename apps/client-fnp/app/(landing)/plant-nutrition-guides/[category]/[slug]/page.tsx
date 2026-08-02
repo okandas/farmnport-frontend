@@ -39,7 +39,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     'View application rates and usage guidelines on farmnport.com.',
   ].filter(Boolean).join('. ')
 
-  return buildGuideMetadata(product, categorySingularTitle, 'Application Rates & Guide', description, `/plant-nutrition-guides/${category}/${slug}`, product.images?.[0]?.img?.src)
+  const keywords = `${product.name.toLowerCase()}, ${categorySingular} zimbabwe, ${ingredients ? ingredients.toLowerCase() + ', ' : ''}${crops ? crops.toLowerCase() + ', ' : ''}plant nutrition guide zimbabwe, ${category} application rates`
+
+  return buildGuideMetadata(product, categorySingularTitle, 'Application Rates & Guide', description, `/plant-nutrition-guides/${category}/${slug}`, product.images?.[0]?.img?.src, keywords)
 }
 
 interface GuidePageProps {
@@ -96,6 +98,17 @@ export default async function PlantNutritionGuidePage({ params }: GuidePageProps
         ? `${product.name} is a ${product.plant_nutrition_category.name}. View active ingredients and application rates.`
         : `Plant nutrition guide for ${product.name}. Complete information on active ingredients and application rates.`
 
+    const breadcrumbJsonLd = {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://farmnport.com" },
+            { "@type": "ListItem", "position": 2, "name": "Plant Nutrition Guides", "item": "https://farmnport.com/plant-nutrition-guides" },
+            { "@type": "ListItem", "position": 3, "name": product.plant_nutrition_category?.name || category, "item": `https://farmnport.com/plant-nutrition-guides/${categorySlug}` },
+            { "@type": "ListItem", "position": 4, "name": product.name, "item": `https://farmnport.com/plant-nutrition-guides/${category}/${slug}` },
+        ],
+    }
+
     const structuredData = {
         "@context": "https://schema.org",
         "@type": "Product",
@@ -114,6 +127,7 @@ export default async function PlantNutritionGuidePage({ params }: GuidePageProps
 
     return (
         <div className="min-h-screen bg-background">
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
             <script
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}

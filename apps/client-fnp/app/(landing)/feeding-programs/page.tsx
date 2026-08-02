@@ -6,7 +6,15 @@ import { capitalizeFirstLetter } from "@/lib/utilities"
 export const metadata = {
     title: "Feeding Programs Zimbabwe — Livestock Nutrition Schedules | farmnport.com",
     description: "Browse structured feeding programs for livestock in Zimbabwe — formulations, schedules, and nutritional targets by animal type.",
-    alternates: { canonical: "https://farmnport.com/feeding-programs" },
+    keywords: "feeding programs zimbabwe, livestock feed schedule, poultry feeding program, cattle feeding program zimbabwe, broiler feed schedule, pig feeding plan",
+    alternates: { canonical: "/feeding-programs" },
+    openGraph: {
+        title: "Feeding Programs Zimbabwe — Livestock Nutrition Schedules",
+        description: "Browse structured feeding programs for livestock in Zimbabwe — formulations, schedules, and nutritional targets by animal type.",
+        url: "https://farmnport.com/feeding-programs",
+        siteName: "farmnport",
+        type: "website",
+    },
 }
 
 function getAnimalGroup(farmProduceName: string): string {
@@ -45,8 +53,19 @@ export default async function FeedingProgramsPage() {
         programs: items,
     }))
 
+    const breadcrumbJsonLd = {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://farmnport.com" },
+            { "@type": "ListItem", "position": 2, "name": "Programs", "item": "https://farmnport.com/programs" },
+            { "@type": "ListItem", "position": 3, "name": "Feeding Programs", "item": "https://farmnport.com/feeding-programs" },
+        ],
+    }
+
     return (
         <div className="min-h-screen">
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
                 <nav className="flex items-center gap-1.5 text-xs text-muted-foreground mb-6">
                     <Link href="/" className="hover:text-foreground transition-colors">Home</Link>

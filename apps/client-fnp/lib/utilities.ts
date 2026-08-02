@@ -140,7 +140,8 @@ export function buildGuideMetadata(
   titleSuffix: string,
   description: string,
   route: string,
-  imageUrl?: string
+  imageUrl?: string,
+  keywords?: string
 ) {
   const name = formatProductName(product.name)
   const brandInTitle = product.brand?.name ? ` ${formatProductName(product.brand.name)}` : ''
@@ -148,10 +149,12 @@ export function buildGuideMetadata(
   return {
     title: `${name}${brandInTitle} – ${categorySingularTitle} ${titleSuffix} | farmnport.com`,
     description,
+    ...(keywords ? { keywords } : {}),
     alternates: { canonical: route },
     openGraph: {
       title: `${name}${brandInTitle} – ${categorySingularTitle} Guide`,
       description,
+      url: `https://farmnport.com${route}`,
       siteName: 'farmnport',
       type: 'website' as const,
       images: [ogImage],

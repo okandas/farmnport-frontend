@@ -5,10 +5,12 @@ import { serverFetch } from "@/lib/serverFetch"
 export const metadata = {
   title: 'Agrochemical Guides Zimbabwe – Herbicides, Fungicides, Insecticides & More | farmnport.com',
   description: 'Browse agrochemical product guides for Zimbabwe farmers. Herbicides, fungicides, insecticides, acaricides, and fertilizers — active ingredients, dosage rates, and application guidelines.',
+  keywords: 'agrochemical guides zimbabwe, herbicides zimbabwe, fungicides zimbabwe, insecticides zimbabwe, crop protection products, agrochemical dosage rates, pesticides zimbabwe',
   alternates: { canonical: '/agrochemical-guides' },
   openGraph: {
     title: 'Agrochemical Guides Zimbabwe',
     description: 'Browse agrochemical product guides for Zimbabwe farmers. Herbicides, fungicides, insecticides, acaricides — dosage rates and application guidelines.',
+    url: 'https://farmnport.com/agrochemical-guides',
     siteName: 'farmnport',
     type: 'website',
   },
@@ -20,8 +22,19 @@ export default async function AgrochemicalGuidesPage() {
     const initialChemicals = chemicalsRes?.data || []
     const initialTotal = chemicalsRes?.total || 0
 
+    const breadcrumbJsonLd = {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://farmnport.com" },
+            { "@type": "ListItem", "position": 2, "name": "Guides", "item": "https://farmnport.com/guides" },
+            { "@type": "ListItem", "position": 3, "name": "Agrochemical Guides", "item": "https://farmnport.com/agrochemical-guides" },
+        ],
+    }
+
     return (
         <main className="bg-gradient-to-b from-background to-muted/20">
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
             {/* Products Section */}
             <section className="py-6 lg:py-8 bg-muted/30">
                 <div className="mx-auto max-w-7xl px-6 lg:px-8">

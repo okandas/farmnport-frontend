@@ -11,10 +11,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${name} Zimbabwe – Application Rates & Product Guides | farmnport.com`,
     description: `Browse ${name.toLowerCase()} products for Zimbabwe crops. Compare application rates, active ingredients, and usage guidelines for better crop nutrition.`,
+    keywords: `${name.toLowerCase()} zimbabwe, ${name.toLowerCase()} products, plant nutrition ${name.toLowerCase()}, crop nutrition zimbabwe, ${name.toLowerCase()} application rates`,
     alternates: { canonical: `/plant-nutrition-guides/${category}` },
     openGraph: {
       title: `${name} Zimbabwe – Plant Nutrition Guides`,
       description: `Browse ${name.toLowerCase()} products for Zimbabwe crops. Compare application rates and usage guidelines.`,
+      url: `https://farmnport.com/plant-nutrition-guides/${category}`,
       siteName: 'farmnport',
       type: 'website',
     },
@@ -46,8 +48,19 @@ export default async function PlantNutritionCategoryPage({ params }: CategoryPag
 
     const categoryName = products[0]?.plant_nutrition_category?.name || category.replace(/-/g, ' ')
 
+    const breadcrumbJsonLd = {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://farmnport.com" },
+            { "@type": "ListItem", "position": 2, "name": "Plant Nutrition Guides", "item": "https://farmnport.com/plant-nutrition-guides" },
+            { "@type": "ListItem", "position": 3, "name": categoryName, "item": `https://farmnport.com/plant-nutrition-guides/${category}` },
+        ],
+    }
+
     return (
         <main className="bg-gradient-to-b from-background to-muted/20">
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
             <section className="py-6 lg:py-8 bg-muted/30">
                 <div className="mx-auto max-w-7xl px-6 lg:px-8">
                     <nav className="flex text-sm text-muted-foreground mb-6">

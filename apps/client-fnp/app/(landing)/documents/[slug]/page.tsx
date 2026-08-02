@@ -70,6 +70,7 @@ export default async function DocumentGuidePage({ params }: Props) {
             "price": (doc.price_cents / 100).toFixed(2),
             "priceCurrency": "USD",
             "availability": "https://schema.org/InStock",
+            "validFrom": new Date().toISOString().split('T')[0],
         } : undefined,
     }
 

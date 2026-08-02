@@ -37,7 +37,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     'View dosage rates and usage guidelines on farmnport.com.',
   ].filter(Boolean).join('. ')
 
-  return buildGuideMetadata(product, categorySingularTitle, 'Dosage & Guide', description, `/animal-health-guides/${category}/${slug}`, product.images?.[0]?.img?.src)
+  const keywords = `${product.name.toLowerCase()}, ${categorySingular} zimbabwe, ${ingredients ? ingredients.toLowerCase() + ', ' : ''}${usedOn ? usedOn.toLowerCase() + ', ' : ''}animal health guide zimbabwe, veterinary ${category}`
+
+  return buildGuideMetadata(product, categorySingularTitle, 'Dosage & Guide', description, `/animal-health-guides/${category}/${slug}`, product.images?.[0]?.img?.src, keywords)
 }
 
 interface GuidePageProps {
@@ -104,6 +106,17 @@ export default async function AnimalHealthGuidePage({ params }: GuidePageProps) 
     const usageInfo = product.dosage_rates?.length > 0
         ? `Dosage rates available for ${product.dosage_rates.map((r: any) => r.animal).join(', ')}`
         : undefined
+
+    const breadcrumbJsonLd = {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://farmnport.com" },
+            { "@type": "ListItem", "position": 2, "name": "Animal Health Guides", "item": "https://farmnport.com/animal-health-guides" },
+            { "@type": "ListItem", "position": 3, "name": product.animal_health_category?.name || category, "item": `https://farmnport.com/animal-health-guides/${category}` },
+            { "@type": "ListItem", "position": 4, "name": product.name, "item": `https://farmnport.com/animal-health-guides/${category}/${slug}` },
+        ],
+    }
 
     const structuredData = {
         "@context": "https://schema.org",
@@ -237,6 +250,7 @@ export default async function AnimalHealthGuidePage({ params }: GuidePageProps) 
     return (
         <div className="min-h-screen bg-background">
             {/* JSON-LD Structured Data */}
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
             <script
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
