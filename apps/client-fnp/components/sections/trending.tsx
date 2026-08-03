@@ -96,7 +96,7 @@ export function TrendingSection() {
                   >
                     <div className="aspect-square bg-muted/30 dark:bg-white relative">
                       {item.image && (
-                        <img src={item.image} alt="" className="absolute inset-0 w-full h-full object-contain p-3" />
+                        <img src={item.image} alt="" className="absolute inset-0 w-full h-full object-cover" />
                       )}
                     </div>
                     <div className="p-3 flex flex-col flex-1 border-t">
