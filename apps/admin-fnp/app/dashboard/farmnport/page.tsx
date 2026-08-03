@@ -2,15 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query"
 import Link from "next/link"
-import {
-  Users,
-  Package,
-  Tag,
-  Eye,
-  BookOpen,
-  TrendingUp,
-  ShoppingCart,
-} from "lucide-react"
+import { ChevronRight } from "lucide-react"
 
 import { queryDashboardStats, queryContactViewsStats, querySalesStats } from "@/lib/query"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -27,6 +19,56 @@ interface DashboardStats {
   buyer_contacts: number
   brands: number
   contact_views: number
+}
+
+function SectionHeader({ title, href }: { title: string; href: string }) {
+  return (
+    <Link href={href} className="group flex items-center justify-between mb-3">
+      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider group-hover:text-foreground transition-colors">{title}</p>
+      <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors flex items-center gap-0.5">
+        View <ChevronRight className="h-3 w-3" />
+      </span>
+    </Link>
+  )
+}
+
+function ClickableCard({
+  href,
+  children,
+}: {
+  href: string
+  children: React.ReactNode
+}) {
+  return (
+    <Link href={href} className="rounded-xl border bg-card p-5 hover:border-foreground/20 hover:shadow-sm transition-all block">
+      {children}
+    </Link>
+  )
+}
+
+function QuickLink({
+  href,
+  label,
+  count,
+}: {
+  href: string
+  label: string
+  count?: number | string
+}) {
+  return (
+    <Link
+      href={href}
+      className="flex items-center justify-between rounded-lg border bg-card px-4 py-3 hover:border-foreground/20 hover:shadow-sm transition-all"
+    >
+      <span className="text-sm font-medium">{label}</span>
+      <div className="flex items-center gap-2">
+        {count != null && (
+          <span className="text-xs text-muted-foreground">{count}</span>
+        )}
+        <ChevronRight className="h-4 w-4 text-muted-foreground" />
+      </div>
+    </Link>
+  )
 }
 
 export default function DashboardPage() {
@@ -69,15 +111,9 @@ export default function DashboardPage() {
 
   const farmerPct = stats.users.total > 0 ? Math.round((stats.users.farmers / stats.users.total) * 100) : 0
   const buyerPct = stats.users.total > 0 ? Math.round((stats.users.buyers / stats.users.total) * 100) : 0
-  const totalGuides = stats.guides.spray_programs + stats.guides.feeding_programs
-  const sprayPct = totalGuides > 0 ? Math.round((stats.guides.spray_programs / totalGuides) * 100) : 0
-  const feedingPct = totalGuides > 0 ? Math.round((stats.guides.feeding_programs / totalGuides) * 100) : 0
-  const agroPct = stats.products.total > 0 ? Math.round((stats.products.agro_chemicals / stats.products.total) * 100) : 0
-  const animalPct = stats.products.total > 0 ? Math.round((stats.products.animal_health / stats.products.total) * 100) : 0
-  const feedPct = stats.products.total > 0 ? Math.round((stats.products.feed / stats.products.total) * 100) : 0
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-8">
 
       {/* Header */}
       <div>
@@ -85,130 +121,70 @@ export default function DashboardPage() {
         <p className="text-sm text-muted-foreground mt-0.5">Platform overview</p>
       </div>
 
-      {/* Primary metrics */}
-      <div className="grid gap-4 md:grid-cols-3">
+      {/* ── Users & Engagement ── */}
+      <div>
+        <SectionHeader title="Users & Engagement" href="/dashboard/farmnport/users" />
+        <div className="grid gap-4 md:grid-cols-3">
 
-        {/* Total Users */}
-        <div className="rounded-xl border bg-card p-5">
-          <div className="flex items-center justify-between mb-3">
+          <ClickableCard href="/dashboard/farmnport/users">
             <span className="text-sm font-medium text-muted-foreground">Total Users</span>
-            <div className="h-8 w-8 rounded-lg bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center">
-              <Users className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+            <div className="text-3xl font-bold mt-1">{stats.users.total}</div>
+            <div className="mt-3 space-y-1.5">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-muted-foreground">Farmers</span>
+                <span className="font-medium">{stats.users.farmers} <span className="text-muted-foreground">({farmerPct}%)</span></span>
+              </div>
+              <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+                <div className="h-full bg-green-500 rounded-full" style={{ width: `${farmerPct}%` }} />
+              </div>
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-muted-foreground">Buyers</span>
+                <span className="font-medium">{stats.users.buyers} <span className="text-muted-foreground">({buyerPct}%)</span></span>
+              </div>
+              <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+                <div className="h-full bg-blue-500 rounded-full" style={{ width: `${buyerPct}%` }} />
+              </div>
             </div>
-          </div>
-          <div className="text-3xl font-bold">{stats.users.total}</div>
-          <div className="mt-3 space-y-1.5">
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-muted-foreground">Farmers</span>
-              <span className="font-medium">{stats.users.farmers} <span className="text-muted-foreground">({farmerPct}%)</span></span>
-            </div>
-            <div className="h-1.5 rounded-full bg-muted overflow-hidden">
-              <div className="h-full bg-green-500 rounded-full" style={{ width: `${farmerPct}%` }} />
-            </div>
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-muted-foreground">Buyers</span>
-              <span className="font-medium">{stats.users.buyers} <span className="text-muted-foreground">({buyerPct}%)</span></span>
-            </div>
-            <div className="h-1.5 rounded-full bg-muted overflow-hidden">
-              <div className="h-full bg-blue-500 rounded-full" style={{ width: `${buyerPct}%` }} />
-            </div>
-          </div>
-        </div>
+          </ClickableCard>
 
-        {/* Total Products */}
-        <div className="rounded-xl border bg-card p-5">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-sm font-medium text-muted-foreground">Total Products</span>
-            <div className="h-8 w-8 rounded-lg bg-orange-100 dark:bg-orange-900/40 flex items-center justify-center">
-              <Package className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+          <ClickableCard href="/dashboard/farmnport/analytics">
+            <span className="text-sm font-medium text-muted-foreground">Contact Views</span>
+            <div className="text-3xl font-bold mt-1">{viewsSummary?.total_views ?? stats.contact_views ?? 0}</div>
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              <div className="rounded-lg bg-muted/50 px-2.5 py-2">
+                <p className="text-[11px] text-muted-foreground">Viewers</p>
+                <p className="text-sm font-semibold">{viewsSummary?.unique_viewers ?? "—"}</p>
+              </div>
+              <div className="rounded-lg bg-muted/50 px-2.5 py-2">
+                <p className="text-[11px] text-muted-foreground">Viewed</p>
+                <p className="text-sm font-semibold">{viewsSummary?.unique_viewed ?? "—"}</p>
+              </div>
             </div>
-          </div>
-          <div className="text-3xl font-bold">{stats.products.total}</div>
-          <div className="mt-3 space-y-1.5">
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-muted-foreground">Agro</span>
-              <span className="font-medium">{stats.products.agro_chemicals} <span className="text-muted-foreground">({agroPct}%)</span></span>
-            </div>
-            <div className="h-1.5 rounded-full bg-muted overflow-hidden">
-              <div className="h-full bg-orange-500 rounded-full" style={{ width: `${agroPct}%` }} />
-            </div>
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-muted-foreground">Animal</span>
-              <span className="font-medium">{stats.products.animal_health} <span className="text-muted-foreground">({animalPct}%)</span></span>
-            </div>
-            <div className="h-1.5 rounded-full bg-muted overflow-hidden">
-              <div className="h-full bg-amber-500 rounded-full" style={{ width: `${animalPct}%` }} />
-            </div>
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-muted-foreground">Feed</span>
-              <span className="font-medium">{stats.products.feed} <span className="text-muted-foreground">({feedPct}%)</span></span>
-            </div>
-            <div className="h-1.5 rounded-full bg-muted overflow-hidden">
-              <div className="h-full bg-yellow-500 rounded-full" style={{ width: `${feedPct}%` }} />
-            </div>
-          </div>
-        </div>
+          </ClickableCard>
 
-        {/* Guides */}
-        <div className="rounded-xl border bg-card p-5">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-sm font-medium text-muted-foreground">Guides</span>
-            <div className="h-8 w-8 rounded-lg bg-teal-100 dark:bg-teal-900/40 flex items-center justify-center">
-              <BookOpen className="h-4 w-4 text-teal-600 dark:text-teal-400" />
-            </div>
-          </div>
-          <div className="text-3xl font-bold">{totalGuides}</div>
-          <div className="mt-3 space-y-1.5">
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-muted-foreground">Spray</span>
-              <span className="font-medium">{stats.guides.spray_programs} <span className="text-muted-foreground">({sprayPct}%)</span></span>
-            </div>
-            <div className="h-1.5 rounded-full bg-muted overflow-hidden">
-              <div className="h-full bg-teal-500 rounded-full" style={{ width: `${sprayPct}%` }} />
-            </div>
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-muted-foreground">Feeding</span>
-              <span className="font-medium">{stats.guides.feeding_programs} <span className="text-muted-foreground">({feedingPct}%)</span></span>
-            </div>
-            <div className="h-1.5 rounded-full bg-muted overflow-hidden">
-              <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${feedingPct}%` }} />
-            </div>
-          </div>
-        </div>
+          <ClickableCard href="/dashboard/farmnport/brands">
+            <span className="text-sm font-medium text-muted-foreground">Brands</span>
+            <div className="text-3xl font-bold mt-1">{stats.brands}</div>
+            <p className="text-xs text-muted-foreground mt-1">Registered brands</p>
+          </ClickableCard>
 
+        </div>
       </div>
 
-      {/* Orders */}
+      {/* ── Sales & Orders ── */}
       <div>
-        <div className="flex items-center justify-between mb-3">
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Orders</p>
-          <Link href="/dashboard/farmnport/orders/sales" className="text-xs text-muted-foreground hover:text-foreground transition-colors">
-            View all →
-          </Link>
-        </div>
+        <SectionHeader title="Sales & Orders" href="/dashboard/farmnport/orders/sales" />
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
 
-          {/* Total Orders */}
-          <div className="rounded-xl border bg-card p-5">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-sm font-medium text-muted-foreground">Total Orders</span>
-              <div className="h-8 w-8 rounded-lg bg-violet-100 dark:bg-violet-900/40 flex items-center justify-center">
-                <ShoppingCart className="h-4 w-4 text-violet-600 dark:text-violet-400" />
-              </div>
-            </div>
-            <div className="text-3xl font-bold">{salesStats?.orders?.total ?? "—"}</div>
+          <ClickableCard href="/dashboard/farmnport/orders/sales">
+            <span className="text-sm font-medium text-muted-foreground">Total Orders</span>
+            <div className="text-3xl font-bold mt-1">{salesStats?.orders?.total ?? "—"}</div>
             <p className="text-xs text-muted-foreground mt-1">Excluding cancelled</p>
-          </div>
+          </ClickableCard>
 
-          {/* Revenue */}
-          <div className="rounded-xl border bg-card p-5">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-sm font-medium text-muted-foreground">Revenue</span>
-              <div className="h-8 w-8 rounded-lg bg-green-100 dark:bg-green-900/40 flex items-center justify-center">
-                <TrendingUp className="h-4 w-4 text-green-600 dark:text-green-400" />
-              </div>
-            </div>
-            <div className="text-3xl font-bold">
+          <ClickableCard href="/dashboard/farmnport/sales">
+            <span className="text-sm font-medium text-muted-foreground">Revenue</span>
+            <div className="text-3xl font-bold mt-1">
               {salesStats?.revenue?.all_time != null
                 ? `$${(salesStats.revenue.all_time / 100).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
                 : "—"}
@@ -233,17 +209,11 @@ export default function DashboardPage() {
                 </p>
               </div>
             </div>
-          </div>
+          </ClickableCard>
 
-          {/* Pending & Paid */}
-          <div className="rounded-xl border bg-card p-5">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-sm font-medium text-muted-foreground">Needs Attention</span>
-              <div className="h-8 w-8 rounded-lg bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center">
-                <ShoppingCart className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-              </div>
-            </div>
-            <div className="text-3xl font-bold">
+          <ClickableCard href="/dashboard/farmnport/orders/sales">
+            <span className="text-sm font-medium text-muted-foreground">Needs Attention</span>
+            <div className="text-3xl font-bold mt-1">
               {salesStats?.orders != null
                 ? (salesStats.orders.pending ?? 0) + (salesStats.orders.paid ?? 0)
                 : "—"}
@@ -258,17 +228,11 @@ export default function DashboardPage() {
                 <span className="font-medium">{salesStats?.orders?.paid ?? "—"}</span>
               </div>
             </div>
-          </div>
+          </ClickableCard>
 
-          {/* Delivered & Collected */}
-          <div className="rounded-xl border bg-card p-5">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-sm font-medium text-muted-foreground">Fulfilled</span>
-              <div className="h-8 w-8 rounded-lg bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center">
-                <Package className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-              </div>
-            </div>
-            <div className="text-3xl font-bold">
+          <ClickableCard href="/dashboard/farmnport/orders/sales">
+            <span className="text-sm font-medium text-muted-foreground">Fulfilled</span>
+            <div className="text-3xl font-bold mt-1">
               {salesStats?.orders != null
                 ? (salesStats.orders.delivered ?? 0) + (salesStats.orders.collected ?? 0)
                 : "—"}
@@ -283,45 +247,81 @@ export default function DashboardPage() {
                 <span className="font-medium">{salesStats?.orders?.collected ?? "—"}</span>
               </div>
             </div>
-          </div>
+          </ClickableCard>
 
+        </div>
+
+        {/* Sales quick links */}
+        <div className="grid gap-2 md:grid-cols-4 mt-3">
+          <QuickLink href="/dashboard/farmnport/orders/bookings" label="Bookings" />
+          <QuickLink href="/dashboard/farmnport/orders/booking-preorders" label="Pre-Orders" />
+          <QuickLink href="/dashboard/farmnport/lots" label="Lots" />
+          <QuickLink href="/dashboard/farmnport/documents" label="Documents" />
         </div>
       </div>
 
-      {/* Secondary metrics */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      {/* ── Products ── */}
+      <div>
+        <SectionHeader title="Products" href="/dashboard/farmnport/agrochemicals" />
+        <div className="grid gap-4 md:grid-cols-3">
 
-        <div className="rounded-xl border bg-card p-5">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-sm font-medium text-muted-foreground">Brands</span>
-            <div className="h-8 w-8 rounded-lg bg-yellow-100 dark:bg-yellow-900/40 flex items-center justify-center">
-              <Tag className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
-            </div>
-          </div>
-          <div className="text-3xl font-bold">{stats.brands}</div>
-          <p className="text-xs text-muted-foreground mt-1">Registered brands</p>
+          <ClickableCard href="/dashboard/farmnport/agrochemicals">
+            <span className="text-sm font-medium text-muted-foreground">AgroChemicals</span>
+            <div className="text-3xl font-bold mt-1">{stats.products.agro_chemicals}</div>
+            <p className="text-xs text-muted-foreground mt-1">Products</p>
+          </ClickableCard>
+
+          <ClickableCard href="/dashboard/farmnport/animal-health-products">
+            <span className="text-sm font-medium text-muted-foreground">Animal Health</span>
+            <div className="text-3xl font-bold mt-1">{stats.products.animal_health}</div>
+            <p className="text-xs text-muted-foreground mt-1">Products</p>
+          </ClickableCard>
+
+          <ClickableCard href="/dashboard/farmnport/feed-products">
+            <span className="text-sm font-medium text-muted-foreground">Feed</span>
+            <div className="text-3xl font-bold mt-1">{stats.products.feed}</div>
+            <p className="text-xs text-muted-foreground mt-1">Products</p>
+          </ClickableCard>
+
         </div>
 
-        <div className="rounded-xl border bg-card p-5">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-sm font-medium text-muted-foreground">Contact Views</span>
-            <div className="h-8 w-8 rounded-lg bg-rose-100 dark:bg-rose-900/40 flex items-center justify-center">
-              <Eye className="h-4 w-4 text-rose-600 dark:text-rose-400" />
-            </div>
-          </div>
-          <div className="text-3xl font-bold">{viewsSummary?.total_views ?? stats.contact_views ?? 0}</div>
-          <div className="mt-3 grid grid-cols-2 gap-2">
-            <div className="rounded-lg bg-muted/50 px-2.5 py-2">
-              <p className="text-[11px] text-muted-foreground">Viewers</p>
-              <p className="text-sm font-semibold">{viewsSummary?.unique_viewers ?? "—"}</p>
-            </div>
-            <div className="rounded-lg bg-muted/50 px-2.5 py-2">
-              <p className="text-[11px] text-muted-foreground">Viewed</p>
-              <p className="text-sm font-semibold">{viewsSummary?.unique_viewed ?? "—"}</p>
-            </div>
-          </div>
+        {/* Product quick links */}
+        <div className="grid gap-2 md:grid-cols-4 mt-3">
+          <QuickLink href="/dashboard/farmnport/agrochemical-categories" label="Agro Categories" />
+          <QuickLink href="/dashboard/farmnport/agrochemical-active-ingredients" label="Agro Ingredients" />
+          <QuickLink href="/dashboard/farmnport/agrochemical-targets" label="Agro Targets" />
+          <QuickLink href="/dashboard/farmnport/animal-health-categories" label="Animal Categories" />
+          <QuickLink href="/dashboard/farmnport/feed-categories" label="Feed Categories" />
+          <QuickLink href="/dashboard/farmnport/feed-active-ingredients" label="Feed Ingredients" />
+          <QuickLink href="/dashboard/farmnport/feed-nutritional-specs" label="Nutritional Specs" />
+          <QuickLink href="/dashboard/farmnport/equipment" label="Equipment" />
         </div>
+      </div>
 
+      {/* ── Farm Produce & Programs ── */}
+      <div>
+        <SectionHeader title="Farm Produce & Programs" href="/dashboard/farmnport/farmproduce" />
+        <div className="grid gap-2 md:grid-cols-4">
+          <QuickLink href="/dashboard/farmnport/farmproduce" label="Produce" />
+          <QuickLink href="/dashboard/farmnport/farmproducecategories" label="Produce Categories" />
+          <QuickLink href="/dashboard/farmnport/seed-products" label="Seed Products" />
+          <QuickLink href="/dashboard/farmnport/breeds" label="Breeds" />
+          <QuickLink href="/dashboard/farmnport/crop-groups" label="Crop Groups" />
+          <QuickLink href="/dashboard/farmnport/weed-groups" label="Weed Groups" />
+          <QuickLink href="/dashboard/farmnport/spray-programs" label="Spray Programs" count={stats.guides.spray_programs} />
+          <QuickLink href="/dashboard/farmnport/feeding-programs" label="Feeding Programs" count={stats.guides.feeding_programs} />
+        </div>
+      </div>
+
+      {/* ── Communications ── */}
+      <div>
+        <SectionHeader title="Communications" href="/dashboard/farmnport/blast" />
+        <div className="grid gap-2 md:grid-cols-4">
+          <QuickLink href="/dashboard/farmnport/blast" label="New Blast" />
+          <QuickLink href="/dashboard/farmnport/blast/sent" label="Sent Blasts" />
+          <QuickLink href="/dashboard/farmnport/buyer-contacts" label="Buyer Contacts" />
+          <QuickLink href="/dashboard/farmnport/prices/series" label="Price Series" />
+        </div>
       </div>
 
     </div>
