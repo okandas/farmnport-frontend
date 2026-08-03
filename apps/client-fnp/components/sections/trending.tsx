@@ -51,7 +51,7 @@ function TrendingSkeleton() {
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="flex-shrink-0 basis-1/2 sm:basis-1/3 lg:basis-1/6">
               <div className="rounded-lg border bg-card overflow-hidden">
-                <Skeleton className="aspect-square w-full" />
+                <Skeleton className="aspect-[4/3] w-full" />
                 <div className="p-3 space-y-2">
                   <Skeleton className="h-4 w-3/4" />
                   <Skeleton className="h-3 w-full" />
@@ -94,9 +94,9 @@ export function TrendingSection() {
                     href={item.href}
                     className="group flex flex-col rounded-lg border bg-card hover:border-primary/40 hover:shadow-md transition-all overflow-hidden h-full cursor-pointer"
                   >
-                    <div className="aspect-square bg-muted/30 dark:bg-white relative">
+                    <div className="aspect-[4/3] bg-muted/30 dark:bg-white relative">
                       {item.image && (
-                        <img src={item.image} alt="" className="absolute inset-0 w-full h-full object-contain" />
+                        <img src={item.image} alt="" className="absolute inset-0 w-full h-full object-cover" />
                       )}
                     </div>
                     <div className="p-3 flex flex-col flex-1 border-t">
