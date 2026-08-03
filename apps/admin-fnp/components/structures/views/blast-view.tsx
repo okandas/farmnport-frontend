@@ -30,9 +30,11 @@ interface BlastRecipient {
   email_subject: string
   email_template?: string
   channel: string
+  force?: boolean
 }
 
 interface BlastResult {
+  id?: string
   name: string
   to: string
   channel: string
@@ -137,10 +139,21 @@ export function BlastView({ source }: { source?: "farmnport" | "menus" } = {}) {
     onSuccess: (res) => handleBlastSuccess(res.data),
   })
 
+  const verifyStatusQuery = useQuery({
+    queryKey: ["verify-reminder-status"],
+    queryFn: () => authorizedHTTPClient.get<{ total_unverified: number; sent: number; remaining: number }>("/v1/blast/verify-reminder/status"),
+    select: (res) => res.data,
+    enabled: blastTemplate === "verify-reminder",
+    refetchOnWindowFocus: false,
+  })
+
   const verifyMutation = useMutation({
     mutationFn: (payload: { test_email?: string; limit?: number }) =>
       authorizedHTTPClient.post<{ sent: number; failed: number; remaining: number; results: BlastResult[] }>("/v1/blast/verify-reminder", payload),
-    onSuccess: (res) => handleBlastSuccess(res.data),
+    onSuccess: (res) => {
+      handleBlastSuccess(res.data)
+      verifyStatusQuery.refetch()
+    },
   })
 
   // ── Helpers ────────────────────────────────────────────────────────────────
@@ -175,6 +188,16 @@ export function BlastView({ source }: { source?: "farmnport" | "menus" } = {}) {
     blastMutation.mutate(recipients)
   }
 
+  function handleResend(r: BlastResult) {
+    const client = clients.find((c) => c.id === r.id) ?? { id: r.id ?? "", name: r.name, phone: "", email: "" }
+    const msg = overrides[client.id] ?? template.replace(/\{name\}/gi, client.name)
+    blastMutation.mutate([{
+      id: client.id, name: client.name, phone: client.phone || r.to, email: client.email || r.to,
+      message: msg, email_subject: emailSubject || (isMenus ? "Message from menus.co.zw" : "Message from farmnport"),
+      email_template: isMenus ? "menus-blast" : "", channel: r.channel, force: true,
+    }])
+  }
+
   function handleReset() {
     setTypeFilter("all"); setProvinceFilter("all"); setCategoryFilter("all")
     setProduceFilter("all"); setSearchFilter(""); setSelected(new Set())
@@ -206,6 +229,7 @@ export function BlastView({ source }: { source?: "farmnport" | "menus" } = {}) {
               <th className="px-5 py-2.5 text-left">To</th>
               <th className="px-5 py-2.5 text-left">Channel</th>
               <th className="px-5 py-2.5 text-left">Status</th>
+              <th className="px-5 py-2.5 text-left w-20"></th>
             </tr>
           </thead>
           <tbody className="divide-y">
@@ -219,6 +243,14 @@ export function BlastView({ source }: { source?: "farmnport" | "menus" } = {}) {
                   {r.ok
                     ? <span className="text-green-600 font-medium">Sent</span>
                     : <span className="text-red-500">{r.error ?? "Failed"}</span>}
+                </td>
+                <td className="px-5 py-2.5">
+                  {!r.ok && r.error === "already received" && r.id && (
+                    <button onClick={() => handleResend(r)} disabled={blastMutation.isPending}
+                      className="text-xs font-medium text-primary hover:underline disabled:opacity-40">
+                      Resend
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}
@@ -306,12 +338,12 @@ export function BlastView({ source }: { source?: "farmnport" | "menus" } = {}) {
                     ? <><Icons.spinner className="w-3.5 h-3.5 animate-spin" /> Sending test…</>
                     : <><Icons.send className="w-3.5 h-3.5" /> Send test to me</>}
                 </button>
-                <button onClick={() => verifyMutation.mutate({ limit: 100 })}
-                  disabled={verifyMutation.isPending}
+                <button onClick={() => verifyMutation.mutate({ limit: 500 })}
+                  disabled={verifyMutation.isPending || (verifyStatusQuery.data?.remaining === 0)}
                   className="h-8 px-4 rounded-md bg-primary text-white text-xs font-bold hover:bg-primary/90 disabled:opacity-40 flex items-center gap-1.5 shadow-sm">
                   {verifyMutation.isPending
-                    ? <><Icons.spinner className="w-3.5 h-3.5 animate-spin" /> Sending batch…</>
-                    : <><Icons.send className="w-3.5 h-3.5" /> Send next 100</>}
+                    ? <><Icons.spinner className="w-3.5 h-3.5 animate-spin" /> Sending…</>
+                    : <><Icons.send className="w-3.5 h-3.5" /> Send to {verifyStatusQuery.data?.remaining ?? "all"} remaining</>}
                 </button>
               </>
             )}
@@ -322,11 +354,17 @@ export function BlastView({ source }: { source?: "farmnport" | "menus" } = {}) {
         {blastTemplate === "verify-reminder" && (
           <div className="p-6 space-y-4">
             <div className="flex items-center gap-6">
-              {results && (
+              {verifyStatusQuery.data && (
                 <div className="flex items-center gap-4 text-sm">
-                  <span className="text-green-600 font-semibold">{results.sent} sent</span>
+                  <span className="text-muted-foreground">{verifyStatusQuery.data.total_unverified} unverified</span>
+                  <span className="text-green-600 font-semibold">{verifyStatusQuery.data.sent} sent</span>
+                  <span className="font-semibold">{verifyStatusQuery.data.remaining} remaining</span>
+                </div>
+              )}
+              {results && (
+                <div className="flex items-center gap-4 text-sm border-l pl-6">
+                  <span className="text-green-600 font-semibold">{results.sent} sent this batch</span>
                   {results.failed > 0 && <span className="text-red-500 font-semibold">{results.failed} failed</span>}
-                  {results.remaining !== undefined && <span className="text-muted-foreground">{results.remaining} unverified remaining</span>}
                 </div>
               )}
             </div>
