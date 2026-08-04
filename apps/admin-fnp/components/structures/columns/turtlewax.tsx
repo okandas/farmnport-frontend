@@ -4,7 +4,7 @@ import { ColumnDef } from "@tanstack/react-table"
 import { TurtlewaxProductItem } from "@/lib/schemas"
 import { Checkbox } from "@/components/ui/checkbox"
 import { TurtlewaxProductControlDropDown } from "@/components/structures/dropdowns/turtlewax-dropdown"
-import { formatDate, centsToDollars } from "@/lib/utilities"
+import { centsToDollars } from "@/lib/utilities"
 
 export const turtlewaxProductColumns: ColumnDef<TurtlewaxProductItem>[] = [
   {
@@ -31,6 +31,20 @@ export const turtlewaxProductColumns: ColumnDef<TurtlewaxProductItem>[] = [
   {
     accessorKey: "name",
     header: "Name",
+    cell: ({ row }) => {
+      const images = (row.original as any).images as { img: { src: string } }[] | undefined
+      const src = images && images.length > 0 ? images[0].img.src : null
+      return (
+        <div className="flex items-center gap-3">
+          {src ? (
+            <img src={src} alt="" className="w-10 h-10 rounded object-cover shrink-0" />
+          ) : (
+            <div className="w-10 h-10 rounded bg-muted/30 shrink-0" />
+          )}
+          <span className="capitalize">{row.getValue("name") as string}</span>
+        </div>
+      )
+    },
   },
   {
     accessorKey: "sku",
@@ -69,16 +83,23 @@ export const turtlewaxProductColumns: ColumnDef<TurtlewaxProductItem>[] = [
     accessorKey: "stock_level",
     header: "Stock",
     cell: ({ row }) => {
-      const stock = row.getValue("stock_level") as number
-      return stock > 0 ? stock : "—"
+      const available = (row.original as any).available_for_sale
+      return available
+        ? <span className="text-emerald-600 font-medium">In Stock</span>
+        : <span className="text-red-500 font-medium">Out of Stock</span>
     },
   },
   {
-    accessorKey: "created",
-    header: "Date Created",
+    accessorKey: "remaining_stock",
+    header: "Remaining Stock",
     cell: ({ row }) => {
-      const created = row.original.created
-      return <span>{formatDate(created)}</span>
+      const variants = row.original.variants as { stock_level: number }[] | undefined
+      if (variants && variants.length > 0) {
+        const total = variants.reduce((sum, v) => sum + (v.stock_level || 0), 0)
+        return total > 0 ? total : "0"
+      }
+      const stock = (row.original as any).stock_level as number
+      return stock > 0 ? stock : "0"
     },
   },
   {
