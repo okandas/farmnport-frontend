@@ -487,6 +487,7 @@ export function adminCreateLot(data: {
   expires_at: string
   main_image?: ImageModel
   images?: ImageModel[]
+  video_id?: string
 }) {
   return api.post(`${baseUrl}/lots/admin/create`, data)
 }

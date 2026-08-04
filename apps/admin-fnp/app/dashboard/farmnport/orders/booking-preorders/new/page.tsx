@@ -213,6 +213,7 @@ export default function NewPreOrderPage() {
     cancellation_fee: "0",
     transferable: false,
     delivery_dates: [] as Date[],
+    video_id: "",
   })
 
   const mutation = useMutation({
