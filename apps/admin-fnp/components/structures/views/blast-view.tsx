@@ -276,7 +276,16 @@ export function BlastView({ source }: { source?: "farmnport" | "menus" } = {}) {
           <div className="flex items-center gap-3">
             <Icons.messageSquare className="w-4 h-4 text-muted-foreground" />
             <span className="text-sm font-semibold">New Blast</span>
-            {clientsQuery.isFetching
+            {blastTemplate === "verify-reminder" ? (
+              verifyStatusQuery.isFetching
+                ? <span className="text-xs text-muted-foreground flex items-center gap-1"><Icons.spinner className="w-3 h-3 animate-spin" /> loading…</span>
+                : verifyStatusQuery.data
+                  ? <div className="flex items-center gap-1.5">
+                      <span className="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground font-medium">{verifyStatusQuery.data.remaining} remaining</span>
+                      <span className="text-xs text-muted-foreground">{verifyStatusQuery.data.sent} already sent</span>
+                    </div>
+                  : null
+            ) : clientsQuery.isFetching
               ? <span className="text-xs text-muted-foreground flex items-center gap-1"><Icons.spinner className="w-3 h-3 animate-spin" /> loading…</span>
               : clients.length > 0
                 ? <div className="flex items-center gap-1.5">
