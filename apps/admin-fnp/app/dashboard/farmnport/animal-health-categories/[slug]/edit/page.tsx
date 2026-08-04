@@ -237,8 +237,8 @@ export default function EditAnimalHealthCategoryPage({ params }: { params: Promi
                                                             entityType="animal_health_category"
                                                             maxImages={5}
                                                             value={field.value || []}
-                                                            onChange={field.onChange
-                                                            }}
+                                                            onChange={field.onChange}
+
                                                         />
                                                     </FormControl>
                                                     <FormMessage />

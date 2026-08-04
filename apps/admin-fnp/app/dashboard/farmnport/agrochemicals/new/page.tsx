@@ -21,6 +21,7 @@ export default function CreateAgroChemicalPage() {
         name: "",
         brand_id: "",
         agrochemical_category_id: "",
+        video_id: "",
         front_label: undefined,
         back_label: undefined,
         images: [],

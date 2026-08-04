@@ -237,8 +237,8 @@ export default function EditFeedCategoryPage({ params }: { params: Promise<{ slu
                                                             entityType="feed_category"
                                                             maxImages={5}
                                                             value={field.value || []}
-                                                            onChange={field.onChange
-                                                            }}
+                                                            onChange={field.onChange}
+
                                                         />
                                                     </FormControl>
                                                     <FormMessage />

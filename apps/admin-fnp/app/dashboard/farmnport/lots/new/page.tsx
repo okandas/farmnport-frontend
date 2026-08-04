@@ -47,6 +47,7 @@ interface NewLotForm {
   expires_at: string
   main_image: ImageModel[]
   images: ImageModel[]
+  video_id: string
 }
 
 export default function NewAdminLotPage() {
@@ -68,6 +69,7 @@ export default function NewAdminLotPage() {
       expires_at: "",
       main_image: [],
       images: [],
+      video_id: "",
     },
   })
 
@@ -86,6 +88,7 @@ export default function NewAdminLotPage() {
       expires_at: new Date(data.expires_at).toISOString(),
       main_image: data.main_image?.[0] ?? undefined,
       images: data.images ?? [],
+      video_id: data.video_id,
     }),
     onSuccess: () => {
       toast({ description: "Lot created successfully" })

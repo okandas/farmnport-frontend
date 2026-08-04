@@ -63,6 +63,7 @@ export function AgroChemicalForm({ agroChemical, mode = "create" }: AgroChemical
             name: agroChemical?.name,
             brand_id: agroChemical?.brand_id,
             agrochemical_category_id: agroChemical?.agrochemical_category_id,
+            video_id: agroChemical?.video_id || "",
             front_label: agroChemical?.front_label,
             back_label: agroChemical?.back_label,
             images: agroChemical?.images || [],
