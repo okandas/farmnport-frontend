@@ -347,7 +347,7 @@ export function BlastView({ source }: { source?: "farmnport" | "menus" } = {}) {
                     ? <><Icons.spinner className="w-3.5 h-3.5 animate-spin" /> Sending test…</>
                     : <><Icons.send className="w-3.5 h-3.5" /> Send test to me</>}
                 </button>
-                <button onClick={() => verifyMutation.mutate({ limit: 500 })}
+                <button onClick={() => verifyMutation.mutate({ limit: 100 })}
                   disabled={verifyMutation.isPending || (verifyStatusQuery.data?.remaining === 0)}
                   className="h-8 px-4 rounded-md bg-primary text-white text-xs font-bold hover:bg-primary/90 disabled:opacity-40 flex items-center gap-1.5 shadow-sm">
                   {verifyMutation.isPending
