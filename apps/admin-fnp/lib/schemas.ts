@@ -1708,3 +1708,63 @@ export const EditLotSchema = z.object({
 })
 
 export type EditLotModel = z.infer<typeof EditLotSchema>
+
+// Turtlewax Product schemas
+export const TurtlewaxProductSchema = z.object({
+  id: z.string(),
+  name: z.string().min(1, "Name is required"),
+  sku: z.string().optional().default(""),
+  turtlewax_category_id: z.string().optional().default(""),
+  slug: z.string().optional(),
+  images: z.array(z.custom<ImageModel>()).max(5, "Maximum 5 images allowed"),
+  variants: z.array(z.object({
+    sku: z.string(),
+    name: z.string().min(1, "Variant name is required"),
+    sale_price: z.coerce.number().nonnegative().default(0),
+    was_price: z.coerce.number().nonnegative().default(0),
+    wholesale_price: z.coerce.number().nonnegative().default(0),
+    stock_level: z.coerce.number().int().nonnegative().default(0),
+    weight_grams: z.coerce.number().int().nonnegative().default(0),
+  })).optional().default([]),
+  product_overview: z.string().optional().default(""),
+  stock_level: z.coerce.number().int().nonnegative().default(0),
+  available_for_sale: z.boolean().default(false),
+  sale_price: z.coerce.number().nonnegative().default(0),
+  show_was_price: z.boolean().default(false),
+  was_price: z.coerce.number().nonnegative().default(0),
+  weight_grams: z.coerce.number().int().nonnegative().default(0),
+  is_test: z.boolean().default(false),
+  delivery_available: z.boolean().default(false),
+  pickup_available: z.boolean().default(false),
+  pickup_location_ids: z.array(z.string()).optional().default([]),
+  delivery_location_ids: z.array(z.string()).optional().default([]),
+  created: z.string().optional(),
+  updated: z.string().optional(),
+})
+
+export const FormTurtlewaxProductSchema = TurtlewaxProductSchema
+export type TurtlewaxProductItem = z.infer<typeof TurtlewaxProductSchema>
+export type FormTurtlewaxProductModel = z.infer<typeof FormTurtlewaxProductSchema>
+
+// Turtlewax Category schemas
+export const TurtlewaxCategorySchema = z.object({
+  id: z.string(),
+  name: z.string().min(1, "Name is required"),
+  slug: z.string().optional(),
+  short_description: z.string().max(100, "Short description cannot exceed 100 characters"),
+  description: z.string().max(500, "Description cannot exceed 500 characters"),
+  images: z.array(z.any()).optional().default([]),
+  created: z.string().optional(),
+  updated: z.string().optional(),
+})
+
+export const FormTurtlewaxCategorySchema = TurtlewaxCategorySchema.pick({
+  id: true,
+  name: true,
+  short_description: true,
+  description: true,
+  images: true,
+})
+
+export type TurtlewaxCategory = z.infer<typeof TurtlewaxCategorySchema>
+export type FormTurtlewaxCategoryModel = z.infer<typeof FormTurtlewaxCategorySchema>
