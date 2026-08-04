@@ -56,6 +56,7 @@ const Schema = z.object({
     was_price: z.coerce.number().default(0),
     weight_grams: z.coerce.number().int().nonnegative().default(0),
     is_test: z.boolean().default(false),
+    video_id: z.string().optional().default(""),
 })
 
 type FormModel = z.infer<typeof Schema>
@@ -71,6 +72,7 @@ export default function NewSeedProductPage() {
             days_to_maturity: "", yield_potential: "", soil_requirements: "",
             seed_treatment: "", management_tips: "",
             planting_guide: [], precautions: [], variants: [],
+            video_id: "",
         },
         resolver: zodResolver(Schema),
     })
@@ -372,6 +374,21 @@ export default function NewSeedProductPage() {
                                     ))}
                                 </div>
                             )}
+                        </div>
+
+                        <div className="border-b border-gray-900/10 dark:border-white/10 pb-12">
+                            <div className="px-1">
+                                <label className="block text-sm/6 font-medium text-gray-900 dark:text-white mb-2">YouTube Video ID</label>
+                                <FormField control={form.control} name="video_id" render={({ field }) => (
+                                    <FormItem>
+                                        <FormControl>
+                                            <Input placeholder="e.g. dQw4w9WgXcQ" {...field} />
+                                        </FormControl>
+                                        <p className="mt-1 text-xs text-gray-500">The video ID from the YouTube URL (after watch?v=)</p>
+                                        <FormMessage />
+                                    </FormItem>
+                                )} />
+                            </div>
                         </div>
 
                         <ProductPricingSection />

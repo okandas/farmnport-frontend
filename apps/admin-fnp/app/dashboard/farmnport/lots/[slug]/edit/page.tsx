@@ -329,6 +329,11 @@ function EditForm({ lot, slug }: { lot: any; slug: string }) {
                       imageClassName="flex items-center justify-center w-32 h-32 overflow-hidden bg-gray-50"
                     />
                   </div>
+                  <div>
+                    <label className="block text-sm/6 font-medium text-gray-900 dark:text-white mb-2">YouTube Video ID</label>
+                    <Input placeholder="e.g. dQw4w9WgXcQ" defaultValue={(lot as any).video_id || ""} readOnly />
+                    <p className="mt-1 text-xs text-gray-500">The video ID from the YouTube URL (after watch?v=)</p>
+                  </div>
                 </div>
               </div>
             </div>

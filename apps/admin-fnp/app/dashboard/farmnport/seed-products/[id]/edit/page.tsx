@@ -61,6 +61,7 @@ const Schema = z.object({
     was_price: z.coerce.number().default(0),
     weight_grams: z.coerce.number().int().nonnegative().default(0),
     is_test: z.boolean().default(false),
+    video_id: z.string().optional().default(""),
     delivery_available: z.boolean().default(false),
     pickup_available: z.boolean().default(false),
 }).refine((data) => !!data.brand_id || !!data.seller_id, {
@@ -126,6 +127,7 @@ function EditForm({ product, id }: { product: any; id: string }) {
             was_price: (product?.was_price || 0) / 100,
             weight_grams: product?.weight_grams ?? 0,
             is_test: (product as any)?.is_test ?? false,
+            video_id: (product as any)?.video_id ?? "",
             delivery_available: product?.delivery_available || false,
             pickup_available: (product as any)?.pickup_available || false,
         },
@@ -530,6 +532,25 @@ function EditForm({ product, id }: { product: any; id: string }) {
                                         ))}
                                     </div>
                                 )}
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-gray-900/10 pb-12 md:grid-cols-3 dark:border-white/10">
+                            <div>
+                                <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">Video</h2>
+                                <p className="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">Optional YouTube video for this product.</p>
+                            </div>
+                            <div className="md:col-span-2">
+                                <label className="block text-sm/6 font-medium text-gray-900 dark:text-white mb-2">YouTube Video ID</label>
+                                <FormField control={form.control} name="video_id" render={({ field }) => (
+                                    <FormItem>
+                                        <FormControl>
+                                            <Input placeholder="e.g. dQw4w9WgXcQ" className={inputClass} {...field} />
+                                        </FormControl>
+                                        <p className="mt-1 text-xs text-gray-500">The video ID from the YouTube URL (after watch?v=)</p>
+                                        <FormMessage />
+                                    </FormItem>
+                                )} />
                             </div>
                         </div>
 

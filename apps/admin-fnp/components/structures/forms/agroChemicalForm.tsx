@@ -626,6 +626,32 @@ export function AgroChemicalForm({ agroChemical, mode = "create" }: AgroChemical
 
                 <div>
                     <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">
+                        Product Video
+                    </h2>
+                    <p className="mt-1 max-w-2xl text-sm/6 text-gray-600 dark:text-gray-400">
+                        Add a YouTube video ID to display on the product page.
+                    </p>
+                    <div className="mt-6 max-w-md">
+                        <FormField
+                            control={form.control}
+                            name="video_id"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormControl>
+                                        <Input placeholder="e.g. dQw4w9WgXcQ" {...field} />
+                                    </FormControl>
+                                    <p className="mt-1 text-xs text-gray-500">
+                                        The video ID from the YouTube URL (after watch?v=)
+                                    </p>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+                </div>
+
+                <div>
+                    <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">
                         Active Ingredients
                     </h2>
                     <p className="mt-1 max-w-2xl text-sm/6 text-gray-600 dark:text-gray-400">

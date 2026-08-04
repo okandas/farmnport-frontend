@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import Image from "next/image"
-import { ChevronLeft, ChevronRight, Expand, Share2, Link2, Check } from "lucide-react"
+import { ChevronLeft, ChevronRight, Expand, Share2, Link2, Check, Play } from "lucide-react"
 import { sendGTMEvent } from "@next/third-parties/google"
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
@@ -20,17 +20,20 @@ interface ProductImageGalleryProps {
     name: string
     height?: number
     fallback?: React.ReactNode
+    videoId?: string
 }
 
-export function ProductImageGallery({ images, name, height = 520, fallback }: ProductImageGalleryProps) {
+export function ProductImageGallery({ images, name, height = 520, fallback, videoId }: ProductImageGalleryProps) {
     const [selected, setSelected] = useState(0)
     const [open, setOpen] = useState(false)
     const [copied, setCopied] = useState(false)
+    const videoIndex = videoId ? images.length : -1
+    const isVideo = videoId && selected === videoIndex
 
     return (
         <>
             <div className="flex gap-2">
-                {images.length > 1 && (
+                {(images.length > 1 || videoId) && (
                     <div className="hidden md:flex flex-col gap-2 shrink-0 p-1">
                         {images.map((img, idx) => (
                             <button
@@ -48,32 +51,55 @@ export function ProductImageGallery({ images, name, height = 520, fallback }: Pr
                                 )}
                             </button>
                         ))}
+                        {videoId && (
+                            <button
+                                onClick={() => setSelected(videoIndex)}
+                                onMouseEnter={() => setSelected(videoIndex)}
+                                className={`relative w-16 h-16 rounded-lg overflow-hidden bg-muted/50 transition-colors flex items-center justify-center ${
+                                    isVideo ? "ring-2 ring-primary" : "opacity-60 hover:opacity-100"
+                                }`}
+                            >
+                                <Play className="w-5 h-5 fill-current" />
+                            </button>
+                        )}
                     </div>
                 )}
-                <button
-                    className="relative flex-1 aspect-square bg-muted/30 dark:bg-white rounded-xl border overflow-hidden shadow-sm cursor-pointer group"
-                    onClick={() => images[selected]?.img?.src && setOpen(true)}
-                >
-                    {images[selected]?.img?.src ? (
-                        <Image
-                            src={images[selected].img.src}
-                            alt={name}
-                            fill
-                            sizes="(max-width: 1024px) 100vw, 450px"
-                            className="object-contain p-8"
-                            priority
+                {isVideo ? (
+                    <div className="relative flex-1 aspect-square bg-black rounded-xl border overflow-hidden shadow-sm">
+                        <iframe
+                            src={`https://www.youtube.com/embed/${videoId}?rel=0`}
+                            title={`${name} video`}
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                            className="absolute inset-0 w-full h-full"
                         />
-                    ) : (
-                        <FpPlaceholder />
-                    )}
-                    {images[selected]?.img?.src && (
-                        <span className="absolute bottom-3 right-3 md:top-3 md:bottom-auto w-8 h-8 flex items-center justify-center rounded-full bg-background text-foreground shadow-sm">
-                            <Expand className="w-4 h-4" />
-                        </span>
-                    )}
-                </button>
+                    </div>
+                ) : (
+                    <button
+                        className="relative flex-1 aspect-square bg-muted/30 dark:bg-white rounded-xl border overflow-hidden shadow-sm cursor-pointer group"
+                        onClick={() => images[selected]?.img?.src && setOpen(true)}
+                    >
+                        {images[selected]?.img?.src ? (
+                            <Image
+                                src={images[selected].img.src}
+                                alt={name}
+                                fill
+                                sizes="(max-width: 1024px) 100vw, 450px"
+                                className="object-contain p-8"
+                                priority
+                            />
+                        ) : (
+                            <FpPlaceholder />
+                        )}
+                        {images[selected]?.img?.src && (
+                            <span className="absolute bottom-3 right-3 md:top-3 md:bottom-auto w-8 h-8 flex items-center justify-center rounded-full bg-background text-foreground shadow-sm">
+                                <Expand className="w-4 h-4" />
+                            </span>
+                        )}
+                    </button>
+                )}
             </div>
-            {images.length > 1 && (
+            {(images.length > 1 || videoId) && (
                 <div className="flex md:hidden gap-2 overflow-x-auto px-1 py-1">
                     {images.map((img, idx) => (
                         <button
@@ -90,7 +116,26 @@ export function ProductImageGallery({ images, name, height = 520, fallback }: Pr
                             )}
                         </button>
                     ))}
+                    {videoId && (
+                        <button
+                            onClick={() => setSelected(videoIndex)}
+                            className={`relative w-14 h-14 rounded-lg overflow-hidden bg-muted/50 shrink-0 transition-colors flex items-center justify-center ${
+                                isVideo ? "ring-2 ring-primary" : "opacity-60 hover:opacity-100"
+                            }`}
+                        >
+                            <Play className="w-4 h-4 fill-current" />
+                        </button>
+                    )}
                 </div>
+            )}
+            {videoId && !isVideo && (
+                <button
+                    onClick={() => setSelected(videoIndex)}
+                    className="flex items-center gap-2 w-full py-2.5 px-4 rounded-lg border bg-muted/30 hover:bg-muted/50 transition-colors text-sm text-muted-foreground hover:text-foreground"
+                >
+                    <Play className="w-4 h-4 fill-current" />
+                    Watch Product Video
+                </button>
             )}
 
             <Dialog open={open} onOpenChange={setOpen}>
@@ -98,7 +143,7 @@ export function ProductImageGallery({ images, name, height = 520, fallback }: Pr
                     <VisuallyHidden><DialogTitle>{name}</DialogTitle></VisuallyHidden>
 
                     <div className="flex h-full max-md:flex-col">
-                        {images.length > 1 && (
+                        {(images.length > 1 || videoId) && (
                             <div className="hidden md:flex flex-col gap-1.5 p-3 overflow-y-auto shrink-0 w-20">
                                 {images.map((img, idx) => (
                                     <button
@@ -116,20 +161,31 @@ export function ProductImageGallery({ images, name, height = 520, fallback }: Pr
                                         )}
                                     </button>
                                 ))}
+                                {videoId && (
+                                    <button
+                                        onClick={() => setSelected(videoIndex)}
+                                        onMouseEnter={() => setSelected(videoIndex)}
+                                        className={`relative w-14 h-14 rounded-lg overflow-hidden bg-muted/50 shrink-0 transition-colors flex items-center justify-center ${
+                                            isVideo ? "ring-2 ring-primary" : "opacity-60 hover:opacity-100"
+                                        }`}
+                                    >
+                                        <Play className="w-5 h-5 fill-current" />
+                                    </button>
+                                )}
                             </div>
                         )}
 
                         <div className="relative flex-1 flex items-center justify-center">
-                            {images.length > 1 && (
+                            {(images.length > 1 || videoId) && (
                                 <>
                                     <button
-                                        onClick={() => setSelected((selected - 1 + images.length) % images.length)}
+                                        onClick={() => { const total = videoId ? images.length + 1 : images.length; setSelected((selected - 1 + total) % total) }}
                                         className="absolute left-3 z-50 w-9 h-9 flex items-center justify-center rounded-full bg-background/80 hover:bg-muted text-foreground transition-colors"
                                     >
                                         <ChevronLeft className="w-5 h-5" />
                                     </button>
                                     <button
-                                        onClick={() => setSelected((selected + 1) % images.length)}
+                                        onClick={() => { const total = videoId ? images.length + 1 : images.length; setSelected((selected + 1) % total) }}
                                         className="absolute right-3 z-50 w-9 h-9 flex items-center justify-center rounded-full bg-background/80 hover:bg-muted text-foreground transition-colors"
                                     >
                                         <ChevronRight className="w-5 h-5" />
@@ -138,7 +194,15 @@ export function ProductImageGallery({ images, name, height = 520, fallback }: Pr
                             )}
 
                             <div className="relative w-[60%] h-[70%] max-md:w-[90%] max-md:h-[80%]">
-                                {images[selected]?.img?.src && (
+                                {isVideo ? (
+                                    <iframe
+                                        src={`https://www.youtube.com/embed/${videoId}?rel=0&autoplay=1`}
+                                        title={`${name} video`}
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                        allowFullScreen
+                                        className="absolute inset-0 w-full h-full rounded-lg"
+                                    />
+                                ) : images[selected]?.img?.src ? (
                                     <Image
                                         src={images[selected].img.src}
                                         alt={name}
@@ -146,11 +210,11 @@ export function ProductImageGallery({ images, name, height = 520, fallback }: Pr
                                         sizes="(max-width: 768px) 90vw, 60vw"
                                         className="object-contain"
                                     />
-                                )}
+                                ) : null}
                             </div>
                         </div>
 
-                        {images.length > 1 && (
+                        {(images.length > 1 || videoId) && (
                             <div className="flex md:hidden gap-1.5 justify-center px-3 py-2 shrink-0">
                                 {images.map((_, idx) => (
                                     <button
@@ -161,6 +225,14 @@ export function ProductImageGallery({ images, name, height = 520, fallback }: Pr
                                         }`}
                                     />
                                 ))}
+                                {videoId && (
+                                    <button
+                                        onClick={() => setSelected(videoIndex)}
+                                        className={`w-2 h-2 rounded-full transition-colors ${
+                                            isVideo ? "bg-primary" : "bg-muted-foreground/30"
+                                        }`}
+                                    />
+                                )}
                             </div>
                         )}
 

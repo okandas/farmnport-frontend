@@ -78,7 +78,7 @@ const [mounted, setMounted] = useState(false)
       <div className="grid lg:grid-cols-[480px_1fr_300px] gap-6 items-start">
 
         {/* ── Column 1: Image ── */}
-        <ProductImageGallery images={images} name={product.name} />
+        <ProductImageGallery images={images} name={product.name} videoId={product.video_id} />
 
         {/* ── Column 2: Product info ── */}
         <div className="space-y-5">

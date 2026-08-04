@@ -481,6 +481,7 @@ export const AgroChemicalSchema = z.object({
   front_label: z.custom<ImageModel>().optional(),
   back_label: z.custom<ImageModel>().optional(),
   images: z.array(z.custom<ImageModel>()).max(5, "Maximum 5 images allowed"),
+  video_id: z.string().optional().default(""),
   active_ingredients: z.array(z.object({
     id: z.string(),
     name: z.string(),
@@ -773,6 +774,7 @@ export const AnimalHealthProductSchema = z.object({
   front_label: z.custom<ImageModel>().optional(),
   back_label: z.custom<ImageModel>().optional(),
   images: z.array(z.custom<ImageModel>()).max(5, "Maximum 5 images allowed"),
+  video_id: z.string().optional().default(""),
   active_ingredients: z.array(z.object({
     id: z.string(),
     name: z.string(),
@@ -878,6 +880,7 @@ export const EquipmentProductSchema = z.object({
   front_label: z.custom<ImageModel>().optional(),
   back_label: z.custom<ImageModel>().optional(),
   images: z.array(z.custom<ImageModel>()).max(5, "Maximum 5 images allowed"),
+  video_id: z.string().optional().default(""),
   specifications: z.array(z.string()).default([]),
   stock_level: z.coerce.number().int().nonnegative().default(0),
   available_for_sale: z.boolean().default(false),
@@ -1066,6 +1069,7 @@ export const FeedProductSchema = z.object({
   front_label: z.custom<ImageModel>().optional(),
   back_label: z.custom<ImageModel>().optional(),
   images: z.array(z.custom<ImageModel>()).max(5, "Maximum 5 images allowed"),
+  video_id: z.string().optional().default(""),
   active_ingredients: z.array(z.object({
     id: z.string(),
     name: z.string(),

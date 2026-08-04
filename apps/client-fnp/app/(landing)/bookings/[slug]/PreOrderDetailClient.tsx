@@ -199,6 +199,7 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
                 ]}
                 name={event.name}
                 height={400}
+                videoId={event.video_id}
               />
               {event.is_test && <span className="absolute top-3 right-3 z-10 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded">TEST</span>}
             </div>
