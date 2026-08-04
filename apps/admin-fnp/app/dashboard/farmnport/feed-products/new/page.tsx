@@ -77,6 +77,7 @@ const NewFeedProductSchema = z.object({
     was_price: z.coerce.number().nonnegative().default(0),
     weight_grams: z.coerce.number().int().nonnegative().default(0),
     is_test: z.boolean().default(false),
+    video_id: z.string().optional().default(""),
 }).refine(data => !data.available_for_sale || data.weight_grams > 0, {
     message: "Weight is required before enabling available for sale",
     path: ["weight_grams"],
@@ -113,6 +114,7 @@ export default function NewFeedProductPage() {
             sale_price: 0,
             was_price: 0,
             weight_grams: 0,
+            video_id: "",
         },
         resolver: zodResolver(NewFeedProductSchema),
     })
@@ -862,6 +864,21 @@ export default function NewFeedProductPage() {
                             ))}
                         </div>
                     )}
+                </div>
+
+                <div className="border-b border-gray-900/10 dark:border-gray-100/10 pb-12">
+                    <div className="px-1">
+                        <label className="block text-sm/6 font-medium text-gray-900 dark:text-white mb-2">YouTube Video ID</label>
+                        <FormField control={form.control} name="video_id" render={({ field }) => (
+                            <FormItem>
+                                <FormControl>
+                                    <Input placeholder="e.g. dQw4w9WgXcQ" {...field} />
+                                </FormControl>
+                                <p className="mt-1 text-xs text-gray-500">The video ID from the YouTube URL (after watch?v=)</p>
+                                <FormMessage />
+                            </FormItem>
+                        )} />
+                    </div>
                 </div>
 
                 <ProductPricingSection />

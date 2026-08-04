@@ -312,6 +312,19 @@ export default function NewPreOrderPage() {
               </div>
             </div>
             <div className="sm:col-span-3">
+              <label className={labelCls}>YouTube Video ID</label>
+              <div className="mt-2">
+                <input
+                  type="text"
+                  value={form.video_id || ""}
+                  onChange={(e) => set("video_id", e.target.value)}
+                  placeholder="e.g. dQw4w9WgXcQ"
+                  className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                />
+                <p className="mt-1 text-xs text-gray-500">The video ID from the YouTube URL (after watch?v=)</p>
+              </div>
+            </div>
+            <div className="sm:col-span-3">
               <label className={labelCls}>Status</label>
               <div className="mt-2">
                 <Select value={form.status} onValueChange={(v) => set("status", v)}>

@@ -156,6 +156,7 @@ export default async function LotDetailPage({ params }: Props) {
                                     <LotImageGallery
                                         mainImage={(bidsData?.accepted as any)?.supply_images?.main_image ?? lot.main_image}
                                         images={(bidsData?.accepted as any)?.supply_images?.images ?? lot.images ?? []}
+                                        videoId={lot.video_id}
                                     />
                                 )}
 

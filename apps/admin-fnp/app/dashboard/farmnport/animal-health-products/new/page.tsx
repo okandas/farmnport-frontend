@@ -45,6 +45,7 @@ export default function NewAnimalHealthProductPage() {
             was_price: 0,
             weight_grams: 0,
             variants: [],
+            video_id: "",
         },
         resolver: zodResolver(FormAnimalHealthProductSchema),
     })
@@ -148,6 +149,19 @@ export default function NewAnimalHealthProductPage() {
                                     </p>
                                 </div>
                             </div>
+                        </div>
+
+                        <div className="px-1">
+                            <label className="block text-sm/6 font-medium text-gray-900 dark:text-white mb-2">YouTube Video ID</label>
+                            <FormField control={form.control} name="video_id" render={({ field }) => (
+                                <FormItem>
+                                    <FormControl>
+                                        <Input placeholder="e.g. dQw4w9WgXcQ" {...field} />
+                                    </FormControl>
+                                    <p className="mt-1 text-xs text-gray-500">The video ID from the YouTube URL (after watch?v=)</p>
+                                    <FormMessage />
+                                </FormItem>
+                            )} />
                         </div>
 
                         <ProductPricingSection />

@@ -81,6 +81,7 @@ const EditFeedProductSchema = z.object({
     was_price: z.coerce.number().nonnegative().default(0),
     weight_grams: z.coerce.number().int().nonnegative().default(0),
     is_test: z.boolean().default(false),
+    video_id: z.string().optional().default(""),
     delivery_available: z.boolean().default(false),
     pickup_available: z.boolean().default(false),
 }).refine(data => !data.available_for_sale || data.weight_grams > 0, {
@@ -169,6 +170,7 @@ export default function EditFeedProductPage({ params }: { params: Promise<{ slug
             was_price: product?.was_price ?? 0,
             weight_grams: product?.weight_grams ?? 0,
             is_test: (product as any)?.is_test ?? false,
+            video_id: (product as any)?.video_id ?? "",
             delivery_available: (product as any)?.delivery_available ?? false,
             pickup_available: (product as any)?.pickup_available ?? false,
         },
@@ -200,6 +202,7 @@ export default function EditFeedProductPage({ params }: { params: Promise<{ slug
             delivery_available: (product as any).delivery_available ?? false,
             pickup_available: (product as any).pickup_available ?? false,
             is_test: (product as any).is_test ?? false,
+            video_id: (product as any).video_id ?? "",
         } : undefined,
         resolver: zodResolver(EditFeedProductSchema),
     })
@@ -984,6 +987,21 @@ export default function EditFeedProductPage({ params }: { params: Promise<{ slug
                             ))}
                         </div>
                     )}
+                </div>
+
+                <div className="border-b border-gray-900/10 dark:border-gray-100/10 pb-12">
+                    <div className="px-1">
+                        <label className="block text-sm/6 font-medium text-gray-900 dark:text-white mb-2">YouTube Video ID</label>
+                        <FormField control={form.control} name="video_id" render={({ field }) => (
+                            <FormItem>
+                                <FormControl>
+                                    <Input placeholder="e.g. dQw4w9WgXcQ" {...field} />
+                                </FormControl>
+                                <p className="mt-1 text-xs text-gray-500">The video ID from the YouTube URL (after watch?v=)</p>
+                                <FormMessage />
+                            </FormItem>
+                        )} />
+                    </div>
                 </div>
 
                 <ProductPricingSection />
