@@ -29,6 +29,17 @@ const apps = [
     ],
   },
   {
+    href: "/dashboard/turtlewax",
+    name: "Turtlewax",
+    description: "Manage Turtlewax car care products, pricing, and inventory",
+    color: "bg-emerald-500",
+    initials: "TW",
+    links: [
+      { label: "Categories", href: "/dashboard/turtlewax/categories" },
+      { label: "Products", href: "/dashboard/turtlewax/products" },
+    ],
+  },
+  {
     href: "/dashboard/tumira",
     name: "Tumira",
     description: "Manage delivery wards, couriers, rates, and vanity codes",
