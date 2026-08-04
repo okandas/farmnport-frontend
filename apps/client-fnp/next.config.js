@@ -16,6 +16,7 @@ const nextConfig = {
       { source: '/agrochemical-guides/foliar-feeds/voema-starter', destination: '/plant-nutrition-guides/foliar-feeds/voema-starter', permanent: true },
       { source: '/agrochemical-guides/foliar-feeds/voema-vegetative', destination: '/plant-nutrition-guides/foliar-feeds/voema-vegetative', permanent: true },
       { source: '/agrochemical-guides/foliar-feeds/voema-fruit-flower', destination: '/plant-nutrition-guides/foliar-feeds/voema-flower-fruit', permanent: true },
+      { source: '/buyer/seta-produce', destination: '/farmer/seta-produce', permanent: true },
     ]
   },
   images: {
