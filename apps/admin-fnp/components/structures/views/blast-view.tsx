@@ -39,6 +39,7 @@ interface BlastResult {
   to: string
   channel: string
   ok: boolean
+  status?: string
   error?: string
 }
 
@@ -128,8 +129,8 @@ export function BlastView({ source }: { source?: "farmnport" | "menus" } = {}) {
     setEmailSubject("")
     setOverrides({})
     toast({
-      title: `Blast sent — ${data.sent} delivered`,
-      description: data.failed > 0 ? `${data.failed} failed` : "Check your inbox",
+      title: `Blast queued — ${data.sent} emails`,
+      description: data.failed > 0 ? `${data.failed} failed` : "Delivery in progress",
     })
   }
 
@@ -213,8 +214,8 @@ export function BlastView({ source }: { source?: "farmnport" | "menus" } = {}) {
       <div className="rounded-lg border bg-white overflow-hidden shadow-sm">
         <div className="flex items-center justify-between px-5 py-3.5 border-b bg-white">
           <div className="flex items-center gap-3">
-            <span className="text-sm font-semibold">Blast sent</span>
-            <span className="text-xs px-2.5 py-0.5 rounded-full bg-green-100 text-green-700 font-semibold">{results.sent} sent</span>
+            <span className="text-sm font-semibold">Blast queued</span>
+            <span className="text-xs px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-700 font-semibold">{results.sent} queued</span>
             {results.failed > 0 && <span className="text-xs px-2.5 py-0.5 rounded-full bg-red-100 text-red-600 font-semibold">{results.failed} failed</span>}
           </div>
           <button onClick={handleReset} className="text-xs font-medium text-primary hover:underline flex items-center gap-1">
@@ -241,7 +242,7 @@ export function BlastView({ source }: { source?: "farmnport" | "menus" } = {}) {
                 <td className="px-5 py-2.5 capitalize">{r.channel}</td>
                 <td className="px-5 py-2.5">
                   {r.ok
-                    ? <span className="text-green-600 font-medium">Sent</span>
+                    ? <span className={r.status === "queued" ? "text-amber-600 font-medium" : "text-green-600 font-medium"}>{r.status === "queued" ? "Queued" : "Sent"}</span>
                     : <span className="text-red-500">{r.error ?? "Failed"}</span>}
                 </td>
                 <td className="px-5 py-2.5">
@@ -372,7 +373,7 @@ export function BlastView({ source }: { source?: "farmnport" | "menus" } = {}) {
               )}
               {results && (
                 <div className="flex items-center gap-4 text-sm border-l pl-6">
-                  <span className="text-green-600 font-semibold">{results.sent} sent this batch</span>
+                  <span className="text-amber-600 font-semibold">{results.sent} queued this batch</span>
                   {results.failed > 0 && <span className="text-red-500 font-semibold">{results.failed} failed</span>}
                 </div>
               )}
