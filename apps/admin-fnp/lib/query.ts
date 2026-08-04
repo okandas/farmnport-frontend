@@ -10,6 +10,8 @@ import {
   LoginResponse,
   ProducerPriceList,
   FormAgroChemicalModel,
+  FormTurtlewaxProductModel,
+  FormTurtlewaxCategoryModel,
   ImageModel,
   Brand,
 } from "@/lib/schemas"
@@ -1981,4 +1983,68 @@ export function adminCreateResourceArticle(data: any) {
 
 export function adminUpdateResourceArticle(id: string, data: any) {
   return api.put(`${baseUrl}/resource-articles/admin/${id}`, data)
+}
+
+// Turtlewax Products
+export function queryTurtlewaxProducts(pagination?: pagination) {
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) {
+    params.append("p", pagination.p.toString())
+  }
+  if (pagination?.search !== undefined && pagination.search.length >= 2) {
+    params.append("search", pagination.search)
+  }
+  const query = params.toString()
+  const url = query
+    ? `${baseUrl}/user/turtlewax-products?${query}`
+    : `${baseUrl}/user/turtlewax-products`
+  return api.get(url)
+}
+
+export function addTurtlewaxProduct(data: FormTurtlewaxProductModel) {
+  return api.post(`${baseUrl}/user/turtlewax-products/add`, data)
+}
+
+export function queryTurtlewaxProduct(id: string) {
+  return api.get(`${baseUrl}/user/turtlewax-products/${id}`)
+}
+
+export function updateTurtlewaxProduct(data: FormTurtlewaxProductModel) {
+  return api.post(`${baseUrl}/user/turtlewax-products/update`, data)
+}
+
+export function deleteTurtlewaxProducts(productIds: string[]) {
+  return api.post(`${baseUrl}/user/turtlewax-products/delete`, { product_ids: productIds })
+}
+
+// Turtlewax Categories
+export function queryTurtlewaxCategories(pagination?: pagination) {
+  const params = new URLSearchParams()
+  if (pagination?.p !== undefined && pagination.p >= 2) {
+    params.append("p", pagination.p.toString())
+  }
+  if (pagination?.search !== undefined && pagination.search.length >= 2) {
+    params.append("search", pagination.search)
+  }
+  const query = params.toString()
+  const url = query
+    ? `${baseUrl}/user/turtlewax-categories?${query}`
+    : `${baseUrl}/user/turtlewax-categories`
+  return api.get(url)
+}
+
+export function addTurtlewaxCategory(data: FormTurtlewaxCategoryModel) {
+  return api.post(`${baseUrl}/user/turtlewax-categories/add`, data)
+}
+
+export function queryTurtlewaxCategory(id: string) {
+  return api.get(`${baseUrl}/user/turtlewax-categories/${id}`)
+}
+
+export function updateTurtlewaxCategory(data: FormTurtlewaxCategoryModel) {
+  return api.post(`${baseUrl}/user/turtlewax-categories/update`, data)
+}
+
+export function deleteTurtlewaxCategory(id: string) {
+  return api.post(`${baseUrl}/user/turtlewax-categories/delete`, { id })
 }

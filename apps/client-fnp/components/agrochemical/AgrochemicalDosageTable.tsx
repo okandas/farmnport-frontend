@@ -98,7 +98,7 @@ export function AgrochemicalDosageTable({ dosageRates }: AgrochemicalDosageTable
     return (
         <div className="mb-12">
             <h2 id="dosage-guide" className="sticky top-16 z-10 text-2xl font-bold py-4 text-foreground bg-background">Dosage Rates & Application Guide</h2>
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto relative z-0">
                 <table className="w-full border-collapse">
                     <thead>
                         <tr className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/50 dark:to-indigo-950/50 border-b-2 border-blue-200 dark:border-blue-800">
