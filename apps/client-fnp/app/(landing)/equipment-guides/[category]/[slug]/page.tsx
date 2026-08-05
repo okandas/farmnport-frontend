@@ -1,16 +1,10 @@
 import type { Metadata } from 'next'
-import Image from "next/image"
-import Link from "next/link"
 import { BaseURL } from "@/lib/schemas"
 import { buildGuideMetadata } from "@/lib/utilities"
-import { GuideProductTitle } from "@/components/shared/GuideProductTitle"
-import { WantToBuyCTA } from "@/components/shared/WantToBuyCTA"
-import { ShareBar } from "@/components/shared/ShareBar"
-import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
 import { guardTestItem } from "@/lib/guardTestItem"
 import { ProductNotFound } from "@/components/shared/ProductNotFound"
-import { SidebarPromo } from "@/components/ads/SidebarPromo"
-
+import { GuideDetailLayout } from "@/components/shared/GuideDetailLayout"
+import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
 
 type Props = { params: Promise<{ category: string; slug: string }> }
 
@@ -29,14 +23,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return buildGuideMetadata(product, categoryName, 'Specifications & Guide', description, `/equipment-guides/${category}/${slug}`, product.images?.[0]?.img?.src)
 }
 
-interface GuidePageProps {
-    params: Promise<{
-        category: string
-        slug: string
-    }>
-}
-
 const fetchOptions: RequestInit = { cache: "no-store" }
+
+interface GuidePageProps {
+    params: Promise<{ category: string; slug: string }>
+}
 
 export default async function EquipmentGuidePage({ params }: GuidePageProps) {
     const { category, slug } = await params
@@ -66,171 +57,87 @@ export default async function EquipmentGuidePage({ params }: GuidePageProps) {
         "category": product.equipment_category?.name || "Farm Equipment",
         "url": url,
         "brand": product.brand?.name ? { "@type": "Brand", "name": product.brand.name } : undefined,
-        "additionalProperty": [
-            ...(product.specifications?.map((spec: any) => ({
-                "@type": "PropertyValue",
-                "name": spec.name,
-                "value": spec.value
-            })) || [])
-        ],
+        "additionalProperty": product.specifications?.map((spec: any) => ({
+            "@type": "PropertyValue",
+            "name": spec.name,
+            "value": spec.value
+        })) || [],
     }
 
     return (
-        <div className="min-h-screen bg-background">
-            <script
-                type="application/ld+json"
-                dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-            />
-
-            <div className="border-b">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-                    <nav className="flex flex-wrap text-sm text-muted-foreground">
-                        <Link href="/" className="hover:text-foreground">Home</Link>
-                        <span className="mx-2">/</span>
-                        <Link href="/equipment-guides" className="hover:text-foreground">Equipment Guides</Link>
-                        <span className="mx-2">/</span>
-                        <Link href={`/equipment-guides/${category}`} className="hover:text-foreground capitalize">{product.equipment_category?.name || category}</Link>
-                        <span className="mx-2">/</span>
-                        <span className="text-foreground capitalize truncate max-w-[200px] sm:max-w-none">{product.name}</span>
-                    </nav>
+        <GuideDetailLayout
+            product={product}
+            breadcrumbs={[
+                { label: "Equipment Guides", href: "/equipment-guides" },
+                { label: product.equipment_category?.name || category, href: `/equipment-guides/${category}` },
+                { label: product.name, href: url },
+            ]}
+            categoryBadge={product.equipment_category ? { label: product.equipment_category.name } : undefined}
+            buyHref={`/buy-equipment/${slug}`}
+            interestHref={`/interest/equipment/${slug}`}
+            safetyText="Always follow manufacturer guidelines when operating farm equipment. Wear appropriate protective gear and ensure proper training before use."
+            structuredData={structuredData}
+        >
+            {/* Overview */}
+            {product.description && (
+                <div>
+                    <h2 className="text-lg font-semibold mb-3 text-foreground">Overview</h2>
+                    <p className="text-muted-foreground leading-relaxed text-sm">{product.description}</p>
                 </div>
-            </div>
+            )}
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div className="grid lg:grid-cols-[450px,1fr] gap-6 lg:gap-12 mb-16">
-                    {/* Left - Image */}
-                    <div className="flex flex-col gap-4">
-                        <div className="relative aspect-square bg-muted/30 dark:bg-white rounded-xl border overflow-hidden shadow-sm">
-                            {product.images && product.images[0] && product.images[0].img?.src ? (
-                                <Image
-                                    src={product.images[0].img.src}
-                                    alt={product.name}
-                                    fill
-                                    sizes="(max-width: 1024px) 100vw, 450px"
-                                    className="object-contain p-8"
-                                    priority
-                                />
-                            ) : (
-                                <div className="absolute inset-0 bg-muted/30" />
-                            )}
-                        </div>
+            <AdSenseInFeed />
 
-                        {product.images && product.images.length > 1 && (
-                            <div className="grid grid-cols-4 gap-3">
-                                {product.images.slice(0, 4).map((img: any, idx: number) => (
-                                    <button
-                                        key={idx}
-                                        className="relative aspect-square bg-muted/30 dark:bg-white rounded-lg border hover:border-primary transition-colors"
-                                    >
-                                        {img.img?.src ? (
-                                            <Image
-                                                src={img.img.src}
-                                                alt={`${product.name} ${idx + 1}`}
-                                                fill
-                                                sizes="(max-width: 1024px) 25vw, 100px"
-                                                className="object-contain p-2"
-                                            />
-                                        ) : (
-                                            <div className="absolute inset-0 bg-muted/30 rounded-lg" />
-                                        )}
-                                    </button>
-                                ))}
+            {/* Grouped specs */}
+            {product.spec_groups && product.spec_groups.length > 0 && (
+                <div className="border overflow-hidden">
+                    {product.spec_groups.map((group: any, gIdx: number) => (
+                        <div key={gIdx}>
+                            <div className="bg-muted px-4 py-2 text-xs font-bold uppercase tracking-wider border-b">
+                                {group.name}
                             </div>
-                        )}
-
-                        <div className="hidden lg:block">
-                            <WantToBuyCTA available_for_sale={product.available_for_sale} name={product.name} brand={product.brand?.name} href={`/buy-equipment/${slug}`} interestHref={`/interest/equipment/${slug}`} />
-                        </div>
-
-                        <div className="hidden lg:block flex-1">
-                            <SidebarPromo />
-                        </div>
-                    </div>
-
-                    {/* Right - Product Info */}
-                    <div className="space-y-4 lg:space-y-6">
-                        <div>
-                            <GuideProductTitle name={product.name} brand={product.brand?.name} />
-                            <div className="flex items-center gap-2 mt-2">
-                                {product.equipment_category && (
-                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
-                                        {product.equipment_category.name}
-                                    </span>
-                                )}
-                                <ShareBar name={product.name} />
-                            </div>
-                        </div>
-
-                        <div className="lg:hidden space-y-4">
-                            <WantToBuyCTA available_for_sale={product.available_for_sale} name={product.name} brand={product.brand?.name} href={`/buy-equipment/${slug}`} interestHref={`/interest/equipment/${slug}`} />
-                            <SidebarPromo />
-                        </div>
-
-                        <div className="h-px bg-border" />
-
-                        {product.description && (
-                            <div>
-                                <h2 className="text-lg font-semibold mb-3 text-foreground">Overview</h2>
-                                <p className="text-muted-foreground leading-relaxed text-sm">{product.description}</p>
-                            </div>
-                        )}
-
-
-                        <AdSenseInFeed />
-
-                        {/* Grouped specs */}
-                        {product.spec_groups && product.spec_groups.length > 0 && (
-                            <div className="border overflow-hidden">
-                                {product.spec_groups.map((group: any, gIdx: number) => (
-                                    <div key={gIdx}>
-                                        <div className="bg-muted px-4 py-2 text-xs font-bold uppercase tracking-wider border-b">
-                                            {group.name}
-                                        </div>
-                                        <dl className="divide-y divide-border">
-                                            {group.specs.map((spec: any, sIdx: number) => (
-                                                <div key={sIdx} className="flex justify-between gap-4 px-4 py-2 text-sm">
-                                                    <dt className="text-muted-foreground">{spec.name}</dt>
-                                                    <dd className="font-medium text-foreground text-right">{spec.value}</dd>
-                                                </div>
-                                            ))}
-                                        </dl>
+                            <dl className="divide-y divide-border">
+                                {group.specs.map((spec: any, sIdx: number) => (
+                                    <div key={sIdx} className="flex justify-between gap-4 px-4 py-2 text-sm">
+                                        <dt className="text-muted-foreground">{spec.name}</dt>
+                                        <dd className="font-medium text-foreground text-right">{spec.value}</dd>
                                     </div>
                                 ))}
-                            </div>
-                        )}
-
-                        {/* Fallback: flat specs for backward compat */}
-                        {(!product.spec_groups || product.spec_groups.length === 0) && product.specifications && product.specifications.length > 0 && (
-                            <div className="rounded-xl border bg-card p-4">
-                                <h2 className="text-sm font-semibold uppercase tracking-wide text-green-700 dark:text-green-400 mb-3">Specifications</h2>
-                                <dl className="space-y-2">
-                                    {product.specifications.map((spec: any, idx: number) => (
-                                        <div key={idx} className="flex justify-between gap-4 text-sm">
-                                            <dt className="text-muted-foreground flex-shrink-0">{typeof spec === "string" ? spec : spec.name}</dt>
-                                            <dd className="font-medium text-foreground text-right">{typeof spec === "string" ? "" : spec.value}</dd>
-                                        </div>
-                                    ))}
-                                </dl>
-                            </div>
-                        )}
-
-                        {product.features && product.features.length > 0 && (
-                            <div className="rounded-xl border bg-card p-4">
-                                <h2 className="text-sm font-semibold uppercase tracking-wide text-blue-700 dark:text-blue-400 mb-3">Features</h2>
-                                <ul className="space-y-1.5">
-                                    {product.features.map((feature: string, idx: number) => (
-                                        <li key={idx} className="flex items-start gap-2 text-sm text-foreground">
-                                            <span className="h-1.5 w-1.5 rounded-full bg-blue-500 dark:bg-blue-400 flex-shrink-0 mt-1.5" />
-                                            <span>{feature}</span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        )}
-
-                    </div>
+                            </dl>
+                        </div>
+                    ))}
                 </div>
-            </div>
-        </div>
+            )}
+
+            {/* Fallback: flat specs */}
+            {(!product.spec_groups || product.spec_groups.length === 0) && product.specifications && product.specifications.length > 0 && (
+                <div className="rounded-xl border bg-card p-4">
+                    <h2 className="text-sm font-semibold uppercase tracking-wide text-green-700 dark:text-green-400 mb-3">Specifications</h2>
+                    <dl className="space-y-2">
+                        {product.specifications.map((spec: any, idx: number) => (
+                            <div key={idx} className="flex justify-between gap-4 text-sm">
+                                <dt className="text-muted-foreground flex-shrink-0">{typeof spec === "string" ? spec : spec.name}</dt>
+                                <dd className="font-medium text-foreground text-right">{typeof spec === "string" ? "" : spec.value}</dd>
+                            </div>
+                        ))}
+                    </dl>
+                </div>
+            )}
+
+            {/* Features */}
+            {product.features && product.features.length > 0 && (
+                <div className="rounded-xl border bg-card p-4">
+                    <h2 className="text-sm font-semibold uppercase tracking-wide text-blue-700 dark:text-blue-400 mb-3">Features</h2>
+                    <ul className="space-y-1.5">
+                        {product.features.map((feature: string, idx: number) => (
+                            <li key={idx} className="flex items-start gap-2 text-sm text-foreground">
+                                <span className="h-1.5 w-1.5 rounded-full bg-blue-500 dark:bg-blue-400 flex-shrink-0 mt-1.5" />
+                                <span>{feature}</span>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
+        </GuideDetailLayout>
     )
 }
