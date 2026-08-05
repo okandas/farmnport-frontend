@@ -17,6 +17,10 @@ const nextConfig = {
       { source: '/agrochemical-guides/foliar-feeds/voema-vegetative', destination: '/plant-nutrition-guides/foliar-feeds/voema-vegetative', permanent: true },
       { source: '/agrochemical-guides/foliar-feeds/voema-fruit-flower', destination: '/plant-nutrition-guides/foliar-feeds/voema-flower-fruit', permanent: true },
       { source: '/buyer/seta-produce', destination: '/farmer/seta-produce', permanent: true },
+      { source: '/buyer/danchip', destination: '/buyers/cattle', permanent: true },
+      { source: '/buyer/top-choice-butchery', destination: '/buyers/cattle', permanent: true },
+      { source: '/buyer/greenlight-butchery-shop', destination: '/buyers/cattle', permanent: true },
+      { source: '/buyer/flyfix-grocery', destination: '/buyers', permanent: true },
     ]
   },
   images: {
