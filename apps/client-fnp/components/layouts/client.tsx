@@ -91,7 +91,7 @@ export function Client({ slug, type, user, latestPrices }: ClientPageProps) {
               <div className="flex-1 min-w-0 text-center sm:text-left">
                 <h1 className="text-xl sm:text-2xl font-bold tracking-tight mb-1">{name}</h1>
                 <div className="flex flex-wrap items-center justify-center sm:justify-start gap-1.5 mb-2">
-                  <Badge variant="secondary" className="text-[10px]">{capitalizeFirstLetter(client.type)}</Badge>
+                  <Badge variant="secondary" className="text-[10px]">{client.sub_type === "broker" && client.broker_label ? client.broker_label : capitalizeFirstLetter(client.type)}</Badge>
                   {client.verified ? (
                     <Badge className="bg-green-100 text-green-800 hover:bg-green-100 border-green-200 text-[10px]">
                       <Icons.verified className="h-3 w-3 mr-1" />Verified
@@ -236,7 +236,7 @@ export function Client({ slug, type, user, latestPrices }: ClientPageProps) {
             {/* Produces */}
             {produces.length > 0 && (
               <div className="border rounded-lg p-4">
-                <h3 className="text-sm font-semibold mb-3">{client.type === "buyer" ? "Products They Buy" : "Products They Sell"}</h3>
+                <h3 className="text-sm font-semibold mb-3">{client.sub_type === "broker" ? "Products Under Brokerage" : client.type === "buyer" ? "Products They Buy" : "Products They Sell"}</h3>
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
                   {produces.map((p) => (
                     <span key={p} className="text-xs px-3 py-2 rounded-md bg-muted/50 text-muted-foreground text-center">{p}</span>
