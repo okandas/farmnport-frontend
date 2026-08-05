@@ -1,11 +1,6 @@
 import type { Metadata } from 'next'
 import { serverFetch } from "@/lib/serverFetch"
 import { ActiveIngredientsList } from "@/components/shared/ActiveIngredientUnitsKey"
-import Image from "next/image"
-import { AlertTriangle } from "lucide-react"
-import Link from "next/link"
-import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
-import { SidebarPromo } from "@/components/ads/SidebarPromo"
 import { capitalizeFirstLetter, buildGuideMetadata } from "@/lib/utilities"
 import { ProductNotFound } from "@/components/shared/ProductNotFound"
 import { guardTestItem } from "@/lib/guardTestItem"
@@ -13,9 +8,7 @@ import { SprayProgramBackLink } from "./SprayProgramBackLink"
 import { FertilizerApplicationRates } from "@/components/agrochemical/FertilizerApplicationRates"
 import { AgrochemicalDosageTable } from "@/components/agrochemical/AgrochemicalDosageTable"
 import { ProductTargets } from "@/components/agrochemical/ProductTargets"
-import { WantToBuyCTA } from "@/components/shared/WantToBuyCTA"
-import { GuideProductTitle } from "@/components/shared/GuideProductTitle"
-import { ShareBar } from "@/components/shared/ShareBar"
+import { GuideDetailLayout } from "@/components/shared/GuideDetailLayout"
 
 type Props = { params: Promise<{ category: string; slug: string }> }
 
@@ -47,53 +40,52 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return buildGuideMetadata(chemical, categorySingularTitle, 'Dosage, Label & Guide', description, `/agrochemical-guides/${category}/${slug}`, chemical.images?.[0]?.img?.src, keywords)
 }
 
+const overviewDesc: Record<string, string> = {
+    herbicides: "a herbicide used for weed management and control. It helps suppress unwanted weed growth while protecting crops when applied according to recommended guidelines.",
+    insecticides: "an insecticide formulated for effective pest control. It targets harmful insects while maintaining crop safety when used as directed.",
+    fungicides: "a fungicide designed to prevent and control fungal diseases. It provides protective and curative action to keep crops healthy throughout the growing season.",
+    acaricides: "an acaricide developed for mite and tick control. It effectively manages mite populations while being safe for crops when applied correctly.",
+    nematicides: "a nematicide used to control plant-parasitic nematodes. It protects root systems and promotes healthy crop development.",
+    rodenticides: "a rodenticide formulated for rodent control in agricultural settings. It helps protect stored crops and field produce from rodent damage.",
+    molluscicides: "a molluscicide designed to control snails and slugs. It protects crops from mollusc damage during vulnerable growth stages.",
+    bactericides: "a bactericide used to manage bacterial infections in crops. It helps prevent the spread of bacterial diseases and supports plant health.",
+}
+
+const targetLabel: Record<string, string> = {
+    herbicides: "Target Weeds",
+    insecticides: "Target Pests",
+    fungicides: "Target Diseases",
+    acaricides: "Target Mites & Ticks",
+    nematicides: "Target Nematodes",
+    rodenticides: "Target Rodents",
+    molluscicides: "Target Molluscs",
+    bactericides: "Target Bacteria",
+    "foliar-feeds": "Targets",
+    fertilizers: "Targets",
+    "plant-nutrition": "Targets",
+    biostimulants: "Targets",
+}
+
+const DISCLAIMER = "Disclaimer: The information provided on this page, including active ingredients, dosage rates, application methods, and safety guidelines, has been compiled from publicly available product labels, manufacturer datasheets, and other third-party sources. Farmnport does not manufacture, formulate, or independently verify the accuracy, completeness, or currency of this information. Product formulations, registrations, and label directions may change without notice. Always refer to the official product label accompanying the purchased product for the most up-to-date and legally binding instructions. Farmnport accepts no liability for any loss, damage, crop injury, or adverse outcome arising from the use of, or reliance on, the information presented here. Use of any agrochemical product is entirely at the user's own risk."
+
 interface GuidePageProps {
-    params: Promise<{
-        category: string
-        slug: string
-    }>
+    params: Promise<{ category: string; slug: string }>
 }
 
 export default async function AgroChemicalGuidePage({ params }: GuidePageProps) {
     const { category, slug } = await params
-
     const chemical = await serverFetch(`/agrochemical/${slug}`).catch(() => null)
 
     await guardTestItem(!!chemical?.is_test)
-
-    const categorySlug = chemical?.agrochemical_category?.slug || ""
-    const targetLabel: Record<string, string> = {
-        herbicides: "Target Weeds",
-        insecticides: "Target Pests",
-        fungicides: "Target Diseases",
-        acaricides: "Target Mites & Ticks",
-        nematicides: "Target Nematodes",
-        rodenticides: "Target Rodents",
-        molluscicides: "Target Molluscs",
-        bactericides: "Target Bacteria",
-        "foliar-feeds": "Targets",
-        fertilizers: "Targets",
-        "plant-nutrition": "Targets",
-        biostimulants: "Targets",
-    }
-    const overviewDesc: Record<string, string> = {
-        herbicides: "a herbicide used for weed management and control. It helps suppress unwanted weed growth while protecting crops when applied according to recommended guidelines.",
-        insecticides: "an insecticide formulated for effective pest control. It targets harmful insects while maintaining crop safety when used as directed.",
-        fungicides: "a fungicide designed to prevent and control fungal diseases. It provides protective and curative action to keep crops healthy throughout the growing season.",
-        acaricides: "an acaricide developed for mite and tick control. It effectively manages mite populations while being safe for crops when applied correctly.",
-        nematicides: "a nematicide used to control plant-parasitic nematodes. It protects root systems and promotes healthy crop development.",
-        rodenticides: "a rodenticide formulated for rodent control in agricultural settings. It helps protect stored crops and field produce from rodent damage.",
-        molluscicides: "a molluscicide designed to control snails and slugs. It protects crops from mollusc damage during vulnerable growth stages.",
-        bactericides: "a bactericide used to manage bacterial infections in crops. It helps prevent the spread of bacterial diseases and supports plant health.",
-    }
-    const sectionTitle = targetLabel[categorySlug] || "Targets"
-    const noTargetMsg = `No ${sectionTitle.toLowerCase()} information available.`
 
     if (!chemical) {
         return <ProductNotFound title="AgroChemical Guide Not Found" description="The agrochemical guide you're looking for doesn't exist or may have been removed." primary={{ href: "/agrochemical-guides", label: "Browse AgroChemical Guides" }} secondary={{ href: "/buy-agrochemicals", label: "Buy AgroChemicals" }} />
     }
 
-    // Generate JSON-LD structured data
+    const categorySlug = chemical?.agrochemical_category?.slug || ""
+    const sectionTitle = targetLabel[categorySlug] || "Targets"
+    const noTargetMsg = `No ${sectionTitle.toLowerCase()} information available.`
+
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://farmnport.com'
     const url = `${baseUrl}/agrochemical-guides/${category}/${slug}`
     const imageUrl = chemical.images?.[0]?.img?.src || `${baseUrl}/default-chemical.png`
@@ -102,10 +94,6 @@ export default async function AgroChemicalGuidePage({ params }: GuidePageProps) 
         ? `${chemical.name} is a ${chemical.agrochemical_category.name} for effective pest and disease control. View active ingredients, dosage rates, and application guidelines.`
         : `Professional agrochemical guide for ${chemical.name}. Complete information on active ingredients, dosage rates, and safe application.`
 
-    const usageInfo = chemical.dosage_rates?.length > 0
-        ? `Dosage rates available for ${chemical.dosage_rates.map((r: any) => r.crop).join(', ')}`
-        : undefined
-
     const breadcrumbJsonLd = {
         "@context": "https://schema.org",
         "@type": "BreadcrumbList",
@@ -113,7 +101,7 @@ export default async function AgroChemicalGuidePage({ params }: GuidePageProps) 
             { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://farmnport.com" },
             { "@type": "ListItem", "position": 2, "name": "Agrochemical Guides", "item": "https://farmnport.com/agrochemical-guides" },
             { "@type": "ListItem", "position": 3, "name": chemical.agrochemical_category?.name || category, "item": `https://farmnport.com/agrochemical-guides/${category}` },
-            { "@type": "ListItem", "position": 4, "name": chemical.name, "item": `https://farmnport.com/agrochemical-guides/${category}/${slug}` },
+            { "@type": "ListItem", "position": 4, "name": chemical.name, "item": url },
         ],
     }
 
@@ -138,242 +126,81 @@ export default async function AgroChemicalGuidePage({ params }: GuidePageProps) 
             })) || [])
         ],
         "applicationCategory": "Agricultural Chemical",
-        "usageInfo": usageInfo
     }
 
+    const dosageTable = chemical.dosage_rates?.length > 0 ? (
+        chemical.dosage_rates.every((r: any) => !r.crop_group_id && r.crop_group)
+            ? <FertilizerApplicationRates dosageRates={chemical.dosage_rates} />
+            : <AgrochemicalDosageTable dosageRates={chemical.dosage_rates} />
+    ) : null
+
     return (
-        <div className="min-h-screen bg-background">
-            {/* JSON-LD Structured Data */}
-            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
-            <script
-                type="application/ld+json"
-                dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-            />
-
-            {/* Back to Spray Program */}
-            <SprayProgramBackLink />
-
-            {/* Breadcrumb */}
-            <div className="border-b">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-                    <nav className="flex text-sm text-muted-foreground">
-                        <Link href="/" className="hover:text-foreground">Home</Link>
-                        <span className="mx-2">/</span>
-                        <Link href="/agrochemical-guides" className="hover:text-foreground">Agrochemical Guides</Link>
-                        <span className="mx-2">/</span>
-                        <Link href={`/agrochemical-guides/${category}`} className="hover:text-foreground capitalize">{chemical.agrochemical_category?.name || category}</Link>
-                        <span className="mx-2">/</span>
-                        <span className="text-foreground capitalize">{chemical.name}</span>
-                    </nav>
-                </div>
+        <GuideDetailLayout
+            product={chemical}
+            breadcrumbs={[
+                { label: "Agrochemical Guides", href: "/agrochemical-guides" },
+                { label: chemical.agrochemical_category?.name || category, href: `/agrochemical-guides/${category}` },
+                { label: chemical.name, href: url },
+            ]}
+            categoryBadge={chemical.agrochemical_category ? { label: chemical.agrochemical_category.name } : undefined}
+            buyHref={`/buy-agrochemicals/${slug}`}
+            interestHref={`/interest/agrochemical/${slug}`}
+            safetyText="Always read and follow label directions. Wear appropriate personal protective equipment (PPE) when handling agrochemicals. Store in original containers in a secure location away from children and animals. Dispose of containers properly according to local regulations."
+            disclaimerText={DISCLAIMER}
+            structuredData={structuredData}
+            breadcrumbJsonLd={breadcrumbJsonLd}
+            topContent={<SprayProgramBackLink />}
+            bottomContent={dosageTable}
+        >
+            {/* Overview */}
+            <div>
+                <h2 className="text-lg font-semibold mb-3 text-foreground">Overview</h2>
+                <p className="text-muted-foreground leading-relaxed text-sm">
+                    {chemical.product_overview ? (
+                        chemical.product_overview
+                    ) : chemical.agrochemical_category?.slug ? (
+                        <><span className="font-medium text-foreground">{capitalizeFirstLetter(chemical.name)}</span> is {overviewDesc[chemical.agrochemical_category.slug] || `a ${chemical.agrochemical_category.name.toLowerCase().replace(/s$/, '')} for effective crop protection. It provides targeted action while ensuring crop safety when used according to recommended guidelines.`}</>
+                    ) : (
+                        <><span className="font-medium text-foreground">{chemical.name}</span> is a professional agrochemical solution for crop protection and management in agricultural applications.</>
+                    )}
+                </p>
             </div>
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                {/* Header Section */}
-                <div className="grid lg:grid-cols-[450px,1fr] gap-12 mb-16">
-                    {/* Left - Image */}
-                    <div className="flex flex-col gap-4">
-                        <div className="relative aspect-square bg-muted/30 dark:bg-white rounded-xl border overflow-hidden shadow-sm">
-                            {chemical.images && chemical.images[0] && chemical.images[0].img?.src ? (
-                                <Image
-                                    src={chemical.images[0].img.src}
-                                    alt={chemical.name}
-                                    fill
-                                    sizes="(max-width: 1024px) 100vw, 450px"
-                                    className="object-contain p-8"
-                                    priority
-                                />
-                            ) : (
-                                <div className="absolute inset-0 bg-muted/30" />
-                            )}
-                        </div>
+            {/* Active Ingredients */}
+            <div>
+                <h2 className="text-lg font-semibold mb-1 text-foreground">Active Ingredients</h2>
+                <ActiveIngredientsList activeIngredients={chemical.active_ingredients || []} />
+            </div>
 
-                        {/* Thumbnail Gallery - if multiple images */}
-                        {chemical.images && chemical.images.length > 1 && (
-                            <div className="grid grid-cols-4 gap-3">
-                                {chemical.images.slice(0, 4).map((img: any, idx: number) => (
-                                    <div
-                                        key={idx}
-                                        className="relative aspect-square bg-muted/30 dark:bg-white rounded-lg border hover:border-primary transition-colors"
-                                    >
-                                        {img.img?.src && (
-                                            <Image
-                                                src={img.img.src}
-                                                alt={`${chemical.name} ${idx + 1}`}
-                                                fill
-                                                sizes="(max-width: 1024px) 25vw, 100px"
-                                                className="object-contain p-2"
-                                            />
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-
-                        {/* Want to Buy CTA */}
-                        <WantToBuyCTA available_for_sale={chemical.available_for_sale} name={chemical.name} brand={chemical.brand?.name} href={`/buy-agrochemicals/${slug}`} interestHref={`/interest/agrochemical/${slug}`} />
-
-                        {/* Precautions */}
-                        {chemical.precautions && chemical.precautions.length > 0 && (
-                            <div className="rounded-lg border border-red-200 dark:border-red-900 bg-red-50/50 dark:bg-red-950/30 px-3 py-2">
-                                <h2 className="text-xs font-semibold uppercase tracking-wide text-red-700 dark:text-red-400 mb-1.5 flex items-center gap-1.5">
-                                    <AlertTriangle className="w-3.5 h-3.5" />
-                                    Precautions
-                                </h2>
-                                <ul className="space-y-0.5">
-                                    {chemical.precautions.map((precaution: string, idx: number) => (
-                                        <li key={idx} className="flex items-start gap-1.5 text-xs text-red-800 dark:text-red-300">
-                                            <span className="h-1 w-1 rounded-full bg-red-500 dark:bg-red-400 flex-shrink-0 mt-1.5" />
-                                            <span>{precaution}</span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        )}
-
-                        {/* Promo - fills remaining sidebar space */}
-                        <div className="flex-1">
-                            <SidebarPromo />
-                        </div>
-                    </div>
-
-                    {/* Right - Product Info */}
-                    <div className="space-y-6">
-                        {/* Product Name */}
-                        <GuideProductTitle name={chemical.name} brand={chemical.brand?.name} />
-                        <div className="mt-3 flex items-center flex-wrap gap-3">
-                            {chemical.agrochemical_category && (
-                                <div className="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
-                                    {chemical.agrochemical_category.name}
-                                </div>
-                            )}
-                            <ShareBar name={chemical.name} />
-                        </div>
-
-                        {/* Divider */}
-                        <div className="h-px bg-border" />
-
-                        {/* Overview */}
-                        <div>
-                            <h2 className="text-lg font-semibold mb-3 text-foreground">Overview</h2>
-                            <p className="text-muted-foreground leading-relaxed text-sm">
-                                {chemical.product_overview ? (
-                                    chemical.product_overview
-                                ) : chemical.agrochemical_category?.slug ? (
-                                    <><span className="font-medium text-foreground">{capitalizeFirstLetter(chemical.name)}</span> is {overviewDesc[chemical.agrochemical_category.slug] || `a ${chemical.agrochemical_category.name.toLowerCase().replace(/s$/, '')} for effective crop protection. It provides targeted action while ensuring crop safety when used according to recommended guidelines.`}</>
-                                ) : (
-                                    <><span className="font-medium text-foreground">{chemical.name}</span> is a professional agrochemical solution for crop protection and management in agricultural applications.</>
-                                )}
-                            </p>
-                        </div>
-
-                        {/* Active Ingredients Section */}
-                        <div>
-                            <h2 className="text-lg font-semibold mb-1 text-foreground">Active Ingredients</h2>
-                            <ActiveIngredientsList activeIngredients={chemical.active_ingredients || []} />
-                        </div>
-
-                        {/* AdSense Ad */}
-                        <AdSenseInFeed />
-
-                        {/* Used On & Targets Grid */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:h-[315px]">
-                            {/* Used On Section */}
-                            {chemical.dosage_rates && chemical.dosage_rates.length > 0 && (
-                                <div className="rounded-xl border bg-card p-4 overflow-y-auto">
-                                    <h2 className="text-sm font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-400 mb-3">
-                                        Used On
-                                    </h2>
-                                    <ul className="space-y-1.5">
-                                        {Array.from(new Set(chemical.dosage_rates.flatMap((rate: any) => {
-                                            if (rate.crop_group_items?.length > 0) return rate.crop_group_items
-                                            if (rate.crop) return [rate.crop]
-                                            if (rate.crop_group) return [rate.crop_group]
-                                            return []
-                                        }))).map((crop: any, idx: number) => (
-                                            <li key={idx} className="flex items-center gap-2 text-sm text-foreground">
-                                                <span className="h-1.5 w-1.5 rounded-full bg-amber-500 dark:bg-amber-400 flex-shrink-0" />
-                                                <span className="capitalize">{crop}</span>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            )}
-
-                            {/* Target Pests & Diseases Section */}
-                            <ProductTargets
-                                title={sectionTitle}
-                                targets={chemical.targets || []}
-                                emptyMessage={noTargetMsg}
-                            />
-                        </div>
-                    </div>
-                </div>
-
-                {/* Dosage Rates & Application Guide Section */}
+            {/* Used On & Targets Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:h-[315px]">
                 {chemical.dosage_rates && chemical.dosage_rates.length > 0 && (
-                    chemical.dosage_rates.every((r: any) => !r.crop_group_id && r.crop_group)
-                        ? <FertilizerApplicationRates dosageRates={chemical.dosage_rates} />
-                        : <AgrochemicalDosageTable dosageRates={chemical.dosage_rates} />
-                )}
-
-                {/* Product Labels Section */}
-                {(chemical.front_label?.img?.src || chemical.back_label?.img?.src) && (
-                    <div className="mb-12">
-                        <h2 className="text-2xl font-bold mb-6">Product Labels</h2>
-                        <div className="grid md:grid-cols-2 gap-6">
-                            {/* Front Label */}
-                            {chemical.front_label?.img?.src && (
-                                <div className="space-y-3">
-                                    <h3 className="text-lg font-semibold">Front Label</h3>
-                                    <div className="relative aspect-[3/4] bg-white rounded-lg border overflow-hidden">
-                                        <Image
-                                            src={chemical.front_label.img.src}
-                                            alt={`${chemical.name} - Front Label`}
-                                            fill
-                                            sizes="(max-width: 768px) 100vw, 50vw"
-                                            className="object-contain p-4"
-                                        />
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Back Label */}
-                            {chemical.back_label?.img?.src && (
-                                <div className="space-y-3">
-                                    <h3 className="text-lg font-semibold">Back Label</h3>
-                                    <div className="relative aspect-[3/4] bg-white rounded-lg border overflow-hidden">
-                                        <Image
-                                            src={chemical.back_label.img.src}
-                                            alt={`${chemical.name} - Back Label`}
-                                            fill
-                                            sizes="(max-width: 768px) 100vw, 50vw"
-                                            className="object-contain p-4"
-                                        />
-                                    </div>
-                                </div>
-                            )}
-                        </div>
+                    <div className="rounded-xl border bg-card p-4 overflow-y-auto">
+                        <h2 className="text-sm font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-400 mb-3">
+                            Used On
+                        </h2>
+                        <ul className="space-y-1.5">
+                            {Array.from(new Set(chemical.dosage_rates.flatMap((rate: any) => {
+                                if (rate.crop_group_items?.length > 0) return rate.crop_group_items
+                                if (rate.crop) return [rate.crop]
+                                if (rate.crop_group) return [rate.crop_group]
+                                return []
+                            }))).map((crop: any, idx: number) => (
+                                <li key={idx} className="flex items-center gap-2 text-sm text-foreground">
+                                    <span className="h-1.5 w-1.5 rounded-full bg-amber-500 dark:bg-amber-400 flex-shrink-0" />
+                                    <span className="capitalize">{crop}</span>
+                                </li>
+                            ))}
+                        </ul>
                     </div>
                 )}
 
-                {/* Safety Warning */}
-                <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-6">
-                    <div className="flex items-start gap-3">
-                        <AlertTriangle className="w-6 h-6 text-yellow-600 dark:text-yellow-500 flex-shrink-0" />
-                        <div>
-                            <h3 className="font-semibold mb-2 text-yellow-900 dark:text-yellow-100">Safety Information</h3>
-                            <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                                Always read and follow label directions. Wear appropriate personal protective equipment (PPE) when handling agrochemicals.
-                                Store in original containers in a secure location away from children and animals. Dispose of containers properly according to local regulations.
-                            </p>
-                            <p className="text-xs text-black dark:text-white mt-2">
-                                Disclaimer: The information provided on this page, including active ingredients, dosage rates, application methods, and safety guidelines, has been compiled from publicly available product labels, manufacturer datasheets, and other third-party sources. Farmnport does not manufacture, formulate, or independently verify the accuracy, completeness, or currency of this information. Product formulations, registrations, and label directions may change without notice. Always refer to the official product label accompanying the purchased product for the most up-to-date and legally binding instructions. Farmnport accepts no liability for any loss, damage, crop injury, or adverse outcome arising from the use of, or reliance on, the information presented here. Use of any agrochemical product is entirely at the user&#39;s own risk.
-                            </p>
-                        </div>
-                    </div>
-                </div>
+                <ProductTargets
+                    title={sectionTitle}
+                    targets={chemical.targets || []}
+                    emptyMessage={noTargetMsg}
+                />
             </div>
-        </div>
+        </GuideDetailLayout>
     )
 }
