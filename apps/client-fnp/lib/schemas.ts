@@ -128,6 +128,8 @@ export const ApplicationUserSchema = z.object({
     updated: z.string(),
     confirmed: z.boolean(),
     type: z.string().nonempty(),
+    sub_type: z.string().optional(),
+    broker_label: z.string().optional(),
     phase: z.string(),
     admin: z.object({
         id: z.string(),

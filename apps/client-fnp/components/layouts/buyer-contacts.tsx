@@ -27,6 +27,11 @@ export function BuyerContactsCard({ buyer, user }: BuyerContactsCardProps) {
           {buyer.verified && (
             <BadgeCheck className="h-4 w-4 flex-shrink-0 text-green-700" aria-hidden="true" />
           )}
+          {buyer.sub_type === "broker" && buyer.broker_label && (
+            <Badge variant="secondary" className="bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-50 text-[10px] rounded-md">
+              {buyer.broker_label}
+            </Badge>
+          )}
           {buyer.has_prices && (
             <Badge variant="secondary" className="bg-green-50 text-green-700 border-green-200 hover:bg-green-50 text-[10px] rounded-md">
               Pricing Available
