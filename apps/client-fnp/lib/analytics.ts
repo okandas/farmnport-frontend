@@ -21,10 +21,12 @@ export function trackViewGuide(params: {
   item_name: string
   item_category: string
   price: number        // in dollars
+  page_location?: string
 }) {
   pushEcom("view_guide", {
     currency: "USD",
     value: params.price,
+    page_location: params.page_location,
     items: [{ ...params, quantity: 1 }],
   })
 }

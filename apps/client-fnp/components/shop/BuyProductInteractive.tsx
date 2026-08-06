@@ -148,6 +148,7 @@ const [mounted, setMounted] = useState(false)
                 item_name: product.name,
                 item_category: categoryName ?? productType,
                 price: displayPrice ?? 0,
+                page_location: guideHref,
               })}
             >
               {guideLabel}
