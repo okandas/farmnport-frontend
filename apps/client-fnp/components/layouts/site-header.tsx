@@ -25,18 +25,12 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { makeAbbveriation } from "@/lib/utilities"
 import { useQuery } from "@tanstack/react-query"
 import { useCart } from "@/contexts/cart-context"
-import { getCart, countBookingNotifications } from "@/lib/query"
+import { countBookingNotifications } from "@/lib/query"
+import { useUnifiedCart } from "@/hooks/use-unified-cart"
 
-function CartIcon({ user }: { user: AuthenticatedUser | null }) {
+function CartIcon() {
   const { openCart } = useCart()
-  const { data } = useQuery({
-    queryKey: ["cart"],
-    queryFn: () => getCart().then((r) => r.data),
-    enabled: !!user,
-    staleTime: 30000,
-  })
-  const items: any[] = (data as any)?.items ?? []
-  const count = items.length
+  const { itemCount } = useUnifiedCart()
 
   return (
     <button
@@ -45,9 +39,9 @@ function CartIcon({ user }: { user: AuthenticatedUser | null }) {
       aria-label="Open cart"
     >
       <ShoppingCart className="w-5 h-5" />
-      {count > 0 && (
+      {itemCount > 0 && (
         <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
-          {count}
+          {itemCount}
         </span>
       )}
     </button>
@@ -404,7 +398,7 @@ export function SiteHeader() {
               </DropdownMenuContent>
             </DropdownMenu>
           )}
-          <CartIcon user={user} />
+          <CartIcon />
         </div>
 
         {/* Mobile nav */}

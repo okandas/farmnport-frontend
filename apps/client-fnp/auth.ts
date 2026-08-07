@@ -1,5 +1,6 @@
 import NextAuth, { Session, User } from "next-auth";
 import Credentials from 'next-auth/providers/credentials'
+import Google from 'next-auth/providers/google'
 import jwt_decode from "jwt-decode"
 import { Debug, Secret } from "@/lib/schemas"
 import { captureException } from "@sentry/nextjs";
@@ -123,6 +124,10 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
                 }
             }
         }),
+        Google({
+            clientId: process.env.GOOGLE_CLIENT_ID,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        }),
         Credentials({
             id: "impersonate",
             async authorize(credentials: any) {
@@ -168,7 +173,38 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
         })
     ],
     callbacks: {
-        async signIn() {
+        async signIn({ user, account, profile }) {
+            // For OAuth providers (Google/Facebook), exchange profile for farmnport JWT
+            if (account?.provider === "google") {
+                try {
+                    const email = profile?.email || user.email
+                    const name = profile?.name || user.name
+                    if (!email || !name) return false
+
+                    const res = await fetch(`${BaseURL}/client/oauth`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            provider: account.provider,
+                            email,
+                            name,
+                        }),
+                    })
+
+                    if (!res.ok) return false
+
+                    const data = await res.json()
+                    const decoded = jwt_decode<User>(data.token)
+                    decoded.token = data.token
+                    decoded.name = decoded.username
+
+                    // Attach decoded farmnport user to the user object so jwt callback can pick it up
+                    Object.assign(user, decoded)
+                } catch (err) {
+                    captureException({ message: "OAuth backend exchange failed", error: err })
+                    return false
+                }
+            }
             return true
         },
         async redirect({ url, baseUrl }) {

@@ -1,14 +1,7 @@
 "use client"
 
-import { Minus, Plus, Loader2, CheckCircle2 } from "lucide-react"
-import Link from "next/link"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { useSession } from "next-auth/react"
-import { useRouter } from "next/navigation"
-import { toast } from "sonner"
-import { addToCart, clearCart, getCart, updateCartItem, removeFromCart } from "@/lib/query"
-import { trackAddToCart } from "@/lib/analytics"
-import { useCart } from "@/contexts/cart-context"
+import { Minus, Plus, Loader2 } from "lucide-react"
+import { useUnifiedCart } from "@/hooks/use-unified-cart"
 
 export type CartProductType = "agrochemical" | "feed" | "animal_health" | "plant_nutrition" | "document" | "seed_product" | "equipment"
 
@@ -34,101 +27,22 @@ export function AddToCartButton({
   imageSrc,
   unitPrice,
   available = true,
-  loginRedirect,
   singleUnit = false,
 }: AddToCartButtonProps) {
-  const { data: session } = useSession()
-  const router = useRouter()
-  const { openCart } = useCart()
-  const qc = useQueryClient()
+  const { addItem, updateItem, getItemQty, isMutating } = useUnifiedCart()
 
-  const { data: cartData } = useQuery({
-    queryKey: ["cart"],
-    queryFn: () => getCart().then((r) => r.data),
-    enabled: !!session,
-    staleTime: 0,
-  })
-
-  const cartItem = (cartData as any)?.items?.find((i: any) =>
-    i.product_id === productId && (i.sku ?? "") === (sku ?? "")
-  )
-  const cartQty: number = cartItem?.quantity ?? 0
-
-  const addMutation = useMutation({
-    mutationFn: addToCart,
-    onSuccess: (_, variables) => {
-      qc.invalidateQueries({ queryKey: ["cart"] })
-      openCart()
-      if (variables.unit_price) {
-        trackAddToCart({
-          item_id: variables.product_id,
-          item_name: variables.product_name,
-          item_category: variables.product_type,
-          price: variables.unit_price / 100,
-          quantity: variables.quantity,
-        })
-      }
-    },
-    onError: (err: any, variables) => {
-      if (err?.response?.status === 409) {
-        const msg = err?.response?.data?.message
-        const isTestConflict = msg === "test_conflict"
-        const isDigitalConflict = msg === "digital_conflict"
-        toast.warning(
-          isTestConflict
-            ? "Test products cannot be mixed with real products."
-            : isDigitalConflict
-            ? "Documents cannot be mixed with physical products."
-            : "This item has a different pickup method.",
-          {
-            description: "Complete and pay for your current cart first, then add this item.",
-            duration: Infinity,
-            closeButton: true,
-            action: {
-              label: "Go to checkout",
-              onClick: () => router.push("/checkout"),
-            },
-            cancel: {
-              label: "Start new cart",
-              onClick: async () => {
-                await clearCart()
-                addMutation.mutate(variables)
-              },
-            },
-          }
-        )
-        return
-      }
-      toast.error("Failed to add to cart")
-    },
-  })
-
-  const updateMutation = useMutation({
-    mutationFn: ({ qty }: { qty: number }) =>
-      qty < 1 ? removeFromCart(productId, sku) : updateCartItem(productId, qty, sku),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["cart"] }),
-    onError: () => toast.error("Failed to update cart"),
-  })
-
-  const isMutating = addMutation.isPending || updateMutation.isPending
+  const cartQty = getItemQty(productId, sku)
 
   function handleAdd() {
-    if (!session) {
-      router.push(`/login?next=${loginRedirect}`)
-      return
-    }
-    if (!unitPrice) {
-      toast.info("Please contact us for pricing")
-      return
-    }
-    addMutation.mutate({
+    if (!unitPrice) return
+    addItem({
       product_id: productId,
       sku,
       product_type: productType,
       product_name: productName,
       product_slug: productSlug,
       image_src: imageSrc ?? "",
-      unit_price: Math.round(unitPrice ?? 0),
+      unit_price: Math.round(unitPrice),
       quantity: 1,
     })
   }
@@ -137,18 +51,18 @@ export function AddToCartButton({
     if (singleUnit) {
       return (
         <button
-          onClick={() => updateMutation.mutate({ qty: 0 })}
-          disabled={updateMutation.isPending}
+          onClick={() => updateItem(productId, 0, sku)}
+          disabled={isMutating}
           className="w-full mt-3 h-9 rounded-md border border-destructive/40 text-destructive text-sm font-medium hover:bg-destructive/10 transition-colors disabled:opacity-50"
         >
-          {updateMutation.isPending ? "Removing…" : "Remove"}
+          {isMutating ? "Removing…" : "Remove"}
         </button>
       )
     }
     return (
       <div className="flex items-center mt-3 rounded-md border border-primary overflow-hidden">
         <button
-          onClick={() => updateMutation.mutate({ qty: cartQty - 1 })}
+          onClick={() => updateItem(productId, cartQty - 1, sku)}
           disabled={isMutating}
           className="flex-1 flex items-center justify-center h-9 hover:bg-primary/10 transition-colors disabled:opacity-60"
         >
@@ -158,7 +72,7 @@ export function AddToCartButton({
           {isMutating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : cartQty}
         </span>
         <button
-          onClick={() => updateMutation.mutate({ qty: cartQty + 1 })}
+          onClick={() => updateItem(productId, cartQty + 1, sku)}
           disabled={isMutating}
           className="flex-1 flex items-center justify-center h-9 hover:bg-primary/10 transition-colors disabled:opacity-60"
         >
@@ -171,10 +85,10 @@ export function AddToCartButton({
   return (
     <button
       onClick={handleAdd}
-      disabled={addMutation.isPending || !available}
+      disabled={isMutating || !available}
       className={`flex items-center justify-center gap-2 w-full border font-medium text-sm h-9 px-3 rounded-md transition-colors ${available ? "border-border hover:bg-muted text-foreground" : "border-transparent text-destructive cursor-not-allowed"}`}
     >
-      {addMutation.isPending && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+      {isMutating && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
       {available ? "Add to Cart" : "Out of Stock"}
     </button>
   )
