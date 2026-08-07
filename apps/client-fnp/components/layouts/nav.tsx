@@ -18,25 +18,19 @@ import {AppURL, AuthenticatedUser} from "@/lib/schemas";
 import { ShoppingCart } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useCart } from "@/contexts/cart-context";
-import { getCart, countBookingNotifications } from "@/lib/query";
+import { countBookingNotifications } from "@/lib/query";
+import { useUnifiedCart } from "@/hooks/use-unified-cart";
 
 interface NavigationProps {
   user: AuthenticatedUser | null
 }
 
-function CartIcon({ user }: { user: AuthenticatedUser | null }) {
+function CartIcon() {
   const { openCart } = useCart()
-  const { data } = useQuery({
-    queryKey: ["cart"],
-    queryFn: () => getCart().then((r) => r.data),
-    enabled: !!user,
-    staleTime: 30000,
-  })
-  const items: any[] = (data as any)?.items ?? []
-  const count = items.length
-  const totalCents = items.reduce((s: number, i: any) => s + (i.unit_price * i.quantity), 0)
+  const { items, itemCount } = useUnifiedCart()
+  const totalCents = items.reduce((s: number, i) => s + (i.unit_price * i.quantity), 0)
 
-  if (!user || count === 0) {
+  if (itemCount === 0) {
     return (
       <button
         onClick={openCart}
@@ -55,7 +49,7 @@ function CartIcon({ user }: { user: AuthenticatedUser | null }) {
       aria-label="Open cart"
     >
       <ShoppingCart className="w-4 h-4" />
-      <span>{count}</span>
+      <span>{itemCount}</span>
       <span className="opacity-70">·</span>
       <span>{centsToDollars(totalCents)}</span>
     </button>
@@ -183,7 +177,7 @@ export function Navigation({ user }: NavigationProps) {
 
         )}
         <span className="ml-4"><BellIcon user={user} /></span>
-        <CartIcon user={user} />
+        <CartIcon />
       </nav>
   )
 }

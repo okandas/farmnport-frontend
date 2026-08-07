@@ -17,8 +17,9 @@ import { signOut } from "next-auth/react"
 import { ShoppingCart } from "lucide-react"
 import { useCart } from "@/contexts/cart-context"
 import { useQuery } from "@tanstack/react-query"
-import { getCart, countBookingNotifications } from "@/lib/query"
+import { countBookingNotifications } from "@/lib/query"
 import { centsToDollars } from "@/lib/utilities"
+import { useUnifiedCart } from "@/hooks/use-unified-cart"
 
 // Grouped nav — matches desktop SelectCategory
 const NAV_GROUPS: { name: string; subcategories: { name: string; href: string; bold?: boolean }[] }[] = [
@@ -77,15 +78,8 @@ export function MobileNav({ user }: MobileNavProps) {
     const [isOpen, setIsOpen] = React.useState(false)
     const [activeCategory, setActiveCategory] = React.useState<number | null>(null)
     const { openCart } = useCart()
-    const { data: cartData } = useQuery({
-      queryKey: ["cart"],
-      queryFn: () => getCart().then((r) => r.data),
-      enabled: !!user,
-      staleTime: 30000,
-    })
-    const cartItems: any[] = (cartData as any)?.items ?? []
-    const cartCount: number = cartItems.length
-    const cartTotalCents: number = cartItems.reduce((s: number, i: any) => s + (i.unit_price * i.quantity), 0)
+    const { items: cartItems, itemCount: cartCount } = useUnifiedCart()
+    const cartTotalCents: number = cartItems.reduce((s: number, i) => s + (i.unit_price * i.quantity), 0)
 
     const pollingEnabled = process.env.NEXT_PUBLIC_ENABLE_NOTIFICATION_POLLING === "true"
     const { data: notifData } = useQuery({

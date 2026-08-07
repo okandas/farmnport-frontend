@@ -73,7 +73,7 @@ export function ProductCard({
         </Link>
         <div className="flex-1 p-3 sm:p-4 flex flex-col justify-between min-w-0">
           <div>
-            <Link href={href} onClick={mode === "guide" ? () => sendGTMEvent({ event: 'view_guide', value: name }) : undefined}>
+            <Link href={href} onClick={mode === "guide" ? () => sendGTMEvent({ event: 'view_guide', value: name, page_location: href }) : undefined}>
               <h3 className="font-semibold text-sm leading-tight line-clamp-2 group-hover:text-primary transition-colors">
                 {formatProductName(name)}
               </h3>
@@ -122,7 +122,7 @@ export function ProductCard({
                 </div>
               </>
             ) : (
-              <Link href={href} onClick={() => sendGTMEvent({ event: 'view_guide', value: name })}>
+              <Link href={href} onClick={() => sendGTMEvent({ event: 'view_guide', value: name, page_location: href })}>
                 <Button variant="outline" size="sm">{buttonLabel}</Button>
               </Link>
             )}
@@ -161,7 +161,7 @@ export function ProductCard({
       </Link>
 
       <div className="p-3 sm:p-4 border-t flex flex-col flex-1">
-        <Link href={href} onClick={mode === "guide" ? () => sendGTMEvent({ event: 'view_guide', value: name }) : undefined}>
+        <Link href={href} onClick={mode === "guide" ? () => sendGTMEvent({ event: 'view_guide', value: name, page_location: href }) : undefined}>
           <h3 className="font-semibold text-sm leading-tight line-clamp-2 group-hover:text-primary transition-colors">
             {formatProductName(name)}
           </h3>
@@ -214,7 +214,7 @@ export function ProductCard({
               )}
             </div>
           ) : (
-            <Link href={href} className="block" onClick={() => sendGTMEvent({ event: 'view_guide', value: name })}>
+            <Link href={href} className="block" onClick={() => sendGTMEvent({ event: 'view_guide', value: name, page_location: href })}>
               <Button variant="outline" className="w-full" size="sm">
                 {buttonLabel}
               </Button>

@@ -10,11 +10,12 @@ import { Check, Loader2, ShoppingCart, CreditCard, Smartphone, Globe, Truck, Sto
 import Image from "next/image"
 import Link from "next/link"
 
-import { getCart, checkout, pollOrderStatus, queryClient as fetchClient, updateCartItem, removeFromCart, queryTumira, queryTumiraDeliveryRates, queryTumiraCheckAddress, queryTumiraConfirmPin } from "@/lib/query"
+import { getCart, checkout, pollOrderStatus, queryClient as fetchClient, updateCartItem, removeFromCart, queryTumira, queryTumiraDeliveryRates, queryTumiraCheckAddress, queryTumiraConfirmPin, syncCart, clearCart } from "@/lib/query"
 import { trackPurchase, trackBeginCheckout, trackAddShippingInfo, trackAddPaymentInfo } from "@/lib/analytics"
 import { AuthenticatedUser } from "@/lib/schemas"
 import { centsToDollars } from "@/lib/utilities"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { getGuestCartItems, clearGuestCart } from "@/hooks/use-guest-cart"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 const PAYMENT_METHODS = [
@@ -134,6 +135,69 @@ export default function CheckoutPage() {
 
   const [step, setStep] = useState<"form" | "waiting" | "success" | "cancelled">("form")
   const [orderId, setOrderId] = useState("")
+  const [syncing, setSyncing] = useState(false)
+  const syncAttempted = useRef(false)
+
+  // Sync guest cart to backend on checkout load
+  useEffect(() => {
+    if (!session || syncAttempted.current) return
+    syncAttempted.current = true
+
+    const guestItems = getGuestCartItems()
+    if (guestItems.length === 0) return
+
+    setSyncing(true)
+    syncCart(guestItems)
+      .then((res) => {
+        const { removed, out_of_stock } = res.data as { removed?: string[]; out_of_stock?: string[] }
+        clearGuestCart()
+        qc.invalidateQueries({ queryKey: ["cart"] })
+
+        if (removed && removed.length > 0) {
+          toast.info(`Some items are no longer available: ${removed.join(", ")}`)
+        }
+        if (out_of_stock && out_of_stock.length > 0) {
+          toast.warning("Some items in your cart are out of stock")
+        }
+      })
+      .catch((err) => {
+        if (err?.response?.status === 409) {
+          const conflictType = err?.response?.data?.conflict_type
+          const isTest = conflictType === "test_conflict"
+          toast.warning(
+            isTest
+              ? "Your saved cart has items that cannot be mixed with your guest cart items."
+              : "Your saved cart has items with a different product type.",
+            {
+              duration: Infinity,
+              closeButton: true,
+              action: {
+                label: "Start fresh",
+                onClick: async () => {
+                  await clearCart()
+                  const items = getGuestCartItems()
+                  if (items.length > 0) {
+                    await syncCart(items)
+                    clearGuestCart()
+                    qc.invalidateQueries({ queryKey: ["cart"] })
+                  }
+                },
+              },
+              cancel: {
+                label: "Keep saved cart",
+                onClick: () => {
+                  clearGuestCart()
+                  qc.invalidateQueries({ queryKey: ["cart"] })
+                },
+              },
+            }
+          )
+        } else {
+          toast.error("Failed to sync your cart")
+        }
+      })
+      .finally(() => setSyncing(false))
+  }, [session, qc])
 
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<CheckoutForm>({
     defaultValues: { provider: "paynow", method: "ecocash" },
@@ -411,15 +475,31 @@ function onSubmit(data: CheckoutForm) {
     )
   }
 
+  if (syncing) {
+    return (
+      <div className="min-h-[75vh] flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <Loader2 className="w-8 h-8 mx-auto animate-spin text-primary" />
+          <p className="text-muted-foreground">Syncing your cart…</p>
+        </div>
+      </div>
+    )
+  }
+
   if (!session) {
     return (
       <div className="min-h-[75vh] flex items-center justify-center">
         <div className="text-center space-y-4">
           <ShoppingCart className="w-12 h-12 mx-auto text-muted-foreground/40" />
           <p className="font-semibold">Sign in to checkout</p>
-          <Link href="/login?next=/checkout" className="inline-flex items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-semibold px-6 py-2.5 hover:bg-primary/90 transition-colors">
-            Sign In
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Link href="/login?next=/checkout" className="inline-flex items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-semibold px-6 py-2.5 hover:bg-primary/90 transition-colors">
+              Sign In
+            </Link>
+            <Link href="/signup/quick?next=/checkout" className="inline-flex items-center justify-center rounded-full border border-primary text-primary text-sm font-semibold px-6 py-2.5 hover:bg-primary/10 transition-colors">
+              Create Account
+            </Link>
+          </div>
         </div>
       </div>
     )

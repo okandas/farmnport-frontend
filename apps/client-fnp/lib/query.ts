@@ -132,6 +132,10 @@ export async function clientSignup(data: SignUpFormData) {
     return api.post(url, data)
 }
 
+export async function shopperSignup(data: { name: string; email: string; phone: string; password: string; confirm_password: string }) {
+    return api.post(`${BaseURL}/client/signup/quick`, data)
+}
+
 export function queryMarketStats() {
   return api.get(`${BaseURL}/prices/market-stats`)
 }
@@ -869,6 +873,20 @@ export function removeFromCart(product_id: string, sku?: string) {
 
 export function clearCart() {
   return api.delete(`${BaseURL}/cart/clear`)
+}
+
+export function syncCart(items: Array<{
+  product_id: string
+  sku?: string
+  product_type: string
+  product_name: string
+  product_slug: string
+  image_src: string
+  unit_price: number
+  quantity: number
+  seller_id?: string
+}>) {
+  return api.post(`${BaseURL}/cart/sync`, { items })
 }
 
 // Orders

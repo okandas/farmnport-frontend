@@ -3,9 +3,6 @@
 import Image from "next/image"
 import Link from "next/link"
 import { Minus, Plus, ShoppingCart, Trash2 } from "lucide-react"
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { useSession } from "next-auth/react"
-import { toast } from "sonner"
 
 import {
   Sheet,
@@ -15,51 +12,13 @@ import {
 } from "@/components/ui/sheet"
 
 import { useCart } from "@/contexts/cart-context"
-import { getCart, removeFromCart, updateCartItem } from "@/lib/query"
+import { useUnifiedCart } from "@/hooks/use-unified-cart"
 import { centsToDollars } from "@/lib/utilities"
-
-interface CartItem {
-  product_id: string
-  sku?: string
-  product_type: string
-  product_name: string
-  product_slug: string
-  image_src: string
-  unit_price: number
-  quantity: number
-}
-
-interface Cart {
-  id: string
-  items: CartItem[]
-}
 
 export function CartDrawer() {
   const { isOpen, closeCart } = useCart()
-  const { data: session } = useSession()
-  const qc = useQueryClient()
+  const { items, isLoading, updateItem, removeItem } = useUnifiedCart()
 
-  const { data: cartData, isLoading } = useQuery({
-    queryKey: ["cart"],
-    queryFn: () => getCart().then((r) => r.data as Cart),
-    enabled: !!session && isOpen,
-    staleTime: 0,
-  })
-
-  const removeMutation = useMutation({
-    mutationFn: ({ productId, sku }: { productId: string; sku?: string }) => removeFromCart(productId, sku),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["cart"] }),
-    onError: () => toast.error("Failed to remove item"),
-  })
-
-  const updateMutation = useMutation({
-    mutationFn: ({ productId, quantity, sku }: { productId: string; quantity: number; sku?: string }) =>
-      updateCartItem(productId, quantity, sku),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["cart"] }),
-    onError: () => toast.error("Failed to update quantity"),
-  })
-
-  const items: CartItem[] = cartData?.items ?? []
   const subtotalCents = items.reduce((sum, i) => sum + (i.unit_price * i.quantity), 0)
 
   return (
@@ -81,19 +40,7 @@ export function CartDrawer() {
 
         {/* Body */}
         <div className="flex-1 overflow-y-auto px-6 py-4">
-          {!session ? (
-            <div className="flex flex-col items-center justify-center h-full gap-4 text-center">
-              <ShoppingCart className="w-12 h-12 text-muted-foreground/40" />
-              <p className="text-muted-foreground">Sign in to view your cart</p>
-              <Link
-                href="/login"
-                onClick={closeCart}
-                className="inline-flex items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-semibold px-6 py-2.5 hover:bg-primary/90 transition-colors"
-              >
-                Sign In
-              </Link>
-            </div>
-          ) : isLoading ? (
+          {isLoading ? (
             <div className="space-y-4">
               {[1, 2].map((n) => (
                 <div key={n} className="flex gap-3 animate-pulse">
@@ -135,9 +82,7 @@ export function CartDrawer() {
                         className="object-contain p-1"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-muted-foreground/20 text-xl">
-                        📦
-                      </div>
+                      <div className="w-full h-full flex items-center justify-center bg-muted/30" />
                     )}
                   </div>
 
@@ -158,14 +103,7 @@ export function CartDrawer() {
                       {item.product_type !== "document" && (
                         <>
                           <button
-                            onClick={() =>
-                              updateMutation.mutate({
-                                productId: item.product_id,
-                                quantity: item.quantity - 1,
-                                sku: item.sku,
-                              })
-                            }
-                            disabled={updateMutation.isPending}
+                            onClick={() => updateItem(item.product_id, item.quantity - 1, item.sku)}
                             className="w-6 h-6 rounded border flex items-center justify-center hover:bg-muted transition-colors"
                           >
                             <Minus className="w-3 h-3" />
@@ -174,14 +112,7 @@ export function CartDrawer() {
                             {item.quantity}
                           </span>
                           <button
-                            onClick={() =>
-                              updateMutation.mutate({
-                                productId: item.product_id,
-                                quantity: item.quantity + 1,
-                                sku: item.sku,
-                              })
-                            }
-                            disabled={updateMutation.isPending}
+                            onClick={() => updateItem(item.product_id, item.quantity + 1, item.sku)}
                             className="w-6 h-6 rounded border flex items-center justify-center hover:bg-muted transition-colors"
                           >
                             <Plus className="w-3 h-3" />
@@ -189,8 +120,7 @@ export function CartDrawer() {
                         </>
                       )}
                       <button
-                        onClick={() => removeMutation.mutate({ productId: item.product_id, sku: item.sku })}
-                        disabled={removeMutation.isPending}
+                        onClick={() => removeItem(item.product_id, item.sku)}
                         className="ml-auto text-muted-foreground hover:text-destructive transition-colors"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -204,7 +134,7 @@ export function CartDrawer() {
         </div>
 
         {/* Footer totals + checkout */}
-        {session && items.length > 0 && (
+        {items.length > 0 && (
           <div className="border-t px-6 py-4 space-y-3">
             <div className="flex justify-between font-bold text-base text-sm">
               <span>Total</span>
