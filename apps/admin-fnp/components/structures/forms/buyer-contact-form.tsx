@@ -110,7 +110,7 @@ export function BuyerContactForm() {
             <FormItem>
               <FormLabel>Contact Name</FormLabel>
               <FormControl>
-                <Input placeholder="John Doe" {...field} />
+                <Input placeholder="Full name" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -156,7 +156,7 @@ export function BuyerContactForm() {
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input type="email" placeholder="john@example.com" {...field} />
+                  <Input type="email" placeholder="you@example.com" {...field} />
                 </FormControl>
                 <FormDescription>Optional</FormDescription>
                 <FormMessage />
