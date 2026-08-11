@@ -7,12 +7,15 @@ import { toast } from "sonner"
 import { captureException } from "@sentry/nextjs"
 import Link from "next/link"
 
+import { useState } from "react"
+import { Eye, EyeOff } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { buttonVariants } from "@/components/ui/button"
 import { Icons } from "@/components/icons/lucide"
 import { cn } from "@/lib/utilities"
 import { shopperSignup } from "@/lib/query"
+import { PhoneInput } from "@/components/forms/phone-input"
 
 interface QuickSignupData {
   name: string
@@ -28,7 +31,8 @@ interface QuickSignupFormProps {
 }
 
 export function QuickSignupForm({ redirectTo = "/", className }: QuickSignupFormProps) {
-  const { register, handleSubmit, formState: { errors } } = useForm<QuickSignupData>()
+  const { register, handleSubmit, setValue, formState: { errors } } = useForm<QuickSignupData>()
+  const [showPassword, setShowPassword] = useState(false)
 
   const { mutate, isPending, isSuccess } = useMutation({
     mutationFn: async (data: QuickSignupData) => {
@@ -84,7 +88,7 @@ export function QuickSignupForm({ redirectTo = "/", className }: QuickSignupForm
             <Label htmlFor="qs-name">Full name</Label>
             <Input
               id="qs-name"
-              placeholder="John Doe"
+              placeholder="Full name"
               disabled={isPending}
               {...register("name", { required: "Name is required" })}
             />
@@ -104,41 +108,57 @@ export function QuickSignupForm({ redirectTo = "/", className }: QuickSignupForm
           </div>
 
           <div className="grid gap-1">
-            <Label htmlFor="qs-phone">Phone number</Label>
-            <Input
-              id="qs-phone"
-              type="tel"
-              placeholder="0771234567"
-              disabled={isPending}
-              {...register("phone", { required: "Phone number is required" })}
+            <Label>Phone number</Label>
+            <PhoneInput
+              value=""
+              onChange={(digits) => setValue("phone", digits, { shouldValidate: true })}
+              error={errors.phone?.message}
             />
-            {errors.phone && <p className="text-xs text-red-600">{errors.phone.message}</p>}
+            <input type="hidden" {...register("phone", { required: "Phone number is required" })} />
           </div>
 
           <div className="grid gap-1">
             <Label htmlFor="qs-password">Password</Label>
-            <Input
-              id="qs-password"
-              type="password"
-              placeholder="Min 8 characters"
-              disabled={isPending}
-              {...register("password", {
-                required: "Password is required",
-                minLength: { value: 8, message: "Min 8 characters" },
-              })}
-            />
+            <div className="relative">
+              <Input
+                id="qs-password"
+                type={showPassword ? "text" : "password"}
+                placeholder="Min 8 characters"
+                disabled={isPending}
+                {...register("password", {
+                  required: "Password is required",
+                  minLength: { value: 8, message: "Min 8 characters" },
+                })}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
             {errors.password && <p className="text-xs text-red-600">{errors.password.message}</p>}
           </div>
 
           <div className="grid gap-1">
             <Label htmlFor="qs-confirm">Confirm password</Label>
-            <Input
-              id="qs-confirm"
-              type="password"
-              placeholder="Confirm password"
-              disabled={isPending}
-              {...register("confirm_password", { required: "Please confirm your password" })}
-            />
+            <div className="relative">
+              <Input
+                id="qs-confirm"
+                type={showPassword ? "text" : "password"}
+                placeholder="Confirm password"
+                disabled={isPending}
+                {...register("confirm_password", { required: "Please confirm your password" })}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
             {errors.confirm_password && <p className="text-xs text-red-600">{errors.confirm_password.message}</p>}
           </div>
 

@@ -17,6 +17,10 @@ import { centsToDollars } from "@/lib/utilities"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { getGuestCartItems, clearGuestCart } from "@/hooks/use-guest-cart"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { QuickSignupForm } from "@/components/forms/quick-signup"
+import { AuthForm } from "@/components/forms/login"
 
 const PAYMENT_METHODS = [
   { value: "ecocash", label: "EcoCash",          description: "Mobile money prompt to your phone",  icon: Smartphone },
@@ -488,20 +492,25 @@ function onSubmit(data: CheckoutForm) {
 
   if (!session) {
     return (
-      <div className="min-h-[75vh] flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <ShoppingCart className="w-12 h-12 mx-auto text-muted-foreground/40" />
-          <p className="font-semibold">Sign in to checkout</p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/login?next=/checkout" className="inline-flex items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-semibold px-6 py-2.5 hover:bg-primary/90 transition-colors">
-              Sign In
-            </Link>
-            <Link href="/signup/quick?next=/checkout" className="inline-flex items-center justify-center rounded-full border border-primary text-primary text-sm font-semibold px-6 py-2.5 hover:bg-primary/10 transition-colors">
-              Create Account
-            </Link>
-          </div>
-        </div>
-      </div>
+      <Dialog open={true} onOpenChange={(open) => { if (!open) router.back() }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-center">Sign in to checkout</DialogTitle>
+          </DialogHeader>
+          <Tabs defaultValue="login" className="mt-2">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="login">Sign In</TabsTrigger>
+              <TabsTrigger value="signup">Create Account</TabsTrigger>
+            </TabsList>
+            <TabsContent value="login" className="mt-4">
+              <AuthForm />
+            </TabsContent>
+            <TabsContent value="signup" className="mt-4">
+              <QuickSignupForm redirectTo="/checkout" />
+            </TabsContent>
+          </Tabs>
+        </DialogContent>
+      </Dialog>
     )
   }
 
