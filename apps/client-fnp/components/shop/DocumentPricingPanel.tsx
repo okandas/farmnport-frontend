@@ -8,6 +8,7 @@ import Link from "next/link"
 import { toast } from "sonner"
 import { myDownloads, downloadDocument } from "@/lib/query"
 import { AddToCartButton } from "@/components/cart/AddToCartButton"
+import { PaynowBadge } from "@/components/shared/PaynowBadge"
 
 interface Props {
     docId: string
@@ -93,6 +94,7 @@ export function DocumentPricingPanel({ docId, docSlug, docTitle, priceCents, pri
                     <Share2 className="w-3 h-3 shrink-0 mt-0.5" />
                     <span>Digital delivery — no shipping required</span>
                 </div>
+                <PaynowBadge />
             </div>
         </div>
     )

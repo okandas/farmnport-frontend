@@ -8,6 +8,7 @@ import { ProductImageGallery } from "@/components/shared/ProductImageGallery"
 import { Badge } from "@/components/ui/badge"
 import { Check, Share2 } from "lucide-react"
 import { AddToCartButton, CartProductType } from "@/components/cart/AddToCartButton"
+import { PaynowBadge } from "@/components/shared/PaynowBadge"
 import { ShareBar } from "@/components/shared/ShareBar"
 
 interface BuyProductInteractiveProps {
@@ -206,17 +207,19 @@ const [mounted, setMounted] = useState(false)
                     </div>
                   ) : (
                     ctaSlot ?? (
-                      <AddToCartButton
-                        productId={product.id}
-                        sku={selectedVariant?.sku}
-                        productType={productType}
-                        productName={selectedVariant ? `${product.name} - ${selectedVariant.name}` : product.name}
-                        productSlug={slug}
-                        imageSrc={product.images?.[0]?.img?.src}
-                        unitPrice={selectedVariant?.sale_price || product.sale_price || 0}
-                        available={inStock}
-                        loginRedirect={loginRedirect}
-                      />
+                      <>
+                        <AddToCartButton
+                          productId={product.id}
+                          sku={selectedVariant?.sku}
+                          productType={productType}
+                          productName={selectedVariant ? `${product.name} - ${selectedVariant.name}` : product.name}
+                          productSlug={slug}
+                          imageSrc={product.images?.[0]?.img?.src}
+                          unitPrice={selectedVariant?.sale_price || product.sale_price || 0}
+                          available={inStock}
+                          loginRedirect={loginRedirect}
+                        />
+                      </>
                     )
                   )}
                 </>
@@ -232,6 +235,7 @@ const [mounted, setMounted] = useState(false)
                 <Share2 className="w-3 h-3 shrink-0 mt-0.5" />
                 <span>Share this product with someone who needs it</span>
               </button>
+              {inStock && <PaynowBadge />}
             </div>
           </div>
         </div>
