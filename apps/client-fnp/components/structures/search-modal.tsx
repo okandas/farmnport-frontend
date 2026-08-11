@@ -178,7 +178,9 @@ export function SearchModal({ open, onOpenChange }: { open: boolean; onOpenChang
       setActiveIndex((i) => Math.max(i - 1, 0))
     } else if (e.key === "Enter") {
       e.preventDefault()
-      navigate(activeIndex)
+      if (query.trim().length >= 1 && flatItems.length > 0) {
+        navigate(activeIndex)
+      }
     }
   }
 

@@ -6,6 +6,7 @@ import Link from "next/link"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { BuyProductInteractive } from "@/components/shop/BuyProductInteractive"
 import { guardTestItem } from "@/lib/guardTestItem"
+import { RelatedGuideProducts } from "@/components/sections/related-guide-products"
 
 interface BuyEquipmentProductPageProps {
     params: Promise<{ slug: string }>
@@ -121,6 +122,11 @@ export default async function BuyEquipmentProductPage({ params }: BuyEquipmentPr
                     guideLabel="View Product Guide & Specs →"
                     loginRedirect={`/buy-equipment/${slug}`}
                     tabsContent={tabsContent}
+                />
+                <RelatedGuideProducts
+                    collection="equipment"
+                    categoryName={product.equipment_category?.name || product.category_name || "Farm Equipment"}
+                    currentSlug={slug}
                 />
             </div>
         </div>

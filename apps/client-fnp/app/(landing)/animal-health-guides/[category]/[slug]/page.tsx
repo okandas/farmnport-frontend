@@ -4,6 +4,7 @@ import { capitalizeFirstLetter, formatUnit, buildGuideMetadata } from "@/lib/uti
 import { BaseURL } from "@/lib/schemas"
 import { ProductTargets } from "@/components/agrochemical/ProductTargets"
 import { GuideDetailLayout } from "@/components/shared/GuideDetailLayout"
+import { RelatedGuideProducts } from "@/components/sections/related-guide-products"
 import { ProductNotFound } from "@/components/shared/ProductNotFound"
 
 type Props = { params: Promise<{ category: string; slug: string }> }
@@ -259,6 +260,15 @@ export default async function AnimalHealthGuidePage({ params }: GuidePageProps) 
             structuredData={structuredData}
             breadcrumbJsonLd={breadcrumbJsonLd}
             bottomContent={dosageTable}
+            afterContent={
+                <RelatedGuideProducts
+                    collection="animal_health"
+                    categoryName={product.animal_health_category?.name || category}
+                    currentSlug={slug}
+                    targets={(product.targets || []).map((t: any) => t.name)}
+                    targetAnimals={(product.target_animals || []).map((t: any) => t.name || t)}
+                />
+            }
         >
             {/* Overview */}
             <div>

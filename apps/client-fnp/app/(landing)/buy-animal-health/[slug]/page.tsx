@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { BuyProductInteractive } from "@/components/shop/BuyProductInteractive"
 import { guardTestItem } from "@/lib/guardTestItem"
 import { ProductNotFound } from "@/components/shared/ProductNotFound"
+import { RelatedGuideProducts } from "@/components/sections/related-guide-products"
 
 interface BuyAnimalHealthProductPageProps {
     params: Promise<{ slug: string }>
@@ -136,6 +137,13 @@ export default async function BuyAnimalHealthProductPage({ params }: BuyAnimalHe
                     loginRedirect={`/buy-animal-health/${slug}`}
                     fallbackIcon={null}
                     tabsContent={tabsContent}
+                />
+                <RelatedGuideProducts
+                    collection="animal_health"
+                    categoryName={product.animal_health_category?.name || "Animal Health"}
+                    currentSlug={slug}
+                    targets={(product.targets || []).map((t: any) => t.name)}
+                    targetAnimals={(product.target_animals || []).map((a: any) => typeof a === "string" ? a : a.name).filter(Boolean)}
                 />
             </div>
         </div>

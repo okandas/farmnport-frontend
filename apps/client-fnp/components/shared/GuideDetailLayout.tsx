@@ -26,6 +26,8 @@ interface GuideDetailLayoutProps {
     precautions?: string[]
     /** Safety warnings as a single string (feeds use this instead of precautions array) */
     safetyWarnings?: string
+    /** Content rendered after the safety warning (related products, etc.) */
+    afterContent?: React.ReactNode
     /** Content for the right column (overview, AI, targets, specs, etc.) */
     children: React.ReactNode
     /** Content below the 2-column grid (dosage tables, planting guides, etc.) */
@@ -52,6 +54,7 @@ export function GuideDetailLayout({
     bottomContent,
     topContent,
     customBreadcrumb,
+    afterContent,
 }: GuideDetailLayoutProps) {
     const resolvedPrecautions = precautions ?? product.precautions
 
@@ -89,7 +92,7 @@ export function GuideDetailLayout({
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {/* Header Section — 2 column grid */}
-                <div className="grid lg:grid-cols-[450px,1fr] gap-6 lg:gap-12 mb-16">
+                <div className="grid lg:grid-cols-[450px,1fr] gap-6 lg:gap-12 mb-6">
                     {/* Left — Image + CTA + Precautions + Promo */}
                     <div className="flex flex-col gap-4">
                         <div className="relative aspect-square bg-muted/30 dark:bg-white rounded-xl border overflow-hidden shadow-sm">
@@ -194,6 +197,8 @@ export function GuideDetailLayout({
                         <AdSenseInFeed />
                     </div>
                 </div>
+
+                {afterContent}
 
                 {/* Below the grid — dosage tables, planting guides, etc. */}
                 {bottomContent}

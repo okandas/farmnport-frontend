@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { BuyProductInteractive } from "@/components/shop/BuyProductInteractive"
 import { guardTestItem } from "@/lib/guardTestItem"
 import { ProductNotFound } from "@/components/shared/ProductNotFound"
+import { RelatedGuideProducts } from "@/components/sections/related-guide-products"
 
 interface Props {
     params: Promise<{ slug: string }>
@@ -184,6 +185,12 @@ export default async function BuySeedProductPage({ params }: Props) {
                             </Link>
                         ) : undefined
                     }
+                />
+                <RelatedGuideProducts
+                    collection="seed_products"
+                    categoryName={product.crop_name || product.type?.replace("_", " ") || "Seeds"}
+                    currentSlug={slug}
+                    targetCrops={product.crop_name ? [product.crop_name] : []}
                 />
             </div>
         </div>

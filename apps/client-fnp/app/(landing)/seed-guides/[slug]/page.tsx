@@ -3,6 +3,7 @@ import { formatProductName } from "@/lib/utilities"
 import { ProductNotFound } from "@/components/shared/ProductNotFound"
 import { GuideDetailLayout } from "@/components/shared/GuideDetailLayout"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
+import { RelatedGuideProducts } from "@/components/sections/related-guide-products"
 
 interface Props {
     params: Promise<{ slug: string }>
@@ -132,6 +133,12 @@ export default async function SeedGuidePage({ params }: Props) {
                     <p className="text-sm text-muted-foreground leading-relaxed">{product.management_tips}</p>
                 </div>
             )}
+            <RelatedGuideProducts
+                collection="seed_products"
+                categoryName={product.crop_name || "Seeds"}
+                currentSlug={slug}
+                targetCrops={product.crop_name ? [product.crop_name] : []}
+            />
         </GuideDetailLayout>
     )
 }

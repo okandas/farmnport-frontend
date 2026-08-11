@@ -8,6 +8,7 @@ import {
     ArrowRight, Sprout, Flag, X, AlertTriangle
 } from "lucide-react"
 import { capitalizeFirstLetter, titleCase } from "@/lib/utilities"
+import { RelatedProducts } from "@/components/sections/related-products"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
 import { ShareBar } from "@/components/shared/ShareBar"
 
@@ -515,6 +516,16 @@ export function FeedingProgramDetailClient({ program, slug }: FeedingProgramDeta
                     </div>
                 </div>
             )}
+
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <RelatedProducts
+                    collection="guides"
+                    query={`feeding program ${program.farm_produce_name || ""}`}
+                    excludeSlug={slug}
+                    title="Related Feeding Programs"
+                    filterBy="type:=feeding_program"
+                />
+            </div>
         </div>
     )
 }
