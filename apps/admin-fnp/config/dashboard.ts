@@ -44,9 +44,29 @@ export const dashboardConfig: DashboardConfig = {
       alwaysOpen: true,
       items: [
         {
-          title: "Analytics",
+          title: "Overview",
           href: "/dashboard/farmnport/analytics",
           icon: "eye",
+        },
+        {
+          title: "Viewed Farmers",
+          href: "/dashboard/farmnport/analytics/viewed-farmers",
+          icon: "user",
+        },
+        {
+          title: "Viewed Buyers",
+          href: "/dashboard/farmnport/analytics/viewed-buyers",
+          icon: "user",
+        },
+        {
+          title: "Active Farmers",
+          href: "/dashboard/farmnport/analytics/active-farmers",
+          icon: "user",
+        },
+        {
+          title: "Active Buyers",
+          href: "/dashboard/farmnport/analytics/active-buyers",
+          icon: "user",
         },
       ],
     },
