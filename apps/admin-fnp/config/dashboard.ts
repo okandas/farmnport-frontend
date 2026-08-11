@@ -41,6 +41,7 @@ export const dashboardConfig: DashboardConfig = {
     },
     {
       label: "Analytics",
+      alwaysOpen: true,
       items: [
         {
           title: "Analytics",
@@ -69,9 +70,9 @@ export const dashboardConfig: DashboardConfig = {
           icon: "send",
         },
         {
-          title: "Sent Blasts",
-          href: "/dashboard/farmnport/blast/sent",
-          icon: "messageSquare",
+          title: "Campaigns",
+          href: "/dashboard/farmnport/campaigns",
+          icon: "barChart",
         },
       ],
     },
