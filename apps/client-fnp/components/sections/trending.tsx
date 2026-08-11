@@ -48,8 +48,8 @@ function TrendingSkeleton() {
           <h2 className="text-2xl font-bold">Trending on Farmnport</h2>
         </div>
         <div className="flex gap-4">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="flex-shrink-0 basis-1/2 sm:basis-1/3 lg:basis-1/6">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="flex-shrink-0 basis-1/2 sm:basis-1/3 lg:basis-1/5">
               <div className="rounded-lg border bg-card overflow-hidden">
                 <Skeleton className="aspect-[4/3] w-full" />
                 <div className="p-3 space-y-2">
@@ -82,13 +82,13 @@ export function TrendingSection() {
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold">Trending on Farmnport</h2>
         </div>
-        <Carousel opts={{ align: "start", slidesToScroll: 6 }}>
+        <Carousel opts={{ align: "start", slidesToScroll: 5 }}>
           <div className="relative">
             <CarouselContent>
               {items.map((item) => (
                 <CarouselItem
                   key={item.href}
-                  className="basis-1/2 sm:basis-1/3 lg:basis-1/6"
+                  className="basis-1/2 sm:basis-1/3 lg:basis-1/5"
                 >
                   <Link
                     href={item.href}
