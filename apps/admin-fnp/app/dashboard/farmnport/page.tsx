@@ -32,13 +32,7 @@ function SectionHeader({ title, href }: { title: string; href: string }) {
   )
 }
 
-function ClickableCard({
-  href,
-  children,
-}: {
-  href: string
-  children: React.ReactNode
-}) {
+function ClickableCard({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <Link href={href} className="rounded-xl border bg-card p-5 hover:border-foreground/20 hover:shadow-sm transition-all block">
       {children}
@@ -46,25 +40,12 @@ function ClickableCard({
   )
 }
 
-function QuickLink({
-  href,
-  label,
-  count,
-}: {
-  href: string
-  label: string
-  count?: number | string
-}) {
+function QuickLink({ href, label, count }: { href: string; label: string; count?: number | string }) {
   return (
-    <Link
-      href={href}
-      className="flex items-center justify-between rounded-lg border bg-card px-4 py-3 hover:border-foreground/20 hover:shadow-sm transition-all"
-    >
+    <Link href={href} className="flex items-center justify-between rounded-lg border bg-card px-4 py-3 hover:border-foreground/20 hover:shadow-sm transition-all">
       <span className="text-sm font-medium">{label}</span>
       <div className="flex items-center gap-2">
-        {count != null && (
-          <span className="text-xs text-muted-foreground">{count}</span>
-        )}
+        {count != null && <span className="text-xs text-muted-foreground">{count}</span>}
         <ChevronRight className="h-4 w-4 text-muted-foreground" />
       </div>
     </Link>
@@ -99,7 +80,7 @@ export default function DashboardPage() {
       <div className="flex flex-col gap-6">
         <Skeleton className="h-8 w-48" />
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {Array.from({ length: 8 }).map((_, i) => (
+          {Array.from({ length: 4 }).map((_, i) => (
             <Skeleton key={i} className="h-28 rounded-xl" />
           ))}
         </div>
@@ -115,13 +96,12 @@ export default function DashboardPage() {
   return (
     <div className="flex flex-col gap-8">
 
-      {/* Header */}
       <div>
         <h2 className="text-2xl font-bold tracking-tight">Dashboard</h2>
         <p className="text-sm text-muted-foreground mt-0.5">Platform overview</p>
       </div>
 
-      {/* ── Users & Engagement ── */}
+      {/* ── Users & Contact Views ── */}
       <div>
         <SectionHeader title="Users & Engagement" href="/dashboard/farmnport/users" />
         <div className="grid gap-4 md:grid-cols-3">
@@ -162,25 +142,28 @@ export default function DashboardPage() {
             </div>
           </ClickableCard>
 
-          <ClickableCard href="/dashboard/farmnport/brands">
-            <span className="text-sm font-medium text-muted-foreground">Brands</span>
-            <div className="text-3xl font-bold mt-1">{stats.brands}</div>
-            <p className="text-xs text-muted-foreground mt-1">Registered brands</p>
+          <ClickableCard href="/dashboard/farmnport/campaigns">
+            <span className="text-sm font-medium text-muted-foreground">Campaigns</span>
+            <div className="text-3xl font-bold mt-1">—</div>
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              <div className="rounded-lg bg-muted/50 px-2.5 py-2">
+                <p className="text-[11px] text-muted-foreground">Blasts</p>
+                <p className="text-sm font-semibold">—</p>
+              </div>
+              <div className="rounded-lg bg-muted/50 px-2.5 py-2">
+                <p className="text-[11px] text-muted-foreground">SMS</p>
+                <p className="text-sm font-semibold">—</p>
+              </div>
+            </div>
           </ClickableCard>
 
         </div>
       </div>
 
-      {/* ── Sales & Orders ── */}
+      {/* ── Revenue Channels ── */}
       <div>
-        <SectionHeader title="Sales & Orders" href="/dashboard/farmnport/orders/sales" />
+        <SectionHeader title="Revenue Channels" href="/dashboard/farmnport/sales" />
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-
-          <ClickableCard href="/dashboard/farmnport/orders/sales">
-            <span className="text-sm font-medium text-muted-foreground">Total Orders</span>
-            <div className="text-3xl font-bold mt-1">{salesStats?.orders?.total ?? "—"}</div>
-            <p className="text-xs text-muted-foreground mt-1">Excluding cancelled</p>
-          </ClickableCard>
 
           <ClickableCard href="/dashboard/farmnport/sales">
             <span className="text-sm font-medium text-muted-foreground">Revenue</span>
@@ -212,12 +195,8 @@ export default function DashboardPage() {
           </ClickableCard>
 
           <ClickableCard href="/dashboard/farmnport/orders/sales">
-            <span className="text-sm font-medium text-muted-foreground">Needs Attention</span>
-            <div className="text-3xl font-bold mt-1">
-              {salesStats?.orders != null
-                ? (salesStats.orders.pending ?? 0) + (salesStats.orders.paid ?? 0)
-                : "—"}
-            </div>
+            <span className="text-sm font-medium text-muted-foreground">Orders</span>
+            <div className="text-3xl font-bold mt-1">{salesStats?.orders?.total ?? "—"}</div>
             <div className="mt-3 space-y-1.5">
               <div className="flex items-center justify-between text-xs">
                 <span className="text-muted-foreground">Pending</span>
@@ -230,97 +209,25 @@ export default function DashboardPage() {
             </div>
           </ClickableCard>
 
-          <ClickableCard href="/dashboard/farmnport/orders/sales">
-            <span className="text-sm font-medium text-muted-foreground">Fulfilled</span>
-            <div className="text-3xl font-bold mt-1">
-              {salesStats?.orders != null
-                ? (salesStats.orders.delivered ?? 0) + (salesStats.orders.collected ?? 0)
-                : "—"}
-            </div>
-            <div className="mt-3 space-y-1.5">
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-muted-foreground">Delivered</span>
-                <span className="font-medium">{salesStats?.orders?.delivered ?? "—"}</span>
-              </div>
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-muted-foreground">Collected</span>
-                <span className="font-medium">{salesStats?.orders?.collected ?? "—"}</span>
-              </div>
-            </div>
+          <ClickableCard href="/dashboard/farmnport/orders/bookings">
+            <span className="text-sm font-medium text-muted-foreground">Bookings</span>
+            <div className="text-3xl font-bold mt-1">—</div>
+            <p className="text-xs text-muted-foreground mt-1">Active bookings</p>
+          </ClickableCard>
+
+          <ClickableCard href="/dashboard/farmnport/lots">
+            <span className="text-sm font-medium text-muted-foreground">Lots</span>
+            <div className="text-3xl font-bold mt-1">—</div>
+            <p className="text-xs text-muted-foreground mt-1">Active lots</p>
           </ClickableCard>
 
         </div>
 
-        {/* Sales quick links */}
         <div className="grid gap-2 md:grid-cols-4 mt-3">
-          <QuickLink href="/dashboard/farmnport/orders/bookings" label="Bookings" />
           <QuickLink href="/dashboard/farmnport/orders/booking-preorders" label="Pre-Orders" />
-          <QuickLink href="/dashboard/farmnport/lots" label="Lots" />
           <QuickLink href="/dashboard/farmnport/documents" label="Documents" />
-        </div>
-      </div>
-
-      {/* ── Products ── */}
-      <div>
-        <SectionHeader title="Products" href="/dashboard/farmnport/agrochemicals" />
-        <div className="grid gap-4 md:grid-cols-3">
-
-          <ClickableCard href="/dashboard/farmnport/agrochemicals">
-            <span className="text-sm font-medium text-muted-foreground">AgroChemicals</span>
-            <div className="text-3xl font-bold mt-1">{stats.products.agro_chemicals}</div>
-            <p className="text-xs text-muted-foreground mt-1">Products</p>
-          </ClickableCard>
-
-          <ClickableCard href="/dashboard/farmnport/animal-health-products">
-            <span className="text-sm font-medium text-muted-foreground">Animal Health</span>
-            <div className="text-3xl font-bold mt-1">{stats.products.animal_health}</div>
-            <p className="text-xs text-muted-foreground mt-1">Products</p>
-          </ClickableCard>
-
-          <ClickableCard href="/dashboard/farmnport/feed-products">
-            <span className="text-sm font-medium text-muted-foreground">Feed</span>
-            <div className="text-3xl font-bold mt-1">{stats.products.feed}</div>
-            <p className="text-xs text-muted-foreground mt-1">Products</p>
-          </ClickableCard>
-
-        </div>
-
-        {/* Product quick links */}
-        <div className="grid gap-2 md:grid-cols-4 mt-3">
-          <QuickLink href="/dashboard/farmnport/agrochemical-categories" label="Agro Categories" />
-          <QuickLink href="/dashboard/farmnport/agrochemical-active-ingredients" label="Agro Ingredients" />
-          <QuickLink href="/dashboard/farmnport/agrochemical-targets" label="Agro Targets" />
-          <QuickLink href="/dashboard/farmnport/animal-health-categories" label="Animal Categories" />
-          <QuickLink href="/dashboard/farmnport/feed-categories" label="Feed Categories" />
-          <QuickLink href="/dashboard/farmnport/feed-active-ingredients" label="Feed Ingredients" />
-          <QuickLink href="/dashboard/farmnport/feed-nutritional-specs" label="Nutritional Specs" />
-          <QuickLink href="/dashboard/farmnport/equipment" label="Equipment" />
-        </div>
-      </div>
-
-      {/* ── Farm Produce & Programs ── */}
-      <div>
-        <SectionHeader title="Farm Produce & Programs" href="/dashboard/farmnport/farmproduce" />
-        <div className="grid gap-2 md:grid-cols-4">
-          <QuickLink href="/dashboard/farmnport/farmproduce" label="Produce" />
-          <QuickLink href="/dashboard/farmnport/farmproducecategories" label="Produce Categories" />
-          <QuickLink href="/dashboard/farmnport/seed-products" label="Seed Products" />
-          <QuickLink href="/dashboard/farmnport/breeds" label="Breeds" />
-          <QuickLink href="/dashboard/farmnport/crop-groups" label="Crop Groups" />
-          <QuickLink href="/dashboard/farmnport/weed-groups" label="Weed Groups" />
-          <QuickLink href="/dashboard/farmnport/spray-programs" label="Spray Programs" count={stats.guides.spray_programs} />
-          <QuickLink href="/dashboard/farmnport/feeding-programs" label="Feeding Programs" count={stats.guides.feeding_programs} />
-        </div>
-      </div>
-
-      {/* ── Communications ── */}
-      <div>
-        <SectionHeader title="Communications" href="/dashboard/farmnport/blast" />
-        <div className="grid gap-2 md:grid-cols-4">
-          <QuickLink href="/dashboard/farmnport/blast" label="New Blast" />
-          <QuickLink href="/dashboard/farmnport/blast/sent" label="Sent Blasts" />
-          <QuickLink href="/dashboard/farmnport/buyer-contacts" label="Buyer Contacts" />
           <QuickLink href="/dashboard/farmnport/prices/series" label="Price Series" />
+          <QuickLink href="/dashboard/farmnport/buyer-contacts" label="Buyer Contacts" />
         </div>
       </div>
 

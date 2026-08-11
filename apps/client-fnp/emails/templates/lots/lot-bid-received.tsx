@@ -11,7 +11,7 @@ interface LotBidReceivedEmailProps {
 
 export default function LotBidReceivedEmail({
   name = "Okandas",
-  bidderName = "John",
+  bidderName = "Okandas",
   lotSlug = "chickens-broilers-abc123",
   quantity = "100.00",
   unit = "bird",
