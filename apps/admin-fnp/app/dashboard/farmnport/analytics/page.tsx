@@ -2,9 +2,9 @@
 
 import { useQuery } from "@tanstack/react-query"
 import Link from "next/link"
-import { Eye, Users, UserCheck, TrendingUp, Phone, Mail, MessageCircle } from "lucide-react"
+import { Eye, Users, UserCheck, TrendingUp } from "lucide-react"
 
-import { queryContactViewsStats, queryRecentViewedContacts } from "@/lib/query"
+import { queryContactViewsStats } from "@/lib/query"
 import { formatDate } from "@/lib/utilities"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -25,34 +25,60 @@ function StatCard({ title, value, icon: Icon, subtitle }: { title: string; value
   )
 }
 
-const TYPE_BADGE: Record<string, string> = {
-  farmer: "bg-green-100 text-green-800",
-  buyer: "bg-blue-100 text-blue-800",
-}
+function ViewTable({ title, subtitle, items, idKey, countLabel, linkPrefix }: {
+  title: string
+  subtitle: string
+  items: any[]
+  idKey: string
+  countLabel: string
+  linkPrefix: string
+}) {
+  if (items.length === 0) return null
 
-const ACTION_ICON: Record<string, any> = {
-  phone: Phone,
-  email: Mail,
-  whatsapp: MessageCircle,
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">{title}</CardTitle>
+        <p className="text-xs text-muted-foreground">{subtitle}</p>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-1">
+          <div className="grid grid-cols-[2rem_1fr_5rem_6rem_3.5rem] gap-2 text-xs font-medium text-muted-foreground pb-1 border-b">
+            <span>#</span>
+            <span>Name</span>
+            <span>City</span>
+            <span>Last</span>
+            <span className="text-right">{countLabel}</span>
+          </div>
+          {items.map((item: any, i: number) => (
+            <Link
+              key={item[idKey] || i}
+              href={`/dashboard/farmnport/contact-views/${linkPrefix}/${item[idKey]}`}
+              className="grid grid-cols-[2rem_1fr_5rem_6rem_3.5rem] gap-2 items-center rounded-lg p-2 text-sm hover:bg-muted/50 transition-colors"
+            >
+              <span className="text-muted-foreground text-xs">{i + 1}</span>
+              <span className="font-medium truncate capitalize">{item.name}</span>
+              <span className="text-xs text-muted-foreground truncate capitalize">{item.city || "—"}</span>
+              <span className="text-xs text-muted-foreground">{formatDate(item.last_date) || "—"}</span>
+              <span className="text-right font-semibold">{item.view_count ?? item.contacts_viewed}</span>
+            </Link>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  )
 }
 
 export default function AnalyticsPage() {
-  const { data: statsData, isLoading: statsLoading } = useQuery({
+  const { data: statsData, isLoading } = useQuery({
     queryKey: ["contact-views-stats"],
     queryFn: () => queryContactViewsStats(),
     refetchOnWindowFocus: false,
   })
 
-  const { data: recentData } = useQuery({
-    queryKey: ["recent-viewed-contacts", 1],
-    queryFn: () => queryRecentViewedContacts(1, 10),
-    refetchOnWindowFocus: false,
-  })
-
   const stats = statsData?.data
-  const recentContacts = recentData?.data?.contacts ?? []
 
-  if (statsLoading) {
+  if (isLoading) {
     return (
       <div className="flex flex-col gap-6">
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -72,6 +98,17 @@ export default function AnalyticsPage() {
   const topViewers = stats?.top_viewers ?? []
   const viewsByType = stats?.views_by_type ?? []
 
+  // Split by type
+  const viewedFarmers = topViewed.filter((c: any) => c.type === "farmer")
+  const viewedBuyers = topViewed.filter((c: any) => c.type === "buyer")
+  const activeFarmers = topViewers.filter((v: any) => v.type === "farmer")
+  const activeBuyers = topViewers.filter((v: any) => v.type === "buyer")
+
+  // Only farmer + buyer counts
+  const farmerViews = viewsByType.find((v: any) => v.type === "farmer")?.count ?? 0
+  const buyerViews = viewsByType.find((v: any) => v.type === "buyer")?.count ?? 0
+  const totalViews = farmerViews + buyerViews
+
   return (
     <div className="flex flex-col gap-6">
       <div>
@@ -87,130 +124,63 @@ export default function AnalyticsPage() {
         <StatCard title="Avg Views Per Profile" value={summary?.avg_views_per_profile?.toFixed(1) ?? "0"} icon={TrendingUp} subtitle="Average views per contact" />
       </div>
 
-      {/* Views by Type */}
-      {viewsByType.length > 0 && (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {viewsByType.map((vt: any) => {
-            const total = viewsByType.reduce((sum: number, v: any) => sum + v.count, 0)
-            const pct = total > 0 ? ((vt.count / total) * 100).toFixed(0) : "0"
-            return (
-              <div key={vt.type} className="flex items-center justify-between rounded-lg border p-3">
-                <div>
-                  <p className="text-sm font-medium capitalize">{vt.type}</p>
-                  <p className="text-xs text-muted-foreground">{pct}% of views</p>
-                </div>
-                <span className="text-lg font-bold">{vt.count}</span>
-              </div>
-            )
-          })}
+      {/* Farmer vs Buyer split */}
+      <div className="grid gap-3 sm:grid-cols-2">
+        <div className="flex items-center justify-between rounded-lg border p-3">
+          <div>
+            <p className="text-sm font-medium">Buyer profiles viewed</p>
+            <p className="text-xs text-muted-foreground">{totalViews > 0 ? ((buyerViews / totalViews) * 100).toFixed(0) : 0}% of views</p>
+          </div>
+          <span className="text-lg font-bold">{buyerViews}</span>
         </div>
-      )}
-
-      <div className="grid gap-6 lg:grid-cols-2">
-        {/* Most Viewed — Who's being looked at */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Most Viewed — Buyers Getting Attention</CardTitle>
-            <p className="text-xs text-muted-foreground">Profiles whose contact info was viewed most often</p>
-          </CardHeader>
-          <CardContent>
-            {topViewed.length === 0 ? (
-              <p className="text-sm text-muted-foreground py-4 text-center">No data yet</p>
-            ) : (
-              <div className="space-y-2">
-                <div className="grid grid-cols-[2rem_1fr_5rem_5rem_3.5rem] gap-2 text-xs font-medium text-muted-foreground pb-1 border-b">
-                  <span>#</span>
-                  <span>Name</span>
-                  <span>Type</span>
-                  <span>Last</span>
-                  <span className="text-right">Views</span>
-                </div>
-                {topViewed.slice(0, 10).map((contact: any, i: number) => (
-                  <Link
-                    key={contact.viewed_id || i}
-                    href={`/dashboard/farmnport/contact-views/contact/${contact.viewed_id}`}
-                    className="grid grid-cols-[2rem_1fr_5rem_5rem_3.5rem] gap-2 items-center rounded-lg p-2 text-sm hover:bg-muted/50 transition-colors"
-                  >
-                    <span className="text-muted-foreground text-xs">{i + 1}</span>
-                    <span className="font-medium truncate capitalize">{contact.name}</span>
-                    <Badge variant="secondary" className="text-xs w-fit capitalize">{contact.type}</Badge>
-                    <span className="text-muted-foreground text-xs">{formatDate(contact.last_date) || "—"}</span>
-                    <span className="text-right font-semibold">{contact.view_count}</span>
-                  </Link>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Most Active Viewers — Who's looking */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Most Active — Farmers Looking for Buyers</CardTitle>
-            <p className="text-xs text-muted-foreground">Users who have viewed the most contact profiles</p>
-          </CardHeader>
-          <CardContent>
-            {topViewers.length === 0 ? (
-              <p className="text-sm text-muted-foreground py-4 text-center">No data yet</p>
-            ) : (
-              <div className="space-y-2">
-                <div className="grid grid-cols-[2rem_1fr_5rem_5rem_4rem] gap-2 text-xs font-medium text-muted-foreground pb-1 border-b">
-                  <span>#</span>
-                  <span>Name</span>
-                  <span>Type</span>
-                  <span>Last</span>
-                  <span className="text-right">Viewed</span>
-                </div>
-                {topViewers.slice(0, 10).map((viewer: any, i: number) => (
-                  <Link
-                    key={viewer.user_id || i}
-                    href={`/dashboard/farmnport/contact-views/viewer/${viewer.user_id}`}
-                    className="grid grid-cols-[2rem_1fr_5rem_5rem_4rem] gap-2 items-center rounded-lg p-2 text-sm hover:bg-muted/50 transition-colors"
-                  >
-                    <span className="text-muted-foreground text-xs">{i + 1}</span>
-                    <span className="font-medium truncate capitalize">{viewer.name}</span>
-                    <Badge variant="secondary" className="text-xs w-fit capitalize">{viewer.type}</Badge>
-                    <span className="text-muted-foreground text-xs">{formatDate(viewer.last_date) || "—"}</span>
-                    <span className="text-right font-semibold">{viewer.contacts_viewed}</span>
-                  </Link>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+        <div className="flex items-center justify-between rounded-lg border p-3">
+          <div>
+            <p className="text-sm font-medium">Farmer profiles viewed</p>
+            <p className="text-xs text-muted-foreground">{totalViews > 0 ? ((farmerViews / totalViews) * 100).toFixed(0) : 0}% of views</p>
+          </div>
+          <span className="text-lg font-bold">{farmerViews}</span>
+        </div>
       </div>
 
-      {/* Recent Activity */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Recent Contact Views</CardTitle>
-          <p className="text-xs text-muted-foreground">Latest contact reveal activity</p>
-        </CardHeader>
-        <CardContent>
-          {recentContacts.length === 0 ? (
-            <p className="text-sm text-muted-foreground py-4 text-center">No recent activity</p>
-          ) : (
-            <div className="space-y-2">
-              <div className="grid grid-cols-[1fr_5rem_5rem_5rem_6rem] gap-2 text-xs font-medium text-muted-foreground pb-1 border-b">
-                <span>Contact</span>
-                <span>Type</span>
-                <span>Category</span>
-                <span>Produce</span>
-                <span className="text-right">Last Viewed</span>
-              </div>
-              {recentContacts.slice(0, 10).map((c: any, i: number) => (
-                <div key={i} className="grid grid-cols-[1fr_5rem_5rem_5rem_6rem] gap-2 items-center p-2 text-sm rounded-lg hover:bg-muted/50">
-                  <span className="font-medium capitalize truncate">{c.name}</span>
-                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium capitalize w-fit ${TYPE_BADGE[c.type] ?? "bg-muted text-muted-foreground"}`}>{c.type || "—"}</span>
-                  <span className="text-xs text-muted-foreground capitalize truncate">{c.primary_category || "—"}</span>
-                  <span className="text-xs text-muted-foreground capitalize truncate">{c.main_produce || "—"}</span>
-                  <span className="text-xs text-muted-foreground text-right">{formatDate(c.last_date) || "—"}</span>
-                </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      {/* Most Viewed Farmers */}
+      <ViewTable
+        title="Most Viewed Farmers"
+        subtitle="Farmer profiles being viewed by buyers and other farmers"
+        items={viewedFarmers}
+        idKey="viewed_id"
+        countLabel="Views"
+        linkPrefix="contact"
+      />
+
+      {/* Most Viewed Buyers */}
+      <ViewTable
+        title="Most Viewed Buyers"
+        subtitle="Buyer profiles being viewed by farmers and other buyers"
+        items={viewedBuyers}
+        idKey="viewed_id"
+        countLabel="Views"
+        linkPrefix="contact"
+      />
+
+      {/* Most Active Farmers */}
+      <ViewTable
+        title="Most Active Farmers"
+        subtitle="Farmers who are actively looking at other profiles"
+        items={activeFarmers}
+        idKey="user_id"
+        countLabel="Viewed"
+        linkPrefix="viewer"
+      />
+
+      {/* Most Active Buyers */}
+      <ViewTable
+        title="Most Active Buyers"
+        subtitle="Buyers who are actively sourcing from the platform"
+        items={activeBuyers}
+        idKey="user_id"
+        countLabel="Viewed"
+        linkPrefix="viewer"
+      />
     </div>
   )
 }
