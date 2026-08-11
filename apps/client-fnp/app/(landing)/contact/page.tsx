@@ -27,8 +27,20 @@ export default function ContactPage() {
               For general enquiries, support, partnership opportunities, or feedback about our agricultural marketplace:
             </p>
             <div className="rounded-lg border p-4">
-              <a href="mailto:sales@famnport.com" className="text-sm font-semibold underline hover:text-foreground">sales@famnport.com</a>
+              <a href="mailto:sales@farmnport.com" className="text-sm font-semibold underline hover:text-foreground">sales@farmnport.com</a>
               <p className="text-sm text-muted-foreground mt-1">We aim to respond within 24–48 hours during business days.</p>
+            </div>
+          </section>
+
+          {/* WhatsApp */}
+          <section>
+            <h2 className="text-xl font-semibold mb-4">WhatsApp</h2>
+            <p className="text-sm leading-6 text-muted-foreground mb-4">
+              For quick sales enquiries, order support, or product questions — message us directly on WhatsApp:
+            </p>
+            <div className="rounded-lg border p-4">
+              <a href="https://wa.me/263789888837?text=Hi%2C%20I%20have%20a%20question%20about%20farmnport" target="_blank" rel="noopener noreferrer" className="text-sm font-semibold underline hover:text-foreground">+263 78 988 8837</a>
+              <p className="text-sm text-muted-foreground mt-1">Tap the number to start a conversation.</p>
             </div>
           </section>
 
