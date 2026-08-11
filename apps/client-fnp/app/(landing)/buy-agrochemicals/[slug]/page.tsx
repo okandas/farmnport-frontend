@@ -7,6 +7,7 @@ import Link from "next/link"
 import { Beaker } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { BuyProductInteractive } from "@/components/shop/BuyProductInteractive"
+import { RelatedGuideProducts } from "@/components/sections/related-guide-products"
 
 interface BuyAgroChemicalPageProps {
     params: Promise<{ slug: string }>
@@ -137,6 +138,13 @@ export default async function BuyAgroChemicalPage({ params }: BuyAgroChemicalPag
                     loginRedirect={`/buy-agrochemicals/${slug}`}
                     fallbackIcon={null}
                     tabsContent={tabsContent}
+                />
+                <RelatedGuideProducts
+                    collection="agro_chemicals"
+                    categoryName={chemical.agrochemical_category?.name || "Agrochemicals"}
+                    currentSlug={slug}
+                    targets={(chemical.targets || []).map((t: any) => t.name)}
+                    targetCrops={Array.from(new Set((chemical.dosage_rates || []).map((r: any) => r.crop).filter(Boolean)))}
                 />
             </div>
         </div>

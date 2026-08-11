@@ -10,6 +10,7 @@ import { DocumentPricingPanel } from "@/components/shop/DocumentPricingPanel"
 import { Badge } from "@/components/ui/badge"
 import { ProductImageGallery } from "@/components/shared/ProductImageGallery"
 import ReactMarkdown from "react-markdown"
+import { RelatedGuideProducts } from "@/components/sections/related-guide-products"
 
 interface Props {
     params: Promise<{ slug: string }>
@@ -249,6 +250,11 @@ export default async function BuyDocumentDetailPage({ params }: Props) {
                     </div>
 
                 </div>
+                <RelatedGuideProducts
+                    collection="guides"
+                    categoryName={doc.title}
+                    currentSlug={slug}
+                />
             </div>
         </div>
     )

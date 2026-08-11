@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { BuyProductInteractive } from "@/components/shop/BuyProductInteractive"
 import { guardTestItem } from "@/lib/guardTestItem"
 import { ProductNotFound } from "@/components/shared/ProductNotFound"
+import { RelatedGuideProducts } from "@/components/sections/related-guide-products"
 
 interface BuyPlantNutritionProductPageProps {
     params: Promise<{ slug: string }>
@@ -137,6 +138,12 @@ export default async function BuyPlantNutritionProductPage({ params }: BuyPlantN
                     loginRedirect={`/buy-plant-nutrition/${slug}`}
                     fallbackIcon={<div className="w-28 h-28 bg-muted/30 rounded-full" />}
                     tabsContent={tabsContent}
+                />
+                <RelatedGuideProducts
+                    collection="plant_nutrition"
+                    categoryName={product.plant_nutrition_category?.name || "Plant Nutrition"}
+                    currentSlug={slug}
+                    targetCrops={Array.from(new Set((product.dosage_rates || []).map((r: any) => r.crop).filter(Boolean)))}
                 />
             </div>
         </div>

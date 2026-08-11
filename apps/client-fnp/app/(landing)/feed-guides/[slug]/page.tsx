@@ -3,6 +3,7 @@ import { BaseURL } from "@/lib/schemas"
 import { guardTestItem } from "@/lib/guardTestItem"
 import { ProductNotFound } from "@/components/shared/ProductNotFound"
 import { GuideDetailLayout } from "@/components/shared/GuideDetailLayout"
+import { RelatedGuideProducts } from "@/components/sections/related-guide-products"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
 import { capitalizeFirstLetter } from "@/lib/utilities"
 import { FeedBreadcrumb } from "./FeedBreadcrumb"
@@ -109,6 +110,14 @@ export default async function FeedDetailPage({ params }: FeedDetailPageProps) {
             structuredData={structuredData}
             breadcrumbJsonLd={breadcrumbJsonLd}
             safetyWarnings={product.safety_warnings}
+            afterContent={
+                <RelatedGuideProducts
+                    collection="feed_products"
+                    categoryName={product.feed_category?.name || "Animal Feed"}
+                    currentSlug={slug}
+                    targetAnimals={product.animal ? [product.animal] : []}
+                />
+            }
             customBreadcrumb={
                 <div className="border-b">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">

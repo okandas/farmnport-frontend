@@ -29,6 +29,7 @@ import {
   LotBidReceivedEmail,
   LotBidAcceptedEmail,
   LotBidRejectedEmail,
+  PhoneUpdateCodeEmail,
 } from "@/emails"
 
 const FROM_FARMNPORT = "farmnport <noreply@farmnport.com>"
@@ -61,6 +62,11 @@ export async function POST(req: NextRequest) {
     case "verify-reminder":
       subject = (props as { subject?: string }).subject ?? "Verify your farmnport account to start trading"
       html = await render(VerifyReminderEmail(props as Parameters<typeof VerifyReminderEmail>[0]))
+      break
+
+    case "phone-update-code":
+      subject = (props as { subject?: string }).subject ?? "Your farmnport verification code"
+      html = await render(PhoneUpdateCodeEmail(props as Parameters<typeof PhoneUpdateCodeEmail>[0]))
       break
 
     case "magic-link":

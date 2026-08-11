@@ -136,12 +136,12 @@ export function SearchResults() {
   const hasMore = results.some(r => r.collection !== "farm_produce" && (filter === "all" || r.collection === filter) && r.found > page * 5)
 
   useEffect(() => {
-    if (!q.trim()) return
+    if (!q.trim() || q.trim().length < 1) return
     doSearch(q, page)
   }, [q, page])
 
   async function doSearch(term: string, p: number) {
-    if (!term.trim()) return
+    if (!term.trim() || term.trim().length < 1) return
     setLoading(true)
     setSearched(true)
     try {

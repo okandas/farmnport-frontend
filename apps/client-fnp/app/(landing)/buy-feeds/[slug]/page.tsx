@@ -9,6 +9,7 @@ import { BaseURL } from "@/lib/schemas"
 import { buildBuyMetadata } from "@/lib/utilities"
 import { BuyProductInteractive } from "@/components/shop/BuyProductInteractive"
 import { guardTestItem } from "@/lib/guardTestItem"
+import { RelatedGuideProducts } from "@/components/sections/related-guide-products"
 import { BackToProgram } from "./BackToProgram"
 import Link from "next/link"
 
@@ -343,6 +344,12 @@ export default async function BuyFeedPage({ params }: BuyFeedPageProps) {
                     loginRedirect={`/buy-feeds/${slug}`}
                     fallbackIcon={<Egg className="w-28 h-28 text-muted-foreground/20" />}
                     tabsContent={tabsContent}
+                />
+                <RelatedGuideProducts
+                    collection="feed_products"
+                    categoryName={product.feed_category?.name || "Livestock Feed"}
+                    currentSlug={slug}
+                    targetAnimals={product.animal ? [product.animal] : []}
                 />
             </div>
         </div>

@@ -5,6 +5,7 @@ import { BaseURL } from "@/lib/schemas"
 import { FertilizerApplicationRates } from "@/components/agrochemical/FertilizerApplicationRates"
 import { AgrochemicalDosageTable } from "@/components/agrochemical/AgrochemicalDosageTable"
 import { GuideDetailLayout } from "@/components/shared/GuideDetailLayout"
+import { RelatedGuideProducts } from "@/components/sections/related-guide-products"
 import { ProductNotFound } from "@/components/shared/ProductNotFound"
 
 type Props = { params: Promise<{ category: string; slug: string }> }
@@ -112,6 +113,14 @@ export default async function PlantNutritionGuidePage({ params }: GuidePageProps
             structuredData={structuredData}
             breadcrumbJsonLd={breadcrumbJsonLd}
             bottomContent={dosageTable}
+            afterContent={
+                <RelatedGuideProducts
+                    collection="plant_nutrition"
+                    categoryName={product.plant_nutrition_category?.name || category}
+                    currentSlug={slug}
+                    targetCrops={Array.from(new Set((product.dosage_rates || []).map((r: any) => r.crop).filter(Boolean)))}
+                />
+            }
         >
             {/* Overview */}
             <div>

@@ -9,6 +9,7 @@ import { FertilizerApplicationRates } from "@/components/agrochemical/Fertilizer
 import { AgrochemicalDosageTable } from "@/components/agrochemical/AgrochemicalDosageTable"
 import { ProductTargets } from "@/components/agrochemical/ProductTargets"
 import { GuideDetailLayout } from "@/components/shared/GuideDetailLayout"
+import { RelatedGuideProducts } from "@/components/sections/related-guide-products"
 
 type Props = { params: Promise<{ category: string; slug: string }> }
 
@@ -151,6 +152,15 @@ export default async function AgroChemicalGuidePage({ params }: GuidePageProps) 
             breadcrumbJsonLd={breadcrumbJsonLd}
             topContent={<SprayProgramBackLink />}
             bottomContent={dosageTable}
+            afterContent={
+                <RelatedGuideProducts
+                    collection="agro_chemicals"
+                    categoryName={chemical.agrochemical_category?.name || category}
+                    currentSlug={slug}
+                    targets={(chemical.targets || []).map((t: any) => t.name)}
+                    targetCrops={Array.from(new Set((chemical.dosage_rates || []).map((r: any) => r.crop).filter(Boolean)))}
+                />
+            }
         >
             {/* Overview */}
             <div>
