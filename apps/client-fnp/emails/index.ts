@@ -1,6 +1,7 @@
 // Auth templates
 export { default as WelcomeEmail } from "./templates/auth/welcome"
 export { default as VerifyReminderEmail } from "./templates/auth/verify-reminder"
+export { default as PhoneUpdateCodeEmail } from "./templates/auth/phone-update-code"
 export { default as MagicLinkEmail } from "./templates/auth/magic-link"
 export { default as ScheduleEmail } from "./templates/auth/schedule"
 
