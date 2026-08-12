@@ -359,6 +359,23 @@ export function SiteHeader() {
 
         {/* Right side actions */}
         <div className="hidden lg:flex items-center gap-2">
+          {!user && (
+            <>
+              <Link
+                href="/login"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Login
+              </Link>
+              <span className="text-muted-foreground/40">|</span>
+              <Link
+                href="/signup"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Sign Up
+              </Link>
+            </>
+          )}
           <Link
             href="/prices"
             onClick={() => sendGTMEvent({ event: 'nav_click', link_name: 'prices' })}
