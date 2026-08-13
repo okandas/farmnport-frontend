@@ -2,10 +2,13 @@
 
 import { useState, useEffect } from "react"
 import { useSession } from "next-auth/react"
+import { useQuery } from "@tanstack/react-query"
 import { toast } from "sonner"
-import { requestPhoneCode, verifyPhoneCode } from "@/lib/query"
+import { requestPhoneCode, verifyPhoneCode, myBookings, incomingBookings } from "@/lib/query"
 import { BaseURL } from "@/lib/schemas"
 import axios from "axios"
+import Link from "next/link"
+import { CalendarDays, ArrowRight, Package, Truck } from "lucide-react"
 
 type View = "idle" | "entering_phone" | "entering_code"
 
