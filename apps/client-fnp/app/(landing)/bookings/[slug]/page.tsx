@@ -3,6 +3,7 @@ import { notFound } from "next/navigation"
 import { bookingsEnabled, preorderDepositEnabled } from "@/flags"
 import { serverFetch } from "@/lib/serverFetch"
 import { guardTestItem } from "@/lib/guardTestItem"
+import { capitalizeFirstLetter } from "@/lib/utilities"
 import PreOrderDetailClient from "./PreOrderDetailClient"
 
 interface Props {
@@ -16,8 +17,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         const p = res?.preorder
         if (!p) return { title: 'Booking | farmnport.com', robots: { index: false } }
 
-        const supplier = p.client_name || p.brand_name || ""
-        const produce = p.produce_name || ""
+        const supplier = capitalizeFirstLetter(p.client_name || p.brand_name || "")
+        const produce = capitalizeFirstLetter(p.produce_name || "")
         const isBuyer = p.market_side === "demand"
         const action = isBuyer ? "Buying" : "Selling"
         const cta = isBuyer ? "Supply Now" : "Book Now"
