@@ -1,14 +1,16 @@
-import { Body, Button, Container, Head, Hr, Html, Link, Preview, Section, Text } from "@react-email/components"
+import { Body, Container, Head, Hr, Html, Link, Preview, Section, Text } from "@react-email/components"
 
 interface BlastEmailProps {
   name?: string
   message?: string
   subject?: string
+  link?: string
+  linkLabel?: string
 }
 
 const UTM = "?utm_source=blast&utm_medium=email&utm_campaign=custom_blast"
 
-export default function BlastEmail({ name = "Okandas", message = "" }: BlastEmailProps) {
+export default function BlastEmail({ name = "Okandas", message = "", link, linkLabel }: BlastEmailProps) {
   return (
     <Html lang="en">
       <Head />
@@ -25,6 +27,9 @@ export default function BlastEmail({ name = "Okandas", message = "" }: BlastEmai
           <Section style={content}>
             <Text style={greeting}>Hi {name},</Text>
             <Text style={paragraph}>{message}</Text>
+            {link && (
+              <Link href={link} style={inlineLink}>{linkLabel || link}</Link>
+            )}
           </Section>
 
           <Hr style={divider} />

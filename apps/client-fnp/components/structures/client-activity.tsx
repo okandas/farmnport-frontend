@@ -2,9 +2,8 @@
 
 import { useState, useRef } from "react"
 import Link from "next/link"
-import { useSession } from "next-auth/react"
 import { useQuery } from "@tanstack/react-query"
-import { ChevronLeft, ChevronRight } from "lucide-react"
+import { ChevronLeft, ChevronRight, ArrowRight } from "lucide-react"
 import { queryLots, listPreOrders } from "@/lib/query"
 import { centsToDollars } from "@/lib/utilities"
 
@@ -52,27 +51,27 @@ function PreOrderCard({ event }: { event: any }) {
       href={`/bookings/${event.slug}`}
       className="shrink-0 w-64 sm:w-72 bg-card border border-border rounded-lg overflow-hidden hover:shadow-lg hover:border-primary/50 transition-all duration-200 group flex flex-col"
     >
-      <div className="relative h-40 sm:h-48 bg-muted/30">
-        {event.image_src && (
+      {event.image_src && (
+        <div className="relative h-40 sm:h-48 bg-muted/30">
           <img src={event.image_src} alt={event.name} className="absolute inset-0 w-full h-full object-cover" />
-        )}
-      </div>
-      <div className="p-3 space-y-1 border-t flex-1">
+        </div>
+      )}
+      <div className={`p-3 space-y-1 flex-1 ${event.image_src ? "border-t" : ""}`}>
         <h3 className="font-semibold text-sm leading-tight line-clamp-1 group-hover:text-primary transition-colors">{event.name}</h3>
         {event.subtitle && <p className="text-xs text-muted-foreground line-clamp-1">{event.subtitle}</p>}
         <div className="text-xs text-muted-foreground pt-1 space-y-0.5">
           {event.unit_price > 0 && (
             <div className="flex justify-between">
-              <span>Price</span>
+              <span>{event.market_side === "demand" ? "Buying at" : "Price"}</span>
               <span className="font-semibold text-foreground">${(event.unit_price / 100 * 1.069).toFixed(2)}</span>
             </div>
           )}
           <div className="flex justify-between">
-            <span>Available</span>
+            <span>{event.market_side === "demand" ? "Needed" : "Available"}</span>
             <span className="font-medium text-foreground">{available} of {event.total_available}</span>
           </div>
           <div className="flex justify-between">
-            <span>Closes</span>
+            <span>{event.market_side === "demand" ? "Deadline" : "Closes"}</span>
             <span className="font-medium text-foreground">
               {!event.close_date || event.close_date === "0001-01-01T00:00:00Z" ? "Always open" : formatDate(event.close_date)}
             </span>
@@ -112,8 +111,7 @@ function ScrollableRow({ children }: { children: React.ReactNode }) {
 }
 
 export function ClientActivity({ slug }: { slug: string }) {
-  const { data: session } = useSession()
-  const [tab, setTab] = useState<"lots" | "preorders">("lots")
+  const [tab, setTab] = useState<"lots" | "preorders" | null>(null)
 
   const { data: lotsData } = useQuery({
     queryKey: ["client-lots", slug],
@@ -132,40 +130,27 @@ export function ClientActivity({ slug }: { slug: string }) {
 
   const tabs = [
     ...(lots.length > 0 ? [{ key: "lots" as const, label: "Lots", count: lots.length }] : []),
-    ...(preorders.length > 0 ? [{ key: "preorders" as const, label: "Pre-Orders", count: preorders.length }] : []),
+    ...(preorders.length > 0 ? [{ key: "preorders" as const, label: "Bookings", count: preorders.length }] : []),
   ]
+
+  const activeTab = tab ?? tabs[0]?.key ?? "lots"
 
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-base font-semibold">Activity</h2>
-        <div className="flex items-center gap-3">
-          {session && (
-            <>
-              <Link href="/lots/new" className="text-xs font-medium text-primary hover:underline">
-                New Lot
-              </Link>
-              <Link href="/bookings/new" className="text-xs font-medium text-primary hover:underline">
-                New Booking
-              </Link>
-            </>
-          )}
-          <Link href={tab === "lots" ? "/lots" : "/bookings"} className="text-xs text-muted-foreground hover:text-foreground">
-            Show all
-          </Link>
-        </div>
       </div>
 
       {tabs.length > 1 && (
-        <div className="flex items-center gap-1 mb-4">
+        <div className="flex items-center gap-2 mb-4">
           {tabs.map((t) => (
             <button
               key={t.key}
               onClick={() => setTab(t.key)}
-              className={`px-4 py-2 rounded-lg border text-sm font-medium transition-colors ${
-                tab === t.key
-                  ? "text-primary border-primary"
-                  : "text-muted-foreground border-border hover:text-foreground hover:border-foreground"
+              className={`px-4 py-1.5 rounded-full text-sm font-medium border transition-colors ${
+                activeTab === t.key
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "text-muted-foreground border-border hover:bg-muted"
               }`}
             >
               {t.label}
@@ -174,7 +159,7 @@ export function ClientActivity({ slug }: { slug: string }) {
         </div>
       )}
 
-      {tab === "lots" && lots.length > 0 && (
+      {activeTab === "lots" && lots.length > 0 && (
         <ScrollableRow>
           {lots.map((lot) => (
             <LotCard key={lot._id} lot={lot} />
@@ -182,13 +167,22 @@ export function ClientActivity({ slug }: { slug: string }) {
         </ScrollableRow>
       )}
 
-      {tab === "preorders" && preorders.length > 0 && (
+      {activeTab === "preorders" && preorders.length > 0 && (
         <ScrollableRow>
           {preorders.map((event) => (
             <PreOrderCard key={event.id} event={event} />
           ))}
         </ScrollableRow>
       )}
+
+      <div className="flex justify-center mt-4">
+        <Link
+          href={`/bookings?client=${slug}`}
+          className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+        >
+          Show all activity <ArrowRight className="h-3.5 w-3.5" />
+        </Link>
+      </div>
     </div>
   )
 }
