@@ -21,6 +21,9 @@ const nextConfig = {
       { source: '/buyer/top-choice-butchery', destination: '/buyers/cattle', permanent: true },
       { source: '/buyer/greenlight-butchery-shop', destination: '/buyers/cattle', permanent: true },
       { source: '/buyer/flyfix-grocery', destination: '/buyers', permanent: true },
+      { source: '/buyer/agriboost-international', destination: '/buyers', permanent: true },
+      { source: '/buyer/karumazondo-meats', destination: '/buyers/chicken', permanent: true },
+      { source: '/buyer/lettuce-product', destination: '/buyers/lettuce', permanent: true },
     ]
   },
   images: {
