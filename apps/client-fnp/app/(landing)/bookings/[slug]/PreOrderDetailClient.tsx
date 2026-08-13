@@ -213,7 +213,7 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
                     <span className="text-xs px-3 py-1 rounded-full bg-orange-100 text-orange-800 font-medium">Pre-order for Next Batch</span>
                   )
                 ) : (
-                  <span className="text-xs px-3 py-1 rounded-full bg-green-100 text-green-800 font-medium">Open for bookings</span>
+                  <span className="text-xs px-3 py-1 rounded-full bg-green-100 text-green-800 font-medium">{event.market_side === "demand" ? "Looking for suppliers" : "Open for bookings"}</span>
                 )}
                 {available <= 20 && available > 0 && (
                   <span className="text-xs px-3 py-1 rounded-full bg-red-100 text-red-800 font-medium">Only {available} left!</span>
@@ -283,14 +283,14 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
             <div className="grid grid-cols-3 gap-3">
               {event.unit_price > 0 && (
               <div className="rounded-xl border bg-muted/30 p-4">
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Available</p>
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">{event.market_side === "demand" ? "Quantity Needed" : "Available"}</p>
                 <p className="text-lg font-bold">{available.toLocaleString()}</p>
                 <p className="text-xs text-muted-foreground mt-1">of {event.total_available.toLocaleString()} {event.unit} total</p>
               </div>
               )}
               {event.unit_price > 0 && (
               <div className="rounded-xl border bg-muted/30 p-4">
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Min Order</p>
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">{event.market_side === "demand" ? "Min Supply" : "Min Order"}</p>
                 <p className="text-lg font-bold">{minQty.toLocaleString()}</p>
                 <p className="text-xs text-muted-foreground mt-1">
                   {event.max_quantity > 0 ? `max ${event.max_quantity.toLocaleString()} ${event.unit}` : `${event.unit} minimum`}
@@ -312,7 +312,7 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
                       <Clock className="w-3 h-3" /> Closes
                     </p>
                     <p className="text-lg font-bold">{formatDate(event.close_date)}</p>
-                    <p className="text-xs text-muted-foreground mt-1">booking deadline</p>
+                    <p className="text-xs text-muted-foreground mt-1">{event.market_side === "demand" ? "request deadline" : "booking deadline"}</p>
                   </>
                 )}
               </div>
@@ -330,13 +330,20 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
             <div id="booking-how-it-works" className="bg-muted/40 rounded-xl p-5 space-y-3">
               <h3 className="font-semibold text-sm">{event.market_side === "demand" ? "How Bookings Work" : "How Pre-Orders Work"}</h3>
               <ol className="space-y-2 text-sm text-muted-foreground list-decimal list-inside">
-                <li>Submit your booking request</li>
-                <li>We confirm your delivery or collection date and notify you</li>
-                <li>{event.market_side === "demand"
-                  ? "Ensure you deliver on your confirmed date or are ready for collection on the agreed date"
-                  : `Pay to secure your allocation${event.payment_deadline_hours ? ` (within ${event.payment_deadline_hours} hours)` : ""}`}
-                </li>
-                {event.market_side !== "demand" && <li>Collect your order when ready — balance due on collection</li>}
+                {event.market_side === "demand" ? (
+                  <>
+                    <li>Submit your supply offer with the quantity you can provide</li>
+                    <li>The buyer reviews your offer and confirms</li>
+                    <li>Deliver on the agreed date or prepare for collection</li>
+                  </>
+                ) : (
+                  <>
+                    <li>Submit your booking request</li>
+                    <li>We confirm your delivery or collection date and notify you</li>
+                    <li>Pay to secure your allocation{event.payment_deadline_hours ? ` (within ${event.payment_deadline_hours} hours)` : ""}</li>
+                    <li>Collect your order when ready — balance due on collection</li>
+                  </>
+                )}
               </ol>
             </div>
           </div>
@@ -347,14 +354,14 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
               <div className="border rounded-xl p-6 text-center space-y-4">
                 <CalendarDays className="w-10 h-10 mx-auto text-muted-foreground/40" />
                 <div>
-                  <p className="font-semibold">Sign in to place a booking</p>
-                  <p className="text-xs text-muted-foreground mt-1">Create a free account to reserve your batch</p>
+                  <p className="font-semibold">{event.market_side === "demand" ? "Sign in to supply this buyer" : "Sign in to place a booking"}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{event.market_side === "demand" ? "Create a free account to respond to this request" : "Create a free account to reserve your batch"}</p>
                 </div>
                 <Link
                   href={`/login?next=/bookings/${slug}`}
                   className="block w-full text-center bg-primary text-primary-foreground text-sm font-semibold px-6 py-2.5 rounded-xl hover:bg-primary/90 transition-colors"
                 >
-                  Sign In to Book
+                  {event.market_side === "demand" ? "Sign In to Respond" : "Sign In to Book"}
                 </Link>
                 <Link href="/register" className="block text-xs text-primary hover:underline">
                   Don&apos;t have an account? Register free
@@ -362,7 +369,7 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
               </div>
             ) : (
               <div className="border rounded-xl p-5 space-y-4">
-                <h2 className="font-semibold">Place Your Booking</h2>
+                <h2 className="font-semibold">{event.market_side === "demand" ? "Offer Supply" : "Place Your Booking"}</h2>
 
                 <div id="booking-quantity" className="space-y-1.5">
                   <label className="text-xs font-medium text-muted-foreground">
@@ -547,7 +554,9 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
                 </button>
 
                 <p className="text-xs text-muted-foreground text-center">
-                  We&apos;ll confirm availability and notify you to pay
+                  {event.market_side === "demand"
+                    ? "The buyer will review your offer and get back to you"
+                    : "We\u2019ll confirm availability and notify you to pay"}
                 </p>
               </div>
             )}

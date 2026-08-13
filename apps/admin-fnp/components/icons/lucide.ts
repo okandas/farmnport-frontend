@@ -66,6 +66,9 @@ import {
   Mail,
   Box,
   Gavel,
+  ChefHat,
+  Wallet,
+  Star,
 } from "lucide-react"
 
 export type Icon = LucideIcon
@@ -141,4 +144,7 @@ export const Icons = {
   mail: Mail,
   box: Box,
   gavel: Gavel,
+  chefHat: ChefHat,
+  wallet: Wallet,
+  star: Star,
 }

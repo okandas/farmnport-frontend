@@ -40,6 +40,18 @@ const apps = [
     ],
   },
   {
+    href: "/dashboard/chefs",
+    name: "Chefs",
+    description: "Manage chef profiles, listings, bookings, subscriptions, and payouts",
+    color: "bg-purple-500",
+    initials: "CH",
+    links: [
+      { label: "Chefs", href: "/dashboard/chefs" },
+      { label: "Listings", href: "/dashboard/chefs/listings" },
+      { label: "Bookings", href: "/dashboard/chefs/bookings" },
+    ],
+  },
+  {
     href: "/dashboard/tumira",
     name: "Tumira",
     description: "Manage delivery wards, couriers, rates, and vanity codes",

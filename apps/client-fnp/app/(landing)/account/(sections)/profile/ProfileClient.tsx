@@ -74,6 +74,14 @@ export default function AccountProfilePage() {
         setCode("")
     }
 
+    const { data: bookedData } = useQuery({
+        queryKey: ["my-bookings"],
+        queryFn: () => myBookings().then(r => r.data),
+        enabled: !!user?.token,
+    })
+
+    const bookings: any[] = ((bookedData as any)?.bookings ?? []).slice(0, 5)
+
     if (fetching) return <div className="py-10 text-center text-sm text-muted-foreground">Loading...</div>
 
     return (
@@ -171,6 +179,49 @@ export default function AccountProfilePage() {
                         </div>
                     )}
                 </div>
+            </div>
+
+            {/* Activity – LinkedIn style */}
+            <div className="border rounded-xl">
+                <div className="flex items-center justify-between px-5 py-4">
+                    <h2 className="text-base font-bold">Activity</h2>
+                    {bookings.length > 0 && (
+                        <Link href="/account/bookings" className="text-sm font-medium text-primary hover:underline flex items-center gap-1">
+                            Show all <ArrowRight className="w-3.5 h-3.5" />
+                        </Link>
+                    )}
+                </div>
+                {bookings.length === 0 ? (
+                    <div className="px-5 pb-5 text-center space-y-2">
+                        <CalendarDays className="w-10 h-10 mx-auto text-muted-foreground/40" />
+                        <p className="text-sm text-muted-foreground">No bookings yet</p>
+                    </div>
+                ) : (
+                    <div className="divide-y">
+                        {bookings.map((b: any) => (
+                            <Link
+                                key={b.id}
+                                href={`/account/bookings/${b.id}`}
+                                className="flex items-start gap-3 px-5 py-3.5 hover:bg-muted/50 transition-colors"
+                            >
+                                <CalendarDays className="w-4 h-4 mt-0.5 text-muted-foreground shrink-0" />
+                                <div className="min-w-0">
+                                    <p className="text-sm font-medium truncate">
+                                        {b.type === "pre-order" && b.pre_order
+                                            ? b.pre_order.event_title
+                                            : b.type === "delivery" && b.delivery
+                                            ? b.delivery.goods
+                                            : b.booking_ref}
+                                    </p>
+                                    <p className="text-xs text-muted-foreground mt-0.5">
+                                        {b.booking_ref} · {new Date(b.created).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
+                                    </p>
+                                </div>
+                                <span className="ml-auto shrink-0 text-xs font-medium text-muted-foreground capitalize">{b.status}</span>
+                            </Link>
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     )

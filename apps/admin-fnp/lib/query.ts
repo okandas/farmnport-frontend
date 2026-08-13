@@ -2048,3 +2048,114 @@ export function updateTurtlewaxCategory(data: FormTurtlewaxCategoryModel) {
 export function deleteTurtlewaxCategory(id: string) {
   return api.post(`${baseUrl}/user/turtlewax-categories/delete`, { id })
 }
+
+// ── Chefs ─────────────────────────────────────────────────────────────────────
+
+export function adminListChefs(params?: { status?: string; p?: number }) {
+  const qs = new URLSearchParams()
+  if (params?.status) qs.set("status", params.status)
+  if (params?.p && params.p > 1) qs.set("page", params.p.toString())
+  const q = qs.toString()
+  return api.get(`${baseUrl}/chefs/admin/list${q ? `?${q}` : ""}`)
+}
+
+export function adminGetChef(id: string) {
+  return api.get(`${baseUrl}/chefs/admin/${id}`)
+}
+
+export function adminCreateChef(data: Record<string, unknown>) {
+  return api.post(`${baseUrl}/chefs/admin/`, data)
+}
+
+export function adminUpdateChef(id: string, data: Record<string, unknown>) {
+  return api.put(`${baseUrl}/chefs/admin/${id}`, data)
+}
+
+export function adminUpdateChefStatus(id: string, status: string) {
+  return api.put(`${baseUrl}/chefs/admin/${id}/status`, { status })
+}
+
+export function adminDeleteChef(id: string) {
+  return api.delete(`${baseUrl}/chefs/admin/${id}/delete`)
+}
+
+// ── Chef Listings ─────────────────────────────────────────────────────────────
+
+export function adminListChefListings(params?: { chef_id?: string; type?: string; status?: string; p?: number }) {
+  const qs = new URLSearchParams()
+  if (params?.chef_id) qs.set("chef_id", params.chef_id)
+  if (params?.type) qs.set("type", params.type)
+  if (params?.status) qs.set("status", params.status)
+  if (params?.p && params.p > 1) qs.set("page", params.p.toString())
+  const q = qs.toString()
+  return api.get(`${baseUrl}/chefs/admin/listings/list${q ? `?${q}` : ""}`)
+}
+
+export function adminGetChefListing(id: string) {
+  return api.get(`${baseUrl}/chefs/admin/listings/${id}`)
+}
+
+export function adminCreateChefListing(data: Record<string, unknown>) {
+  return api.post(`${baseUrl}/chefs/admin/listings/`, data)
+}
+
+export function adminUpdateChefListing(id: string, data: Record<string, unknown>) {
+  return api.put(`${baseUrl}/chefs/admin/listings/${id}`, data)
+}
+
+export function adminDeleteChefListing(id: string) {
+  return api.delete(`${baseUrl}/chefs/admin/listings/${id}/delete`)
+}
+
+// ── Chef Bookings ─────────────────────────────────────────────────────────────
+
+export function adminListChefBookings(params?: { chef_id?: string; status?: string; p?: number }) {
+  const qs = new URLSearchParams()
+  if (params?.chef_id) qs.set("chef_id", params.chef_id)
+  if (params?.status) qs.set("status", params.status)
+  if (params?.p && params.p > 1) qs.set("page", params.p.toString())
+  const q = qs.toString()
+  return api.get(`${baseUrl}/chefs/admin/bookings/list${q ? `?${q}` : ""}`)
+}
+
+export function adminGetChefBooking(id: string) {
+  return api.get(`${baseUrl}/chefs/admin/bookings/${id}`)
+}
+
+export function adminUpdateChefBookingStatus(id: string, status: string, admin_notes?: string) {
+  return api.put(`${baseUrl}/chefs/admin/bookings/${id}/status`, { status, admin_notes: admin_notes ?? "" })
+}
+
+// ── Chef Subscriptions ────────────────────────────────────────────────────────
+
+export function adminListChefSubscriptions(params?: { chef_id?: string; status?: string; p?: number }) {
+  const qs = new URLSearchParams()
+  if (params?.chef_id) qs.set("chef_id", params.chef_id)
+  if (params?.status) qs.set("status", params.status)
+  if (params?.p && params.p > 1) qs.set("page", params.p.toString())
+  const q = qs.toString()
+  return api.get(`${baseUrl}/chefs/admin/subscriptions/list${q ? `?${q}` : ""}`)
+}
+
+export function adminGetChefSubscription(id: string) {
+  return api.get(`${baseUrl}/chefs/admin/subscriptions/${id}`)
+}
+
+export function adminUpdateChefSubscriptionStatus(id: string, status: string) {
+  return api.put(`${baseUrl}/chefs/admin/subscriptions/${id}/status`, { status })
+}
+
+// ── Chef Payouts ──────────────────────────────────────────────────────────────
+
+export function adminListChefPayouts(params?: { chef_id?: string; status?: string; p?: number }) {
+  const qs = new URLSearchParams()
+  if (params?.chef_id) qs.set("chef_id", params.chef_id)
+  if (params?.status) qs.set("status", params.status)
+  if (params?.p && params.p > 1) qs.set("page", params.p.toString())
+  const q = qs.toString()
+  return api.get(`${baseUrl}/chefs/admin/payouts/list${q ? `?${q}` : ""}`)
+}
+
+export function adminMarkChefPayoutPaid(id: string) {
+  return api.put(`${baseUrl}/chefs/admin/payouts/${id}/pay`, {})
+}
