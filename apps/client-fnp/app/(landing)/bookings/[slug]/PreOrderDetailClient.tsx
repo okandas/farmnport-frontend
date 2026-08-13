@@ -438,6 +438,24 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
                   const hasDelivery = hasDeliveryDates
                   if (!hasCollection && !hasDelivery) return null
 
+                  // Demand bookings: show delivery locations as static info
+                  if (event.market_side === "demand" && locs.length > 0) {
+                    return (
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-medium text-muted-foreground">Deliver to</label>
+                        <div className="space-y-2">
+                          {locs.map((loc: any) => (
+                            <div key={loc.id} className="rounded-lg border bg-muted/30 px-4 py-3">
+                              <p className="text-sm font-medium">{loc.name}</p>
+                              {loc.address && <p className="text-xs text-muted-foreground mt-0.5">{loc.address}</p>}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )
+                  }
+
+                  // Supply bookings: show collection point dropdown
                   // Auto-select if only one option
                   if (hasCollection && !hasDelivery && fulfillment !== "collection") setFulfillment("collection")
                   if (hasDelivery && !hasCollection && fulfillment !== "delivery") setFulfillment("delivery")
@@ -468,7 +486,7 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
                       )}
                       {fulfillment === "collection" && locs.length > 0 && (
                         <div className="space-y-1.5">
-                          <label className="text-xs font-medium text-muted-foreground">{event.market_side === "demand" ? "Delivery Point" : "Collection Point"} *</label>
+                          <label className="text-xs font-medium text-muted-foreground">Collection Point *</label>
                           <Select
                             value={selectedCollectionPoint?.id ?? ""}
                             onValueChange={(val) => {
@@ -476,7 +494,7 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
                               setSelectedCollectionPoint(loc ? { id: loc.id, name: loc.name } : null)
                             }}
                           >
-                            <SelectTrigger><SelectValue placeholder={event.market_side === "demand" ? "Select a delivery point" : "Select a collection point"} /></SelectTrigger>
+                            <SelectTrigger><SelectValue placeholder="Select a collection point" /></SelectTrigger>
                             <SelectContent>
                               {locs.map((loc: any) => (
                                 <SelectItem key={loc.id} value={loc.id}>{loc.name}</SelectItem>
