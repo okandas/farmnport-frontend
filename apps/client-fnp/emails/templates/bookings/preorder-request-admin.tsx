@@ -1,7 +1,7 @@
 import { Body, Button, Container, Head, Hr, Html, Link, Preview, Section, Text } from "@react-email/components"
 import { centsToDollars } from "@/lib/utilities"
 
-interface Props { bookingRef?: string; customerName?: string; customerEmail?: string; customerPhone?: string; productName?: string; quantity?: number; unit?: string; offerPrice?: number; buyerNotes?: string; adminUrl?: string }
+interface Props { bookingRef?: string; customerName?: string; customerEmail?: string; customerPhone?: string; productName?: string; quantity?: number; unit?: string; offerPrice?: number; marketSide?: string; buyerNotes?: string; adminUrl?: string }
 
 export default function PreorderRequestAdminEmail({
   bookingRef = "FNP-BK-PO-0001",
@@ -12,6 +12,7 @@ export default function PreorderRequestAdminEmail({
   quantity = 0,
   unit = "",
   offerPrice = 0,
+  marketSide = "",
   buyerNotes = "",
   adminUrl = "https://admin.farmnport.com",
 }: Props) {
@@ -26,7 +27,7 @@ export default function PreorderRequestAdminEmail({
   return (
     <Html lang="en">
       <Head />
-      <Preview>{`New pre-order request from ${customerName} — ${String(quantity)} ${productName}`}</Preview>
+      <Preview>{marketSide === "demand" ? `New supply offer from ${customerName} — ${String(quantity)} ${unit} of ${productName}` : `New booking request from ${customerName} — ${String(quantity)} ${productName}`}</Preview>
       <Body style={body}>
         <Container style={container}>
 
@@ -37,8 +38,8 @@ export default function PreorderRequestAdminEmail({
 
           {/* Content */}
           <Section style={content}>
-            <Text style={greeting}>New pre-order request</Text>
-            <Text style={paragraph}>A new pre-order request needs your review.</Text>
+            <Text style={greeting}>{marketSide === "demand" ? "New supply offer" : "New booking request"}</Text>
+            <Text style={paragraph}>{marketSide === "demand" ? "A farmer is offering to supply." : "A new booking request needs your review."}</Text>
             <Text style={paragraph}>Booking reference: <strong>{bookingRef}</strong></Text>
             <Text style={paragraph}>{customerDetails}</Text>
             <Text style={paragraph}>{orderDetails}</Text>

@@ -8,6 +8,7 @@ import Link from "next/link"
 import { toast } from "sonner"
 
 import { getBooking, cancelBooking, initiatePreOrderPayment, pollPreOrderPayment } from "@/lib/query"
+import { centsToDollars, plural } from "@/lib/utilities"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 
 const STATUS_STYLES: Record<string, string> = {
@@ -302,7 +303,7 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
               {booking.pre_order.offer_price > 0 && (
                 <div className="border-t pt-3 text-sm">
                   <p className="text-muted-foreground text-xs mb-0.5">Your Offered Price</p>
-                  <p className="font-medium">${(booking.pre_order.offer_price / 100).toFixed(2)} per {booking.pre_order.unit}</p>
+                  <p className="font-medium">{centsToDollars(booking.pre_order.offer_price)} per {plural(booking.pre_order.unit || "unit", 1)}</p>
                 </div>
               )}
               {booking.pre_order.buyer_notes && (
