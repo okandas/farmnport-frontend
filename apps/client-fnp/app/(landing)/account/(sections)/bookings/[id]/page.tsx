@@ -299,6 +299,12 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
                   )}
                 </div>
               )}
+              {booking.pre_order.offer_price > 0 && (
+                <div className="border-t pt-3 text-sm">
+                  <p className="text-muted-foreground text-xs mb-0.5">Your Offered Price</p>
+                  <p className="font-medium">${(booking.pre_order.offer_price / 100).toFixed(2)} per {booking.pre_order.unit}</p>
+                </div>
+              )}
               {booking.pre_order.buyer_notes && (
                 <div className="border-t pt-3 text-sm">
                   <p className="text-muted-foreground text-xs mb-0.5">Your Notes</p>

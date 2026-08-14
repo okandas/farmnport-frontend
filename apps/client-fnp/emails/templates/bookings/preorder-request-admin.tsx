@@ -1,6 +1,7 @@
 import { Body, Button, Container, Head, Hr, Html, Link, Preview, Section, Text } from "@react-email/components"
+import { centsToDollars } from "@/lib/utilities"
 
-interface Props { bookingRef?: string; customerName?: string; customerEmail?: string; customerPhone?: string; productName?: string; quantity?: number; buyerNotes?: string; adminUrl?: string }
+interface Props { bookingRef?: string; customerName?: string; customerEmail?: string; customerPhone?: string; productName?: string; quantity?: number; unit?: string; offerPrice?: number; buyerNotes?: string; adminUrl?: string }
 
 export default function PreorderRequestAdminEmail({
   bookingRef = "FNP-BK-PO-0001",
@@ -8,14 +9,17 @@ export default function PreorderRequestAdminEmail({
   customerEmail = "okandas@farmnport.com",
   customerPhone = "0719099990",
   productName = "Fivet Cobb 500 Day-Old Chicks",
-  quantity = 100,
+  quantity = 0,
+  unit = "",
+  offerPrice = 0,
   buyerNotes = "",
   adminUrl = "https://admin.farmnport.com",
 }: Props) {
   const customerDetails = `Name    ${customerName}\nEmail   ${customerEmail}\nPhone   ${customerPhone}`
   const orderDetails = [
     `Produce   ${productName}`,
-    `Quantity  ${quantity} units`,
+    `Quantity  ${quantity} ${unit || "units"}`,
+    offerPrice > 0 ? `Offer     ${centsToDollars(offerPrice)} per ${unit || "unit"}` : "",
     buyerNotes ? `Notes     ${buyerNotes}` : "",
   ].filter(Boolean).join("\n")
 

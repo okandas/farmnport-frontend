@@ -211,27 +211,27 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
               <div className="flex gap-3 flex-wrap">
                 {isOpenEnded ? (
                   available > 0 ? (
-                    <span className="text-xs px-3 py-1 rounded-full bg-green-100 text-green-800 font-medium">Always Available</span>
+                    <span className="text-xs px-3 py-1 rounded-md bg-green-100 text-green-800 font-medium">Always Available</span>
                   ) : (
-                    <span className="text-xs px-3 py-1 rounded-full bg-orange-100 text-orange-800 font-medium">Pre-order for Next Batch</span>
+                    <span className="text-xs px-3 py-1 rounded-md bg-orange-100 text-orange-800 font-medium">Pre-order for Next Batch</span>
                   )
                 ) : (
-                  <span className="text-xs px-3 py-1 rounded-full bg-green-100 text-green-800 font-medium">{event.market_side === "demand" ? "Looking for suppliers" : "Open for bookings"}</span>
+                  <span className="text-xs px-3 py-1 rounded-md bg-green-100 text-green-800 font-medium">{event.market_side === "demand" ? "Looking for suppliers" : "Open for bookings"}</span>
                 )}
-                {available <= 20 && available > 0 && (
-                  <span className="text-xs px-3 py-1 rounded-full bg-red-100 text-red-800 font-medium">Only {available} left!</span>
+                {available > 0 && available <= event.total_available * 0.3 && (
+                  <span className="text-xs px-3 py-1 rounded-md bg-red-100 text-red-800 font-medium">Only {available} left!</span>
                 )}
               </div>
               {event.total_available > 0 && (
               <div className="space-y-1.5">
                 <div className="flex justify-between text-xs">
-                  <span className="text-muted-foreground">{event.total_booked?.toLocaleString() ?? 0} of {event.total_available.toLocaleString()} {event.unit} booked</span>
-                  <span className="font-medium">{available.toLocaleString()} remaining</span>
+                  <span className="text-muted-foreground">{event.total_booked?.toLocaleString() ?? 0} of {event.total_available.toLocaleString()} {event.unit} {event.market_side === "demand" ? "supplied" : "booked"}</span>
+                  <span className="font-medium">{available.toLocaleString()} {event.market_side === "demand" ? "needed" : "remaining"}</span>
                 </div>
                 <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
                   <div
                     className={`h-full rounded-full transition-all ${
-                      available <= 20 ? "bg-red-500" : available <= event.total_available * 0.3 ? "bg-orange-500" : "bg-primary"
+                      available <= event.total_available * 0.1 ? "bg-red-500" : available <= event.total_available * 0.3 ? "bg-orange-500" : "bg-primary"
                     }`}
                     style={{ width: `${Math.min(100, ((event.total_booked ?? 0) / event.total_available) * 100)}%` }}
                   />
