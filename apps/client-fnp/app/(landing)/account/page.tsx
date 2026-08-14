@@ -6,7 +6,7 @@ const ALL_OPTIONS: (AccountOption & { flag?: () => Promise<boolean> })[] = [
   { label: "My Bids for Lots",    href: "/account/bids",              protected: true },
   { label: "Lots",                href: "/account/lots",              protected: true },
   { label: "My Bids for Bookings", href: "/account/bookings",         protected: true, flag: bookingsEnabled },
-  { label: "Received Bookings",   href: "/account/incoming-bookings", protected: true, flag: bookingsEnabled },
+  { label: "Received Bids",       href: "/account/incoming-bookings", protected: true, flag: bookingsEnabled },
   { label: "My Bookings",         href: "/account/booking-preorders", protected: true, flag: bookingsEnabled },
   { label: "Notifications",       href: "/account/notifications",     protected: true, flag: notificationsEnabled },
   { label: "Documents",           href: "/account/documents",         protected: true, flag: documentsEnabled },
