@@ -1,6 +1,8 @@
 "use client"
 
 import { useSession } from "next-auth/react"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { makeAbbveriation } from "@/lib/utilities"
 
 export default function AccountLayout({ children }: { children: React.ReactNode }) {
     const { data: session } = useSession()
@@ -12,11 +14,9 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
 
                 {/* Header */}
                 <div className="flex items-center gap-4 mb-8">
-                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                        <span className="text-primary font-bold text-lg">
-                            {user?.username?.charAt(0)?.toUpperCase() ?? "A"}
-                        </span>
-                    </div>
+                    <Avatar className="h-12 w-12">
+                        <AvatarFallback className="text-lg">{makeAbbveriation(user?.username)}</AvatarFallback>
+                    </Avatar>
                     <div>
                         <p className="font-semibold text-lg leading-tight">{user?.username ? `Hi, ${user.username}` : "My Account"}</p>
                         {user?.email && <p className="text-sm text-muted-foreground">{user.email}</p>}

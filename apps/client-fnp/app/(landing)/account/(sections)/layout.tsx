@@ -2,12 +2,12 @@ import { bookingsEnabled, notificationsEnabled, documentsEnabled, profileEnabled
 import AccountSectionsNav, { NavItem } from "./AccountSectionsNav"
 
 const ALL_NAV: (NavItem & { flag?: () => Promise<boolean> })[] = [
-  { label: "My Orders",      href: "/account/orders" },
-  { label: "My Offers",      href: "/account/bids" },
-  { label: "My Lots",        href: "/account/lots" },
-  { label: "Booked",         href: "/account/bookings",            flag: bookingsEnabled },
-  { label: "Received",       href: "/account/incoming-bookings",   flag: bookingsEnabled },
-  { label: "My Bookings",    href: "/account/booking-preorders",   flag: bookingsEnabled },
+  { label: "Orders",            href: "/account/orders" },
+  { label: "My Bids for Lots",  href: "/account/bids" },
+  { label: "Lots",              href: "/account/lots" },
+  { label: "My Bids for Bookings",  href: "/account/bookings",            flag: bookingsEnabled },
+  { label: "Received Bookings",    href: "/account/incoming-bookings",   flag: bookingsEnabled },
+  { label: "My Bookings",          href: "/account/booking-preorders",   flag: bookingsEnabled },
   { label: "Notifications",  href: "/account/notifications",       flag: notificationsEnabled },
   { label: "Documents",      href: "/account/documents",           flag: documentsEnabled },
   { label: "Profile",        href: "/account/profile",             flag: profileEnabled },
