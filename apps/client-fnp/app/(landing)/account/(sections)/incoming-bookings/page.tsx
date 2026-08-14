@@ -2,24 +2,10 @@
 
 import { useSession } from "next-auth/react"
 import { useQuery } from "@tanstack/react-query"
-import { Loader2, Truck } from "lucide-react"
+import { Loader2 } from "lucide-react"
 import Link from "next/link"
 
 import { incomingBookings } from "@/lib/query"
-
-const STATUS_STYLES: Record<string, string> = {
-  pending:          "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400",
-  confirmed:        "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
-  pending_payment:  "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400",
-  paid:             "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
-  approved:         "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400",
-  ready:            "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400",
-  collected:        "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
-  completed:        "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
-  rejected:         "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
-  expired:          "bg-muted text-muted-foreground",
-  cancelled:        "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
-}
 
 const STATUS_LABELS: Record<string, string> = {
   pending:          "Pending Approval",
@@ -54,11 +40,11 @@ export default function IncomingBookingsPage() {
       <nav className="flex items-center gap-1.5 text-sm text-muted-foreground mb-4">
         <Link href="/account" className="hover:text-foreground transition-colors">Account</Link>
         <span>/</span>
-        <span className="text-foreground font-medium">Received</span>
+        <span className="text-foreground font-medium">Received Bids</span>
       </nav>
 
-      <h1 className="text-2xl font-bold">Received</h1>
-      <p className="text-sm text-muted-foreground mb-6">Bookings others made from you — review and confirm.</p>
+      <h1 className="text-2xl font-bold">Received Bids</h1>
+      <p className="text-sm text-muted-foreground mb-6">Bids received on your bookings — review and respond.</p>
 
       {isLoading ? (
         <div className="flex items-center justify-center py-32">
@@ -66,9 +52,8 @@ export default function IncomingBookingsPage() {
         </div>
       ) : bookings.length === 0 ? (
         <div className="text-center py-16 space-y-3">
-          <Truck className="w-10 h-10 mx-auto text-muted-foreground/40" />
           <p className="font-semibold">No incoming bookings</p>
-          <p className="text-sm text-muted-foreground">Pre-order and delivery bookings will appear here.</p>
+          <p className="text-sm text-muted-foreground">Bookings and supply offers will appear here.</p>
         </div>
       ) : (
         <div className="space-y-4">

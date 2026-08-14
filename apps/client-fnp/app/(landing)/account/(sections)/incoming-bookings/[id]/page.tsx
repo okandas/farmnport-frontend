@@ -8,7 +8,7 @@ import Link from "next/link"
 import { toast } from "sonner"
 
 import { getIncomingBooking, buyerUpdateBookingStatus, clientConfirmBooking, clientRejectBooking, clientMarkReady, clientMarkCollected } from "@/lib/query"
-import { centsToDollars, platformFee, withPlatformFee } from "@/lib/utilities"
+import { centsToDollars, platformFee, withPlatformFee, plural } from "@/lib/utilities"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 
 const STATUS_STYLES: Record<string, string> = {
@@ -191,7 +191,7 @@ export default function IncomingBookingDetailPage({ params }: { params: Promise<
       <nav className="flex items-center gap-1.5 text-sm text-muted-foreground mb-4">
         <Link href="/account" className="hover:text-foreground transition-colors">Account</Link>
         <span>/</span>
-        <Link href="/account/incoming-bookings" className="hover:text-foreground transition-colors">Incoming Bookings</Link>
+        <Link href="/account/incoming-bookings" className="hover:text-foreground transition-colors">Received Bids</Link>
         <span>/</span>
         <span className="text-foreground font-medium font-mono">{booking.booking_ref}</span>
       </nav>
@@ -203,7 +203,7 @@ export default function IncomingBookingDetailPage({ params }: { params: Promise<
             {STATUS_LABELS[booking.status] ?? booking.status}
           </span>
           <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
-            <Truck className="w-3.5 h-3.5" /> {booking.type === "pre-order" ? "Pre-Order" : "Delivery"}
+            <Truck className="w-3.5 h-3.5" /> {booking.type === "pre-order" ? "Supply Offer" : "Delivery"}
           </span>
         </div>
         <p className="text-xs text-muted-foreground">{formatDateTime(booking.created)}</p>
@@ -222,11 +222,17 @@ export default function IncomingBookingDetailPage({ params }: { params: Promise<
 
           {/* Farmer details */}
           <div className="border rounded-xl p-5">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-4">Farmer</p>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-4">Supplier</p>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              <Field label="Name"  value={booking.client_name} />
-              <Field label="Phone" value={booking.client_phone} />
-              <Field label="Email" value={booking.client_email} />
+              {booking.status === "pending" ? (
+                <Field label="Name" value={booking.client_name} />
+              ) : (
+              <>
+                <Field label="Name"  value={booking.client_name} />
+                <Field label="Phone" value={booking.client_phone} />
+                <Field label="Email" value={booking.client_email} />
+              </>
+              )}
             </div>
           </div>
 
@@ -261,10 +267,10 @@ export default function IncomingBookingDetailPage({ params }: { params: Promise<
           {/* Pre-order details */}
           {booking.type === "pre-order" && booking.pre_order && (
             <div className="border rounded-xl p-5">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-4">Pre-Order Details</p>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-4">Booking Details</p>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Pre-Order</span>
+                  <span className="text-muted-foreground">Booking</span>
                   <Link href={`/bookings/${booking.pre_order.event_id}`} className="font-medium text-primary hover:underline">{booking.pre_order.event_title}</Link>
                 </div>
                 <div className="flex justify-between">
@@ -273,19 +279,27 @@ export default function IncomingBookingDetailPage({ params }: { params: Promise<
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Quantity</span>
-                  <span className="font-medium">{booking.pre_order.quantity?.toLocaleString()} {booking.pre_order.unit || "units"}</span>
+                  <span className="font-medium">{booking.pre_order.quantity?.toLocaleString()} {plural(booking.pre_order.unit || "unit", booking.pre_order.quantity)}</span>
                 </div>
+                {booking.pre_order.offer_price > 0 && (
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Your Unit Price</span>
+                  <span className="text-muted-foreground">Offered Price</span>
+                  <span className="font-medium">{centsToDollars(booking.pre_order.offer_price)} per {plural(booking.pre_order.unit || "unit", 1)}</span>
+                </div>
+                )}
+                {booking.pre_order.unit_price > 0 && (
+                <>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Unit Price</span>
                   <span className="font-medium">{centsToDollars(booking.pre_order.unit_price)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Our Fee — Buyer Pays (6.9%)</span>
-                  <span className="font-medium">${(booking.pre_order.unit_price / 100 * 0.069).toFixed(2)}</span>
+                  <span className="text-muted-foreground">Platform Fee (6.9%)</span>
+                  <span className="font-medium">{centsToDollars(platformFee(booking.pre_order.unit_price))}</span>
                 </div>
                 <div className="flex justify-between border-t pt-2">
                   <span className="font-semibold">Total Unit Price</span>
-                  <span className="font-bold">${(booking.pre_order.unit_price / 100 * 1.069).toFixed(2)}</span>
+                  <span className="font-bold">{centsToDollars(withPlatformFee(booking.pre_order.unit_price))}</span>
                 </div>
                 <div className="border-t pt-2 mt-2 flex justify-between">
                   <span className="text-muted-foreground">Subtotal</span>
@@ -303,6 +317,8 @@ export default function IncomingBookingDetailPage({ params }: { params: Promise<
                   <span className="text-muted-foreground">Payment</span>
                   <span className={`font-medium ${booking.pre_order.deposit_paid ? "text-green-700" : "text-red-600"}`}>{booking.pre_order.deposit_paid ? "Paid" : "Not yet paid"}</span>
                 </div>
+                </>
+                )}
               </div>
               {booking.pre_order.buyer_notes && (
                 <div className="mt-4 pt-4 border-t">

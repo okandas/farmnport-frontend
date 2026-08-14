@@ -358,6 +358,10 @@ export function queryBuyerContacts(clientId: string) {
   return api.get(url)
 }
 
+export function queryClientMe() {
+  return api.get(`${BaseURL}/client/me`)
+}
+
 export function requestPhoneCode(phone: string) {
   return api.post(`${BaseURL}/client/phone/request-code`, { phone })
 }
@@ -1067,6 +1071,7 @@ export function createBooking(data: {
   collection_point_id?: string
   collection_point_name?: string
   delivery_date?: string
+  offer_price?: number // cents — supplier's offered price per unit
   // delivery
   delivery_location_id?: string
   goods_items?: GoodsItemPayload[]

@@ -302,29 +302,6 @@ async function fetchSprayPrograms() {
   }))
 }
 
-async function fetchCdmPrices() {
-  const apiUrl = getApiUrl()
-  if (!apiUrl) return []
-
-  try {
-    const response = await fetch(`${apiUrl}/cdmprices/all?p=1&limit=100`, { next: { revalidate: 86400 } })
-    if (!response.ok) return []
-    const data = await response.json()
-    const prices = data.data || []
-    return prices
-      .filter((p: any) => p.effectiveDate && !isNaN(new Date(p.effectiveDate).getTime()))
-      .map((p: any) => {
-        const pDate = new Date(p.effectiveDate).toISOString().split('T')[0]
-        return {
-          slug: `${p.client_name.toLowerCase().replace(/\s+/g, '-')}-${pDate}`,
-          effectiveDate: p.effectiveDate,
-        }
-      })
-  } catch (error) {
-    console.error('Error fetching CDM prices for sitemap:', error)
-    return []
-  }
-}
 
 async function fetchClients() {
   const apiUrl = getApiUrl()
@@ -356,40 +333,3 @@ async function fetchClients() {
   }
 }
 
-async function fetchPriceLists() {
-  const apiUrl = getApiUrl()
-  if (!apiUrl) return []
-
-  try {
-    let all: any[] = []
-    let page = 1
-
-    while (page <= 20 && all.length < 500) {
-      const response = await fetch(`${apiUrl}/prices/all?p=${page}&limit=100`, {
-        next: { revalidate: 3600 },
-      })
-      if (!response.ok) break
-
-      const data = await response.json()
-      const priceLists = data.data || []
-      if (priceLists.length === 0) break
-
-      const mapped = priceLists
-        .filter((pl: any) => pl.effectiveDate && !isNaN(new Date(pl.effectiveDate).getTime()))
-        .map((pl: any) => {
-          const plDate = new Date(pl.effectiveDate).toISOString().split('T')[0]
-          return {
-            slug: `${pl.client_name.toLowerCase().replace(/\s+/g, '-')}-${plDate}`,
-            effectiveDate: pl.effectiveDate,
-          }
-        })
-      all = [...all, ...mapped]
-      page++
-    }
-
-    return all
-  } catch (error) {
-    console.error('Error fetching price lists for sitemap:', error)
-    return []
-  }
-}

@@ -10,7 +10,8 @@ import { toast } from "sonner"
 import { driver } from "driver.js"
 import "driver.js/dist/driver.css"
 
-import { createBooking, queryClient as queryClientProfile } from "@/lib/query"
+import { createBooking, queryClient as queryClientProfile, queryClientMe } from "@/lib/query"
+import { plural, titleCase } from "@/lib/utilities"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ShareBar } from "@/components/shared/ShareBar"
 import { ProductImageGallery } from "@/components/shared/ProductImageGallery"
@@ -29,15 +30,16 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
   const queryClient = useQueryClient()
 
   const [quantity, setQuantity] = useState(String(preorder.min_quantity || 1))
+  const [offerPrice, setOfferPrice] = useState("")
   const [notes, setNotes] = useState("")
   const [fulfillment, setFulfillment] = useState<"collection" | "delivery" | "">("")
   const [selectedCollectionPoint, setSelectedCollectionPoint] = useState<{ id: string; name: string } | null>(null)
   const [selectedDeliveryDate, setSelectedDeliveryDate] = useState<Date | undefined>()
 
   const { data: profileData } = useQuery({
-    queryKey: ["my-profile", user?.username],
-    queryFn: () => queryClientProfile(user.username.replace(/ /g, "-")).then((r) => r.data),
-    enabled: !!user?.username,
+    queryKey: ["my-profile"],
+    queryFn: () => queryClientMe().then((r) => r.data),
+    enabled: !!user?.token,
   })
 
   const phone: string = profileData?.phone ?? ""
@@ -58,6 +60,7 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
         type: "pre-order",
         event_id: event?.id,
         quantity: parseInt(quantity),
+        offer_price: offerPrice ? Math.round(parseFloat(offerPrice) * 100) : undefined,
         phone,
         notes: notes || undefined,
         fulfillment_type: fulfillment || undefined,
@@ -208,27 +211,27 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
               <div className="flex gap-3 flex-wrap">
                 {isOpenEnded ? (
                   available > 0 ? (
-                    <span className="text-xs px-3 py-1 rounded-full bg-green-100 text-green-800 font-medium">Always Available</span>
+                    <span className="text-xs px-3 py-1 rounded-md bg-green-100 text-green-800 font-medium">Always Available</span>
                   ) : (
-                    <span className="text-xs px-3 py-1 rounded-full bg-orange-100 text-orange-800 font-medium">Pre-order for Next Batch</span>
+                    <span className="text-xs px-3 py-1 rounded-md bg-orange-100 text-orange-800 font-medium">Pre-order for Next Batch</span>
                   )
                 ) : (
-                  <span className="text-xs px-3 py-1 rounded-full bg-green-100 text-green-800 font-medium">{event.market_side === "demand" ? "Looking for suppliers" : "Open for bookings"}</span>
+                  <span className="text-xs px-3 py-1 rounded-md bg-green-100 text-green-800 font-medium">{event.market_side === "demand" ? "Looking for suppliers" : "Open for bookings"}</span>
                 )}
-                {available <= 20 && available > 0 && (
-                  <span className="text-xs px-3 py-1 rounded-full bg-red-100 text-red-800 font-medium">Only {available} left!</span>
+                {available > 0 && available <= event.total_available * 0.3 && (
+                  <span className="text-xs px-3 py-1 rounded-md bg-red-100 text-red-800 font-medium">Only {available} left!</span>
                 )}
               </div>
-              {event.unit_price > 0 && (
+              {event.total_available > 0 && (
               <div className="space-y-1.5">
                 <div className="flex justify-between text-xs">
-                  <span className="text-muted-foreground">{event.total_booked?.toLocaleString() ?? 0} of {event.total_available.toLocaleString()} {event.unit} booked</span>
-                  <span className="font-medium">{available.toLocaleString()} remaining</span>
+                  <span className="text-muted-foreground">{event.total_booked?.toLocaleString() ?? 0} of {event.total_available.toLocaleString()} {event.unit} {event.market_side === "demand" ? "supplied" : "booked"}</span>
+                  <span className="font-medium">{available.toLocaleString()} {event.market_side === "demand" ? "needed" : "remaining"}</span>
                 </div>
                 <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
                   <div
                     className={`h-full rounded-full transition-all ${
-                      available <= 20 ? "bg-red-500" : available <= event.total_available * 0.3 ? "bg-orange-500" : "bg-primary"
+                      available <= event.total_available * 0.1 ? "bg-red-500" : available <= event.total_available * 0.3 ? "bg-orange-500" : "bg-primary"
                     }`}
                     style={{ width: `${Math.min(100, ((event.total_booked ?? 0) / event.total_available) * 100)}%` }}
                   />
@@ -241,18 +244,18 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
           {/* ── Column 2: Details ── */}
           <div className="space-y-6">
             <div>
-              <h1 className="text-2xl font-bold leading-tight">{event.name}</h1>
+              <h1 className="text-2xl font-bold leading-tight">{titleCase(event.name)}</h1>
               {event.subtitle && <p className="text-sm text-muted-foreground mt-1">{event.subtitle}</p>}
               <div className="mt-3"><ShareBar name={event.name} /></div>
               <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground flex-wrap">
                 <span className="flex items-center gap-1.5">
                   <Users className="w-4 h-4" />
-                  {event.client_name}
+                  {titleCase(event.client_name)}
                 </span>
                 {event.produce_name && (
                   <span className="flex items-center gap-1.5">
                     <Package className="w-4 h-4" />
-                    {event.produce_name}
+                    {titleCase(event.produce_name)}
                   </span>
                 )}
               </div>
@@ -264,11 +267,17 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
 
             {/* Pricing & capacity */}
             <div className={`grid gap-3 ${depositEnabled && event.deposit_per_unit > 0 ? "grid-cols-2" : "grid-cols-1"}`}>
-              {event.unit_price > 0 && (
+              {event.unit_price > 0 ? (
               <div className="rounded-xl border bg-muted/30 p-4">
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Unit Price</p>
                 <p className="text-2xl font-bold">${(event.unit_price / 100 * 1.069).toFixed(2)}</p>
                 <p className="text-xs text-muted-foreground mt-1">per {event.unit || "unit"} incl. fees</p>
+              </div>
+              ) : (
+              <div className="rounded-xl border bg-muted/30 p-4">
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Offer Your Price</p>
+                <p className="text-lg font-bold">per {plural(event.unit || "unit", 1)}</p>
+                <p className="text-xs text-muted-foreground mt-1">Submit your price when you respond</p>
               </div>
               )}
               {depositEnabled && event.deposit_per_unit > 0 && (
@@ -281,22 +290,20 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
             </div>
 
             <div className="grid grid-cols-3 gap-3">
-              {event.unit_price > 0 && (
+              {event.total_available > 0 && (
               <div className="rounded-xl border bg-muted/30 p-4">
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">{event.market_side === "demand" ? "Quantity Needed" : "Available"}</p>
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2 min-h-[32px]">{event.market_side === "demand" ? "Quantity Needed" : "Available"}</p>
                 <p className="text-lg font-bold">{available.toLocaleString()}</p>
                 <p className="text-xs text-muted-foreground mt-1">of {event.total_available.toLocaleString()} {event.unit} total</p>
               </div>
               )}
-              {event.unit_price > 0 && (
               <div className="rounded-xl border bg-muted/30 p-4">
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">{event.market_side === "demand" ? "Min Supply" : "Min Order"}</p>
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2 min-h-[32px]">{event.market_side === "demand" ? "Min Supply" : "Min Order"}</p>
                 <p className="text-lg font-bold">{minQty.toLocaleString()}</p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  {event.max_quantity > 0 ? `max ${event.max_quantity.toLocaleString()} ${event.unit}` : `${event.unit} minimum`}
+                  {event.max_quantity > 0 ? `max ${event.max_quantity.toLocaleString()} ${plural(event.unit || "unit", event.max_quantity)}` : `${plural(event.unit || "unit", minQty)} minimum`}
                 </p>
               </div>
-              )}
               <div className="rounded-xl border bg-muted/30 p-4">
                 {isOpenEnded ? (
                   <>
@@ -405,6 +412,25 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
                   </div>
                 </div>
 
+                {/* Offer Price */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-muted-foreground">
+                    Your price per {plural(event.unit || "unit", 1)} {event.unit_price === 0 ? "*" : ""} (USD)
+                  </label>
+                  <div className="flex items-center gap-0 border border-input rounded-md overflow-hidden">
+                    <span className="h-9 w-10 flex items-center justify-center text-sm font-medium bg-muted shrink-0 border-r">$</span>
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      placeholder="0.00"
+                      value={offerPrice}
+                      onChange={(e) => setOfferPrice(e.target.value)}
+                      className="flex-1 h-9 px-3 text-sm bg-background outline-none"
+                    />
+                  </div>
+                </div>
+
                 {/* Fulfillment */}
                 {(() => {
                   const locs = [...(event.delivery_locations || []), ...(event.collection_locations || [])]
@@ -412,6 +438,24 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
                   const hasDelivery = hasDeliveryDates
                   if (!hasCollection && !hasDelivery) return null
 
+                  // Demand bookings: show delivery locations as static info
+                  if (event.market_side === "demand" && locs.length > 0) {
+                    return (
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-medium text-muted-foreground">Deliver to</label>
+                        <div className="space-y-2">
+                          {locs.map((loc: any) => (
+                            <div key={loc.id} className="rounded-lg border bg-muted/30 px-4 py-3">
+                              <p className="text-sm font-medium">{loc.name}</p>
+                              {loc.address && <p className="text-xs text-muted-foreground mt-0.5">{loc.address}</p>}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )
+                  }
+
+                  // Supply bookings: show collection point dropdown
                   // Auto-select if only one option
                   if (hasCollection && !hasDelivery && fulfillment !== "collection") setFulfillment("collection")
                   if (hasDelivery && !hasCollection && fulfillment !== "delivery") setFulfillment("delivery")
