@@ -1,4 +1,5 @@
 import { Body, Container, Head, Hr, Html, Link, Preview, Section, Text } from "@react-email/components"
+import { centsToDollars, plural, titleCase } from "@/lib/utilities"
 
 interface Props { bookingRef?: string; sellerName?: string; customerName?: string; productName?: string; quantity?: number; unit?: string; offerPrice?: number; buyerNotes?: string }
 
@@ -14,8 +15,8 @@ export default function PreorderRequestSellerEmail({
 }: Props) {
   const orderDetails = [
     `Produce   ${productName}`,
-    `Quantity  ${quantity} ${unit || "units"}`,
-    offerPrice > 0 ? `Offer     $${(offerPrice / 100).toFixed(2)} per ${unit || "unit"}` : "",
+    `Quantity  ${quantity} ${plural(unit || "unit", quantity)}`,
+    offerPrice > 0 ? `Offer     ${centsToDollars(offerPrice)} per ${plural(unit || "unit", 1)}` : "",
     buyerNotes ? `Notes     ${buyerNotes}` : "",
   ].filter(Boolean).join("\n")
 
@@ -33,12 +34,12 @@ export default function PreorderRequestSellerEmail({
 
           {/* Content */}
           <Section style={content}>
-            <Text style={greeting}>Hi {sellerName},</Text>
+            <Text style={greeting}>Hi {titleCase(sellerName)},</Text>
             <Text style={paragraph}>You have a new booking request on farmnport.</Text>
             <Text style={paragraph}>Booking reference: <strong>{bookingRef}</strong></Text>
             <Text style={paragraph}>Customer: <strong>{customerName}</strong></Text>
             <Text style={paragraph}>{orderDetails}</Text>
-            <Text style={paragraph}>Our team will review this request and coordinate with you shortly.</Text>
+            <Text style={paragraph}>Please accept or review this request — it expires in 48 hours.</Text>
           </Section>
 
           <Hr style={divider} />
