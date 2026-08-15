@@ -32,6 +32,7 @@ export { default as LotBidRejectedEmail } from "./templates/lots/lot-bid-rejecte
 // Pre-order templates
 export { default as PreorderRequestReceivedEmail } from "./templates/bookings/preorder-request-received"
 export { default as PreorderRequestAdminEmail } from "./templates/bookings/preorder-request-admin"
+export { default as PreorderRequestSellerEmail } from "./templates/bookings/preorder-request-seller"
 export { default as PreorderConfirmedEmail } from "./templates/bookings/preorder-confirmed"
 export { default as PreorderRejectedEmail } from "./templates/bookings/preorder-rejected"
 export { default as PreorderDepositPaidEmail } from "./templates/bookings/preorder-deposit-paid"
