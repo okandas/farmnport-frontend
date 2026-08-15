@@ -6,11 +6,13 @@ interface BlastEmailProps {
   subject?: string
   link?: string
   linkLabel?: string
+  link2?: string
+  linkLabel2?: string
 }
 
 const UTM = "?utm_source=blast&utm_medium=email&utm_campaign=custom_blast"
 
-export default function BlastEmail({ name = "Okandas", message = "", link, linkLabel }: BlastEmailProps) {
+export default function BlastEmail({ name = "Okandas", message = "", link, linkLabel, link2, linkLabel2 }: BlastEmailProps) {
   return (
     <Html lang="en">
       <Head />
@@ -28,7 +30,10 @@ export default function BlastEmail({ name = "Okandas", message = "", link, linkL
             <Text style={greeting}>Hi {name},</Text>
             <Text style={paragraph}>{message}</Text>
             {link && (
-              <Link href={link} style={inlineLink}>{linkLabel || link}</Link>
+              <Text style={{ margin: "0 0 8px" }}><Link href={link} style={inlineLink}>{linkLabel || link}</Link></Text>
+            )}
+            {link2 && (
+              <Text style={{ margin: "0 0 8px" }}><Link href={link2} style={inlineLink}>{linkLabel2 || link2}</Link></Text>
             )}
           </Section>
 
