@@ -40,6 +40,7 @@ export default function PreorderRequestSellerEmail({
             <Text style={paragraph}>Customer: <strong>{customerName}</strong></Text>
             <Text style={paragraph}>{orderDetails}</Text>
             <Text style={paragraph}>Please accept or review this request — it expires in 48 hours.</Text>
+            <Text style={{ margin: "0 0 8px" }}><Link href="https://farmnport.com/account/incoming-bookings" style={inlineLink}>Review Received Bids</Link></Text>
           </Section>
 
           <Hr style={divider} />
@@ -73,6 +74,7 @@ const greeting: React.CSSProperties = { fontSize: "18px", fontWeight: "600", col
 const paragraph: React.CSSProperties = { fontSize: "15px", lineHeight: "1.7", color: "#475569", margin: "0 0 16px", whiteSpace: "pre-wrap" }
 const divider: React.CSSProperties = { borderColor: "#e2e8f0", margin: "8px 40px" }
 const signoff: React.CSSProperties = { fontSize: "14px", color: "#64748b", lineHeight: "1.6", whiteSpace: "pre-wrap" }
+const inlineLink: React.CSSProperties = { color: "#ea580c", fontWeight: "600", textDecoration: "none" }
 const footer: React.CSSProperties = { padding: "16px 40px 32px" }
 const footerText: React.CSSProperties = { fontSize: "12px", color: "#94a3b8", margin: "0 0 4px", textAlign: "center" }
 const footerLink: React.CSSProperties = { color: "#94a3b8", textDecoration: "underline" }
