@@ -12,6 +12,7 @@ import { MobileNav } from "@/components/layouts/mobile-nav"
 import { AuthenticatedUser, AppURL } from "@/lib/schemas"
 import { capitalizeFirstLetter } from "@/lib/utilities"
 import { Button, buttonVariants } from "@/components/ui/button"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -242,15 +243,16 @@ function NavSearchBar({ router, onFocus }: { router: ReturnType<typeof useRouter
       }}
     >
       <div className="relative w-full flex items-center rounded-sm bg-muted p-0.5">
-        <select
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          className="h-8 pl-2 pr-1 text-xs font-medium bg-transparent border-r border-border/40 outline-none text-muted-foreground cursor-pointer shrink-0"
-        >
-          {SEARCH_CATEGORIES.map((c) => (
-            <option key={c.value} value={c.value}>{c.label}</option>
-          ))}
-        </select>
+        <Select value={category} onValueChange={setCategory}>
+          <SelectTrigger className="h-8 w-auto gap-1 border-0 border-r border-border/40 rounded-none bg-transparent text-xs font-medium text-muted-foreground shadow-none focus:ring-0 focus:ring-offset-0 shrink-0">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {SEARCH_CATEGORIES.map((c) => (
+              <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         <input
           type="text"
           placeholder="Search for products, guides, programs..."
