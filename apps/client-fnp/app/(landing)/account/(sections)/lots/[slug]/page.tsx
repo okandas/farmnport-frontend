@@ -13,10 +13,11 @@ import { AcceptedOfferCard } from "@/components/lots/AcceptedOfferCard"
 import { formatDistanceToNow } from "date-fns"
 
 const STATUS_STYLES: Record<string, string> = {
-  pending:   "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400",
-  accepted:  "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
-  rejected:  "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
-  closed:    "bg-muted text-muted-foreground",
+  pending:    "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400",
+  countered:  "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400",
+  accepted:   "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
+  rejected:   "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
+  closed:     "bg-muted text-muted-foreground",
 }
 
 function capitalize(s: string) {
@@ -27,11 +28,29 @@ export default function MyLotDetailPage({ params }: { params: Promise<{ slug: st
   const { slug } = use(params)
   const { data: session } = useSession()
   const [responding, setResponding] = useState<string | null>(null)
+  const [counterBidId, setCounterBidId] = useState<string | null>(null)
+  const [counterPrice, setCounterPrice] = useState("")
 
   async function handleRespond(bidId: string, action: "accept" | "reject") {
     setResponding(bidId + action)
     try {
       await respondToBid(bidId, { action })
+      await refetch()
+    } catch {
+      // silent
+    } finally {
+      setResponding(null)
+    }
+  }
+
+  async function handleCounter(bidId: string) {
+    const cents = Math.round(parseFloat(counterPrice) * 100)
+    if (!cents || cents <= 0) return
+    setResponding(bidId + "counter")
+    try {
+      await respondToBid(bidId, { action: "counter", price_per_unit_cents: cents })
+      setCounterBidId(null)
+      setCounterPrice("")
       await refetch()
     } catch {
       // silent
@@ -176,23 +195,80 @@ export default function MyLotDetailPage({ params }: { params: Promise<{ slug: st
                 </div>
                 <p className="font-semibold text-sm shrink-0">{centsToDollars(bid.offered_price_per_unit_cents)}</p>
               </div>
-              {!accepted && bid.status === "pending" && (
-                <div className="flex items-center gap-1.5 pl-15 sm:pl-0 sm:justify-end">
-                  <button
-                    disabled={!!responding}
-                    onClick={() => handleRespond(bid.id, "accept")}
-                    className="text-xs font-semibold px-3 py-1.5 rounded-md bg-green-600 text-white hover:bg-green-700 transition-colors disabled:opacity-50"
-                  >
-                    {responding === bid.id + "accept" ? <Loader2 className="w-3 h-3 animate-spin" /> : "Accept"}
-                  </button>
-                  <button
-                    disabled={!!responding}
-                    onClick={() => handleRespond(bid.id, "reject")}
-                    className="text-xs font-semibold px-3 py-1.5 rounded-md border hover:bg-muted transition-colors disabled:opacity-50"
-                  >
-                    {responding === bid.id + "reject" ? <Loader2 className="w-3 h-3 animate-spin" /> : "Decline"}
-                  </button>
+              {/* Counter-offer history */}
+              {bid.counter_offers?.length > 0 && (
+                <div className="pl-15 sm:pl-0 space-y-1">
+                  <p className="text-xs font-medium text-muted-foreground">Negotiation history</p>
+                  {bid.counter_offers.map((co: any, i: number) => (
+                    <div key={i} className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <span className="font-medium capitalize">{co.by_name}</span>
+                      <span>→</span>
+                      <span className="font-semibold text-foreground">{centsToDollars(co.price_per_unit_cents)}/{bid.unit}</span>
+                      {co.notes && <span className="italic">"{co.notes}"</span>}
+                      <span className="text-muted-foreground/60">{formatDistanceToNow(new Date(co.created_at), { addSuffix: true })}</span>
+                    </div>
+                  ))}
                 </div>
+              )}
+
+              {/* Action buttons — show for pending bids or countered bids where it's the owner's turn */}
+              {!accepted && (bid.status === "pending" || (bid.status === "countered" && bid.countered_by === "bidder")) && (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-1.5 pl-15 sm:pl-0 sm:justify-end">
+                    <button
+                      disabled={!!responding}
+                      onClick={() => handleRespond(bid.id, "accept")}
+                      className="text-xs font-semibold px-3 py-1.5 rounded-md bg-green-600 text-white hover:bg-green-700 transition-colors disabled:opacity-50"
+                    >
+                      {responding === bid.id + "accept" ? <Loader2 className="w-3 h-3 animate-spin" /> : "Accept"}
+                    </button>
+                    <button
+                      disabled={!!responding}
+                      onClick={() => setCounterBidId(counterBidId === bid.id ? null : bid.id)}
+                      className="text-xs font-semibold px-3 py-1.5 rounded-md bg-purple-600 text-white hover:bg-purple-700 transition-colors disabled:opacity-50"
+                    >
+                      Counter
+                    </button>
+                    <button
+                      disabled={!!responding}
+                      onClick={() => handleRespond(bid.id, "reject")}
+                      className="text-xs font-semibold px-3 py-1.5 rounded-md border hover:bg-muted transition-colors disabled:opacity-50"
+                    >
+                      {responding === bid.id + "reject" ? <Loader2 className="w-3 h-3 animate-spin" /> : "Decline"}
+                    </button>
+                  </div>
+
+                  {/* Inline counter-offer input */}
+                  {counterBidId === bid.id && (
+                    <div className="flex items-center gap-2 pl-15 sm:pl-0 sm:justify-end">
+                      <div className="flex items-center gap-1">
+                        <span className="text-xs text-muted-foreground">$</span>
+                        <input
+                          type="number"
+                          step="0.01"
+                          min="0.01"
+                          placeholder="Price per unit"
+                          value={counterPrice}
+                          onChange={(e) => setCounterPrice(e.target.value)}
+                          className="w-28 text-xs px-2 py-1.5 rounded-md border bg-background"
+                        />
+                        <span className="text-xs text-muted-foreground">/{bid.unit}</span>
+                      </div>
+                      <button
+                        disabled={!!responding || !counterPrice}
+                        onClick={() => handleCounter(bid.id)}
+                        className="text-xs font-semibold px-3 py-1.5 rounded-md bg-purple-600 text-white hover:bg-purple-700 transition-colors disabled:opacity-50"
+                      >
+                        {responding === bid.id + "counter" ? <Loader2 className="w-3 h-3 animate-spin" /> : "Send"}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Show waiting message when lot owner has countered */}
+              {bid.status === "countered" && bid.countered_by === "lot_owner" && (
+                <p className="text-xs text-muted-foreground pl-15 sm:pl-0 sm:text-right">Waiting for {bid.bidder_name} to respond to your counter-offer</p>
               )}
             </div>
           ))}

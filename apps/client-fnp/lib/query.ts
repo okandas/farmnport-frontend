@@ -274,7 +274,7 @@ export function queryMyBidOnLot(slug: string) {
   return api.get(`${BaseURL}/bids/mine/lot/${slug}`)
 }
 
-export function respondToBid(bidId: string, data: { action: "accept" | "reject"; notes?: string }) {
+export function respondToBid(bidId: string, data: { action: "accept" | "reject" | "counter"; notes?: string; price_per_unit_cents?: number }) {
   return api.patch(`${BaseURL}/bids/${bidId}/respond`, data)
 }
 

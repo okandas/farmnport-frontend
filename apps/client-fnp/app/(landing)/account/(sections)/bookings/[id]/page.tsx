@@ -152,7 +152,7 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
           </div>
           <span className={`inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full font-medium ${STATUS_STYLES[booking.status] ?? "bg-muted text-muted-foreground"}`}>
             {STATUS_ICONS[booking.status]}
-            {STATUS_LABELS[booking.status] ?? booking.status}
+            {booking.status === "confirmed" && booking.pre_order?.market_side === "demand" ? "Confirmed" : STATUS_LABELS[booking.status] ?? booking.status}
           </span>
         </div>
 

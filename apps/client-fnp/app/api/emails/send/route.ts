@@ -30,6 +30,7 @@ import {
   LotBidReceivedEmail,
   LotBidAcceptedEmail,
   LotBidRejectedEmail,
+  LotBidCounteredEmail,
   PhoneUpdateCodeEmail,
 } from "@/emails"
 
@@ -220,6 +221,11 @@ export async function POST(req: NextRequest) {
     case "lot-bid-rejected":
       subject = "Your offer was not accepted"
       html = await render(LotBidRejectedEmail(props as Parameters<typeof LotBidRejectedEmail>[0]))
+      break
+
+    case "lot-bid-countered":
+      subject = `Counter-offer received — lot ${(props as { lotSlug?: string }).lotSlug ?? ""}`
+      html = await render(LotBidCounteredEmail(props as Parameters<typeof LotBidCounteredEmail>[0]))
       break
 
     default:

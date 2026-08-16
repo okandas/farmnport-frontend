@@ -5,19 +5,20 @@ import { useSession } from "next-auth/react"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { Loader2, ChevronLeft } from "lucide-react"
 import Link from "next/link"
-import { myBidByID, initiateBidPayment, pollBidPayment } from "@/lib/query"
+import { myBidByID, initiateBidPayment, pollBidPayment, respondToBid } from "@/lib/query"
 import { trackPurchase } from "@/lib/analytics"
 import { centsToDollars } from "@/lib/utilities"
 import { LotImageGallery } from "@/components/ui/lot-image-gallery"
 import { AcceptedOfferCard } from "@/components/lots/AcceptedOfferCard"
 
 const STATUS_STYLES: Record<string, string> = {
-  pending:   "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400",
-  accepted:  "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
-  rejected:  "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
-  paid:      "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
-  completed: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
-  expired:   "bg-muted text-muted-foreground",
+  pending:    "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400",
+  countered:  "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400",
+  accepted:   "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
+  rejected:   "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
+  paid:       "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
+  completed:  "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
+  expired:    "bg-muted text-muted-foreground",
 }
 
 function capitalize(s: string) {
@@ -51,6 +52,38 @@ export default function BidDetailPage({ params }: { params: Promise<{ id: string
     enabled: !!session && !!id,
     refetchOnMount: "always",
   })
+
+  const [responding, setResponding] = useState<string | null>(null)
+  const [counterPrice, setCounterPrice] = useState("")
+  const [showCounterInput, setShowCounterInput] = useState(false)
+
+  async function handleBidderRespond(action: "accept" | "reject") {
+    setResponding(action)
+    try {
+      await respondToBid(id, { action })
+      await refetch()
+    } catch {
+      // silent
+    } finally {
+      setResponding(null)
+    }
+  }
+
+  async function handleBidderCounter() {
+    const cents = Math.round(parseFloat(counterPrice) * 100)
+    if (!cents || cents <= 0) return
+    setResponding("counter")
+    try {
+      await respondToBid(id, { action: "counter", price_per_unit_cents: cents })
+      setShowCounterInput(false)
+      setCounterPrice("")
+      await refetch()
+    } catch {
+      // silent
+    } finally {
+      setResponding(null)
+    }
+  }
 
   // Poll Paynow only after buyer clicks Pay Now (not for suppliers)
   const [polling, setPolling] = useState(false)
@@ -156,6 +189,10 @@ export default function BidDetailPage({ params }: { params: Promise<{ id: string
               ? `Your offer to buy ${bid.quantity} ${bid.unit} at ${centsToDollars(bid.offered_price_per_unit_cents)} per ${bid.unit} was accepted. Complete payment of ${centsToDollars(bid.offered_price_per_unit_cents * bid.quantity)} to secure this lot.`
               : isBuyer && isPaid
               ? `You bought ${bid.quantity} ${bid.unit} at ${centsToDollars(bid.offered_price_per_unit_cents)} per ${bid.unit}. Payment of ${centsToDollars(bid.offered_price_per_unit_cents * bid.quantity)} confirmed. The seller will arrange delivery within 2 days.`
+              : bid.status === "countered" && bid.countered_by === "lot_owner"
+              ? `The seller made a counter-offer of ${centsToDollars(bid.offered_price_per_unit_cents)} per ${bid.unit} (total ${centsToDollars(bid.total_cents)}). You can accept, decline, or counter back.`
+              : bid.status === "countered" && bid.countered_by === "bidder"
+              ? `You counter-offered ${centsToDollars(bid.offered_price_per_unit_cents)} per ${bid.unit}. Waiting for the seller to respond.`
               : `You offered to buy ${bid.quantity} ${bid.unit} at ${centsToDollars(bid.offered_price_per_unit_cents)} per ${bid.unit}. Waiting for the seller to review your offer.`
             }
           </p>
@@ -176,6 +213,76 @@ export default function BidDetailPage({ params }: { params: Promise<{ id: string
           My Offers
         </Link>
       </div>
+
+      {/* Counter-offer history */}
+      {bid.counter_offers?.length > 0 && (
+        <div className="mb-6 space-y-2">
+          <p className="text-sm font-semibold">Negotiation history</p>
+          <div className="space-y-1.5">
+            {bid.counter_offers.map((co: any, i: number) => (
+              <div key={i} className="flex items-center gap-2 text-sm text-muted-foreground">
+                <span className="font-medium capitalize text-foreground">{co.by_name}</span>
+                <span>→</span>
+                <span className="font-semibold text-foreground">{centsToDollars(co.price_per_unit_cents)}/{bid.unit}</span>
+                {co.notes && <span className="italic">"{co.notes}"</span>}
+                <span className="text-xs text-muted-foreground/60">{formatDate(co.created_at)}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Bidder response to counter-offer */}
+      {bid.status === "countered" && bid.countered_by === "lot_owner" && (
+        <div className="mb-8 p-4 rounded-lg border border-purple-200 bg-purple-50 dark:border-purple-800 dark:bg-purple-950/30 space-y-3">
+          <p className="text-sm font-semibold">Respond to counter-offer</p>
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              disabled={!!responding}
+              onClick={() => handleBidderRespond("accept")}
+              className="text-xs font-semibold px-4 py-2 rounded-md bg-green-600 text-white hover:bg-green-700 transition-colors disabled:opacity-50"
+            >
+              {responding === "accept" ? <Loader2 className="w-3 h-3 animate-spin" /> : `Accept at ${centsToDollars(bid.offered_price_per_unit_cents)}/${bid.unit}`}
+            </button>
+            <button
+              disabled={!!responding}
+              onClick={() => setShowCounterInput(!showCounterInput)}
+              className="text-xs font-semibold px-4 py-2 rounded-md bg-purple-600 text-white hover:bg-purple-700 transition-colors disabled:opacity-50"
+            >
+              Counter
+            </button>
+            <button
+              disabled={!!responding}
+              onClick={() => handleBidderRespond("reject")}
+              className="text-xs font-semibold px-4 py-2 rounded-md border hover:bg-muted transition-colors disabled:opacity-50"
+            >
+              {responding === "reject" ? <Loader2 className="w-3 h-3 animate-spin" /> : "Decline"}
+            </button>
+          </div>
+          {showCounterInput && (
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">$</span>
+              <input
+                type="number"
+                step="0.01"
+                min="0.01"
+                placeholder="Your price per unit"
+                value={counterPrice}
+                onChange={(e) => setCounterPrice(e.target.value)}
+                className="w-32 text-sm px-3 py-2 rounded-md border bg-background"
+              />
+              <span className="text-sm text-muted-foreground">/{bid.unit}</span>
+              <button
+                disabled={!!responding || !counterPrice}
+                onClick={handleBidderCounter}
+                className="text-xs font-semibold px-4 py-2 rounded-md bg-purple-600 text-white hover:bg-purple-700 transition-colors disabled:opacity-50"
+              >
+                {responding === "counter" ? <Loader2 className="w-3 h-3 animate-spin" /> : "Send Counter"}
+              </button>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Image + Details */}
       <div className="flex flex-col sm:flex-row gap-6 mb-8">
