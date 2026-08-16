@@ -12,6 +12,7 @@ import { MobileNav } from "@/components/layouts/mobile-nav"
 import { AuthenticatedUser, AppURL } from "@/lib/schemas"
 import { capitalizeFirstLetter } from "@/lib/utilities"
 import { Button, buttonVariants } from "@/components/ui/button"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -134,8 +135,7 @@ const NAV_GROUPS: { name: string; subcategories: { name: string; href: string; b
   },
 ]
 
-function SelectCategory() {
-  const [open, setOpen] = useState(false)
+function SelectCategory({ open, setOpen }: { open: boolean; setOpen: (v: boolean) => void }) {
   const [activeIndex, setActiveIndex] = useState(0)
 
   return (
@@ -224,7 +224,7 @@ const SEARCH_CATEGORIES = [
   { value: "lots", label: "Lots" },
 ]
 
-function NavSearchBar({ router }: { router: ReturnType<typeof useRouter> }) {
+function NavSearchBar({ router, onFocus }: { router: ReturnType<typeof useRouter>; onFocus?: () => void }) {
   const [category, setCategory] = useState("all")
 
   return (
@@ -243,19 +243,21 @@ function NavSearchBar({ router }: { router: ReturnType<typeof useRouter> }) {
       }}
     >
       <div className="relative w-full flex items-center rounded-sm bg-muted p-0.5">
-        <select
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          className="h-8 pl-2 pr-1 text-xs font-medium bg-transparent border-r border-border/40 outline-none text-muted-foreground cursor-pointer shrink-0"
-        >
-          {SEARCH_CATEGORIES.map((c) => (
-            <option key={c.value} value={c.value}>{c.label}</option>
-          ))}
-        </select>
+        <Select value={category} onValueChange={setCategory}>
+          <SelectTrigger className="h-8 w-auto gap-1 border-0 border-r border-border/40 rounded-none bg-transparent text-xs font-medium text-muted-foreground shadow-none focus:ring-0 focus:ring-offset-0 shrink-0">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {SEARCH_CATEGORIES.map((c) => (
+              <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         <input
           type="text"
           placeholder="Search for products, guides, programs..."
           className="flex-1 h-8 pl-3 pr-12 text-sm bg-transparent outline-none placeholder:text-muted-foreground/60"
+          onFocus={onFocus}
         />
         <button type="submit" className="absolute right-0.5 top-1/2 -translate-y-1/2 h-8 w-9 flex items-center justify-center rounded-sm bg-primary text-primary-foreground hover:bg-primary/90 transition-colors">
           <Search className="h-4 w-4" />
@@ -328,6 +330,7 @@ export function SiteHeader() {
   const { data: session } = useSession()
   const user = (session?.user as AuthenticatedUser) ?? undefined
   const router = useRouter()
+  const [categoryOpen, setCategoryOpen] = useState(false)
 
   // Cmd+K navigates to search
   useEffect(() => {
@@ -352,10 +355,10 @@ export function SiteHeader() {
         </Link>
 
         {/* Select Category */}
-        <SelectCategory />
+        <SelectCategory open={categoryOpen} setOpen={setCategoryOpen} />
 
         {/* Search bar — takes remaining space */}
-        <NavSearchBar router={router} />
+        <NavSearchBar router={router} onFocus={() => setCategoryOpen(false)} />
 
         {/* Right side actions */}
         <div className="hidden lg:flex items-center gap-2">
