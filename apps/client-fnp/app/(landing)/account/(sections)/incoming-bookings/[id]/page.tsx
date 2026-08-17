@@ -4,10 +4,11 @@ import { useState, use } from "react"
 import { useSession } from "next-auth/react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { Loader2, CheckCircle2, Circle, Truck } from "lucide-react"
+import { sendGTMEvent } from "@next/third-parties/google"
 import Link from "next/link"
 import { toast } from "sonner"
 
-import { getIncomingBooking, buyerUpdateBookingStatus, clientConfirmBooking, clientRejectBooking, clientMarkReady, clientMarkCollected } from "@/lib/query"
+import { getIncomingBooking, buyerUpdateBookingStatus, clientConfirmBooking, clientRejectBooking, clientCashPayment, clientMarkReady, clientMarkCollected } from "@/lib/query"
 import { centsToDollars, platformFee, withPlatformFee, plural } from "@/lib/utilities"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 
@@ -66,11 +67,23 @@ function formatDateTime(d: string) {
   return new Date(d).toLocaleString("en-GB", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })
 }
 
-function Field({ label, value }: { label: string; value?: string | null }) {
+function Field({ label, value, className }: { label: string; value?: string | null; className?: string }) {
+  return (
+    <div className={className}>
+      <p className="text-xs text-muted-foreground">{label}</p>
+      <p className="text-sm font-medium mt-0.5 break-all">{value || "—"}</p>
+    </div>
+  )
+}
+
+function ContactField({ label, value, href, event }: { label: string; value?: string | null; href: string; event: string }) {
+  if (!value) return <Field label={label} value={value} />
   return (
     <div>
       <p className="text-xs text-muted-foreground">{label}</p>
-      <p className="text-sm font-medium mt-0.5">{value || "—"}</p>
+      <a href={href} onClick={() => sendGTMEvent({ event: "contact_click", method: event, value })} className="text-sm font-medium text-primary hover:underline break-all mt-0.5 block">
+        {value}
+      </a>
     </div>
   )
 }
@@ -158,6 +171,12 @@ export default function IncomingBookingDetailPage({ params }: { params: Promise<
     onError: () => toast.error("Failed to reject"),
   })
 
+  const cashPaymentMutation = useMutation({
+    mutationFn: () => clientCashPayment(id),
+    onSuccess: () => { toast.success("Cash payment recorded — marked ready for collection"); invalidate() },
+    onError: (err: any) => toast.error(err?.response?.data?.message || "Failed to update"),
+  })
+
   const readyMutation = useMutation({
     mutationFn: () => clientMarkReady(id),
     onSuccess: () => { toast.success("Marked as ready — buyer notified"); invalidate() },
@@ -229,8 +248,8 @@ export default function IncomingBookingDetailPage({ params }: { params: Promise<
               ) : (
               <>
                 <Field label="Name"  value={booking.client_name} />
-                <Field label="Phone" value={booking.client_phone} />
-                <Field label="Email" value={booking.client_email} />
+                <ContactField label="Phone" value={booking.client_phone} href={`tel:${booking.client_phone}`} event="phone" />
+                <ContactField label="Email" value={booking.client_email} href={`mailto:${booking.client_email}`} event="email" />
               </>
               )}
             </div>
@@ -382,7 +401,16 @@ export default function IncomingBookingDetailPage({ params }: { params: Promise<
               )}
 
               {["confirmed", "pending_payment"].includes(booking.status) && (
-                <p className="text-xs text-muted-foreground text-center">Waiting for buyer to pay</p>
+                <>
+                  <button
+                    onClick={() => cashPaymentMutation.mutate()}
+                    disabled={cashPaymentMutation.isPending}
+                    className="w-full py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90"
+                  >
+                    {cashPaymentMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : "Cash Payment"}
+                  </button>
+                  <p className="text-xs text-muted-foreground text-center">Online payments coming soon</p>
+                </>
               )}
             </div>
           )}

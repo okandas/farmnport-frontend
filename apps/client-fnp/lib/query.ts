@@ -362,6 +362,10 @@ export function queryClientMe() {
   return api.get(`${BaseURL}/client/me`)
 }
 
+export function updateNotificationPrefs(data: { whatsapp_opt_in?: boolean; email_opt_in?: boolean }) {
+  return api.post(`${BaseURL}/client/notification-prefs`, data)
+}
+
 export function requestPhoneCode(phone: string) {
   return api.post(`${BaseURL}/client/phone/request-code`, { phone })
 }
@@ -1152,6 +1156,10 @@ export function clientConfirmBooking(id: string) {
 
 export function clientRejectBooking(id: string, reason: string) {
   return api.put(`${BaseURL}/booking/client/${id}/reject`, { reason })
+}
+
+export function clientCashPayment(id: string) {
+  return api.put(`${BaseURL}/booking/client/${id}/cash-payment`, {})
 }
 
 export function clientMarkReady(id: string) {
