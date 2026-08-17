@@ -5,7 +5,7 @@ import { PreOrdersTable } from "@/components/structures/tables/preorders"
 export default function PreOrdersPage() {
   return (
     <DashboardShell>
-      <DashboardHeader heading="Pre-Orders" text="Create and manage pre-order listings." />
+      <DashboardHeader heading="Bookings" text="Create and manage booking listings." />
       <PreOrdersTable />
     </DashboardShell>
   )
