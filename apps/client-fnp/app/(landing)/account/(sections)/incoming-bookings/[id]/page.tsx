@@ -81,7 +81,7 @@ function ContactField({ label, value, href, event }: { label: string; value?: st
   return (
     <div>
       <p className="text-xs text-muted-foreground">{label}</p>
-      <a href={href} onClick={() => sendGTMEvent({ event: "contact_click", method: event, value })} className="text-sm font-medium text-primary hover:underline break-all mt-0.5 block">
+      <a href={href} onClick={() => sendGTMEvent({ event: "contact_click", method: event, value })} className="text-sm font-medium text-foreground hover:underline break-all mt-0.5 block">
         {value}
       </a>
     </div>
@@ -241,18 +241,15 @@ export default function IncomingBookingDetailPage({ params }: { params: Promise<
 
           {/* Farmer details */}
           <div className="border rounded-xl p-5">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-4">Supplier</p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              {booking.status === "pending" ? (
-                <Field label="Name" value={booking.client_name} />
-              ) : (
-              <>
-                <Field label="Name"  value={booking.client_name} />
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">
+              Supplier: <span className="text-foreground capitalize">{booking.client_name}</span>
+            </p>
+            {booking.status !== "pending" && (
+              <div className="grid grid-cols-2 gap-4 mt-3">
                 <ContactField label="Phone" value={booking.client_phone} href={`tel:${booking.client_phone}`} event="phone" />
                 <ContactField label="Email" value={booking.client_email} href={`mailto:${booking.client_email}`} event="email" />
-              </>
-              )}
-            </div>
+              </div>
+            )}
           </div>
 
           {/* Delivery details */}
