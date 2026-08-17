@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { Suspense, useState, useEffect } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { useSearchParams } from "next/navigation"
 import { PaginationState } from "@tanstack/react-table"
@@ -25,6 +25,14 @@ const statusOptions = [
 ]
 
 export default function ChefBookingsPage() {
+  return (
+    <Suspense fallback={<DashboardShell><FormSkeleton /></DashboardShell>}>
+      <ChefBookingsContent />
+    </Suspense>
+  )
+}
+
+function ChefBookingsContent() {
   const searchParams = useSearchParams()
   const chefID = searchParams.get("chef_id") ?? ""
   const [statusFilter, setStatusFilter] = useState<Set<string>>(new Set())
