@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { useSession } from "next-auth/react"
 import { useQuery } from "@tanstack/react-query"
 import { toast } from "sonner"
-import { requestPhoneCode, verifyPhoneCode, myBookings, incomingBookings } from "@/lib/query"
+import { requestPhoneCode, verifyPhoneCode, myBookings, incomingBookings, updateNotificationPrefs } from "@/lib/query"
 import { BaseURL } from "@/lib/schemas"
 import axios from "axios"
 import Link from "next/link"
@@ -23,6 +23,8 @@ export default function AccountProfilePage() {
     const [currentEmail, setCurrentEmail] = useState("")
     const [loading, setLoading] = useState(false)
     const [fetching, setFetching] = useState(true)
+    const [whatsappOptIn, setWhatsappOptIn] = useState(true)
+    const [emailOptIn, setEmailOptIn] = useState(true)
 
     useEffect(() => {
         if (!user?.token) return
@@ -31,6 +33,8 @@ export default function AccountProfilePage() {
         }).then(res => {
             setCurrentPhone(res.data?.phone || "")
             setCurrentEmail(res.data?.email || user?.email || "")
+            setWhatsappOptIn(res.data?.whatsapp_opt_in ?? true)
+            setEmailOptIn(res.data?.email_opt_in ?? true)
         }).catch(() => {}).finally(() => setFetching(false))
     }, [user])
 
@@ -181,6 +185,64 @@ export default function AccountProfilePage() {
                             </div>
                         </div>
                     )}
+                </div>
+            </div>
+
+            {/* Notification preferences */}
+            <div className="border rounded-xl">
+                <div className="px-5 py-4">
+                    <h2 className="text-base font-bold">Notification preferences</h2>
+                    <p className="text-xs text-muted-foreground mt-1">Choose how you want to hear from us</p>
+                </div>
+                <div className="divide-y">
+                    <label className="flex items-center justify-between px-5 py-4 cursor-pointer">
+                        <div>
+                            <p className="text-sm font-medium">WhatsApp notifications</p>
+                            <p className="text-xs text-muted-foreground mt-0.5">Order updates, delivery alerts, and price changes</p>
+                        </div>
+                        <button
+                            role="switch"
+                            aria-checked={whatsappOptIn}
+                            onClick={async () => {
+                                const next = !whatsappOptIn
+                                setWhatsappOptIn(next)
+                                try {
+                                    await updateNotificationPrefs({ whatsapp_opt_in: next })
+                                    toast.success(next ? "WhatsApp notifications enabled" : "WhatsApp notifications disabled")
+                                } catch {
+                                    setWhatsappOptIn(!next)
+                                    toast.error("Failed to update preference")
+                                }
+                            }}
+                            className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${whatsappOptIn ? "bg-primary" : "bg-muted"}`}
+                        >
+                            <span className={`inline-block h-4 w-4 rounded-full bg-white transition-transform ${whatsappOptIn ? "translate-x-6" : "translate-x-1"}`} />
+                        </button>
+                    </label>
+                    <label className="flex items-center justify-between px-5 py-4 cursor-pointer">
+                        <div>
+                            <p className="text-sm font-medium">Email notifications</p>
+                            <p className="text-xs text-muted-foreground mt-0.5">Platform updates, announcements, and offers</p>
+                        </div>
+                        <button
+                            role="switch"
+                            aria-checked={emailOptIn}
+                            onClick={async () => {
+                                const next = !emailOptIn
+                                setEmailOptIn(next)
+                                try {
+                                    await updateNotificationPrefs({ email_opt_in: next })
+                                    toast.success(next ? "Email notifications enabled" : "Email notifications disabled")
+                                } catch {
+                                    setEmailOptIn(!next)
+                                    toast.error("Failed to update preference")
+                                }
+                            }}
+                            className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${emailOptIn ? "bg-primary" : "bg-muted"}`}
+                        >
+                            <span className={`inline-block h-4 w-4 rounded-full bg-white transition-transform ${emailOptIn ? "translate-x-6" : "translate-x-1"}`} />
+                        </button>
+                    </label>
                 </div>
             </div>
 

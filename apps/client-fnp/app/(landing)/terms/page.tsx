@@ -18,7 +18,8 @@ const sections = [
   { id: 'indemnification', title: '9. Indemnification' },
   { id: 'modifications', title: '10. Modifications to terms' },
   { id: 'governing-law', title: '11. Governing law' },
-  { id: 'contact', title: '12. Contact us' },
+  { id: 'communications', title: '12. Communications and notifications' },
+  { id: 'contact', title: '13. Contact us' },
 ]
 
 export default function TermsOfServicePage() {
@@ -28,7 +29,7 @@ export default function TermsOfServicePage() {
         {/* Header */}
         <div className="mb-12">
           <h1 className="text-4xl font-heading font-bold tracking-tight mb-3">Terms of Service</h1>
-          <p className="text-sm text-muted-foreground">Last updated: March 2026</p>
+          <p className="text-sm text-muted-foreground">Last updated: August 2026</p>
         </div>
 
         {/* Intro */}
@@ -188,8 +189,28 @@ export default function TermsOfServicePage() {
           </section>
 
           {/* 12 */}
+          <section id="communications">
+            <h2 className="text-xl font-semibold mb-4">12. Communications and notifications</h2>
+            <p className="text-sm leading-6 text-muted-foreground mb-3">
+              By creating an account on Farmnport, you consent to receive communications from Farmnport, including but not limited to:
+            </p>
+            <ul className="list-disc pl-5 space-y-1.5 text-sm leading-6 text-muted-foreground mb-4">
+              <li><span className="font-semibold">Email notifications</span> &mdash; order updates, account activity, platform announcements, and promotional content</li>
+              <li><span className="font-semibold">WhatsApp notifications</span> &mdash; order updates, delivery alerts, price changes, and other service-related messages sent to the phone number associated with your account</li>
+            </ul>
+            <p className="text-sm leading-6 text-muted-foreground mb-3">
+              You may opt out of WhatsApp notifications or email communications at any time through your account settings at{' '}
+              <a href="/account/profile" className="underline hover:text-foreground">farmnport.com/account/profile</a>.
+              Opting out of certain transactional notifications (such as order confirmations and security alerts) is not available, as these are essential to the operation of your account.
+            </p>
+            <p className="text-sm leading-6 text-muted-foreground">
+              By providing your phone number during registration, you acknowledge that Farmnport may contact you via WhatsApp for service-related communications. Farmnport will not share your phone number with third parties for marketing purposes.
+            </p>
+          </section>
+
+          {/* 13 */}
           <section id="contact">
-            <h2 className="text-xl font-semibold mb-4">12. Contact us</h2>
+            <h2 className="text-xl font-semibold mb-4">13. Contact us</h2>
             <p className="text-sm leading-6 text-muted-foreground mb-4">
               If you have any questions about these Terms of Service, please contact us:
             </p>

@@ -27,6 +27,7 @@ import {
   PreorderCollectedEmail,
   PreorderExpiredEmail,
   MarketingLaunchEmail,
+  TermsUpdateEmail,
   LotBidReceivedEmail,
   LotBidAcceptedEmail,
   LotBidRejectedEmail,
@@ -135,6 +136,13 @@ export async function POST(req: NextRequest) {
       const p = props as Parameters<typeof MarketingLaunchEmail>[0]
       subject = "New ways to trade on farmnport — bookings and lots"
       html = await render(MarketingLaunchEmail(p))
+      break
+    }
+
+    case "terms-update": {
+      const p = props as Parameters<typeof TermsUpdateEmail>[0]
+      subject = "We've updated our Terms of Service"
+      html = await render(TermsUpdateEmail(p))
       break
     }
 
