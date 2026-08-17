@@ -37,6 +37,7 @@ export { default as PreorderRequestAdminEmail } from "./templates/bookings/preor
 export { default as PreorderRequestSellerEmail } from "./templates/bookings/preorder-request-seller"
 export { default as PreorderConfirmedEmail } from "./templates/bookings/preorder-confirmed"
 export { default as PreorderRejectedEmail } from "./templates/bookings/preorder-rejected"
+export { default as PreorderEventRejectedEmail } from "./templates/bookings/preorder-event-rejected"
 export { default as PreorderDepositPaidEmail } from "./templates/bookings/preorder-deposit-paid"
 export { default as PreorderDepositPaidAdminEmail } from "./templates/bookings/preorder-deposit-paid-admin"
 export { default as PreorderReadyEmail } from "./templates/bookings/preorder-ready"
