@@ -1633,6 +1633,10 @@ export function approvePreOrderStock(preOrderId: string, actualQuantity?: number
   return api.post(`${baseUrl}/booking/admin/preorders/${preOrderId}/approve-stock`, { actual_quantity: actualQuantity || 0 })
 }
 
+export function rejectPreOrderEvent(preOrderId: string, reason: string) {
+  return api.put(`${baseUrl}/booking/admin/preorders/${preOrderId}/reject`, { reason })
+}
+
 export function queryAdminPreOrders(status?: string) {
   const qs = status ? `?status=${status}` : ""
   return api.get(`${baseUrl}/booking/admin/preorders${qs}`)

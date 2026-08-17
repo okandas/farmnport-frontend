@@ -3,10 +3,10 @@
 import { use, useState } from "react"
 import { PaginationState } from "@tanstack/react-table"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { Loader2, ArrowLeft, Package, Users, CalendarDays, CheckCircle2 } from "lucide-react"
+import { Loader2, ArrowLeft, Package, Users, CalendarDays, CheckCircle2, XCircle } from "lucide-react"
 import Link from "next/link"
 
-import { queryAdminPreOrders, queryPreOrderBookings, approvePreOrderStock } from "@/lib/query"
+import { queryAdminPreOrders, queryPreOrderBookings, approvePreOrderStock, rejectPreOrderEvent } from "@/lib/query"
 import { centsToDollars } from "@/lib/utilities"
 import { toast } from "@/components/ui/use-toast"
 import { FormSkeleton } from "@/components/state/skeleton-table"
@@ -45,6 +45,7 @@ const EVENT_STATUS_STYLES: Record<string, string> = {
   pending_stock_approval: "bg-purple-100 text-purple-800",
   fulfilled:              "bg-blue-100 text-blue-800",
   cancelled:              "bg-red-100 text-red-800",
+  rejected:               "bg-red-100 text-red-800",
 }
 
 function formatDate(d: string) {
@@ -64,6 +65,8 @@ export default function PreOrderDetailPage({ params }: { params: Promise<{ id: s
   const queryClient = useQueryClient()
   const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: 20 })
   const [search, setSearch] = useState("")
+  const [rejectOpen, setRejectOpen] = useState(false)
+  const [rejectReason, setRejectReason] = useState("")
 
   const { data: eventsData, isLoading: eventsLoading } = useQuery({
     queryKey: ["admin-preorders"],
@@ -85,6 +88,17 @@ export default function PreOrderDetailPage({ params }: { params: Promise<{ id: s
       queryClient.invalidateQueries({ queryKey: ["preorder-bookings", id] })
     },
     onError: (err: any) => toast({ description: err?.response?.data?.message || "Failed to approve stock", variant: "destructive" }),
+  })
+
+  const rejectMutation = useMutation({
+    mutationFn: () => rejectPreOrderEvent(id, rejectReason),
+    onSuccess: () => {
+      toast({ description: "Pre-order event rejected" })
+      setRejectOpen(false)
+      setRejectReason("")
+      queryClient.invalidateQueries({ queryKey: ["admin-preorders"] })
+    },
+    onError: (err: any) => toast({ description: err?.response?.data?.message || "Failed to reject event", variant: "destructive" }),
   })
 
   if (eventsLoading || bookingsLoading) {
@@ -124,14 +138,65 @@ export default function PreOrderDetailPage({ params }: { params: Promise<{ id: s
               {capitalize(event.status)}
             </span>
           </div>
-          <Link
-            href={`/dashboard/farmnport/orders/booking-preorders/${id}/edit`}
-            className="text-sm text-primary hover:underline"
-          >
-            Edit
-          </Link>
+          <div className="flex items-center gap-3">
+            {(event.status === "draft" || event.status === "open") && (
+              <button
+                onClick={() => setRejectOpen(true)}
+                className="inline-flex items-center gap-1.5 text-sm text-red-600 hover:text-red-700 font-medium"
+              >
+                <XCircle className="w-3.5 h-3.5" /> Reject
+              </button>
+            )}
+            <Link
+              href={`/dashboard/farmnport/orders/booking-preorders/${id}/edit`}
+              className="text-sm text-primary hover:underline"
+            >
+              Edit
+            </Link>
+          </div>
         </div>
       </div>
+
+      {/* Reject dialog */}
+      {rejectOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white rounded-xl p-6 w-full max-w-md shadow-lg">
+            <h2 className="text-lg font-bold mb-1">Reject Pre-Order Event</h2>
+            <p className="text-sm text-muted-foreground mb-4">This will notify {event.client_name} via email and SMS.</p>
+            <textarea
+              value={rejectReason}
+              onChange={(e) => setRejectReason(e.target.value)}
+              placeholder="Reason for rejection..."
+              rows={3}
+              className="w-full border rounded-lg px-3 py-2 text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-red-500"
+            />
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => { setRejectOpen(false); setRejectReason("") }}
+                className="text-sm px-4 py-2 rounded-lg border hover:bg-muted/50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => rejectMutation.mutate()}
+                disabled={!rejectReason.trim() || rejectMutation.isPending}
+                className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
+              >
+                {rejectMutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
+                Reject
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Rejected banner */}
+      {event.status === "rejected" && (
+        <div className="border border-red-200 bg-red-50 rounded-xl p-4 mb-8">
+          <p className="text-sm text-red-800 font-medium">This pre-order event was rejected.</p>
+          {event.reject_reason && <p className="text-sm text-red-700 mt-1">Reason: {event.reject_reason}</p>}
+        </div>
+      )}
 
       {/* Summary cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">

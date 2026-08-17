@@ -21,6 +21,7 @@ import {
   PreorderRequestSellerEmail,
   PreorderConfirmedEmail,
   PreorderRejectedEmail,
+  PreorderEventRejectedEmail,
   PreorderDepositPaidEmail,
   PreorderDepositPaidAdminEmail,
   PreorderReadyEmail,
@@ -189,6 +190,11 @@ export async function POST(req: NextRequest) {
     case "preorder-rejected":
       subject = `Booking Not Fulfilled — ${(props as { bookingRef?: string }).bookingRef ?? ""}`
       html = await render(PreorderRejectedEmail(props as Parameters<typeof PreorderRejectedEmail>[0]))
+      break
+
+    case "preorder-event-rejected":
+      subject = `Booking Listing Not Approved — ${(props as { eventTitle?: string }).eventTitle ?? ""}`
+      html = await render(PreorderEventRejectedEmail(props as Parameters<typeof PreorderEventRejectedEmail>[0]))
       break
 
     case "preorder-deposit-paid":
