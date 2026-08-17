@@ -580,28 +580,6 @@ export function SprayProgramDetailClient({ program, slug }: SprayProgramDetailCl
                                     </div>
                                 )}
 
-                                {/* Active Ingredients - inline */}
-                                {quickViewProduct.agrochemical?.active_ingredients?.length > 0 && (
-                                    <div className="flex flex-wrap gap-1.5">
-                                        {quickViewProduct.agrochemical.active_ingredients.map((ai: any, idx: number) => (
-                                            <span key={idx} className="px-2 py-0.5 rounded text-[11px] font-medium bg-muted text-foreground capitalize">
-                                                {ai.name} {ai.dosage_value}{ai.dosage_unit}
-                                            </span>
-                                        ))}
-                                    </div>
-                                )}
-
-                                {/* Targets - inline */}
-                                {quickViewProduct.agrochemical?.targets?.length > 0 && (
-                                    <ul className="flex flex-wrap gap-x-4 gap-y-1">
-                                        {quickViewProduct.agrochemical.targets.map((t: any, idx: number) => (
-                                            <li key={idx} className="flex items-center gap-1.5 text-[11px] text-green-700 dark:text-green-300 capitalize">
-                                                <span className="h-1.5 w-1.5 rounded-full bg-green-500 flex-shrink-0" />
-                                                {t.name}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                )}
                             </div>
                         </div>
 
