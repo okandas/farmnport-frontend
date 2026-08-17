@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { ShoppingCart } from "lucide-react"
+import { capitalizeFirstLetter } from "@/lib/utilities"
 
 interface WantToBuyCTAProps {
     available_for_sale: boolean
@@ -10,7 +11,7 @@ interface WantToBuyCTAProps {
 }
 
 export function WantToBuyCTA({ name, brand, href }: WantToBuyCTAProps) {
-    const label = brand ? `${name} ${brand}` : name
+    const label = brand ? `${name} ${capitalizeFirstLetter(brand)}` : name
     return (
         <Link
             href={href}
