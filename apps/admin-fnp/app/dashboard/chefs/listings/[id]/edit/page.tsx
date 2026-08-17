@@ -101,15 +101,17 @@ export default function EditChefListingPage() {
     setMealPlans(mealPlans.filter((_, idx) => idx !== i))
   }
 
-  function updateMealPlan(i: number, field: string, value: string) {
+  function updateMealPlan(i: number, field: "name" | "meals", value: string) {
     const updated = [...mealPlans]
-    ;(updated[i] as Record<string, unknown>)[field] = value
+    updated[i] = { ...updated[i], [field]: value }
     setMealPlans(updated)
   }
 
-  function updateVariant(planIdx: number, varIdx: number, field: string, value: string) {
+  function updateVariant(planIdx: number, varIdx: number, field: "size" | "price", value: string) {
     const updated = [...mealPlans]
-    ;(updated[planIdx].variants[varIdx] as Record<string, unknown>)[field] = value
+    const variants = [...updated[planIdx].variants]
+    variants[varIdx] = { ...variants[varIdx], [field]: value }
+    updated[planIdx] = { ...updated[planIdx], variants }
     setMealPlans(updated)
   }
 
@@ -121,9 +123,9 @@ export default function EditChefListingPage() {
     setAddOns(addOns.filter((_, idx) => idx !== i))
   }
 
-  function updateAddOn(i: number, field: string, value: string) {
+  function updateAddOn(i: number, field: "name" | "price", value: string) {
     const updated = [...addOns]
-    ;(updated[i] as Record<string, unknown>)[field] = value
+    updated[i] = { ...updated[i], [field]: value }
     setAddOns(updated)
   }
 
