@@ -106,9 +106,9 @@ export function RelatedProducts({ collection, query, excludeSlug, title = "Relat
             href={getHref(collection, item)}
             className="group flex flex-col rounded-lg border bg-card hover:border-primary/40 hover:shadow-md transition-all overflow-hidden"
           >
-            <div className="aspect-[4/3] bg-muted/30 dark:bg-white relative">
+            <div className="aspect-[4/3] bg-white relative">
               {item.image_src && (
-                <img src={item.image_src} alt="" className="absolute inset-0 w-full h-full object-contain p-3" />
+                <img src={item.image_src} alt="" className="absolute inset-0 w-full h-full object-contain p-1" />
               )}
             </div>
             <div className="p-3 flex flex-col flex-1 border-t">

@@ -95,7 +95,7 @@ export function GuideDetailLayout({
                 <div className="grid lg:grid-cols-[450px,1fr] gap-6 lg:gap-12 mb-6">
                     {/* Left — Image + CTA + Precautions + Promo */}
                     <div className="flex flex-col gap-4">
-                        <div className="relative aspect-square bg-muted/30 dark:bg-white rounded-xl border overflow-hidden shadow-sm">
+                        <div className={`relative aspect-square rounded-xl border overflow-hidden shadow-sm ${product.images?.[0]?.img?.src ? "bg-white" : "bg-muted/30"}`}>
                             {product.images?.[0]?.img?.src ? (
                                 <Image
                                     src={product.images[0].img.src}
@@ -232,7 +232,7 @@ export function GuideDetailLayout({
                 )}
 
                 {/* Safety Warning / Disclaimer */}
-                <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-6">
+                <div className="mt-8 bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-6">
                     <div className="flex items-start gap-3">
                         <AlertTriangle className="w-6 h-6 text-yellow-600 dark:text-yellow-500 flex-shrink-0" />
                         <div>
