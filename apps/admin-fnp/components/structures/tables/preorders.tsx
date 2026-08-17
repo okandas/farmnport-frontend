@@ -63,7 +63,7 @@ export function PreOrdersTable() {
       columns={preorderColumns}
       data={events}
       newUrl="/dashboard/farmnport/orders/booking-preorders/new"
-      tableName="Pre-Order"
+      tableName="Booking"
       total={total}
       pagination={pagination}
       setPagination={setPagination}
