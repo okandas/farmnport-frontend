@@ -12,6 +12,7 @@ export { default as MenusReviewsFavouritesEmail } from "./templates/menus-review
 
 // Marketing templates
 export { default as MarketingLaunchEmail } from "./templates/marketing-launch"
+export { default as TermsUpdateEmail } from "./templates/terms-update"
 
 // Order templates
 export { default as OrderConfirmationEmail } from "./templates/orders/order-confirmation"
