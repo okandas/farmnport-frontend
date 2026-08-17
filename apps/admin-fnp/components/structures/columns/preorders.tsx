@@ -2,7 +2,7 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 import Link from "next/link"
-import { centsToDollars } from "@/lib/utilities"
+import { centsToDollars, capitalizeWords } from "@/lib/utilities"
 import { PreOrderDropDown } from "@/components/structures/dropdowns/preorder-dropdown"
 
 const STATUS_STYLES: Record<string, string> = {
@@ -28,15 +28,15 @@ export const preorderColumns: ColumnDef<any>[] = [
     accessorKey: "supplier",
     header: "Supplier",
     cell: ({ row }) => (
-      <span className="text-foreground">{row.original.brand_name || row.original.client_name || "—"}</span>
+      <span className="text-foreground">{capitalizeWords(row.original.brand_name || row.original.client_name || "—")}</span>
     ),
   },
   {
     accessorKey: "produce_name",
     header: "Produce",
     cell: ({ row }) => (
-      <span className="text-foreground capitalize">
-        {[row.original.produce_name, row.original.breed_name].filter(Boolean).join(" · ") || "—"}
+      <span className="text-foreground">
+        {capitalizeWords([row.original.produce_name, row.original.breed_name].filter(Boolean).join(" · ") || "—")}
       </span>
     ),
   },

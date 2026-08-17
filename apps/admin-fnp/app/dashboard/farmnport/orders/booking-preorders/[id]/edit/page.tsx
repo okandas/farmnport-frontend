@@ -3,7 +3,7 @@
 import { use, useState } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
-import { Loader2, X } from "lucide-react"
+import { Loader2, X, ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 
@@ -237,6 +237,12 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
 
   return (
     <DashboardShell>
+      <Link
+        href={`/dashboard/farmnport/orders/booking-preorders/${id}`}
+        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-4"
+      >
+        <ArrowLeft className="w-3.5 h-3.5" /> Back
+      </Link>
       <DashboardHeader heading="Edit Pre-Order" text={event?.name ?? ""} />
 
       <div className="mt-4 space-y-0 divide-y divide-border">

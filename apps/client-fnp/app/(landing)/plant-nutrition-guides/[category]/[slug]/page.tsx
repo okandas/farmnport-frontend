@@ -7,6 +7,7 @@ import { AgrochemicalDosageTable } from "@/components/agrochemical/AgrochemicalD
 import { GuideDetailLayout } from "@/components/shared/GuideDetailLayout"
 import { RelatedGuideProducts } from "@/components/sections/related-guide-products"
 import { ProductNotFound } from "@/components/shared/ProductNotFound"
+import { WantToBuyCTA } from "@/components/shared/WantToBuyCTA"
 
 type Props = { params: Promise<{ category: string; slug: string }> }
 
@@ -133,6 +134,15 @@ export default async function PlantNutritionGuidePage({ params }: GuidePageProps
                     )}
                 </p>
             </div>
+
+            {/* Want to Buy CTA */}
+            <WantToBuyCTA
+                available_for_sale={product.available_for_sale}
+                name={product.name}
+                brand={product.brand?.name}
+                href={`/buy-plant-nutrition/${slug}`}
+                interestHref={`/interest/plant-nutrition/${slug}`}
+            />
 
             {/* Composition (not "Active Ingredients" for plant nutrition) */}
             <div>

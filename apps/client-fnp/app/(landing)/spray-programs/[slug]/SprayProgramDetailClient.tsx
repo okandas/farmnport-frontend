@@ -610,7 +610,7 @@ export function SprayProgramDetailClient({ program, slug }: SprayProgramDetailCl
                             <div className="px-5 pb-5 flex gap-2">
                                 <Link
                                     href={`/agrochemical-guides/${quickViewProduct.agrochemical.agrochemical_category.slug}/${quickViewProduct.agrochemical_slug}?from=${slug}`}
-                                    className="flex-1 flex items-center justify-center gap-1 py-2 rounded-full text-sm font-semibold border border-primary text-primary hover:bg-primary/5 transition-colors"
+                                    className="flex-1 flex items-center justify-center gap-1 py-2 rounded-md text-sm font-semibold border border-primary text-primary hover:bg-primary/5 transition-colors"
                                     onClick={() => setQuickViewProduct(null)}
                                 >
                                     View Full Guide
@@ -618,7 +618,7 @@ export function SprayProgramDetailClient({ program, slug }: SprayProgramDetailCl
                                 </Link>
                                 <Link
                                     href={`/buy-agrochemicals/${quickViewProduct.agrochemical_slug}`}
-                                    className="flex-1 flex items-center justify-center py-2 rounded-full text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                                    className="flex-1 flex items-center justify-center py-2 rounded-md text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
                                     onClick={() => setQuickViewProduct(null)}
                                 >
                                     Buy Now
