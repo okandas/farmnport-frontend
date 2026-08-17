@@ -129,15 +129,6 @@ export function GuideDetailLayout({
                             </div>
                         )}
 
-                        {/* Want to Buy CTA */}
-                        <WantToBuyCTA
-                            available_for_sale={product.available_for_sale}
-                            name={product.name}
-                            brand={product.brand?.name}
-                            href={buyHref}
-                            interestHref={interestHref}
-                        />
-
                         {/* Precautions (array) */}
                         {resolvedPrecautions && resolvedPrecautions.length > 0 && (
                             <div className="rounded-lg border border-red-200 dark:border-red-900 bg-red-50/50 dark:bg-red-950/30 px-3 py-2">
