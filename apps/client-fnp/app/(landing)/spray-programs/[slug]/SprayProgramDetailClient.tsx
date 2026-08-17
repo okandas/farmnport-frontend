@@ -570,6 +570,13 @@ export function SprayProgramDetailClient({ program, slug }: SprayProgramDetailCl
                                     )}
                                 </div>
 
+                                {/* Overview */}
+                                {quickViewProduct.agrochemical?.product_overview && (
+                                    <p className="text-xs text-muted-foreground leading-relaxed line-clamp-3">
+                                        {quickViewProduct.agrochemical.product_overview}
+                                    </p>
+                                )}
+
                                 {/* Dosage */}
                                 {quickViewProduct.dosage && (quickViewProduct.dosage.value || quickViewProduct.dosage.unit) && (
                                     <div className="text-sm">
