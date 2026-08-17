@@ -183,7 +183,7 @@ export default async function AgroChemicalGuidePage({ params }: GuidePageProps) 
             </div>
 
             {/* Used On & Targets Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:h-[315px]">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:h-[150px]">
                 {chemical.dosage_rates && chemical.dosage_rates.length > 0 && (
                     <div className="rounded-xl border bg-card p-4 overflow-y-auto">
                         <h2 className="text-sm font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-400 mb-3">
