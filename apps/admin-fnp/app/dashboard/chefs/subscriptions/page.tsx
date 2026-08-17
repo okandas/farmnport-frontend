@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { Suspense, useState, useEffect } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { useSearchParams } from "next/navigation"
 import { PaginationState } from "@tanstack/react-table"
@@ -44,6 +44,14 @@ interface SubscriptionRow {
 }
 
 export default function ChefSubscriptionsPage() {
+  return (
+    <Suspense fallback={<DashboardShell><FormSkeleton /></DashboardShell>}>
+      <ChefSubscriptionsContent />
+    </Suspense>
+  )
+}
+
+function ChefSubscriptionsContent() {
   const searchParams = useSearchParams()
   const chefID = searchParams.get("chef_id") ?? ""
   const [statusFilter, setStatusFilter] = useState<Set<string>>(new Set())

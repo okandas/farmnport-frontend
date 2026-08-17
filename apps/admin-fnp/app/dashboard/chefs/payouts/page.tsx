@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { Suspense, useState, useEffect } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useSearchParams } from "next/navigation"
 import { PaginationState } from "@tanstack/react-table"
@@ -43,6 +43,14 @@ interface PayoutRow {
 }
 
 export default function ChefPayoutsPage() {
+  return (
+    <Suspense fallback={<DashboardShell><FormSkeleton /></DashboardShell>}>
+      <ChefPayoutsContent />
+    </Suspense>
+  )
+}
+
+function ChefPayoutsContent() {
   const searchParams = useSearchParams()
   const chefID = searchParams.get("chef_id") ?? ""
   const [statusFilter, setStatusFilter] = useState<Set<string>>(new Set())
