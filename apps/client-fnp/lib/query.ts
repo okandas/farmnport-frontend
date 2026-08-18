@@ -1137,8 +1137,8 @@ export function getBooking(id: string) {
   return api.get(`${BaseURL}/booking/${id}`)
 }
 
-export function cancelBooking(id: string) {
-  return api.put(`${BaseURL}/booking/${id}/cancel`, {})
+export function cancelBooking(id: string, reason?: string) {
+  return api.put(`${BaseURL}/booking/${id}/cancel`, { reason })
 }
 
 export function initiatePreOrderPayment(id: string, data: { method?: string; phone?: string }) {

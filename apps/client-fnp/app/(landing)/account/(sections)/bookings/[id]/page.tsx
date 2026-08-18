@@ -86,6 +86,7 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
   const queryClient = useQueryClient()
   const [cancelOpen, setCancelOpen] = useState(false)
   const [cancelInput, setCancelInput] = useState("")
+  const [cancelReason, setCancelReason] = useState("")
   const [paying, setPaying] = useState(false)
   const [checking, setChecking] = useState(false)
   const [counterOpen, setCounterOpen] = useState(false)
@@ -103,9 +104,9 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
   }
 
   const cancelMutation = useMutation({
-    mutationFn: () => cancelBooking(id),
+    mutationFn: (reason: string) => cancelBooking(id, reason),
     onSuccess: () => { toast.success("Booking cancelled"); invalidate() },
-    onError: () => toast.error("Failed to cancel booking. Please try again."),
+    onError: (err: any) => toast.error(err?.response?.data?.message || "Failed to cancel booking."),
   })
 
   const counterMutation = useMutation({
@@ -494,12 +495,21 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
         </Link>
 
         {/* Cancel dialog */}
-        <Dialog open={cancelOpen} onOpenChange={(o) => { setCancelOpen(o); if (!o) setCancelInput("") }}>
+        <Dialog open={cancelOpen} onOpenChange={(o) => { setCancelOpen(o); if (!o) { setCancelInput(""); setCancelReason("") } }}>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Cancel Booking</DialogTitle>
             </DialogHeader>
-            <p className="text-sm text-muted-foreground">This action cannot be undone. Paste the booking reference to confirm cancellation.</p>
+            <p className="text-sm text-muted-foreground">This action cannot be undone. The seller will be notified with your reason.</p>
+            <textarea
+              value={cancelReason}
+              onChange={(e) => setCancelReason(e.target.value)}
+              placeholder="Provide a reason (minimum 10 characters)..."
+              rows={3}
+              className="w-full text-sm border rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-1 focus:ring-ring bg-transparent"
+            />
+            <p className="text-xs text-muted-foreground">{cancelReason.trim().length}/10 characters minimum</p>
+            <p className="text-xs text-muted-foreground mt-2">Paste the booking reference to confirm.</p>
             <div className="flex items-center justify-between bg-muted/50 rounded-lg px-3 py-2">
               <span className="text-sm font-mono font-semibold">{booking.booking_ref}</span>
               <button type="button" onClick={() => { navigator.clipboard.writeText(booking.booking_ref) }} className="text-xs text-primary hover:underline">Copy</button>
@@ -511,14 +521,14 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
               className="w-full text-sm border rounded-lg px-3 py-2 font-mono focus:outline-none focus:ring-1 focus:ring-ring bg-transparent"
             />
             <DialogFooter>
-              <button onClick={() => { setCancelOpen(false); setCancelInput("") }} className="px-4 py-2 text-sm rounded-lg border hover:bg-muted transition-colors">
+              <button onClick={() => { setCancelOpen(false); setCancelInput(""); setCancelReason("") }} className="px-4 py-2 text-sm rounded-lg border hover:bg-muted transition-colors">
                 Go back
               </button>
               <button
                 onClick={() => {
-                  cancelMutation.mutate(undefined, { onSuccess: () => { setCancelOpen(false); setCancelInput("") } })
+                  cancelMutation.mutate(cancelReason, { onSuccess: () => { setCancelOpen(false); setCancelInput(""); setCancelReason("") } })
                 }}
-                disabled={cancelInput !== booking.booking_ref || cancelMutation.isPending}
+                disabled={cancelInput !== booking.booking_ref || cancelReason.trim().length < 10 || cancelMutation.isPending}
                 className="px-4 py-2 text-sm rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors disabled:opacity-50"
               >
                 {cancelMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Cancel Booking"}
