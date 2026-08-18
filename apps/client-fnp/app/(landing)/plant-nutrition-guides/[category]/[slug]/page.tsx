@@ -152,12 +152,17 @@ export default async function PlantNutritionGuidePage({ params }: GuidePageProps
 
             {/* Used On */}
             {product.dosage_rates && product.dosage_rates.length > 0 && (
-                <div className="rounded-xl border bg-card p-4">
+                <div className="rounded-xl border bg-card p-4 sm:h-[150px] overflow-y-auto">
                     <h2 className="text-sm font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-400 mb-3">
                         Used On
                     </h2>
                     <ul className="space-y-1.5">
-                        {Array.from(new Set(product.dosage_rates.map((rate: any) => rate.crop_group))).map((crop: any, idx: number) => (
+                        {Array.from(new Set(product.dosage_rates.flatMap((rate: any) => {
+                            if (rate.crop_group_items?.length > 0) return rate.crop_group_items
+                            if (rate.crop) return [rate.crop]
+                            if (rate.crop_group) return [rate.crop_group]
+                            return []
+                        }))).map((crop: any, idx: number) => (
                             <li key={idx} className="flex items-center gap-2 text-sm text-foreground">
                                 <span className="h-1.5 w-1.5 rounded-full bg-amber-500 dark:bg-amber-400 flex-shrink-0" />
                                 <span className="capitalize">{crop}</span>
