@@ -1186,6 +1186,10 @@ export function buyerUpdateBookingStatus(id: string, status: string, note?: stri
   return api.put(`${BaseURL}/booking/${id}/buyer-status`, { status, note })
 }
 
+export function respondToBooking(id: string, data: { action: "accept" | "reject" | "counter"; price_per_unit_cents?: number; notes?: string }) {
+  return api.patch(`${BaseURL}/booking/${id}/respond`, data)
+}
+
 export function getIncomingBooking(id: string) {
   return api.get(`${BaseURL}/booking/incoming/${id}`)
 }

@@ -88,7 +88,7 @@ export default function MyPreOrdersPage() {
                     {statusLabel}, {event.title || event.name || "—"}
                   </p>
                   <Link
-                    href={`/account/booking-preorders/${event.id}`}
+                    href={`/account/booking-preorders/${event.slug}`}
                     className="shrink-0 text-sm font-medium px-4 py-2 rounded-lg border hover:bg-muted transition-colors"
                   >
                     Manage
