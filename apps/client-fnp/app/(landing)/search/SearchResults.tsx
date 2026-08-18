@@ -51,7 +51,7 @@ function getUrls(collection: string, doc: Record<string, any>): { guide?: string
   }
   if (collection === "prices") return { view: "/prices" }
   if (collection === "clients") {
-    const prefix = doc.type === "farmer" ? "/farmers" : "/buyers"
+    const prefix = doc.type === "farmer" ? "/farmer" : "/buyer"
     return { view: `${prefix}/${doc.slug}` }
   }
   if (collection === "bookings") return { view: `/bookings/${doc.slug}` }

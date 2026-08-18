@@ -43,7 +43,7 @@ const COLLECTION_URL_PREFIX: Record<string, string> = {
   equipment: "/buy-equipment/",
   guides: "/buy-documents/",
   farm_produce: "/farm-produce/",
-  clients: "/buyers/",
+  clients: "/buyer/",
   prices: "/prices",
   bookings: "/bookings/",
   lots: "/lots/",
@@ -69,7 +69,7 @@ function getProductUrl(product: AISearchProduct): string {
   if (!prefix) return "/"
   if (product._collection === "prices") return "/prices"
   if (product._collection === "clients") {
-    const clientPrefix = product.type === "farmer" ? "/farmers/" : "/buyers/"
+    const clientPrefix = product.type === "farmer" ? "/farmer/" : "/buyer/"
     return `${clientPrefix}${product.slug}`
   }
   if (product._collection === "guides") {
