@@ -111,12 +111,12 @@ export const dashboardConfig: DashboardConfig = {
           icon: "shoppingCart",
         },
         {
-          title: "Bookings",
+          title: "Booking Bids",
           href: "/dashboard/farmnport/orders/bookings",
           icon: "calender",
         },
         {
-          title: "Bookings",
+          title: "Pre-Orders",
           href: "/dashboard/farmnport/orders/booking-preorders",
           icon: "calender",
         },
