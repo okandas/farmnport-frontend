@@ -6,6 +6,7 @@ import { GuideDetailLayout } from "@/components/shared/GuideDetailLayout"
 import { RelatedGuideProducts } from "@/components/sections/related-guide-products"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
 import { capitalizeFirstLetter } from "@/lib/utilities"
+import { WantToBuyCTA } from "@/components/shared/WantToBuyCTA"
 import { FeedBreadcrumb } from "./FeedBreadcrumb"
 
 interface FeedDetailPageProps {
@@ -157,6 +158,15 @@ export default async function FeedDetailPage({ params }: FeedDetailPageProps) {
                     <p className="text-muted-foreground leading-relaxed text-sm">{product.description}</p>
                 </div>
             )}
+
+            {/* Want to Buy CTA */}
+            <WantToBuyCTA
+                available_for_sale={product.available_for_sale}
+                name={product.name}
+                brand={product.brand?.name}
+                href={`/buy-feeds/${slug}`}
+                interestHref={`/interest/feed/${slug}`}
+            />
 
             {/* Breed Recommendations */}
             {product.breed_recommendations && (

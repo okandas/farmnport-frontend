@@ -3,6 +3,7 @@ import { formatProductName } from "@/lib/utilities"
 import { ProductNotFound } from "@/components/shared/ProductNotFound"
 import { GuideDetailLayout } from "@/components/shared/GuideDetailLayout"
 import { AdSenseInFeed } from "@/components/ads/AdSenseInFeed"
+import { WantToBuyCTA } from "@/components/shared/WantToBuyCTA"
 import { RelatedGuideProducts } from "@/components/sections/related-guide-products"
 
 interface Props {
@@ -87,6 +88,15 @@ export default async function SeedGuidePage({ params }: Props) {
                     <p className="text-muted-foreground leading-relaxed text-sm">{product.description}</p>
                 </div>
             )}
+
+            {/* Want to Buy CTA */}
+            <WantToBuyCTA
+                available_for_sale={product.available_for_sale}
+                name={product.name}
+                brand={product.brand?.name}
+                href={`/buy-seed-products/${slug}`}
+                interestHref={`/interest/seed/${slug}`}
+            />
 
             <AdSenseInFeed />
 
