@@ -192,6 +192,11 @@ export async function POST(req: NextRequest) {
       html = await render(PreorderRejectedEmail(props as Parameters<typeof PreorderRejectedEmail>[0]))
       break
 
+    case "preorder-cancelled":
+      subject = `Booking Cancelled — ${(props as { bookingRef?: string }).bookingRef ?? ""}`
+      html = await render(PreorderRejectedEmail(props as Parameters<typeof PreorderRejectedEmail>[0]))
+      break
+
     case "preorder-event-rejected":
       subject = `Booking Listing Not Approved — ${(props as { eventTitle?: string }).eventTitle ?? ""}`
       html = await render(PreorderEventRejectedEmail(props as Parameters<typeof PreorderEventRejectedEmail>[0]))
