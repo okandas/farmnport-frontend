@@ -36,8 +36,8 @@ import {
   PhoneUpdateCodeEmail,
 } from "@/emails"
 
-const FROM_FARMNPORT = "farmnport <noreply@farmnport.com>"
-const FROM_MENUS = "menus <noreply@farmnport.com>"
+const FROM_FARMNPORT = "farmnport <support@notifications.farmnport.com>"
+const FROM_MENUS = "menus <support@notifications.farmnport.com>"
 
 export async function POST(req: NextRequest) {
   const resend = new Resend(process.env.RESEND_API_KEY)
