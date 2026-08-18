@@ -46,7 +46,7 @@ function getResultUrl(collection: string, doc: Record<string, any>): string {
 
   if (collection === "prices") return "/prices"
   if (collection === "clients") {
-    const prefix = doc.type === "farmer" ? "/farmers/" : "/buyers/"
+    const prefix = doc.type === "farmer" ? "/farmer/" : "/buyer/"
     return `${prefix}${doc.slug}`
   }
 
