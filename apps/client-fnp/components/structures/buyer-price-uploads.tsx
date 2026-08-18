@@ -281,7 +281,7 @@ export function BuyerPriceUploads({ clientName, latestPrices }: { clientName: st
 
   return (
     <div className="rounded-md border bg-card shadow-sm overflow-hidden">
-      <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr]" style={{ height: 560 }}>
+      <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr]" style={{ height: 350 }}>
 
         {/* Left sidebar — date list */}
         <div className="border-b lg:border-b-0 lg:border-r flex flex-col min-h-0 max-h-60 lg:max-h-none">

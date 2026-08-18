@@ -6,6 +6,7 @@ import { ProductTargets } from "@/components/agrochemical/ProductTargets"
 import { GuideDetailLayout } from "@/components/shared/GuideDetailLayout"
 import { RelatedGuideProducts } from "@/components/sections/related-guide-products"
 import { ProductNotFound } from "@/components/shared/ProductNotFound"
+import { WantToBuyCTA } from "@/components/shared/WantToBuyCTA"
 
 type Props = { params: Promise<{ category: string; slug: string }> }
 
@@ -281,6 +282,15 @@ export default async function AnimalHealthGuidePage({ params }: GuidePageProps) 
                     )}
                 </p>
             </div>
+
+            {/* Want to Buy CTA */}
+            <WantToBuyCTA
+                available_for_sale={product.available_for_sale}
+                name={product.name}
+                brand={product.brand?.name}
+                href={`/buy-animal-health/${slug}`}
+                interestHref={`/interest/animal-health/${slug}`}
+            />
 
             {/* Active Ingredients */}
             <div>

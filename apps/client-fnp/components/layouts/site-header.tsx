@@ -6,7 +6,8 @@ import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
 import { signOut } from "next-auth/react"
 import { sendGTMEvent } from "@next/third-parties/google"
-import { Search, ShoppingCart } from "lucide-react"
+import { Search, ShoppingCart, Sparkles } from "lucide-react"
+import { AISearchOverlay } from "@/components/structures/ai-search"
 import { siteConfig } from "@/config/site"
 import { MobileNav } from "@/components/layouts/mobile-nav"
 import { AuthenticatedUser, AppURL } from "@/lib/schemas"
@@ -224,50 +225,60 @@ const SEARCH_CATEGORIES = [
   { value: "lots", label: "Lots" },
 ]
 
-function NavSearchBar({ router, onFocus }: { router: ReturnType<typeof useRouter>; onFocus?: () => void }) {
+function NavSearchBar({ router, onFocus, onAskAI }: { router: ReturnType<typeof useRouter>; onFocus?: () => void; onAskAI: () => void }) {
   const [category, setCategory] = useState("all")
 
   return (
-    <form
-      className="hidden lg:flex flex-1 items-center px-6"
-      onSubmit={(e) => {
-        e.preventDefault()
-        const input = e.currentTarget.querySelector("input[type=text]") as HTMLInputElement
-        const q = input?.value?.trim()
-        if (q) {
-          sendGTMEvent({ event: "search_open", method: "submit" })
-          const params = new URLSearchParams({ q })
-          if (category !== "all") params.set("category", category)
-          router.push(`/search?${params.toString()}`)
-        }
-      }}
-    >
-      <div className="relative w-full flex items-center rounded-sm bg-muted p-0.5">
-        <Select value={category} onValueChange={setCategory}>
-          <SelectTrigger className="h-8 w-auto gap-1 border-0 border-r border-border/40 rounded-none bg-transparent text-xs font-medium text-muted-foreground shadow-none focus:ring-0 focus:ring-offset-0 shrink-0">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {SEARCH_CATEGORIES.map((c) => (
-              <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <input
-          type="text"
-          placeholder="Search for products, guides, programs..."
-          className="flex-1 h-8 pl-3 pr-12 text-sm bg-transparent outline-none placeholder:text-muted-foreground/60"
-          onFocus={onFocus}
-        />
-        <button type="submit" className="absolute right-0.5 top-1/2 -translate-y-1/2 h-8 w-9 flex items-center justify-center rounded-sm bg-primary text-primary-foreground hover:bg-primary/90 transition-colors">
-          <Search className="h-4 w-4" />
-        </button>
-      </div>
-    </form>
+    <div className="hidden lg:flex flex-1 items-center px-6 gap-2">
+      {/* <button
+        type="button"
+        onClick={onAskAI}
+        className="shrink-0 flex items-center gap-1.5 h-9 px-3 rounded-sm bg-primary text-primary-foreground hover:bg-primary/90 transition-colors text-xs font-medium"
+      >
+        <Sparkles className="h-3.5 w-3.5" />
+        Ask AI
+      </button> */}
+      <form
+        className="flex-1"
+        onSubmit={(e) => {
+          e.preventDefault()
+          const input = e.currentTarget.querySelector("input[type=text]") as HTMLInputElement
+          const q = input?.value?.trim()
+          if (q) {
+            sendGTMEvent({ event: "search_open", method: "submit" })
+            const params = new URLSearchParams({ q })
+            if (category !== "all") params.set("category", category)
+            router.push(`/search?${params.toString()}`)
+          }
+        }}
+      >
+        <div className="relative w-full flex items-center rounded-sm bg-muted p-0.5">
+          <Select value={category} onValueChange={setCategory}>
+            <SelectTrigger className="h-8 w-auto gap-1 border-0 border-r border-border/40 rounded-none bg-transparent text-xs font-medium text-muted-foreground shadow-none focus:ring-0 focus:ring-offset-0 shrink-0">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {SEARCH_CATEGORIES.map((c) => (
+                <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <input
+            type="text"
+            placeholder="Search for products, guides, programs..."
+            className="flex-1 h-8 pl-3 pr-12 text-sm bg-transparent outline-none placeholder:text-muted-foreground/60"
+            onFocus={onFocus}
+          />
+          <button type="submit" className="absolute right-0.5 top-1/2 -translate-y-1/2 h-8 w-9 flex items-center justify-center rounded-sm bg-primary text-primary-foreground hover:bg-primary/90 transition-colors">
+            <Search className="h-4 w-4" />
+          </button>
+        </div>
+      </form>
+    </div>
   )
 }
 
-function MobileSearch({ router }: { router: ReturnType<typeof useRouter> }) {
+function MobileSearch({ router, onAskAI }: { router: ReturnType<typeof useRouter>; onAskAI: () => void }) {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState("")
 
@@ -284,6 +295,13 @@ function MobileSearch({ router }: { router: ReturnType<typeof useRouter> }) {
 
   return (
     <>
+      {/* <button
+        onClick={onAskAI}
+        className="lg:hidden p-2 rounded-lg hover:bg-muted transition-colors"
+        aria-label="Ask AI"
+      >
+        <Sparkles className="h-5 w-5" />
+      </button> */}
       <button
         onClick={() => {
           sendGTMEvent({ event: "search_open", method: "mobile_icon" })
@@ -331,6 +349,7 @@ export function SiteHeader() {
   const user = (session?.user as AuthenticatedUser) ?? undefined
   const router = useRouter()
   const [categoryOpen, setCategoryOpen] = useState(false)
+  const [aiSearchOpen, setAiSearchOpen] = useState(false)
 
   // Cmd+K navigates to search
   useEffect(() => {
@@ -346,6 +365,8 @@ export function SiteHeader() {
   }, [router])
 
   return (
+    <>
+    {/* <AISearchOverlay open={aiSearchOpen} onClose={() => setAiSearchOpen(false)} /> */}
     <header className="sticky top-0 z-50 w-full bg-background border-b">
       {/* Main nav */}
       <div className="container flex h-14 items-center gap-2 lg:gap-6">
@@ -358,7 +379,7 @@ export function SiteHeader() {
         <SelectCategory open={categoryOpen} setOpen={setCategoryOpen} />
 
         {/* Search bar — takes remaining space */}
-        <NavSearchBar router={router} onFocus={() => setCategoryOpen(false)} />
+        <NavSearchBar router={router} onFocus={() => setCategoryOpen(false)} onAskAI={() => setAiSearchOpen(true)} />
 
         {/* Right side actions */}
         <div className="hidden lg:flex items-center gap-2">
@@ -423,9 +444,10 @@ export function SiteHeader() {
 
         {/* Mobile nav */}
         <div className="flex-1 lg:hidden" />
-        <MobileSearch router={router} />
+        <MobileSearch router={router} onAskAI={() => setAiSearchOpen(true)} />
         <MobileNav user={user} />
       </div>
     </header>
+    </>
   )
 }
