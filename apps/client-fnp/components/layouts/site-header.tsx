@@ -230,14 +230,14 @@ function NavSearchBar({ router, onFocus, onAskAI }: { router: ReturnType<typeof 
 
   return (
     <div className="hidden lg:flex flex-1 items-center px-6 gap-2">
-      <button
+      {/* <button
         type="button"
         onClick={onAskAI}
         className="shrink-0 flex items-center gap-1.5 h-9 px-3 rounded-sm bg-primary text-primary-foreground hover:bg-primary/90 transition-colors text-xs font-medium"
       >
         <Sparkles className="h-3.5 w-3.5" />
         Ask AI
-      </button>
+      </button> */}
       <form
         className="flex-1"
         onSubmit={(e) => {
@@ -295,13 +295,13 @@ function MobileSearch({ router, onAskAI }: { router: ReturnType<typeof useRouter
 
   return (
     <>
-      <button
+      {/* <button
         onClick={onAskAI}
         className="lg:hidden p-2 rounded-lg hover:bg-muted transition-colors"
         aria-label="Ask AI"
       >
         <Sparkles className="h-5 w-5" />
-      </button>
+      </button> */}
       <button
         onClick={() => {
           sendGTMEvent({ event: "search_open", method: "mobile_icon" })
@@ -366,7 +366,7 @@ export function SiteHeader() {
 
   return (
     <>
-    <AISearchOverlay open={aiSearchOpen} onClose={() => setAiSearchOpen(false)} />
+    {/* <AISearchOverlay open={aiSearchOpen} onClose={() => setAiSearchOpen(false)} /> */}
     <header className="sticky top-0 z-50 w-full bg-background border-b">
       {/* Main nav */}
       <div className="container flex h-14 items-center gap-2 lg:gap-6">
