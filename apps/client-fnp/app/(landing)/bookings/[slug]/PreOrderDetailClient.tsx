@@ -340,15 +340,15 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
                 {event.market_side === "demand" ? (
                   <>
                     <li>Submit your supply offer with the quantity you can provide</li>
-                    <li>The buyer reviews your offer and confirms</li>
-                    <li>Deliver on the agreed date or prepare for collection</li>
+                    <li>The buyer reviews and confirms your offer</li>
+                    <li>Deliver on the agreed date or prepare for the buyer to collect</li>
                   </>
                 ) : (
                   <>
-                    <li>Submit your booking request</li>
-                    <li>We confirm your delivery or collection date and notify you</li>
+                    <li>Submit your booking request with your desired quantity</li>
+                    <li>The farmer confirms your order and notifies you of the collection or delivery date</li>
                     <li>Pay to secure your allocation{event.payment_deadline_hours ? ` (within ${event.payment_deadline_hours} hours)` : ""}</li>
-                    <li>Collect your order when ready — balance due on collection</li>
+                    <li>Collect your order on the agreed date — balance due on collection</li>
                   </>
                 )}
               </ol>

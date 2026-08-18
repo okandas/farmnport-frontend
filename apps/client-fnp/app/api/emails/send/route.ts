@@ -36,8 +36,8 @@ import {
   PhoneUpdateCodeEmail,
 } from "@/emails"
 
-const FROM_FARMNPORT = "farmnport <noreply@farmnport.com>"
-const FROM_MENUS = "menus <noreply@farmnport.com>"
+const FROM_FARMNPORT = "farmnport <support@notifications.farmnport.com>"
+const FROM_MENUS = "menus <support@notifications.farmnport.com>"
 
 export async function POST(req: NextRequest) {
   const resend = new Resend(process.env.RESEND_API_KEY)
@@ -189,6 +189,11 @@ export async function POST(req: NextRequest) {
 
     case "preorder-rejected":
       subject = `Booking Not Fulfilled — ${(props as { bookingRef?: string }).bookingRef ?? ""}`
+      html = await render(PreorderRejectedEmail(props as Parameters<typeof PreorderRejectedEmail>[0]))
+      break
+
+    case "preorder-cancelled":
+      subject = `Booking Cancelled — ${(props as { bookingRef?: string }).bookingRef ?? ""}`
       html = await render(PreorderRejectedEmail(props as Parameters<typeof PreorderRejectedEmail>[0]))
       break
 

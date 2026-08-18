@@ -20,6 +20,7 @@ const STATUS_LABELS: Record<string, string> = {
   rejected:         "Rejected",
   expired:          "Expired",
   cancelled:        "Cancelled",
+  countered:        "Counter-Offer",
 }
 
 function formatDate(d: string) {

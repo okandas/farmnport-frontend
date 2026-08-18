@@ -7,7 +7,7 @@ import { Loader2, CalendarDays, Truck, Package, CheckCircle, XCircle, Clock, Ale
 import Link from "next/link"
 import { toast } from "sonner"
 
-import { getBooking, cancelBooking, initiatePreOrderPayment, pollPreOrderPayment } from "@/lib/query"
+import { getBooking, cancelBooking, initiatePreOrderPayment, pollPreOrderPayment, respondToBooking } from "@/lib/query"
 import { centsToDollars, plural } from "@/lib/utilities"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 
@@ -23,6 +23,7 @@ const STATUS_STYLES: Record<string, string> = {
   rejected:         "bg-red-100 text-red-800",
   expired:          "bg-muted text-muted-foreground",
   cancelled:        "bg-red-100 text-red-800",
+  countered:        "bg-purple-100 text-purple-800",
 }
 
 const STATUS_LABELS: Record<string, string> = {
@@ -37,6 +38,7 @@ const STATUS_LABELS: Record<string, string> = {
   rejected:         "Rejected",
   expired:          "Expired",
   cancelled:        "Cancelled",
+  countered:        "Counter-Offer",
 }
 
 const STATUS_ICONS: Record<string, React.ReactNode> = {
@@ -86,6 +88,8 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
   const [cancelInput, setCancelInput] = useState("")
   const [paying, setPaying] = useState(false)
   const [checking, setChecking] = useState(false)
+  const [counterOpen, setCounterOpen] = useState(false)
+  const [counterPrice, setCounterPrice] = useState("")
 
   const { data, isLoading } = useQuery({
     queryKey: ["booking", id],
@@ -93,16 +97,33 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
     enabled: !!session,
   })
 
+  const invalidate = () => {
+    queryClient.invalidateQueries({ queryKey: ["booking", id] })
+    queryClient.invalidateQueries({ queryKey: ["my-bookings"] })
+  }
+
   const cancelMutation = useMutation({
     mutationFn: () => cancelBooking(id),
-    onSuccess: () => {
-      toast.success("Booking cancelled")
-      queryClient.invalidateQueries({ queryKey: ["booking", id] })
-      queryClient.invalidateQueries({ queryKey: ["my-bookings"] })
-    },
-    onError: () => {
-      toast.error("Failed to cancel booking. Please try again.")
-    },
+    onSuccess: () => { toast.success("Booking cancelled"); invalidate() },
+    onError: () => toast.error("Failed to cancel booking. Please try again."),
+  })
+
+  const counterMutation = useMutation({
+    mutationFn: (cents: number) => respondToBooking(id, { action: "counter", price_per_unit_cents: cents }),
+    onSuccess: () => { toast.success("Counter-offer sent"); setCounterOpen(false); setCounterPrice(""); invalidate() },
+    onError: (err: any) => toast.error(err?.response?.data?.message || "Failed to send counter-offer"),
+  })
+
+  const acceptMutation = useMutation({
+    mutationFn: () => respondToBooking(id, { action: "accept" }),
+    onSuccess: () => { toast.success("Offer accepted"); invalidate() },
+    onError: (err: any) => toast.error(err?.response?.data?.message || "Failed to accept"),
+  })
+
+  const rejectMutation = useMutation({
+    mutationFn: () => respondToBooking(id, { action: "reject", notes: "Buyer declined the counter-offer" }),
+    onSuccess: () => { toast.success("Offer rejected"); invalidate() },
+    onError: (err: any) => toast.error(err?.response?.data?.message || "Failed to reject"),
   })
 
 
@@ -241,6 +262,48 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
           </div>
         )}
 
+        {/* Counter-offer response — buyer's turn */}
+        {booking.status === "countered" && booking.countered_by === "seller" && booking.pre_order && (
+          <div className="border border-purple-200 bg-purple-50 rounded-xl p-5 space-y-3">
+            <p className="font-semibold text-purple-900">The seller made a counter-offer</p>
+            <p className="text-sm text-purple-700">
+              New price: <span className="font-bold">${(booking.pre_order.offer_price / 100).toFixed(2)}</span> per {booking.pre_order.unit || "unit"}
+              {" "}({booking.pre_order.quantity} {booking.pre_order.unit || "units"} = ${((booking.pre_order.offer_price / 100) * booking.pre_order.quantity).toFixed(2)})
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => acceptMutation.mutate()}
+                disabled={acceptMutation.isPending}
+                className="inline-flex items-center gap-2 rounded-md bg-primary text-primary-foreground text-sm font-semibold px-4 py-1.5 hover:bg-primary/90 transition-colors disabled:opacity-50"
+              >
+                {acceptMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                Accept Offer
+              </button>
+              <button
+                onClick={() => setCounterOpen(true)}
+                className="inline-flex items-center gap-2 rounded-md border border-purple-200 text-purple-700 text-sm font-semibold px-4 py-1.5 hover:bg-purple-50 transition-colors"
+              >
+                Counter-Offer
+              </button>
+              <button
+                onClick={() => rejectMutation.mutate()}
+                disabled={rejectMutation.isPending}
+                className="inline-flex items-center gap-2 rounded-md border border-red-200 text-red-600 text-sm font-semibold px-4 py-1.5 hover:bg-red-50 transition-colors disabled:opacity-50"
+              >
+                {rejectMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                Decline
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Waiting for seller response */}
+        {booking.status === "countered" && booking.countered_by === "buyer" && (
+          <div className="border border-purple-200 bg-purple-50 rounded-xl p-4">
+            <p className="text-sm text-purple-700">Waiting for the seller to respond to your counter-offer.</p>
+          </div>
+        )}
+
         {/* Expired notice */}
         {booking.status === "expired" && (
           <div className="border border-muted bg-muted/30 rounded-xl p-4">
@@ -370,6 +433,27 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
           )}
         </div>
 
+        {/* Negotiation history */}
+        {booking.counter_offers?.length > 0 && (
+          <div className="border border-purple-200 rounded-xl p-5">
+            <h2 className="text-sm font-semibold text-purple-700 mb-4">Negotiation</h2>
+            <div className="space-y-3">
+              {[...booking.counter_offers].reverse().map((co: any, i: number) => (
+                <div key={i} className="flex gap-3 text-sm">
+                  <div className="w-1.5 h-1.5 rounded-full bg-purple-400 mt-1.5 shrink-0" />
+                  <div>
+                    <p className="font-medium">${(co.price_per_unit_cents / 100).toFixed(2)} per {booking.pre_order?.unit || "unit"}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {co.by_name} ({co.by_role}) · {formatDateTime(co.created_at)}
+                    </p>
+                    {co.notes && <p className="text-xs text-muted-foreground mt-0.5">{co.notes}</p>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Status history */}
         {booking.status_history?.length > 0 && (
           <div className="border rounded-xl p-5">
@@ -438,6 +522,55 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
                 className="px-4 py-2 text-sm rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors disabled:opacity-50"
               >
                 {cancelMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Cancel Booking"}
+              </button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Counter-offer dialog */}
+        <Dialog open={counterOpen} onOpenChange={(o) => { setCounterOpen(o); if (!o) setCounterPrice("") }}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Make a Counter-Offer</DialogTitle>
+            </DialogHeader>
+            <p className="text-sm text-muted-foreground">
+              Propose a different price per {booking.pre_order?.unit || "unit"}. The seller can accept, reject, or counter back.
+            </p>
+            {booking.pre_order?.offer_price > 0 && (
+              <div className="bg-muted/50 rounded-lg px-3 py-2 text-sm">
+                Current offered price: <span className="font-semibold">${(booking.pre_order.offer_price / 100).toFixed(2)}</span> per {booking.pre_order.unit || "unit"}
+              </div>
+            )}
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">$</span>
+              <input
+                type="number"
+                step="0.01"
+                min="0.01"
+                value={counterPrice}
+                onChange={(e) => setCounterPrice(e.target.value)}
+                placeholder="0.00"
+                className="w-full text-sm border rounded-lg pl-7 pr-3 py-2 focus:outline-none focus:ring-1 focus:ring-ring bg-transparent"
+              />
+            </div>
+            {counterPrice && (
+              <p className="text-xs text-muted-foreground">
+                Total: ${(parseFloat(counterPrice) * (booking.pre_order?.quantity || 0)).toFixed(2)} for {booking.pre_order?.quantity} {booking.pre_order?.unit || "units"}
+              </p>
+            )}
+            <DialogFooter>
+              <button onClick={() => { setCounterOpen(false); setCounterPrice("") }} className="px-4 py-2 text-sm rounded-lg border hover:bg-muted transition-colors">
+                Go back
+              </button>
+              <button
+                onClick={() => {
+                  const cents = Math.round(parseFloat(counterPrice) * 100)
+                  if (cents > 0) counterMutation.mutate(cents)
+                }}
+                disabled={!counterPrice || parseFloat(counterPrice) <= 0 || counterMutation.isPending}
+                className="px-4 py-2 text-sm rounded-lg bg-purple-600 text-white hover:bg-purple-700 transition-colors disabled:opacity-50"
+              >
+                {counterMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Send Counter-Offer"}
               </button>
             </DialogFooter>
           </DialogContent>
