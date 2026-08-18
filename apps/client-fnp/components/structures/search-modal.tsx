@@ -27,7 +27,7 @@ const COLLECTION_META: Record<string, { label: string; icon: React.ElementType; 
   equipment: { label: "Equipment", icon: Tractor, urlPrefix: "/buy-equipment/" },
   guides: { label: "Guides & Programs", icon: FileText, urlPrefix: "" },
   farm_produce: { label: "Farm Produce", icon: ShoppingBag, urlPrefix: "/farm-produce/" },
-  buyers: { label: "Buyers", icon: Users, urlPrefix: "/buyers/" },
+  clients: { label: "Farmers & Buyers", icon: Users, urlPrefix: "" },
   prices: { label: "Market Prices", icon: DollarSign, urlPrefix: "/prices" },
   bookings: { label: "Bookings", icon: CalendarCheck, urlPrefix: "/bookings/" },
   lots: { label: "Lots & Auctions", icon: Gavel, urlPrefix: "/lots/" },
@@ -45,7 +45,10 @@ function getResultUrl(collection: string, doc: Record<string, any>): string {
   }
 
   if (collection === "prices") return "/prices"
-  if (collection === "buyers") return `/buyers/${doc.slug}`
+  if (collection === "clients") {
+    const prefix = doc.type === "farmer" ? "/farmers/" : "/buyers/"
+    return `${prefix}${doc.slug}`
+  }
 
   return `${meta.urlPrefix}${doc.slug}`
 }
@@ -84,8 +87,9 @@ function getDisplaySub(collection: string, doc: Record<string, any>): string {
     const location = [doc.city, doc.province].filter(Boolean).join(", ")
     return [doc.breed_name, qty, price, location].filter(Boolean).join(" · ")
   }
-  if (collection === "buyers") {
-    return [doc.city, doc.province].filter(Boolean).join(", ")
+  if (collection === "clients") {
+    const typeLabel = doc.type === "farmer" ? "Farmer" : "Buyer"
+    return [typeLabel, doc.city, doc.province].filter(Boolean).join(" · ")
   }
   if (collection === "farm_produce") {
     return doc.category_name || ""
@@ -198,7 +202,7 @@ export function SearchModal({ open, onOpenChange }: { open: boolean; onOpenChang
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Search products, guides, buyers, prices..."
+            placeholder="Search products, guides, farmers, buyers, prices..."
             className="flex h-12 w-full bg-transparent px-3 text-sm outline-none placeholder:text-muted-foreground"
             autoFocus
           />
@@ -213,7 +217,7 @@ export function SearchModal({ open, onOpenChange }: { open: boolean; onOpenChang
         <div className="max-h-[400px] overflow-y-auto p-2">
           {!query.trim() && (
             <div className="py-12 text-center text-sm text-muted-foreground">
-              Start typing to search across all products, guides, and buyers
+              Start typing to search across all products, guides, farmers, and buyers
             </div>
           )}
 

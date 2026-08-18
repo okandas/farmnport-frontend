@@ -20,7 +20,7 @@ const COLLECTION_LABELS: Record<string, string> = {
   seed_products: "Seeds",
   equipment: "Equipment",
   guides: "Guide",
-  buyers: "Buyer",
+  clients: "Client",
   prices: "Market Prices",
   bookings: "Pre-Order",
   lots: "Lot",
@@ -50,7 +50,10 @@ function getUrls(collection: string, doc: Record<string, any>): { guide?: string
     return { view: `/buy-documents/${doc.slug}` }
   }
   if (collection === "prices") return { view: "/prices" }
-  if (collection === "buyers") return { view: `/buyer/${doc.slug}` }
+  if (collection === "clients") {
+    const prefix = doc.type === "farmer" ? "/farmers" : "/buyers"
+    return { view: `${prefix}/${doc.slug}` }
+  }
   if (collection === "bookings") return { view: `/bookings/${doc.slug}` }
   if (collection === "lots") return { view: `/lots/${doc.slug}` }
 
@@ -83,7 +86,10 @@ function getDescription(collection: string, doc: Record<string, any>): string {
     const location = [doc.city, doc.province].filter(Boolean).join(", ")
     return [doc.breed_name, qty, location].filter(Boolean).join(" · ")
   }
-  if (collection === "buyers") return [doc.short_description, doc.city, doc.province].filter(Boolean).join(" · ")
+  if (collection === "clients") {
+    const typeLabel = doc.type === "farmer" ? "Farmer" : "Buyer"
+    return [typeLabel, doc.short_description, doc.city, doc.province].filter(Boolean).join(" · ")
+  }
   if (collection === "bookings") return [doc.produce_name, doc.breed_name, doc.client_name].filter(Boolean).join(" · ")
   if (collection === "guides") return doc.description || ""
   return [doc.brand_name, doc.category_name].filter(Boolean).join(" · ")
@@ -209,10 +215,19 @@ export function SearchResults() {
               const price = getPrice(item.doc)
               const urls = getUrls(item.collection, item.doc)
               const image = item.doc.image_src
+              const primaryUrl = urls.buy || urls.view || "/"
               return (
-                <div
+                <Link
                   key={`${item.collection}-${item.doc.id}-${i}`}
-                  className="group flex flex-col rounded-lg border bg-card hover:border-primary/40 hover:shadow-md transition-all overflow-hidden cursor-pointer"
+                  href={primaryUrl}
+                  onClick={() => sendGTMEvent({
+                    event: "search_result_click",
+                    search_term: q,
+                    result_collection: item.collection,
+                    result_name: name,
+                    result_position: i + 1,
+                  })}
+                  className="group flex flex-col rounded-lg border bg-card hover:border-primary/40 hover:shadow-md transition-all overflow-hidden"
                 >
                   {/* Image */}
                   <div className="aspect-square bg-muted/30 dark:bg-white relative">
@@ -223,7 +238,7 @@ export function SearchResults() {
 
                   {/* Content */}
                   <div className="p-3 flex flex-col flex-1 border-t">
-                    <p className="text-[11px] font-medium text-foreground mb-1">{COLLECTION_LABELS[item.collection] ?? item.collection}</p>
+                    <p className="text-[11px] font-medium text-foreground mb-1">{item.collection === "clients" ? (item.doc.type === "farmer" ? "Farmer" : "Buyer") : (COLLECTION_LABELS[item.collection] ?? item.collection)}</p>
                     <h3 className="text-sm font-semibold group-hover:text-primary transition-colors line-clamp-2 capitalize">
                       {name}
                     </h3>
@@ -237,33 +252,37 @@ export function SearchResults() {
                       {/* Action buttons */}
                       <div className="flex items-center gap-1.5">
                         {urls.buy && (
-                          <Link
-                            href={urls.buy}
-                            className="flex-1 h-7 rounded text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors inline-flex items-center justify-center"
-                          >
+                          <span className="flex-1 h-7 rounded text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors inline-flex items-center justify-center">
                             Buy
-                          </Link>
+                          </span>
                         )}
                         {urls.guide && (
                           <Link
                             href={urls.guide}
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              sendGTMEvent({
+                                event: "search_guide_click",
+                                search_term: q,
+                                result_collection: item.collection,
+                                result_name: name,
+                                result_position: i + 1,
+                              })
+                            }}
                             className="flex-1 h-7 rounded text-xs font-medium border text-muted-foreground hover:bg-muted/50 hover:text-foreground transition-colors inline-flex items-center justify-center"
                           >
                             Guide
                           </Link>
                         )}
                         {urls.view && !urls.buy && (
-                          <Link
-                            href={urls.view}
-                            className="flex-1 h-7 rounded text-xs font-medium border text-muted-foreground hover:bg-muted/50 hover:text-foreground transition-colors inline-flex items-center justify-center"
-                          >
+                          <span className="flex-1 h-7 rounded text-xs font-medium border text-muted-foreground hover:bg-muted/50 hover:text-foreground transition-colors inline-flex items-center justify-center">
                             View
-                          </Link>
+                          </span>
                         )}
                       </div>
                     </div>
                   </div>
-                </div>
+                </Link>
               )
             })}
           </div>

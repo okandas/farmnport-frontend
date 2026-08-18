@@ -11,6 +11,7 @@ interface AISearchProduct {
   name: string
   slug: string
   _collection: string
+  type?: string
   brand_name?: string
   category_name?: string
   image_src?: string
@@ -42,7 +43,7 @@ const COLLECTION_URL_PREFIX: Record<string, string> = {
   equipment: "/buy-equipment/",
   guides: "/buy-documents/",
   farm_produce: "/farm-produce/",
-  buyers: "/buyers/",
+  clients: "/buyers/",
   prices: "/prices",
   bookings: "/bookings/",
   lots: "/lots/",
@@ -57,7 +58,7 @@ const COLLECTION_LABELS: Record<string, string> = {
   equipment: "Equipment",
   guides: "Guide",
   farm_produce: "Farm Produce",
-  buyers: "Buyer",
+  clients: "Client",
   prices: "Prices",
   bookings: "Pre-Order",
   lots: "Lot",
@@ -67,6 +68,15 @@ function getProductUrl(product: AISearchProduct): string {
   const prefix = COLLECTION_URL_PREFIX[product._collection]
   if (!prefix) return "/"
   if (product._collection === "prices") return "/prices"
+  if (product._collection === "clients") {
+    const clientPrefix = product.type === "farmer" ? "/farmers/" : "/buyers/"
+    return `${clientPrefix}${product.slug}`
+  }
+  if (product._collection === "guides") {
+    if (product.type === "spray_program") return `/spray-programs/${product.slug}`
+    if (product.type === "feeding_program") return `/feeding-programs/${product.slug}`
+    return `/buy-documents/${product.slug}`
+  }
   return `${prefix}${product.slug}`
 }
 
@@ -270,7 +280,7 @@ export function AISearchOverlay({ open, onClose }: { open: boolean; onClose: () 
                                 <span className="text-xs text-muted-foreground truncate">{product.brand_name}</span>
                               )}
                               <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground">
-                                {COLLECTION_LABELS[product._collection] || product._collection}
+                                {product._collection === "clients" ? (product.type === "farmer" ? "Farmer" : "Buyer") : (COLLECTION_LABELS[product._collection] || product._collection)}
                               </span>
                             </div>
                           </div>
