@@ -1,4 +1,5 @@
 import { Body, Button, Container, Head, Hr, Html, Link, Preview, Section, Text } from "@react-email/components"
+import { titleCase } from "@/lib/utilities"
 
 interface OrderStatusEmailProps {
   name?: string
@@ -49,7 +50,7 @@ export default function OrderStatusEmail({
           {/* Greeting */}
           <Section style={content}>
             <Text style={greeting}>Order update</Text>
-            <Text style={paragraph}>Hi {name},</Text>
+            <Text style={paragraph}>Hi {titleCase(name)},</Text>
             <Text style={paragraph}>{message}</Text>
             <Text style={paragraph}>
               {"Order: "}<strong>{orderNumber}</strong>

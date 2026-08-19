@@ -35,7 +35,8 @@ const columnHelper = createColumnHelper<ApplicationUser>()
     enableHiding: false,
   }),
   columnHelper.accessor('name', {
-    header: "Name"
+    header: "Name",
+    cell: ({ getValue }) => <span className="capitalize">{getValue()}</span>,
   }),
   columnHelper.accessor('address', {
     header: "Address"

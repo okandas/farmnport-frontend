@@ -1,4 +1,5 @@
 import { Body, Button, Container, Head, Hr, Html, Link, Preview, Section, Text } from "@react-email/components"
+import { titleCase } from "@/lib/utilities"
 
 interface LotBidCounteredEmailProps {
   name?: string
@@ -35,9 +36,9 @@ export default function LotBidCounteredEmail({
 
           {/* Greeting */}
           <Section style={content}>
-            <Text style={greeting}>Hi {name},</Text>
+            <Text style={greeting}>Hi {titleCase(name)},</Text>
             <Text style={paragraph}>
-              {counterName} has made a counter-offer on lot {lotSlug}.
+              {titleCase(counterName)} has made a counter-offer on lot {lotSlug}.
             </Text>
             <Text style={paragraph}>
               {"Quantity: "}{quantity} {unit}{"\n"}

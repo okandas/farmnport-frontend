@@ -1,4 +1,5 @@
 import { Body, Button, Container, Head, Hr, Html, Link, Preview, Section, Text } from "@react-email/components"
+import { titleCase } from "@/lib/utilities"
 
 interface Props { name?: string; bookingRef?: string; productName?: string; quantity?: number; bookingUrl?: string }
 
@@ -23,7 +24,7 @@ export default function PreorderExpiredEmail({
 
           {/* Content */}
           <Section style={content}>
-            <Text style={greeting}>Hi {name},</Text>
+            <Text style={greeting}>Hi {titleCase(name)},</Text>
             <Text style={paragraph}>Your booking for {quantity} {productName} has expired because the payment was not received within the deadline. Your reserved quantity has been released.</Text>
             <Text style={paragraph}>Booking reference: <strong>{bookingRef}</strong></Text>
             <Text style={paragraph}>If you&apos;d still like to place an order, you can submit a new booking request.</Text>

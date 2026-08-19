@@ -1,4 +1,5 @@
 import { Body, Button, Container, Head, Hr, Html, Link, Preview, Section, Text } from "@react-email/components"
+import { titleCase } from "@/lib/utilities"
 
 interface MarketingLaunchEmailProps {
   name?: string
@@ -24,7 +25,7 @@ export default function MarketingLaunchEmail({ name = "Member" }: MarketingLaunc
 
           {/* Greeting */}
           <Section style={content}>
-            <Text style={greeting}>Hi {name},</Text>
+            <Text style={greeting}>Hi {titleCase(name)},</Text>
             <Text style={paragraph}>
               We have added two new ways for you to trade directly on farmnport. Whether you supply or buy produce, these tools help you connect faster.
             </Text>

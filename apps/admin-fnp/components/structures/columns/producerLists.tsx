@@ -43,6 +43,7 @@ export const producerPriceListColumns: ColumnDef<ProducerPriceList>[] = [
   {
     accessorKey: "client_name",
     header: "Client Name",
+    cell: ({ row }: any) => <span className="capitalize">{row.original.client_name}</span>,
   },
   {
     id: "see_price",

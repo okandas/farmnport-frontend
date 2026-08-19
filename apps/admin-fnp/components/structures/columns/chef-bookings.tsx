@@ -52,7 +52,7 @@ export const chefBookingColumns: ColumnDef<ChefBookingRow>[] = [
     accessorKey: "client_name",
     header: "Client",
     cell: ({ row }) => (
-      <span className="text-sm">{row.original.client_name}</span>
+      <span className="text-sm capitalize">{row.original.client_name}</span>
     ),
   },
   {

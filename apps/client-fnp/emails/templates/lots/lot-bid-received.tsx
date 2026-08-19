@@ -1,4 +1,5 @@
 import { Body, Button, Container, Head, Hr, Html, Link, Preview, Section, Text } from "@react-email/components"
+import { titleCase } from "@/lib/utilities"
 
 interface LotBidReceivedEmailProps {
   name?: string
@@ -33,9 +34,9 @@ export default function LotBidReceivedEmail({
 
           {/* Greeting */}
           <Section style={content}>
-            <Text style={greeting}>Hi {name},</Text>
+            <Text style={greeting}>Hi {titleCase(name)},</Text>
             <Text style={paragraph}>
-              {bidderName} has placed an offer on your lot.
+              {titleCase(bidderName)} has placed an offer on your lot.
             </Text>
             <Text style={paragraph}>
               {"Quantity: "}{quantity} {unit}{"\n"}
