@@ -49,10 +49,12 @@ function EventCard({ event }: { event: any }) {
               <span className="font-medium text-foreground">${(event.deposit_per_unit / 100).toFixed(2)}</span>
             </div>
           )}
+          {event.total_available > 0 && (
           <div className="flex justify-between">
             <span>Available</span>
             <span className="font-medium text-foreground">{available} of {event.total_available}</span>
           </div>
+          )}
           {(event.delivery_locations?.length > 0 || event.collection_locations?.length > 0) && (
             <div className="flex items-center justify-between">
               <span>Locations</span>
