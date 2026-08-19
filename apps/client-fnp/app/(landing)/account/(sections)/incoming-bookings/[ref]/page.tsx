@@ -584,7 +584,7 @@ export default function IncomingBookingDetailPage({ params }: { params: Promise<
                   <div key={i} className="flex gap-3 text-sm">
                     <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40 mt-1.5 shrink-0" />
                     <div>
-                      <p className="font-medium text-sm capitalize">{h.to}</p>
+                      <p className="font-medium text-sm">{STATUS_LABELS[h.to] ?? h.to}</p>
                       {h.note && <p className="text-xs text-muted-foreground mt-0.5">{h.note}</p>}
                       <p className="text-xs text-muted-foreground mt-0.5">
                         {formatDateTime(h.timestamp)}
