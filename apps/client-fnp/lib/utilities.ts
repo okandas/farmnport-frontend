@@ -145,7 +145,7 @@ export function buildGuideMetadata(
 ) {
   const name = formatProductName(product.name)
   const brandInTitle = product.brand?.name ? ` ${formatProductName(product.brand.name)}` : ''
-  const ogImage = imageUrl || '/og-image.png'
+  const ogImage = imageUrl || '/api/og'
   return {
     title: `${name}${brandInTitle} – ${categorySingularTitle} ${titleSuffix} | farmnport.com`,
     description,
@@ -177,7 +177,7 @@ export function buildBuyMetadata(
 ) {
   const name = formatProductName(product.name)
   const brand = product.brand?.name ? ` ${formatProductName(product.brand.name)}` : ''
-  const ogImage = imageUrl || '/og-image.png'
+  const ogImage = imageUrl || '/api/og'
   const description = product.description ||
     `Buy ${name}${brand}. ${category} for ${descriptionContext}. View pricing and order online at farmnport.com.`
   return {

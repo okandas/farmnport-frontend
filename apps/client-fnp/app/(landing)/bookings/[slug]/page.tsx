@@ -21,9 +21,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         const produce = titleCase(p.produce_name || "")
         const isBuyer = p.market_side === "demand"
         const action = isBuyer ? "Buying" : "Selling"
-        const cta = isBuyer ? "Supply Now" : "Book Now"
-
-        const title = `${supplier} ${action} ${produce} — ${cta} | farmnport`
+        const title = `${supplier} — ${action} ${produce} | farmnport`
         const description = p.description || (isBuyer
             ? `${supplier} is looking for ${produce}. Supply them now on farmnport.com.`
             : `${supplier} is selling ${produce}. Pre-order now on farmnport.com — secure your stock before it sells out.`)
@@ -37,7 +35,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
                 title,
                 description,
                 url: `${baseUrl}/bookings/${slug}`,
-                images: p.image_src ? [{ url: p.image_src }] : [],
+                images: [{ url: p.image_src || `${baseUrl}/api/og` }],
                 siteName: "farmnport",
                 type: "website",
             },
@@ -45,7 +43,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
                 card: "summary_large_image",
                 title,
                 description,
-                images: ["/og-image.png"],
+                images: [{ url: p.image_src || `${baseUrl}/api/og` }],
             },
         }
     } catch {
@@ -71,7 +69,7 @@ export default async function PreOrderDetailPage({ params }: Props) {
         "@context": "https://schema.org",
         "@type": "Product",
         "name": `${preorder.client_name || preorder.brand_name || "Supplier"} — ${preorder.produce_name || "Farm Produce"}`,
-        "image": preorder.image_src ? [preorder.image_src] : [`${baseUrl}/og-image.png`],
+        "image": preorder.image_src ? [preorder.image_src] : [`${baseUrl}/api/og`],
         "description": preorder.description || `${isBuyer ? "Buying" : "Selling"} ${preorder.produce_name || "farm produce"} on farmnport.com`,
         "sku": preorder.id || slug,
         "category": "Farm Bookings",

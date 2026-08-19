@@ -13,13 +13,13 @@ export const metadata = {
         siteName: "farmnport",
         type: "website" as const,
         url: "https://farmnport.com/buy-seed-products",
-        images: [{ url: "https://farmnport.com/og-image.png", width: 1200, height: 630, alt: "farmnport" }],
+        images: [{ url: "https://farmnport.com/api/og", width: 1200, height: 630, alt: "farmnport" }],
     },
     twitter: {
         card: "summary_large_image" as const,
         title: "Buy Seed Products Zimbabwe – Prices & Varieties",
         description: "Shop maize seed, vegetable seed and pasture seed from certified suppliers. Compare prices, view varieties and order online.",
-        images: ["/og-image.png"],
+        images: ["/api/og"],
     },
 }
 

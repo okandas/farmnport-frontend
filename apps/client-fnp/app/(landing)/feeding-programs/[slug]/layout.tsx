@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: LayoutProps): Promise<Metadat
 
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://farmnport.com'
     const url = `${baseUrl}/feeding-programs/${slug}`
-    const imageUrl = program.cover_image?.img?.src || `${baseUrl}/og-image.png`
+    const imageUrl = program.cover_image?.img?.src || `${baseUrl}/api/og`
 
     const stageCount = program.stages?.length || 0
     const animal = program.animal || 'livestock'

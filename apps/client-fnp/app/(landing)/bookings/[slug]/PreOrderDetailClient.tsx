@@ -294,7 +294,7 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
               <div className="rounded-xl border bg-muted/30 p-4">
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2 min-h-[32px]">{event.market_side === "demand" ? "Quantity Needed" : "Available"}</p>
                 <p className="text-lg font-bold">{available.toLocaleString()}</p>
-                <p className="text-xs text-muted-foreground mt-1">of {event.total_available.toLocaleString()} {event.unit} total</p>
+                <p className="text-xs text-muted-foreground mt-1">{event.market_side === "demand" ? `${event.unit}${event.frequency ? ` / ${event.frequency}` : ""}` : `of ${event.total_available.toLocaleString()} ${event.unit} total`}</p>
               </div>
               )}
               <div className="rounded-xl border bg-muted/30 p-4">

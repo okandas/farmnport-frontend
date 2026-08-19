@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: LayoutProps): Promise<Metadat
 
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://farmnport.com'
     const url = `${baseUrl}/spray-programs/${slug}`
-    const imageUrl = program.cover_image?.img?.src || `${baseUrl}/og-image.png`
+    const imageUrl = program.cover_image?.img?.src || `${baseUrl}/api/og`
 
     const stageCount = program.stages?.length || 0
     const description = `${program.name} spray program for ${program.farm_produce_name || 'crops'} with ${stageCount} growth stages. View recommended agrochemicals, dosages, and application methods for each stage.`

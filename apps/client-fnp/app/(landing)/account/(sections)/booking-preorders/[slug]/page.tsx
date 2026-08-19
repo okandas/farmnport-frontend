@@ -178,7 +178,7 @@ export default function BookingPreOrderDetailPage({ params }: { params: Promise<
               <Field label="Max Quantity" value={event.max_quantity || "No maximum"} />
               {event.quantity_step > 1 && <Field label="Step" value={`Multiples of ${event.quantity_step}`} />}
               <Field label="Opens" value={formatDate(event.open_date)} />
-              <Field label="Closes" value={formatDate(event.close_date)} />
+              {event.close_date && <Field label="Closes" value={formatDate(event.close_date)} />}
               <Field label="Market Side" value={event.market_side === "demand" ? "Buyer Request" : "Supply Offer"} />
             </div>
             {event.description && (

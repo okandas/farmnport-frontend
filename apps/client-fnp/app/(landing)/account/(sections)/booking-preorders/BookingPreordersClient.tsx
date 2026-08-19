@@ -99,7 +99,7 @@ export default function MyPreOrdersPage() {
                     {event.product_name ? `${event.product_name} · ` : ""}
                     {booked}/{available} {event.unit} booked · {centsToDollars(event.unit_price)}/{event.unit}
                   </p>
-                  <p>Opens {formatDate(event.open_date)} · Closes {formatDate(event.close_date)}</p>
+                  <p>Opens {formatDate(event.open_date)}{event.close_date ? ` · Closes ${formatDate(event.close_date)}` : ""}</p>
                 </div>
               </div>
             )
