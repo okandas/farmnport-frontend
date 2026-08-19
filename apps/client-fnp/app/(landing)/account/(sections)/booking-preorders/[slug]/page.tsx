@@ -238,7 +238,7 @@ export default function BookingPreOrderDetailPage({ params }: { params: Promise<
                     {bookings.map((b: any) => (
                       <Link
                         key={b.id}
-                        href={`/account/incoming-bookings/${b.id}`}
+                        href={`/account/incoming-bookings/${b.booking_ref}`}
                         className="block border rounded-lg p-3 hover:bg-muted/50 transition-colors"
                       >
                         <div className="flex items-center justify-between gap-3">

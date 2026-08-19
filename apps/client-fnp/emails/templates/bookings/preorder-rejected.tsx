@@ -1,19 +1,42 @@
 import { Body, Button, Container, Head, Hr, Html, Link, Preview, Section, Text } from "@react-email/components"
 
-interface Props { name?: string; bookingRef?: string; productName?: string; quantity?: number; reason?: string; bookingUrl?: string }
+interface Props { name?: string; bookingRef?: string; productName?: string; quantity?: number; unit?: string; reason?: string; bookingUrl?: string; marketSide?: string; cancelledBy?: string; action?: string }
 
 export default function PreorderRejectedEmail({
   name = "Okandas",
   bookingRef = "FNP-BK-PO-0001",
   productName = "Fivet Cobb 500 Day-Old Chicks",
   quantity = 100,
+  unit = "",
   reason = "Insufficient stock for requested quantity",
   bookingUrl = "https://farmnport.com/account/bookings/preview",
+  marketSide = "supply",
+  cancelledBy = "",
+  action = "rejected",
 }: Props) {
+  const isCancelled = action === "cancelled"
+  const isDemand = marketSide === "demand"
+  const qty = unit ? `${quantity} ${unit} of ${productName}` : `${quantity} ${productName}`
+
+  let headline = ""
+  if (isCancelled && cancelledBy) {
+    headline = isDemand
+      ? `${cancelledBy} cancelled your bid to supply ${qty}.`
+      : `${cancelledBy} cancelled your booking for ${qty}.`
+  } else {
+    headline = isDemand
+      ? `Unfortunately, your bid to supply ${qty} could not be fulfilled.`
+      : `Unfortunately, your booking request for ${qty} could not be fulfilled.`
+  }
+
+  const previewText = isCancelled
+    ? `Booking ${bookingRef} has been cancelled`
+    : `Booking ${bookingRef} could not be fulfilled`
+
   return (
     <Html lang="en">
       <Head />
-      <Preview>Booking {bookingRef} could not be fulfilled</Preview>
+      <Preview>{previewText}</Preview>
       <Body style={body}>
         <Container style={container}>
 
@@ -25,7 +48,7 @@ export default function PreorderRejectedEmail({
           {/* Content */}
           <Section style={content}>
             <Text style={greeting}>Hi {name},</Text>
-            <Text style={paragraph}>Unfortunately, your booking request for {quantity} {productName} could not be fulfilled.</Text>
+            <Text style={paragraph}>{headline}</Text>
             <Text style={paragraph}>Booking reference: <strong>{bookingRef}</strong></Text>
             {reason && <Text style={paragraph}>Reason: {reason}</Text>}
           </Section>

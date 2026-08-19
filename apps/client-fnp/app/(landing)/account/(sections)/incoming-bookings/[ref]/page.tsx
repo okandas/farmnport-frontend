@@ -123,8 +123,8 @@ function StatusSteps({ status, type }: { status: string; type: string }) {
   )
 }
 
-export default function IncomingBookingDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params)
+export default function IncomingBookingDetailPage({ params }: { params: Promise<{ ref: string }> }) {
+  const { ref: id } = use(params)
   const { data: session } = useSession()
   const qc = useQueryClient()
   const [note, setNote] = useState("")
