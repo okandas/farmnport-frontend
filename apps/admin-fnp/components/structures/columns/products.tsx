@@ -31,6 +31,20 @@ export const agroChemicalColumns: ColumnDef<AgroChemicalItem>[] = [
   {
     accessorKey: "name",
     header: "Name",
+    cell: ({ row }) => {
+      const images = (row.original as any).images as { img: { src: string } }[] | undefined
+      const src = images && images.length > 0 ? images[0].img.src : null
+      return (
+        <div className="flex items-center gap-3">
+          {src ? (
+            <img src={src} alt="" className="w-10 h-10 rounded object-cover shrink-0" />
+          ) : (
+            <div className="w-10 h-10 rounded bg-muted/30 shrink-0" />
+          )}
+          <span className="capitalize">{row.getValue("name") as string}</span>
+        </div>
+      )
+    },
   },
   {
     accessorKey: "brand.name",

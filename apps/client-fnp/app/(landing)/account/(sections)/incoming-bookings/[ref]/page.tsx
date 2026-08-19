@@ -17,6 +17,7 @@ const STATUS_STYLES: Record<string, string> = {
   confirmed:        "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
   pending_payment:  "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400",
   paid:             "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
+  cash_on_delivery: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400",
   approved:         "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400",
   ready:            "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400",
   collected:        "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
@@ -32,6 +33,7 @@ const STATUS_LABELS: Record<string, string> = {
   confirmed:        "Confirmed",
   pending_payment:  "Payment Processing",
   paid:             "Paid",
+  cash_on_delivery: "Cash on Delivery",
   approved:         "Approved",
   ready:            "Ready for Collection",
   collected:        "Collected",
@@ -48,12 +50,20 @@ const DELIVERY_STEPS = [
   { status: "completed", label: "Completed" },
 ]
 
-const PRE_ORDER_STEPS = [
+const PRE_ORDER_STEPS_ONLINE = [
   { status: "pending",   label: "Pending" },
   { status: "confirmed", label: "Confirmed" },
   { status: "paid",      label: "Paid" },
   { status: "ready",     label: "Ready" },
   { status: "collected", label: "Collected" },
+]
+
+const PRE_ORDER_STEPS_CASH = [
+  { status: "pending",          label: "Pending" },
+  { status: "confirmed",        label: "Confirmed" },
+  { status: "cash_on_delivery", label: "Cash on Delivery" },
+  { status: "ready",            label: "Ready" },
+  { status: "collected",        label: "Collected" },
 ]
 
 const BUYER_TRANSITIONS: Record<string, { label: string; status: string }[]> = {
@@ -90,13 +100,13 @@ function ContactField({ label, value, href, event }: { label: string; value?: st
   )
 }
 
-function StatusSteps({ status, type }: { status: string; type: string }) {
+function StatusSteps({ status, type, paymentMethod }: { status: string; type: string; paymentMethod?: string }) {
   if (["cancelled", "rejected", "expired"].includes(status)) {
     return <span className="text-sm font-medium text-red-600">
       {status === "rejected" ? "This booking was rejected." : status === "expired" ? "Payment deadline passed." : "This booking was cancelled."}
     </span>
   }
-  const steps = type === "pre-order" ? PRE_ORDER_STEPS : DELIVERY_STEPS
+  const steps = type !== "pre-order" ? DELIVERY_STEPS : paymentMethod === "cash" ? PRE_ORDER_STEPS_CASH : PRE_ORDER_STEPS_ONLINE
   const currentIdx = steps.findIndex((s) => s.status === status)
   return (
     <div className="flex items-start gap-0">
@@ -257,7 +267,7 @@ export default function IncomingBookingDetailPage({ params }: { params: Promise<
           {/* Progress steps */}
           <div className="border rounded-xl p-5">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-4">Progress</p>
-            <StatusSteps status={booking.status} type={booking.type} />
+            <StatusSteps status={booking.status} type={booking.type} paymentMethod={booking.payment_method} />
           </div>
 
           {/* Farmer details */}
