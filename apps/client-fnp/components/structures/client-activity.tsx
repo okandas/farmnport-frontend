@@ -45,37 +45,56 @@ function LotCard({ lot }: { lot: any }) {
 
 function PreOrderCard({ event }: { event: any }) {
   const available = event.total_available - event.total_booked
+  const isBuying = event.market_side === "demand"
 
   return (
     <Link
       href={`/bookings/${event.slug}`}
       className="shrink-0 w-64 sm:w-72 bg-card border border-border rounded-lg overflow-hidden hover:shadow-lg hover:border-primary/50 transition-all duration-200 group flex flex-col"
     >
-      {event.image_src && (
-        <div className="relative h-40 sm:h-48 bg-muted/30">
+      <div className="relative h-40 sm:h-48 bg-muted/30">
+        {event.image_src ? (
           <img src={event.image_src} alt={event.name} className="absolute inset-0 w-full h-full object-cover" />
-        </div>
-      )}
-      <div className={`p-3 space-y-1 flex-1 ${event.image_src ? "border-t" : ""}`}>
-        <h3 className="font-semibold text-sm leading-tight line-clamp-1 group-hover:text-primary transition-colors">{event.name}</h3>
-        {event.subtitle && <p className="text-xs text-muted-foreground line-clamp-1">{event.subtitle}</p>}
+        ) : (
+          <div className="absolute inset-0 bg-muted/30" />
+        )}
+        <span className={`absolute top-2 left-2 inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium ${isBuying ? "bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400" : "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"}`}>
+          {isBuying ? "Buying" : "Selling"}
+        </span>
+      </div>
+      <div className="p-3 space-y-1 border-t flex-1">
+        <h3 className="font-semibold text-sm leading-tight line-clamp-1 group-hover:text-primary transition-colors">{event.produce_name || event.name}</h3>
+        {event.description && <p className="text-xs text-muted-foreground line-clamp-2">{event.description}</p>}
         <div className="text-xs text-muted-foreground pt-1 space-y-0.5">
           {event.unit_price > 0 && (
             <div className="flex justify-between">
-              <span>{event.market_side === "demand" ? "Buying at" : "Price"}</span>
-              <span className="font-semibold text-foreground">${(event.unit_price / 100 * (event.fee_bearer === "seller" ? 1 : 1 + (event.platform_fee_rate || DEFAULT_PLATFORM_FEE_RATE))).toFixed(2)}</span>
+              <span>{isBuying ? "Buying at" : "Price"}</span>
+              <span className="font-semibold text-foreground">${(event.unit_price / 100 * (event.fee_bearer === "seller" ? 1 : 1 + (event.platform_fee_rate || DEFAULT_PLATFORM_FEE_RATE))).toFixed(2)}/{event.unit}</span>
             </div>
           )}
-          <div className="flex justify-between">
-            <span>{event.market_side === "demand" ? "Needed" : "Available"}</span>
-            <span className="font-medium text-foreground">{available} of {event.total_available}</span>
-          </div>
-          <div className="flex justify-between">
-            <span>{event.market_side === "demand" ? "Deadline" : "Closes"}</span>
-            <span className="font-medium text-foreground">
-              {!event.close_date || event.close_date === "0001-01-01T00:00:00Z" ? "Always open" : formatDate(event.close_date)}
-            </span>
-          </div>
+          {event.min_quantity > 0 && (
+            <div className="flex justify-between">
+              <span>Minimum</span>
+              <span className="font-medium text-foreground">{event.min_quantity.toLocaleString()} {event.unit}</span>
+            </div>
+          )}
+          {event.total_available > 0 && (
+            <div className="flex justify-between">
+              <span>{isBuying ? "Needed" : "Available"}</span>
+              <span className="font-medium text-foreground">{available.toLocaleString()} of {event.total_available.toLocaleString()} {event.unit}</span>
+            </div>
+          )}
+          {event.frequency && (
+            <div className="flex justify-between">
+              <span>Frequency</span>
+              <span className="font-medium text-foreground capitalize">{event.frequency}</span>
+            </div>
+          )}
+        </div>
+        <div className="pt-2">
+          <span className="w-full h-7 rounded text-xs font-semibold bg-primary text-primary-foreground inline-flex items-center justify-center">
+            {isBuying ? "Offer Supply" : "Enquire"}
+          </span>
         </div>
       </div>
     </Link>
