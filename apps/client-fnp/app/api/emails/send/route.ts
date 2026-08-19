@@ -169,7 +169,7 @@ export async function POST(req: NextRequest) {
       break
 
     case "preorder-request-received":
-      subject = `Booking Request Submitted — ${(props as { bookingRef?: string }).bookingRef ?? ""}`
+      subject = `Bid Request Submitted for Booking — ${(props as { bookingRef?: string }).bookingRef ?? ""}`
       html = await render(PreorderRequestReceivedEmail(props as Parameters<typeof PreorderRequestReceivedEmail>[0]))
       break
 
