@@ -173,7 +173,7 @@ export async function POST(req: NextRequest) {
       break
 
     case "preorder-request-admin":
-      subject = `New Pre-Order Request — ${(props as { bookingRef?: string }).bookingRef ?? ""}`
+      subject = `Alert: New Booking Bid By ${(props as { customerName?: string }).customerName ?? "buyer"} on ${(props as { sellerName?: string }).sellerName ?? "seller"} - Booking ${(props as { bookingRef?: string }).bookingRef ?? ""}`
       html = await render(PreorderRequestAdminEmail(props as Parameters<typeof PreorderRequestAdminEmail>[0]))
       break
 

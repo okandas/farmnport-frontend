@@ -21,7 +21,7 @@ export default function PreorderRequestReceivedEmail({ name = "Okandas", booking
           {/* Content */}
           <Section style={content}>
             <Text style={greeting}>Hi {titleCase(name)},</Text>
-            <Text style={paragraph}>Your pre-order request has been submitted. We&apos;ll confirm availability and notify you to pay.</Text>
+            <Text style={paragraph}>Your pre-order request has been submitted. Supplier will confirm your order and notify you to continue with payment.</Text>
             <Text style={paragraph}>Booking reference: <strong>{bookingRef}</strong></Text>
             <Text style={paragraph}>{details}</Text>
           </Section>
