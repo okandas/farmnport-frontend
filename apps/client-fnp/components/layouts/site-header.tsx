@@ -6,8 +6,7 @@ import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
 import { signOut } from "next-auth/react"
 import { sendGTMEvent } from "@next/third-parties/google"
-import { Search, ShoppingCart, Sparkles } from "lucide-react"
-import { AISearchOverlay } from "@/components/structures/ai-search"
+import { Search, ShoppingCart } from "lucide-react"
 import { siteConfig } from "@/config/site"
 import { MobileNav } from "@/components/layouts/mobile-nav"
 import { AuthenticatedUser, AppURL } from "@/lib/schemas"
@@ -225,19 +224,11 @@ const SEARCH_CATEGORIES = [
   { value: "lots", label: "Lots" },
 ]
 
-function NavSearchBar({ router, onFocus, onAskAI }: { router: ReturnType<typeof useRouter>; onFocus?: () => void; onAskAI: () => void }) {
+function NavSearchBar({ router, onFocus }: { router: ReturnType<typeof useRouter>; onFocus?: () => void }) {
   const [category, setCategory] = useState("all")
 
   return (
     <div className="hidden lg:flex flex-1 items-center px-6 gap-2">
-      {/* <button
-        type="button"
-        onClick={onAskAI}
-        className="shrink-0 flex items-center gap-1.5 h-9 px-3 rounded-sm bg-primary text-primary-foreground hover:bg-primary/90 transition-colors text-xs font-medium"
-      >
-        <Sparkles className="h-3.5 w-3.5" />
-        Ask AI
-      </button> */}
       <form
         className="flex-1"
         onSubmit={(e) => {
@@ -278,7 +269,7 @@ function NavSearchBar({ router, onFocus, onAskAI }: { router: ReturnType<typeof 
   )
 }
 
-function MobileSearch({ router, onAskAI }: { router: ReturnType<typeof useRouter>; onAskAI: () => void }) {
+function MobileSearch({ router }: { router: ReturnType<typeof useRouter> }) {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState("")
 
@@ -295,13 +286,6 @@ function MobileSearch({ router, onAskAI }: { router: ReturnType<typeof useRouter
 
   return (
     <>
-      {/* <button
-        onClick={onAskAI}
-        className="lg:hidden p-2 rounded-lg hover:bg-muted transition-colors"
-        aria-label="Ask AI"
-      >
-        <Sparkles className="h-5 w-5" />
-      </button> */}
       <button
         onClick={() => {
           sendGTMEvent({ event: "search_open", method: "mobile_icon" })
