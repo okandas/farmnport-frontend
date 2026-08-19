@@ -1,15 +1,33 @@
 import { Body, Button, Container, Head, Hr, Html, Link, Preview, Section, Text } from "@react-email/components"
 import { titleCase } from "@/lib/utilities"
 
-interface Props { name?: string; bookingRef?: string; productName?: string; quantity?: number; bookingUrl?: string }
+interface Props {
+  name?: string
+  counterName?: string
+  bookingRef?: string
+  quantity?: number
+  unit?: string
+  originalPrice?: string
+  counterPrice?: string
+  total?: string
+  bidUrl?: string
+}
 
-export default function PreorderRequestReceivedEmail({ name = "Okandas", bookingRef = "FNP-BK-PO-0001", productName = "Fivet Cobb 500 Day-Old Chicks", quantity = 100, bookingUrl = "https://farmnport.com/account/bookings/preview" }: Props) {
-  const details = `Produce   ${productName}\nQuantity  ${quantity} units`
-
+export default function BookingCounterOfferEmail({
+  name = "Okandas",
+  counterName = "Palbrook Seed Potatoes",
+  bookingRef = "FNP-BK-PO-0001",
+  quantity = 50,
+  unit = "chicks",
+  originalPrice = "$0.30",
+  counterPrice = "$0.35",
+  total = "$17.50",
+  bidUrl = "https://farmnport.com/account/bookings/preview",
+}: Props) {
   return (
     <Html lang="en">
       <Head />
-      <Preview>Booking request {bookingRef} submitted — {productName}</Preview>
+      <Preview>Counter-offer on booking {bookingRef} — {counterPrice} per {unit}</Preview>
       <Body style={body}>
         <Container style={container}>
 
@@ -21,25 +39,34 @@ export default function PreorderRequestReceivedEmail({ name = "Okandas", booking
           {/* Content */}
           <Section style={content}>
             <Text style={greeting}>Hi {titleCase(name)},</Text>
-            <Text style={paragraph}>Your pre-order request has been submitted. Supplier will confirm your order and notify you to continue with payment.</Text>
-            <Text style={paragraph}>Booking reference: <strong>{bookingRef}</strong></Text>
-            <Text style={paragraph}>{details}</Text>
+            <Text style={paragraph}>
+              Your offer was {originalPrice} per {unit}. {titleCase(counterName)} has countered with {counterPrice} per {unit}.
+            </Text>
+            <Text style={paragraph}>
+              {"Booking: "}<strong>{bookingRef}</strong>{"\n"}
+              {"Quantity: "}{String(quantity)} {unit}{"\n"}
+              {"Counter price: "}{counterPrice} per {unit}{"\n"}
+              {"Total: "}{total}
+            </Text>
+            <Text style={paragraph}>
+              You can accept, decline, or counter back.
+            </Text>
           </Section>
 
           <Hr style={divider} />
 
+          {/* CTA */}
           <Section style={content}>
             <Section style={buttonWrapper}>
-              <Button href={bookingUrl} style={buttonPrimary}>View your booking</Button>
+              <Button href={bidUrl} style={buttonPrimary}>View and Respond</Button>
             </Section>
           </Section>
 
           <Hr style={divider} />
 
+          {/* Sign off */}
           <Section style={content}>
-            <Text style={signoff}>
-              Questions? Reply to this email and quote <strong>{bookingRef}</strong>.{"\n\n"}the farmnport team
-            </Text>
+            <Text style={signoff}>the farmnport team</Text>
           </Section>
 
           {/* Footer */}

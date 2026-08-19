@@ -7,7 +7,7 @@ import { Loader2, CalendarDays, Truck, Package, CheckCircle, XCircle, Clock, Ale
 import Link from "next/link"
 import { toast } from "sonner"
 
-import { getBooking, cancelBooking, initiatePreOrderPayment, pollPreOrderPayment, respondToBooking } from "@/lib/query"
+import { getBooking, cancelBooking, initiatePreOrderPayment, pollPreOrderPayment, respondToBooking, clientCashPayment } from "@/lib/query"
 import { centsToDollars, plural, DEFAULT_PLATFORM_FEE_RATE, feePercentLabel } from "@/lib/utilities"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 
@@ -16,6 +16,7 @@ const STATUS_STYLES: Record<string, string> = {
   confirmed:        "bg-blue-100 text-blue-800",
   pending_payment:  "bg-orange-100 text-orange-800",
   paid:             "bg-green-100 text-green-800",
+  cash_on_delivery: "bg-amber-100 text-amber-800",
   approved:         "bg-purple-100 text-purple-800",
   ready:            "bg-emerald-100 text-emerald-800",
   collected:        "bg-green-100 text-green-800",
@@ -31,6 +32,7 @@ const STATUS_LABELS: Record<string, string> = {
   confirmed:        "Confirmed — Pay Now",
   pending_payment:  "Payment Processing",
   paid:             "Paid",
+  cash_on_delivery: "Cash on Delivery",
   approved:         "Approved",
   ready:            "Ready for Collection",
   collected:        "Collected",
@@ -164,7 +166,10 @@ export default function BookingDetailPage({ params }: { params: Promise<{ ref: s
         <span className="text-foreground font-medium">{booking.booking_ref}</span>
       </nav>
 
-      <div className="space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        {/* ── Left: details ── */}
+        <div className="lg:col-span-2 space-y-6">
 
         {/* Header */}
         <div className="flex items-start justify-between gap-4">
@@ -186,11 +191,11 @@ export default function BookingDetailPage({ params }: { params: Promise<{ ref: s
           const fee = sellerPaysFee ? 0 : Math.round(booking.pre_order.deposit_amount * rate) / 100
           const total = subtotal + fee
           return (
-          <div className="border border-orange-200 bg-orange-50 rounded-xl p-5 space-y-3">
+          <div className="border rounded-xl p-5 space-y-3">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="font-semibold text-orange-900">Your booking is confirmed — pay to secure</p>
-                <p className="text-sm text-orange-700 mt-1">
+                <p className="font-semibold">Your booking is confirmed — pay to secure</p>
+                <p className="text-sm text-muted-foreground mt-1">
                   Pay ${total.toFixed(2)} to secure your {booking.pre_order.quantity} {booking.pre_order.produce_name}
                 </p>
               </div>
@@ -201,20 +206,20 @@ export default function BookingDetailPage({ params }: { params: Promise<{ ref: s
                 </div>
               )}
             </div>
-            <div className="bg-white/60 rounded-lg p-3 text-sm space-y-1">
+            <div className="bg-muted/30 rounded-lg p-3 text-sm space-y-1">
               <div className="flex justify-between">
-                <span className="text-orange-700">Subtotal</span>
+                <span className="text-muted-foreground">Subtotal</span>
                 <span className="font-medium">${subtotal.toFixed(2)}</span>
               </div>
               {!sellerPaysFee && (
               <div className="flex justify-between">
-                <span className="text-orange-700">Platform fee ({feePercentLabel(rate)})</span>
+                <span className="text-muted-foreground">Platform fee ({feePercentLabel(rate)})</span>
                 <span className="font-medium">${fee.toFixed(2)}</span>
               </div>
               )}
               <div className="flex justify-between border-t pt-1">
-                <span className="font-semibold text-orange-900">Total</span>
-                <span className="font-bold text-orange-900">${total.toFixed(2)}</span>
+                <span className="font-semibold">Total</span>
+                <span className="font-bold">${total.toFixed(2)}</span>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -237,6 +242,7 @@ export default function BookingDetailPage({ params }: { params: Promise<{ ref: s
                 {paying ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
                 Pay Now
               </button>
+              {booking.pre_order?.poll_url && (
               <button
                 disabled={checking}
                 onClick={async () => {
@@ -254,6 +260,21 @@ export default function BookingDetailPage({ params }: { params: Promise<{ ref: s
               >
                 {checking ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
                 I have paid
+              </button>
+              )}
+              <button
+                onClick={async () => {
+                  try {
+                    await clientCashPayment(id)
+                    queryClient.invalidateQueries({ queryKey: ["booking", id] })
+                    toast.success("Cash on delivery selected. Supplier has been notified.")
+                  } catch {
+                    toast.error("Failed to select cash on delivery.")
+                  }
+                }}
+                className="inline-flex items-center gap-2 rounded-md border text-sm font-semibold px-4 py-1.5 hover:bg-muted transition-colors"
+              >
+                Cash on Delivery
               </button>
             </div>
           </div>
@@ -456,48 +477,6 @@ export default function BookingDetailPage({ params }: { params: Promise<{ ref: s
           )}
         </div>
 
-        {/* Negotiation history */}
-        {booking.counter_offers?.length > 0 && (
-          <div className="border border-purple-200 rounded-xl p-5">
-            <h2 className="text-sm font-semibold text-purple-700 mb-4">Negotiation</h2>
-            <div className="space-y-3">
-              {[...booking.counter_offers].reverse().map((co: any, i: number) => (
-                <div key={i} className="flex gap-3 text-sm">
-                  <div className="w-1.5 h-1.5 rounded-full bg-purple-400 mt-1.5 shrink-0" />
-                  <div>
-                    <p className="font-medium">${(co.price_per_unit_cents / 100).toFixed(2)} per {booking.pre_order?.unit || "unit"}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      {co.by_name} ({co.by_role}) · {formatDateTime(co.created_at)}
-                    </p>
-                    {co.notes && <p className="text-xs text-muted-foreground mt-0.5">{co.notes}</p>}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Status history */}
-        {booking.status_history?.length > 0 && (
-          <div className="border rounded-xl p-5">
-            <h2 className="text-sm font-semibold mb-4">Status History</h2>
-            <div className="space-y-3">
-              {[...booking.status_history].reverse().map((h: any, i: number) => (
-                <div key={i} className="flex items-start gap-3 text-sm">
-                  <div className="mt-0.5 shrink-0">
-                    {STATUS_ICONS[h.to] ?? <Clock className="w-4 h-4 text-muted-foreground" />}
-                  </div>
-                  <div>
-                    <p className="font-medium">{STATUS_LABELS[h.to] ?? h.to}</p>
-                    {h.note && <p className="text-xs text-muted-foreground">{h.note}</p>}
-                    <p className="text-xs text-muted-foreground">{formatDateTime(h.timestamp)}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
         {/* Actions */}
         {canCancel && (
           <button
@@ -515,6 +494,52 @@ export default function BookingDetailPage({ params }: { params: Promise<{ ref: s
         >
           Back to all bookings
         </Link>
+        </div>
+
+        {/* ── Right sidebar: negotiation + history ── */}
+        <div className="space-y-5">
+          {/* Negotiation history */}
+          {booking.counter_offers?.length > 0 && (
+            <div className="border border-purple-200 rounded-xl p-5 max-h-[320px] overflow-y-auto">
+              <h2 className="text-sm font-semibold text-purple-700 mb-4">Negotiation</h2>
+              <div className="space-y-3">
+                {[...booking.counter_offers].reverse().map((co: any, i: number) => (
+                  <div key={i} className="flex gap-3 text-sm">
+                    <div className="w-1.5 h-1.5 rounded-full bg-purple-400 mt-1.5 shrink-0" />
+                    <div>
+                      <p className="font-medium">${(co.price_per_unit_cents / 100).toFixed(2)} per {booking.pre_order?.unit || "unit"}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {co.by_name} ({co.by_role}) · {formatDateTime(co.created_at)}
+                      </p>
+                      {co.notes && <p className="text-xs text-muted-foreground mt-0.5">{co.notes}</p>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Status history */}
+          {booking.status_history?.length > 0 && (
+            <div className="border rounded-xl p-5 max-h-[320px] overflow-y-auto">
+              <h2 className="text-sm font-semibold mb-4">Status History</h2>
+              <div className="space-y-3">
+                {[...booking.status_history].reverse().map((h: any, i: number) => (
+                  <div key={i} className="flex items-start gap-3 text-sm">
+                    <div className="mt-0.5 shrink-0">
+                      {STATUS_ICONS[h.to] ?? <Clock className="w-4 h-4 text-muted-foreground" />}
+                    </div>
+                    <div>
+                      <p className="font-medium">{STATUS_LABELS[h.to] ?? h.to}</p>
+                      {h.note && <p className="text-xs text-muted-foreground">{h.note}</p>}
+                      <p className="text-xs text-muted-foreground">{formatDateTime(h.timestamp)}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
 
         {/* Cancel dialog */}
         <Dialog open={cancelOpen} onOpenChange={(o) => { setCancelOpen(o); if (!o) { setCancelInput(""); setCancelReason("") } }}>

@@ -1,13 +1,14 @@
 import { Body, Button, Container, Head, Hr, Html, Link, Preview, Section, Text } from "@react-email/components"
 import { centsToDollars } from "@/lib/utilities"
 
-interface Props { bookingRef?: string; customerName?: string; customerEmail?: string; customerPhone?: string; productName?: string; quantity?: number; unit?: string; offerPrice?: number; marketSide?: string; buyerNotes?: string; adminUrl?: string }
+interface Props { bookingRef?: string; customerName?: string; customerEmail?: string; customerPhone?: string; sellerName?: string; productName?: string; quantity?: number; unit?: string; offerPrice?: number; marketSide?: string; buyerNotes?: string; adminUrl?: string }
 
 export default function PreorderRequestAdminEmail({
   bookingRef = "FNP-BK-PO-0001",
   customerName = "Okandas",
   customerEmail = "okandas@farmnport.com",
   customerPhone = "0719099990",
+  sellerName = "Palbrook Seed Potatoes",
   productName = "Fivet Cobb 500 Day-Old Chicks",
   quantity = 0,
   unit = "",
@@ -41,7 +42,7 @@ export default function PreorderRequestAdminEmail({
             <Text style={greeting}>{marketSide === "demand" ? "New supply offer" : "New booking request"}</Text>
             <Text style={paragraph}>{marketSide === "demand" ? "A farmer is offering to supply." : "A new booking request needs your review."}</Text>
             <Text style={paragraph}>Booking reference: <strong>{bookingRef}</strong></Text>
-            <Text style={paragraph}>{customerDetails}</Text>
+            <Text style={paragraph}>Buyer: <strong>{customerName}</strong> ({customerEmail}, {customerPhone}){"\n"}Seller: <strong>{sellerName}</strong></Text>
             <Text style={paragraph}>{orderDetails}</Text>
           </Section>
 

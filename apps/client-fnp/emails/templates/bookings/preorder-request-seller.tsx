@@ -39,7 +39,7 @@ export default function PreorderRequestSellerEmail({
             <Text style={paragraph}>Booking reference: <strong>{bookingRef}</strong></Text>
             <Text style={paragraph}>Customer: <strong>{customerName}</strong></Text>
             <Text style={paragraph}>{orderDetails}</Text>
-            <Text style={paragraph}>Please accept or review this request — it expires in 48 hours.</Text>
+            <Text style={paragraph}>Please view request, confirm and coordinate with us to complete sell.</Text>
             <Text style={{ margin: "0 0 8px" }}><Link href="https://farmnport.com/account/incoming-bookings" style={inlineLink}>Review Received Bids</Link></Text>
           </Section>
 
