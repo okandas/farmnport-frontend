@@ -35,7 +35,7 @@ export default function PreorderRequestSellerEmail({
           {/* Content */}
           <Section style={content}>
             <Text style={greeting}>Hi {titleCase(sellerName)},</Text>
-            <Text style={paragraph}>You have a new booking request on farmnport.</Text>
+            <Text style={paragraph}>You have a new bid on your booking.</Text>
             <Text style={paragraph}>Booking reference: <strong>{bookingRef}</strong></Text>
             <Text style={paragraph}>Customer: <strong>{customerName}</strong></Text>
             <Text style={paragraph}>{orderDetails}</Text>

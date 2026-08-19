@@ -7,7 +7,7 @@ import { Loader2, CalendarDays, Truck, Package, CheckCircle, XCircle, Clock, Ale
 import Link from "next/link"
 import { toast } from "sonner"
 
-import { getBooking, cancelBooking, initiatePreOrderPayment, pollPreOrderPayment, respondToBooking, clientCashPayment } from "@/lib/query"
+import { getBooking, cancelBooking, initiatePreOrderPayment, pollPreOrderPayment, respondToBooking, clientCashPayment, clientMarkReady } from "@/lib/query"
 import { centsToDollars, plural, DEFAULT_PLATFORM_FEE_RATE, feePercentLabel } from "@/lib/utilities"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 
@@ -154,7 +154,9 @@ export default function BookingDetailPage({ params }: { params: Promise<{ ref: s
   }
 
   const canCancel = !["completed", "collected", "cancelled", "rejected", "expired", "paid"].includes(booking.status)
-  const canPay = booking.status === "confirmed" && booking.type === "pre-order" && (booking.pre_order?.unit_price ?? 0) > 0
+  const isDemand = booking.pre_order?.market_side === "demand"
+  // Supply: submitter is buyer → they pay. Demand: submitter is supplier → they don't pay.
+  const canPay = booking.status === "confirmed" && booking.type === "pre-order" && !isDemand && (booking.pre_order?.unit_price ?? 0) > 0
 
   return (
     <div>
@@ -280,6 +282,36 @@ export default function BookingDetailPage({ params }: { params: Promise<{ ref: s
           </div>
           )
         })()}
+
+        {/* Demand: supplier actions — Mark Ready for Collection */}
+        {isDemand && (booking.status === "cash_on_delivery" || booking.status === "paid") && (
+          <div className="border rounded-xl p-5 space-y-3">
+            <p className="font-semibold">Buyer has confirmed payment</p>
+            <p className="text-sm text-muted-foreground">
+              {booking.status === "cash_on_delivery" ? "Buyer will pay cash on delivery or collection." : "Buyer has paid online."}
+            </p>
+            <button
+              onClick={async () => {
+                try {
+                  await clientMarkReady(id)
+                  queryClient.invalidateQueries({ queryKey: ["booking", id] })
+                  toast.success("Marked as ready for collection.")
+                } catch {
+                  toast.error("Failed to mark ready.")
+                }
+              }}
+              className="w-full py-2.5 rounded-lg text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+            >
+              Mark Ready for Collection
+            </button>
+          </div>
+        )}
+
+        {isDemand && booking.status === "confirmed" && (
+          <div className="border rounded-xl p-4">
+            <p className="text-sm text-muted-foreground text-center">Waiting for buyer to pay online or choose cash on delivery.</p>
+          </div>
+        )}
 
         {/* Rejected reason */}
         {booking.status === "rejected" && booking.pre_order?.reject_reason && (

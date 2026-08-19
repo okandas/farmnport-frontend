@@ -462,37 +462,69 @@ export default function IncomingBookingDetailPage({ params }: { params: Promise<
                 <p className="text-sm text-muted-foreground text-center">Waiting for the buyer to respond to your counter-offer.</p>
               )}
 
-              {(booking.status === "paid" || booking.status === "cash_on_delivery") && (
-                <button
-                  onClick={() => readyMutation.mutate()}
-                  disabled={readyMutation.isPending}
-                  className="w-full py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90"
-                >
-                  {readyMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : "Mark Ready for Collection"}
-                </button>
-              )}
+              {/* Supply: event owner is seller → Mark Ready / Mark Collected / wait for buyer */}
+              {/* Demand: event owner is buyer → they pay / choose cash on delivery */}
+              {(() => {
+                const isDemand = booking.pre_order?.market_side === "demand"
 
-              {booking.status === "cash_on_delivery" && (
-                <p className="text-sm text-muted-foreground text-center">Buyer will pay cash on delivery or collection.</p>
-              )}
+                if (isDemand) {
+                  // Event owner is the buyer — they handle payment
+                  if (booking.status === "confirmed") return (
+                    <button
+                      onClick={() => cashPaymentMutation.mutate()}
+                      disabled={cashPaymentMutation.isPending}
+                      className="w-full py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90"
+                    >
+                      {cashPaymentMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : "Cash on Delivery"}
+                    </button>
+                  )
+                  if (booking.status === "cash_on_delivery") return (
+                    <p className="text-sm text-muted-foreground text-center">Waiting for supplier to mark ready for collection.</p>
+                  )
+                  if (booking.status === "ready") return (
+                    <button
+                      onClick={() => collectedMutation.mutate()}
+                      disabled={collectedMutation.isPending}
+                      className="w-full py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90"
+                    >
+                      {collectedMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : "Mark as Collected"}
+                    </button>
+                  )
+                  return null
+                }
 
-              {booking.status === "ready" && (
-                <button
-                  onClick={() => collectedMutation.mutate()}
-                  disabled={collectedMutation.isPending}
-                  className="w-full py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90"
-                >
-                  {collectedMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : "Mark as Collected"}
-                </button>
-              )}
-
-              {booking.status === "confirmed" && (
-                <p className="text-sm text-muted-foreground text-center">Waiting for buyer to pay online or choose cash on delivery.</p>
-              )}
-
-              {booking.status === "pending_payment" && (
-                <p className="text-sm text-muted-foreground text-center">Buyer is completing payment. You will be notified once paid.</p>
-              )}
+                // Supply: event owner is the seller
+                if (booking.status === "paid" || booking.status === "cash_on_delivery") return (
+                  <>
+                    <button
+                      onClick={() => readyMutation.mutate()}
+                      disabled={readyMutation.isPending}
+                      className="w-full py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90"
+                    >
+                      {readyMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : "Mark Ready for Collection"}
+                    </button>
+                    {booking.status === "cash_on_delivery" && (
+                      <p className="text-sm text-muted-foreground text-center">Buyer will pay cash on delivery or collection.</p>
+                    )}
+                  </>
+                )
+                if (booking.status === "ready") return (
+                  <button
+                    onClick={() => collectedMutation.mutate()}
+                    disabled={collectedMutation.isPending}
+                    className="w-full py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90"
+                  >
+                    {collectedMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : "Mark as Collected"}
+                  </button>
+                )
+                if (booking.status === "confirmed") return (
+                  <p className="text-sm text-muted-foreground text-center">Waiting for buyer to pay online or choose cash on delivery.</p>
+                )
+                if (booking.status === "pending_payment") return (
+                  <p className="text-sm text-muted-foreground text-center">Buyer is completing payment. You will be notified once paid.</p>
+                )
+                return null
+              })()}
             </div>
           )}
 
@@ -552,7 +584,7 @@ export default function IncomingBookingDetailPage({ params }: { params: Promise<
                   <div key={i} className="flex gap-3 text-sm">
                     <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40 mt-1.5 shrink-0" />
                     <div>
-                      <p className="font-medium text-sm capitalize">{h.to}</p>
+                      <p className="font-medium text-sm">{STATUS_LABELS[h.to] ?? h.to}</p>
                       {h.note && <p className="text-xs text-muted-foreground mt-0.5">{h.note}</p>}
                       <p className="text-xs text-muted-foreground mt-0.5">
                         {formatDateTime(h.timestamp)}
