@@ -80,8 +80,8 @@ function PaymentDeadlineCountdown({ deadline }: { deadline: string }) {
   )
 }
 
-export default function BookingDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params)
+export default function BookingDetailPage({ params }: { params: Promise<{ ref: string }> }) {
+  const { ref: id } = use(params)
   const { data: session, status } = useSession()
   const queryClient = useQueryClient()
   const [cancelOpen, setCancelOpen] = useState(false)
