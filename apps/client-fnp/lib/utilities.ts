@@ -78,22 +78,26 @@ export function centsToDollars(cents: number): string {
   return `$${dollars.toFixed(2)}`
 }
 
-const PLATFORM_FEE_RATE = 0.069
+export const DEFAULT_PLATFORM_FEE_RATE = 0.069
 
-export function platformFee(cents: number): number {
-  return Math.round(cents * PLATFORM_FEE_RATE)
+export function platformFee(cents: number, rate = DEFAULT_PLATFORM_FEE_RATE): number {
+  return Math.round(cents * rate)
 }
 
-export function withPlatformFee(cents: number): number {
-  return cents + platformFee(cents)
+export function withPlatformFee(cents: number, rate = DEFAULT_PLATFORM_FEE_RATE): number {
+  return cents + platformFee(cents, rate)
 }
 
-export function platformFeeDisplay(cents: number): string {
-  return centsToDollars(platformFee(cents))
+export function platformFeeDisplay(cents: number, rate = DEFAULT_PLATFORM_FEE_RATE): string {
+  return centsToDollars(platformFee(cents, rate))
 }
 
-export function withPlatformFeeDisplay(cents: number): string {
-  return centsToDollars(withPlatformFee(cents))
+export function withPlatformFeeDisplay(cents: number, rate = DEFAULT_PLATFORM_FEE_RATE): string {
+  return centsToDollars(withPlatformFee(cents, rate))
+}
+
+export function feePercentLabel(rate = DEFAULT_PLATFORM_FEE_RATE): string {
+  return `${(rate * 100).toFixed(1)}%`
 }
 
 export function titleCase(str?: string): string {
