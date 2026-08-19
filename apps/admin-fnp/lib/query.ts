@@ -1654,6 +1654,7 @@ export function createPreOrder(data: {
   breed_id?: string
   breed_name?: string
   unit?: string
+  frequency?: string
   name?: string
   unit_price: number
   deposit_per_unit: number
