@@ -1,9 +1,9 @@
 import { Body, Button, Container, Head, Hr, Html, Link, Preview, Section, Text } from "@react-email/components"
 import { titleCase } from "@/lib/utilities"
 
-interface Props { name?: string; bookingRef?: string; productName?: string; quantity?: number; bookingUrl?: string }
+interface Props { name?: string; bookingRef?: string; productName?: string; quantity?: number; bookingUrl?: string; marketSide?: string }
 
-export default function PreorderRequestReceivedEmail({ name = "Okandas", bookingRef = "FNP-BK-PO-0001", productName = "Fivet Cobb 500 Day-Old Chicks", quantity = 100, bookingUrl = "https://farmnport.com/account/bookings/preview" }: Props) {
+export default function PreorderRequestReceivedEmail({ name = "Okandas", bookingRef = "FNP-BK-PO-0001", productName = "Fivet Cobb 500 Day-Old Chicks", quantity = 100, bookingUrl = "https://farmnport.com/account/bookings/preview", marketSide = "" }: Props) {
   const details = `Produce   ${productName}\nQuantity  ${quantity} units`
 
   return (
@@ -21,7 +21,7 @@ export default function PreorderRequestReceivedEmail({ name = "Okandas", booking
           {/* Content */}
           <Section style={content}>
             <Text style={greeting}>Hi {titleCase(name)},</Text>
-            <Text style={paragraph}>Your bid has been submitted. Supplier will confirm your order and notify you to continue with payment.</Text>
+            <Text style={paragraph}>{marketSide === "demand" ? "Your supply offer has been submitted. Buyer will confirm your offer and arrange payment." : "Your bid has been submitted. Supplier will confirm your order and notify you to continue with payment."}</Text>
             <Text style={paragraph}>Booking reference: <strong>{bookingRef}</strong></Text>
             <Text style={paragraph}>{details}</Text>
           </Section>
