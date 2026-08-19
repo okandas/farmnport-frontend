@@ -452,7 +452,7 @@ export default function IncomingBookingDetailPage({ params }: { params: Promise<
                 <p className="text-sm text-muted-foreground text-center">Waiting for the buyer to respond to your counter-offer.</p>
               )}
 
-              {booking.status === "paid" && (
+              {(booking.status === "paid" || booking.status === "cash_on_delivery") && (
                 <button
                   onClick={() => readyMutation.mutate()}
                   disabled={readyMutation.isPending}
@@ -460,6 +460,10 @@ export default function IncomingBookingDetailPage({ params }: { params: Promise<
                 >
                   {readyMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : "Mark Ready for Collection"}
                 </button>
+              )}
+
+              {booking.status === "cash_on_delivery" && (
+                <p className="text-sm text-muted-foreground text-center">Buyer will pay cash on delivery or collection.</p>
               )}
 
               {booking.status === "ready" && (
@@ -472,16 +476,12 @@ export default function IncomingBookingDetailPage({ params }: { params: Promise<
                 </button>
               )}
 
-              {["confirmed", "pending_payment"].includes(booking.status) && (
-                <>
-                  <button
-                    onClick={() => setCashOpen(true)}
-                    className="w-full py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90"
-                  >
-                    Cash on Delivery
-                  </button>
-                  <p className="text-xs text-muted-foreground text-center">Online payments coming soon</p>
-                </>
+              {booking.status === "confirmed" && (
+                <p className="text-sm text-muted-foreground text-center">Waiting for buyer to pay online or choose cash on delivery.</p>
+              )}
+
+              {booking.status === "pending_payment" && (
+                <p className="text-sm text-muted-foreground text-center">Buyer is completing payment. You will be notified once paid.</p>
               )}
             </div>
           )}
