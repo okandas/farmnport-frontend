@@ -1689,6 +1689,7 @@ export function updatePreOrder(id: string, data: Partial<{
   breed_id: string
   breed_name: string
   unit: string
+  frequency: string
   name: string
   status: string
   total_available: number
