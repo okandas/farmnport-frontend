@@ -9,7 +9,7 @@ import { BaseURL } from "@/lib/schemas"
 interface SearchResult {
   collection: string
   found: number
-  hits: { document: Record<string, any> }[]
+  hits: { document: Record<string, any>; score?: number }[]
 }
 
 const COLLECTION_LABELS: Record<string, string> = {
@@ -136,8 +136,9 @@ export function SearchResults() {
     .filter(group => group.collection !== "farm_produce")
     .filter(group => filter === "all" || group.collection === filter)
     .flatMap(group =>
-      (group.hits ?? []).map(hit => ({ collection: group.collection, doc: hit.document }))
+      (group.hits ?? []).map(hit => ({ collection: group.collection, doc: hit.document, score: hit.score ?? 0 }))
     )
+    .sort((a, b) => b.score - a.score)
   const totalFound = results.filter(r => r.collection !== "farm_produce").reduce((sum, r) => sum + r.found, 0)
   const hasMore = results.some(r => r.collection !== "farm_produce" && (filter === "all" || r.collection === filter) && r.found > page * 5)
 
