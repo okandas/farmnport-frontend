@@ -19,6 +19,7 @@ import {
   PreorderRequestReceivedEmail,
   PreorderRequestAdminEmail,
   PreorderRequestSellerEmail,
+  BookingCounterOfferEmail,
   PreorderConfirmedEmail,
   PreorderRejectedEmail,
   PreorderEventRejectedEmail,
@@ -180,6 +181,11 @@ export async function POST(req: NextRequest) {
     case "preorder-request-seller":
       subject = `New Booking on Your Listing — ${(props as { bookingRef?: string }).bookingRef ?? ""}`
       html = await render(PreorderRequestSellerEmail(props as Parameters<typeof PreorderRequestSellerEmail>[0]))
+      break
+
+    case "booking-counter-offer":
+      subject = `Counter-offer on Booking ${(props as { bookingRef?: string }).bookingRef ?? ""}`
+      html = await render(BookingCounterOfferEmail(props as Parameters<typeof BookingCounterOfferEmail>[0]))
       break
 
     case "preorder-confirmed":
