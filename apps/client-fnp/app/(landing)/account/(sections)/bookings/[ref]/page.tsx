@@ -166,7 +166,10 @@ export default function BookingDetailPage({ params }: { params: Promise<{ ref: s
         <span className="text-foreground font-medium">{booking.booking_ref}</span>
       </nav>
 
-      <div className="space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        {/* ── Left: details ── */}
+        <div className="lg:col-span-2 space-y-6">
 
         {/* Header */}
         <div className="flex items-start justify-between gap-4">
@@ -474,48 +477,6 @@ export default function BookingDetailPage({ params }: { params: Promise<{ ref: s
           )}
         </div>
 
-        {/* Negotiation history */}
-        {booking.counter_offers?.length > 0 && (
-          <div className="border border-purple-200 rounded-xl p-5">
-            <h2 className="text-sm font-semibold text-purple-700 mb-4">Negotiation</h2>
-            <div className="space-y-3">
-              {[...booking.counter_offers].reverse().map((co: any, i: number) => (
-                <div key={i} className="flex gap-3 text-sm">
-                  <div className="w-1.5 h-1.5 rounded-full bg-purple-400 mt-1.5 shrink-0" />
-                  <div>
-                    <p className="font-medium">${(co.price_per_unit_cents / 100).toFixed(2)} per {booking.pre_order?.unit || "unit"}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      {co.by_name} ({co.by_role}) · {formatDateTime(co.created_at)}
-                    </p>
-                    {co.notes && <p className="text-xs text-muted-foreground mt-0.5">{co.notes}</p>}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Status history */}
-        {booking.status_history?.length > 0 && (
-          <div className="border rounded-xl p-5">
-            <h2 className="text-sm font-semibold mb-4">Status History</h2>
-            <div className="space-y-3">
-              {[...booking.status_history].reverse().map((h: any, i: number) => (
-                <div key={i} className="flex items-start gap-3 text-sm">
-                  <div className="mt-0.5 shrink-0">
-                    {STATUS_ICONS[h.to] ?? <Clock className="w-4 h-4 text-muted-foreground" />}
-                  </div>
-                  <div>
-                    <p className="font-medium">{STATUS_LABELS[h.to] ?? h.to}</p>
-                    {h.note && <p className="text-xs text-muted-foreground">{h.note}</p>}
-                    <p className="text-xs text-muted-foreground">{formatDateTime(h.timestamp)}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
         {/* Actions */}
         {canCancel && (
           <button
@@ -533,6 +494,52 @@ export default function BookingDetailPage({ params }: { params: Promise<{ ref: s
         >
           Back to all bookings
         </Link>
+        </div>
+
+        {/* ── Right sidebar: negotiation + history ── */}
+        <div className="space-y-5">
+          {/* Negotiation history */}
+          {booking.counter_offers?.length > 0 && (
+            <div className="border border-purple-200 rounded-xl p-5 max-h-[320px] overflow-y-auto">
+              <h2 className="text-sm font-semibold text-purple-700 mb-4">Negotiation</h2>
+              <div className="space-y-3">
+                {[...booking.counter_offers].reverse().map((co: any, i: number) => (
+                  <div key={i} className="flex gap-3 text-sm">
+                    <div className="w-1.5 h-1.5 rounded-full bg-purple-400 mt-1.5 shrink-0" />
+                    <div>
+                      <p className="font-medium">${(co.price_per_unit_cents / 100).toFixed(2)} per {booking.pre_order?.unit || "unit"}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {co.by_name} ({co.by_role}) · {formatDateTime(co.created_at)}
+                      </p>
+                      {co.notes && <p className="text-xs text-muted-foreground mt-0.5">{co.notes}</p>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Status history */}
+          {booking.status_history?.length > 0 && (
+            <div className="border rounded-xl p-5 max-h-[320px] overflow-y-auto">
+              <h2 className="text-sm font-semibold mb-4">Status History</h2>
+              <div className="space-y-3">
+                {[...booking.status_history].reverse().map((h: any, i: number) => (
+                  <div key={i} className="flex items-start gap-3 text-sm">
+                    <div className="mt-0.5 shrink-0">
+                      {STATUS_ICONS[h.to] ?? <Clock className="w-4 h-4 text-muted-foreground" />}
+                    </div>
+                    <div>
+                      <p className="font-medium">{STATUS_LABELS[h.to] ?? h.to}</p>
+                      {h.note && <p className="text-xs text-muted-foreground">{h.note}</p>}
+                      <p className="text-xs text-muted-foreground">{formatDateTime(h.timestamp)}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
 
         {/* Cancel dialog */}
         <Dialog open={cancelOpen} onOpenChange={(o) => { setCancelOpen(o); if (!o) { setCancelInput(""); setCancelReason("") } }}>

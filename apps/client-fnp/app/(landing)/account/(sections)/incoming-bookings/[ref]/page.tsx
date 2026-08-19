@@ -514,7 +514,7 @@ export default function IncomingBookingDetailPage({ params }: { params: Promise<
 
           {/* Negotiation history */}
           {booking.counter_offers?.length > 0 && (
-            <div className="border border-purple-200 rounded-xl p-5">
+            <div className="border border-purple-200 rounded-xl p-5 max-h-[320px] overflow-y-auto">
               <p className="text-xs font-medium text-purple-700 uppercase tracking-wide mb-4">Negotiation</p>
               <div className="space-y-3">
                 {[...booking.counter_offers].reverse().map((co: any, i: number) => (
@@ -535,7 +535,7 @@ export default function IncomingBookingDetailPage({ params }: { params: Promise<
 
           {/* Status history */}
           {booking.status_history?.length > 0 && (
-            <div className="border rounded-xl p-5">
+            <div className="border rounded-xl p-5 max-h-[320px] overflow-y-auto">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-4">History</p>
               <div className="space-y-4">
                 {[...booking.status_history].reverse().map((h: any, i: number) => (
