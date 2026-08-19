@@ -112,7 +112,7 @@ export async function generateMetadata({ params }: Props, _parent: ResolvingMeta
       siteName: "Farmnport",
       title: `${guide.title} | farmnport.com`,
       description: guide.description,
-      images: [{ url: "/og-image.png", width: 1200, height: 630, alt: `Sell ${guide.name} on Farmnport` }],
+      images: [{ url: "/api/og", width: 1200, height: 630, alt: `Sell ${guide.name} on Farmnport` }],
     },
   }
 }

@@ -20,7 +20,7 @@ export const metadata = {
         description: 'Browse farm produce lots listed by farmers across Zimbabwe. Buy chillies, maize, cattle and more — directly from sellers at listed prices.',
         images: [
             {
-                url: "/og-image.png",
+                url: "/api/og",
                 width: 1200,
                 height: 630,
                 alt: "Farm Produce Lots Zimbabwe – Farmnport",
@@ -31,7 +31,7 @@ export const metadata = {
         card: "summary_large_image",
         title: 'Farm Produce Lots Zimbabwe – Buy & Sell Directly | farmnport.com',
         description: 'Browse farm produce lots listed by farmers across Zimbabwe. Buy chillies, maize, cattle and more — directly from sellers at listed prices.',
-        images: ["/og-image.png"],
+        images: ["/api/og"],
     },
 }
 

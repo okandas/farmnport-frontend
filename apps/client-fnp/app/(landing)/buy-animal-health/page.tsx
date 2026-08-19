@@ -13,13 +13,13 @@ export const metadata = {
         siteName: "farmnport",
         type: "website" as const,
         url: "https://farmnport.com/buy-animal-health",
-        images: [{ url: "https://farmnport.com/og-image.png", width: 1200, height: 630, alt: "farmnport" }],
+        images: [{ url: "https://farmnport.com/api/og", width: 1200, height: 630, alt: "farmnport" }],
     },
     twitter: {
         card: "summary_large_image" as const,
         title: "Buy Animal Health Products Zimbabwe – Prices & Guides",
         description: "Shop dips, dewormers, vaccines and veterinary supplements for cattle, poultry and livestock. Compare prices, view dosage rates and order online.",
-        images: ["/og-image.png"],
+        images: ["/api/og"],
     },
 }
 

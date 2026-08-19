@@ -191,6 +191,7 @@ export default function NewPreOrderPage() {
     breed_id: "",
     breed_name: "",
     unit: "",
+    frequency: "",
     name: "",
     unit_price: "",
     deposit_per_unit: "",
@@ -226,6 +227,7 @@ export default function NewPreOrderPage() {
         breed_id: form.breed_id || undefined,
         breed_name: form.breed_name || undefined,
         unit: form.unit || undefined,
+        frequency: form.frequency || undefined,
         name: form.name || undefined,
         unit_price: Math.round(parseFloat(form.unit_price) * 100),
         deposit_per_unit: Math.round(parseFloat(form.deposit_per_unit) * 100),
@@ -498,6 +500,21 @@ export default function NewPreOrderPage() {
                     <SelectItem value="bags">Bags</SelectItem>
                     <SelectItem value="kg">Kg</SelectItem>
                     <SelectItem value="units">Units</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div>
+              <label className={labelCls}>Frequency</label>
+              <div className="mt-2">
+                <Select value={form.frequency} onValueChange={(v) => setForm((f) => ({ ...f, frequency: v }))}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="One-time (no frequency)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="daily">Daily</SelectItem>
+                    <SelectItem value="weekly">Weekly</SelectItem>
+                    <SelectItem value="monthly">Monthly</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

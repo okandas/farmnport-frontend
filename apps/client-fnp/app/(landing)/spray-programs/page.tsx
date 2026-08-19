@@ -14,13 +14,13 @@ export const metadata: Metadata = {
         url: "https://farmnport.com/spray-programs",
         siteName: "farmnport",
         type: "website",
-        images: [{ url: "https://farmnport.com/og-image.png", width: 1200, height: 630, alt: "farmnport" }],
+        images: [{ url: "https://farmnport.com/api/og", width: 1200, height: 630, alt: "farmnport" }],
     },
     twitter: {
         card: "summary_large_image",
         title: "Spray Programs Zimbabwe — Crop Protection Schedules",
         description: "Browse spray program schedules for Zimbabwe crops. Step-by-step agrochemical application timings for every growth stage.",
-        images: ["/og-image.png"],
+        images: ["/api/og"],
     },
 }
 

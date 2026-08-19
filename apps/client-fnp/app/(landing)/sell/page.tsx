@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     title: "Sell Your Farm Produce Directly to Buyers | farmnport.com",
     description:
       "List lots, create bookings, and connect directly with buyers across Zimbabwe.",
-    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Sell Farm Produce on Farmnport" }],
+    images: [{ url: "/api/og", width: 1200, height: 630, alt: "Sell Farm Produce on Farmnport" }],
   },
 }
 

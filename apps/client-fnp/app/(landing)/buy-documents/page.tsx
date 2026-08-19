@@ -15,13 +15,13 @@ export const metadata = {
         siteName: "farmnport",
         type: "website" as const,
         url: "https://farmnport.com/buy-documents",
-        images: [{ url: "https://farmnport.com/og-image.png", width: 1200, height: 630, alt: "farmnport" }],
+        images: [{ url: "https://farmnport.com/api/og", width: 1200, height: 630, alt: "farmnport" }],
     },
     twitter: {
         card: "summary_large_image" as const,
         title: "Farm Building Plans & Documents | farmnport.com",
         description: "Download pig sty, goat pen, chicken house and cattle kraal design plans. Instant PDF download.",
-        images: ["/og-image.png"],
+        images: ["/api/og"],
     },
 }
 

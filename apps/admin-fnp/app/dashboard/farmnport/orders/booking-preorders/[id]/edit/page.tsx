@@ -118,6 +118,7 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
     breed_id: string
     breed_name: string
     unit: string
+    frequency: string
     name: string
     total_available: string
     unit_price: string
@@ -156,6 +157,7 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
       breed_id: event.breed_id ?? "",
       breed_name: event.breed_name ?? "",
       unit: event.unit ?? "",
+      frequency: event.frequency ?? "",
       name: event.name ?? "",
       total_available: String(event.total_available ?? ""),
       unit_price: ((event.unit_price ?? 0) / 100).toFixed(2),
@@ -184,6 +186,7 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
         breed_id: form!.breed_id || undefined,
         breed_name: form!.breed_name || undefined,
         unit: form!.unit || undefined,
+        frequency: form!.frequency || undefined,
         name: form!.name || undefined,
         total_available: parseInt(form!.total_available),
         unit_price: Math.round(parseFloat(form!.unit_price) * 100),
@@ -470,6 +473,21 @@ export default function EditPreOrderPage({ params }: { params: Promise<{ id: str
                     <SelectItem value="bags">Bags</SelectItem>
                     <SelectItem value="kg">Kg</SelectItem>
                     <SelectItem value="units">Units</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div>
+              <label className={labelCls}>Frequency</label>
+              <div className="mt-2">
+                <Select value={form.frequency} onValueChange={(v) => setForm((f) => f ? { ...f, frequency: v } : f)}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="One-time (no frequency)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="daily">Daily</SelectItem>
+                    <SelectItem value="weekly">Weekly</SelectItem>
+                    <SelectItem value="monthly">Monthly</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

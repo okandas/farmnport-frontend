@@ -21,7 +21,7 @@ export const metadata = {
     description: "Looking for fresh, high-quality agricultural produce in Zimbabwe? Buy directly from local farmers for the best prices, farm-to-table freshness, and support for Zimbabwean agriculture.",
     images: [
       {
-        url: "/og-image.png",
+        url: "/api/og",
         width: 1200,
         height: 630,
         alt: "Farmnport Farmers - Buy Fresh Agricultural Produce",
@@ -32,7 +32,7 @@ export const metadata = {
     card: "summary_large_image",
     title: 'Buy Fresh Agricultural Produce Directly from Farmers',
     description: "Looking for fresh, high-quality agricultural produce in Zimbabwe? Buy directly from local farmers for the best prices, farm-to-table freshness, and support for Zimbabwean agriculture.",
-    images: ["/og-image.png"],
+    images: ["/api/og"],
   },
 }
 

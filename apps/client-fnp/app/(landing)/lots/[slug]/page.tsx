@@ -47,7 +47,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
             card: "summary_large_image",
             title,
             description,
-            images: ["/og-image.png"],
+            images: ["/api/og"],
         },
     }
 }
@@ -73,7 +73,7 @@ export default async function LotDetailPage({ params }: Props) {
         "@context": "https://schema.org",
         "@type": "Product",
         "name": `${produce}${breed ? ` — ${breed}` : ""}`,
-        "image": lot.images?.[0]?.img?.src ? [lot.images[0].img.src] : [`${AppURL}/og-image.png`],
+        "image": lot.images?.[0]?.img?.src ? [lot.images[0].img.src] : [`${AppURL}/api/og`],
         "description": lot.notes || `${isSelling ? "Selling" : "Buying"} ${produce} in Zimbabwe`,
         "sku": lot.id || slug,
         "category": "Farm Lots",

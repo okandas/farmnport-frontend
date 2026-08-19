@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: LayoutProps): Promise<Metadat
 
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://farmnport.com'
     const url = `${baseUrl}/feeds/${slug}`
-    const imageUrl = product.images?.[0]?.img?.src || `${baseUrl}/og-image.png`
+    const imageUrl = product.images?.[0]?.img?.src || `${baseUrl}/api/og`
     const name = capitalizeFirstLetter(product.name)
     const category = product.feed_category?.name || 'Livestock Feed'
     const animal = product.animal ? ` for ${product.animal}` : ''

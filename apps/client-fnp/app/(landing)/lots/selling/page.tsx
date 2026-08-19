@@ -15,7 +15,7 @@ export const metadata = {
         siteName: "Farmnport",
         title: 'Selling Lots – Farm Produce for Sale in Zimbabwe | farmnport.com',
         description: 'Browse farm produce lots available for sale across Zimbabwe.',
-        images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Farmnport Selling Lots" }],
+        images: [{ url: "/api/og", width: 1200, height: 630, alt: "Farmnport Selling Lots" }],
     },
 }
 

@@ -15,7 +15,7 @@ export const metadata = {
         siteName: "Farmnport",
         title: 'Buying Lots – Farmers Looking to Buy Produce in Zimbabwe | farmnport.com',
         description: 'Browse buying lots from farmers and businesses looking to purchase farm produce across Zimbabwe.',
-        images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Farmnport Buying Lots" }],
+        images: [{ url: "/api/og", width: 1200, height: 630, alt: "Farmnport Buying Lots" }],
     },
 }
 
