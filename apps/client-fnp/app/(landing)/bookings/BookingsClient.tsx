@@ -6,6 +6,7 @@ import { driver } from "driver.js"
 import "driver.js/dist/driver.css"
 
 import { ProductSidebarNav } from "@/components/generic/ProductSidebarNav"
+import { DEFAULT_PLATFORM_FEE_RATE } from "@/lib/utilities"
 
 function formatDate(d: string) {
   return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
@@ -39,7 +40,7 @@ function EventCard({ event }: { event: any }) {
           {event.unit_price > 0 && (
           <div className="flex justify-between">
             <span>Unit price</span>
-            <span className="font-semibold text-foreground">${(event.unit_price / 100 * 1.069).toFixed(2)}</span>
+            <span className="font-semibold text-foreground">${(event.unit_price / 100 * (event.fee_bearer === "seller" ? 1 : 1 + (event.platform_fee_rate || DEFAULT_PLATFORM_FEE_RATE))).toFixed(2)}</span>
           </div>
           )}
           {event.deposit_per_unit > 0 && (

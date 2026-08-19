@@ -80,6 +80,12 @@ export function dollarsToCents(dollars: number) {
   return Math.round(100 * dollars)
 }
 
+export const DEFAULT_PLATFORM_FEE_RATE = 0.069
+
+export function feePercentLabel(rate = DEFAULT_PLATFORM_FEE_RATE): string {
+  return `${(rate * 100).toFixed(1)}%`
+}
+
 export function createPriceListDefaultValues(priceList: ProducerPriceList) {
   return {
     defaultValues: {

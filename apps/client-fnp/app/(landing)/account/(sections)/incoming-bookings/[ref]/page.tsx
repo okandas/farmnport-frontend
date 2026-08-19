@@ -9,7 +9,7 @@ import Link from "next/link"
 import { toast } from "sonner"
 
 import { getIncomingBooking, buyerUpdateBookingStatus, clientConfirmBooking, clientRejectBooking, clientCashPayment, clientMarkReady, clientMarkCollected, respondToBooking } from "@/lib/query"
-import { centsToDollars, platformFee, withPlatformFee, plural } from "@/lib/utilities"
+import { centsToDollars, platformFee, withPlatformFee, plural, DEFAULT_PLATFORM_FEE_RATE, feePercentLabel } from "@/lib/utilities"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 
 const STATUS_STYLES: Record<string, string> = {
@@ -129,6 +129,7 @@ export default function IncomingBookingDetailPage({ params }: { params: Promise<
   const qc = useQueryClient()
   const [note, setNote] = useState("")
   const [cancelOpen, setCancelOpen] = useState(false)
+  const [cashOpen, setCashOpen] = useState(false)
   const [cancelReason, setCancelReason] = useState("")
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [confirmInput, setConfirmInput] = useState("")
@@ -193,7 +194,7 @@ export default function IncomingBookingDetailPage({ params }: { params: Promise<
 
   const cashPaymentMutation = useMutation({
     mutationFn: () => clientCashPayment(id),
-    onSuccess: () => { toast.success("Cash payment recorded — marked ready for collection"); invalidate() },
+    onSuccess: () => { toast.success("Cash on delivery confirmed — marked ready for collection"); invalidate() },
     onError: (err: any) => toast.error(err?.response?.data?.message || "Failed to update"),
   })
 
@@ -323,38 +324,81 @@ export default function IncomingBookingDetailPage({ params }: { params: Promise<
                   <span className="font-medium">{centsToDollars(booking.pre_order.offer_price)} per {plural(booking.pre_order.unit || "unit", 1)}</span>
                 </div>
                 )}
-                {booking.pre_order.unit_price > 0 && (
-                <>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Unit Price</span>
-                  <span className="font-medium">{centsToDollars(booking.pre_order.unit_price)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Platform Fee (6.9%)</span>
-                  <span className="font-medium">{centsToDollars(platformFee(booking.pre_order.unit_price))}</span>
-                </div>
-                <div className="flex justify-between border-t pt-2">
-                  <span className="font-semibold">Total Unit Price</span>
-                  <span className="font-bold">{centsToDollars(withPlatformFee(booking.pre_order.unit_price))}</span>
-                </div>
-                <div className="border-t pt-2 mt-2 flex justify-between">
-                  <span className="text-muted-foreground">Subtotal</span>
-                  <span className="font-medium">{centsToDollars(booking.pre_order.deposit_amount)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Platform Fee (6.9%)</span>
-                  <span className="font-medium">{centsToDollars(platformFee(booking.pre_order.deposit_amount))}</span>
-                </div>
-                <div className="flex justify-between border-t pt-2">
-                  <span className="font-semibold">Total Due</span>
-                  <span className="font-bold">{centsToDollars(withPlatformFee(booking.pre_order.deposit_amount))}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Payment</span>
-                  <span className={`font-medium ${booking.pre_order.deposit_paid ? "text-green-700" : "text-red-600"}`}>{booking.pre_order.deposit_paid ? "Paid" : "Not yet paid"}</span>
-                </div>
-                </>
-                )}
+                {booking.pre_order.unit_price > 0 && (() => {
+                  const isDemand = booking.pre_order.market_side === "demand"
+                  const feePct = feePercentLabel()
+                  return (
+                  <>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Unit Price</span>
+                    <span className="font-medium">{centsToDollars(booking.pre_order.unit_price)}</span>
+                  </div>
+                  {isDemand ? (
+                    <>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Platform Fee ({feePct})</span>
+                      <span className="font-medium text-red-600">-{centsToDollars(platformFee(booking.pre_order.unit_price))}</span>
+                    </div>
+                    <div className="flex justify-between border-t pt-2">
+                      <span className="font-semibold">You Receive per Unit</span>
+                      <span className="font-bold">{centsToDollars(booking.pre_order.unit_price - platformFee(booking.pre_order.unit_price))}</span>
+                    </div>
+                    <div className="border-t pt-2 mt-2 flex justify-between">
+                      <span className="text-muted-foreground">Order Total</span>
+                      <span className="font-medium">{centsToDollars(booking.pre_order.deposit_amount)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Platform Fee ({feePct})</span>
+                      <span className="font-medium text-red-600">-{centsToDollars(platformFee(booking.pre_order.deposit_amount))}</span>
+                    </div>
+                    <div className="flex justify-between border-t pt-2">
+                      <span className="font-semibold">You Receive</span>
+                      <span className="font-bold">{centsToDollars(booking.pre_order.deposit_amount - platformFee(booking.pre_order.deposit_amount))}</span>
+                    </div>
+                    </>
+                  ) : (
+                    <>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Platform Fee ({feePct})</span>
+                      <span className="font-medium">{centsToDollars(platformFee(booking.pre_order.unit_price))}</span>
+                    </div>
+                    <div className="flex justify-between border-t pt-2">
+                      <span className="font-semibold">Total Unit Price</span>
+                      <span className="font-bold">{centsToDollars(withPlatformFee(booking.pre_order.unit_price))}</span>
+                    </div>
+                    <div className="border-t pt-2 mt-2 flex justify-between">
+                      <span className="text-muted-foreground">Subtotal</span>
+                      <span className="font-medium">{centsToDollars(booking.pre_order.deposit_amount)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Platform Fee ({feePct})</span>
+                      <span className="font-medium">{centsToDollars(platformFee(booking.pre_order.deposit_amount))}</span>
+                    </div>
+                    <div className="flex justify-between border-t pt-2">
+                      <span className="font-semibold">Total Due</span>
+                      <span className="font-bold">{centsToDollars(withPlatformFee(booking.pre_order.deposit_amount))}</span>
+                    </div>
+                    </>
+                  )}
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Payment</span>
+                    <span className={`font-medium ${booking.pre_order.deposit_paid ? "text-green-700" : "text-red-600"}`}>
+                      {booking.pre_order.deposit_paid
+                        ? booking.payment_method === "cash" ? "Paid (Cash)" : "Paid (Online)"
+                        : "Not yet paid"}
+                    </span>
+                  </div>
+                  {booking.payment_method === "cash" && booking.pre_order.deposit_paid && (
+                    <div className="flex justify-between border-t pt-2 mt-1">
+                      <span className="text-muted-foreground">Platform fee owed to farmnport</span>
+                      <span className="font-medium text-orange-700">
+                        {centsToDollars(platformFee(booking.pre_order.deposit_amount))}
+                      </span>
+                    </div>
+                  )}
+                  </>
+                  )
+                })()}
               </div>
               {booking.pre_order.buyer_notes && (
                 <div className="mt-4 pt-4 border-t">
@@ -431,11 +475,10 @@ export default function IncomingBookingDetailPage({ params }: { params: Promise<
               {["confirmed", "pending_payment"].includes(booking.status) && (
                 <>
                   <button
-                    onClick={() => cashPaymentMutation.mutate()}
-                    disabled={cashPaymentMutation.isPending}
+                    onClick={() => setCashOpen(true)}
                     className="w-full py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90"
                   >
-                    {cashPaymentMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : "Cash Payment"}
+                    Cash on Delivery
                   </button>
                   <p className="text-xs text-muted-foreground text-center">Online payments coming soon</p>
                 </>
@@ -595,6 +638,72 @@ export default function IncomingBookingDetailPage({ params }: { params: Promise<
               {(rejectMutation.isPending || cancelMutation.isPending)
                 ? <Loader2 className="w-4 h-4 animate-spin" />
                 : booking.status === "pending" ? "Reject" : "Cancel Booking"}
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Cash payment confirmation dialog */}
+      <Dialog open={cashOpen} onOpenChange={setCashOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Cash on Delivery</DialogTitle>
+          </DialogHeader>
+          {booking.pre_order && (() => {
+            const isDemand = booking.pre_order.market_side === "demand"
+            const depositCents = booking.pre_order.deposit_amount
+            const unitPriceCents = booking.pre_order.unit_price
+            const qty = booking.pre_order.quantity
+            const totalCents = unitPriceCents > 0 ? unitPriceCents * qty : depositCents
+            const feeCents = platformFee(totalCents)
+            const netCents = totalCents - feeCents
+            return (
+            <div className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                {isDemand
+                  ? "The supplier will be paid in cash on delivery/collection. The platform fee will be invoiced to you separately."
+                  : "The buyer will pay you in cash on delivery/collection. This marks the order as ready."}
+              </p>
+              <div className="bg-muted/50 rounded-lg p-4 text-sm space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">{isDemand ? "Supplier receives" : "You receive from buyer"}</span>
+                  <span className="font-semibold">{centsToDollars(totalCents)}</span>
+                </div>
+                {isDemand ? (
+                  <>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Platform fee ({feePercentLabel()}) — owed to farmnport</span>
+                      <span className="font-medium text-red-600">{centsToDollars(feeCents)}</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">This fee will be invoiced to you by farmnport after collection.</p>
+                  </>
+                ) : (
+                  <>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Platform fee ({feePercentLabel()}) — owed to farmnport</span>
+                      <span className="font-medium text-red-600">-{centsToDollars(feeCents)}</span>
+                    </div>
+                    <div className="flex justify-between border-t pt-2">
+                      <span className="font-semibold">You keep</span>
+                      <span className="font-bold">{centsToDollars(netCents)}</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">The platform fee of {centsToDollars(feeCents)} will be invoiced to you by farmnport after collection.</p>
+                  </>
+                )}
+              </div>
+            </div>
+            )
+          })()}
+          <DialogFooter>
+            <button onClick={() => setCashOpen(false)} className="px-4 py-2 text-sm rounded-lg border hover:bg-muted transition-colors">
+              Go back
+            </button>
+            <button
+              onClick={() => cashPaymentMutation.mutate(undefined, { onSuccess: () => setCashOpen(false) })}
+              disabled={cashPaymentMutation.isPending}
+              className="px-4 py-2 text-sm rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50"
+            >
+              {cashPaymentMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Confirm Cash on Delivery"}
             </button>
           </DialogFooter>
         </DialogContent>

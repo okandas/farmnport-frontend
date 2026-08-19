@@ -8,7 +8,7 @@ import Link from "next/link"
 import { toast } from "sonner"
 
 import { getBooking, cancelBooking, initiatePreOrderPayment, pollPreOrderPayment, respondToBooking } from "@/lib/query"
-import { centsToDollars, plural } from "@/lib/utilities"
+import { centsToDollars, plural, DEFAULT_PLATFORM_FEE_RATE, feePercentLabel } from "@/lib/utilities"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 
 const STATUS_STYLES: Record<string, string> = {
@@ -180,8 +180,10 @@ export default function BookingDetailPage({ params }: { params: Promise<{ ref: s
 
         {/* Pay Now banner for confirmed bookings */}
         {canPay && (() => {
+          const sellerPaysFee = booking.pre_order?.market_side === "demand"
           const subtotal = booking.pre_order.deposit_amount / 100
-          const fee = Math.round(booking.pre_order.deposit_amount * 0.069) / 100
+          const rate = DEFAULT_PLATFORM_FEE_RATE
+          const fee = sellerPaysFee ? 0 : Math.round(booking.pre_order.deposit_amount * rate) / 100
           const total = subtotal + fee
           return (
           <div className="border border-orange-200 bg-orange-50 rounded-xl p-5 space-y-3">
@@ -204,10 +206,12 @@ export default function BookingDetailPage({ params }: { params: Promise<{ ref: s
                 <span className="text-orange-700">Subtotal</span>
                 <span className="font-medium">${subtotal.toFixed(2)}</span>
               </div>
+              {!sellerPaysFee && (
               <div className="flex justify-between">
-                <span className="text-orange-700">Platform fee (6.9%)</span>
+                <span className="text-orange-700">Platform fee ({feePercentLabel(rate)})</span>
                 <span className="font-medium">${fee.toFixed(2)}</span>
               </div>
+              )}
               <div className="flex justify-between border-t pt-1">
                 <span className="font-semibold text-orange-900">Total</span>
                 <span className="font-bold text-orange-900">${total.toFixed(2)}</span>
@@ -337,8 +341,14 @@ export default function BookingDetailPage({ params }: { params: Promise<{ ref: s
                 {booking.pre_order.unit_price > 0 && (
                 <div>
                   <p className="text-muted-foreground text-xs mb-0.5">Unit Price</p>
-                  <p className="font-medium">${(booking.pre_order.unit_price / 100 * 1.069).toFixed(2)}</p>
-                  <p className="text-xs text-muted-foreground">incl. fees</p>
+                  {booking.pre_order.market_side === "demand" ? (
+                    <p className="font-medium">{centsToDollars(booking.pre_order.unit_price)}</p>
+                  ) : (
+                    <>
+                      <p className="font-medium">${(booking.pre_order.unit_price / 100 * (1 + DEFAULT_PLATFORM_FEE_RATE)).toFixed(2)}</p>
+                      <p className="text-xs text-muted-foreground">incl. fees</p>
+                    </>
+                  )}
                 </div>
                 )}
               </div>
@@ -377,19 +387,30 @@ export default function BookingDetailPage({ params }: { params: Promise<{ ref: s
                 </div>
               )}
 
-              {booking.pre_order.unit_price > 0 && <div className="border-t pt-3 grid grid-cols-2 gap-3 text-sm">
+              {booking.pre_order.unit_price > 0 && (() => {
+                const isDemand = booking.pre_order.market_side === "demand"
+                const depositCents = booking.pre_order.deposit_amount
+                const feeCents = isDemand ? 0 : Math.round(depositCents * DEFAULT_PLATFORM_FEE_RATE)
+                const totalCents = depositCents + feeCents
+                return <div className="border-t pt-3 grid grid-cols-2 gap-3 text-sm">
                 <div>
                   <p className="text-muted-foreground text-xs mb-0.5">Subtotal</p>
-                  <p className="font-medium">${(booking.pre_order.deposit_amount / 100).toFixed(2)}</p>
+                  <p className="font-medium">{centsToDollars(depositCents)}</p>
                 </div>
+                {!isDemand && (
                 <div>
-                  <p className="text-muted-foreground text-xs mb-0.5">Platform Fee (6.9%)</p>
-                  <p className="font-medium">${(Math.round(booking.pre_order.deposit_amount * 0.069) / 100).toFixed(2)}</p>
+                  <p className="text-muted-foreground text-xs mb-0.5">Platform Fee ({feePercentLabel()})</p>
+                  <p className="font-medium">{centsToDollars(feeCents)}</p>
                 </div>
+                )}
                 <div>
                   <p className="text-muted-foreground text-xs mb-0.5">Total Due</p>
-                  <p className="font-bold text-orange-700">${(Math.round(booking.pre_order.deposit_amount * 1.069) / 100).toFixed(2)}</p>
-                  <p className="text-xs text-muted-foreground">{booking.pre_order.deposit_paid ? "Paid" : "Not yet paid"}</p>
+                  <p className="font-bold text-orange-700">{centsToDollars(totalCents)}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {booking.pre_order.deposit_paid
+                      ? booking.payment_method === "cash" ? "Paid (Cash)" : "Paid (Online)"
+                      : "Not yet paid"}
+                  </p>
                 </div>
                 {booking.pre_order.balance_due > 0 && (
                   <div>
@@ -397,7 +418,8 @@ export default function BookingDetailPage({ params }: { params: Promise<{ ref: s
                     <p className="font-bold">${(booking.pre_order.balance_due / 100).toFixed(2)}</p>
                   </div>
                 )}
-              </div>}
+              </div>
+              })()}
             </div>
           )}
 

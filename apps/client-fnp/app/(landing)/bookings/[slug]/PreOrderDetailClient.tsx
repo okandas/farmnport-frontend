@@ -11,7 +11,7 @@ import { driver } from "driver.js"
 import "driver.js/dist/driver.css"
 
 import { createBooking, queryClient as queryClientProfile, queryClientMe } from "@/lib/query"
-import { plural, titleCase } from "@/lib/utilities"
+import { plural, titleCase, centsToDollars, DEFAULT_PLATFORM_FEE_RATE, feePercentLabel } from "@/lib/utilities"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ShareBar } from "@/components/shared/ShareBar"
 import { ProductImageGallery } from "@/components/shared/ProductImageGallery"
@@ -270,8 +270,17 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
               {event.unit_price > 0 ? (
               <div className="rounded-xl border bg-muted/30 p-4">
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Unit Price</p>
-                <p className="text-2xl font-bold">${(event.unit_price / 100 * 1.069).toFixed(2)}</p>
-                <p className="text-xs text-muted-foreground mt-1">per {event.unit || "unit"} incl. fees</p>
+                {event.fee_bearer === "seller" ? (
+                  <>
+                    <p className="text-2xl font-bold">{centsToDollars(event.unit_price)}</p>
+                    <p className="text-xs text-muted-foreground mt-1">per {event.unit || "unit"}</p>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-2xl font-bold">${(event.unit_price / 100 * (1 + (event.platform_fee_rate || DEFAULT_PLATFORM_FEE_RATE))).toFixed(2)}</p>
+                    <p className="text-xs text-muted-foreground mt-1">per {event.unit || "unit"} incl. fees</p>
+                  </>
+                )}
               </div>
               ) : (
               <div className="rounded-xl border bg-muted/30 p-4">
@@ -555,7 +564,11 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
                   </div>
                 )}
 
-                {qty >= minQty && event.unit_price > 0 && (
+                {qty >= minQty && event.unit_price > 0 && (() => {
+                  const rate = event.platform_fee_rate || DEFAULT_PLATFORM_FEE_RATE
+                  const feePct = feePercentLabel(rate)
+                  const sellerPaysFee = event.fee_bearer === "seller"
+                  return (
                   <div className="bg-muted/50 rounded-lg p-3 text-sm space-y-1.5">
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Order total ({qty.toLocaleString()} units)</span>
@@ -572,20 +585,32 @@ export default function PreOrderDetailPage({ preorder, depositEnabled = false }:
                           <span className="font-medium">${balanceDue.toFixed(2)}</span>
                         </div>
                       </>
+                    ) : sellerPaysFee ? (
+                      <>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Platform fee ({feePct})</span>
+                          <span className="font-medium">-${(orderTotal * rate).toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between border-t pt-1.5">
+                          <span className="font-semibold">You receive</span>
+                          <span className="font-bold">${(orderTotal * (1 - rate)).toFixed(2)}</span>
+                        </div>
+                      </>
                     ) : (
                       <>
                         <div className="flex justify-between">
-                          <span className="text-muted-foreground">Platform fee (6.9%)</span>
-                          <span className="font-medium">${(orderTotal * 0.069).toFixed(2)}</span>
+                          <span className="text-muted-foreground">Platform fee ({feePct})</span>
+                          <span className="font-medium">${(orderTotal * rate).toFixed(2)}</span>
                         </div>
                         <div className="flex justify-between border-t pt-1.5">
                           <span className="font-semibold">Total</span>
-                          <span className="font-bold">${(orderTotal * 1.069).toFixed(2)}</span>
+                          <span className="font-bold">${(orderTotal * (1 + rate)).toFixed(2)}</span>
                         </div>
                       </>
                     )}
                   </div>
-                )}
+                  )
+                })()}
 
                 <button
                   id="booking-submit"

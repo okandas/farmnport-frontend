@@ -6,7 +6,7 @@ import { Loader2, CalendarDays, Truck, ArrowLeft, CheckCircle2, Circle } from "l
 import Link from "next/link"
 
 import { queryAdminBooking, updateBookingStatus, confirmPreOrderBooking, rejectPreOrderBooking, markPreOrderReady, markPreOrderCollected } from "@/lib/query"
-import { centsToDollars } from "@/lib/utilities"
+import { centsToDollars, DEFAULT_PLATFORM_FEE_RATE, feePercentLabel } from "@/lib/utilities"
 import { toast } from "@/components/ui/use-toast"
 import { FormSkeleton } from "@/components/state/skeleton-table"
 import { DashboardShell } from "@/components/state/dashboardShell"
@@ -316,8 +316,10 @@ export default function AdminBookingDetailPage({ params }: { params: Promise<{ i
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-4">Payment</p>
               {(() => {
                 const subtotal = (booking.pre_order.unit_price ?? 0) * (booking.pre_order.quantity ?? 0)
-                const fee = Math.round(subtotal * 0.069)
-                const total = subtotal + fee
+                const isDemand = booking.pre_order.market_side === "demand"
+                const fee = Math.round(subtotal * DEFAULT_PLATFORM_FEE_RATE)
+                const buyerTotal = isDemand ? subtotal : subtotal + fee
+                const sellerNet = isDemand ? subtotal - fee : subtotal
                 return (
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
@@ -325,17 +327,23 @@ export default function AdminBookingDetailPage({ params }: { params: Promise<{ i
                     <span className="font-medium">{centsToDollars(subtotal)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Platform Fee (6.9%)</span>
+                    <span className="text-muted-foreground">Platform Fee ({feePercentLabel()}) — {isDemand ? "seller pays" : "buyer pays"}</span>
                     <span className="font-medium">{centsToDollars(fee)}</span>
                   </div>
                   <div className="flex justify-between border-t pt-2 mt-1">
-                    <span className="font-semibold">Total</span>
-                    <span className="font-bold">{centsToDollars(total)}</span>
+                    <span className="font-semibold">Buyer Pays</span>
+                    <span className="font-bold">{centsToDollars(buyerTotal)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-semibold">Seller Receives</span>
+                    <span className="font-bold">{centsToDollars(sellerNet)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Payment Status</span>
                     <span className={`font-medium ${booking.pre_order.deposit_paid ? "text-green-700" : "text-red-600"}`}>
-                      {booking.pre_order.deposit_paid ? "Paid" : "Not yet paid"}
+                      {booking.pre_order.deposit_paid
+                        ? booking.payment_method === "cash" ? "Paid (Cash)" : "Paid (Online)"
+                        : "Not yet paid"}
                     </span>
                   </div>
                   {booking.pre_order.deposit_paid && (() => {

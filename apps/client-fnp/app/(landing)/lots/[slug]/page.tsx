@@ -7,7 +7,7 @@ import { PlaceBidForm } from "@/components/forms/place-bid"
 import { LotBidsPanel } from "@/components/layouts/lot-bids-panel"
 import { fetchLot, fetchLotBids, fetchMyBidOnLot } from "@/lib/serverFetch"
 import { retrieveUser } from "@/lib/actions"
-import { capitalizeFirstLetter, formatDate, centsToDollars } from "@/lib/utilities"
+import { capitalizeFirstLetter, formatDate, centsToDollars, DEFAULT_PLATFORM_FEE_RATE } from "@/lib/utilities"
 import { PayBidButton } from "@/components/ui/pay-bid-button"
 import { ShareBar } from "@/components/shared/ShareBar"
 import { AppURL } from "@/lib/schemas"
@@ -30,7 +30,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const province = lot.province ? `, ${capitalizeFirstLetter(lot.province)}` : ""
 
     const title = `${typeLabel}: ${produce}${breed}${province} | farmnport.com`
-    const description = `${typeLabel} ${produce}${breed} in Zimbabwe. ${lot.quantity.toLocaleString()} ${lot.unit} available at ${centsToDollars(Math.round(lot.price_per_unit_cents * 1.069))}/${lot.unit}. ${lot.notes ?? ""}`
+    const feeMultiplier = lot.fee_bearer === "seller" ? 1 : 1 + (lot.platform_fee_rate || DEFAULT_PLATFORM_FEE_RATE)
+    const description = `${typeLabel} ${produce}${breed} in Zimbabwe. ${lot.quantity.toLocaleString()} ${lot.unit} available at ${centsToDollars(Math.round(lot.price_per_unit_cents * feeMultiplier))}/${lot.unit}. ${lot.notes ?? ""}`
 
     return {
         title,
@@ -172,8 +173,17 @@ export default async function LotDetailPage({ params }: Props) {
                                 <div className="grid grid-cols-3 gap-3">
                                     <div className="rounded-xl border bg-card p-4">
                                         <p className="text-xs text-muted-foreground mb-1">Listed price</p>
-                                        <p className="text-2xl font-bold">{centsToDollars(Math.round(lot.price_per_unit_cents * 1.069))}</p>
-                                        <p className="text-xs text-muted-foreground mt-0.5">per {lot.unit} incl. fees</p>
+                                        {lot.fee_bearer === "seller" ? (
+                                          <>
+                                            <p className="text-2xl font-bold">{centsToDollars(lot.price_per_unit_cents)}</p>
+                                            <p className="text-xs text-muted-foreground mt-0.5">per {lot.unit}</p>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <p className="text-2xl font-bold">{centsToDollars(Math.round(lot.price_per_unit_cents * (1 + (lot.platform_fee_rate || DEFAULT_PLATFORM_FEE_RATE))))}</p>
+                                            <p className="text-xs text-muted-foreground mt-0.5">per {lot.unit} incl. fees</p>
+                                          </>
+                                        )}
                                     </div>
                                     <div className="rounded-xl border bg-card p-4">
                                         <p className="text-xs text-muted-foreground mb-1">Quantity</p>
