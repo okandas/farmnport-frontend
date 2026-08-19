@@ -1,4 +1,5 @@
 import { Body, Button, Container, Head, Hr, Html, Img, Link, Preview, Section, Text } from "@react-email/components"
+import { titleCase } from "@/lib/utilities"
 
 interface MenusReviewsFavouritesEmailProps {
   name?: string
@@ -22,7 +23,7 @@ export default function MenusReviewsFavouritesEmail({ name = "there" }: MenusRev
 
           {/* Greeting */}
           <Section style={content}>
-            <Text style={greeting}>Hi {name},</Text>
+            <Text style={greeting}>Hi {titleCase(name)},</Text>
             <Text style={paragraph}>
               Thank you for using menus.co.zw — we are building Zimbabwe's most complete restaurant guide and your input makes it better for everyone.
             </Text>

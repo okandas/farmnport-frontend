@@ -1,4 +1,5 @@
 import { Body, Button, Container, Head, Hr, Html, Link, Preview, Section, Text } from "@react-email/components"
+import { titleCase } from "@/lib/utilities"
 
 interface Props { name?: string; bookingRef?: string; productName?: string; quantity?: number; unit?: string; reason?: string; bookingUrl?: string; marketSide?: string; cancelledBy?: string; action?: string }
 
@@ -17,12 +18,13 @@ export default function PreorderRejectedEmail({
   const isCancelled = action === "cancelled"
   const isDemand = marketSide === "demand"
   const qty = unit ? `${quantity} ${unit} of ${productName}` : `${quantity} ${productName}`
+  const who = titleCase(cancelledBy)
 
   let headline = ""
-  if (isCancelled && cancelledBy) {
+  if (isCancelled && who) {
     headline = isDemand
-      ? `${cancelledBy} cancelled your bid to supply ${qty}.`
-      : `${cancelledBy} cancelled your booking for ${qty}.`
+      ? `${who} cancelled your bid to supply ${qty}.`
+      : `${who} cancelled your booking for ${qty}.`
   } else {
     headline = isDemand
       ? `Unfortunately, your bid to supply ${qty} could not be fulfilled.`
@@ -47,7 +49,7 @@ export default function PreorderRejectedEmail({
 
           {/* Content */}
           <Section style={content}>
-            <Text style={greeting}>Hi {name},</Text>
+            <Text style={greeting}>Hi {titleCase(name)},</Text>
             <Text style={paragraph}>{headline}</Text>
             <Text style={paragraph}>Booking reference: <strong>{bookingRef}</strong></Text>
             {reason && <Text style={paragraph}>Reason: {reason}</Text>}

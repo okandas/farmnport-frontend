@@ -1,4 +1,5 @@
 import { Body, Button, Container, Head, Hr, Html, Link, Preview, Section, Text } from "@react-email/components"
+import { titleCase } from "@/lib/utilities"
 
 interface VerifyReminderEmailProps {
   name?: string
@@ -25,7 +26,7 @@ export default function VerifyReminderEmail({
 
           {/* Greeting */}
           <Section style={content}>
-            <Text style={greeting}>Hi {name},</Text>
+            <Text style={greeting}>Hi {titleCase(name)},</Text>
             <Text style={paragraph}>
               You signed up on farmnport but haven't verified your email yet. A verified account unlocks everything you need to trade directly.
             </Text>

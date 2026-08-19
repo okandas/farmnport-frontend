@@ -1,4 +1,5 @@
 import { Body, Button, Container, Head, Hr, Html, Link, Preview, Section, Text } from "@react-email/components"
+import { titleCase } from "@/lib/utilities"
 
 interface Props { name?: string; bookingRef?: string; productName?: string; quantity?: number; bookingUrl?: string }
 
@@ -19,7 +20,7 @@ export default function PreorderRequestReceivedEmail({ name = "Okandas", booking
 
           {/* Content */}
           <Section style={content}>
-            <Text style={greeting}>Hi {name},</Text>
+            <Text style={greeting}>Hi {titleCase(name)},</Text>
             <Text style={paragraph}>Your pre-order request has been submitted. We&apos;ll confirm availability and notify you to pay.</Text>
             <Text style={paragraph}>Booking reference: <strong>{bookingRef}</strong></Text>
             <Text style={paragraph}>{details}</Text>

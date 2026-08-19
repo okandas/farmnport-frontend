@@ -79,7 +79,7 @@ export const orderColumns: ColumnDef<OrderRow>[] = [
       const order = row.original
       return (
         <div>
-          <span className="text-sm">{order.client_name}</span>
+          <span className="text-sm capitalize">{order.client_name}</span>
           <p className="text-xs text-muted-foreground">{order.client_email}</p>
         </div>
       )

@@ -1,4 +1,5 @@
 import { Body, Button, Container, Head, Hr, Html, Link, Preview, Section, Text } from "@react-email/components"
+import { titleCase } from "@/lib/utilities"
 
 interface TermsUpdateEmailProps {
   name?: string
@@ -19,7 +20,7 @@ export default function TermsUpdateEmail({ name = "Member" }: TermsUpdateEmailPr
 
           {/* Greeting */}
           <Section style={content}>
-            <Text style={greeting}>Hi {name},</Text>
+            <Text style={greeting}>Hi {titleCase(name)},</Text>
             <Text style={paragraph}>
               We have made some updates to our Terms of Service that we would like you to know about.
             </Text>

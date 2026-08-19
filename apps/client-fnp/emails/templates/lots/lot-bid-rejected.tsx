@@ -1,4 +1,5 @@
 import { Body, Button, Container, Head, Hr, Html, Link, Preview, Section, Text } from "@react-email/components"
+import { titleCase } from "@/lib/utilities"
 
 interface LotBidRejectedEmailProps {
   name?: string
@@ -25,7 +26,7 @@ export default function LotBidRejectedEmail({
 
           {/* Greeting */}
           <Section style={content}>
-            <Text style={greeting}>Hi {name},</Text>
+            <Text style={greeting}>Hi {titleCase(name)},</Text>
             <Text style={paragraph}>
               Unfortunately, {lotOwnerName} did not accept your offer on lot {lotSlug}.
             </Text>

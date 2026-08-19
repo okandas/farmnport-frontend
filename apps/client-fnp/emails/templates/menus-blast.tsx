@@ -1,4 +1,5 @@
 import { Body, Container, Head, Hr, Html, Link, Preview, Section, Text } from "@react-email/components"
+import { titleCase } from "@/lib/utilities"
 
 interface MenusBlastEmailProps {
   name?: string
@@ -24,7 +25,7 @@ export default function MenusBlastEmail({ name = "there", message = "" }: MenusB
 
           {/* Greeting + Message */}
           <Section style={content}>
-            <Text style={greeting}>Hi {name},</Text>
+            <Text style={greeting}>Hi {titleCase(name)},</Text>
             <Text style={paragraph}>{message}</Text>
           </Section>
 

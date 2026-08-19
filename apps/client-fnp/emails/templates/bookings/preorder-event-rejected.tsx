@@ -1,4 +1,5 @@
 import { Body, Button, Container, Head, Hr, Html, Link, Preview, Section, Text } from "@react-email/components"
+import { titleCase } from "@/lib/utilities"
 
 interface Props { name?: string; eventTitle?: string; produceName?: string; reason?: string; eventUrl?: string }
 
@@ -23,7 +24,7 @@ export default function PreorderEventRejectedEmail({
 
           {/* Content */}
           <Section style={content}>
-            <Text style={greeting}>Hi {name},</Text>
+            <Text style={greeting}>Hi {titleCase(name)},</Text>
             <Text style={paragraph}>Your booking listing <strong>{eventTitle}</strong> for {produceName} was not approved.</Text>
             {reason && <Text style={paragraph}>Reason: {reason}</Text>}
           </Section>

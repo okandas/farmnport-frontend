@@ -68,7 +68,7 @@ export const priceSeriesColumns: ColumnDef<PriceSeriesEntry>[] = [
     accessorKey: "client_name",
     header: "Client",
     cell: ({ row }) => (
-      <span className="text-sm">{row.getValue("client_name") || row.original.client_id}</span>
+      <span className="text-sm capitalize">{row.getValue("client_name") || row.original.client_id}</span>
     ),
   },
   {

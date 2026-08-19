@@ -42,6 +42,7 @@ export const cdmPriceColumns: ColumnDef<CdmPrice>[] = [
   {
     accessorKey: "client_name",
     header: "Client Name",
+    cell: ({ row }: any) => <span className="capitalize">{row.original.client_name}</span>,
   },
   {
     accessorKey: "exchange_rate",

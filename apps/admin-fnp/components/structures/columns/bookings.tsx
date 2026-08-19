@@ -67,7 +67,7 @@ export const bookingColumns: ColumnDef<any>[] = [
     header: "Client",
     cell: ({ row }) => (
       <div>
-        <p className="font-medium">{row.original.client_name}</p>
+        <p className="font-medium capitalize">{row.original.client_name}</p>
         <p className="text-xs text-muted-foreground">{row.original.client_phone}</p>
       </div>
     ),

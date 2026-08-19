@@ -1,4 +1,5 @@
 import { Body, Container, Head, Hr, Html, Link, Preview, Section, Text } from "@react-email/components"
+import { titleCase } from "@/lib/utilities"
 
 interface PhoneUpdateCodeEmailProps {
   name?: string
@@ -23,7 +24,7 @@ export default function PhoneUpdateCodeEmail({
           </Section>
 
           <Section style={content}>
-            <Text style={greeting}>Hi {name},</Text>
+            <Text style={greeting}>Hi {titleCase(name)},</Text>
             <Text style={paragraph}>
               You requested to update your phone number to {phone}. Use the verification code below to confirm the change.
             </Text>
