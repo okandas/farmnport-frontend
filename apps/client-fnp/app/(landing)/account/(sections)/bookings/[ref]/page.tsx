@@ -355,10 +355,10 @@ export default function BookingDetailPage({ params }: { params: Promise<{ ref: s
           </div>
         )}
 
-        {/* Waiting for seller response */}
+        {/* Waiting for other party to respond */}
         {booking.status === "countered" && booking.countered_by === "buyer" && (
           <div className="border border-purple-200 bg-purple-50 rounded-xl p-4">
-            <p className="text-sm text-purple-700">Waiting for the seller to respond to your counter-offer.</p>
+            <p className="text-sm text-purple-700">Waiting for the {isDemand ? "buyer" : "seller"} to respond to your counter-offer.</p>
           </div>
         )}
 

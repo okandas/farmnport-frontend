@@ -459,7 +459,7 @@ export default function IncomingBookingDetailPage({ params }: { params: Promise<
               )}
 
               {booking.status === "countered" && booking.countered_by === "seller" && (
-                <p className="text-sm text-muted-foreground text-center">Waiting for the buyer to respond to your counter-offer.</p>
+                <p className="text-sm text-muted-foreground text-center">Waiting for the {booking.pre_order?.market_side === "demand" ? "supplier" : "buyer"} to respond to your counter-offer.</p>
               )}
 
               {/* Supply: event owner is seller → Mark Ready / Mark Collected / wait for buyer */}
