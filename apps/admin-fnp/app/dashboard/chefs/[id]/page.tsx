@@ -30,8 +30,7 @@ interface ChefDetail {
   name: string
   slug: string
   bio: string
-  profile_image: string
-  gallery: string[]
+  profile_image: { img: { id: string; src: string } } | null
   cuisines: string[]
   city: string
   service_radius: number
@@ -42,7 +41,6 @@ interface ChefDetail {
   enabled_types: string[]
   bank_name: string
   account_number: string
-  social_links: { instagram?: string; facebook?: string; website?: string }
   status: string
   featured: boolean
   created: string
@@ -156,9 +154,9 @@ export default function ChefDetailPage() {
             <CardTitle className="text-base">Profile</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2 text-sm">
-            {chef.profile_image && (
+            {chef.profile_image?.img?.src && (
               <div className="mb-4">
-                <img src={chef.profile_image} alt={chef.name} className="w-24 h-24 rounded-full object-cover" />
+                <img src={chef.profile_image.img.src} alt={chef.name} className="w-24 h-24 rounded-lg object-cover" />
               </div>
             )}
             <p><span className="text-muted-foreground">Bio:</span> {chef.bio}</p>
@@ -187,37 +185,12 @@ export default function ChefDetailPage() {
           <CardContent className="space-y-2 text-sm">
             <p><span className="text-muted-foreground">Phone:</span> {chef.phone}</p>
             <p><span className="text-muted-foreground">Email:</span> {chef.email}</p>
-            {chef.social_links?.instagram && (
-              <p><span className="text-muted-foreground">Instagram:</span> {chef.social_links.instagram}</p>
-            )}
-            {chef.social_links?.facebook && (
-              <p><span className="text-muted-foreground">Facebook:</span> {chef.social_links.facebook}</p>
-            )}
-            {chef.social_links?.website && (
-              <p><span className="text-muted-foreground">Website:</span> {chef.social_links.website}</p>
-            )}
             <hr className="my-3" />
             <p><span className="text-muted-foreground">Bank:</span> {chef.bank_name || "Not set"}</p>
             <p><span className="text-muted-foreground">Account:</span> {chef.account_number || "Not set"}</p>
           </CardContent>
         </Card>
       </div>
-
-      {/* Gallery */}
-      {chef.gallery && chef.gallery.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Gallery</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {chef.gallery.map((img, i) => (
-                <img key={i} src={img} alt={`Gallery ${i + 1}`} className="rounded-lg object-cover aspect-square" />
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
 
       {/* Quick Links */}
       <Card>
