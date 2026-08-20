@@ -173,7 +173,7 @@ export default function EditChefListingPage() {
           <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Edit Listing</h1>
         </div>
         <Link href={`/dashboard/chefs/listings/${id}`} className={cn(buttonVariants({ variant: "ghost" }))}>
-          <Icons.close className="w-4 h-4 mr-2" /> Close
+          <Icons.chevronLeft className="w-4 h-4 mr-2" /> Back
         </Link>
       </div>
 
@@ -324,7 +324,7 @@ export default function EditChefListingPage() {
           <button
             type="submit"
             disabled={isPending}
-            className="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-indigo-500 dark:hover:bg-indigo-400"
+            className="inline-flex items-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-green-500 dark:hover:bg-green-400"
           >
             {isPending && <Icons.spinner className="w-4 h-4 mr-2 animate-spin" />}
             Update

@@ -6,9 +6,10 @@ import { usePathname } from "next/navigation"
 export default function NotFound() {
   const pathname = usePathname()
 
-  const dashboardHref = pathname?.startsWith("/dashboard/restaurants")
-    ? "/dashboard/restaurants"
-    : "/dashboard/farmnport"
+  const segments = pathname?.split("/").filter(Boolean) ?? []
+  const dashboardHref = segments.length >= 2
+    ? `/${segments[0]}/${segments[1]}`
+    : "/dashboard"
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-4 text-center">

@@ -74,7 +74,7 @@ export default function EditChefPage() {
       queryClient.invalidateQueries({ queryKey: ["admin-chef", id] })
       queryClient.invalidateQueries({ queryKey: ["admin-chefs"] })
       toast({ description: "Chef updated successfully" })
-      router.push(`/dashboard/chefs/${id}`)
+      router.push(`/dashboard/chefs`)
     },
     onError: () => {
       toast({ description: "Failed to update chef", variant: "destructive" })
@@ -136,8 +136,8 @@ export default function EditChefPage() {
           href={`/dashboard/chefs/${id}`}
           className={cn(buttonVariants({ variant: "ghost" }))}
         >
-          <Icons.close className="w-4 h-4 mr-2" />
-          Close
+          <Icons.chevronLeft className="w-4 h-4 mr-2" />
+          Back
         </Link>
       </div>
 
@@ -251,8 +251,8 @@ export default function EditChefPage() {
                   entityType="chef"
                   value={profileImage}
                   onChange={setProfileImage}
-                  thumbnailClassName="relative overflow-hidden border border-gray-200 rounded-lg bg-white shadow-sm w-full"
-                  imageClassName="flex items-center justify-center w-full h-64 overflow-hidden bg-gray-50"
+                  thumbnailClassName="inline-flex flex-col overflow-hidden border border-gray-200 rounded-lg bg-white shadow-sm"
+                  imageClassName="flex items-center justify-center w-32 h-32 overflow-hidden bg-gray-50"
                 />
               </div>
             </div>
@@ -261,32 +261,32 @@ export default function EditChefPage() {
 
         {/* Chef Types */}
         <div className="mt-12">
-          <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">
-            Chef Types *
-          </h2>
-          <p className="mt-1 max-w-2xl text-sm/6 text-gray-600 dark:text-gray-400">
-            Select which services this chef offers.
-          </p>
-
-          <div className="mt-6 flex flex-wrap gap-2">
-            {CHEF_TYPES.map((type) => {
-              const isSelected = enabledTypes.has(type.value)
-              return (
-                <button
-                  key={type.value}
-                  type="button"
-                  onClick={() => toggleType(type.value)}
-                  className={cn(
-                    "inline-flex items-center rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
-                    isSelected
-                      ? "bg-green-600 text-white hover:bg-green-500"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-white/10 dark:text-gray-300 dark:hover:bg-white/20"
-                  )}
-                >
-                  {type.label}
-                </button>
-              )
-            })}
+          <div className="mt-10 space-y-8 border-b border-gray-900/10 pb-12 sm:space-y-0 sm:divide-y sm:divide-gray-900/10 sm:border-t sm:border-t-gray-900/10 sm:pb-0 dark:border-white/10 dark:sm:divide-white/10 dark:sm:border-t-white/10">
+            <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
+              <label className="block text-sm/6 font-medium text-gray-900 sm:pt-1.5 dark:text-white">
+                Chef Types *
+              </label>
+              <div className="mt-2 sm:col-span-2 sm:mt-0 flex flex-wrap gap-2">
+                {CHEF_TYPES.map((type) => {
+                  const isSelected = enabledTypes.has(type.value)
+                  return (
+                    <button
+                      key={type.value}
+                      type="button"
+                      onClick={() => toggleType(type.value)}
+                      className={cn(
+                        "inline-flex items-center rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
+                        isSelected
+                          ? "bg-green-600 text-white hover:bg-green-500"
+                          : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-white/10 dark:text-gray-300 dark:hover:bg-white/20"
+                      )}
+                    >
+                      {type.label}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
           </div>
         </div>
 
@@ -331,7 +331,7 @@ export default function EditChefPage() {
           <button
             type="submit"
             disabled={isPending}
-            className="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-indigo-500 dark:shadow-none dark:hover:bg-indigo-400 dark:focus-visible:outline-indigo-500"
+            className="inline-flex items-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-green-500 dark:shadow-none dark:hover:bg-green-400 dark:focus-visible:outline-green-500"
           >
             {isPending && <Icons.spinner className="w-4 h-4 mr-2 animate-spin" />}
             Update

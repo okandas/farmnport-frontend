@@ -45,7 +45,7 @@ export const chefColumns: ColumnDef<ChefRow>[] = [
     header: "Chef",
     cell: ({ row }) => (
       <Link
-        href={`/dashboard/chefs/${row.original.id}`}
+        href={`/dashboard/chefs/${row.original.id}/edit`}
         className="font-medium text-sm text-primary hover:underline"
       >
         {row.original.name}
@@ -65,7 +65,7 @@ export const chefColumns: ColumnDef<ChefRow>[] = [
     cell: ({ row }) => (
       <div className="flex gap-1 flex-wrap">
         {(row.original.enabled_types ?? []).map((t) => (
-          <Badge key={t} variant="outline" className="text-xs">
+          <Badge key={t} variant="outline" className="text-xs rounded-md">
             {TYPE_LABELS[t] ?? t}
           </Badge>
         ))}
@@ -112,9 +112,6 @@ export const chefColumns: ColumnDef<ChefRow>[] = [
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-          <DropdownMenuItem asChild>
-            <Link href={`/dashboard/chefs/${row.original.id}`}>View</Link>
-          </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link href={`/dashboard/chefs/${row.original.id}/edit`}>Edit</Link>
           </DropdownMenuItem>
