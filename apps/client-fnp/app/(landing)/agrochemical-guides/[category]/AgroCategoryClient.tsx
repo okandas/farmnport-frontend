@@ -51,6 +51,7 @@ export function AgroCategoryClient({ category, categoryName, initialChemicals, i
 
     const handlePageChange = (newPage: number) => {
         setQueryState({ p: newPage })
+        window.scrollTo({ top: 0, behavior: 'smooth' })
     }
 
     return (

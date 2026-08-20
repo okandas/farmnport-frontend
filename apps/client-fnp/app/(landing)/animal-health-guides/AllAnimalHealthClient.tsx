@@ -50,6 +50,7 @@ export function AllAnimalHealthClient({ initialProducts, initialTotal }: AllAnim
 
     const handlePageChange = (newPage: number) => {
         setQueryState({ p: newPage })
+        window.scrollTo({ top: 0, behavior: 'smooth' })
     }
 
     return (

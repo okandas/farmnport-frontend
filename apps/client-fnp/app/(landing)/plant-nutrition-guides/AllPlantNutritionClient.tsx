@@ -49,6 +49,7 @@ export function AllPlantNutritionClient({ initialProducts, initialTotal }: AllPl
 
     const handlePageChange = (newPage: number) => {
         setQueryState({ p: newPage })
+        window.scrollTo({ top: 0, behavior: 'smooth' })
     }
 
     return (

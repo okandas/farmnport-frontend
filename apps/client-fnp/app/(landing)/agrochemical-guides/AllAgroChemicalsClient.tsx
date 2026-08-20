@@ -52,6 +52,7 @@ export function AllAgroChemicalsClient({ initialChemicals, initialTotal }: AllAg
 
     const handlePageChange = (newPage: number) => {
         setQueryState({ p: newPage })
+        window.scrollTo({ top: 0, behavior: 'smooth' })
     }
 
     return (
