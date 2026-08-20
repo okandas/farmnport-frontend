@@ -76,7 +76,7 @@ export function FertilizerApplicationRates({ dosageRates }: FertilizerApplicatio
                                         {entry.remarks && entry.remarks.length > 0 ? (
                                             <ul className="space-y-1">
                                                 {entry.remarks.map((remark, remarkIdx) => (
-                                                    <li key={remarkIdx} className="text-xs text-foreground flex items-start gap-1.5">
+                                                    <li key={remarkIdx} className={`text-sm flex items-start gap-1.5 ${remarkIdx % 2 === 0 ? "text-foreground" : "text-muted-foreground"}`}>
                                                         <span className="h-1 w-1 mt-1.5 rounded-full bg-foreground/50 flex-shrink-0" />
                                                         <span className="flex-1">{remark}</span>
                                                     </li>
