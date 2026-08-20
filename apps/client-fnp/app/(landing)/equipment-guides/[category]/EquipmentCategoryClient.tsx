@@ -43,6 +43,7 @@ export function EquipmentCategoryClient({ category, categoryName, initialProduct
 
     const handlePageChange = (newPage: number) => {
         setQueryState({ p: newPage })
+        window.scrollTo({ top: 0, behavior: 'smooth' })
     }
 
     return (

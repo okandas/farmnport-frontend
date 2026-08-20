@@ -39,6 +39,7 @@ export function AllEquipmentClient({ initialProducts, initialTotal }: AllEquipme
 
     const handlePageChange = (newPage: number) => {
         setQueryState({ p: newPage })
+        window.scrollTo({ top: 0, behavior: 'smooth' })
     }
 
     return (
