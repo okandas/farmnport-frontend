@@ -252,7 +252,7 @@ export default function EditChefPage() {
                   value={profileImage}
                   onChange={setProfileImage}
                   thumbnailClassName="inline-flex flex-col overflow-hidden border border-gray-200 rounded-lg bg-white shadow-sm"
-                  imageClassName="flex items-center justify-center w-32 h-32 overflow-hidden bg-gray-50"
+                  imageClassName="flex items-center justify-center w-40 h-56 overflow-hidden bg-gray-50"
                 />
               </div>
             </div>
