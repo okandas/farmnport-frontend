@@ -12,8 +12,9 @@ import { Icons } from "@/components/icons/lucide"
 import { toast } from "@/components/ui/use-toast"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
 import { Skeleton } from "@/components/ui/skeleton"
+import { FileInput } from "@/components/structures/controls/file-input"
+import { ImageModel } from "@/lib/schemas"
 
 const CHEF_TYPES = [
   { value: "solo", label: "Solo Chef" },
@@ -33,10 +34,9 @@ export default function EditChefPage() {
   const [email, setEmail] = useState("")
   const [city, setCity] = useState("")
   const [serviceRadius, setServiceRadius] = useState("")
-  const [profileImage, setProfileImage] = useState("")
-  const [instagram, setInstagram] = useState("")
-  const [facebook, setFacebook] = useState("")
-  const [website, setWebsite] = useState("")
+  const [profileImage, setProfileImage] = useState<ImageModel[]>([])
+
+
   const [bankName, setBankName] = useState("")
   const [accountNumber, setAccountNumber] = useState("")
   const [enabledTypes, setEnabledTypes] = useState<Set<string>>(new Set())
@@ -58,10 +58,8 @@ export default function EditChefPage() {
       setEmail(chef.email ?? "")
       setCity(chef.city ?? "")
       setServiceRadius(chef.service_radius ? String(chef.service_radius) : "")
-      setProfileImage(chef.profile_image ?? "")
-      setInstagram(chef.social_links?.instagram ?? "")
-      setFacebook(chef.social_links?.facebook ?? "")
-      setWebsite(chef.social_links?.website ?? "")
+      setProfileImage(chef.profile_image ? [chef.profile_image] : [])
+
       setBankName(chef.bank_name ?? "")
       setAccountNumber(chef.account_number ?? "")
       setEnabledTypes(new Set(chef.enabled_types ?? []))
@@ -105,17 +103,12 @@ export default function EditChefPage() {
       email,
       city,
       service_radius: serviceRadius ? parseInt(serviceRadius) : 0,
-      profile_image: profileImage,
+      profile_image: profileImage[0] || null,
       cuisines: cuisines.split(",").map((c) => c.trim()).filter(Boolean),
       enabled_types: Array.from(enabledTypes),
       bank_name: bankName,
       account_number: accountNumber,
       featured,
-      social_links: {
-        instagram,
-        facebook,
-        website,
-      },
     })
   }
 
@@ -149,109 +142,179 @@ export default function EditChefPage() {
       </div>
 
       <form onSubmit={handleSubmit}>
-        <div className="space-y-12">
-          {/* Basic Info */}
-          <div className="border-b border-gray-900/10 pb-12 dark:border-white/10">
-            <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">
-              Chef Information
-            </h2>
-            <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-              <div className="sm:col-span-3">
-                <Label htmlFor="name">Name *</Label>
-                <Input id="name" value={name} onChange={(e) => setName(e.target.value)} className="mt-2" />
+        {/* Chef Information */}
+        <div>
+          <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">
+            Chef Information
+          </h2>
+
+          <div className="mt-10 space-y-8 border-b border-gray-900/10 pb-12 sm:space-y-0 sm:divide-y sm:divide-gray-900/10 sm:border-t sm:border-t-gray-900/10 sm:pb-0 dark:border-white/10 dark:sm:divide-white/10 dark:sm:border-t-white/10">
+            <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
+              <label htmlFor="name" className="block text-sm/6 font-medium text-gray-900 sm:pt-1.5 dark:text-white">
+                Name *
+              </label>
+              <div className="mt-2 sm:col-span-2 sm:mt-0">
+                <Input id="name" value={name} onChange={(e) => setName(e.target.value)} className="sm:max-w-md" />
               </div>
-              <div className="sm:col-span-3">
-                <Label htmlFor="city">City *</Label>
-                <Input id="city" value={city} onChange={(e) => setCity(e.target.value)} className="mt-2" />
+            </div>
+
+            <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
+              <label htmlFor="bio" className="block text-sm/6 font-medium text-gray-900 sm:pt-1.5 dark:text-white">
+                Bio *
+              </label>
+              <div className="mt-2 sm:col-span-2 sm:mt-0">
+                <Textarea id="bio" value={bio} onChange={(e) => setBio(e.target.value)} rows={4} className="sm:max-w-2xl" />
               </div>
-              <div className="sm:col-span-6">
-                <Label htmlFor="bio">Bio *</Label>
-                <Textarea id="bio" value={bio} onChange={(e) => setBio(e.target.value)} className="mt-2" rows={4} />
+            </div>
+
+            <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
+              <label htmlFor="phone" className="block text-sm/6 font-medium text-gray-900 sm:pt-1.5 dark:text-white">
+                Phone *
+              </label>
+              <div className="mt-2 sm:col-span-2 sm:mt-0">
+                <Input id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} className="sm:max-w-md" />
               </div>
-              <div className="sm:col-span-3">
-                <Label htmlFor="phone">Phone *</Label>
-                <Input id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} className="mt-2" />
+            </div>
+
+            <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
+              <label htmlFor="email" className="block text-sm/6 font-medium text-gray-900 sm:pt-1.5 dark:text-white">
+                Email *
+              </label>
+              <div className="mt-2 sm:col-span-2 sm:mt-0">
+                <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="sm:max-w-md" />
               </div>
-              <div className="sm:col-span-3">
-                <Label htmlFor="email">Email *</Label>
-                <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="mt-2" />
+            </div>
+
+            <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
+              <label htmlFor="city" className="block text-sm/6 font-medium text-gray-900 sm:pt-1.5 dark:text-white">
+                City *
+              </label>
+              <div className="mt-2 sm:col-span-2 sm:mt-0">
+                <Input id="city" value={city} onChange={(e) => setCity(e.target.value)} className="sm:max-w-md" />
               </div>
-              <div className="sm:col-span-3">
-                <Label htmlFor="serviceRadius">Service Radius (km)</Label>
-                <Input id="serviceRadius" type="number" value={serviceRadius} onChange={(e) => setServiceRadius(e.target.value)} className="mt-2" />
+            </div>
+
+            <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
+              <label htmlFor="serviceRadius" className="block text-sm/6 font-medium text-gray-900 sm:pt-1.5 dark:text-white">
+                Service Radius (km)
+              </label>
+              <div className="mt-2 sm:col-span-2 sm:mt-0">
+                <Input id="serviceRadius" type="number" value={serviceRadius} onChange={(e) => setServiceRadius(e.target.value)} className="sm:max-w-md" />
               </div>
-              <div className="sm:col-span-3">
-                <Label htmlFor="profileImage">Profile Image URL</Label>
-                <Input id="profileImage" value={profileImage} onChange={(e) => setProfileImage(e.target.value)} className="mt-2" />
+            </div>
+
+            <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
+              <label htmlFor="cuisines" className="block text-sm/6 font-medium text-gray-900 sm:pt-1.5 dark:text-white">
+                Cuisines
+              </label>
+              <div className="mt-2 sm:col-span-2 sm:mt-0">
+                <Input id="cuisines" value={cuisines} onChange={(e) => setCuisines(e.target.value)} className="sm:max-w-md" />
+                <p className="mt-1 text-xs text-gray-500">Comma separated</p>
               </div>
-              <div className="sm:col-span-6">
-                <Label htmlFor="cuisines">Cuisines (comma separated)</Label>
-                <Input id="cuisines" value={cuisines} onChange={(e) => setCuisines(e.target.value)} className="mt-2" />
-              </div>
-              <div className="sm:col-span-3">
+            </div>
+
+            <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
+              <label className="block text-sm/6 font-medium text-gray-900 sm:pt-1.5 dark:text-white">
+                Featured
+              </label>
+              <div className="mt-2 sm:col-span-2 sm:mt-0 sm:pt-1.5">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input type="checkbox" checked={featured} onChange={(e) => setFeatured(e.target.checked)} className="rounded" />
-                  <span className="text-sm font-medium text-gray-900 dark:text-white">Featured</span>
+                  <span className="text-sm text-gray-700 dark:text-gray-300">Show as featured chef</span>
                 </label>
               </div>
             </div>
           </div>
+        </div>
 
-          {/* Chef Types */}
-          <div className="border-b border-gray-900/10 pb-12 dark:border-white/10">
-            <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">Chef Types *</h2>
-            <div className="mt-6 flex flex-wrap gap-2">
-              {CHEF_TYPES.map((type) => {
-                const isSelected = enabledTypes.has(type.value)
-                return (
-                  <button
-                    key={type.value}
-                    type="button"
-                    onClick={() => toggleType(type.value)}
-                    className={cn(
-                      "inline-flex items-center rounded-full px-3 py-1.5 text-sm font-medium transition-colors",
-                      isSelected
-                        ? "bg-indigo-600 text-white hover:bg-indigo-500"
-                        : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-white/10 dark:text-gray-300 dark:hover:bg-white/20"
-                    )}
-                  >
-                    {type.label}
-                  </button>
-                )
-              })}
-            </div>
-          </div>
+        {/* Profile Image & Gallery */}
+        {/* Profile Image */}
+        <div className="mt-12">
+          <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">
+            Chef or Business Photo
+          </h2>
+          <p className="mt-1 max-w-2xl text-sm/6 text-gray-600 dark:text-gray-400">
+            Main profile photo for the chef or business.
+          </p>
 
-          {/* Social Links */}
-          <div className="border-b border-gray-900/10 pb-12 dark:border-white/10">
-            <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">Social Links</h2>
-            <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-              <div className="sm:col-span-2">
-                <Label htmlFor="instagram">Instagram</Label>
-                <Input id="instagram" value={instagram} onChange={(e) => setInstagram(e.target.value)} className="mt-2" />
+          <div className="mt-10 space-y-8 border-b border-gray-900/10 pb-12 sm:space-y-0 sm:divide-y sm:divide-gray-900/10 sm:border-t sm:border-t-gray-900/10 sm:pb-0 dark:border-white/10 dark:sm:divide-white/10 dark:sm:border-t-white/10">
+            <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
+              <div>
+                <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">
+                  Photo
+                </label>
               </div>
-              <div className="sm:col-span-2">
-                <Label htmlFor="facebook">Facebook</Label>
-                <Input id="facebook" value={facebook} onChange={(e) => setFacebook(e.target.value)} className="mt-2" />
-              </div>
-              <div className="sm:col-span-2">
-                <Label htmlFor="website">Website</Label>
-                <Input id="website" value={website} onChange={(e) => setWebsite(e.target.value)} className="mt-2" />
+              <div className="mt-2 sm:col-span-2 sm:mt-0">
+                <FileInput
+                  id={id}
+                  fieldName="front_label"
+                  entityType="chef"
+                  value={profileImage}
+                  onChange={setProfileImage}
+                  thumbnailClassName="relative overflow-hidden border border-gray-200 rounded-lg bg-white shadow-sm w-full"
+                  imageClassName="flex items-center justify-center w-full h-64 overflow-hidden bg-gray-50"
+                />
               </div>
             </div>
           </div>
+        </div>
 
-          {/* Bank Details */}
-          <div className="border-b border-gray-900/10 pb-12 dark:border-white/10">
-            <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">Bank Details</h2>
-            <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-              <div className="sm:col-span-3">
-                <Label htmlFor="bankName">Bank Name</Label>
-                <Input id="bankName" value={bankName} onChange={(e) => setBankName(e.target.value)} className="mt-2" />
+        {/* Chef Types */}
+        <div className="mt-12">
+          <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">
+            Chef Types *
+          </h2>
+          <p className="mt-1 max-w-2xl text-sm/6 text-gray-600 dark:text-gray-400">
+            Select which services this chef offers.
+          </p>
+
+          <div className="mt-6 flex flex-wrap gap-2">
+            {CHEF_TYPES.map((type) => {
+              const isSelected = enabledTypes.has(type.value)
+              return (
+                <button
+                  key={type.value}
+                  type="button"
+                  onClick={() => toggleType(type.value)}
+                  className={cn(
+                    "inline-flex items-center rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
+                    isSelected
+                      ? "bg-green-600 text-white hover:bg-green-500"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-white/10 dark:text-gray-300 dark:hover:bg-white/20"
+                  )}
+                >
+                  {type.label}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Bank Details */}
+        <div className="mt-12">
+          <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">
+            Bank Details
+          </h2>
+          <p className="mt-1 max-w-2xl text-sm/6 text-gray-600 dark:text-gray-400">
+            For payouts after completed bookings.
+          </p>
+
+          <div className="mt-10 space-y-8 border-b border-gray-900/10 pb-12 sm:space-y-0 sm:divide-y sm:divide-gray-900/10 sm:border-t sm:border-t-gray-900/10 sm:pb-0 dark:border-white/10 dark:sm:divide-white/10 dark:sm:border-t-white/10">
+            <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
+              <label htmlFor="bankName" className="block text-sm/6 font-medium text-gray-900 sm:pt-1.5 dark:text-white">
+                Bank Name
+              </label>
+              <div className="mt-2 sm:col-span-2 sm:mt-0">
+                <Input id="bankName" value={bankName} onChange={(e) => setBankName(e.target.value)} placeholder="e.g. CABS" className="sm:max-w-md" />
               </div>
-              <div className="sm:col-span-3">
-                <Label htmlFor="accountNumber">Account Number</Label>
-                <Input id="accountNumber" value={accountNumber} onChange={(e) => setAccountNumber(e.target.value)} className="mt-2" />
+            </div>
+
+            <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
+              <label htmlFor="accountNumber" className="block text-sm/6 font-medium text-gray-900 sm:pt-1.5 dark:text-white">
+                Account Number
+              </label>
+              <div className="mt-2 sm:col-span-2 sm:mt-0">
+                <Input id="accountNumber" value={accountNumber} onChange={(e) => setAccountNumber(e.target.value)} placeholder="Account number" className="sm:max-w-md" />
               </div>
             </div>
           </div>
