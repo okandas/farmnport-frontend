@@ -160,6 +160,7 @@ function FilterContent({
   }, [aggregateData])
 
   const handleToggle = (filterKey: string, value: string) => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
     if (filterKey === 'used_on') {
       const isDeselecting = queryState.used_on === value
       sendGTMEvent({ event: 'filter', value: `${isDeselecting ? 'Remove' : 'Add'}UsedOnFilter` })
