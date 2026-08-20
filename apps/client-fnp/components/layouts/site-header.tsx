@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
 import { signOut } from "next-auth/react"
 import { sendGTMEvent } from "@next/third-parties/google"
-import { Search, ShoppingCart } from "lucide-react"
+import { Search, ShoppingCart, Sparkles } from "lucide-react"
 import { siteConfig } from "@/config/site"
 import { MobileNav } from "@/components/layouts/mobile-nav"
 import { AuthenticatedUser, AppURL } from "@/lib/schemas"
@@ -257,12 +257,31 @@ function NavSearchBar({ router, onFocus }: { router: ReturnType<typeof useRouter
           <input
             type="text"
             placeholder="Search for products, guides, programs..."
-            className="flex-1 h-8 pl-3 pr-12 text-sm bg-transparent outline-none placeholder:text-muted-foreground/60"
+            className="flex-1 h-8 pl-3 pr-[76px] text-sm bg-transparent outline-none placeholder:text-muted-foreground/60"
             onFocus={onFocus}
           />
-          <button type="submit" className="absolute right-0.5 top-1/2 -translate-y-1/2 h-8 w-9 flex items-center justify-center rounded-sm bg-primary text-primary-foreground hover:bg-primary/90 transition-colors">
-            <Search className="h-4 w-4" />
-          </button>
+          <div className="absolute right-0.5 top-1/2 -translate-y-1/2 flex items-center gap-0.5">
+            <button
+              type="button"
+              onClick={() => {
+                const input = document.querySelector<HTMLInputElement>(".lg\\:flex input[type=text]")
+                const q = input?.value?.trim()
+                if (q) {
+                  sendGTMEvent({ event: "ai_search_open", method: "header_button" })
+                  const params = new URLSearchParams({ q })
+                  if (category !== "all") params.set("category", category)
+                  router.push(`/search?${params.toString()}`)
+                }
+              }}
+              className="h-8 w-9 flex items-center justify-center rounded-sm bg-foreground text-background hover:bg-foreground/90 transition-colors"
+              title="Ask AI"
+            >
+              <Sparkles className="h-4 w-4" />
+            </button>
+            <button type="submit" className="h-8 w-9 flex items-center justify-center rounded-sm bg-primary text-primary-foreground hover:bg-primary/90 transition-colors">
+              <Search className="h-4 w-4" />
+            </button>
+          </div>
         </div>
       </form>
     </div>
@@ -333,7 +352,6 @@ export function SiteHeader() {
   const user = (session?.user as AuthenticatedUser) ?? undefined
   const router = useRouter()
   const [categoryOpen, setCategoryOpen] = useState(false)
-  const [aiSearchOpen, setAiSearchOpen] = useState(false)
 
   // Cmd+K navigates to search
   useEffect(() => {
@@ -350,7 +368,6 @@ export function SiteHeader() {
 
   return (
     <>
-    {/* <AISearchOverlay open={aiSearchOpen} onClose={() => setAiSearchOpen(false)} /> */}
     <header className="sticky top-0 z-50 w-full bg-background border-b">
       {/* Main nav */}
       <div className="container flex h-14 items-center gap-2 lg:gap-6">
@@ -363,7 +380,7 @@ export function SiteHeader() {
         <SelectCategory open={categoryOpen} setOpen={setCategoryOpen} />
 
         {/* Search bar — takes remaining space */}
-        <NavSearchBar router={router} onFocus={() => setCategoryOpen(false)} onAskAI={() => setAiSearchOpen(true)} />
+        <NavSearchBar router={router} onFocus={() => setCategoryOpen(false)} />
 
         {/* Right side actions */}
         <div className="hidden lg:flex items-center gap-2">
@@ -428,7 +445,7 @@ export function SiteHeader() {
 
         {/* Mobile nav */}
         <div className="flex-1 lg:hidden" />
-        <MobileSearch router={router} onAskAI={() => setAiSearchOpen(true)} />
+        <MobileSearch router={router} />
         <MobileNav user={user} />
       </div>
     </header>

@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation"
 import Link from "next/link"
 import { sendGTMEvent } from "@next/third-parties/google"
 import { BaseURL } from "@/lib/schemas"
+import { AISearchSection } from "@/components/structures/ai-search"
 
 interface SearchResult {
   collection: string
@@ -182,6 +183,9 @@ export function SearchResults() {
   return (
     <div className="min-h-screen">
       <div className="container py-6">
+
+        {/* AI search section */}
+        {q.trim() && <AISearchSection query={q} />}
 
         {/* Results count */}
         {searched && !loading && (
