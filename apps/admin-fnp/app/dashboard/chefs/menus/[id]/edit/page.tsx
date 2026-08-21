@@ -27,6 +27,10 @@ export default function EditChefMenuPage() {
 
   const [chefId, setChefId] = useState("")
   const [name, setName] = useState("")
+  const [description, setDescription] = useState("")
+  const [label, setLabel] = useState("")
+  const [note, setNote] = useState("")
+  const [notice, setNotice] = useState("")
   const [status, setStatus] = useState("active")
   const [selectedItems, setSelectedItems] = useState<{ id: string; name: string }[]>([])
   const [search, setSearch] = useState("")
@@ -50,6 +54,10 @@ export default function EditChefMenuPage() {
     if (menu) {
       setChefId(menu.chef_id ?? "")
       setName(menu.name ?? "")
+      setDescription(menu.description ?? "")
+      setLabel(menu.label ?? "")
+      setNote(menu.note ?? "")
+      setNotice(menu.notice ?? "")
       setStatus(menu.status ?? "active")
       setSelectedItems((menu.items ?? []).map((i: { item_id: string; item_name: string }) => ({
         id: i.item_id,
@@ -102,6 +110,10 @@ export default function EditChefMenuPage() {
     mutate({
       chef_id: chefId,
       name,
+      description,
+      label,
+      note,
+      notice,
       items: selectedItems.map((item) => ({ item_id: item.id, item_name: item.name })),
       status,
     })
@@ -168,6 +180,42 @@ export default function EditChefMenuPage() {
               </label>
               <div className="mt-2 sm:col-span-2 sm:mt-0">
                 <Input id="name" value={name} onChange={(e) => setName(e.target.value)} className="sm:max-w-md" />
+              </div>
+            </div>
+
+            <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
+              <label htmlFor="description" className="block text-sm/6 font-medium text-gray-900 sm:pt-1.5 dark:text-white">
+                Description
+              </label>
+              <div className="mt-2 sm:col-span-2 sm:mt-0">
+                <Input id="description" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="e.g. Daily Deliveries" className="sm:max-w-md" />
+              </div>
+            </div>
+
+            <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
+              <label htmlFor="label" className="block text-sm/6 font-medium text-gray-900 sm:pt-1.5 dark:text-white">
+                Label
+              </label>
+              <div className="mt-2 sm:col-span-2 sm:mt-0">
+                <Input id="label" value={label} onChange={(e) => setLabel(e.target.value)} placeholder="e.g. SET MENU 4th - 7th August" className="sm:max-w-md" />
+              </div>
+            </div>
+
+            <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
+              <label htmlFor="note" className="block text-sm/6 font-medium text-gray-900 sm:pt-1.5 dark:text-white">
+                Note
+              </label>
+              <div className="mt-2 sm:col-span-2 sm:mt-0">
+                <Input id="note" value={note} onChange={(e) => setNote(e.target.value)} placeholder="e.g. Available in gluten free, low carb or vegetarian" className="sm:max-w-md" />
+              </div>
+            </div>
+
+            <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
+              <label htmlFor="notice" className="block text-sm/6 font-medium text-gray-900 sm:pt-1.5 dark:text-white">
+                Notice
+              </label>
+              <div className="mt-2 sm:col-span-2 sm:mt-0">
+                <Input id="notice" value={notice} onChange={(e) => setNotice(e.target.value)} placeholder="e.g. CLOSED from Monday 10th - Friday 14th" className="sm:max-w-md" />
               </div>
             </div>
 
