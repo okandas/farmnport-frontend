@@ -12,6 +12,16 @@ export const chefsDashboardConfig: DashboardConfig = {
           icon: "chefHat",
         },
         {
+          title: "Menus",
+          href: "/dashboard/chefs/menus",
+          icon: "clipboardList",
+        },
+        {
+          title: "Menu Items",
+          href: "/dashboard/chefs/menu-items",
+          icon: "utensilsCrossed",
+        },
+        {
           title: "Listings",
           href: "/dashboard/chefs/listings",
           icon: "clipboardList",

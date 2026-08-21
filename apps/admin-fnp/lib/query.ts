@@ -2165,3 +2165,55 @@ export function adminListChefPayouts(params?: { chef_id?: string; status?: strin
 export function adminMarkChefPayoutPaid(id: string) {
   return api.put(`${baseUrl}/chefs/admin/payouts/${id}/pay`, {})
 }
+
+// ── Chef Menu Items ───────────────────────────────────────────────────────────
+
+export function adminListChefMenuItems(params?: { chef_id?: string; p?: number }) {
+  const qs = new URLSearchParams()
+  if (params?.chef_id) qs.set("chef_id", params.chef_id)
+  if (params?.p && params.p > 1) qs.set("p", params.p.toString())
+  const q = qs.toString()
+  return api.get(`${baseUrl}/chefs/admin/menu-items/list${q ? `?${q}` : ""}`)
+}
+
+export function adminCreateChefMenuItem(data: Record<string, unknown>) {
+  return api.post(`${baseUrl}/chefs/admin/menu-items/`, data)
+}
+
+export function adminGetChefMenuItem(id: string) {
+  return api.get(`${baseUrl}/chefs/admin/menu-items/${id}`)
+}
+
+export function adminUpdateChefMenuItem(id: string, data: Record<string, unknown>) {
+  return api.put(`${baseUrl}/chefs/admin/menu-items/${id}`, data)
+}
+
+export function adminDeleteChefMenuItem(id: string) {
+  return api.delete(`${baseUrl}/chefs/admin/menu-items/${id}/delete`)
+}
+
+// ── Chef Menus ────────────────────────────────────────────────────────────────
+
+export function adminListChefMenus(params?: { chef_id?: string; p?: number }) {
+  const qs = new URLSearchParams()
+  if (params?.chef_id) qs.set("chef_id", params.chef_id)
+  if (params?.p && params.p > 1) qs.set("p", params.p.toString())
+  const q = qs.toString()
+  return api.get(`${baseUrl}/chefs/admin/menus/list${q ? `?${q}` : ""}`)
+}
+
+export function adminCreateChefMenu(data: Record<string, unknown>) {
+  return api.post(`${baseUrl}/chefs/admin/menus/`, data)
+}
+
+export function adminGetChefMenu(id: string) {
+  return api.get(`${baseUrl}/chefs/admin/menus/${id}`)
+}
+
+export function adminUpdateChefMenu(id: string, data: Record<string, unknown>) {
+  return api.put(`${baseUrl}/chefs/admin/menus/${id}`, data)
+}
+
+export function adminDeleteChefMenu(id: string) {
+  return api.delete(`${baseUrl}/chefs/admin/menus/${id}/delete`)
+}
