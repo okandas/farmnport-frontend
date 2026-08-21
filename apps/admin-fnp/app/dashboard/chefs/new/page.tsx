@@ -24,6 +24,7 @@ const CHEF_TYPES = [
 export default function NewChefPage() {
   const router = useRouter()
   const [name, setName] = useState("")
+  const [username, setUsername] = useState("")
   const [bio, setBio] = useState("")
   const [phone, setPhone] = useState("")
   const [email, setEmail] = useState("")
@@ -70,6 +71,7 @@ export default function NewChefPage() {
     }
     mutate({
       name,
+      username,
       bio,
       phone,
       email,
@@ -125,6 +127,18 @@ export default function NewChefPage() {
               </label>
               <div className="mt-2 sm:col-span-2 sm:mt-0">
                 <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Chef name" className="sm:max-w-md" />
+              </div>
+            </div>
+
+            <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
+              <div>
+                <label htmlFor="username" className="block text-sm/6 font-medium text-gray-900 sm:pt-1.5 dark:text-white">
+                  Username *
+                </label>
+                <p className="mt-1 text-xs text-gray-500">Unique URL handle</p>
+              </div>
+              <div className="mt-2 sm:col-span-2 sm:mt-0">
+                <Input id="username" value={username} onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))} placeholder="e.g. nosh" className="sm:max-w-md" />
               </div>
             </div>
 
