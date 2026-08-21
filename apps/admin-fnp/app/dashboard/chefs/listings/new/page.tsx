@@ -25,7 +25,7 @@ import {
 interface MealPlanForm {
   name: string
   meals: string
-  variants: { size: string; price: string }[]
+  variants: { name: string; price: string }[]
 }
 
 interface AddOnForm {
@@ -70,7 +70,7 @@ export default function NewChefListingPage() {
   })
 
   function addMealPlan() {
-    setMealPlans([...mealPlans, { name: "", meals: "", variants: [{ size: "Classic", price: "" }, { size: "PowerUp", price: "" }, { size: "XL", price: "" }] }])
+    setMealPlans([...mealPlans, { name: "", meals: "", variants: [{ name: "", price: "" }] }])
   }
 
   function removeMealPlan(i: number) {
@@ -83,7 +83,19 @@ export default function NewChefListingPage() {
     setMealPlans(updated)
   }
 
-  function updateVariant(planIdx: number, varIdx: number, field: "size" | "price", value: string) {
+  function addVariant(planIdx: number) {
+    const updated = [...mealPlans]
+    updated[planIdx] = { ...updated[planIdx], variants: [...updated[planIdx].variants, { name: "", price: "" }] }
+    setMealPlans(updated)
+  }
+
+  function removeVariant(planIdx: number, varIdx: number) {
+    const updated = [...mealPlans]
+    updated[planIdx] = { ...updated[planIdx], variants: updated[planIdx].variants.filter((_, idx) => idx !== varIdx) }
+    setMealPlans(updated)
+  }
+
+  function updateVariant(planIdx: number, varIdx: number, field: "name" | "price", value: string) {
     const updated = [...mealPlans]
     const variants = [...updated[planIdx].variants]
     variants[varIdx] = { ...variants[varIdx], [field]: value }
@@ -137,7 +149,7 @@ export default function NewChefListingPage() {
         name: mp.name,
         meals: parseInt(mp.meals) || 0,
         variants: mp.variants.map((v) => ({
-          size: v.size,
+          name: v.name,
           price: Math.round(parseFloat(v.price) * 100) || 0,
         })),
       })),
@@ -290,12 +302,18 @@ export default function NewChefListingPage() {
                       </div>
                     </div>
                     <div>
-                      <Label className="mb-2 block">Variants (USD)</Label>
-                      <div className="grid grid-cols-3 gap-3">
+                      <div className="flex items-center justify-between mb-2">
+                        <Label>Variants</Label>
+                        <button type="button" onClick={() => addVariant(i)} className="text-xs text-green-600 hover:text-green-500">+ Add variant</button>
+                      </div>
+                      <div className="space-y-2">
                         {plan.variants.map((v, vi) => (
-                          <div key={vi}>
-                            <Label className="text-xs text-muted-foreground">{v.size}</Label>
-                            <Input type="number" step="0.01" value={v.price} onChange={(e) => updateVariant(i, vi, "price", e.target.value)} className="mt-1" placeholder="0.00" />
+                          <div key={vi} className="flex items-center gap-2">
+                            <Input value={v.name} onChange={(e) => updateVariant(i, vi, "name", e.target.value)} placeholder="e.g. Classic" className="flex-1" />
+                            <Input type="number" step="0.01" value={v.price} onChange={(e) => updateVariant(i, vi, "price", e.target.value)} placeholder="0.00" className="w-28" />
+                            <button type="button" onClick={() => removeVariant(i, vi)} className="text-gray-400 hover:text-red-500">
+                              <Icons.close className="h-4 w-4" />
+                            </button>
                           </div>
                         ))}
                       </div>
