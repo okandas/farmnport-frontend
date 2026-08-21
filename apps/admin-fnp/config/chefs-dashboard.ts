@@ -11,28 +11,11 @@ export const chefsDashboardConfig: DashboardConfig = {
           href: "/dashboard/chefs",
           icon: "chefHat",
         },
-      ],
-    },
-    {
-      label: "Listings",
-      alwaysOpen: true,
-      items: [
         {
-          title: "All Listings",
+          title: "Listings",
           href: "/dashboard/chefs/listings",
           icon: "clipboardList",
         },
-        {
-          title: "New Listing",
-          href: "/dashboard/chefs/listings/new",
-          icon: "add",
-        },
-      ],
-    },
-    {
-      label: "Bookings & Subscriptions",
-      alwaysOpen: true,
-      items: [
         {
           title: "Bookings",
           href: "/dashboard/chefs/bookings",
@@ -43,12 +26,6 @@ export const chefsDashboardConfig: DashboardConfig = {
           href: "/dashboard/chefs/subscriptions",
           icon: "layers",
         },
-      ],
-    },
-    {
-      label: "Finance",
-      alwaysOpen: true,
-      items: [
         {
           title: "Payouts",
           href: "/dashboard/chefs/payouts",

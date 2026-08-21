@@ -7,7 +7,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 
 import { adminGetChef, adminUpdateChef } from "@/lib/query"
 import { cn } from "@/lib/utilities"
-import { buttonVariants } from "@/components/ui/button"
+import { buttonVariants, Button } from "@/components/ui/button"
 import { Icons } from "@/components/icons/lucide"
 import { toast } from "@/components/ui/use-toast"
 import { Input } from "@/components/ui/input"
@@ -42,6 +42,11 @@ export default function EditChefPage() {
   const [enabledTypes, setEnabledTypes] = useState<Set<string>>(new Set())
   const [cuisines, setCuisines] = useState("")
   const [featured, setFeatured] = useState(false)
+  const [serviceOptions, setServiceOptions] = useState("")
+  const [portionSizes, setPortionSizes] = useState<{ name: string; details: string }[]>([])
+
+  const [serviceAreas, setServiceAreas] = useState("")
+  const [chefNotes, setChefNotes] = useState<{ name: string; value: string }[]>([])
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin-chef", id],
@@ -60,6 +65,11 @@ export default function EditChefPage() {
       setServiceRadius(chef.service_radius ? String(chef.service_radius) : "")
       setProfileImage(chef.profile_image ? [chef.profile_image] : [])
 
+      setServiceOptions((chef.service_options ?? []).join(", "))
+      setPortionSizes(chef.portion_sizes ?? [])
+
+      setServiceAreas((chef.service_areas ?? []).join(", "))
+      setChefNotes(chef.chef_notes ?? [])
       setBankName(chef.bank_name ?? "")
       setAccountNumber(chef.account_number ?? "")
       setEnabledTypes(new Set(chef.enabled_types ?? []))
@@ -109,6 +119,11 @@ export default function EditChefPage() {
       bank_name: bankName,
       account_number: accountNumber,
       featured,
+      service_options: serviceOptions.split(",").map((s) => s.trim()).filter(Boolean),
+      portion_sizes: portionSizes.filter((p) => p.name),
+
+      service_areas: serviceAreas.split(",").map((s) => s.trim()).filter(Boolean),
+      chef_notes: chefNotes.filter((n) => n.name && n.value),
     })
   }
 
@@ -133,7 +148,7 @@ export default function EditChefPage() {
           </p>
         </div>
         <Link
-          href={`/dashboard/chefs/${id}`}
+          href="/dashboard/chefs"
           className={cn(buttonVariants({ variant: "ghost" }))}
         >
           <Icons.chevronLeft className="w-4 h-4 mr-2" />
@@ -320,10 +335,166 @@ export default function EditChefPage() {
           </div>
         </div>
 
+        {/* Service Options & Areas */}
+        <div className="mt-12">
+          <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">
+            Services & Areas
+          </h2>
+          <p className="mt-1 max-w-2xl text-sm/6 text-gray-600 dark:text-gray-400">
+            What the chef offers and where they operate.
+          </p>
+
+          <div className="mt-10 space-y-8 border-b border-gray-900/10 pb-12 sm:space-y-0 sm:divide-y sm:divide-gray-900/10 sm:border-t sm:border-t-gray-900/10 sm:pb-0 dark:border-white/10 dark:sm:divide-white/10 dark:sm:border-t-white/10">
+            <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
+              <div>
+                <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Service Options</label>
+                <p className="mt-1 text-xs text-gray-500">Comma separated</p>
+              </div>
+              <div className="mt-2 sm:col-span-2 sm:mt-0">
+                <Input value={serviceOptions} onChange={(e) => setServiceOptions(e.target.value)} placeholder="e.g. Original, Gluten Free, Vegetarian" className="sm:max-w-md" />
+              </div>
+            </div>
+
+            <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
+              <div>
+                <label className="block text-sm/6 font-medium text-gray-900 dark:text-white">Service Areas</label>
+                <p className="mt-1 text-xs text-gray-500">Comma separated</p>
+              </div>
+              <div className="mt-2 sm:col-span-2 sm:mt-0">
+                <Input value={serviceAreas} onChange={(e) => setServiceAreas(e.target.value)} placeholder="e.g. Avondale, Borrowdale, Mount Pleasant" className="sm:max-w-md" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Portion Sizes */}
+        <div className="mt-12">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">
+                Portion Sizes
+              </h2>
+              <p className="mt-1 max-w-2xl text-sm/6 text-gray-600 dark:text-gray-400">
+                Size options with nutritional or pricing details.
+              </p>
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setPortionSizes([...portionSizes, { name: "", details: "" }])}
+            >
+              Add Size
+            </Button>
+          </div>
+
+          <div className="mt-6 space-y-3">
+            {portionSizes.map((size, i) => (
+              <div key={i} className="flex items-start gap-3">
+                <div className="w-1/3">
+                  <Input
+                    value={size.name}
+                    onChange={(e) => {
+                      const updated = [...portionSizes]
+                      updated[i] = { ...updated[i], name: e.target.value }
+                      setPortionSizes(updated)
+                    }}
+                    placeholder="e.g. Classic"
+                  />
+                </div>
+                <div className="flex-1">
+                  <Input
+                    value={size.details}
+                    onChange={(e) => {
+                      const updated = [...portionSizes]
+                      updated[i] = { ...updated[i], details: e.target.value }
+                      setPortionSizes(updated)
+                    }}
+                    placeholder="e.g. 100g protein, 100g carbs, 100g veg"
+                  />
+                </div>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setPortionSizes(portionSizes.filter((_, idx) => idx !== i))}
+                >
+                  <Icons.close className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
+            {portionSizes.length === 0 && (
+              <p className="text-sm text-muted-foreground">No portion sizes added yet.</p>
+            )}
+          </div>
+        </div>
+
+        {/* Chef Notes */}
+        <div className="mt-12">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">
+                Chef Notes
+              </h2>
+              <p className="mt-1 max-w-2xl text-sm/6 text-gray-600 dark:text-gray-400">
+                Policies, terms, and other info shown on the chef profile.
+              </p>
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setChefNotes([...chefNotes, { name: "", value: "" }])}
+            >
+              Add Note
+            </Button>
+          </div>
+
+          <div className="mt-6 space-y-3">
+            {chefNotes.map((note, i) => (
+              <div key={i} className="flex items-start gap-3">
+                <div className="w-1/3">
+                  <Input
+                    value={note.name}
+                    onChange={(e) => {
+                      const updated = [...chefNotes]
+                      updated[i] = { ...updated[i], name: e.target.value }
+                      setChefNotes(updated)
+                    }}
+                    placeholder="e.g. Plan Validity"
+                  />
+                </div>
+                <div className="flex-1">
+                  <Input
+                    value={note.value}
+                    onChange={(e) => {
+                      const updated = [...chefNotes]
+                      updated[i] = { ...updated[i], value: e.target.value }
+                      setChefNotes(updated)
+                    }}
+                    placeholder="e.g. 90 days from purchase"
+                  />
+                </div>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setChefNotes(chefNotes.filter((_, idx) => idx !== i))}
+                >
+                  <Icons.close className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
+            {chefNotes.length === 0 && (
+              <p className="text-sm text-muted-foreground">No notes added yet.</p>
+            )}
+          </div>
+        </div>
+
         <div className="mt-6 flex items-center justify-end gap-x-6">
           <button
             type="button"
-            onClick={() => router.push(`/dashboard/chefs/${id}`)}
+            onClick={() => router.push(`/dashboard/chefs`)}
             className="text-sm/6 font-semibold text-gray-900 dark:text-white"
           >
             Cancel
