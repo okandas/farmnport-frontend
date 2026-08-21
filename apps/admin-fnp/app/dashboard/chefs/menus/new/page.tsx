@@ -1,8 +1,8 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
-import { useMutation, useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery, useInfiniteQuery } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
 
 import { adminCreateChefMenu, adminListChefs, adminListChefMenuItems } from "@/lib/query"
@@ -29,6 +29,7 @@ export default function NewChefMenuPage() {
   const [status, setStatus] = useState("active")
   const [selectedItems, setSelectedItems] = useState<{ id: string; name: string }[]>([])
   const [search, setSearch] = useState("")
+  const [selectedSearch, setSelectedSearch] = useState("")
 
   const { data: chefsData } = useQuery({
     queryKey: ["admin-chefs-all"],
@@ -38,14 +39,41 @@ export default function NewChefMenuPage() {
 
   const chefs = (chefsData?.data?.chefs as { id: string; name: string }[]) ?? []
 
-  const { data: itemsData } = useQuery({
+  const { data: itemsData, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
     queryKey: ["admin-chef-menu-items-by-chef", chefId],
-    queryFn: () => adminListChefMenuItems({ chef_id: chefId }),
+    queryFn: ({ pageParam }) => adminListChefMenuItems({ chef_id: chefId, p: pageParam as number }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage: any, allPages: any[]) => {
+      const total = lastPage?.data?.total || 0
+      const loaded = allPages.flatMap((p) => (p?.data?.data ?? [])).length
+      return loaded < total ? allPages.length + 1 : undefined
+    },
     enabled: !!chefId,
     refetchOnWindowFocus: false,
   })
 
-  const catalogItems = (itemsData?.data?.data as MenuItemOption[]) ?? []
+  const catalogItems = (() => {
+    const all = (itemsData?.pages.flatMap((p) => (p?.data?.data ?? [])) ?? []) as MenuItemOption[]
+    const seen = new Set<string>()
+    return all.filter((item) => {
+      if (seen.has(item.id)) return false
+      seen.add(item.id)
+      return true
+    })
+  })()
+
+  const catalogEndRef = useRef<HTMLDivElement>(null)
+  const catalogScrollRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!catalogEndRef.current || !hasNextPage || isFetchingNextPage) return
+    const observer = new IntersectionObserver(
+      (entries) => { if (entries[0].isIntersecting) fetchNextPage() },
+      { root: catalogScrollRef.current, threshold: 0.1 }
+    )
+    observer.observe(catalogEndRef.current)
+    return () => observer.disconnect()
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage])
 
   useEffect(() => {
     setSelectedItems([])
@@ -58,7 +86,7 @@ export default function NewChefMenuPage() {
   )
 
   function addItem(item: MenuItemOption) {
-    setSelectedItems((prev) => [...prev, { id: item.id, name: item.name }])
+    setSelectedItems((prev) => [{ id: item.id, name: item.name }, ...prev])
   }
 
   function removeItem(itemId: string) {
@@ -222,22 +250,30 @@ export default function NewChefMenuPage() {
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">
                   On this menu ({selectedItems.length})
                 </p>
-                <div className="h-[300px] overflow-y-auto space-y-2">
+                <Input
+                  value={selectedSearch}
+                  onChange={(e) => setSelectedSearch(e.target.value)}
+                  placeholder="Search selected..."
+                  className="mb-3"
+                />
+                <div className="max-h-[400px] overflow-y-auto space-y-1">
                   {selectedItems.length === 0 ? (
-                    <div className="flex items-center justify-center h-[200px] text-sm text-muted-foreground">
+                    <div className="flex items-center justify-center h-[160px] text-sm text-muted-foreground">
                       No items yet
                     </div>
                   ) : (
-                    selectedItems.map((item) => (
+                    selectedItems
+                      .filter((item) => item.name.toLowerCase().includes(selectedSearch.toLowerCase()))
+                      .map((item) => (
                       <div
                         key={item.id}
-                        className="group flex items-center justify-between rounded-lg bg-green-50/50 dark:bg-green-900/10 px-4 py-3"
+                        className="flex w-full items-center justify-between rounded-lg px-4 py-3 text-left text-sm text-gray-600 dark:text-gray-400 hover:bg-muted/50 transition-colors"
                       >
-                        <span className="text-sm font-medium text-gray-900 dark:text-white">{item.name}</span>
+                        <span>{item.name}</span>
                         <button
                           type="button"
                           onClick={() => removeItem(item.id)}
-                          className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 transition-all"
+                          className="text-gray-400 hover:text-red-500 transition-colors"
                         >
                           <Icons.close className="h-3.5 w-3.5" />
                         </button>
@@ -258,15 +294,15 @@ export default function NewChefMenuPage() {
                   placeholder="Search items..."
                   className="mb-3"
                 />
-                <div className="h-[300px] overflow-y-auto space-y-1">
+                <div ref={catalogScrollRef} className="max-h-[400px] overflow-y-auto space-y-1">
                   {availableItems.length === 0 ? (
                     <div className="flex items-center justify-center h-[160px] text-sm text-muted-foreground">
                       {catalogItems.length === 0 ? "No menu items for this chef. Add menu items first." : "No matching items."}
                     </div>
                   ) : (
-                    availableItems.map((item) => (
+                    availableItems.map((item, idx) => (
                       <button
-                        key={item.id}
+                        key={`${item.id}-${idx}`}
                         type="button"
                         onClick={() => addItem(item)}
                         className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-left text-sm text-gray-600 dark:text-gray-400 hover:bg-muted/50 transition-colors"
@@ -276,6 +312,9 @@ export default function NewChefMenuPage() {
                       </button>
                     ))
                   )}
+                  <div ref={catalogEndRef} className="py-2 text-center">
+                    {isFetchingNextPage && <Icons.spinner className="h-4 w-4 animate-spin mx-auto text-muted-foreground" />}
+                  </div>
                 </div>
               </div>
             </div>
