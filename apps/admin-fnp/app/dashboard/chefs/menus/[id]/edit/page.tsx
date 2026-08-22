@@ -6,8 +6,8 @@ import { useParams, useRouter } from "next/navigation"
 import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 
 import { adminGetChefMenu, adminUpdateChefMenu, adminListChefs, adminListChefMenuItems } from "@/lib/query"
-import { cn } from "@/lib/utilities"
-import { buttonVariants } from "@/components/ui/button"
+import { cn, dollarsToCents, centsToDollarsFormInputs } from "@/lib/utilities"
+import { Button, buttonVariants } from "@/components/ui/button"
 import { Icons } from "@/components/icons/lucide"
 import { toast } from "@/components/ui/use-toast"
 import { Input } from "@/components/ui/input"
@@ -32,6 +32,8 @@ export default function EditChefMenuPage() {
   const [note, setNote] = useState("")
   const [notice, setNotice] = useState("")
   const [status, setStatus] = useState("active")
+  const [sizes, setSizes] = useState<{ name: string; description: string; price_cents: string }[]>([])
+  const [serviceOptions, setServiceOptions] = useState<{ name: string; description: string }[]>([])
   const [selectedItems, setSelectedItems] = useState<{ id: string; name: string }[]>([])
   const [search, setSearch] = useState("")
   const [selectedSearch, setSelectedSearch] = useState("")
@@ -63,6 +65,15 @@ export default function EditChefMenuPage() {
       setSelectedItems((menu.items ?? []).map((i: { item_id: string; item_name: string }) => ({
         id: i.item_id,
         name: i.item_name,
+      })))
+      setServiceOptions((menu.service_options ?? []).map((o: { name: string; description: string }) => ({
+        name: o.name,
+        description: o.description ?? "",
+      })))
+      setSizes((menu.sizes ?? []).map((s: { name: string; description: string; price_cents: number }) => ({
+        name: s.name,
+        description: s.description ?? "",
+        price_cents: s.price_cents ? centsToDollarsFormInputs(s.price_cents).toString() : "",
       })))
     }
   }, [data])
@@ -143,6 +154,15 @@ export default function EditChefMenuPage() {
       note,
       notice,
       items: selectedItems.map((item) => ({ item_id: item.id, item_name: item.name })),
+      service_options: serviceOptions.filter(o => o.name.trim()).map(o => ({
+        name: o.name.trim(),
+        description: o.description.trim(),
+      })),
+      sizes: sizes.filter(s => s.name.trim()).map(s => ({
+        name: s.name.trim(),
+        description: s.description.trim(),
+        price_cents: dollarsToCents(parseFloat(s.price_cents || "0")),
+      })),
       status,
     })
   }
@@ -353,6 +373,136 @@ export default function EditChefMenuPage() {
               </div>
             </div>
           )}
+        </div>
+
+        {/* Menu Options */}
+        <div className="mt-12">
+          <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">
+            Menu Options
+          </h2>
+          <p className="mt-1 max-w-2xl text-sm/6 text-gray-600 dark:text-gray-400">
+            Menu options customers can choose from (e.g. Original, Gluten Free, Vegetarian).
+          </p>
+          <div className="mt-4 space-y-2">
+            {serviceOptions.length > 0 && (
+              <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                <div className="flex-1">Name</div>
+                <div className="flex-1">Description</div>
+                <div className="w-4" />
+              </div>
+            )}
+            {serviceOptions.map((option, index) => (
+              <div key={index} className="flex items-center gap-2">
+                <Input
+                  placeholder="Option name (e.g. Gluten Free)"
+                  value={option.name}
+                  onChange={(e) => {
+                    const updated = [...serviceOptions]
+                    updated[index] = { ...updated[index], name: e.target.value }
+                    setServiceOptions(updated)
+                  }}
+                />
+                <Input
+                  placeholder="Description (e.g. Made with ingredients free from gluten)"
+                  value={option.description}
+                  onChange={(e) => {
+                    const updated = [...serviceOptions]
+                    updated[index] = { ...updated[index], description: e.target.value }
+                    setServiceOptions(updated)
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setServiceOptions(serviceOptions.filter((_, i) => i !== index))}
+                  className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+                >
+                  <Icons.close className="w-4 h-4" />
+                </button>
+              </div>
+            ))}
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="mt-4"
+            onClick={() => setServiceOptions([...serviceOptions, { name: "", description: "" }])}
+          >
+            <Icons.add className="w-4 h-4 mr-1" />
+            Add Menu Option
+          </Button>
+        </div>
+
+        {/* Sizes */}
+        <div className="mt-12">
+          <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">
+            Options / Variants
+          </h2>
+          <p className="mt-1 max-w-2xl text-sm/6 text-gray-600 dark:text-gray-400">
+            Add options if this menu has plan sizes (e.g. Classic | 5 meals, Power Up | 12 meals).
+          </p>
+          <div className="mt-4 space-y-2">
+            {sizes.length > 0 && (
+              <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                <div className="flex-1">Name</div>
+                <div className="flex-1">Description</div>
+                <div className="w-28">Price ($)</div>
+                <div className="w-4" />
+              </div>
+            )}
+            {sizes.map((size, index) => (
+              <div key={index} className="flex items-center gap-2">
+                <Input
+                  placeholder="Option name (e.g. Classic | 5 meals)"
+                  value={size.name}
+                  onChange={(e) => {
+                    const updated = [...sizes]
+                    updated[index] = { ...updated[index], name: e.target.value }
+                    setSizes(updated)
+                  }}
+                />
+                <Input
+                  placeholder="Description (e.g. $10.00 per meal)"
+                  value={size.description}
+                  onChange={(e) => {
+                    const updated = [...sizes]
+                    updated[index] = { ...updated[index], description: e.target.value }
+                    setSizes(updated)
+                  }}
+                />
+                <Input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  placeholder="Price ($)"
+                  value={size.price_cents}
+                  onChange={(e) => {
+                    const updated = [...sizes]
+                    updated[index] = { ...updated[index], price_cents: e.target.value }
+                    setSizes(updated)
+                  }}
+                  className="w-28"
+                />
+                <button
+                  type="button"
+                  onClick={() => setSizes(sizes.filter((_, i) => i !== index))}
+                  className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+                >
+                  <Icons.close className="w-4 h-4" />
+                </button>
+              </div>
+            ))}
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="mt-4"
+            onClick={() => setSizes([...sizes, { name: "", description: "", price_cents: "" }])}
+          >
+            <Icons.add className="w-4 h-4 mr-1" />
+            Add Option
+          </Button>
         </div>
 
         <div className="mt-6 flex items-center justify-end gap-x-6">

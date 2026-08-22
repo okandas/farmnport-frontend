@@ -6,8 +6,8 @@ import { useParams, useRouter } from "next/navigation"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 
 import { adminGetChefMenuItem, adminUpdateChefMenuItem, adminListChefs } from "@/lib/query"
-import { cn } from "@/lib/utilities"
-import { buttonVariants } from "@/components/ui/button"
+import { cn, dollarsToCents, centsToDollarsFormInputs } from "@/lib/utilities"
+import { Button, buttonVariants } from "@/components/ui/button"
 import { Icons } from "@/components/icons/lucide"
 import { toast } from "@/components/ui/use-toast"
 import { Input } from "@/components/ui/input"
@@ -23,6 +23,9 @@ export default function EditChefMenuItemPage() {
   const [chefId, setChefId] = useState("")
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
+  const [category, setCategory] = useState("")
+  const [priceCents, setPriceCents] = useState("")
+  const [sizes, setSizes] = useState<{ name: string; description: string; price_cents: string }[]>([])
   const [tags, setTags] = useState("")
   const [status, setStatus] = useState("active")
 
@@ -46,6 +49,13 @@ export default function EditChefMenuItemPage() {
       setChefId(item.chef_id ?? "")
       setName(item.name ?? "")
       setDescription(item.description ?? "")
+      setCategory(item.category ?? "")
+      setPriceCents(item.price_cents ? centsToDollarsFormInputs(item.price_cents).toString() : "")
+      setSizes((item.sizes ?? []).map((s: { name: string; description: string; price_cents: number }) => ({
+        name: s.name,
+        description: s.description ?? "",
+        price_cents: s.price_cents ? centsToDollarsFormInputs(s.price_cents).toString() : "",
+      })))
       setTags((item.tags ?? []).join(", "))
       setStatus(item.status ?? "active")
     }
@@ -74,6 +84,13 @@ export default function EditChefMenuItemPage() {
       chef_id: chefId,
       name,
       description,
+      category,
+      price_cents: dollarsToCents(parseFloat(priceCents || "0")),
+      sizes: sizes.filter(s => s.name.trim()).map(s => ({
+        name: s.name.trim(),
+        description: s.description.trim(),
+        price_cents: dollarsToCents(parseFloat(s.price_cents || "0")),
+      })),
       tags: tags.split(",").map((t) => t.trim()).filter(Boolean),
       status,
     })
@@ -153,6 +170,24 @@ export default function EditChefMenuItemPage() {
             </div>
 
             <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
+              <label htmlFor="category" className="block text-sm/6 font-medium text-gray-900 sm:pt-1.5 dark:text-white">
+                Category
+              </label>
+              <div className="mt-2 sm:col-span-2 sm:mt-0">
+                <Input id="category" value={category} onChange={(e) => setCategory(e.target.value)} placeholder="e.g. Frozen, Tots, Treats, Lunch Club" className="sm:max-w-md" />
+              </div>
+            </div>
+
+            <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
+              <label htmlFor="priceCents" className="block text-sm/6 font-medium text-gray-900 sm:pt-1.5 dark:text-white">
+                Price ($)
+              </label>
+              <div className="mt-2 sm:col-span-2 sm:mt-0">
+                <Input id="priceCents" type="number" step="0.01" min="0" value={priceCents} onChange={(e) => setPriceCents(e.target.value)} placeholder="e.g. 8.00" className="sm:max-w-xs" />
+              </div>
+            </div>
+
+            <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
               <div>
                 <label htmlFor="tags" className="block text-sm/6 font-medium text-gray-900 dark:text-white">
                   Tags
@@ -181,6 +216,78 @@ export default function EditChefMenuItemPage() {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Sizes */}
+        <div className="mt-12">
+          <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">
+            Options / Variants
+          </h2>
+          <p className="mt-1 max-w-2xl text-sm/6 text-gray-600 dark:text-gray-400">
+            Add options if this item has variants (e.g. 5 meals, 12 meals, 20 meals).
+          </p>
+          <div className="mt-4 space-y-2">
+            {sizes.length > 0 && (
+              <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                <div className="flex-1">Name</div>
+                <div className="flex-1">Description</div>
+                <div className="w-28">Price ($)</div>
+                <div className="w-4" />
+              </div>
+            )}
+            {sizes.map((size, index) => (
+              <div key={index} className="flex items-center gap-2">
+                <Input
+                  placeholder="Option name (e.g. 5 meals)"
+                  value={size.name}
+                  onChange={(e) => {
+                    const updated = [...sizes]
+                    updated[index] = { ...updated[index], name: e.target.value }
+                    setSizes(updated)
+                  }}
+                />
+                <Input
+                  placeholder="Description (e.g. $2.00 each)"
+                  value={size.description}
+                  onChange={(e) => {
+                    const updated = [...sizes]
+                    updated[index] = { ...updated[index], description: e.target.value }
+                    setSizes(updated)
+                  }}
+                />
+                <Input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  placeholder="Price ($)"
+                  value={size.price_cents}
+                  onChange={(e) => {
+                    const updated = [...sizes]
+                    updated[index] = { ...updated[index], price_cents: e.target.value }
+                    setSizes(updated)
+                  }}
+                  className="w-28"
+                />
+                <button
+                  type="button"
+                  onClick={() => setSizes(sizes.filter((_, i) => i !== index))}
+                  className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+                >
+                  <Icons.close className="w-4 h-4" />
+                </button>
+              </div>
+            ))}
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="mt-4"
+            onClick={() => setSizes([...sizes, { name: "", description: "", price_cents: "" }])}
+          >
+            <Icons.add className="w-4 h-4 mr-1" />
+            Add Option
+          </Button>
         </div>
 
         <div className="mt-6 flex items-center justify-end gap-x-6">
