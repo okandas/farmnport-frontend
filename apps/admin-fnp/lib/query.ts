@@ -2085,34 +2085,6 @@ export function adminDeleteChef(id: string) {
   return api.delete(`${baseUrl}/chefs/admin/${id}/delete`)
 }
 
-// ── Chef Listings ─────────────────────────────────────────────────────────────
-
-export function adminListChefListings(params?: { chef_id?: string; type?: string; status?: string; p?: number }) {
-  const qs = new URLSearchParams()
-  if (params?.chef_id) qs.set("chef_id", params.chef_id)
-  if (params?.type) qs.set("type", params.type)
-  if (params?.status) qs.set("status", params.status)
-  if (params?.p && params.p > 1) qs.set("page", params.p.toString())
-  const q = qs.toString()
-  return api.get(`${baseUrl}/chefs/admin/listings/list${q ? `?${q}` : ""}`)
-}
-
-export function adminGetChefListing(id: string) {
-  return api.get(`${baseUrl}/chefs/admin/listings/${id}`)
-}
-
-export function adminCreateChefListing(data: Record<string, unknown>) {
-  return api.post(`${baseUrl}/chefs/admin/listings/`, data)
-}
-
-export function adminUpdateChefListing(id: string, data: Record<string, unknown>) {
-  return api.put(`${baseUrl}/chefs/admin/listings/${id}`, data)
-}
-
-export function adminDeleteChefListing(id: string) {
-  return api.delete(`${baseUrl}/chefs/admin/listings/${id}/delete`)
-}
-
 // ── Chef Bookings ─────────────────────────────────────────────────────────────
 
 export function adminListChefBookings(params?: { chef_id?: string; status?: string; p?: number }) {

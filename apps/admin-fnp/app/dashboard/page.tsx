@@ -47,7 +47,6 @@ const apps = [
     initials: "CH",
     links: [
       { label: "Chefs", href: "/dashboard/chefs" },
-      { label: "Listings", href: "/dashboard/chefs/listings" },
       { label: "Bookings", href: "/dashboard/chefs/bookings" },
     ],
   },

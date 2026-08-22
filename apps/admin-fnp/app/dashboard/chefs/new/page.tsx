@@ -65,8 +65,15 @@ export default function NewChefPage() {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!name || !bio || !phone || !email || !city || enabledTypes.size === 0) {
-      toast({ description: "Please fill in all required fields", variant: "destructive" })
+    const missing = []
+    if (!name) missing.push("Name")
+    if (!bio) missing.push("Bio")
+    if (!phone) missing.push("Phone")
+    if (!email) missing.push("Email")
+    if (!city) missing.push("City")
+    if (enabledTypes.size === 0) missing.push("Chef Type")
+    if (missing.length > 0) {
+      toast({ description: `Missing: ${missing.join(", ")}`, variant: "destructive" })
       return
     }
     mutate({

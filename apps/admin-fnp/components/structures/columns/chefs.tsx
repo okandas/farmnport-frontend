@@ -2,6 +2,7 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 import Link from "next/link"
+import Image from "next/image"
 import { MoreHorizontal } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -34,6 +35,7 @@ export interface ChefRow {
   phone: string
   email: string
   enabled_types: string[]
+  profile_image?: { img?: { src?: string } }
   status: string
   featured: boolean
   created: string
@@ -43,14 +45,30 @@ export const chefColumns: ColumnDef<ChefRow>[] = [
   {
     accessorKey: "name",
     header: "Chef",
-    cell: ({ row }) => (
-      <Link
-        href={`/dashboard/chefs/${row.original.id}/edit`}
-        className="font-medium text-sm text-primary hover:underline"
-      >
-        {row.original.name}
-      </Link>
-    ),
+    cell: ({ row }) => {
+      const src = row.original.profile_image?.img?.src
+      return (
+        <Link
+          href={`/dashboard/chefs/${row.original.id}/edit`}
+          className="flex items-center gap-3"
+        >
+          {src ? (
+            <Image
+              src={src}
+              alt={row.original.name}
+              width={32}
+              height={32}
+              className="h-8 w-8 rounded-full object-cover"
+            />
+          ) : (
+            <div className="h-8 w-8 rounded-full bg-muted/30" />
+          )}
+          <span className="font-medium text-sm text-primary hover:underline">
+            {row.original.name}
+          </span>
+        </Link>
+      )
+    },
   },
   {
     accessorKey: "city",

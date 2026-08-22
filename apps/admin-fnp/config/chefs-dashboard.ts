@@ -22,11 +22,6 @@ export const chefsDashboardConfig: DashboardConfig = {
           icon: "utensilsCrossed",
         },
         {
-          title: "Listings",
-          href: "/dashboard/chefs/listings",
-          icon: "clipboardList",
-        },
-        {
           title: "Bookings",
           href: "/dashboard/chefs/bookings",
           icon: "calendarCheck",
